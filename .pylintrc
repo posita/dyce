@@ -1,0 +1,6 @@
+[MESSAGES CONTROL]
+disable=C,R,fixme,locally-disabled,missing-super-argument,no-init,no-member
+enable=useless-suppression
+
+[REPORTS]
+reports=n

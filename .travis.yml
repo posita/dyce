@@ -1,0 +1,37 @@
+#-*- encoding: utf-8; mode: yaml -*-
+
+#=========================================================================
+# Copyright (c) 2015 Matt Bogosian <mtb19@columbia.edu>.
+#
+# Please see the accompanying LICENSE (or LICENSE.txt) file for rights and
+# restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If such a file did not accompany this
+# software, then please contact the author before viewing or using this
+# software in any capacity.
+#=========================================================================
+
+language: python
+python: "3.4"
+
+install:
+    - pip install coveralls tox
+
+# Grrr; <https://github.com/travis-ci/travis-ci/issues/1519> is closed
+# without a fix
+env:
+    - TOX_ENV=py27
+    - TOX_ENV=pypy
+    - TOX_ENV=py33
+    - TOX_ENV=py34
+    - TOX_ENV=py35
+
+# matrix:
+#     allow_failures:
+#         # PyPy is experimental
+#         - env: TOX_ENV=pypy
+
+script:
+    - tox -e "${TOX_ENV}"
+
+after_success:
+    - coveralls
