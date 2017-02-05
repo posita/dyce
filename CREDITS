@@ -1,20 +1,20 @@
-Written by Matt Bogosian <https://github.com/posita>.
+``CREDITS``
+===========
 
-The following individuals or entities have created and contributed
-derivative works of this software. By adding your name to this list, you
-transfer all title, license, and any other rights to your contributions to
-this software to its owner. You further warrant and agree that: (1) your
-contributions are exclusively your own creations and no one else has any
-right or claim to them; (2) once accepted, your contributions become the
-exclusive property of this software' owner and you retain no rights to
-them; and (3) you indemnify and hold harmless this software's owner of
-against any colorable claim of infringement by a third party for this
-software's owner's otherwise lawful use of your contribution, whether or
-not such use was contemplated by you at the time you made the
-contribution.
+Contributors
+------------
 
-Contributors:
+The following individuals or entities have contributed to this software.
 
-* Roger Hoover <https://github.com/theduderog> (see <https://gist.github.com/theduderog/735556>)
-* Terry Jones <http://blogs.fluidinfo.com/terry/about/> (see <http://blogs.fluidinfo.com/terry/2009/11/12/twisted-code-for-retrying-function-calls/>)
-* <https://github.com/htoothrot> (see <https://gist.github.com/theduderog/735556>)
+By adding your name to this list, you grant a nonexclusive, perpetual
+license to your contributions to this software under the same terms as its
+:doc:`LICENSE <LICENSE>`. Further, you warrant that your contributions to
+this software are exclusively your own creations and no one else has any
+superior right or claim to them. Finally, you agree to indemnify and hold
+harmless this software's owner against any colorable claim of infringement
+by a third party for this software's owner's otherwise lawful use of your
+contribution, whether or not such use was contemplated by you at the time
+you made it.
+
+.. Entry format:
+.. * `NAME <CONTACT_URL>`__ (see `REPO_URL <REPO_URL>`__)

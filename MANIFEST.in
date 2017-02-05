@@ -9,62 +9,7 @@
 # software in any capacity.
 # ========================================================================
 
-# Various build/test entities
-/.cache/
-/.coverage
-/.eggs/
-/.tox/
-/build/
-/dist/
-/docs/_build/
-/docs/_static/
-/htmlcov/
-__pycache__/
-*_flymake.py
-*.egg
-*.egg-info/
-
-# Compiled objects
-*.class
-*.com
-*.dll
-*.exe
-*.o
-*.py[co]
-*.so
-dropin.cache
-node_modules/
-
-# Packages
-*.7z
-*.bz2
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.xz
-*.zip
-
-# Logs, databases, etc.
-*.err
-*.log
-*.log.[0-9]*
-*.out
-*.pid
-*.sqlite
-nohup.out
-
-# OS/app generated entities
-._*
-.~*
-.DS_Store
-.DS_Store?
-.Spotlight-V100/
-.Trashes/
-desktop.ini
-ehthumbs.db
-Thumbs.db
-
-# Exceptions
+include \
+    CREDITS \
+    LICENSE \
+    test/requirements.txt

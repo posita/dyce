@@ -1,6 +1,15 @@
-The MIT License (MIT)
+``LICENSE``
+===========
 
-Copyright (c) 2015 Matt Bogosian <mtb19@columbia.edu>.
+The MIT License (MIT)
+---------------------
+
+Copyright |(c)| 2015-2017 `Matt Bogosian`_ (|@posita|_).
+
+.. |(c)| unicode:: u+a9
+.. _`Matt Bogosian`: mailto:matt@bogosian.net?Subject=modwalk
+.. |@posita| replace:: **@posita**
+.. _`@posita`: https://github.com/posita
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),

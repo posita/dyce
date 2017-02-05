@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- encoding: utf-8; grammar-ext: py; mode: python -*-
 
 # ========================================================================
@@ -19,13 +20,37 @@ from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redef
 
 # ---- Imports -----------------------------------------------------------
 
-import logging as _logging
+import logging
+import unittest
 
-from .main import *  # noqa: F401,F403; pylint: disable=wildcard-import
-from .version import __version__  # noqa: F401
+import test  # noqa: F401; pylint: disable=unused-import
+# from test.symmetries import mock
 
 # ---- Constants ---------------------------------------------------------
 
 __all__ = ()
 
-LOGGER = _logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
+
+# ---- Classes -----------------------------------------------------------
+
+# ========================================================================
+class MainTestCase(unittest.TestCase):
+
+    longMessage = True
+
+    # ---- Public hooks --------------------------------------------------
+
+    def setUp(self):
+        super().setUp()
+
+    def tearDown(self):
+        super().tearDown()
+
+    def test_main(self):
+        pass
+
+# ---- Initialization ----------------------------------------------------
+
+if __name__ == '__main__':
+    unittest.main()

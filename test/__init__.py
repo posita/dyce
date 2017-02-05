@@ -19,13 +19,26 @@ from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redef
 
 # ---- Imports -----------------------------------------------------------
 
-import logging as _logging
+import unittest
 
-from .main import *  # noqa: F401,F403; pylint: disable=wildcard-import
-from .version import __version__  # noqa: F401
+from _skel.main import _configlogging
 
 # ---- Constants ---------------------------------------------------------
 
 __all__ = ()
 
-LOGGER = _logging.getLogger(__name__)
+# ---- Initialization ----------------------------------------------------
+
+# Python 3 complains that the assert*Regexp* methods are deprecated in
+# favor of the analogous assert*Regex methods, which Python 2's unittest
+# doesn't have; this monkey patch fixes all that nonsense
+if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
+    unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
+if not hasattr(unittest.TestCase, 'assertRegex'):
+    unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
+
+if not hasattr(unittest.TestCase, 'assertNotRegex'):
+    unittest.TestCase.assertNotRegex = unittest.TestCase.assertNotRegexpMatches
+
+_configlogging()

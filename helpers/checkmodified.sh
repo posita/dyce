@@ -1,4 +1,5 @@
-# -*- encoding: utf-8; mode: yaml -*-
+#!/usr/bin/env sh
+# -*- encoding: utf-8; grammar-ext: sh; mode: shell-script -*-
 
 # ========================================================================
 # Copyright and other protections apply. Please see the accompanying
@@ -9,31 +10,9 @@
 # software in any capacity.
 # ========================================================================
 
-sudo: false
-language: python
-
-python:
-    - "2.7"
-    - "3.3"
-    - "3.4"
-    - "3.5"
-    - "3.6"
-    - "pypy"
-    - "pypy3"
-
-install:
-    - pip install coveralls tox-travis
-
-matrix:
-    allow_failures:
-        # 3.6 is experimental (needs pylint >= 2.0)
-        - python: "3.6"
-
-        # PyPy3 is experimental
-        - python: "pypy3"
-
-script:
-    - tox
-
-after_success:
-    - coveralls
+_REPO_DIR="$( cd "$( dirname "${0}" )" && pwd )/.."
+set -ex
+[ -d "${_REPO_DIR}" ]
+[ "${_REPO_DIR}/helpers/checkmodified.sh" -ef "${0}" ]
+cd "${_REPO_DIR}"
+test -z "$( git ls-files --other --exclude-from .gitignore docs )"

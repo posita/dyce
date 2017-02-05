@@ -19,13 +19,10 @@ from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redef
 
 # ---- Imports -----------------------------------------------------------
 
-import logging as _logging
-
-from .main import *  # noqa: F401,F403; pylint: disable=wildcard-import
-from .version import __version__  # noqa: F401
-
-# ---- Constants ---------------------------------------------------------
-
-__all__ = ()
-
-LOGGER = _logging.getLogger(__name__)
+try:
+    from unittest import mock  # pylint: disable=no-name-in-module,unused-import,useless-suppression
+except ImportError:
+    try:
+        import mock  # noqa: F401; pylint: disable=import-error,unused-import,useless-suppression
+    except ImportError:
+        pass  # mock unavailable

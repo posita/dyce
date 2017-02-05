@@ -1,3 +1,14 @@
+# -*- encoding: utf-8; mode: ini -*-
+
+# ========================================================================
+# Copyright and other protections apply. Please see the accompanying
+# ``LICENSE`` and ``CREDITS`` files for rights and restrictions governing
+# use of this software. All rights not expressly waived or licensed are
+# reserved. If those files are missing or appear to be modified from their
+# originals, then please contact the author before viewing or using this
+# software in any capacity.
+# ========================================================================
+
 [MESSAGES CONTROL]
 disable=C,R,fixme,locally-disabled,missing-super-argument,no-init,no-member
 enable=useless-suppression
