@@ -26,7 +26,7 @@ install:
 
 matrix:
     allow_failures:
-        # 3.6 is experimental (needs pylint >= 2.0)
+        # 3.6 is experimental (needs pylint >= 1.7.0)
         - python: "3.6"
 
         # PyPy3 is experimental
