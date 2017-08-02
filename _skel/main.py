@@ -11,9 +11,13 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals,
-)
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+TYPE_CHECKING = False  # from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+
 from builtins import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
@@ -51,7 +55,7 @@ def _configlogging():
 
     try:
         _LOG_LVL = int(_LOG_LVL, 0)
-    except ( TypeError, ValueError ):
+    except (TypeError, ValueError):
         _LOG_LVL = logging.getLevelName(_LOG_LVL)
 
     _LOG_FMT = os.environ.get(_LOG_FMT_ENV, _LOG_FMT_DFLT)
@@ -61,7 +65,9 @@ def _configlogging():
     LOGGER.setLevel(_LOG_LVL)
 
 # ========================================================================
-def _main(argv=None):
+def _main(
+    argv=None,  # type: typing.Optional[typing.Sequence[typing.Text]]
+):  # type: (...) -> int
     parser = _parser()
     ns = parser.parse_args(argv)
 
@@ -70,12 +76,14 @@ def _main(argv=None):
     return 0
 
 # ========================================================================
-def _parser(prog=None):
+def _parser(
+    prog=None,  # type: typing.Optional[typing.Text]
+):  # type: (...) -> argparse.ArgumentParser
     description = """
 TODO
 """.strip()
 
-    log_lvls = ', '.join(( '"{}"'.format(logging.getLevelName(l)) for l in ( logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG ) ))
+    log_lvls = ', '.join('"{}"'.format(logging.getLevelName(l)) for l in (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG))
     epilog = """
 The environment variables {log_lvl} and {log_fmt} can be used to configure logging output.
 If set, {log_lvl} must be an integer, or one of (from least to most verbose): {log_lvls}.

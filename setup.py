@@ -12,11 +12,8 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import (
-    absolute_import, division, print_function,
-    # See <https://bugs.python.org/setuptools/issue152>
-    # unicode_literals,
-)
+# See <https://bugs.python.org/setuptools/issue152>
+from __future__ import absolute_import, division, print_function  # , unicode_literals
 
 # ---- Imports -----------------------------------------------------------
 
@@ -92,7 +89,7 @@ SETUP_ARGS = {
     'packages': setuptools.find_packages(),
     'include_package_data': True,
     'install_requires': INSTALL_REQUIRES,
-    'setup_requires': ( 'pytest-runner', ),
+    'setup_requires': ('pytest-runner',),
     'tests_require': TESTS_REQUIRE,
 }
 

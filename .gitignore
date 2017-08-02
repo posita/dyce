@@ -13,6 +13,7 @@
 /.cache/
 /.coverage
 /.eggs/
+/.mypy_cache/
 /.tox/
 /build/
 /dist/

@@ -11,18 +11,22 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals,
-)
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+TYPE_CHECKING = False  # from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+
 from builtins import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
 # ---- Imports -----------------------------------------------------------
 
 try:
-    from unittest import mock  # pylint: disable=no-name-in-module,unused-import,useless-suppression
+    from unittest import mock  # type: ignore # pylint: disable=no-name-in-module,unused-import,useless-suppression
 except ImportError:
     try:
-        import mock  # noqa: F401; pylint: disable=import-error,unused-import,useless-suppression
+        import mock  # type: ignore # noqa: F401; pylint: disable=import-error,unused-import,useless-suppression
     except ImportError:
         pass  # mock unavailable

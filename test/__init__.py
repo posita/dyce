@@ -11,9 +11,13 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals,
-)
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+TYPE_CHECKING = False  # from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+
 from builtins import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
@@ -33,12 +37,12 @@ __all__ = ()
 # favor of the analogous assert*Regex methods, which Python 2's unittest
 # doesn't have; this monkey patch fixes all that nonsense
 if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
-    unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+    unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp  # type: ignore
 
 if not hasattr(unittest.TestCase, 'assertRegex'):
-    unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
+    unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches  # type: ignore
 
 if not hasattr(unittest.TestCase, 'assertNotRegex'):
-    unittest.TestCase.assertNotRegex = unittest.TestCase.assertNotRegexpMatches
+    unittest.TestCase.assertNotRegex = unittest.TestCase.assertNotRegexpMatches  # type: ignore
 
 _configlogging()
