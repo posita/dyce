@@ -14,7 +14,6 @@ language: python
 
 python:
     - "2.7"
-    - "3.3"
     - "3.4"
     - "3.5"
     - "3.6"
@@ -23,14 +22,6 @@ python:
 
 install:
     - pip install coveralls tox-travis
-
-matrix:
-    allow_failures:
-        # 3.6 is experimental (needs pylint >= 1.7.0)
-        - python: "3.6"
-
-        # PyPy3 is experimental
-        - python: "pypy3"
 
 script:
     - tox

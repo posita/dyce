@@ -16,10 +16,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
 
-from builtins import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
 # ---- Imports -----------------------------------------------------------
 
@@ -30,7 +30,7 @@ import sys
 
 from .version import __release__
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = (
 )
@@ -41,6 +41,65 @@ _LOG_LVL_ENV = 'LOG_LVL'
 _LOG_FMT_DFLT = '%(message)s'
 _LOG_FMT_ENV = 'LOG_FMT'
 _LOG_LVL_DFLT = logging.getLevelName(logging.WARNING)
+
+# ---- Exceptions --------------------------------------------------------
+
+# ---- Decorators --------------------------------------------------------
+
+# ---- Classes -----------------------------------------------------------
+
+# ========================================================================
+class Template(object):
+    """
+    TODO
+    """
+
+    __slots__ = (
+        '_todo',
+    )
+
+    # ---- Data ----------------------------------------------------------
+
+    # ---- Static methods ------------------------------------------------
+
+    # ---- Class methods -------------------------------------------------
+
+    # ---- Inner classes -------------------------------------------------
+
+    # ---- Constructor ---------------------------------------------------
+
+    def __init__(self,
+        todo=None,  # type: typing.Any
+    ):  # type: (...) -> None
+        """
+        :param todo: the todo to associate with this object
+        """
+        super().__init__()  # type: ignore
+        self._todo = todo
+
+    # ---- Overrides -----------------------------------------------------
+
+    def todohook(self):
+        """
+        Hook method to TODO.
+        """
+
+    # ---- Properties ----------------------------------------------------
+
+    @property
+    def todo(self):  # type: (...) -> typing.Any
+        """
+        The todo associated with this object.
+        """
+        return self._todo
+
+    @todo.setter
+    def todo(self,
+        todo,  # type: typing.Any
+    ):  # type: (...) -> None
+        self._todo = todo
+
+    # ---- Methods -------------------------------------------------------
 
 # ---- Functions ---------------------------------------------------------
 
@@ -97,3 +156,8 @@ It defaults to "{log_fmt_dflt}".
     parser.add_argument('-V', '--version', action='version', version='%(prog)s {}'.format(__release__))
 
     return parser
+
+# ---- Initialization ----------------------------------------------------
+
+if __name__ == '__main__':
+    pass

@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
 
 # ---- Constants ---------------------------------------------------------
 

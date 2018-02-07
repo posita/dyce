@@ -23,10 +23,32 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 # ---- Imports -----------------------------------------------------------
 
-try:
-    from unittest import mock  # type: ignore # pylint: disable=no-name-in-module,unused-import,useless-suppression
-except ImportError:
-    try:
-        import mock  # type: ignore # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
-    except ImportError:
-        pass  # mock unavailable
+import re
+import unittest
+
+# ---- Constants ---------------------------------------------------------
+
+__all__ = ()
+
+# ---- Initialization ----------------------------------------------------
+
+# ========================================================================
+class MetaTestData(unittest.TestCase):
+    """
+    Makes sure our environment is sane.
+    """
+
+    # ---- Methods -------------------------------------------------------
+
+    def test_shims(self):
+        assert hasattr(unittest.TestCase, 'assertCountEqual')
+        assert hasattr(unittest.TestCase, 'assertRaisesRegex')
+        assert hasattr(unittest.TestCase, 'assertRegex')
+        assert not hasattr(unittest.TestCase, 'assertNotRegex')
+        assert not hasattr(unittest.TestCase, 'assertNotRegexpMatches')
+
+        with self.assertRaisesRegex(AssertionError, re.compile(r'\AElement counts were not equal:.*First has [^,]+, Second has ', re.DOTALL)):
+            self.assertCountEqual([1, 2, 1], [2, 1, 2])
+
+        with self.assertRaisesRegex(AssertionError, r"^Regexp? didn't match: .* not found in "):
+            self.assertRegex('spam', r'^ham$')

@@ -17,17 +17,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401; pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
 
-from builtins import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.builtins.disabled import *  # noqa: F401,F403; pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
 # ---- Imports -----------------------------------------------------------
 
 import logging
 import unittest
 
-import test  # noqa: F401; pylint: disable=unused-import
+import test  # noqa: F401 # pylint: disable=unused-import
 # from test.symmetries import mock
 
 # ---- Constants ---------------------------------------------------------
@@ -43,13 +43,7 @@ class MainTestCase(unittest.TestCase):
 
     longMessage = True
 
-    # ---- Public hooks --------------------------------------------------
-
-    def setUp(self):
-        super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
+    # ---- Methods -------------------------------------------------------
 
     def test_main(self):
         pass
