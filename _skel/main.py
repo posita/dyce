@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; grammar-ext: py; mode: python; test-case-name: test.test_main -*-
+# -*- encoding: utf-8; test-case-name: tests.test_main -*-
 
 # ========================================================================
 """
@@ -11,12 +11,12 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
 
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
@@ -32,14 +32,13 @@ from .version import __release__
 
 # ---- Data --------------------------------------------------------------
 
-__all__ = (
-)
+__all__ = ()
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOG_LVL_ENV = 'LOG_LVL'
-_LOG_FMT_DFLT = '%(message)s'
 _LOG_FMT_ENV = 'LOG_FMT'
+_LOG_FMT_DFLT = '%(message)s'
+_LOG_LVL_ENV = 'LOG_LVL'
 _LOG_LVL_DFLT = logging.getLevelName(logging.WARNING)
 
 # ---- Exceptions --------------------------------------------------------
@@ -79,9 +78,12 @@ class Template(object):
 
     # ---- Overrides -----------------------------------------------------
 
-    def todohook(self):
+    def todohook(self):  # type: (...) -> None
         """
         Hook method to TODO.
+
+        >>> True is True and False is False
+        True
         """
 
     # ---- Properties ----------------------------------------------------
@@ -104,24 +106,25 @@ class Template(object):
 # ---- Functions ---------------------------------------------------------
 
 # ========================================================================
-def main():
-    _configlogging()
-    sys.exit(_main())
-
-# ========================================================================
-def _configlogging():
-    _LOG_LVL = os.environ.get(_LOG_LVL_ENV) or _LOG_LVL_DFLT
+def configlogging():  # type: (...) -> None
+    log_lvl_name = os.environ.get(_LOG_LVL_ENV) or _LOG_LVL_DFLT
 
     try:
-        _LOG_LVL = int(_LOG_LVL, 0)
+        log_lvl = int(log_lvl_name, 0)
     except (TypeError, ValueError):
-        _LOG_LVL = logging.getLevelName(_LOG_LVL)
+        log_lvl = 0
+        log_lvl = logging.getLevelName(log_lvl_name)  # type: ignore
 
-    _LOG_FMT = os.environ.get(_LOG_FMT_ENV, _LOG_FMT_DFLT)
-    logging.basicConfig(format=_LOG_FMT)
-    logging.getLogger().setLevel(_LOG_LVL)
+    log_fmt = os.environ.get(_LOG_FMT_ENV, _LOG_FMT_DFLT)
+    logging.basicConfig(format=log_fmt)
+    logging.getLogger().setLevel(log_lvl)
     from . import LOGGER
-    LOGGER.setLevel(_LOG_LVL)
+    LOGGER.setLevel(log_lvl)
+
+# ========================================================================
+def main():  # type: (...) -> None
+    configlogging()
+    sys.exit(_main())
 
 # ========================================================================
 def _main(
@@ -138,12 +141,12 @@ def _main(
 def _parser(
     prog=None,  # type: typing.Optional[typing.Text]
 ):  # type: (...) -> argparse.ArgumentParser
-    description = """
+    description = u"""
 TODO
 """.strip()
 
-    log_lvls = ', '.join('"{}"'.format(logging.getLevelName(l)) for l in (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG))
-    epilog = """
+    log_lvls = u', '.join(u'"{}"'.format(logging.getLevelName(l)) for l in (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG))
+    epilog = u"""
 The environment variables {log_lvl} and {log_fmt} can be used to configure logging output.
 If set, {log_lvl} must be an integer, or one of (from least to most verbose): {log_lvls}.
 It defaults to "{log_lvl_dflt}".
@@ -153,7 +156,7 @@ It defaults to "{log_fmt_dflt}".
 
     parser = argparse.ArgumentParser(prog=prog, description=description, epilog=epilog)
 
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s {}'.format(__release__))
+    parser.add_argument(u'-V', u'--version', action='version', version=u'%(prog)s {}'.format(__release__))
 
     return parser
 

@@ -10,6 +10,9 @@
 # ========================================================================
 
 # Various build/test entities
+*.egg
+*.egg-info/
+*_flymake.py
 /.cache/
 /.coverage
 /.eggs/
@@ -22,9 +25,7 @@
 /docs/_static/
 /htmlcov/
 __pycache__/
-*_flymake.py
-*.egg
-*.egg-info/
+flycheck_*.py
 
 # Compiled objects
 *.class
@@ -32,7 +33,7 @@ __pycache__/
 *.dll
 *.exe
 *.o
-*.py[co]
+*.py[cdo]
 *.so
 dropin.cache
 node_modules/
@@ -59,14 +60,14 @@ node_modules/
 nohup.out
 
 # OS/app generated entities
-._*
-.~*
 .DS_Store
 .DS_Store?
 .Spotlight-V100/
 .Trashes/
+._*
+.~*
+Thumbs.db
 desktop.ini
 ehthumbs.db
-Thumbs.db
 
 # Exceptions

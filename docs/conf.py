@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; grammar-ext: py; mode: python -*-
+# -*- encoding: utf-8 -*-
 # -*- coding: utf-8 -*-
 #
 # Documentation build configuration file, created by

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; grammar-ext: py; mode: python -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 """
@@ -11,12 +11,12 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
 
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
@@ -26,13 +26,16 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 import six
 import unittest
 
-from _skel.main import _configlogging
+from _skel.main import configlogging
 
 # ---- Constants ---------------------------------------------------------
 
 __all__ = ()
 
 # ---- Initialization ----------------------------------------------------
+
+# See <https://github.com/python/typeshed/issues/1874>
+unittest.TestCase.longMessage = True  # type: ignore
 
 # Python 3 complains that the assert*Regexp* methods are deprecated in
 # favor of the analogous assert*Regex methods, which Python 2's unittest
@@ -46,11 +49,4 @@ if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
 if not hasattr(unittest.TestCase, 'assertRegex'):
     setattr(unittest.TestCase, 'assertRegex', six.assertRegex)
 
-# TODO: Add this back if six ever supports assertNotRegex
-if hasattr(unittest.TestCase, 'assertNotRegex'):
-    delattr(unittest.TestCase, 'assertNotRegex')
-
-if hasattr(unittest.TestCase, 'assertNotRegexpMatches'):
-    delattr(unittest.TestCase, 'assertNotRegexpMatches')
-
-_configlogging()
+configlogging()

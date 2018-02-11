@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8; grammar-ext: py; mode: python -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 """
@@ -12,43 +11,22 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
 
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
 # ---- Imports -----------------------------------------------------------
 
-import logging
-import unittest
-
-import test  # noqa: F401 # pylint: disable=unused-import
-# from test.symmetries import mock
-
-# ---- Constants ---------------------------------------------------------
-
-__all__ = ()
-
-_LOGGER = logging.getLogger(__name__)
-
-# ---- Classes -----------------------------------------------------------
-
-# ========================================================================
-class MainTestCase(unittest.TestCase):
-
-    longMessage = True
-
-    # ---- Methods -------------------------------------------------------
-
-    def test_main(self):
-        pass
-
-# ---- Initialization ----------------------------------------------------
-
-if __name__ == '__main__':
-    unittest.main()
+try:
+    from unittest import mock  # type: ignore # pylint: disable=no-name-in-module,unused-import,useless-suppression
+except ImportError:
+    try:
+        import mock  # type: ignore # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
+    except ImportError:
+        pass  # mock unavailable

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# -*- encoding: utf-8; grammar-ext: sh; mode: shell-script -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 # Copyright and other protections apply. Please see the accompanying
@@ -59,7 +59,7 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_PIP}" install debug flake8 jedi mock pyflakes pylint tox twine typing virtualenv
+        "${_VENVSETUP_PIP}" install debug flake8 jedi pylint tox twine virtualenv $( [ -f tests/requirements.txt ] && echo -rtests/requirements.txt )
 
         if [ -f setup.py ] ; then
             "${_VENVSETUP_PIP}" install --editable .

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; mode: yaml -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 # Copyright and other protections apply. Please see the accompanying
@@ -22,6 +22,11 @@ python:
 
 install:
     - pip install coveralls tox-travis
+
+matrix:
+    allow_failures:
+        # PyPy3 is experimental
+        - python: "pypy3"
 
 script:
     - tox

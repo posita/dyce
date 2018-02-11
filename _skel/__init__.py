@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; grammar-ext: py; mode: python -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 """
@@ -11,15 +11,17 @@ viewing or using this software in any capacity.
 """
 # ========================================================================
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import typing  # noqa: E501,F401 # pylint: disable=import-error,unused-import,useless-suppression
+    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
 
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from future.standard_library import install_aliases
+install_aliases()
 
 # ---- Imports -----------------------------------------------------------
 

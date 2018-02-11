@@ -53,7 +53,7 @@ There are only a few guidelines:
     At the very least, existing tests should not fail.
     (There are exceptions, but if there is any doubt, they probably don't apply.)
 
-    Unit tests live in ``./test``.
+    Unit tests live in ``./tests``.
     Tests can be run with ``tox [-e TOX_ENV]`` (requires `Tox <https://tox.readthedocs.org/en/latest/>`_) or ``"${PYTHON:-python}" setup.py test``.
 
     There are two helper scripts that may be of interest.

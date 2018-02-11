@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# -*- encoding: utf-8; grammar-ext: sh; mode: shell-script -*-
+# -*- encoding: utf-8 -*-
 
 # ========================================================================
 # Copyright and other protections apply. Please see the accompanying
