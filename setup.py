@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-
-# ========================================================================
+# ======================================================================
 """
 Copyright and other protections apply. Please see the accompanying
 :doc:`LICENSE <LICENSE>` and :doc:`CREDITS <CREDITS>` file(s) for rights
-and restrictions governing use of this software. All rights not expressly
-waived or licensed are reserved. If those files are missing or appear to
-be modified from their originals, then please contact the author before
-viewing or using this software in any capacity.
+and restrictions governing use of this software. All rights not
+expressly waived or licensed are reserved. If those files are missing or
+appear to be modified from their originals, then please contact the
+author before viewing or using this software in any capacity.
 """
-# ========================================================================
+# ======================================================================
 
 # See <https://bugs.python.org/setuptools/issue152>
 from __future__ import absolute_import, division, print_function
 
-# ---- Imports -----------------------------------------------------------
+# ---- Imports ---------------------------------------------------------
 
 import setuptools
 
@@ -23,7 +22,7 @@ import codecs
 import inspect
 import os
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data ------------------------------------------------------------
 
 __all__ = ()
 
@@ -43,21 +42,21 @@ TESTS_REQUIRE = [
 with open(os.path.join(_MY_DIR, 'tests', 'requirements.txt')) as f:
     TESTS_REQUIRE.extend(f.read().splitlines())
 
-# ---- Initialization ----------------------------------------------------
+# ---- Initialization --------------------------------------------------
 
-_namespace = {
-    '_version_path': os.path.join(_MY_DIR, '_skel', 'version.py'),
+vers_info = {
+    '__path__': os.path.join(_MY_DIR, '_skel', 'version.py'),
 }
 
-if os.path.isfile(_namespace['_version_path']):
-    with open(_namespace['_version_path']) as _version_file:
-        exec(compile(_version_file.read(), _namespace['_version_path'], 'exec'), _namespace, _namespace)  # pylint: disable=exec-used
+if os.path.isfile(vers_info['__path__']):
+    with open(vers_info['__path__']) as _version_file:
+        exec(compile(_version_file.read(), vers_info['__path__'], 'exec'), vers_info, vers_info)  # pylint: disable=exec-used
 
-with codecs.open(os.path.join(_MY_DIR, 'README.rst'), encoding='utf-8') as _readme_file:
-    README = _readme_file.read()
+with codecs.open(os.path.join(_MY_DIR, 'README.rst'), encoding='utf-8') as readme_file:
+    README = readme_file.read()
 
-__vers_str__ = _namespace.get('__vers_str__')
-__release__ = _namespace.get('__release__', __vers_str__)
+__vers_str__ = vers_info.get('__vers_str__')
+__release__ = vers_info.get('__release__', __vers_str__)
 
 SETUP_ARGS = {
     'name': u'py_skel',

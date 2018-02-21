@@ -1,15 +1,14 @@
 # -*- encoding: utf-8; test-case-name: tests.test_main -*-
-
-# ========================================================================
+# ======================================================================
 """
 Copyright and other protections apply. Please see the accompanying
 :doc:`LICENSE <LICENSE>` and :doc:`CREDITS <CREDITS>` file(s) for rights
-and restrictions governing use of this software. All rights not expressly
-waived or licensed are reserved. If those files are missing or appear to
-be modified from their originals, then please contact the author before
-viewing or using this software in any capacity.
+and restrictions governing use of this software. All rights not
+expressly waived or licensed are reserved. If those files are missing or
+appear to be modified from their originals, then please contact the
+author before viewing or using this software in any capacity.
 """
-# ========================================================================
+# ======================================================================
 
 from __future__ import absolute_import, division, print_function
 
@@ -21,7 +20,7 @@ if TYPE_CHECKING:
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 
-# ---- Imports -----------------------------------------------------------
+# ---- Imports ---------------------------------------------------------
 
 import argparse
 import logging
@@ -30,7 +29,7 @@ import sys
 
 from .version import __release__
 
-# ---- Data --------------------------------------------------------------
+# ---- Data ------------------------------------------------------------
 
 __all__ = ()
 
@@ -41,13 +40,13 @@ _LOG_FMT_DFLT = '%(message)s'
 _LOG_LVL_ENV = 'LOG_LVL'
 _LOG_LVL_DFLT = logging.getLevelName(logging.WARNING)
 
-# ---- Exceptions --------------------------------------------------------
+# ---- Exceptions ------------------------------------------------------
 
-# ---- Decorators --------------------------------------------------------
+# ---- Decorators ------------------------------------------------------
 
-# ---- Classes -----------------------------------------------------------
+# ---- Classes ---------------------------------------------------------
 
-# ========================================================================
+# ======================================================================
 class Template(object):
     """
     TODO
@@ -57,28 +56,30 @@ class Template(object):
         '_todo',
     )
 
-    # ---- Data ----------------------------------------------------------
+    # ---- Data --------------------------------------------------------
 
-    # ---- Static methods ------------------------------------------------
+    # ---- Static methods ----------------------------------------------
 
-    # ---- Class methods -------------------------------------------------
+    # ---- Class methods -----------------------------------------------
 
-    # ---- Inner classes -------------------------------------------------
+    # ---- Inner classes -----------------------------------------------
 
-    # ---- Constructor ---------------------------------------------------
+    # ---- Constructor -------------------------------------------------
 
-    def __init__(self,
-        todo=None,  # type: typing.Any
+    def __init__(
+            self,
+            todo=None,  # type: typing.Any
     ):  # type: (...) -> None
         """
         :param todo: the todo to associate with this object
         """
-        super().__init__()  # type: ignore
+        super().__init__()  # type: ignore # py2
         self._todo = todo
 
-    # ---- Overrides -----------------------------------------------------
+    # ---- Overrides ---------------------------------------------------
 
-    def todohook(self):  # type: (...) -> None
+    def todohook(self):
+        # type: (...) -> None
         """
         Hook method to TODO.
 
@@ -86,27 +87,30 @@ class Template(object):
         True
         """
 
-    # ---- Properties ----------------------------------------------------
+    # ---- Properties --------------------------------------------------
 
     @property
-    def todo(self):  # type: (...) -> typing.Any
+    def todo(self):
+        # type: (...) -> typing.Any
         """
         The todo associated with this object.
         """
         return self._todo
 
     @todo.setter
-    def todo(self,
-        todo,  # type: typing.Any
+    def todo(
+            self,
+            todo,  # type: typing.Any
     ):  # type: (...) -> None
         self._todo = todo
 
-    # ---- Methods -------------------------------------------------------
+    # ---- Methods -----------------------------------------------------
 
-# ---- Functions ---------------------------------------------------------
+# ---- Functions -------------------------------------------------------
 
-# ========================================================================
-def configlogging():  # type: (...) -> None
+# ======================================================================
+def configlogging():
+    # type: (...) -> None
     log_lvl_name = os.environ.get(_LOG_LVL_ENV) or _LOG_LVL_DFLT
 
     try:
@@ -121,14 +125,15 @@ def configlogging():  # type: (...) -> None
     from . import LOGGER
     LOGGER.setLevel(log_lvl)
 
-# ========================================================================
-def main():  # type: (...) -> None
+# ======================================================================
+def main():
+    # type: (...) -> None
     configlogging()
     sys.exit(_main())
 
-# ========================================================================
+# ======================================================================
 def _main(
-    argv=None,  # type: typing.Optional[typing.Sequence[typing.Text]]
+        argv=None,  # type: typing.Optional[typing.Sequence[typing.Text]]
 ):  # type: (...) -> int
     parser = _parser()
     ns = parser.parse_args(argv)
@@ -137,9 +142,9 @@ def _main(
 
     return 0
 
-# ========================================================================
+# ======================================================================
 def _parser(
-    prog=None,  # type: typing.Optional[typing.Text]
+        prog=None,  # type: typing.Optional[typing.Text]
 ):  # type: (...) -> argparse.ArgumentParser
     description = u"""
 TODO
@@ -160,7 +165,7 @@ It defaults to "{log_fmt_dflt}".
 
     return parser
 
-# ---- Initialization ----------------------------------------------------
+# ---- Initialization --------------------------------------------------
 
 if __name__ == '__main__':
     pass

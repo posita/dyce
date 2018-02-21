@@ -1,14 +1,13 @@
 #!/usr/bin/env sh
 # -*- encoding: utf-8 -*-
-
-# ========================================================================
+# ======================================================================
 # Copyright and other protections apply. Please see the accompanying
-# ``LICENSE`` and ``CREDITS`` files for rights and restrictions governing
-# use of this software. All rights not expressly waived or licensed are
-# reserved. If those files are missing or appear to be modified from their
-# originals, then please contact the author before viewing or using this
-# software in any capacity.
-# ========================================================================
+# LICENSE and CREDITS files for rights and restrictions governing use of
+# this software. All rights not expressly waived or licensed are
+# reserved. If those files are missing or appear to be modified from
+# their originals, then please contact the author before viewing or
+# using this software in any capacity.
+# ======================================================================
 
 _REPO_DIR="$( cd "$( dirname "${0}" )" && pwd )/.."
 set -ex
@@ -23,6 +22,7 @@ if [ "${#}" -ne 3 ] ; then
 fi
 
 PKG="$( python -c 'import setup ; print(setup.SETUP_ARGS["name"])' )"
+VERS_PY="$( python -c 'import setup ; print(setup.vers_info["__path__"])' )"
 MAJOR="${1}"
 MINOR="${2}"
 PATCH="${3}"
@@ -31,7 +31,7 @@ TAG="v${VERS}"
 
 set -ex
 git checkout -b "${VERS}-release"
-perl -pi -e 's{^__version__\s*=\s*\(\s*0,\s*0,\s*0\s*\)$}{__version__ = ( '"${MAJOR}"', '"${MINOR}"', '"${PATCH}"' )}g ;' "${PKG}/version.py"
+perl -pi -e 's{^__version__\s*=\s*\(\s*0,\s*0,\s*0\s*\)(\s*#.*)?$}{__version__ = ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\1}g ;' "${VERS_PY}"
 perl -pi -e 's{master}{'"${TAG}"'}g ; s{pypi/([^/]+/)'"${PKG}"'(\.svg)?$}{pypi/\1'"${PKG}"'/'"${VERS}"'\2}g' README.rst
 git commit --all --message "Update version and release ${TAG}."
 git tag --sign --force --message "Release ${TAG}." "${TAG}"
