@@ -58,7 +58,9 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_PIP}" install debug flake8 jedi pylint tox twine virtualenv $( [ -f tests/requirements.txt ] && echo -rtests/requirements.txt )
+        "${_VENVSETUP_PIP}" install debug flake8 jedi pylint pytest tox twine virtualenv $( [ -f tests/requirements.txt ] && echo -rtests/requirements.txt )
+        "${_VENVSETUP_PIP}" install mypy \
+            || true
 
         if [ -f setup.py ] ; then
             "${_VENVSETUP_PIP}" install --editable .

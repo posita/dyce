@@ -19,7 +19,7 @@ If those files are missing or appear to be modified from their originals, then p
 
 - [ ] `python3.x setup.py bdist_wheel sdist && python2.7 setup.py bdist_wheel`
 
-- [ ] `twine upload`
+- [ ] `twine upload dist/*`
 
 - [ ] `git checkout master`
 
