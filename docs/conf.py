@@ -22,9 +22,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import inspect
 import os.path
 import sys
-sys.path.append(os.path.pardir)
+_MY_DIR = os.path.abspath(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename))
+sys.path.insert(0, os.path.dirname(_MY_DIR))
 from setup import SETUP_ARGS
 # _setup = {}
 # execfile(os.path.join(os.getcwd(), os.path.pardir, 'setup.py'), _setup, _setup)

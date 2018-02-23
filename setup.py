@@ -26,7 +26,7 @@ import os
 
 __all__ = ()
 
-_MY_DIR = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
+_MY_DIR = os.path.abspath(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename))
 
 INSTALL_REQUIRES = (
     'future',
