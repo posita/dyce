@@ -25,10 +25,7 @@ Filing Issues
 
 You can `file new issues <https://github.com/posita/_skel/issues>`__ as you find them.
 Please avoid duplicating issues.
-These may be helpful:
-
-*   `Tips to Write a Good Bug Report <http://itscommonsensestupid.blogspot.com/2008/07/tips-to-write-good-bug-report.html>`__ by Soon Hui
-*   `Writing Effective Bug Reports <http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf>`__ (PDF) by Elisabeth Hendrickson
+`"Writing Effective Bug Reports" by Elisabeth Hendrickson <http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf>`__ (PDF) may be helpful.
 
 Submission Guidelines
 ---------------------
