@@ -22,5 +22,5 @@ if TYPE_CHECKING:
 __all__ = ()
 
 __version__ = (0, 0, 0)  # type: typing.Tuple[int, int, int]
-__vers_str__ = u'.'.join(str(_) for _ in __version__)
-__release__ = u'v' + __vers_str__
+__vers_str__ = '.'.join(str(_) for _ in __version__)
+__release__ = 'v' + __vers_str__

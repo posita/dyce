@@ -146,12 +146,12 @@ def _main(
 def _parser(
         prog=None,  # type: typing.Optional[typing.Text]
 ):  # type: (...) -> argparse.ArgumentParser
-    description = u"""
+    description = """
 TODO
 """.strip()
 
-    log_lvls = u', '.join(u'"{}"'.format(logging.getLevelName(l)) for l in (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG))
-    epilog = u"""
+    log_lvls = ', '.join('"{}"'.format(logging.getLevelName(l)) for l in (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG))
+    epilog = """
 The environment variables {log_lvl} and {log_fmt} can be used to configure logging output.
 If set, {log_lvl} must be an integer, or one of (from least to most verbose): {log_lvls}.
 It defaults to "{log_lvl_dflt}".
@@ -161,7 +161,7 @@ It defaults to "{log_fmt_dflt}".
 
     parser = argparse.ArgumentParser(prog=prog, description=description, epilog=epilog)
 
-    parser.add_argument(u'-V', u'--version', action='version', version=u'%(prog)s {}'.format(__release__))
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s {}'.format(__release__))
 
     return parser
 

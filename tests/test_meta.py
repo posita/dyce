@@ -49,7 +49,7 @@ class MetaTestCase(unittest.TestCase):
         with self.assertRaises(AttributeError):
             del self.longMessage
 
-        msg = u'Scooby Scooby Doo, where are you?'
+        msg = 'Scooby Scooby Doo, where are you?'
         self.longMessage = False
 
         with self.assertRaisesRegex(AssertionError, re.compile(r'\A{}\Z'.format(re.escape(msg)), re.DOTALL)):
@@ -70,7 +70,7 @@ class MetaTestCase(unittest.TestCase):
             self.assertCountEqual([1, 2, 1], [2, 1, 2])
 
         with self.assertRaisesRegex(AssertionError, r"\ARegexp? didn't match: .* not found in "):
-            self.assertRegex(u'spam', r'\Aham\Z')
+            self.assertRegex('spam', r'\Aham\Z')
 
 # ---- Initialization --------------------------------------------------
 
