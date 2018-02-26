@@ -6,15 +6,20 @@
     It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
     Thank you!
 
+    WARNING: THIS DOCUMENT MUST BE SELF-CONTAINED.
+    ALL LINKS MUST BE ABSOLUTE.
+    This file is used on GitHub and PyPi (via setup.py).
+    There is no guarantee that other docs/resources will be available where this content is displayed.
+
 Copyright and other protections apply.
 Please see the accompanying |LICENSE|_ and |CREDITS|_ file(s) for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If those files are missing or appear to be modified from their originals, then please contact the author before viewing or using this software in any capacity.
 
 .. |LICENSE| replace:: ``LICENSE``
-.. _`LICENSE`: LICENSE
+.. _`LICENSE`: https://_skel.readthedocs.org/en/master/LICENSE.html
 .. |CREDITS| replace:: ``CREDITS``
-.. _`CREDITS`: CREDITS
+.. _`CREDITS`: https://_skel.readthedocs.org/en/master/CREDITS.html
 
 .. image:: https://travis-ci.org/posita/_skel.svg?branch=master
     :target: https://travis-ci.org/posita/_skel?branch=master

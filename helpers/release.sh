@@ -32,6 +32,6 @@ TAG="v${VERS}"
 set -ex
 git checkout -b "${VERS}-release"
 perl -pi -e 's{^__version__\s*=\s*\(\s*0,\s*0,\s*0\s*\)(\s*#.*)?$}{__version__ = ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\1}g ;' "${VERS_PY}"
-perl -pi -e 's{master}{'"${TAG}"'}g ; s{pypi/([^/]+/)'"${PKG}"'(\.svg)?$}{pypi/\1'"${PKG}"'/'"${VERS}"'\2}g' README.rst
+perl -pi -e 's{/master/}{/'"${TAG}"'/}g ; s{\?(branch|version)=master$}{?\1='"${TAG}"'}g ; s{\[master ([^\]]+)\]$}{['"${TAG}"' \1]}g ; s{pypi/([^/]+/)'"${PKG}"'(\.svg)?$}{pypi/\1'"${PKG}"'/'"${VERS}"'\2}g' README.rst
 git commit --all --message "Update version and release ${TAG}."
 git tag --sign --force --message "Release ${TAG}." "${TAG}"
