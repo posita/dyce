@@ -56,7 +56,6 @@ Requirements
 A modern version of Python is required:
 
 * `cPython <https://www.python.org/>`_ (2.7 or 3.3+)
-
 * `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.3+ compatible)
 
 Python 2.6 will *not* work.
