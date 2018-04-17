@@ -25,7 +25,7 @@
 import inspect
 import os.path
 import sys
-_MY_DIR = os.path.abspath(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename))
+_MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
 sys.path.insert(0, os.path.dirname(_MY_DIR))
 from setup import SETUP_ARGS
 # _setup = {}
