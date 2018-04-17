@@ -7,8 +7,8 @@
     Thank you!
 
 .. toctree::
-    :maxdepth: 3
-    :hidden:
+   :maxdepth: 3
+   :hidden:
 
 Copyright and other protections apply.
 Please see the accompanying :doc:`LICENSE <LICENSE>` and :doc:`CREDITS <CREDITS>` file(s) for rights and restrictions governing use of this software.
@@ -37,33 +37,33 @@ Installation can be performed via ``pip`` (which will download and install the `
 
 .. code-block:: console
 
-    % pip install _skel
-    ...
+   % pip install _skel
+   ...
 
 Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/_skel>`__) and run ``setup.py``:
 
 .. code-block:: console
 
-    % git clone https://github.com/posita/_skel
-    ...
-    % cd _skel
-    % python setup.py install
-    ...
+   % git clone https://github.com/posita/_skel
+   ...
+   % cd _skel
+   % python setup.py install
+   ...
 
 Requirements
 ------------
 
 A modern version of Python is required:
 
-*   `cPython <https://www.python.org/>`_ (2.7 or 3.3+)
+* `cPython <https://www.python.org/>`_ (2.7 or 3.3+)
 
-*   `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.3+ compatible)
+* `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.3+ compatible)
 
 Python 2.6 will *not* work.
 
 ``_skel`` has the following dependencies (which will be installed automatically):
 
-*   |future|_
+* |future|_
 
 .. |future| replace:: ``future``
 .. _`future`: http://python-future.org/

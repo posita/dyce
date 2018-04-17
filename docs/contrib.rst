@@ -7,8 +7,8 @@
     Thank you!
 
 .. toctree::
-    :maxdepth: 3
-    :hidden:
+   :maxdepth: 3
+   :hidden:
 
 Copyright and other protections apply.
 Please see the accompanying :doc:`LICENSE <LICENSE>` and :doc:`CREDITS <CREDITS>` file(s) for rights and restrictions governing use of this software.
@@ -37,9 +37,9 @@ There are only a few guidelines:
 
     .. code-block:: rst
 
-        ...
-        *   `Gordon the Turtle <https://github.com/GordonTheTurtle>`_
-        ...
+       ...
+       *   `Gordon the Turtle <https://github.com/GordonTheTurtle>`_
+       ...
 
 *   Try to follow the source conventions as you observe them.
     (Note: I have purposely avoided aspects of `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_, in part because I have adopted conventions developed from my experiences with other languages, but mostly because I'm growing older and more stubborn.)
@@ -58,7 +58,7 @@ There are only a few guidelines:
 
     .. code-block:: sh
 
-        ( . ./helpers/venvsetup.sh && ./helpers/runtests.sh [-e TOX_ENV] )
+       ( . ./helpers/venvsetup.sh && ./helpers/runtests.sh [-e TOX_ENV] )
 
 *   If you need me, mention me (|@posita|_) in your comment, and describe specifically how I can help.
 

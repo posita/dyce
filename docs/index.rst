@@ -22,12 +22,12 @@ Contents
 --------
 
 .. toctree::
-    :maxdepth: 3
+   :maxdepth: 3
 
-    intro
-    contrib
-    LICENSE
-    CREDITS
+   intro
+   contrib
+   LICENSE
+   CREDITS
 
-.. Add "modules" to the above list (usually before "contrib") if enabling
-    the ``sphinx-apidoc ...`` command in ``tox.ini``
+.. Add "modules" to the above list (usually before "contrib") if
+   enabling the ``sphinx-apidoc ...`` command in ``tox.ini``

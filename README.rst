@@ -22,12 +22,12 @@ If those files are missing or appear to be modified from their originals, then p
 .. _`CREDITS`: https://_skel.readthedocs.org/en/master/CREDITS.html
 
 .. image:: https://travis-ci.org/posita/_skel.svg?branch=master
-    :target: https://travis-ci.org/posita/_skel?branch=master
-    :alt: [Build Status]
+   :target: https://travis-ci.org/posita/_skel?branch=master
+   :alt: [Build Status]
 
 .. image:: https://coveralls.io/repos/posita/_skel/badge.svg?branch=master
-    :target: https://coveralls.io/r/posita/_skel?branch=master
-    :alt: [Coverage Status]
+   :target: https://coveralls.io/r/posita/_skel?branch=master
+   :alt: [Coverage Status]
 
 Curious about integrating your project with the above services?
 Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/>`__.
@@ -39,28 +39,28 @@ Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/0
 ===================================
 
 .. image:: https://img.shields.io/pypi/v/_skel.svg
-    :target: https://pypi.python.org/pypi/_skel
-    :alt: [master Version]
+   :target: https://pypi.python.org/pypi/_skel
+   :alt: [master Version]
 
 .. image:: https://readthedocs.org/projects/_skel/badge/?version=master
-    :target: https://_skel.readthedocs.org/en/master/
-    :alt: [master Documentation]
+   :target: https://_skel.readthedocs.org/en/master/
+   :alt: [master Documentation]
 
 .. image:: https://img.shields.io/pypi/l/_skel.svg
-    :target: http://opensource.org/licenses/MIT
-    :alt: [master License]
+   :target: http://opensource.org/licenses/MIT
+   :alt: [master License]
 
 .. image:: https://img.shields.io/pypi/pyversions/_skel.svg
-    :target: https://pypi.python.org/pypi/_skel
-    :alt: [master Supported Python Versions]
+   :target: https://pypi.python.org/pypi/_skel
+   :alt: [master Supported Python Versions]
 
 .. image:: https://img.shields.io/pypi/implementation/_skel.svg
-    :target: https://pypi.python.org/pypi/_skel
-    :alt: [master Supported Python Implementations]
+   :target: https://pypi.python.org/pypi/_skel
+   :alt: [master Supported Python Implementations]
 
 .. image:: https://img.shields.io/pypi/status/_skel.svg
-    :target: https://pypi.python.org/pypi/_skel
-    :alt: [master Development Stage]
+   :target: https://pypi.python.org/pypi/_skel
+   :alt: [master Development Stage]
 
 ..
 
