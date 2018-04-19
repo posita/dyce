@@ -12,15 +12,14 @@
 _VENVSETUP_ME="${ME:-${0}}"
 _VENVSETUP_BASE_PYTHON="${PYTHON:-python}"
 _VENVSETUP_VIRTUALENV="${VIRTUALENV:-virtualenv}"
-_VENVSETUP_ZERO_MD5=d41d8cd98f00b204e9800998ecf8427e
 _VENVSETUP_DIR="${VENV_DIR:-${PWD}/.venv}"
 _VENVSETUP_PYTHON="${_VENVSETUP_DIR}/bin/python"
 _VENVSETUP_PIP="${_VENVSETUP_DIR}/bin/pip"
 
-_VENVSETUP_BOOTSTRAP_VERS=15.1.0
-_VENVSETUP_BOOTSTRAP_URL="https://pypi.python.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-${_VENVSETUP_BOOTSTRAP_VERS}.tar.gz"
+_VENVSETUP_BOOTSTRAP_VERS=15.2.0
+_VENVSETUP_BOOTSTRAP_URL="https://files.pythonhosted.org/packages/b1/72/2d70c5a1de409ceb3a27ff2ec007ecdd5cc52239e7c74990e32af57affe9/virtualenv-${_VENVSETUP_BOOTSTRAP_VERS}.tar.gz"
 _VENVSETUP_BOOTSTRAP_TGZ="/tmp/$( basename "${_VENVSETUP_BOOTSTRAP_URL}" )"
-_VENVSETUP_BOOTSTRAP_TGZ_MD5=44e19f4134906fe2d75124427dc9b716
+_VENVSETUP_BOOTSTRAP_TGZ_CHECKSUM=1d7e241b431e7afce47e77f8843a276f652699d1fa4f93b9d8ce0076fd7b0b54
 _VENVSETUP_BOOTSTRAP_TGZ_DIR="${_VENVSETUP_BOOTSTRAP_TGZ%.tar.gz}"
 
 _venvsetup() {
@@ -37,18 +36,16 @@ _venvsetup() {
                 echo 1>&2 "${_VENVSETUP_ME}: can't find suitable virtualenv; attempting to bootstrap ${_VENVSETUP_BOOTSTRAP_VERS}"
                 curl -o "${_VENVSETUP_BOOTSTRAP_TGZ}" "${_VENVSETUP_BOOTSTRAP_URL}"
 
-                if [ "$( md5 </dev/null | sed -E -es'%^.*([0-9A-Fa-f]{32}).*$%\1%' )" = "${_VENVSETUP_ZERO_MD5}" ] ; then
-                    tgz_md5="$( md5 "${_VENVSETUP_BOOTSTRAP_TGZ}" | sed -E -es'%^.*([0-9A-Fa-f]{32}).*$%\1%' )"
-                elif [ "$( md5sum </dev/null | sed -E -es'%^.*([0-9A-Fa-f]{32}).*$%\1%' )" = "${_VENVSETUP_ZERO_MD5}" ] ; then
-                    tgz_md5="$( md5sum "${_VENVSETUP_BOOTSTRAP_TGZ}" | sed -E -es'%^.*([0-9A-Fa-f]{32}).*$%\1%' )"
-                else
-                    echo 1>&2 "${_VENVSETUP_ME}: can't find MD5 checksum tool; giving up"
+                if ! which >/dev/null 2>&1 openssl ; then
+                    echo 1>&2 "${_VENVSETUP_ME}: can't find openssl; giving up"
 
                     return 1
                 fi
 
-                if [ "${tgz_md5}" != "${_VENVSETUP_BOOTSTRAP_TGZ_MD5}" ] ; then
-                    echo 1>&2 "${_VENVSETUP_ME}: MD5 mismatch for ${_VENVSETUP_BOOTSTRAP_TGZ} (expected ${_VENT_TGZ_MD5}; got ${tgz_md5}); giving up"
+                tgz_checksum="$( openssl dgst -r -sha256 "${_VENVSETUP_BOOTSTRAP_TGZ}" | cut -c 1-64 )"
+
+                if [ "${tgz_checksum}" != "${_VENVSETUP_BOOTSTRAP_TGZ_CHECKSUM}" ] ; then
+                    echo 1>&2 "${_VENVSETUP_ME}: checksum mismatch for ${_VENVSETUP_BOOTSTRAP_TGZ} (expected ${_VENT_TGZ_CHECKSUM}; got ${tgz_checksum}); giving up"
 
                     return 1
                 fi
@@ -58,8 +55,10 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_PIP}" install debug flake8 jedi pylint pytest tox twine virtualenv $( [ -f tests/requirements.txt ] && echo -rtests/requirements.txt )
-        "${_VENVSETUP_PIP}" install mypy \
+        "${_VENVSETUP_PIP}" install --upgrade debug flake8 jedi pylint pytest tox twine virtualenv
+        [ ! -f tests/requirements.txt ] \
+            || "${_VENVSETUP_PIP}" install -rtests/requirements.txt
+        "${_VENVSETUP_PIP}" install --upgrade mypy \
             || true
 
         if [ -f setup.py ] ; then
