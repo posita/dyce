@@ -11,8 +11,7 @@
 
 _VENVSETUP_ME="${ME:-${0}}"
 _VENVSETUP_BASE_PYTHON="${PYTHON:-python}"
-_VENVSETUP_VIRTUALENV="${VIRTUALENV:-virtualenv}"
-_VENVSETUP_DIR="${VENV_DIR:-${PWD}/.venv}"
+_VENVSETUP_DIR="${VIRTUAL_ENV:-${PWD}/.venv}"
 _VENVSETUP_PYTHON="${_VENVSETUP_DIR}/bin/python"
 _VENVSETUP_PIP="${_VENVSETUP_DIR}/bin/pip"
 
@@ -28,9 +27,7 @@ _venvsetup() {
 
         if [ ! -e "${_VENVSETUP_PYTHON}" ] \
                 || [ ! -e "${_VENVSETUP_PIP}" ] ; then
-            if which >/dev/null 2>&1 "${_VENVSETUP_VIRTUALENV}" ; then
-                "${_VENVSETUP_VIRTUALENV}" -p "${_VENVSETUP_BASE_PYTHON}" "${_VENVSETUP_DIR}"
-            elif "${_VENVSETUP_BASE_PYTHON}" >/dev/null 2>&1 -m virtualenv --version ; then
+            if "${_VENVSETUP_BASE_PYTHON}" >/dev/null 2>&1 -m virtualenv --version ; then
                 "${_VENVSETUP_BASE_PYTHON}" -m virtualenv "${_VENVSETUP_DIR}"
             else
                 echo 1>&2 "${_VENVSETUP_ME}: can't find suitable virtualenv; attempting to bootstrap ${_VENVSETUP_BOOTSTRAP_VERS}"
