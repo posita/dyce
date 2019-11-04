@@ -53,7 +53,7 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_PIP}" install --upgrade debug flake8 jedi pylint pytest tox twine virtualenv
+        "${_VENVSETUP_PIP}" install --upgrade debug flake8 jedi mypy pylint pytest tox twine virtualenv
         [ ! -f tests/requirements.txt ] \
             || "${_VENVSETUP_PIP}" install -rtests/requirements.txt
         "${_VENVSETUP_PIP}" install --upgrade mypy \

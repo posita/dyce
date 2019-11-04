@@ -10,15 +10,9 @@ author before viewing or using this software in any capacity.
 """
 # ======================================================================
 
-from __future__ import absolute_import, division, print_function
+# from __future__ import generator_stop
 
-TYPE_CHECKING = False  # from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
-
-from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
 
 # ---- Imports ---------------------------------------------------------
 
@@ -68,18 +62,17 @@ class Template(object):
 
     def __init__(
             self,
-            todo=None,  # type: typing.Any
-    ):  # type: (...) -> None
+            todo: Any = None,  # noqa: F405
+    ) -> None:
         """
         :param todo: the todo to associate with this object
         """
-        super().__init__()  # type: ignore # py2
+        super().__init__()
         self._todo = todo
 
     # ---- Overrides ---------------------------------------------------
 
-    def todohook(self):
-        # type: (...) -> None
+    def todohook(self) -> None:
         """
         Hook method to TODO.
 
@@ -90,8 +83,7 @@ class Template(object):
     # ---- Properties --------------------------------------------------
 
     @property
-    def todo(self):
-        # type: (...) -> typing.Any
+    def todo(self) -> Any:  # noqa: F405
         """
         The todo associated with this object.
         """
@@ -100,8 +92,8 @@ class Template(object):
     @todo.setter
     def todo(
             self,
-            todo,  # type: typing.Any
-    ):  # type: (...) -> None
+            todo: Any,  # noqa: F405
+    ) -> None:
         self._todo = todo
 
     # ---- Methods -----------------------------------------------------
@@ -109,8 +101,7 @@ class Template(object):
 # ---- Functions -------------------------------------------------------
 
 # ======================================================================
-def configlogging():
-    # type: (...) -> None
+def configlogging() -> None:
     log_lvl_name = os.environ.get(_LOG_LVL_ENV) or _LOG_LVL_DFLT
 
     try:
@@ -126,15 +117,14 @@ def configlogging():
     LOGGER.setLevel(log_lvl)
 
 # ======================================================================
-def main():
-    # type: (...) -> None
+def main() -> None:
     configlogging()
     sys.exit(_main())
 
 # ======================================================================
 def _main(
-        argv=None,  # type: typing.Optional[typing.Sequence[typing.Text]]
-):  # type: (...) -> int
+        argv: Optional[Sequence[Text]] = None,  # noqa: F405
+) -> int:
     parser = _parser()
     ns = parser.parse_args(argv)
 
@@ -144,8 +134,8 @@ def _main(
 
 # ======================================================================
 def _parser(
-        prog=None,  # type: typing.Optional[typing.Text]
-):  # type: (...) -> argparse.ArgumentParser
+        prog: Optional[Text] = None,  # noqa: F405
+) -> argparse.ArgumentParser:
     description = """
 TODO
 """.strip()

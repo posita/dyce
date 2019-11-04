@@ -10,17 +10,14 @@ author before viewing or using this software in any capacity.
 """
 # ======================================================================
 
-from __future__ import absolute_import, division, print_function
+# from __future__ import generator_stop
 
-TYPE_CHECKING = False  # from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
+from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
 
 # ---- Data ------------------------------------------------------------
 
 __all__ = ()
 
-__version__ = (0, 0, 0)  # type: typing.Tuple[int, int, int]
+__version__: Tuple[int, int, int] = (0, 0, 0)  # noqa: F405
 __vers_str__ = '.'.join(str(_) for _ in __version__)
 __release__ = 'v' + __vers_str__

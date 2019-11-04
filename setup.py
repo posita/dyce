@@ -11,16 +11,16 @@ author before viewing or using this software in any capacity.
 """
 # ======================================================================
 
-# See <https://bugs.python.org/setuptools/issue152>
-from __future__ import absolute_import, division, print_function
+# from __future__ import generator_stop
+
+from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
 
 # ---- Imports ---------------------------------------------------------
-
-import setuptools
 
 import codecs
 import inspect
 import os
+import setuptools
 
 # ---- Data ------------------------------------------------------------
 
@@ -28,9 +28,9 @@ __all__ = ()
 
 _MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
 
-INSTALL_REQUIRES = (
-    'future',
-)
+INSTALL_REQUIRES = [
+    'typing',
+]
 
 TESTS_REQUIRE = [
     'pytest',
@@ -76,7 +76,6 @@ SETUP_ARGS = {
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

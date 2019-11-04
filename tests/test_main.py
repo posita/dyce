@@ -11,18 +11,14 @@ author before viewing or using this software in any capacity.
 """
 # ======================================================================
 
-from __future__ import absolute_import, division, print_function
+# from __future__ import generator_stop
 
-from typing import *  # noqa: F401, F403 # pylint: disable=import-error,unused-import,unused-wildcard-import,useless-suppression,wildcard-import
-from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
 
 # ---- Imports ---------------------------------------------------------
 
 import logging
 import unittest
-
-# from tests.symmetries import mock
 
 # ---- Data ------------------------------------------------------------
 

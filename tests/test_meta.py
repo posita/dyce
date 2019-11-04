@@ -11,15 +11,9 @@ author before viewing or using this software in any capacity.
 """
 # ======================================================================
 
-from __future__ import absolute_import, division, print_function
+# from __future__ import generator_stop
 
-TYPE_CHECKING = False  # from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
-
-from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
+from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
 
 # ---- Imports ---------------------------------------------------------
 
