@@ -11,7 +11,7 @@
    :hidden:
 
 Copyright and other protections apply.
-Please see the accompanying :doc:`LICENSE <LICENSE>` and :doc:`CREDITS <CREDITS>` file(s) for rights and restrictions governing use of this software.
+Please see the accompanying :doc:`LICENSE <LICENSE>` files for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If those files are missing or appear to be modified from their originals, then please contact the author before viewing or using this software in any capacity.
 
@@ -33,7 +33,7 @@ Submission Guidelines
 If you're willing and able, consider `submitting a pull request <https://github.com/posita/_skel/pulls>`__ (PR) with a fix.
 There are only a few guidelines:
 
-*   If it isn't already there, please add your name (and optionally your GitHub username, email, website address, or other contact information) to the :doc:`CREDITS <CREDITS>` file:
+*   If it is not already present, please add your name (and optionally your GitHub username, email, website address, or other contact information) to the :doc:`LICENSE <LICENSE>` file:
 
     .. code-block:: rst
 

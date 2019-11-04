@@ -1,4 +1,4 @@
-# -*- encoding: utf-8; mode: conf -*-
+# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -7,9 +7,19 @@
 # software in any capacity.
 # ======================================================================================
 
-[MESSAGES CONTROL]
-disable=C,R,locally-disabled,missing-super-argument,no-init,no-member
-enable=useless-suppression
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html
 
-[REPORTS]
-reports=n
+# Required
+version: 2
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+  configuration: docs/conf.py
+
+python:
+  version: 3.8
+  install:
+    - requirements: docs/requirements.txt
+    - method: pip
+      path: .
+  system_packages: true

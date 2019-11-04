@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # -*- encoding: utf-8 -*-
-# ======================================================================
-# Copyright and other protections apply. Please see the accompanying
-# LICENSE and CREDITS files for rights and restrictions governing use of
-# this software. All rights not expressly waived or licensed are
-# reserved. If those files are missing or appear to be modified from
-# their originals, then please contact the author before viewing or
-# using this software in any capacity.
-# ======================================================================
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If those files are missing or appear to be modified
+# from their originals, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
 
 _VENVSETUP_ME="${ME:-${0}}"
 _VENVSETUP_BASE_PYTHON="${PYTHON:-python}"
@@ -53,11 +52,7 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_PIP}" install --upgrade debug flake8 jedi mypy pylint pytest tox twine virtualenv
-        [ ! -f tests/requirements.txt ] \
-            || "${_VENVSETUP_PIP}" install -rtests/requirements.txt
-        "${_VENVSETUP_PIP}" install --upgrade mypy \
-            || true
+        "${_VENVSETUP_PIP}" install --upgrade black debug flake8 jedi mypy pylint pytest tox twine virtualenv
 
         if [ -f setup.py ] ; then
             "${_VENVSETUP_PIP}" install --editable .

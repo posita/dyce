@@ -7,7 +7,7 @@
   Thank you! -->
 
 Copyright and other protections apply.
-Please see the accompanying [`LICENSE`](../LICENSE) and [`CREDITS`](../CREDITS) file(s) for rights and restrictions governing use of this software.
+Please see the accompanying [`LICENSE`](../LICENSE) files for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If those files are missing or appear to be modified from their originals, then please contact the author before viewing or using this software in any capacity.
 
