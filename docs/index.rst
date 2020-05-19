@@ -11,10 +11,10 @@ Please see the accompanying :doc:`LICENSE <LICENSE>` file for rights and restric
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its originals, then please contact the author before viewing or using this software in any capacity.
 
-``_skel`` - Python Project Skeleton
-===================================
+``dyce`` - Simple Python tools for dice-based probabilities
+===========================================================
 
-``_skel`` is a project skeleton for Python.
+``dyce`` is a Python library of simple tools for working with dice-based probabilities.
 It is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the :doc:`LICENSE <LICENSE>` file for details.
 

@@ -29,12 +29,11 @@ __all__ = ()
 
 _MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
 
-
 # ---- Initialization ------------------------------------------------------------------
 
 
 vers_info = {
-    "__path__": os.path.join(_MY_DIR, "_skel", "version.py"),
+    "__path__": os.path.join(_MY_DIR, "dyce", "version.py"),
 }
 
 if os.path.isfile(vers_info["__path__"]):
@@ -52,13 +51,13 @@ __vers_str__ = vers_info.get("__vers_str__")
 __release__ = vers_info.get("__release__", __vers_str__)
 
 SETUP_ARGS = {
-    "name": "py_skel",
+    "name": "dyce",
     "version": __vers_str__,
     "author": "Matt Bogosian",
     "author_email": "matt@bogosian.net",
-    "url": "https://_skel.readthedocs.org/en/{}/".format(__release__),
+    "url": "https://dyce.readthedocs.org/en/{}/".format(__release__),
     "license": "MIT License",
-    "description": "Python Project Skeleton",
+    "description": "Simple Python tools for dice-based probabilities",
     "long_description": README,
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
     "classifiers": (
@@ -76,8 +75,7 @@ SETUP_ARGS = {
     ),
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": ["typing"],
-    "entry_points": {"console_scripts": ("_skel = _skel.main:main",)},
+    "install_requires": ["typing", "typing_extensions"],
 }
 
 if __name__ == "__main__":

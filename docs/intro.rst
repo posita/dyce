@@ -16,14 +16,14 @@ If that file is missing or appears to be modified from its originals, then pleas
 Introduction
 ============
 
-``_skel`` is a project skeleton for Python.
+``dyce`` is a Python library of simple tools for working with dice-based probabilities.
 
 License
 -------
 
-``_skel`` is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
+``dyce`` is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the :doc:`LICENSE <LICENSE>` file for details.
-Source code is `available on GitHub <https://github.com/posita/_skel>`__.
+Source code is `available on GitHub <https://github.com/posita/dyce>`__.
 
 Installation
 ------------
@@ -31,20 +31,20 @@ Installation
 This project is not meant to be installed as is, but rather cloned and then modified as necessary.
 It is intended that derived projects allow installation via ``pip``.
 
-Installation can be performed via ``pip`` (which will download and install the `latest release <https://pypi.python.org/pypi/_skel/>`__):
+Installation can be performed via ``pip`` (which will download and install the `latest release <https://pypi.python.org/pypi/dyce/>`__):
 
 .. code-block:: console
 
-   % pip install _skel
+   % pip install dyce
    ...
 
-Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/_skel>`__) and run ``setup.py``:
+Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/dyce>`__) and run ``setup.py``:
 
 .. code-block:: console
 
-   % git clone https://github.com/posita/_skel
+   % git clone https://github.com/posita/dyce
    ...
-   % cd _skel
+   % cd dyce
    % python setup.py install
    ...
 
@@ -53,12 +53,15 @@ Requirements
 
 A modern version of Python is required:
 
-* `cPython <https://www.python.org/>`_ (3.3+)
+* `cPython <https://www.python.org/>`_ (3.6+)
 * `PyPy <http://pypy.org/>`_ (Python 3.6+ compatible)
 
-``_skel`` has the following dependencies (which will be installed automatically):
+``dyce`` has the following dependencies (which will be installed automatically):
 
 * |typing|_
+* |typing-extensions|_
 
 .. |typing| replace:: ``typing``
 .. _`typing`: https://pypi.org/project/typing/
+.. |typing-extensions| replace:: ``typing-extensions``
+.. _`typing-extensions`: https://pypi.org/project/typing-extensions/

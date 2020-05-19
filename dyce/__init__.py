@@ -11,15 +11,7 @@ software in any capacity.
 
 from __future__ import generator_stop
 
-import logging as _logging
-
-from .main import *  # noqa: F401,F403 # pylint: disable=useless-suppression,wildcard-import
+from .lib import *  # noqa: F401,F403 # pylint: disable=wildcard-import
 from .version import __version__  # noqa: F401
 
 __all__ = ()
-
-
-# ---- Data ----------------------------------------------------------------------------
-
-
-LOGGER = _logging.getLogger(__name__)

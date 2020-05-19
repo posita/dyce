@@ -11,9 +11,7 @@ software in any capacity.
 
 from __future__ import generator_stop
 
-import unittest
-
-from _skel.main import configlogging
+from dyce.lib import config_logging
 
 __all__ = ()
 
@@ -21,5 +19,4 @@ __all__ = ()
 # ---- Initialization ------------------------------------------------------------------
 
 
-unittest.TestCase.longMessage = True
-configlogging()
+config_logging()

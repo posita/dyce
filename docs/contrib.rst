@@ -13,22 +13,22 @@ Please see the accompanying :doc:`LICENSE <LICENSE>` file for rights and restric
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its originals, then please contact the author before viewing or using this software in any capacity.
 
-Contributing to ``_skel``
-=========================
+Contributing to ``dyce``
+========================
 
 There are several ways you can contribute.
 
 Filing Issues
 -------------
 
-You can `file new issues <https://github.com/posita/_skel/issues>`__ as you find them.
+You can `file new issues <https://github.com/posita/dyce/issues>`__ as you find them.
 Please avoid duplicating issues.
 `“Writing Effective Bug Reports” by Elisabeth Hendrickson <http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf>`__ (PDF) may be helpful.
 
 Submission Guidelines
 ---------------------
 
-If you are willing and able, consider `submitting a pull request <https://github.com/posita/_skel/pulls>`__ (PR) with a fix.
+If you are willing and able, consider `submitting a pull request <https://github.com/posita/dyce/pulls>`__ (PR) with a fix.
 There are only a few guidelines:
 
 *   If it is not already present, please add your name (and optionally your GitHub username, email, website address, or other contact information) to the :doc:`LICENSE <LICENSE>` file:
