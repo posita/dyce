@@ -2,7 +2,7 @@
 # ======================================================================================
 """
 Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` files for rights and restrictions governing use of this software. All rights
+<LICENSE>` file for rights and restrictions governing use of this software. All rights
 not expressly waived or licensed are reserved. If those files are missing or appear to
 be modified from their originals, then please contact the author before viewing or using
 this software in any capacity.
@@ -15,10 +15,8 @@ from typing import (
     DefaultDict,
     Iterable,
     Iterator,
-    List,
     Mapping,
     Optional,
-    TextIO,
     Tuple,
     Union,
     cast,
@@ -30,18 +28,18 @@ from typing_extensions import Protocol, runtime_checkable
 
 
 import collections.abc
+import functools
 import itertools
 import logging
+import math
 import operator
 import os
-import sys
-import textwrap
 
 
 # ---- Data ----------------------------------------------------------------------------
 
 
-__all__ = ("D", "H", "print_in_rows", "within")
+__all__ = ("D", "H", "explode", "within")
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,6 +50,8 @@ _LOG_LVL_DFLT = logging.getLevelName(logging.WARNING)
 
 _IntOperatorT = Callable[[int, int], int]
 _IntPredicateT = Callable[[int, int], bool]
+_ExplodeOnT = Callable[["H", int, int], bool]
+_SubstituteT = Callable[["H", int, int], "H"]
 
 try:
     _ROW_WIDTH = os.get_terminal_size().columns
@@ -74,19 +74,20 @@ class H(Mapping[int, int]):
     True
 
     >>> h6 + h6  # like 2d6
-    H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+    H({12: 1, 11: 2, 10: 3, 9: 4, 8: 5, 7: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1})
     >>> print(_.format(width=65))
-      2 |   2.78% |#
-      3 |   5.56% |##
-      4 |   8.33% |####
-      5 |  11.11% |#####
-      6 |  13.89% |######
-      7 |  16.67% |########
-      8 |  13.89% |######
-      9 |  11.11% |#####
-     10 |   8.33% |####
-     11 |   5.56% |##
+    avg |    7.00
      12 |   2.78% |#
+     11 |   5.56% |##
+     10 |   8.33% |####
+      9 |  11.11% |#####
+      8 |  13.89% |######
+      7 |  16.67% |########
+      6 |  13.89% |######
+      5 |  11.11% |#####
+      4 |   8.33% |####
+      3 |   5.56% |##
+      2 |   2.78% |#
     >>> 2@h6 == h6 + h6
     True
 
@@ -96,22 +97,24 @@ class H(Mapping[int, int]):
     36
 
     >>> h6.ne(h6)  # where a first d6 shows a different value than a second d6
-    H({0: 6, 1: 30})
+    H({1: 30, 0: 6})
     >>> print(_.format(width=65))
-      0 |  16.67% |########
+    avg |    0.83
       1 |  83.33% |#########################################
+      0 |  16.67% |########
 
     >>> h6.lt(h6)  # where a first d6 shows less than a second
-    H({0: 21, 1: 15})
+    H({1: 15, 0: 21})
     >>> print(_.format(width=65))
-      0 |  58.33% |#############################
+    avg |    0.42
       1 |  41.67% |####################
+      0 |  58.33% |#############################
 
     Some esoteric things can be captured through careful enumeration. For example,
     re-rolling a 1 that appears on a first d20 roll could be captured by:
 
     >>> H(itertools.chain(((n, 20) for n in range(2, 21)), range(1, 21)))
-    H({1: 1, 2: 21, 3: 21, 4: 21, 5: 21, 6: 21, 7: 21, 8: 21, 9: 21, 10: 21, 11: 21, 12: 21, 13: 21, 14: 21, 15: 21, 16: 21, 17: 21, 18: 21, 19: 21, 20: 21})
+    H({20: 21, 19: 21, 18: 21, 17: 21, 16: 21, 15: 21, 14: 21, 13: 21, 12: 21, 11: 21, 10: 21, 9: 21, 8: 21, 7: 21, 6: 21, 5: 21, 4: 21, 3: 21, 2: 21, 1: 1})
     """
 
     # ---- Types -----------------------------------------------------------------------
@@ -151,15 +154,15 @@ class H(Mapping[int, int]):
 
             for value in values:
                 if isinstance(value, tuple):
-                    val, num = value  # pylint: disable=unpacking-non-sequence
-                    h[val] += num
+                    face, count = value  # pylint: disable=unpacking-non-sequence
+                    h[face] += count
                 else:
                     h[value] += 1
 
             values = h
 
         self._h = collections.OrderedDict(
-            (value, values[value]) for value in sorted(values)
+            (face, values[face]) for face in sorted(values, reverse=True)
         )
 
     # ---- Overrides -------------------------------------------------------------------
@@ -314,7 +317,7 @@ class H(Mapping[int, int]):
             return NotImplemented
 
     def __neg__(self) -> "H":
-        h = H((operator.neg(val), num) for val, num in self.items())
+        h = H((operator.neg(face), count) for face, count in self.items())
 
         if self._simple_init is not None:
             h._simple_init = operator.neg(self._simple_init)
@@ -322,7 +325,7 @@ class H(Mapping[int, int]):
         return h
 
     def __pos__(self) -> "H":
-        h = H((operator.pos(val), num) for val, num in self.items())
+        h = H((operator.pos(face), count) for face, count in self.items())
 
         if self._simple_init is not None:
             h._simple_init = operator.pos(self._simple_init)
@@ -330,7 +333,7 @@ class H(Mapping[int, int]):
         return h
 
     def __abs__(self) -> "H":
-        h = H((operator.abs(val), num) for val, num in self.items())
+        h = H((operator.abs(face), count) for face, count in self.items())
 
         if self._simple_init is not None:
             h._simple_init = operator.abs(self._simple_init)
@@ -353,7 +356,7 @@ class H(Mapping[int, int]):
         TODO
         """
         if isinstance(other, int):
-            return H((int(oper(val, other)), num) for val, num in self.items())
+            return H((int(oper(face, other)), count) for face, count in self.items())
 
         if isinstance(other, H.AbleT):
             other = other.h()
@@ -368,7 +371,7 @@ class H(Mapping[int, int]):
 
     def rapply(self, oper: _IntOperatorT, other: OperandT) -> "H":
         if isinstance(other, int):
-            return H((int(oper(other, val)), num) for val, num in self.items())
+            return H((int(oper(other, face)), count) for face, count in self.items())
 
         if isinstance(other, H.AbleT):
             other = other.h()
@@ -448,6 +451,28 @@ class H(Mapping[int, int]):
         """
         return self.filter(operator.ge, other, t_val, f_val)
 
+    def even(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
+        """
+        >>> H((-4, -2, 0, 1, 2, 3)).even()
+        H({1: 4, 0: 2})
+        """
+
+        def is_even(a, _):
+            return a % 2 == 0
+
+        return self.filter(is_even, 0, t_val, f_val)
+
+    def odd(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
+        """
+        >>> H((-4, -2, 0, 1, 2, 3)).odd()
+        H({1: 2, 0: 4})
+        """
+
+        def is_odd(a, _):
+            return a % 2 != 0
+
+        return self.filter(is_odd, 0, t_val, f_val)
+
     def concat(self, other: SourceT) -> "H":
         """
         TODO
@@ -471,57 +496,70 @@ class H(Mapping[int, int]):
         numerator = 0
         denominator = 0
 
-        for val, num in self.items():
-            numerator += val * num
-            denominator += num
+        for face, count in self.items():
+            numerator += face * count
+            denominator += count
 
         return numerator / (denominator if denominator else 1)
 
     def data(
-        self, relative: bool = False, fillvalues: Optional[Mapping[int, int]] = None
+        self, relative: bool = False, fill_values: Optional[Mapping[int, int]] = None
     ) -> Iterable[Tuple[int, float]]:
         """
         TODO
         """
-        if fillvalues is None:
-            fillvalues = {}
+        if fill_values is None:
+            fill_values = {}
 
         total = sum(self.counts()) if relative else 1
-        faces = sorted(set(itertools.chain(fillvalues, self.faces())))
+        faces = sorted(set(itertools.chain(fill_values, self.faces())), reverse=True)
 
         return (
-            (face, (self[face] if face in self else fillvalues[face]) / (total or 1))
+            (face, (self[face] if face in self else fill_values[face]) / (total or 1))
             for face in faces
         )
 
     def data_xy(
-        self, relative: bool = False, fillvalues: Optional[Mapping[int, int]] = None
+        self, relative: bool = False, fill_values: Optional[Mapping[int, int]] = None
     ) -> Tuple[Iterable[int], Iterable[float]]:
         """
         TODO
         """
         return cast(
-            Tuple[Iterable[int], Iterable[float]], zip(*self.data(relative, fillvalues))
+            Tuple[Iterable[int], Iterable[float]],
+            zip(*self.data(relative, fill_values)),
         )
 
     def format(
         self,
-        fillvalues: Optional[Mapping[int, int]] = None,
-        width: int = 115,
+        fill_values: Optional[Mapping[int, int]] = None,
+        width: int = 0,
         sep: str = os.linesep,
     ) -> str:
         """
         TODO
         """
-        w = width - 15
-        fmt = "{: 3} | {:7.2%} |{}"
+        if width <= 0:
+            return "{{avg: {:.2f}, {}}}".format(
+                self.avg(),
+                ", ".join(
+                    "{}:{:7.2%}".format(val, pct)
+                    for val, pct in self.data(relative=True)
+                ),
+            )
+        else:
+            w = width - 15
 
-        def lines():
-            for val, percentage in self.data(relative=True, fillvalues=fillvalues):
-                ticks = int(w * percentage)
-                yield fmt.format(val, percentage, "#" * ticks)
+            def lines():
+                yield "avg | {:7.2f}".format(self.avg())
 
-        return sep.join(lines())
+                for face, percentage in self.data(
+                    relative=True, fill_values=fill_values
+                ):
+                    ticks = int(w * percentage)
+                    yield "{: 3} | {:7.2%} |{}".format(face, percentage, "#" * ticks)
+
+            return sep.join(lines())
 
     def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
         """
@@ -555,9 +593,9 @@ class D:
     Arithmetic operators involving `D` objects result in a :class:`H`:
 
     >>> 2 * D(8) - 1
-    H({1: 1, 3: 1, 5: 1, 7: 1, 9: 1, 11: 1, 13: 1, 15: 1})
+    H({15: 1, 13: 1, 11: 1, 9: 1, 7: 1, 5: 1, 3: 1, 1: 1})
     >>> d6 + d6
-    H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+    H({12: 1, 11: 2, 10: 3, 9: 4, 8: 5, 7: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1})
 
     Comparisons between `D`s and :class:`H`s still work:
 
@@ -568,34 +606,36 @@ class D:
     from highest values to lowest.
 
     >>> (3@d6)[:2]  # best two dice of 3d6
-    H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
+    H({12: 16, 11: 27, 10: 34, 9: 36, 8: 34, 7: 27, 6: 19, 5: 12, 4: 7, 3: 3, 2: 1})
     >>> print(_.format(width=65))
-      2 |   0.46% |
-      3 |   1.39% |
-      4 |   3.24% |#
-      5 |   5.56% |##
-      6 |   8.80% |####
-      7 |  12.50% |######
-      8 |  15.74% |#######
-      9 |  16.67% |########
-     10 |  15.74% |#######
-     11 |  12.50% |######
+    avg |    8.46
      12 |   7.41% |###
+     11 |  12.50% |######
+     10 |  15.74% |#######
+      9 |  16.67% |########
+      8 |  15.74% |#######
+      7 |  12.50% |######
+      6 |   8.80% |####
+      5 |   5.56% |##
+      4 |   3.24% |#
+      3 |   1.39% |
+      2 |   0.46% |
 
     >>> (3@d6)[-2:]  # worst two dice of 3d6
-    H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
+    H({12: 1, 11: 3, 10: 7, 9: 12, 8: 19, 7: 27, 6: 34, 5: 36, 4: 34, 3: 27, 2: 16})
     >>> print(_.format(width=65))
-      2 |   7.41% |###
-      3 |  12.50% |######
-      4 |  15.74% |#######
-      5 |  16.67% |########
-      6 |  15.74% |#######
-      7 |  12.50% |######
-      8 |   8.80% |####
-      9 |   5.56% |##
-     10 |   3.24% |#
-     11 |   1.39% |
+    avg |    5.54
      12 |   0.46% |
+     11 |   1.39% |
+     10 |   3.24% |#
+      9 |   5.56% |##
+      8 |   8.80% |####
+      7 |  12.50% |######
+      6 |  15.74% |#######
+      5 |  16.67% |########
+      4 |  15.74% |#######
+      3 |  12.50% |######
+      2 |   7.41% |###
     """
 
     # ---- Types -----------------------------------------------------------------------
@@ -623,7 +663,9 @@ class D:
                         )
                     )
 
-        self._hs = tuple(h for h in _gen_hs() if h)
+        hs = list(h for h in _gen_hs() if h)
+        hs.sort(key=lambda h: tuple(h.items()))
+        self._hs = tuple(hs)
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -653,16 +695,35 @@ class D:
 
     def __getitem__(self, key: Union[int, slice]) -> "H":
         if isinstance(key, int):
-            return operator.getitem(self._hs, key)
+            return self._hs[key]
         elif isinstance(key, slice):
+            groups = tuple(
+                (h, sum(1 for _ in hs)) for h, hs in itertools.groupby(self._hs)
+            )
 
-            def gen_sums():
-                if len(operator.getitem(self._hs, key)) > 0:
-                    for rolls in itertools.product(*self._hs):
-                        sub_rolls = operator.getitem(sorted(rolls, reverse=True), key)
-                        yield sum(sub_rolls)
-
-            return H(gen_sums())
+            if len(groups) <= 1:
+                return H(
+                    (sum(operator.getitem(faces, key)), count)
+                    for h, n in groups
+                    for faces, count in _combinations_with_counts(h, n)
+                )
+            else:
+                return H(
+                    (
+                        sum(
+                            operator.getitem(
+                                sorted(itertools.chain(*faces), reverse=True), key
+                            )
+                        ),
+                        functools.reduce(operator.mul, counts),
+                    )
+                    for faces, counts in (
+                        zip(*v)
+                        for v in itertools.product(
+                            *(_combinations_with_counts(h, n) for h, n in groups)
+                        )
+                    )
+                )
         else:
             return NotImplemented
 
@@ -888,6 +949,32 @@ class D:
         """
         return self.filter(operator.ge, other, t_val, f_val)
 
+    def even(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
+        """
+        TODO
+
+        >>> D(H((-4, -2, 0, 1, 2, 3))).even()
+        H({1: 4, 0: 2})
+        """
+
+        def is_even(a, _):
+            return a % 2 == 0
+
+        return self.filter(is_even, 0, t_val, f_val)
+
+    def odd(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
+        """
+        TODO
+
+        >>> D(H((-4, -2, 0, 1, 2, 3))).odd()
+        H({1: 2, 0: 4})
+        """
+
+        def is_odd(a, _):
+            return a % 2 != 0
+
+        return self.filter(is_odd, 0, t_val, f_val)
+
     def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
         """
         Shorthand for `self.apply(within(lo, hi), other)`.
@@ -905,7 +992,7 @@ def config_logging() -> None:
         log_lvl = int(log_lvl_name, 0)
     except (TypeError, ValueError):
         log_lvl = 0
-        log_lvl = logging.getLevelName(log_lvl_name)  # type: ignore
+        log_lvl = logging.getLevelName(log_lvl_name)
 
     log_fmt = os.environ.get(_LOG_FMT_ENV, _LOG_FMT_DFLT)
     logging.basicConfig(format=log_fmt)
@@ -915,62 +1002,45 @@ def config_logging() -> None:
     LOGGER.setLevel(log_lvl)
 
 
-def print_in_rows(
-    rolls: Iterable[Union[str, H, Tuple[H, Optional[str]]]],
-    columns: int = 3,
-    fillvalues: Optional[Mapping[int, int]] = None,
-    out: TextIO = sys.stdout,
-) -> None:
+def substitute(h: Union[H, H.AbleT], explode_on: _ExplodeOnT) -> H:
+    raise NotImplementedError
+
+
+def explode(h: Union[H, H.AbleT], explode_on: _ExplodeOnT) -> H:
     """
     TODO
+
+    >>> def explode_max(h: H, face: int, depth: int):
+    ...   return depth < 2 and face == max(h)
+    >>> d6 = D(6)
+    >>> explode(d6, explode_max)
+    H({18: 1, 17: 1, 16: 1, 15: 1, 14: 1, 13: 1, 11: 6, 10: 6, 9: 6, 8: 6, 7: 6, 5: 36, 4: 36, 3: 36, 2: 36, 1: 36})
     """
-    if fillvalues is None:
-        fillvalues = {}
+    if isinstance(h, H.AbleT):
+        _h = h.h()
+    else:
+        _h = h
 
-    col_width = _ROW_WIDTH // columns - 4
-    paragraphs = []
+    def _explode(depth: int) -> H:
+        exploding_faces = {face for face in _h if explode_on(_h, face, depth)}
 
-    for roll in rolls:
-        if isinstance(roll, str):
-            paragraphs.append([roll])
-            paragraphs.extend([" - - - "] for _ in range(columns - 1))
-        else:
-            if isinstance(roll, H):
-                h, desc = roll, None
-            else:
-                h, desc = roll
+        if exploding_faces:
+            exploded_h = _explode(depth + 1)
+            exploded_h_sum = sum(exploded_h.counts())
+            values = collections.defaultdict(int)  # type: DefaultDict[int, int]
 
-            paragraph = []  # type: List[str]
-
-            if desc is not None:
-                if len(desc) > col_width:
-                    paragraph.extend(textwrap.wrap(desc, col_width))
+            for face, count in _h.items():
+                if face in exploding_faces:
+                    for exploded_face, exploded_count in (exploded_h * count).items():
+                        values[face + exploded_face] += exploded_count
                 else:
-                    paragraph.append(desc)
+                    values[face] += exploded_h_sum * count
 
-                paragraph.append("- " * ((col_width - 1) // 2) + "-")
+            return H(values)
+        else:
+            return _h
 
-            paragraph.extend(
-                h.format(fillvalues=fillvalues, width=col_width).split(os.linesep)
-            )
-            paragraphs.append(paragraph)
-
-    num_paras = len(paragraphs)
-    rows = num_paras // columns + int(bool(num_paras % columns))
-    col_fmt = "{{: <{}}}".format(col_width)
-    line_fmt = "| " + " | ".join(col_fmt for _ in range(columns)) + " |"
-    sep = "+-" + "-+-".join("-" * col_width for _ in range(columns)) + "-+"
-    print(sep, file=out)
-
-    for row in range(rows):
-        row_paras = paragraphs[row * columns : row * columns + columns]
-
-        for row_paras_lines in itertools.zip_longest(*row_paras, fillvalue=""):
-            row_paras_lines = list(row_paras_lines)
-            row_paras_lines.extend("" for _ in range(columns - len(row_paras_lines)))
-            print(line_fmt.format(*row_paras_lines), file=out)
-
-        print(sep, file=out)
+    return _explode(0)
 
 
 def within(lo: int, hi: int) -> _IntOperatorT:
@@ -982,25 +1052,28 @@ def within(lo: int, hi: int) -> _IntOperatorT:
 
     >>> d6 = D(6)
     >>> (2@d6).within(7, 9, 0)  # 2d6 w/in 7-9
-    H({-1: 15, 0: 15, 1: 6})
+    H({1: 6, 0: 15, -1: 15})
     >>> print(_.format(width=65))
-     -1 |  41.67% |####################
-      0 |  41.67% |####################
+    avg |   -0.25
       1 |  16.67% |########
+      0 |  41.67% |####################
+     -1 |  41.67% |####################
 
     >>> (2@d6).within(0, 0, 2@d6)  # 2d6 vs. 2d6 identical rolls
-    H({-1: 575, 0: 146, 1: 575})
+    H({1: 575, 0: 146, -1: 575})
     >>> print(_.format(width=65))
-     -1 |  44.37% |######################
-      0 |  11.27% |#####
+    avg |    0.00
       1 |  44.37% |######################
+      0 |  11.27% |#####
+     -1 |  44.37% |######################
 
     >>> d6.within(-1, 1, d6)  # 1d6 vs. 1d6 w/in 1 of each other
-    H({-1: 10, 0: 16, 1: 10})
+    H({1: 10, 0: 16, -1: 10})
     >>> print(_.format(width=65))
-     -1 |  27.78% |#############
-      0 |  44.44% |######################
+    avg |    0.00
       1 |  27.78% |#############
+      0 |  44.44% |######################
+     -1 |  27.78% |#############
     """
     assert lo <= hi
 
@@ -1018,3 +1091,20 @@ def within(lo: int, hi: int) -> _IntOperatorT:
     setattr(_cmp, "hi", hi)
 
     return _cmp
+
+
+def _combinations_with_counts(h: H, n: int) -> Iterator[Tuple[Tuple[int, ...], int]]:
+    for faces in itertools.combinations_with_replacement(h, n):
+        total_count = 1
+
+        for face in faces:
+            total_count *= h[face]
+
+        num_combinations_denominator = 1
+
+        for _, g in itertools.groupby(faces):
+            num_combinations_denominator *= math.factorial(sum(1 for _ in g))
+
+        yield faces, total_count * math.factorial(
+            len(faces)
+        ) // num_combinations_denominator

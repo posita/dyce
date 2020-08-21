@@ -11,13 +11,16 @@ this software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
+from typing import Sequence
 
 
 # ---- Imports -------------------------------------------------------------------------
 
 
+import functools
 import itertools
 import logging
+import operator
 import os
 
 from dyce.lib import D, H, within
@@ -48,7 +51,7 @@ class TestH:
         assert repr(H(-6)) == "H(-6)"
         assert repr(H(0)) == "H(0)"
         assert repr(H(6)) == "H(6)"
-        assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({0: 1, 1: 3, 2: 2, 3: 1})"
+        assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({3: 1, 2: 2, 1: 3, 0: 1})"
 
     def test_op_add_int(self) -> None:
         h1 = H(range(10, 20))
@@ -147,12 +150,18 @@ class TestH:
         assert H(range(0, 6)).concat(H(range(3, 9))) == h
 
     def test_format(self) -> None:
-        assert H((1, 2, 3, 1, 2, 1)).format() == os.linesep.join(
+        assert H((1, 2, 3, 1, 2, 1)).format(width=115) == os.linesep.join(
             (
-                "  1 |  50.00% |##################################################",
-                "  2 |  33.33% |#################################",
+                "avg |    1.67",
                 "  3 |  16.67% |################",
+                "  2 |  33.33% |#################################",
+                "  1 |  50.00% |##################################################",
             )
+        )
+
+        assert (
+            H((1, 2, 3, 1, 2, 1)).format()
+            == "{avg: 1.67, 3: 16.67%, 2: 33.33%, 1: 50.00%}"
         )
 
     def test_equivalence(self) -> None:
@@ -200,7 +209,7 @@ class TestD:
         assert repr(D(6)) == "D(6)"
         assert (
             repr(D(D(6), D(8), D(H({0: 1, 1: 3, 2: 2, 3: 1}))))
-            == "D(6, 8, H({0: 1, 1: 3, 2: 2, 3: 1}))"
+            == "D(H({3: 1, 2: 2, 1: 3, 0: 1}), 6, 8)"
         )
 
     def test_op_eq(self) -> None:
@@ -209,6 +218,10 @@ class TestD:
         die3 = D(die2)
         assert die2 == die1
         assert die3 == die2
+
+        h4 = H(4)
+        h6 = H(6)
+        assert D(h4, h6) == D(h6, h4)
 
     def test_op_ne(self) -> None:
         die1 = D(H(range(-1, -7, -1)))
@@ -237,19 +250,82 @@ class TestD:
         assert len(D(d6, d8, d6, d8)) == 4
         assert sum(D(d6, d8, d6, d8).h().counts()) == 2304
 
-    def test_getitem(self) -> None:
-        d2 = D(2)
-        d3 = D(3)
+    def test_getitem_empty(self) -> None:
+        d_empty = D()
+        assert d_empty[:] == d_empty.h()
+
+    def test_getitem_nonuniform_dice(self) -> None:
         d4 = D(4)
-        d2d3d4 = D(d2, d3, d4)
-        assert d2d3d4[0] == d2.h()
-        assert d2d3d4[1] == d3.h()
-        assert d2d3d4[2] == d4.h()
-        assert d2d3d4[:] == d2d3d4.h()
-        assert d2d3d4[:1] == H({1: 1, 2: 7, 3: 10, 4: 6})
-        assert d2d3d4[:2] == H({2: 1, 3: 3, 4: 6, 5: 7, 6: 5, 7: 2})
-        assert d2d3d4[-2:] == H({2: 7, 3: 9, 4: 6, 5: 2})
-        assert d2d3d4[-1:] == H({1: 18, 2: 6})
+        d8 = D(8)
+        ds_mixed = 3 @ D(d4, d8, d4)
+        assert ds_mixed[0] == d4.h()
+        assert ds_mixed[1] == d4.h()
+        assert ds_mixed[2] == d4.h()
+        assert ds_mixed[-2] == d8.h()
+        assert ds_mixed[-1] == d8.h()
+        assert ds_mixed[:] == ds_mixed.h()
+        assert ds_mixed[:2] == {
+            16: 90112,
+            15: 159744,
+            14: 212992,
+            13: 245760,
+            12: 353053,
+            11: 306432,
+            10: 249853,
+            9: 196608,
+            8: 203095,
+            7: 57513,
+            6: 19165,
+            5: 2304,
+            4: 511,
+            3: 9,
+            2: 1,
+        }
+        assert ds_mixed[-2:] == {
+            8: 125,
+            7: 825,
+            6: 13699,
+            5: 48384,
+            4: 235398,
+            3: 558873,
+            2: 1239848,
+        }
+        assert ds_mixed[::2] == {
+            28: 1,
+            27: 27,
+            26: 225,
+            25: 1171,
+            24: 4583,
+            23: 13383,
+            22: 31253,
+            21: 65741,
+            20: 121930,
+            19: 193026,
+            18: 290062,
+            17: 319022,
+            16: 303398,
+            15: 253810,
+            14: 190958,
+            13: 133858,
+            12: 88437,
+            11: 54051,
+            10: 21409,
+            9: 8271,
+            8: 2163,
+            7: 327,
+            6: 45,
+            5: 1,
+        }
+
+    def test_getitem_uniform_dice(self) -> None:
+        d6_ish = D(H((2, 3, 3, 4, 4, 5)))
+        d6_ish_2 = 2 @ d6_ish
+        assert d6_ish_2[:] == d6_ish_2.h()
+        assert d6_ish_2[:1] == {2: 1, 3: 8, 4: 16, 5: 11}
+        assert d6_ish_2[-1:] == {2: 11, 3: 16, 4: 8, 5: 1}
+
+        d20s = 5 @ D(20)
+        assert d20s[:] == d20s.h()
 
     def test_op_add_int(self) -> None:
         d6 = D(6)
@@ -371,6 +447,47 @@ class TestD:
         assert d6d8.h() == h_d6d8
         assert D().h() == H({})
 
+    def test_validate_implementation_combinations_nonuniform_dice(self) -> None:
+        d2 = D(2)
+        d3 = D(3)
+        d4 = D(4)
+        d2d3d4 = D(d2, d3, d4)
+        assert d2d3d4[:] == d2d3d4.h()
+        assert d2d3d4[:1] == {1: 1, 2: 7, 3: 10, 4: 6}
+        assert d2d3d4[:1] == H(
+            _inefficient_combinations_with_counts(tuple(d2d3d4), slice(None, 1))
+        )
+        assert d2d3d4[:2] == {2: 1, 3: 3, 4: 6, 5: 7, 6: 5, 7: 2}
+        assert d2d3d4[:2] == H(
+            _inefficient_combinations_with_counts(tuple(d2d3d4), slice(None, 2))
+        )
+        assert d2d3d4[-2:] == {2: 7, 3: 9, 4: 6, 5: 2}
+        assert d2d3d4[-2:] == H(
+            _inefficient_combinations_with_counts(tuple(d2d3d4), slice(-2, None))
+        )
+        assert d2d3d4[-1:] == {1: 18, 2: 6}
+        assert d2d3d4[-1:] == H(
+            _inefficient_combinations_with_counts(tuple(d2d3d4), slice(-1, None))
+        )
+
+    def test_validate_implementation_combinations_uniform_dice(self) -> None:
+        # Use the inefficient mechanism to validate our hard-to-understand implementation
+        h6 = H(6)
+        d6 = D(h6)
+        d6s = 3 @ d6
+        assert d6s[0:1] == {1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91}
+        assert d6s[0:1] == H(
+            _inefficient_combinations_with_counts((h6, h6, h6), slice(0, 1))
+        )
+        assert d6s[1:2] == {1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16}
+        assert d6s[1:2] == H(
+            _inefficient_combinations_with_counts((h6, h6, h6), slice(1, 2))
+        )
+        assert d6s[2:3] == {1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1}
+        assert d6s[2:3] == H(
+            _inefficient_combinations_with_counts((h6, h6, h6), slice(2, 3))
+        )
+
 
 def test_within() -> None:
     within_filter = within(0, 2)
@@ -381,3 +498,13 @@ def test_within() -> None:
     assert within_filter(5, 4) == 0
     assert within_filter(5, 5) == 0
     assert within_filter(5, 6) < 0
+
+
+def _inefficient_combinations_with_counts(hs: Sequence[H], key: slice):
+    # Generate combinations naively, via Cartesian product, which is much less
+    # efficient, but also much easier to read and reason about
+    if len(operator.getitem(hs, key)) > 0:
+        for rolls in itertools.product(*(h.items() for h in hs)):
+            faces, counts = tuple(zip(*rolls))
+            sliced_faces = operator.getitem(sorted(faces, reverse=True), key)
+            yield sum(sliced_faces), functools.reduce(operator.mul, counts)
