@@ -2,20 +2,13 @@
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
-# waived or licensed are reserved. If those files are missing or appear to be modified
-# from their originals, then please contact the author before viewing or using this
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
 # software in any capacity.
 # ======================================================================================
 
-# Various build/test entities
-*.egg
-*.egg-info/
-*_flymake.py
-.mypy_cache/
-.pytest_cache/
-/.cache/
+# Project
 /.coverage
-/.eggs/
 /.tox/
 /build/
 /dist/
@@ -25,31 +18,36 @@
 #/docs/_skel.rst
 #/docs/modules.rst
 /htmlcov/
-__pycache__/
-flycheck_*.py
 
-# Compiled objects
+# Objects and packages
+*.7z
+*.bz2
 *.class
 *.com
 *.dll
-*.exe
-*.o
-*.py[cdo]
-*.so
-dropin.cache
-node_modules/
-
-# Packages
-*.7z
-*.bz2
 *.dmg
+*.egg
+*.egg-info/
+*.exe
 *.gz
 *.iso
 *.jar
+*.o
+*.py[cdo]
 *.rar
+*.so
 *.tar
 *.xz
 *.zip
+*_flymake.py
+.mypy_cache/
+.pytest_cache/
+/.cache/
+/.eggs/
+__pycache__/
+dropin.cache
+flycheck_*.py
+node_modules/
 
 # Logs, databases, etc.
 *.err

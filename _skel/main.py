@@ -1,16 +1,16 @@
-# -*- encoding: utf-8; test-case-name: tests.test_main -*-
+# -*- encoding: utf-8 -*-
 # ======================================================================================
 """
 Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
 <LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If those files are missing or appear to
-be modified from their originals, then please contact the author before viewing or using
-this software in any capacity.
+not expressly waived or licensed are reserved. If that file is missing or appears to be
+modified from its original, then please contact the author before viewing or using this
+software in any capacity.
 """
 # ======================================================================================
 
-# from __future__ import generator_stop
-from typing import *  # noqa: F401,F403 # pylint: disable=unused-wildcard-import,wildcard-import
+from __future__ import generator_stop
+from typing import Any, Optional, Sequence, Text
 
 
 # ---- Imports -------------------------------------------------------------------------
@@ -63,7 +63,10 @@ class Template(object):
 
     # ---- Constructor -----------------------------------------------------------------
 
-    def __init__(self, todo: Any = None,) -> None:  # noqa: F405
+    def __init__(
+        self,
+        todo: Any = None,
+    ) -> None:
         """
         :param todo: the todo to associate with this object
         """
@@ -83,14 +86,17 @@ class Template(object):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def todo(self) -> Any:  # noqa: F405
+    def todo(self) -> Any:
         """
         The todo associated with this object.
         """
         return self._todo
 
     @todo.setter
-    def todo(self, todo: Any,) -> None:  # noqa: F405
+    def todo(
+        self,
+        todo: Any,
+    ) -> None:
         self._todo = todo
 
     # ---- Methods ---------------------------------------------------------------------
@@ -121,7 +127,9 @@ def main() -> None:
     sys.exit(_main())
 
 
-def _main(argv: Optional[Sequence[Text]] = None,) -> int:  # noqa: F405
+def _main(
+    argv: Optional[Sequence[Text]] = None,
+) -> int:
     parser = _parser()
     ns = parser.parse_args(argv)
 
@@ -130,7 +138,9 @@ def _main(argv: Optional[Sequence[Text]] = None,) -> int:  # noqa: F405
     return 0
 
 
-def _parser(prog: Optional[Text] = None,) -> argparse.ArgumentParser:  # noqa: F405
+def _parser(
+    prog: Optional[Text] = None,
+) -> argparse.ArgumentParser:
     description = """
 TODO
 """.strip()
