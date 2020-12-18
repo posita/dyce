@@ -51,7 +51,7 @@ __vers_str__ = vers_info.get("__vers_str__")
 __release__ = vers_info.get("__release__", __vers_str__)
 
 SETUP_ARGS = {
-    "name": "dyce",
+    "name": "dycelib",
     "version": __vers_str__,
     "author": "Matt Bogosian",
     "author_email": "matt@bogosian.net",

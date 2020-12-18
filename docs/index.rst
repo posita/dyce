@@ -11,10 +11,10 @@ Please see the accompanying :doc:`LICENSE <LICENSE>` file for rights and restric
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its originals, then please contact the author before viewing or using this software in any capacity.
 
-``dyce`` - Simple Python tools for dice-based probabilities
-===========================================================
+``dyce`` - Pythonic Dice Probabilities
+======================================
 
-``dyce`` is a Python library of simple tools for working with dice-based probabilities.
+``dyce`` is a pure-Python library for exploring dice probabilities.
 It is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the :doc:`LICENSE <LICENSE>` file for details.
 
@@ -25,7 +25,5 @@ Contents
 
    intro
    contrib
+   dyce
    LICENSE
-
-.. Add "modules" to the above list (usually before "contrib") if
-   enabling the ``sphinx-apidoc ...`` command in ``tox.ini``

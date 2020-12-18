@@ -16,7 +16,7 @@ If that file is missing or appears to be modified from its originals, then pleas
 Introduction
 ============
 
-``dyce`` is a Python library of simple tools for working with dice-based probabilities.
+``dyce`` is a pure-Python library for exploring dice probabilities.
 
 License
 -------
@@ -35,7 +35,7 @@ Installation can be performed via ``pip`` (which will download and install the `
 
 .. code-block:: console
 
-   % pip install dyce
+   % pip install dycelib
    ...
 
 Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/dyce>`__) and run ``setup.py``:
