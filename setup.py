@@ -29,10 +29,6 @@ __all__ = ()
 
 _MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
 
-INSTALL_REQUIRES = [
-    "typing",
-]
-
 
 # ---- Initialization ------------------------------------------------------------------
 
@@ -80,13 +76,9 @@ SETUP_ARGS = {
     ),
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": INSTALL_REQUIRES,
-    "test_suite": "tests",
+    "install_requires": ["typing"],
     "entry_points": {"console_scripts": ("_skel = _skel.main:main",)},
 }
 
 if __name__ == "__main__":
-    os.environ["COVERAGE_PROCESS_START"] = os.environ.get(
-        "COVERAGE_PROCESS_START", os.path.join(_MY_DIR, ".coveragerc")
-    )
     setuptools.setup(**SETUP_ARGS)

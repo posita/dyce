@@ -8,10 +8,11 @@
 # software in any capacity.
 # ======================================================================================
 
-_REPO_DIR="$( cd "$( dirname "${0}" )" && pwd )/.."
+_MY_DIR="$( cd "$( dirname "${0}" )" && pwd )"
+_REPO_DIR="$( cd "${_MY_DIR}${_MY_DIR:+/}.." && pwd )"
 set -ex
 [ -d "${_REPO_DIR}" ]
-[ "${_REPO_DIR}/helpers/release.sh" -ef "${0}" ]
+[ "${_MY_DIR}/release.sh" -ef "${0}" ]
 cd "${_REPO_DIR}"
 
 if [ "${#}" -ne 3 ] ; then

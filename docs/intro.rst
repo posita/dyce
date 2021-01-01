@@ -1,14 +1,12 @@
 .. -*- encoding: utf-8 -*-
-    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    >>>>>>>>>>>>>>> IMPORTANT: READ THIS BEFORE EDITING! <<<<<<<<<<<<<<<
-    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Please keep each sentence on its own unwrapped line.
     It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
     Thank you!
 
 .. toctree::
-   :maxdepth: 3
-   :hidden:
 
 Copyright and other protections apply.
 Please see the accompanying :doc:`LICENSE <LICENSE>` file for rights and restrictions governing use of this software.
@@ -55,14 +53,12 @@ Requirements
 
 A modern version of Python is required:
 
-* `cPython <https://www.python.org/>`_ (2.7 or 3.3+)
-* `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.3+ compatible)
-
-Python 2.6 will *not* work.
+* `cPython <https://www.python.org/>`_ (3.3+)
+* `PyPy <http://pypy.org/>`_ (Python 3.6+ compatible)
 
 ``_skel`` has the following dependencies (which will be installed automatically):
 
-* |future|_
+* |typing|_
 
-.. |future| replace:: ``future``
-.. _`future`: http://python-future.org/
+.. |typing| replace:: ``typing``
+.. _`typing`: https://pypi.org/project/typing/

@@ -14,9 +14,6 @@
 /dist/
 /docs/_build/
 /docs/_static/
-#/docs/_skel.*.rst
-#/docs/_skel.rst
-#/docs/modules.rst
 /htmlcov/
 
 # Objects and packages

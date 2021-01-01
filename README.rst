@@ -1,7 +1,7 @@
 .. -*- encoding: utf-8 -*-
-    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    >>>>>>>>>>>>>>> IMPORTANT: READ THIS BEFORE EDITING! <<<<<<<<<<<<<<<
-    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Please keep each sentence on its own unwrapped line.
     It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
     Thank you!
@@ -22,10 +22,6 @@ If that file is missing or appears to be modified from its originals, then pleas
 .. image:: https://travis-ci.org/posita/_skel.svg?branch=master
    :target: https://travis-ci.org/posita/_skel?branch=master
    :alt: [Build Status]
-
-.. image:: https://coveralls.io/repos/posita/_skel/badge.svg?branch=master
-   :target: https://coveralls.io/r/posita/_skel?branch=master
-   :alt: [Coverage Status]
 
 Curious about integrating your project with the above services?
 Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/>`__.
@@ -78,5 +74,5 @@ Coming soon.
 Issues
 ------
 
-If you find a bug, or want a feature, please `file an issue <https://github.com/posita/_skel/issues>`__ (if it hasn't already been filed).
-If you're willing and able, consider `contributing <https://_skel.readthedocs.org/en/master/contrib.html>`__.
+If you find a bug, or want a feature, please `file an issue <https://github.com/posita/_skel/issues>`__ (if it has not already been filed).
+If you are willing and able, consider `contributing <https://_skel.readthedocs.org/en/master/contrib.html>`__.

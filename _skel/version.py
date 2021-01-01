@@ -12,11 +12,11 @@ software in any capacity.
 from __future__ import generator_stop
 from typing import Tuple
 
+__all__ = ()
+
 
 # ---- Data ----------------------------------------------------------------------------
 
-
-__all__ = ()
 
 __version__: Tuple[int, int, int] = (0, 0, 0)
 __vers_str__ = ".".join(str(_) for _ in __version__)

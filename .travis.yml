@@ -14,10 +14,11 @@ python:
     - "3.6"
     - "3.7"
     - "3.8"
+    - "3.9"
     - "pypy3"
 
 install:
-    - pip install coveralls tox-travis
+    - pip install tox-travis
 
 matrix:
     allow_failures:
@@ -26,6 +27,3 @@ matrix:
 
 script:
     - tox
-
-after_success:
-    - coveralls

@@ -10,6 +10,8 @@
 
 _VENVSETUP_BASE_PYTHON="${PYTHON:-python}"
 _VENVSETUP_DIR="${VIRTUAL_ENV:-${PWD}/.venv}"
+_MY_DIR="$( cd "$( dirname "${0}" )" && pwd )"
+_REPO_DIR="$( cd "${_MY_DIR}${_MY_DIR:+/}.." && pwd )"
 
 _venvsetup() {
     (
@@ -17,6 +19,17 @@ _venvsetup() {
 
         if [ ! -e "${_VENVSETUP_DIR}/bin/python" ] \
                 || [ ! -e "${_VENVSETUP_DIR}/bin/pip" ] ; then
+            if [ "$( "${_VENVSETUP_BASE_PYTHON}" -c 'import sys ; print(sys.version_info.major)' )" -lt 3 ] \
+                    || [ "$( "${_VENVSETUP_BASE_PYTHON}" -c 'import sys ; print(sys.version_info.minor)' )" -lt 6 ] ; then
+                echo 1>&2 "${0}: Python 3.6+ is required; but $( bash -c "which ${_VENVSETUP_BASE_PYTHON}" ) is:"
+                "${_VENVSETUP_BASE_PYTHON}" 2>&1 --version --version \
+                    | sed 1>&2 '-es%^%    %'
+                echo 1>&2 "${0}: Override with:"
+                echo 1>&2 "    PYTHON=/path/to/python ${0}"
+
+                return 1
+            fi
+
             if "${_VENVSETUP_BASE_PYTHON}" >/dev/null 2>&1 -m virtualenv --version ; then
                 "${_VENVSETUP_BASE_PYTHON}" -m virtualenv "${_VENVSETUP_DIR}"
             elif "${_VENVSETUP_BASE_PYTHON}" >/dev/null 2>&1 -m venv -h ; then
@@ -28,14 +41,13 @@ _venvsetup() {
             fi
         fi
 
-        "${_VENVSETUP_DIR}/bin/pip" install --upgrade black debug flake8 jedi mypy pylint pytest tox twine
-
-        if [ -f setup.py ] ; then
-            "${_VENVSETUP_DIR}/bin/pip" install --editable .
-        fi
+        (
+            cd "${_REPO_DIR}"
+            "${_VENVSETUP_DIR}/bin/pip" install --upgrade --requirement "${_MY_DIR}/dev-requirements.txt"
+        )
     ) \
             || return "${?}"
 }
 
-_venvsetup
-. "${_VENVSETUP_DIR}/bin/activate"
+_venvsetup \
+    && . "${_VENVSETUP_DIR}/bin/activate"

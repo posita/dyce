@@ -12,17 +12,13 @@ software in any capacity.
 
 from __future__ import generator_stop
 
-
-# ---- Imports -------------------------------------------------------------------------
-
-
 import logging
+
+__all__ = ()
 
 
 # ---- Data ----------------------------------------------------------------------------
 
-
-__all__ = ()
 
 _LOGGER = logging.getLogger(__name__)
 

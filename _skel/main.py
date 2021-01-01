@@ -12,10 +12,6 @@ software in any capacity.
 from __future__ import generator_stop
 from typing import Any, Optional, Sequence, Text
 
-
-# ---- Imports -------------------------------------------------------------------------
-
-
 import argparse
 import logging
 import os
@@ -23,11 +19,11 @@ import sys
 
 from .version import __release__
 
+__all__ = ()
+
 
 # ---- Data ----------------------------------------------------------------------------
 
-
-__all__ = ()
 
 _LOGGER = logging.getLogger(__name__)
 

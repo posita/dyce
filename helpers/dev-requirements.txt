@@ -1,0 +1,10 @@
+black
+debug
+flake8
+jedi
+mypy
+pylint
+pytest-cov
+tox
+twine
+--editable .

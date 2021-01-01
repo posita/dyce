@@ -11,17 +11,9 @@ software in any capacity.
 
 from __future__ import generator_stop
 
-
-# ---- Imports -------------------------------------------------------------------------
-
-
 import unittest
 
 from _skel.main import configlogging
-
-
-# ---- Data ----------------------------------------------------------------------------
-
 
 __all__ = ()
 
