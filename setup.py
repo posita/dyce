@@ -76,6 +76,20 @@ SETUP_ARGS = {
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
     "install_requires": ["typing", "typing_extensions"],
+    "extras_require": {
+        "dev": [
+            "black",
+            "debug",
+            "flake8",
+            "jedi",
+            "matplotlib",
+            "mypy",
+            "pylint",
+            "pytest-cov",
+            "tox",
+            "twine",
+        ],
+    },
 }
 
 if __name__ == "__main__":

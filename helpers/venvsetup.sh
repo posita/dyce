@@ -43,7 +43,7 @@ _venvsetup() {
 
         (
             cd "${_REPO_DIR}"
-            "${_VENVSETUP_DIR}/bin/pip" install --upgrade --requirement "${_MY_DIR}/dev-requirements.txt"
+            "${_VENVSETUP_DIR}/bin/pip" install --upgrade --editable '.[dev]'
         )
     ) \
             || return "${?}"

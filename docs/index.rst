@@ -14,7 +14,7 @@ If that file is missing or appears to be modified from its originals, then pleas
 ``dyce`` - Pythonic Dice Probabilities
 ======================================
 
-``dyce`` is a pure-Python library for exploring dice probabilities.
+``dyce`` is a pure-Python library for exploring dice probabilities designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
 It is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the :doc:`LICENSE <LICENSE>` file for details.
 
@@ -26,4 +26,5 @@ Contents
    intro
    contrib
    dyce
+   dyce.plt
    LICENSE

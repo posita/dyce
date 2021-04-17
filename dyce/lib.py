@@ -42,8 +42,9 @@ __all__ = ("D", "H")
 
 _T = TypeVar("_T")
 _GetItemT = Union[int, slice]
-_IntOperatorT = Callable[[int, int], int]
-_IntPredicateT = Callable[[int, int], bool]
+_UnaryOperatorT = Callable[[int], int]
+_BinaryOperatorT = Callable[[int, int], int]
+_BinaryPredicateT = Callable[[int, int], bool]
 _ExpandT = Callable[["H", int], Optional["H"]]
 _CoalesceT = Callable[["H", int], "H"]
 
@@ -61,10 +62,10 @@ except OSError:
 
 class H(Mapping[int, int]):
     """
-    A histogram supporting arithmetic operations. In its most explicit form, ``values``
-    maps values to counts.
+    A histogram supporting arithmetic operations. In its most explicit form, *items*
+    maps faces to counts.
 
-    Modeling a single six-sided die (1d6) can be expressed as:
+    Modeling a single six-sided die (`1d6`) can be expressed as:
 
     >>> h6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
@@ -79,19 +80,19 @@ class H(Mapping[int, int]):
     >>> h6 == H((1, 2, 3, 4, 5, 6))
     True
 
-    If an :obj:`int` is given, it is shorthand for creating a sequential range ``[1,
-    values]`` (or ``[values, -1]`` if ``values`` is negative):
+    If an :obj:`int` is given, it is shorthand for creating a sequential range
+    :math:`[{{1} .. {items}}]` (or :math:`[{{items} .. {-1}}]` if *items* is negative):
 
     >>> h6 == H(6)
     True
 
-    Simple indexes can be used to look up a value’s count:
+    Simple indexes can be used to look up a face’s count:
 
     >>> h6[5]
     1
 
     Most arithmetic operators are supported and do what one would expect. If the operand
-    is an :obj:`int`, the operator applies to the values:
+    is an :obj:`int`, the operator applies to the faces:
 
     >>> h6 + 4
     H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
@@ -103,7 +104,7 @@ class H(Mapping[int, int]):
     True
 
     If the operand is another histogram, combinations are computed. Modeling the sum of
-    two six-sided dice (2d6) can be expressed as:
+    two six-sided dice (`2d6`) can be expressed as:
 
     >>> h6 + h6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
@@ -126,7 +127,7 @@ class H(Mapping[int, int]):
     >>> 3@h6 == h6 + h6 + h6
     True
 
-    :func:`len` can be used to show the number of distinct values:
+    :func:`len` can be used to show the number of distinct sums:
 
     >>> len(2@h6)
     11
@@ -136,8 +137,23 @@ class H(Mapping[int, int]):
     >>> sum((2@h6).counts())
     36
 
+    Counts are generally accumulated without reduction:
+
+    >>> h6.concat(h6).concat(h6)
+    H({1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3})
+
+    To reduce, call :meth:`lowest_terms`:
+
+    >>> _.lowest_terms()
+    H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
+
+    Testing equivalence implicitly performs reductions of operands:
+
+    >>> h6.concat(h6) == h6.concat(h6).concat(h6)
+    True
+
     Histograms provide common comparators (e.g., :meth:`eq` :meth:`ne`, etc.). One way
-    to count how often a first six-sided die shows a different value than a second is:
+    to count how often a first six-sided die shows a different face than a second is:
 
     >>> h6.ne(h6)
     H({0: 6, 1: 30})
@@ -146,7 +162,7 @@ class H(Mapping[int, int]):
       0 |  16.67% |########
       1 |  83.33% |#########################################
 
-    Or how often a first six-sided die shows a value less than a second:
+    Or how often a first six-sided die shows a face less than a second:
 
     >>> h6.lt(h6)
     H({0: 21, 1: 15})
@@ -154,6 +170,19 @@ class H(Mapping[int, int]):
     avg |    0.42
       0 |  58.33% |#############################
       1 |  41.67% |####################
+
+    Or how often at least one ``2`` will show when rolling four six-sided dice:
+
+    >>> h6.eq(2)  # how often a 2 shows on a single six-sided die
+    H({0: 5, 1: 1})
+    >>> 4@(_)  # counts of how many 2s show on 4d6
+    H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
+    >>> _.ge(1)  # how often the count is at least one
+    H({0: 625, 1: 671})
+    >>> print(_.format(width=65))
+    avg |    0.52
+      0 |  48.23% |########################
+      1 |  51.77% |#########################
 
     Note, however, that parentheses might be necessary to enforce the desired order of
     operations:
@@ -182,58 +211,59 @@ class H(Mapping[int, int]):
 
     # ---- Constructor -----------------------------------------------------------------
 
-    def __init__(self, values: SourceT) -> None:
+    def __init__(self, items: SourceT) -> None:
         super().__init__()
         self._simple_init = None
 
-        if isinstance(values, int):
-            if values < 0:
-                self._simple_init = values
-                values = range(-1, values - 1, -1)
-            elif values > 0:
-                self._simple_init = values
-                values = range(1, values + 1)
+        if isinstance(items, int):
+            if items < 0:
+                self._simple_init = items
+                items = range(-1, items - 1, -1)
+            elif items > 0:
+                self._simple_init = items
+                items = range(1, items + 1)
             else:
-                values = {}
-        elif isinstance(values, H.AbleT):
-            values = values.h()
+                items = {}
+        elif isinstance(items, H.AbleT):
+            items = items.h()
 
-        if not isinstance(values, collections.abc.Mapping):
+        if not isinstance(items, collections.abc.Mapping):
             h = collections.defaultdict(int)  # type: DefaultDict[int, int]
 
-            for value in values:
-                if isinstance(value, tuple):
-                    face, count = value  # pylint: disable=unpacking-non-sequence
+            for item in items:
+                if isinstance(item, tuple):
+                    face, count = item
                     h[face] += count
                 else:
-                    h[value] += 1
+                    h[item] += 1
 
-            values = h
+            items = h
 
-        self._h = collections.OrderedDict(
-            (face, values[face]) for face in sorted(values)
-        )
+        self._h = collections.OrderedDict((face, items[face]) for face in sorted(items))
 
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        arg = (
-            self._simple_init
-            if self._simple_init is not None
-            else dict.__repr__(self._h)
-        )
+        if self._simple_init is not None:
+            arg = str(self._simple_init)
+        else:
+            arg = dict.__repr__(self._h)
 
         return "{}({})".format(self.__class__.__name__, arg)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, H.AbleT):
             return operator.eq(self, other.h())
+        elif isinstance(other, H):
+            return operator.eq(self.lowest_terms()._h, other.lowest_terms()._h)
         else:
             return super().__eq__(other)
 
     def __ne__(self, other) -> bool:
         if isinstance(other, H.AbleT):
             return operator.ne(self, other.h())
+        elif isinstance(other, H):
+            return not operator.eq(self, other)
         else:
             return super().__ne__(other)
 
@@ -285,11 +315,10 @@ class H(Mapping[int, int]):
     def __matmul__(self, other: int) -> "H":
         if not isinstance(other, int):
             return NotImplemented
-
-        if other < 0:
+        elif other < 0:
             raise ValueError("argument cannot be negative")
-
-        return cast(H, sum(itertools.repeat(self, other)))
+        else:
+            return cast(H, sum(itertools.repeat(self, other)))
 
     def __rmatmul__(self, other: int) -> "H":
         return self.__matmul__(other)
@@ -367,28 +396,13 @@ class H(Mapping[int, int]):
             return NotImplemented
 
     def __neg__(self) -> "H":
-        h = H((operator.neg(face), count) for face, count in self.items())
-
-        if self._simple_init is not None:
-            h._simple_init = operator.neg(self._simple_init)
-
-        return h
+        return self.umap(operator.neg)
 
     def __pos__(self) -> "H":
-        h = H((operator.pos(face), count) for face, count in self.items())
-
-        if self._simple_init is not None:
-            h._simple_init = operator.pos(self._simple_init)
-
-        return h
+        return self.umap(operator.pos)
 
     def __abs__(self) -> "H":
-        h = H((operator.abs(face), count) for face, count in self.items())
-
-        if self._simple_init is not None:
-            h._simple_init = operator.abs(self._simple_init)
-
-        return h
+        return self.umap(operator.abs)
 
     def items(self):
         return self._h.items()
@@ -403,7 +417,7 @@ class H(Mapping[int, int]):
 
     def filter(
         self,
-        predicate: _IntPredicateT,
+        predicate: _BinaryPredicateT,
         other: OperandT,
         t_val: Optional[int] = None,
         f_val: Optional[int] = None,
@@ -411,7 +425,7 @@ class H(Mapping[int, int]):
         """
         Applies *predicate* to each face of the histogram paired with *other*. If the result
         is ``True``, *t_val* is returned, if set. Otherwise the face is returned. If the
-        result is ``False``, *f_val* is returned, if set. Otherwise, the other value is
+        result is ``False``, *f_val* is returned, if set. Otherwise, the other face is
         returned.
 
         >>> h6 = H(6)
@@ -440,7 +454,7 @@ class H(Mapping[int, int]):
 
         return self.map(_resolve, other)
 
-    def map(self, oper: _IntOperatorT, other: OperandT) -> "H":
+    def map(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
         """
         Applies *oper* to each face of the histogram paired with *other*:
 
@@ -458,34 +472,40 @@ class H(Mapping[int, int]):
         >>> h6 + h6 == h6.map(operator.add, h6)
         True
         """
-        if isinstance(other, int):
-            return H((int(oper(face, other)), count) for face, count in self.items())
-
         if isinstance(other, H.AbleT):
             other = other.h()
 
-        if isinstance(other, H):
+        if isinstance(other, int):
+            return H((int(oper(face, other)), count) for face, count in self.items())
+        elif isinstance(other, H):
             return H(
                 (int(oper(a, b)), self[a] * other[b])
                 for a, b in itertools.product(self, other)
             )
+        else:
+            raise NotImplementedError
 
-        raise NotImplementedError
-
-    def rmap(self, oper: _IntOperatorT, other: OperandT) -> "H":
-        if isinstance(other, int):
-            return H((int(oper(other, face)), count) for face, count in self.items())
-
+    def rmap(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
         if isinstance(other, H.AbleT):
             other = other.h()
 
-        if isinstance(other, H):
+        if isinstance(other, int):
+            return H((int(oper(other, face)), count) for face, count in self.items())
+        elif isinstance(other, H):
             return H(
                 (int(oper(b, a)), other[b] * self[a])
                 for b, a in itertools.product(other, self)
             )
+        else:
+            raise NotImplementedError
 
-        raise NotImplementedError
+    def umap(self, oper: _UnaryOperatorT) -> "H":
+        h = H((oper(face), count) for face, count in self.items())
+
+        if self._simple_init is not None:
+            h._simple_init = oper(self._simple_init)  # pylint: disable=protected-access
+
+        return h
 
     def lt(
         self,
@@ -594,14 +614,13 @@ class H(Mapping[int, int]):
         return self.filter(is_odd, 0, t_val, f_val)
 
     def avg(self) -> float:
-        numerator = 0
-        denominator = 0
+        numerator = denominator = 0
 
         for face, count in self.items():
             numerator += face * count
             denominator += count
 
-        return numerator / (denominator if denominator else 1)
+        return numerator / (denominator or 1)
 
     def concat(self, other: SourceT) -> "H":
         """
@@ -624,7 +643,7 @@ class H(Mapping[int, int]):
     def data(
         self,
         relative: bool = False,
-        fill_values: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[Mapping[int, int]] = None,
     ) -> Iterator[Tuple[int, float]]:
         """
         Presentation helper function that returns an iterator for each face/frequency pair:
@@ -635,28 +654,29 @@ class H(Mapping[int, int]):
         >>> list(h6.gt(3).data(relative=True))
         [(0, 0.5), (1, 0.5)]
 
-        If provided, *fill_values* supplies defaults for any missing face values:
+        If provided, *fill_items* supplies defaults for any missing faces:
 
         >>> list(h6.gt(7).data())
         [(0, 6.0)]
-        >>> list(h6.gt(7).data(fill_values={1: 0, 0: 0}))
+        >>> list(h6.gt(7).data(fill_items={1: 0, 0: 0}))
         [(0, 6.0), (1, 0.0)]
         """
-        if fill_values is None:
-            fill_values = {}
+        if fill_items is None:
+            fill_items = {}
 
-        total = sum(self.counts()) if relative else 1
-        faces = sorted(set(itertools.chain(fill_values, self.faces())))
+        if relative:
+            total = sum(self.counts()) or 1
+        else:
+            total = 1
 
-        return (
-            (face, (self[face] if face in self else fill_values[face]) / (total or 1))
-            for face in faces
-        )
+        combined = dict(itertools.chain(fill_items.items(), self.items()))
+
+        return ((face, count / total) for face, count in sorted(combined.items()))
 
     def data_xy(
         self,
         relative: bool = False,
-        fill_values: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[Mapping[int, int]] = None,
     ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
         """
         Presentation helper function that returns an iterator for a “zipped” arrangement of
@@ -670,7 +690,7 @@ class H(Mapping[int, int]):
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.data(relative, fill_values))),
+            tuple(zip(*self.data(relative, fill_items))),
         )
 
     def faces(self) -> Iterator[int]:
@@ -679,20 +699,20 @@ class H(Mapping[int, int]):
 
     def format(
         self,
-        fill_values: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[Mapping[int, int]] = None,
         width: int = _ROW_WIDTH,
         tick: str = "#",
         sep: str = os.linesep,
     ) -> str:
         """
         Returns a formatted string representation of the histogram. If provided,
-        *fill_values* supplies defaults for any missing face values. If *width* is
-        greater than zero, a horizontal bar ASCII graph is printed using *tick* and
-        *sep* (which are otherwise ignored if *width* is zero or less).
+        *fill_items* supplies defaults for any missing faces. If *width* is greater
+        than zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which
+        are otherwise ignored if *width* is zero or less).
 
         >>> print(H(6).format(width=0))
         {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
-        >>> print((2@H(6)).format(fill_values={i: 0 for i in range(1, 21)}, width=65, tick="@"))
+        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
         avg |    7.00
           1 |   0.00% |
           2 |   2.78% |@
@@ -716,26 +736,42 @@ class H(Mapping[int, int]):
          20 |   0.00% |
         """
         if width <= 0:
-            return "{{avg: {:.2f}, {}}}".format(
-                self.avg(),
-                ", ".join(
-                    "{}:{:7.2%}".format(val, pct)
-                    for val, pct in self.data(relative=True)
-                ),
-            )
+
+            def parts():
+                yield "avg: {:.2f}".format(self.avg())
+
+                for face, percentage in self.data(relative=True, fill_items=fill_items):
+                    yield "{}:{:7.2%}".format(face, percentage)
+
+            return "{" + ", ".join(parts()) + "}"
         else:
             w = width - 15
 
             def lines():
                 yield "avg | {:7.2f}".format(self.avg())
 
-                for face, percentage in self.data(
-                    relative=True, fill_values=fill_values
-                ):
+                for face, percentage in self.data(relative=True, fill_items=fill_items):
                     ticks = int(w * percentage)
                     yield "{: 3} | {:7.2%} |{}".format(face, percentage, tick * ticks)
 
             return sep.join(lines())
+
+    def lowest_terms(self) -> "H":
+        """
+        Computes and returns a histogram whose counts share a greatest common divisor of 1.
+
+        >>> H((-1, -1, 0, 0, 1, 1))
+        H({-1: 2, 0: 2, 1: 2})
+        >>> _.lowest_terms()
+        H({-1: 1, 0: 1, 1: 1})
+        >>> H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5))
+        H({2: 2, 3: 4, 4: 4, 5: 2})
+        >>> _.lowest_terms()
+        H({2: 1, 3: 2, 4: 2, 5: 1})
+        """
+        counts_gcd = functools.reduce(math.gcd, self.counts(), 0)
+
+        return H({k: v // counts_gcd for k, v in self.items()})
 
     def roll(self) -> int:
         """
@@ -759,13 +795,13 @@ class H(Mapping[int, int]):
         max_depth: int = 1,
     ) -> "H":
         """
-        Calls :obj:`expand` on each face, recursively up to *max_depth* times. If *expand*
-        returns non-``None``, *coalesce* is called on the face and the expanded value,
-        and the return value is folded into result. The default behavior for *coalesce*
-        is to replace the face with the expanded value.
+        Calls *expand* on each face, recursively up to *max_depth* times. If *expand*
+        returns non-``None``, *coalesce* is called on the face and the expanded
+        histogram, and the returned histogram is folded into result. The default
+        behavior for *coalesce* is to replace the face with the expanded histogram.
 
-        This can be used to model complex rules. The following models re-rolling a value of
-        1 on the first roll:
+        This can be used to model complex rules. The following models re-rolling a face
+        of 1 on the first roll:
 
         >>> def reroll_one(h: H, face: int) -> Optional[H]:
         ...   return h if face == 1 else None
@@ -773,7 +809,7 @@ class H(Mapping[int, int]):
         H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
 
         The following approximates an exploding three-sided die (i.e., if the greatest
-        value comes up, the die is rolled again and its value is added to the total):
+        face comes up, the die is rolled again and its face is added to the total):
 
         >>> def reroll_greatest(h: H, face: int) -> Optional[H]:
         ...   return h if face == max(h) else None
@@ -783,10 +819,10 @@ class H(Mapping[int, int]):
         Consider the following rules:
 
           1. Start with a total of zero.
-          2. Roll a six-sided die. Add the value to the total. If the result is a six, go
+          2. Roll a six-sided die. Add the face to the total. If the result is a six, go
              to step 3. Otherwise stop.
-          3. Roll a four-sided die. Add the value to the total. If the result is a four, go
-             to step 2. Otherwise stop.
+          3. Roll a four-sided die. Add the face to the total. If the result is a four,
+             go to step 2. Otherwise stop.
 
         What is the likelihood of an even final tally? This can be approximated by:
 
@@ -801,16 +837,19 @@ class H(Mapping[int, int]):
         >>> print("{:.3%}".format(h_even.get(1, 0) / sum(h_even.counts())))
         39.131%
         """
-        _coalesce = _coalesce_replace if coalesce is None else coalesce
+        if coalesce is None:
+            coalesce = _coalesce_replace
 
         def _substitute(
             h: H,
             depth: int = 0,
         ) -> H:
+            assert coalesce is not None
+
             if depth == max_depth:
                 return h
 
-            expanded_values = []  # type: List[Tuple[int, int]]
+            expanded_items = []  # type: List[Tuple[int, int]]
             expanded_histograms = []  # type: List[H]
 
             for face, count in h.items():
@@ -819,19 +858,20 @@ class H(Mapping[int, int]):
                 if expanded:
                     expanded = _substitute(expanded, depth + 1)
                     expanded = H((f, count * c) for f, c in expanded.items())
-                    expanded = _coalesce(expanded, face)
+                    expanded = coalesce(expanded, face)
                     expanded_histograms.append(expanded)
                 else:
-                    expanded_values.append((face, count))
+                    expanded_items.append((face, count))
 
             count_multiplier = (
                 sum(itertools.chain(*(ah.counts() for ah in expanded_histograms))) or 1
             )
 
+            expanded_counts = ((f, count_multiplier * c) for f, c in expanded_items)
+
             return H(
                 itertools.chain(
-                    ((f, count_multiplier * c) for f, c in expanded_values),
-                    *(ah.items() for ah in expanded_histograms)
+                    expanded_counts, *(ah.items() for ah in expanded_histograms)
                 )
             )
 
@@ -866,14 +906,14 @@ class H(Mapping[int, int]):
 class D:
     """
     An immutable container of convenience for zero or more :class:`H` objects supporting
-    group operations. The vector can be de-normalized (flattened) to a single histogram,
-    either explicitly via the :meth:`h` method, or by using binary arithmetic
-    operations. Unary operators and the ``@`` operator result in new :class:`D` objects.
-    If one of *args* is an :obj:`int`, it is passed to the constructor for :class:`H`.
+    group operations. The vector can be flattened to a single histogram, either
+    explicitly via the :meth:`h` method, or by using binary arithmetic operations. Unary
+    operators and the ``@`` operator result in new :class:`D` objects. If one of *args*
+    is an :obj:`int`, it is passed to the constructor for :class:`H`.
 
-    >>> D(6)  # shorthand for D(H(6))
+    >>> d6 = D(6)  # shorthand for D(H(6))
+    >>> d6
     D(6)
-    >>> d6 = _
     >>> -d6
     D(-6)
     >>> D(d6, d6)  # 2d6
@@ -900,9 +940,9 @@ class D:
     >>> 3@d6 == H(6) + H(6) + H(6)
     True
 
-    For objects containing more than one :class:`H`, slicing grabs a subset of face
-    values from least to greatest. Modeling the sum of the greatest two face values of
-    three six-sided dice (3d6) can be expressed as:
+    For objects containing more than one :class:`H`, slicing grabs a subset of faces
+    from least to greatest. Modeling the sum of the greatest two faces of three
+    six-sided dice (3d6) can be expressed as:
 
     >>> (3@d6)[-2:]
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
@@ -920,9 +960,23 @@ class D:
      11 |  12.50% |######
      12 |   7.41% |###
 
-    Arbitrary iterables can be used for more flexible selections. Modeling the sum of
-    the greatest two and least two face values of ten four-sided dice (10d4) can be
-    expressed as:
+    Arbitrary iterables can be used for more flexible selections:
+
+    >>> d = 6@D(6)
+    >>> every_other_d6 = d[::-2]
+    >>> every_other_d6
+    H({3: 1, 4: 21, 5: 86, ..., 16: 1106, 17: 395, 18: 31})
+    >>> d[5, 3, 1] == every_other_d6
+    True
+    >>> d[range(1, 6, 2)] == every_other_d6
+    True
+    >>> d[(i for i in range(0, 6) if i % 2 == 1)] == every_other_d6
+    True
+    >>> d[{1, 3, 5}] == every_other_d6
+    True
+
+    Modeling the sum of the greatest two and least two faces of ten four-sided dice
+    (10d4) can be expressed as:
 
     >>> (10@D(4))[:2,-2:]
     H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
@@ -975,13 +1029,15 @@ class D:
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        return "{}({})".format(
-            self.__class__.__name__,
-            ", ".join(
-                str(h._simple_init) if h._simple_init is not None else repr(h)
-                for h in self._hs
-            ),
-        )
+        def parts():
+            for h in self._hs:
+                yield (
+                    str(h._simple_init)  # pylint: disable=protected-access
+                    if h._simple_init is not None  # pylint: disable=protected-access
+                    else repr(h)
+                )
+
+        return "{}({})".format(self.__class__.__name__, ", ".join(parts()))
 
     def __eq__(self, other) -> bool:
         if isinstance(other, D):
@@ -1000,7 +1056,7 @@ class D:
 
     def __getitem__(self, key: Union[_GetItemT, Iterable[_GetItemT]]) -> "H":
         if isinstance(key, int):
-            return self._hs[key]
+            keys: Iterable[_GetItemT] = (key,)
         elif isinstance(key, collections.abc.Iterable):
             keys = tuple(key)
         elif isinstance(key, slice):
@@ -1008,28 +1064,35 @@ class D:
         else:
             return NotImplemented
 
+        def _select_and_sum_faces(
+            rolls_and_counts_iter: Iterator[Tuple[Sequence[int], int]],
+            keys: Iterable[_GetItemT],
+        ) -> Iterator[Tuple[int, int]]:
+            for (
+                sorted_faces_for_roll,
+                roll_count,
+            ) in rolls_and_counts_iter:
+                sum_of_selected_faces = sum(_getitems(sorted_faces_for_roll, keys))
+                yield sum_of_selected_faces, roll_count
+
         groups = tuple((h, sum(1 for _ in hs)) for h, hs in itertools.groupby(self._hs))
 
-        if len(groups) > 1:
+        if len(groups) == 1:
+            # Optimization to use _rolls_and_counts_for_n_uniform_histograms directly if
+            # there's only one group; roughly 15% time savings based on cursory
+            # performance analysis
+            h, n = groups[0]
+
             return H(
-                (
-                    sum(_getitems(sorted(itertools.chain(*faces)), keys)),
-                    functools.reduce(operator.mul, counts),
-                )
-                for faces, counts in (
-                    zip(*v)
-                    for v in itertools.product(
-                        *(_combinations_with_counts(h, n) for h, n in groups)
-                    )
+                _select_and_sum_faces(
+                    _rolls_and_counts_for_n_uniform_histograms(h, n), keys
                 )
             )
         else:
-            # Optimization: we don’t have to (re-)sort if we only have 0-1 groups, since
-            # the return value of _combinations_with_counts is already sorted
             return H(
-                (sum(_getitems(faces, keys)), count)
-                for h, n in groups
-                for faces, count in _combinations_with_counts(h, n)
+                _select_and_sum_faces(
+                    _rolls_and_counts_for_nonuniform_histograms(groups), keys
+                )
             )
 
     def __iter__(self) -> Iterator[H]:
@@ -1111,14 +1174,33 @@ class D:
 
     # ---- Methods ---------------------------------------------------------------------
 
-    def h(self) -> "H":
+    def h(self, index: Optional[int] = None) -> "H":
         """
         Combines contained histograms:
 
         >>> (2@D(6)).h()
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+
+        If the optional *index* parameter is provided, extract the contained histogram
+        at that index:
+
+        >>> D(4, 6, 8).h(0)
+        H(4)
+
+        Note that containers are opinionated about histogram ordering:
+
+        >>> D(8, 6, 4).h(0) == D(8, 4, 6).h(0) == H(4)
+        True
         """
-        return cast(H, sum(self._hs) if self._hs else H(()))
+        if index is not None:
+            return self._hs[index]
+
+        if self._hs:
+            hs_sum = sum(self._hs)
+        else:
+            hs_sum = H(())
+
+        return cast(H, hs_sum)
 
     def lt(
         self,
@@ -1200,7 +1282,7 @@ class D:
 
     def roll(self) -> Tuple[int, ...]:
         """
-        Returns (weighted) random face values from contained histograms.
+        Returns (weighted) random faces from contained histograms.
         """
         return tuple(h.roll() for h in self._hs)
 
@@ -1229,36 +1311,6 @@ def _coalesce_replace(h: H, face: int) -> H:  # pylint: disable=unused-argument
     return h
 
 
-def _combinations_with_counts(
-    h: Mapping[int, int],
-    n: int,
-) -> Iterator[Tuple[Tuple[int, ...], int]]:
-    """
-    Given a group of *n* identical histograms *h*, return an iterator that yields
-    2-tuples (pairs). The first item is an *n*-tuple with the distinct combination. The
-    second item is the count for that combination.
-
-    >>> list(_combinations_with_counts(H((-1, 0, 1)), 2))
-    [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
-
-    This implementation is intended to be more efficient than merely enumerating and
-    Cartesian product. Instead, it enumerates combinations with replacements, then
-    computes the number of permutations with repetitions, leveraging:
-
-    :math:`{{P}_{{{n}_{1}}!,{{n}_{2}}!,\\ldots,{{n}_{k}}!}^{n}} = {\\frac {{n}!} {{{n}_{1}}! {{n}_{2}}! \\cdots {{n}_{k}}!}}`
-    """
-    # combinations_with_replacement preserves input ordering and Hs are sorted
-    for faces in itertools.combinations_with_replacement(h, n):
-        total_count = functools.reduce(operator.mul, (h[face] for face in faces))
-        num_permutations_numerator = math.factorial(len(faces))
-        num_permutations_denominator = functools.reduce(
-            operator.mul,
-            (math.factorial(sum(1 for _ in g)) for _, g in itertools.groupby(faces)),
-        )
-
-        yield faces, total_count * num_permutations_numerator // num_permutations_denominator
-
-
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
         if isinstance(key, int):
@@ -1268,7 +1320,76 @@ def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]
                 yield val
 
 
-def _within(lo: int, hi: int) -> _IntOperatorT:
+def _rolls_and_counts_for_n_uniform_histograms(
+    h: Mapping[int, int],
+    n: int,
+) -> Iterator[Tuple[Sequence[int], int]]:
+    """
+    Given a group of *n* identical histograms *h*, return an iterator that yields
+    2-tuples (pairs). The first item is a sorted sequence of the *n* faces for the
+    distinct roll. The second item is the count for that roll.
+
+    >>> list(_rolls_and_counts_for_n_uniform_histograms(H((-1, 0, 1)), 2))
+    [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
+
+    This implementation is intended to be more efficient than merely enumerating the
+    Cartesian product. Instead, it enumerates combinations with replacements, then
+    computes the number of permutations with repetitions, leveraging:
+
+    :math:`{{P}_{{{n}_{1}}!,{{n}_{2}}!,\\ldots,{{n}_{k}}!}^{n}} = {\\frac {{n}!} {{{n}_{1}}! {{n}_{2}}! \\cdots {{n}_{k}}!}}`
+    """
+    # combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC; note that input
+    # order is preserved and H faces are sorted
+    rolls_iter = itertools.combinations_with_replacement(h, n)
+
+    for sorted_faces_for_roll in rolls_iter:
+        total_count = functools.reduce(
+            operator.mul, (h[face] for face in sorted_faces_for_roll)
+        )
+        num_permutations_numerator = math.factorial(len(sorted_faces_for_roll))
+        num_permutations_denominator = functools.reduce(
+            operator.mul,
+            (
+                math.factorial(sum(1 for _ in g))
+                for _, g in itertools.groupby(sorted_faces_for_roll)
+            ),
+        )
+
+        yield sorted_faces_for_roll, total_count * num_permutations_numerator // num_permutations_denominator
+
+
+def _rolls_and_counts_for_nonuniform_histograms(
+    h_groups: Iterable[Tuple[Mapping[int, int], int]]
+) -> Iterator[Tuple[Sequence[int], int]]:
+    """
+    Given an iterable of histogram/count pairs, return an iterator that yields 2-tuples
+    (pairs). The first item is a sorted sequence of the faces for the distinct roll. The
+    second item is the count for that roll. Note that rolls can appear more than once,
+    and there are no guarantees about the order in which rolls appear in the result.
+
+    >>> list(_rolls_and_counts_for_nonuniform_histograms(((H((2)), 1), (H(3), 1))))
+    [([1, 1], 1), ([1, 2], 1), ([1, 3], 1), ([1, 2], 1), ([2, 2], 1), ([2, 3], 1)]
+
+    The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
+    intended, since its implementation is optimized to leverage
+    :func:`_rolls_and_counts_for_n_uniform_histograms`.
+    """
+    for v in itertools.product(
+        *(_rolls_and_counts_for_n_uniform_histograms(h, n) for h, n in h_groups)
+    ):
+        # It's possible v is () if h_groups is empty; see
+        # https://stackoverflow.com/questions/3154301/ for a detailed discussion
+        if v:
+            rolls_by_group: Iterable[Iterable[int]]
+            counts_by_group: Iterable[int]
+            rolls_by_group, counts_by_group = zip(*v)
+            sorted_faces_for_roll = sorted(itertools.chain(*rolls_by_group))
+            total_count = functools.reduce(operator.mul, counts_by_group)
+
+            yield sorted_faces_for_roll, total_count
+
+
+def _within(lo: int, hi: int) -> _BinaryOperatorT:
     assert lo <= hi
 
     def _cmp(a: int, b: int):
