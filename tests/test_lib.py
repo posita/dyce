@@ -1,12 +1,10 @@
 # -*- encoding: utf-8 -*-
 # ======================================================================================
-"""
-Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If that file is missing or appears to be
-modified from its original, then please contact the author before viewing or using this
-software in any capacity.
-"""
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
@@ -166,6 +164,12 @@ class TestH:
         assert sum(h6h8.counts()) == 48  # combinations
         assert len((h6h8 + h6h8)) == 25
         assert sum((h6h8 + h6h8).counts()) == 2304
+
+    def test_getitem(self) -> None:
+        h6_2 = 2 @ H(6)
+        assert h6_2[2] == 1
+        assert h6_2[7] == 6
+        assert h6_2[12] == 1
 
     def test_lowest_terms_identity(self) -> None:
         lowest_terms = H({i: i for i in range(10)})

@@ -12,8 +12,7 @@
 /.tox/
 /build/
 /dist/
-/docs/_build/
-/docs/_static/
+/site/
 /htmlcov/
 
 # Objects and packages

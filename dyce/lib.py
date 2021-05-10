@@ -1,12 +1,10 @@
 # -*- encoding: utf-8 -*-
 # ======================================================================================
-"""
-Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If that file is missing or appears to be
-modified from its original, then please contact the author before viewing or using this
-software in any capacity.
-"""
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
@@ -61,51 +59,82 @@ except OSError:
 
 
 class H(Mapping[int, int]):
-    """
-    A histogram supporting arithmetic operations. In its most explicit form, *items*
-    maps faces to counts.
+    r"""
+    An immutable mapping for use as a histogram that supports arithmetic operations. The
+    [initializer](#dyce.lib.H.__init__) takes a single parameter, *items*. In its most
+    explicit form, *items* maps faces to counts.
 
-    Modeling a single six-sided die (`1d6`) can be expressed as:
+    Modeling a single six-sided die (``1d6``) can be expressed as:
 
+    ```python
     >>> h6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
-    An iterable of pairs can also be used (similar to :obj:`dict`):
+    ```
 
+    An iterable of pairs can also be used (similar to ``dict``):
+
+    ```python
     >>> h6 == H(((1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)))
     True
 
-    Two shorthands are provided. If an iterable of :obj:`int` s is given, counts of one
-    will be assumed:
+    ```
 
+    Two shorthands are provided. If *items* an iterable of ``int``s, counts of one will be
+    assumed:
+
+    ```python
     >>> h6 == H((1, 2, 3, 4, 5, 6))
     True
 
-    If an :obj:`int` is given, it is shorthand for creating a sequential range
-    :math:`[{{1} .. {items}}]` (or :math:`[{{items} .. {-1}}]` if *items* is negative):
+    ```
 
+    Repeated items do what one would expect:
+
+    ```python
+    >>> H((2, 3, 3, 4, 4, 5))
+    H({2: 1, 3: 2, 4: 2, 5: 1})
+
+    ```
+
+    If *items* is an ``int``, it is shorthand for creating a sequential range
+    $[{1} .. {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
+
+    ```python
     >>> h6 == H(6)
     True
 
+    ```
+
     Simple indexes can be used to look up a face’s count:
 
+    ```python
     >>> h6[5]
     1
 
-    Most arithmetic operators are supported and do what one would expect. If the operand
-    is an :obj:`int`, the operator applies to the faces:
+    ```
 
+    Most arithmetic operators are supported and do what one would expect. If the operand
+    is an ``int``, the operator applies to the faces:
+
+    ```python
     >>> h6 + 4
     H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
+
     >>> h6 * -1
     H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+
     >>> h6 * -1 == -h6
     True
+
     >>> h6 * -1 == H(-6)
     True
 
-    If the operand is another histogram, combinations are computed. Modeling the sum of
-    two six-sided dice (`2d6`) can be expressed as:
+    ```
 
+    If the operand is another histogram, combinations are computed. Modeling the sum of
+    two six-sided dice (``2d6``) can be expressed as:
+
+    ```python
     >>> h6 + h6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
     >>> print(_.format(width=65))
@@ -122,39 +151,63 @@ class H(Mapping[int, int]):
      11 |   5.56% |##
      12 |   2.78% |#
 
-    To accumulate “multiples” of a histogram, use the matrix multiplication operator:
+    ```
 
+    To sum ${n}$ identical histograms, the matrix multiplication operator (``@``) provides a
+    shorthand:
+
+    ```python
     >>> 3@h6 == h6 + h6 + h6
     True
 
-    :func:`len` can be used to show the number of distinct sums:
+    ```
 
+    The ``len`` built-in function can be used to show the number of distinct sums:
+
+    ```python
     >>> len(2@h6)
     11
 
-    :meth:`counts` can be used to show the total number of combinations:
+    ```
 
+    The [``counts`` method][dyce.lib.H.counts] can be used to show the total number of
+    combinations:
+
+    ```python
     >>> sum((2@h6).counts())
     36
 
+    ```
+
     Counts are generally accumulated without reduction:
 
+    ```python
     >>> h6.concat(h6).concat(h6)
     H({1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3})
 
-    To reduce, call :meth:`lowest_terms`:
+    ```
 
+    To reduce, call the [``lowest_terms`` method][dyce.lib.H.lowest_terms]:
+
+    ```python
     >>> _.lowest_terms()
     H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
+    ```
+
     Testing equivalence implicitly performs reductions of operands:
 
+    ```python
     >>> h6.concat(h6) == h6.concat(h6).concat(h6)
     True
 
-    Histograms provide common comparators (e.g., :meth:`eq` :meth:`ne`, etc.). One way
-    to count how often a first six-sided die shows a different face than a second is:
+    ```
 
+    Histograms provide common comparators (e.g., [``eq``][dyce.lib.H.eq]
+    [``ne``][dyce.lib.H.ne], etc.). One way to count how often a first six-sided die
+    shows a different face than a second is:
+
+    ```python
     >>> h6.ne(h6)
     H({0: 6, 1: 30})
     >>> print(_.format(width=65))
@@ -162,8 +215,11 @@ class H(Mapping[int, int]):
       0 |  16.67% |########
       1 |  83.33% |#########################################
 
-    Or how often a first six-sided die shows a face less than a second:
+    ```
 
+    Or, how often a first six-sided die shows a face less than a second is:
+
+    ```python
     >>> h6.lt(h6)
     H({0: 21, 1: 15})
     >>> print(_.format(width=65))
@@ -171,8 +227,11 @@ class H(Mapping[int, int]):
       0 |  58.33% |#############################
       1 |  41.67% |####################
 
+    ```
+
     Or how often at least one ``2`` will show when rolling four six-sided dice:
 
+    ```python
     >>> h6.eq(2)  # how often a 2 shows on a single six-sided die
     H({0: 5, 1: 1})
     >>> 4@(_)  # counts of how many 2s show on 4d6
@@ -184,15 +243,26 @@ class H(Mapping[int, int]):
       0 |  48.23% |########################
       1 |  51.77% |#########################
 
-    Note, however, that parentheses might be necessary to enforce the desired order of
-    operations:
+    ```
 
-    >>> 2@h6.le(7)  # probably not what was intended
-    H({2: 36})
-    >>> 2@h6.le(7) == 2@(h6.lt(7))
-    True
-    >>> (2@h6).le(7)
-    H({0: 15, 1: 21})
+    !!! warning "Mind your parentheses"
+
+        Parentheses are often necessary to enforce the desired order of operations:
+
+        ```python
+        >>> 2@h6.le(7)  # probably not what was intended
+        H({2: 36})
+
+        >>> 2@h6.le(7) == 2@(h6.le(7))
+        True
+
+        >>> (2@h6).le(7)
+        H({0: 15, 1: 21})
+
+        >>> 2@h6.le(7) == (2@h6).le(7)
+        False
+
+        ```
     """
 
     # ---- Types -----------------------------------------------------------------------
@@ -209,9 +279,10 @@ class H(Mapping[int, int]):
         int, Iterable[int], Iterable[Tuple[int, int]], Mapping[int, int], AbleT
     ]
 
-    # ---- Constructor -----------------------------------------------------------------
+    # ---- Initializer -----------------------------------------------------------------
 
     def __init__(self, items: SourceT) -> None:
+        r"Initializer."
         super().__init__()
         self._simple_init = None
 
@@ -422,12 +493,13 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = None,
         f_val: Optional[int] = None,
     ) -> "H":
-        """
+        r"""
         Applies *predicate* to each face of the histogram paired with *other*. If the result
         is ``True``, *t_val* is returned, if set. Otherwise the face is returned. If the
         result is ``False``, *f_val* is returned, if set. Otherwise, the other face is
         returned.
 
+        ```python
         >>> h6 = H(6)
         >>> h6.filter(operator.gt, 3)
         H({3: 3, 4: 1, 5: 1, 6: 1})
@@ -438,12 +510,18 @@ class H(Mapping[int, int]):
         >>> h6.filter(operator.gt, 3, t_val=1, f_val=0)
         H({0: 3, 1: 3})
 
+        ```
+
         Note that shorthands exist for many comparison operators:
 
+        ```python
         >>> h6.gt(h6) == h6.filter(operator.gt, h6, t_val=1, f_val=0)
         True
+
         >>> h6.le(h6, t_val=1, f_val=-1) == h6.filter(operator.le, h6, t_val=1, f_val=-1)
         True
+
+        ```
         """
 
         def _resolve(a: int, b: int):
@@ -455,22 +533,29 @@ class H(Mapping[int, int]):
         return self.map(_resolve, other)
 
     def map(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
-        """
+        r"""
         Applies *oper* to each face of the histogram paired with *other*:
 
+        ```python
         >>> h6 = H(6)
-        >>> h6.map(operator.mul, -1)
-        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-
         >>> h6.map(operator.add, h6)
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 
+        >>> h6.map(operator.mul, -1)
+        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+
+        ```
+
         Note that shorthands exist for many arithmetic operators:
 
+        ```python
         >>> h6 * -1 == h6.map(operator.mul, -1)
         True
+
         >>> h6 + h6 == h6.map(operator.add, h6)
         True
+
+        ```
         """
         if isinstance(other, H.AbleT):
             other = other.h()
@@ -513,11 +598,16 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.lt, other, t_val, f_val)``:
 
+        ```python
         >>> H(6).lt(3)
         H({0: 4, 1: 2})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.lt, other, t_val, f_val)
 
@@ -527,11 +617,16 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.le, other, t_val, f_val)``.
 
+        ```python
         >>> H(6).le(3)
         H({0: 3, 1: 3})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.le, other, t_val, f_val)
 
@@ -541,11 +636,16 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.eq, other, t_val, f_val)``.
 
+        ```python
         >>> H(6).eq(3)
         H({0: 5, 1: 1})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.eq, other, t_val, f_val)
 
@@ -555,11 +655,16 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.ne, other, t_val, f_val)``.
 
+        ```python
         >>> H(6).ne(3)
         H({0: 1, 1: 5})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.ne, other, t_val, f_val)
 
@@ -569,11 +674,16 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.gt, other, t_val, f_val)``.
 
+        ```python
         >>> H(6).gt(3)
         H({0: 3, 1: 3})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.gt, other, t_val, f_val)
 
@@ -583,18 +693,26 @@ class H(Mapping[int, int]):
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
+        r"""
         Shorthand for ``self.filter(operator.ge, other, t_val, f_val)``.
 
+        ```python
         >>> H(6).ge(3)
         H({0: 2, 1: 4})
+
+        ```
+
+        See the [``filter`` method][dyce.lib.H.filter].
         """
         return self.filter(operator.ge, other, t_val, f_val)
 
     def even(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
-        """
+        r"""
+        ```python
         >>> H((-4, -2, 0, 1, 2, 3)).even()
         H({0: 2, 1: 4})
+
+        ```
         """
 
         def is_even(a, _):
@@ -603,9 +721,12 @@ class H(Mapping[int, int]):
         return self.filter(is_even, 0, t_val, f_val)
 
     def odd(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
-        """
+        r"""
+        ```python
         >>> H((-4, -2, 0, 1, 2, 3)).odd()
         H({0: 4, 1: 2})
+
+        ```
         """
 
         def is_odd(a, _):
@@ -623,11 +744,14 @@ class H(Mapping[int, int]):
         return numerator / (denominator or 1)
 
     def concat(self, other: SourceT) -> "H":
-        """
+        r"""
         Accumulates counts:
 
+        ```python
         >>> H(4).concat(H(6))
         H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
+
+        ```
         """
         if isinstance(other, int):
             other = (other,)
@@ -637,7 +761,9 @@ class H(Mapping[int, int]):
         return H(itertools.chain(self.items(), cast(Iterable, other)))
 
     def counts(self) -> Iterator[int]:
-        "More descriptive synonym for :meth:`values`."
+        r"""
+        More descriptive synonym for the [``values`` method][dyce.lib.H.values].
+        """
         return self.values()
 
     def data(
@@ -645,21 +771,29 @@ class H(Mapping[int, int]):
         relative: bool = False,
         fill_items: Optional[Mapping[int, int]] = None,
     ) -> Iterator[Tuple[int, float]]:
-        """
+        r"""
         Presentation helper function that returns an iterator for each face/frequency pair:
 
+        ```python
         >>> h6 = H(6)
         >>> list(h6.gt(3).data())
         [(0, 3.0), (1, 3.0)]
+
         >>> list(h6.gt(3).data(relative=True))
         [(0, 0.5), (1, 0.5)]
 
+        ```
+
         If provided, *fill_items* supplies defaults for any missing faces:
 
+        ```python
         >>> list(h6.gt(7).data())
         [(0, 6.0)]
+
         >>> list(h6.gt(7).data(fill_items={1: 0, 0: 0}))
         [(0, 6.0), (1, 0.0)]
+
+        ```
         """
         if fill_items is None:
             fill_items = {}
@@ -678,15 +812,18 @@ class H(Mapping[int, int]):
         relative: bool = False,
         fill_items: Optional[Mapping[int, int]] = None,
     ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
-        """
+        r"""
         Presentation helper function that returns an iterator for a “zipped” arrangement of
-        :meth:`data`:
+        the output from the [``data`` method][dyce.lib.H.data]:
 
+        ```python
         >>> h6 = H(6)
         >>> list(h6.data())
         [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
         >>> h6.data_xy()
         ((1, 2, 3, 4, 5, 6), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+
+        ```
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
@@ -694,7 +831,9 @@ class H(Mapping[int, int]):
         )
 
     def faces(self) -> Iterator[int]:
-        "More descriptive synonym for :meth:`keys`."
+        r"""
+        More descriptive synonym for the [``keys`` method][dyce.lib.H.keys].
+        """
         return self.keys()
 
     def format(
@@ -704,14 +843,16 @@ class H(Mapping[int, int]):
         tick: str = "#",
         sep: str = os.linesep,
     ) -> str:
-        """
+        r"""
         Returns a formatted string representation of the histogram. If provided,
         *fill_items* supplies defaults for any missing faces. If *width* is greater
         than zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which
         are otherwise ignored if *width* is zero or less).
 
+        ```python
         >>> print(H(6).format(width=0))
         {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
+
         >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
         avg |    7.00
           1 |   0.00% |
@@ -734,6 +875,8 @@ class H(Mapping[int, int]):
          18 |   0.00% |
          19 |   0.00% |
          20 |   0.00% |
+
+        ```
         """
         if width <= 0:
 
@@ -757,24 +900,28 @@ class H(Mapping[int, int]):
             return sep.join(lines())
 
     def lowest_terms(self) -> "H":
-        """
+        r"""
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
 
+        ```python
         >>> H((-1, -1, 0, 0, 1, 1))
         H({-1: 2, 0: 2, 1: 2})
         >>> _.lowest_terms()
         H({-1: 1, 0: 1, 1: 1})
+
         >>> H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5))
         H({2: 2, 3: 4, 4: 4, 5: 2})
         >>> _.lowest_terms()
         H({2: 1, 3: 2, 4: 2, 5: 1})
+
+        ```
         """
         counts_gcd = functools.reduce(math.gcd, self.counts(), 0)
 
         return H({k: v // counts_gcd for k, v in self.items()})
 
     def roll(self) -> int:
-        """
+        r"""
         Returns a (weighted) random face.
         """
         val = random.randrange(0, sum(self.counts()))
@@ -794,48 +941,57 @@ class H(Mapping[int, int]):
         coalesce: Optional[_CoalesceT] = None,
         max_depth: int = 1,
     ) -> "H":
-        """
+        r"""
         Calls *expand* on each face, recursively up to *max_depth* times. If *expand*
-        returns non-``None``, *coalesce* is called on the face and the expanded
-        histogram, and the returned histogram is folded into result. The default
-        behavior for *coalesce* is to replace the face with the expanded histogram.
+        returns non-``None``, *coalesce* is called on the face and the expanded histogram,
+        and the returned histogram is folded into result. The default behavior for
+        *coalesce* is to replace the face with the expanded histogram.
 
         This can be used to model complex rules. The following models re-rolling a face
         of 1 on the first roll:
 
+        ```python
         >>> def reroll_one(h: H, face: int) -> Optional[H]:
         ...   return h if face == 1 else None
-        >>> D(6).substitute(reroll_one)
+        >>> H(6).substitute(reroll_one)
         H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
+
+        ```
 
         The following approximates an exploding three-sided die (i.e., if the greatest
         face comes up, the die is rolled again and its face is added to the total):
 
+        ```python
         >>> def reroll_greatest(h: H, face: int) -> Optional[H]:
         ...   return h if face == max(h) else None
-        >>> D(3).substitute(reroll_greatest, operator.add, max_depth=4)
+        >>> H(3).substitute(reroll_greatest, operator.add, max_depth=4)
         H({1: 81, 2: 81, 4: 27, 5: 27, 7: 9, 8: 9, 10: 3, 11: 3, 13: 1, 14: 1, 15: 1})
+
+        ```
 
         Consider the following rules:
 
           1. Start with a total of zero.
-          2. Roll a six-sided die. Add the face to the total. If the result is a six, go
+          2. Roll a six-sided die. Add the face to the total. If the face was a six, go
              to step 3. Otherwise stop.
-          3. Roll a four-sided die. Add the face to the total. If the result is a four,
+          3. Roll a four-sided die. Add the face to the total. If the face was a four,
              go to step 2. Otherwise stop.
 
         What is the likelihood of an even final tally? This can be approximated by:
 
+        ```python
         >>> h4, h6 = H(4), H(6)
-        >>> def reroll_greatest_on_h6_h4(h: H, face: int) -> Optional[H]:
+        >>> def reroll_greatest_on_h4_h6(h: H, face: int) -> Optional[H]:
         ...   if face == max(h):
         ...     if h == h6: return h4
         ...     if h == h4: return h6
         ...   return None
-        >>> h = h6.substitute(reroll_greatest_on_h6_h4, operator.add, max_depth=6)
+        >>> h = h6.substitute(reroll_greatest_on_h4_h6, operator.add, max_depth=6)
         >>> h_even = h.even()
         >>> print("{:.3%}".format(h_even.get(1, 0) / sum(h_even.counts())))
         39.131%
+
+        ```
         """
         if coalesce is None:
             coalesce = _coalesce_replace
@@ -878,12 +1034,13 @@ class H(Mapping[int, int]):
         return _substitute(self)
 
     def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
-        """
+        r"""
         Computes the difference between this histogram and *other*. -1 is represents where
         that difference is less than *lo*. 0 represents where that difference between
         *lo* and *hi* (inclusive). 1 represents where that difference is greater than
         *hi*.
 
+        ```python
         >>> (2@H(6)).within(7, 9)
         H({-1: 15, 0: 15, 1: 6})
         >>> print(_.format(width=65))
@@ -899,51 +1056,68 @@ class H(Mapping[int, int]):
          -1 |  25.32% |############
           0 |  24.68% |############
           1 |  50.00% |#########################
+
+        ```
         """
         return self.map(_within(lo, hi), other)
 
 
 class D:
-    """
-    An immutable container of convenience for zero or more :class:`H` objects supporting
-    group operations. The vector can be flattened to a single histogram, either
-    explicitly via the :meth:`h` method, or by using binary arithmetic operations. Unary
-    operators and the ``@`` operator result in new :class:`D` objects. If one of *args*
-    is an :obj:`int`, it is passed to the constructor for :class:`H`.
+    r"""
+    An immutable container of convenience for a vector of zero or more
+    [``H``][dyce.lib.H] objects supporting group operations. The vector can be flattened
+    to a single histogram, either explicitly via the [``h`` method][dyce.lib.D.h], or by
+    using binary arithmetic operations. Unary operators and the ``@`` operator result in
+    new ``D`` objects. If any of the [initializer](#dyce.lib.D.__init__)’s *args*
+    parameter is an ``int``, it is passed to the constructor for ``H``.
 
+    ```python
     >>> d6 = D(6)  # shorthand for D(H(6))
     >>> d6
     D(6)
     >>> -d6
     D(-6)
+
     >>> D(d6, d6)  # 2d6
     D(6, 6)
     >>> 2@d6  # also 2d6
     D(6, 6)
+
     >>> 2@(2@d6) == 4@d6
     True
+
     >>> D(4, D(6, D(8, D(10, D(12, D(20))))))
     D(4, 6, 8, 10, 12, 20)
     >>> sum(_.roll()) in _.h()
     True
 
-    Arithmetic operators involving an :obj:`int` or another :class:`D` object produces a
-    :class:`H`:
+    ```
 
+    Arithmetic operators involving an ``int`` or another ``D`` object produces an
+    [``H`` object][dyce.lib.H]:
+
+    ```python
     >>> d6 + d6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+
     >>> 2 * D(8) - 1
     H({1: 1, 3: 1, 5: 1, 7: 1, 9: 1, 11: 1, 13: 1, 15: 1})
 
-    Comparisons between :class:`D` and :class:`H` still work:
+    ```
 
+    Comparisons between ``D`` and [``H``][dyce.lib.H] objects still work:
+
+    ```python
     >>> 3@d6 == H(6) + H(6) + H(6)
     True
 
-    For objects containing more than one :class:`H`, slicing grabs a subset of faces
-    from least to greatest. Modeling the sum of the greatest two faces of three
-    six-sided dice (3d6) can be expressed as:
+    ```
 
+    For ``D`` objects containing more than one [``H`` object][dyce.lib.H], slicing grabs
+    a subset of faces from least to greatest. Modeling the sum of the greatest two faces
+    of three six-sided dice (``3d6``) can be expressed as:
+
+    ```python
     >>> (3@d6)[-2:]
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
     >>> print(_.format(width=65))
@@ -960,8 +1134,11 @@ class D:
      11 |  12.50% |######
      12 |   7.41% |###
 
+    ```
+
     Arbitrary iterables can be used for more flexible selections:
 
+    ```python
     >>> d = 6@D(6)
     >>> every_other_d6 = d[::-2]
     >>> every_other_d6
@@ -975,9 +1152,12 @@ class D:
     >>> d[{1, 3, 5}] == every_other_d6
     True
 
-    Modeling the sum of the greatest two and least two faces of ten four-sided dice
-    (10d4) can be expressed as:
+    ```
 
+    Modeling the sum of the greatest two and least two faces of ten four-sided dice
+    (``10d4``) can be expressed as:
+
+    ```python
     >>> (10@D(4))[:2,-2:]
     H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
     >>> print(_.format(width=65))
@@ -995,6 +1175,8 @@ class D:
      14 |   0.10% |
      15 |   0.00% |
      16 |   0.00% |
+
+    ```
     """
 
     # ---- Types -----------------------------------------------------------------------
@@ -1004,6 +1186,7 @@ class D:
     # ---- Constructor -----------------------------------------------------------------
 
     def __init__(self, *args: Union[int, "D", "H"]) -> None:
+        r"Initializer."
         super().__init__()
 
         def _gen_hs():
@@ -1175,22 +1358,31 @@ class D:
     # ---- Methods ---------------------------------------------------------------------
 
     def h(self, index: Optional[int] = None) -> "H":
-        """
+        r"""
         Combines contained histograms:
 
+        ```python
         >>> (2@D(6)).h()
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+
+        ```
 
         If the optional *index* parameter is provided, extract the contained histogram
         at that index:
 
+        ```python
         >>> D(4, 6, 8).h(0)
         H(4)
 
+        ```
+
         Note that containers are opinionated about histogram ordering:
 
+        ```python
         >>> D(8, 6, 4).h(0) == D(8, 4, 6).h(0) == H(4)
         True
+
+        ```
         """
         if index is not None:
             return self._hs[index]
@@ -1208,8 +1400,9 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().lt(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().lt(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.lt``][dyce.lib.H.lt].
         """
         return self.h().lt(other, t_val, f_val)
 
@@ -1219,8 +1412,9 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().le(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().le(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.le``][dyce.lib.H.le].
         """
         return self.h().le(other, t_val, f_val)
 
@@ -1230,8 +1424,9 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().eq(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().eq(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.eq``][dyce.lib.H.eq].
         """
         return self.h().eq(other, t_val, f_val)
 
@@ -1241,8 +1436,9 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().ne(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().ne(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.ne``][dyce.lib.H.ne].
         """
         return self.h().ne(other, t_val, f_val)
 
@@ -1252,8 +1448,9 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().gt(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().gt(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.gt``][dyce.lib.H.gt].
         """
         return self.h().gt(other, t_val, f_val)
 
@@ -1263,25 +1460,28 @@ class D:
         t_val: Optional[int] = 1,
         f_val: Optional[int] = 0,
     ) -> "H":
-        """
-        Shorthand for ``self.h().ge(other, t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().ge(other, t_val, f_val)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.ge``][dyce.lib.H.ge].
         """
         return self.h().ge(other, t_val, f_val)
 
     def even(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
-        """
-        Shorthand for ``self.h().even(t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().even(t_val, f_val)``. See the [``h`` method][dyce.lib.D.h]
+        and [``H.even``][dyce.lib.H.even].
         """
         return self.h().even(t_val, f_val)
 
     def odd(self, t_val: Optional[int] = 1, f_val: Optional[int] = 0) -> "H":
-        """
-        Shorthand for ``self.h().odd(t_val, f_val)``.
+        r"""
+        Shorthand for ``self.h().odd(t_val, f_val)``. See the [``h`` method][dyce.lib.D.h]
+        and [``H.odd``][dyce.lib.H.odd].
         """
         return self.h().odd(t_val, f_val)
 
     def roll(self) -> Tuple[int, ...]:
-        """
+        r"""
         Returns (weighted) random faces from contained histograms.
         """
         return tuple(h.roll() for h in self._hs)
@@ -1292,14 +1492,16 @@ class D:
         coalesce: Optional[_CoalesceT] = None,
         max_depth: int = 1,
     ) -> H:
-        """
-        Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``.
+        r"""
+        Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.substitute``][dyce.lib.H.substitute].
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
     def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
-        """
-        Shorthand for ``self.h().within(lo, hi, other)``.
+        r"""
+        Shorthand for ``self.h().within(lo, hi, other)``. See the
+        [``h`` method][dyce.lib.D.h] and [``H.within``][dyce.lib.H.within].
         """
         return self.h().within(lo, hi, other)
 
@@ -1324,30 +1526,57 @@ def _rolls_and_counts_for_n_uniform_histograms(
     h: Mapping[int, int],
     n: int,
 ) -> Iterator[Tuple[Sequence[int], int]]:
-    """
+    r"""
     Given a group of *n* identical histograms *h*, return an iterator that yields
     2-tuples (pairs). The first item is a sorted sequence of the *n* faces for the
     distinct roll. The second item is the count for that roll.
 
+    ```
     >>> list(_rolls_and_counts_for_n_uniform_histograms(H((-1, 0, 1)), 2))
     [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
 
-    This implementation is intended to be more efficient than merely enumerating the
-    Cartesian product. Instead, it enumerates combinations with replacements, then
-    computes the number of permutations with repetitions, leveraging:
+    ```
 
-    :math:`{{P}_{{{n}_{1}}!,{{n}_{2}}!,\\ldots,{{n}_{k}}!}^{n}} = {\\frac {{n}!} {{{n}_{1}}! {{n}_{2}}! \\cdots {{n}_{k}}!}}`
+    This is intended to be more efficient at enumerating faces and counts than merely
+    enumerating the Cartesian product. It enumerates combinations with replacements,
+    and, for each combination, computes the number of permutations with repetitions,
+    leveraging the
+    [*multinomial coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets):
+
+    ${{n} \choose {{{k}_{1}},{{k}_{2}},\ldots,{{k}_{m}}}} = {\frac {{n}!} {{{k}_{1}}! {{k}_{2}}! \cdots {{k}_{m}}!}}$
+
+    Consider ``n@D(H(m))``. Enumerating combinations with replacements would yield all
+    unique (unordered) rolls:
+
+    ``((1, 1, …, 1), (1, 1, …, 2), …, (1, 1, …, m), (2, 2, …, 2), …, (m - 1, m, m), (m, m, m))``
+
+    To determine the count for a particular roll ``(a, b, …, n)``, we compute the
+    multinomial coefficient for that roll and multiply by the scalar ``h[a] * h[b] * … *
+    h[n]``.
+
+    Without narrowing the selection of any faces, we can confirm equivalence to our sum
+    operation (which is computed from the Cartesian product).
+
+    ```
+    >>> h = H((2, 3, 3, 4, 4, 5))
+    >>> (4@D(h))[:] == h + h + h + h
+    True
+
+    ```
+
+    (See [this](https://www.lucamoroni.it/the-dice-roll-sum-problem/) for an
+    excellent explanation.)
     """
-    # combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC; note that input
+    # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
     # order is preserved and H faces are sorted
+    multinomial_coefficient_numerator = math.factorial(n)
     rolls_iter = itertools.combinations_with_replacement(h, n)
 
     for sorted_faces_for_roll in rolls_iter:
-        total_count = functools.reduce(
+        count_scalar = functools.reduce(
             operator.mul, (h[face] for face in sorted_faces_for_roll)
         )
-        num_permutations_numerator = math.factorial(len(sorted_faces_for_roll))
-        num_permutations_denominator = functools.reduce(
+        multinomial_coefficient_denominator = functools.reduce(
             operator.mul,
             (
                 math.factorial(sum(1 for _ in g))
@@ -1355,24 +1584,27 @@ def _rolls_and_counts_for_n_uniform_histograms(
             ),
         )
 
-        yield sorted_faces_for_roll, total_count * num_permutations_numerator // num_permutations_denominator
+        yield sorted_faces_for_roll, count_scalar * multinomial_coefficient_numerator // multinomial_coefficient_denominator
 
 
 def _rolls_and_counts_for_nonuniform_histograms(
     h_groups: Iterable[Tuple[Mapping[int, int], int]]
 ) -> Iterator[Tuple[Sequence[int], int]]:
-    """
+    r"""
     Given an iterable of histogram/count pairs, return an iterator that yields 2-tuples
     (pairs). The first item is a sorted sequence of the faces for the distinct roll. The
     second item is the count for that roll. Note that rolls can appear more than once,
     and there are no guarantees about the order in which rolls appear in the result.
 
+    ```
     >>> list(_rolls_and_counts_for_nonuniform_histograms(((H((2)), 1), (H(3), 1))))
     [([1, 1], 1), ([1, 2], 1), ([1, 3], 1), ([1, 2], 1), ([2, 2], 1), ([2, 3], 1)]
 
+    ```
+
     The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
     intended, since its implementation is optimized to leverage
-    :func:`_rolls_and_counts_for_n_uniform_histograms`.
+    ``_rolls_and_counts_for_n_uniform_histograms``.
     """
     for v in itertools.product(
         *(_rolls_and_counts_for_n_uniform_histograms(h, n) for h, n in h_groups)

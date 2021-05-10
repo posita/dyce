@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # ======================================================================================
-"""
-Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If that file is missing or appears to be
-modified from its original, then please contact the author before viewing or using this
-software in any capacity.
-"""
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
@@ -44,35 +42,44 @@ if os.path.isfile(vers_info["__path__"]):
             vers_info,
         )
 
-with codecs.open(os.path.join(_MY_DIR, "README.rst"), encoding="utf-8") as readme_file:
+with codecs.open(os.path.join(_MY_DIR, "README.md"), encoding="utf-8") as readme_file:
     README = readme_file.read()
 
+__version__ = vers_info.get("__version__", (0, 0, 0))
 __vers_str__ = vers_info.get("__vers_str__")
-__release__ = vers_info.get("__release__", __vers_str__)
 
 SETUP_ARGS = {
     "name": "dycelib",
     "version": __vers_str__,
     "author": "Matt Bogosian",
     "author_email": "matt@bogosian.net",
-    "url": "https://dyce.readthedocs.org/en/{}/".format(__release__),
+    "url": "https://posita.github.io/dyce/{}/".format(
+        __vers_str__ if __vers_str__ and __version__ != (0, 0, 0) else "master"
+    ),
     "license": "MIT License",
     "description": "Simple Python tools for dice-based probabilities",
     "long_description": README,
+    "long_description_content_type": "text/markdown",
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
-    "classifiers": (
+    "classifiers": [
+        "Topic :: Education",
+        "Topic :: Games/Entertainment",
+        "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
-    ),
+    ],
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
     "install_requires": ["typing", "typing_extensions"],
@@ -82,12 +89,17 @@ SETUP_ARGS = {
             "debug",
             "flake8",
             "jedi",
-            "matplotlib",
             "mypy",
             "pylint",
-            "pytest-cov",
+            "pytest",
             "tox",
             "twine",
+        ],
+        "doc": [
+            "mike",
+            "mkdocs-exclude",
+            "mkdocs-material",
+            "mkdocstrings",
         ],
     },
 }

@@ -1,0 +1,62 @@
+site_name: dyce
+site_description: Simple Python tools for dice-based probabilities
+site_author: Matt Bogosian
+copyright: <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+repo_url: https://github.com/posita/dyce
+
+nav:
+  - Introduction: index.md
+  - API:
+    - <tt>dyce</tt>: dyce.md
+    - <tt>dyce.plt</tt>: dyce.plt.md
+  - Contributing: contrib.md
+  - License: license.md
+
+# See:
+# * <https://www.mkdocs.org/>
+# * <https://squidfunk.github.io/mkdocs-material/>
+# * <https://mkdocstrings.github.io/>
+
+extra:
+  version:
+    provider: mike
+
+extra_javascript:
+  # ---- BEGIN MathJax config ----
+  - mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  # ----- END MathJax config -----
+
+markdown_extensions:
+  - admonition
+  # ---- BEGIN MathJax config ----
+  - pymdownx.arithmatex:
+      generic: true
+  # ----- END MathJax config -----
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.superfences
+
+plugins:
+  - exclude:
+      glob:
+        - "Makefile"
+        - "*.py"
+  - mike:
+      version_selector: true
+  - mkdocstrings:
+      default_handler: python
+      watch:
+        - dyce
+  - search
+
+theme:
+  name: "material"  # Required by arithmatex and mkdocstrings
+  features:
+    - navigation.expand
+    - navigation.sections
+    - toc.integrate

@@ -1,12 +1,10 @@
 # -*- encoding: utf-8 -*-
 # ======================================================================================
-"""
-Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If that file is missing or appears to be
-modified from its original, then please contact the author before viewing or using this
-software in any capacity.
-"""
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
@@ -114,22 +112,6 @@ def graph_colors(name: str, vals: Iterable, alpha: float = 1.0) -> ColorListT:
     return alphasize(colors, alpha)
 
 
-def plot_burst(
-    h_inner: H,
-    outer: Optional[Iterable[LabelT]] = None,
-    desc: Optional[str] = None,
-    graph_color: str = DEFAULT_GRAPH_COLOR,
-    text_color: str = DEFAULT_TEXT_COLOR,
-    alpha: float = DEFAULT_GRAPH_ALPHA,
-) -> Tuple[FigureT, AxesT]:
-    assert matplotlib
-    fig, ax = matplotlib.pyplot.subplots()
-    display_burst(ax, h_inner, outer, desc, graph_color, text_color, alpha)
-    matplotlib.pyplot.tight_layout()
-
-    return fig, ax
-
-
 def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
@@ -146,3 +128,19 @@ def labels_cumulative(
 
         ge_total -= percentage
         yield (label, percentage)
+
+
+def plot_burst(
+    h_inner: H,
+    outer: Optional[Iterable[LabelT]] = None,
+    desc: Optional[str] = None,
+    graph_color: str = DEFAULT_GRAPH_COLOR,
+    text_color: str = DEFAULT_TEXT_COLOR,
+    alpha: float = DEFAULT_GRAPH_ALPHA,
+) -> Tuple[FigureT, AxesT]:
+    assert matplotlib
+    fig, ax = matplotlib.pyplot.subplots()
+    display_burst(ax, h_inner, outer, desc, graph_color, text_color, alpha)
+    matplotlib.pyplot.tight_layout()
+
+    return fig, ax

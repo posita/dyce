@@ -1,20 +1,25 @@
 # -*- encoding: utf-8 -*-
 # ======================================================================================
-"""
-Copyright and other protections apply. Please see the accompanying :doc:`LICENSE
-<LICENSE>` file for rights and restrictions governing use of this software. All rights
-not expressly waived or licensed are reserved. If that file is missing or appears to be
-modified from its original, then please contact the author before viewing or using this
-software in any capacity.
-"""
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
 # ======================================================================================
 
 from __future__ import generator_stop
 
-import matplotlib.patches
+import pytest
 import random
+import warnings
 
 from dyce import H, plt as dyce_plt
+
+try:
+    import matplotlib.patches
+except ImportError:
+    warnings.warn("matplotlib not found; {} some tests disabled".format(__name__))
+    matplotlib = None  # noqa: F811
 
 __all__ = ()
 
@@ -33,6 +38,7 @@ class TestPlt:
         assert actual_colors == expected_colors
         assert dyce_plt.alphasize(colors, -1.0) == colors
 
+    @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst(self):
         _, ax = dyce_plt.matplotlib.pyplot.subplots()
         h6_2 = 2 @ H(6)
@@ -68,6 +74,7 @@ class TestPlt:
             "12",
         ]
 
+    @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst_outer(self):
         _, ax = dyce_plt.matplotlib.pyplot.subplots()
         h6_2 = 2 @ H(6)

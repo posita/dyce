@@ -1,15 +1,9 @@
-``LICENSE & CREDITS``
-=====================
+# License & Credits
 
-The MIT License (MIT)
----------------------
+## The MIT License (MIT)
 
-Copyright |(c)| 2015-2021 `Matt Bogosian`_ (|@posita|_).
-
-.. |(c)| unicode:: u+a9
-.. _`Matt Bogosian`: mailto:matt@bogosian.net?Subject=dyce
-.. |@posita| replace:: **@posita**
-.. _`@posita`: https://github.com/posita
+Copyright © 2015-2021 [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce)
+([**@posita**](https://github.com/posita)).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this
 software and associated documentation files (the “Software”), to deal in the Software
@@ -28,10 +22,18 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-Contributors
-------------
+## Contributors
 
-The following individuals or entities have contributed to this software.
+The following individuals or entities have contributed to this software:
+
+* [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce); GitHub - [**@posita**](https://github.com/posita)
+
+<!--
+    Entry formats:
+    * NAME
+    * [NAME](MAILTO_URL)
+    * … ; FORUM - [SCREEN_NAME](URL); …
+-->
 
 By adding your name to this list, you grant a nonexclusive, perpetual license to your
 contributions to this software under the same terms as its license, above. Further, you
@@ -40,6 +42,3 @@ no one else has any superior right or claim to them. Finally, you agree to indem
 hold harmless this software’s owner against any colorable claim of infringement by a
 third party for this software’s owner’s otherwise lawful use of your contribution,
 whether or not such use was contemplated by you at the time you made it.
-
-.. Entry format:
-.. * `NAME <CONTACT_URL>`__ (see `REPO_URL <REPO_URL>`__)
