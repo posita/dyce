@@ -17,15 +17,15 @@ Please see the accompanying `LICENSE` file for rights and restrictions governing
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.1.1 Version](https://img.shields.io/pypi/v/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 Development Stage](https://img.shields.io/pypi/status/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 License](https://img.shields.io/pypi/l/dycelib/0.1.1.svg)](http://opensource.org/licenses/MIT)
+[![v0.1.1 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
 
 # `dyce` - Simple Python tools for dice-based probabilities
 
-[![Build Status](https://travis-ci.com/posita/dyce.svg?version=master)](https://travis-ci.com/posita/dyce?version=master)
+[![Build Status](https://travis-ci.com/posita/dyce.svg?version=v0.1.1)](https://travis-ci.com/posita/dyce?version=v0.1.1)
 
 > :point_up: *Curious about integrating your project with the above services?
   Jeff Knupp ([**@jeffknupp**](https://github.com/jeffknupp)) [describes how](https://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/).*
@@ -34,7 +34,7 @@ If that file is missing or appears to be modified from its original, then please
 Inspired by [AnyDice](https://anydice.com/), `dyce` leverages Pythonic syntax and operators for rolling dice and computing weighted outcomes.
 While Python is not as terse as a dedicated grammar, it is quite sufficient.
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
-See [the docs](https://posita.github.io/dyce/latest/) for more information.
+See [the docs](https://posita.github.io/dyce/0.1/) for more information.
 
 `dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying `LICENSE` file for details.

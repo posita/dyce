@@ -13,11 +13,11 @@
   Thank you!
 -->
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.1.1 Version](https://img.shields.io/pypi/v/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 Development Stage](https://img.shields.io/pypi/status/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 License](https://img.shields.io/pypi/l/dycelib/0.1.1.svg)](http://opensource.org/licenses/MIT)
+[![v0.1.1 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
+[![v0.1.1 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.1.1.svg)](https://pypi.python.org/pypi/dycelib/0.1.1)
 
 # Introduction to ``dyce``
 
