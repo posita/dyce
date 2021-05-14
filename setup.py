@@ -54,7 +54,7 @@ SETUP_ARGS = {
     "author": "Matt Bogosian",
     "author_email": "matt@bogosian.net",
     "url": "https://posita.github.io/dyce/{}/".format(
-        __vers_str__ if __vers_str__ and __version__ != (0, 0, 0) else "master"
+        "{}.{}".format(*__version__[:2]) if __version__ != (0, 0, 0) else "latest"
     ),
     "license": "MIT License",
     "description": "Simple Python tools for dice-based probabilities",
@@ -91,7 +91,7 @@ SETUP_ARGS = {
             "jedi",
             "mypy",
             "pylint",
-            "pytest",
+            "pytest-gitignore",
             "tox",
             "twine",
         ],

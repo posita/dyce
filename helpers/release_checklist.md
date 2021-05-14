@@ -27,9 +27,7 @@ The following assumes you are working from the repository root and have a develo
   * updates `gh-pages`
   * see [`./helpers/draft-release.sh`](draft-release.sh) for details
 
-* [ ] `git push origin vX.Y.Z`
-
-* [ ] `git push origin gh-pages`
+* [ ] `git push origin vX.Y.Z gh-pages`
 
 * [ ] `twine upload dist/*-X.Y.Z[-.]*`
 

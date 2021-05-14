@@ -12,7 +12,7 @@ from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
 
 import warnings
 
-from .lib import H
+from .h import H
 
 try:
     import matplotlib.axes

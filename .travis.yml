@@ -20,10 +20,5 @@ python:
 install:
     - pip install tox-travis
 
-matrix:
-    allow_failures:
-        # PyPy3 is experimental
-        - python: "pypy3"
-
 script:
     - tox

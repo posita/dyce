@@ -21,10 +21,10 @@
 
 ``dyce`` provides two key primitives:
 
-* [``H``][dyce.lib.H] for histograms (individual dice or outcomes)
-* [``D``][dyce.lib.D] for collections of histograms (dice sets)
+* [``H``][dyce.h.H] for histograms (outcomes or individual dice)
+* [``P``][dyce.p.P] for collections of histograms (pools)
 
-::: dyce.lib.H
+::: dyce.h.H
     rendering:
       show_root_full_path: false
       show_root_heading: true
@@ -33,7 +33,7 @@
         - "!^OperatorLT$"
         - "!^OperatorRT$"
 
-::: dyce.lib.D
+::: dyce.p.P
     rendering:
       show_root_full_path: false
       show_root_heading: true

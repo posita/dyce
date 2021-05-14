@@ -18,32 +18,39 @@
 [![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
 [![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
 [![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![source code](https://img.shields.io/github/stars/posita/dyce?style=social)](https://github.com/posita/dyce)
 
 # Introduction to ``dyce``
 
 ``dyce`` is a pure-Python library for exploring dice probabilities designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
-Inspired by [AnyDice](https://anydice.com/), ``dyce`` leverages Pythonic syntax and operators for rolling dice and computing weighted outcomes.
-While Python is not as terse as a dedicated grammar, it is quite sufficient.
+``dyce`` is an [AnyDice](https://anydice.com/) replacement that leverages Pythonic syntax and operators for rolling dice and computing weighted outcomes.
+While Python is not as terse as a dedicated grammar, it is quite sufficient, and often more expressive.
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
 
 ``dyce`` is fairly low level by design, prioritizing ergonomics and composability.
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), it provides some basic inspection conveniences which make it useful for tinkering on its own.
+While any AnyDice generously affords a very convenient platform for simple computations, its idiosyncrasies can lead to [confusion](https://duckduckgo.com/?q=site%3Astackexchange.com+title%3Aanydice) and complicated workarounds.
+Like AnyDice, it avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
+Unlike AnyDice, however, it is an open source library that can be run locally and modified as desired.
+Because it exposes Python primitives rather than defining a dedicated grammar and interpreter, one can easily integrate it with other Python tools and libraries.
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), it provides minor formatting conveniences for casual tinkering.
 However, it really shines when used in larger contexts such as [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
-If you have suggested improvements for use with other tools and, please consider [contributing](contrib.md).
+
+``dyce`` should be sufficient to replicate or replace AnyDice and most other dice probability modeling libraries.
+It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
+If you find its functionality or documentation confusing or lacking in any way, please consider [contributing an issue](contrib.md) to start a discussion.
+Source code is [available on GitHub](https://github.com/posita/dyce).
 
 ## Examples
 
-``dyce`` provides two key primitives. [``H``](dyce.md#dyce.lib.H) represent histograms (individual dice or outcomes) and [``D``](dyce.md#dyce.lib.D) represent collections of histograms (dice sets):
+``dyce`` provides two key primitives. [``H`` objects](dyce.md#dyce.h.H) represent histograms for modeling or outcomes and individual dice, and [``P`` objects](dyce.md#dyce.p.P) represent pools (ordered sequences) of histograms:
 
 ```python
->>> from dyce import D, H
+>>> from dyce import H, P
 
 ```
 
 Both support arithmetic operations.
-
-Histograms are used to express individual dice and results.
-A six-sided die can be expressed as:
+A six-sided die can be modeled as:
 
 ```python
 >>> H(6)
@@ -60,7 +67,7 @@ True
 ```
 
 Tuples with repeating faces are accumulated.
-A six-sided “2, 3, 3, 4, 4, 5” die can be expressed as:
+A six-sided “2, 3, 3, 4, 4, 5” die can be modeled as:
 
 ```python
 >>> H((2, 3, 3, 4, 4, 5))
@@ -68,7 +75,7 @@ H({2: 1, 3: 2, 4: 2, 5: 1})
 
 ```
 
-A fudge die can be expressed as:
+A fudge die can be modeled as:
 
 ```python
 >>> H((-1, 0, 1))
@@ -77,55 +84,63 @@ H({-1: 1, 0: 1, 1: 1})
 ```
 
 Python’s matrix multiplication operator (``@``) is used to express the number of a particular die (roughly equivalent to the “``d``” operator in common notations).
-A set of two six-sided dice (``2d6``) is:
+A pool of two six-sided dice (``2d6``) is:
 
 ```python
->>> 2@D(H(6))
-D(6, 6)
+>>> 2@P(H(6))
+P(6, 6)
 
 ```
 
-Where ``n`` is an integer, ``D(n, ...)`` is shorthand for ``D(H(n), ...)``.
+Where ``n`` is an integer, ``P(n, ...)`` is shorthand for ``P(H(n), ...)``.
 The above can be expressed more succinctly:
 
 ```python
->>> 2@D(6)
-D(6, 6)
+>>> 2@P(6)
+P(6, 6)
 
 ```
 
-Dice sets (in this case [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms:
+Pools (in this case [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms:
 
 ```python
->>> sicherman_d = D(H((1, 2, 2, 3, 3, 4)), H((1, 3, 4, 5, 6, 8)))
->>> sicherman_d == 2@H(6)
+>>> d_sicherman = P(H((1, 2, 2, 3, 3, 4)), H((1, 3, 4, 5, 6, 8)))
+>>> d_sicherman == 2@H(6)
 True
 
 ```
 
-Arithmetic operations implicitly flatten dice sets into histograms.
+Arithmetic operations implicitly flatten pools into histograms.
 ``3×(2d6+4)`` is:
 
 ```python
->>> 3*(2@D(6)+4)
+>>> 3*(2@P(6)+4)
 H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 
 ```
 
 In interpreting the results, we see there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
 
-Histograms are sufficient for most calculations.
-However, dice sets are useful for taking only some of the set’s faces.
-This is done using Python’s indexing operator (``[…]``).
+One way to model subtracting the least of two six-sided dice from the greatest is:
+
+```python
+>>> abs(H(6) - H(6))
+H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
+
+```
+
+Histograms should be sufficient for most calculations.
+However, pools are useful for selecting (or “taking”) only some of the pool’s faces.
+This is done by providing the optional *key* argument to the [``h`` method][dyce.p.P.h].
 Indexes can be integers, slices, or iterables thereof.
-Faces are ordered from least (at index `0`) to greatest (at index `-1`).
+Faces are ordered from least to greatest (i.e., ``0``, ``1``, …, ``-2``, ``-1``).
 Summing the least two faces when rolling three six-sided dice would be:
 
 ```python
->>> 3@D(6)
-D(6, 6, 6)
+>>> 3@P(6)
+P(6, 6, 6)
 
->>> (3@D(6))[:2]  # see warning below about parentheses
+>>> (3@P(6)).h(slice(2))  # see warning below about parentheses
 H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
 
 ```
@@ -135,11 +150,11 @@ H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
     Parentheses are needed in the above example because ``@`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``[…]``.
 
     ```python
-    >>> 2@D(6)[1]  # equivalent to 2@(D(6)[1])
+    >>> 2@P(6).h(1)  # equivalent to 2@(P(6).h(1))
     Traceback (most recent call last):
     ...
     IndexError: tuple index out of range
-    >>> (2@D(6))[1]
+    >>> (2@P(6)).h(1)
     H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
     ```
@@ -166,7 +181,7 @@ avg |    7.00
 Selecting the least, middle, or greatest face when rolling three six-sided dice would be:
 
 ```python
->>> (3@D(6))[0]
+>>> (3@P(6)).h(0)
 H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
 >>> print(_.format(width=65))
 avg |    2.04
@@ -177,7 +192,7 @@ avg |    2.04
   5 |   3.24% |#
   6 |   0.46% |
 
->>> (3@D(6))[1]
+>>> (3@P(6)).h(1)
 H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
 >>> print(_.format(width=65))
 avg |    3.50
@@ -188,7 +203,7 @@ avg |    3.50
   5 |  18.52% |#########
   6 |   7.41% |###
 
->>> (3@D(6))[-1]
+>>> (3@P(6)).h(-1)
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
 >>> print(_.format(width=65))
 avg |    4.96
@@ -206,8 +221,33 @@ Summing the greatest and the least faces when rolling an entire standard six-die
 ```python
 >>> H(10)-1  # a common “d10” with faces [0 .. 9]
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
->>> D(4, 6, 8, _, 12, 20)[0, -1]
+>>> P(4, 6, 8, _, 12, 20).h((0, -1))
 H({1: 1, 2: 32, 3: 273, 4: 1384, ..., 21: 20736, 22: 9240, 23: 3360, 24: 810})
+
+```
+
+Note that pools are ordered and iterable:
+
+```python
+>>> list(2@P(8, 4, 6))
+[H(4), H(4), H(6), H(6), H(8), H(8)]
+
+```
+
+Indexing selects particular histograms in a pool:
+
+```python
+>>> (2@P(8, 4, 6))[1:3]
+(H(4), H(6))
+
+```
+
+If desired, one way to enumerate all possible rolls is:
+
+```python
+>>> import itertools
+>>> list(itertools.product(*P(-3, 3)))
+[(-3, 1), (-3, 2), (-3, 3), (-2, 1), (-2, 2), (-2, 3), (-1, 1), (-1, 2), (-1, 3)]
 
 ```
 
@@ -227,12 +267,12 @@ The outer ring and corresponding labels can be overridden for interesting, at-a-
 Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 ```python
->>> d20 = D(20)
-... fig, ax = plot_burst(d20.h(), outer=(
-...   ("crit. fail.", d20.le(1)[1]),
-...   ("fail.", d20.within(2, 14)[0]),
-...   ("succ.", d20.within(15, 19)[0]),
-...   ("crit. succ.", d20.ge(20)[1]),
+>>> p_d20 = P(20)
+>>> fig, ax = plot_burst(p_d20.h(), outer=(
+...   ("crit. fail.", p_d20.le(1).h(1)),
+...   ("fail.", p_d20.within(2, 14).h(0)),
+...   ("succ.", p_d20.within(15, 19).h(0)),
+...   ("crit. succ.", p_d20.ge(20).h(1)),
 ... ), graph_color="RdYlBu_r")  # doctest: +SKIP
 
 ```

@@ -13,7 +13,8 @@ import pytest
 import random
 import warnings
 
-from dyce import H, plt as dyce_plt
+from dyce.h import H
+from dyce import plt as dyce_plt
 
 try:
     import matplotlib.patches
@@ -41,8 +42,8 @@ class TestPlt:
     @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst(self):
         _, ax = dyce_plt.matplotlib.pyplot.subplots()
-        h6_2 = 2 @ H(6)
-        dyce_plt.display_burst(ax, h6_2)
+        d6_2 = 2 @ H(6)
+        dyce_plt.display_burst(ax, d6_2)
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
@@ -77,8 +78,8 @@ class TestPlt:
     @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst_outer(self):
         _, ax = dyce_plt.matplotlib.pyplot.subplots()
-        h6_2 = 2 @ H(6)
-        dyce_plt.display_burst(ax, h6_2, dyce_plt.labels_cumulative(h6_2))
+        d6_2 = 2 @ H(6)
+        dyce_plt.display_burst(ax, d6_2, dyce_plt.labels_cumulative(d6_2))
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
