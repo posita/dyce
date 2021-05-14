@@ -1,0 +1,742 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for dice-based probabilities">
+      
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.4">
+    
+    
+      
+        <title>dyce</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.bde7dde4.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#introduction-to-dyce" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Introduction
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Introduction
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        Introduction
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" data-md-state="indeterminate" type="checkbox" id="__nav_2" checked>
+      
+      <label class="md-nav__link" for="__nav_2">
+        API
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="dyce.plt/" class="md-nav__link">
+        <tt>dyce.plt</tt>
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contrib/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/posita/dyce/edit/master/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <!--- -*- encoding: utf-8 -*-
+  Copyright and other protections apply. Please see the accompanying LICENSE file for
+  rights and restrictions governing use of this software. All rights not expressly
+  waived or licensed are reserved. If that file is missing or appears to be modified
+  from its original, then please contact the author before viewing or using this
+  software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+-->
+
+<p><a href="https://pypi.python.org/pypi/dycelib/0.1.1"><img alt="v0.1.1 Version" src="https://img.shields.io/pypi/v/dycelib/0.1.1.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.1.1"><img alt="v0.1.1 Development Stage" src="https://img.shields.io/pypi/status/dycelib/0.1.1.svg" /></a>
+<a href="http://opensource.org/licenses/MIT"><img alt="v0.1.1 License" src="https://img.shields.io/pypi/l/dycelib/0.1.1.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.1.1"><img alt="v0.1.1 Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dycelib/0.1.1.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.1.1"><img alt="v0.1.1 Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dycelib/0.1.1.svg" /></a></p>
+<h1 id="introduction-to-dyce">Introduction to <code>dyce</code></h1>
+<p><code>dyce</code> is a pure-Python library for exploring dice probabilities designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
+Inspired by <a href="https://anydice.com/">AnyDice</a>, <code>dyce</code> leverages Pythonic syntax and operators for rolling dice and computing weighted outcomes.
+While Python is not as terse as a dedicated grammar, it is quite sufficient.
+Those familiar with various <a href="https://en.wikipedia.org/wiki/Dice_notation">game notations</a> should be able to adapt quickly.</p>
+<p><code>dyce</code> is fairly low level by design, prioritizing ergonomics and composability.
+In an intentional departure from <a href="https://datatracker.ietf.org/doc/html/rfc1925#section-2">RFC 1925, § 2.2</a>, it provides some basic inspection conveniences which make it useful for tinkering on its own.
+However, it really shines when used in larger contexts such as <a href="https://matplotlib.org/">Matplotlib</a> or <a href="https://jupyter.org/">Jupyter</a>.
+If you have suggested improvements for use with other tools and, please consider <a href="contrib/">contributing</a>.</p>
+<h2 id="examples">Examples</h2>
+<p><code>dyce</code> provides two key primitives. <a href="dyce/#dyce.lib.H"><code>H</code></a> represent histograms (individual dice or outcomes) and <a href="dyce/#dyce.lib.D"><code>D</code></a> represent collections of histograms (dice sets):</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">D</span><span class="p">,</span> <span class="n">H</span>
+</code></pre></div>
+</td></tr></table>
+<p>Both support arithmetic operations.</p>
+<p>Histograms are used to express individual dice and results.
+A six-sided die can be expressed as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><code>H(n)</code> is shorthand for explicitly enumerating faces <span class="arithmatex">\([{{1} .. {n}}]\)</span>, each with a frequency of 1:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">==</span> <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p>Tuples with repeating faces are accumulated.
+A six-sided “2, 3, 3, 4, 4, 5” die can be expressed as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>A fudge die can be expressed as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Python’s matrix multiplication operator (<code>@</code>) is used to express the number of a particular die (roughly equivalent to the “<code>d</code>” operator in common notations).
+A set of two six-sided dice (<code>2d6</code>) is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@D</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">D</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Where <code>n</code> is an integer, <code>D(n, ...)</code> is shorthand for <code>D(H(n), ...)</code>.
+The above can be expressed more succinctly:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">D</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Dice sets (in this case <a href="https://en.wikipedia.org/wiki/Sicherman_dice">Sicherman dice</a>) can be compared to histograms:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">sicherman_d</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sicherman_d</span> <span class="o">==</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p>Arithmetic operations implicitly flatten dice sets into histograms.
+<code>3×(2d6+4)</code> is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>In interpreting the results, we see there is one way to make <code>18</code>, two ways to make <code>21</code>, three ways to make <code>24</code>, etc.</p>
+<p>Histograms are sufficient for most calculations.
+However, dice sets are useful for taking only some of the set’s faces.
+This is done using Python’s indexing operator (<code>[…]</code>).
+Indexes can be integers, slices, or iterables thereof.
+Faces are ordered from least (at index <code>0</code>) to greatest (at index <code>-1</code>).
+Summing the least two faces when rolling three six-sided dice would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">D</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">))[:</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># see warning below about parentheses</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<div class="admonition warning">
+<p class="admonition-title">Mind your parentheses</p>
+<p>Parentheses are needed in the above example because <code>@</code> has a <a href="https://docs.python.org/3/reference/expressions.html#operator-precedence">lower precedence</a> than <code>[…]</code>.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># equivalent to 2@(D(6)[1])</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<span class="o">...</span>
+<span class="ne">IndexError</span><span class="p">:</span> <span class="nb">tuple</span> <span class="n">index</span> <span class="n">out</span> <span class="n">of</span> <span class="nb">range</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+<p>Histograms provide rudimentary formatting for convenience:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">11.11</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+  <span class="mi">6</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">7</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">8</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">9</span> <span class="o">|</span>  <span class="mf">11.11</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+ <span class="mi">12</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+</code></pre></div>
+</td></tr></table>
+<p>Selecting the least, middle, or greatest face when rolling three six-sided dice would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.04</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">28.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">17.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">5</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">3.50</span>
+  <span class="mi">1</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">18.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">24.07</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">24.07</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">18.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@D</span><span class="p">(</span><span class="mi">6</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">91</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.96</span>
+  <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">17.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">28.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############</span>
+  <span class="mi">6</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
+</code></pre></div>
+</td></tr></table>
+<p>Summing the greatest and the least faces when rolling an entire standard six-die polygonal set would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># a common “d10” with faces [0 .. 9]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">D</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">20</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">273</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1384</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">20736</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">9240</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">3360</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">810</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>If <a href="https://matplotlib.org/stable/api/index.html"><code>matplotlib</code></a> is installed (e.g., via <a href="https://jupyter.org/">Jupyter</a>), <a href="dyce.plt/"><code>dyce.plt</code></a> provides some experimental, rudimentary conveniences:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.plt</span> <span class="kn">import</span> <span class="n">plot_burst</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_burst</span><span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
+<p><img alt="plot_burst_1.png" src="plot_burst_1.png" /></p>
+<p>The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
+Overrides apply counter-clockwise, starting from the 12 o‘clock position:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d20</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="o">...</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_burst</span><span class="p">(</span><span class="n">d20</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">outer</span><span class="o">=</span><span class="p">(</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">14</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">19</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">20</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+<span class="o">...</span> <span class="p">),</span> <span class="n">graph_color</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
+<p><img alt="plot_burst_2.png" src="plot_burst_2.png" /></p>
+<h2 id="license">License</h2>
+<p><code>dyce</code> is licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.
+See the <a href="license/"><code>LICENSE</code></a> file for details.
+Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.</p>
+<h2 id="installation">Installation</h2>
+<p>Installation can be performed via <code>pip</code> (which will download and install the <a href="https://pypi.python.org/pypi/dyce/">latest release</a>):</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% pip install dycelib
+...
+</code></pre></div>
+</td></tr></table>
+<p>Alternately, you can download the sources (e.g., <a href="https://github.com/posita/dyce">from GitHub</a>) and run <code>setup.py</code>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% git clone https://github.com/posita/dyce
+...
+% <span class="nb">cd</span> dyce
+% python setup.py install
+...
+</code></pre></div>
+</td></tr></table>
+<h3 id="requirements">Requirements</h3>
+<p>A modern version of Python is required:</p>
+<ul>
+<li><a href="https://www.python.org/">cPython</a> (3.6+)</li>
+<li><a href="http://pypy.org/">PyPy</a> (Python 3.6+ compatible)</li>
+</ul>
+<p><code>dyce</code> has the following dependencies (which will be installed automatically):</p>
+<ul>
+<li><a href="https://pypi.org/project/typing/"><code>typing</code></a></li>
+<li><a href="https://pypi.org/project/typing-extensions/"><code>typing-extensions</code></a></li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+      
+        <a href="dyce/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <tt>dyce</tt>
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.4fa0e4ee.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.1d3bfcf1.min.js"></script>
+      
+        <script src="mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
