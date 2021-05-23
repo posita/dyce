@@ -13,11 +13,11 @@
   Thank you!
 -->
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.2.0 Version](https://img.shields.io/pypi/v/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 Development Stage](https://img.shields.io/pypi/status/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 License](https://img.shields.io/pypi/l/dycelib/0.2.0.svg)](http://opensource.org/licenses/MIT)
+[![v0.2.0 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
 [![source code](https://img.shields.io/github/stars/posita/dyce?style=social)](https://github.com/posita/dyce)
 
 # Introduction to ``dyce``

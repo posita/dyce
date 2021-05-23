@@ -17,15 +17,15 @@ Please see the accompanying `LICENSE` file for rights and restrictions governing
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.2.0 Version](https://img.shields.io/pypi/v/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 Development Stage](https://img.shields.io/pypi/status/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 License](https://img.shields.io/pypi/l/dycelib/0.2.0.svg)](http://opensource.org/licenses/MIT)
+[![v0.2.0 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
+[![v0.2.0 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.2.0.svg)](https://pypi.python.org/pypi/dycelib/0.2.0)
 
 # `dyce` - Simple Python tools for dice-based probabilities
 
-[![Build Status](https://travis-ci.com/posita/dyce.svg?version=master)](https://travis-ci.com/posita/dyce?version=master)
+[![Build Status](https://travis-ci.com/posita/dyce.svg?version=v0.2.0)](https://travis-ci.com/posita/dyce?version=v0.2.0)
 
 > :point_up: *Curious about integrating your project with the above services?
   Jeff Knupp ([**@jeffknupp**](https://github.com/jeffknupp)) [describes how](https://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/).*
@@ -44,7 +44,7 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 However, it really shines when used in larger contexts such as [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
 
 ``dyce`` should be sufficient to replicate or replace AnyDice and most other dice probability modeling libraries.
-It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
+It strives to be [fully documented](https://posita.github.io/dyce/0.2/) and relies heavily on examples to develop understanding.
 If you find its functionality or documentation confusing or lacking in any way, please consider [contributing an issue](contrib.md) to start a discussion.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
@@ -214,7 +214,7 @@ Translation of examples from [`LordSembor/DnDice`](https://github.com/LordSembor
 
 ```
 
-See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough treatment, including detailed examples.
+See [the docs](https://posita.github.io/dyce/0.2/) for a much more thorough treatment, including detailed examples.
 
 ## License
 
