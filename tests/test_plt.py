@@ -13,8 +13,7 @@ import pytest
 import random
 import warnings
 
-from dyce.h import H
-from dyce import plt as dyce_plt
+from dyce import H, plt as dyce_plt
 
 try:
     import matplotlib.patches

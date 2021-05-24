@@ -14,7 +14,8 @@ import itertools
 import operator
 import os
 
-from dyce.h import H, _within
+from dyce import H
+from dyce.h import _within
 
 __all__ = ()
 
@@ -23,14 +24,33 @@ __all__ = ()
 
 
 class TestH:
-    def test_init(self) -> None:
+    def test_init_empty(self) -> None:
         assert H(()) == {}
         assert H(0) == {}
+        assert H((i, 0) for i in range(1, 7)) == {}
+
+    def test_init(self) -> None:
         assert H((0, 0, 1, 0, 1)) == {0: 3, 1: 2}
         assert H((1, 2, 3, 1, 2, 1)) == {1: 3, 2: 2, 3: 1}
         assert H(((1, 2), (3, 1), (2, 1), (1, 1))) == {1: 3, 2: 1, 3: 1}
         assert H(-2) == H(range(-1, -3, -1))
         assert H(6) == H(range(1, 7))
+
+    def test_len_and_counts(self) -> None:
+        d0 = H({})
+        d6_d8 = H(6) + H(8)
+        assert len(d0) == 0
+        assert sum(d0.counts()) == 0
+        assert len(d6_d8) == 13  # num distinct values
+        assert sum(d6_d8.counts()) == 48  # combinations
+        assert len((d6_d8 + d6_d8)) == 25
+        assert sum((d6_d8 + d6_d8).counts()) == 2304
+
+    def test_getitem(self) -> None:
+        d6_2 = 2 @ H(6)
+        assert d6_2[2] == 1
+        assert d6_2[7] == 6
+        assert d6_2[12] == 1
 
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
@@ -41,10 +61,10 @@ class TestH:
 
     def test_op_eq(self) -> None:
         base = H(range(10))
-        assert base == base.concat(base)
-        assert base == base.concat(base).concat(base)
-        assert base.concat(base) == base.concat(base).concat(base)
-        assert base != base.concat((0,))
+        assert base == base.accumulate(base)
+        assert base == base.accumulate(base).accumulate(base)
+        assert base.accumulate(base) == base.accumulate(base).accumulate(base)
+        assert base != base.accumulate((0,))
 
     def test_op_add_h(self) -> None:
         d2 = H(range(1, 3))
@@ -122,13 +142,13 @@ class TestH:
         assert h.ge(0) == H((0, 1, 1))
         assert h.ge(h) == H((1, 0, 0, 1, 1, 0, 1, 1, 1))
 
-    def test_concat(self) -> None:
+    def test_accumulate(self) -> None:
         h = H(itertools.chain(range(0, 6), range(3, 9)))
-        assert H(range(0, 6)).concat(H(range(3, 9))) == h
+        assert H(range(0, 6)).accumulate(H(range(3, 9))) == h
 
-    def test_concat_does_not_invoke_lowest_terms(self) -> None:
+    def test_accumulate_does_not_invoke_lowest_terms(self) -> None:
         base = H(range(10))
-        assert dict(base) != dict(base.concat(base))
+        assert dict(base) != dict(base.accumulate(base))
 
     def test_format(self) -> None:
         assert H((1, 2, 3, 1, 2, 1)).format(width=115) == os.linesep.join(
@@ -143,21 +163,6 @@ class TestH:
             H((1, 2, 3, 1, 2, 1)).format(width=0)
             == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
         )
-
-    def test_len_and_counts(self) -> None:
-        d0 = H({})
-        d6_d8 = H(6) + H(8)
-        assert len(d0) == 0
-        assert len(d6_d8) == 13  # num distinct values
-        assert sum(d6_d8.counts()) == 48  # combinations
-        assert len((d6_d8 + d6_d8)) == 25
-        assert sum((d6_d8 + d6_d8).counts()) == 2304
-
-    def test_getitem(self) -> None:
-        d6_2 = 2 @ H(6)
-        assert d6_2[2] == 1
-        assert d6_2[7] == 6
-        assert d6_2[12] == 1
 
     def test_lowest_terms_identity(self) -> None:
         lowest_terms = H({i: i for i in range(10)})

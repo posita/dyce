@@ -15,8 +15,7 @@ import itertools
 import operator
 import pytest
 
-from dyce.h import H
-from dyce.p import P
+from dyce import H, P
 
 __all__ = ()
 
@@ -55,6 +54,39 @@ class TestP:
         assert P(H({})) == P()
         assert P(2, H({}), 2, H({})) == P(2, 2)
 
+    def test_getitem(self) -> None:
+        d4n = H(-4)
+        d8 = H(8)
+        p_d4n_d8 = 3 @ P(d4n, d8)
+        assert p_d4n_d8[0] == d4n
+        assert p_d4n_d8[2] == d4n
+        assert p_d4n_d8[-3] == d8
+        assert p_d4n_d8[-1] == d8
+
+    def test_len(self) -> None:
+        p_d0_1 = P()
+        p_d0_2 = P(H({}))
+        p_d6 = P(6)
+        p_d8 = P(8)
+        assert len(p_d0_1) == 0
+        assert len(p_d0_2) == 0
+        assert len(p_d6) == 1
+        assert len(p_d8) == 1
+        assert len(P(p_d6, p_d8)) == 2
+        assert len(P(p_d6, p_d8, p_d6, p_d8)) == 4
+
+    def test_equivalence(self) -> None:
+        p_d6 = P(6)
+        p_d6n = P(-6)
+        assert -p_d6 == p_d6n
+        assert p_d6 - p_d6 == p_d6 + p_d6n
+        assert -p_d6 + p_d6 == p_d6n + p_d6
+        assert -p_d6 - p_d6 == p_d6n - p_d6
+        assert p_d6 + p_d6 == p_d6 - p_d6n
+        assert P(p_d6, -p_d6).h() == p_d6 + p_d6n
+        assert 2 @ p_d6 - p_d6 == p_d6 + p_d6 + p_d6n
+        assert -(2 @ p_d6) == p_d6n + p_d6n
+
     def test_repr(self) -> None:
         assert repr(P()) == "P()"
         assert repr(P(0)) == "P()"
@@ -80,24 +112,12 @@ class TestP:
     def test_op_eq_invokes_lowest_terms(self) -> None:
         d4 = H(4)
         d6 = H(6)
-        assert P(d4, d6) == P(d4.concat(d4), d6.concat(d6))
+        assert P(d4, d6) == P(d4.accumulate(d4), d6.accumulate(d6))
 
     def test_op_ne(self) -> None:
         p_d6 = P(6)
         p_d6n = P(H(range(-1, -7, -1)))
         assert p_d6n != p_d6
-
-    def test_len(self) -> None:
-        p_d0_1 = P()
-        p_d0_2 = P(H({}))
-        p_d6 = P(6)
-        p_d8 = P(8)
-        assert len(p_d0_1) == 0
-        assert len(p_d0_2) == 0
-        assert len(p_d6) == 1
-        assert len(p_d8) == 1
-        assert len(P(p_d6, p_d8)) == 2
-        assert len(P(p_d6, p_d8, p_d6, p_d8)) == 4
 
     def test_op_add_h(self) -> None:
         p_d2 = P(2)
@@ -209,33 +229,23 @@ class TestP:
         assert isinstance(abs(p), type(p))
         assert abs(p) == P(H((10, 11, 12, 13, 14, 15, 16, 17, 18, 19)))
 
-    def test_rolls_with_counts_empty(self) -> None:
-        assert tuple(P().rolls_with_counts()) == ()
+    def test_h_flatten(self) -> None:
+        r_d6 = range(1, 7)
+        r_d8 = range(1, 9)
+        d6_d8 = H(sum(v) for v in itertools.product(r_d6, r_d8) if v)
+        p_d6 = P(6)
+        p_d8 = P(8)
+        p_d6_d8 = P(p_d6, p_d8)
+        assert p_d6_d8.h() == d6_d8
+        assert P().h() == H({})
 
-    def test_rolls_with_counts_uniform(self) -> None:
-        assert tuple(P(2, 2).rolls_with_counts()) == (
-            ((1, 1), 1),
-            ((1, 2), 2),
-            ((2, 2), 1),
-        )
-
-    def test_rolls_with_counts_nonuniform(self) -> None:
-        assert tuple(P(2, 3).rolls_with_counts()) == (
-            ((1, 1), 1),
-            ((1, 2), 1),
-            ((1, 3), 1),
-            ((1, 2), 1),  # originated as ((2, 1), 1), but faces get sorted
-            ((2, 2), 1),
-            ((2, 3), 1),
-        )
-
-    def test_take_identity(self) -> None:
+    def test_h_take_identity(self) -> None:
         p_d0 = P()
         assert p_d0.h(slice(None)) == p_d0.h()
         p_5d20 = 5 @ P(20)
         assert p_5d20.h(slice(None)) == p_5d20.h()
 
-    def test_take_nonuniform_dice(self) -> None:
+    def test_h_take_heterogeneous_dice(self) -> None:
         p_d3 = P(3)
         p_d3n = -p_d3
         p_d4 = P(4)
@@ -247,22 +257,20 @@ class TestP:
 
         assert p_4d3_4d4.h(slice(0, 0)) == {}
         assert p_4d3_4d4.h(slice(None)) == p_4d3_4d4.h()
-        assert p_4d3_4d4.h(range(len(p_4d3_4d4))) == p_4d3_4d4.h()
+        assert p_4d3_4d4.h(*range(len(p_4d3_4d4))) == p_4d3_4d4.h()
         assert p_4d3_4d4.h(slice(1)) == p_4d3_4d4.h(0)
-        assert p_4d3_4d4.h((0,)) == p_4d3_4d4.h(0)
         assert p_4d3_4d4.h(slice(-1, None)) == p_4d3_4d4.h(-1)
-        assert p_4d3_4d4.h((-1,)) == p_4d3_4d4.h(-1)
-        assert p_4d3_4d4.h((0, 2)) == p_4d3_4d4.h(slice(None, 3, 2))
-        assert p_4d3_4d4.h((0, slice(2, None, 2))) == p_4d3_4d4.h(slice(None, None, 2))
-        assert p_4d3_4d4.h((0, 2, 4, 6)) == p_4d3_4d4.h(slice(None, None, 2))
-        assert p_4d3_4d4.h(range(0, len(p_4d3_4d4), 2)) == p_4d3_4d4.h(
+        assert p_4d3_4d4.h(0, 2) == p_4d3_4d4.h(slice(None, 3, 2))
+        assert p_4d3_4d4.h(0, slice(2, None, 2)) == p_4d3_4d4.h(slice(None, None, 2))
+        assert p_4d3_4d4.h(0, 2, 4, 6) == p_4d3_4d4.h(slice(None, None, 2))
+        assert p_4d3_4d4.h(*range(0, len(p_4d3_4d4), 2)) == p_4d3_4d4.h(
             slice(None, None, 2)
         )
-        assert p_4d3_4d4.h(i for i in range(len(p_4d3_4d4)) if i & 0x1) == p_4d3_4d4.h(
-            slice(1, None, 2)
-        )
+        assert p_4d3_4d4.h(
+            *(i for i in range(len(p_4d3_4d4)) if i & 0x1)
+        ) == p_4d3_4d4.h(slice(1, None, 2))
 
-    def test_take_uniform_dice(self) -> None:
+    def test_h_take_homogeneous_dice(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
 
@@ -272,38 +280,27 @@ class TestP:
         assert p_4df.h(slice(0, 0)) == {}
         assert p_4df.h(slice(None)) == p_4df.h()
 
-    def test_p_flatten(self) -> None:
-        r_d6 = range(1, 7)
-        r_d8 = range(1, 9)
-        d6_d8 = H(sum(v) for v in itertools.product(r_d6, r_d8) if v)
-        p_d6 = P(6)
-        p_d8 = P(8)
-        p_d6_d8 = P(p_d6, p_d8)
-        assert p_d6_d8.h() == d6_d8
-        assert P().h() == H({})
+    def test_rolls_with_counts_empty(self) -> None:
+        assert tuple(P().rolls_with_counts()) == ()
 
-    def test_p_index(self) -> None:
-        d4n = H(-4)
-        d8 = H(8)
-        p_d4n_d8 = 3 @ P(d4n, d8)
-        assert p_d4n_d8[0] == d4n
-        assert p_d4n_d8[2] == d4n
-        assert p_d4n_d8[-3] == d8
-        assert p_d4n_d8[-1] == d8
+    def test_rolls_with_counts_heterogeneous(self) -> None:
+        assert tuple(P(2, 3).rolls_with_counts()) == (
+            ((1, 1), 1),
+            ((1, 2), 1),
+            ((1, 3), 1),
+            ((1, 2), 1),  # originated as ((2, 1), 1), but faces get sorted
+            ((2, 2), 1),
+            ((2, 3), 1),
+        )
 
-    def test_equivalence(self) -> None:
-        p_d6 = P(6)
-        p_d6n = P(-6)
-        assert -p_d6 == p_d6n
-        assert p_d6 - p_d6 == p_d6 + p_d6n
-        assert -p_d6 + p_d6 == p_d6n + p_d6
-        assert -p_d6 - p_d6 == p_d6n - p_d6
-        assert p_d6 + p_d6 == p_d6 - p_d6n
-        assert P(p_d6, -p_d6).h() == p_d6 + p_d6n
-        assert 2 @ p_d6 - p_d6 == p_d6 + p_d6 + p_d6n
-        assert -(2 @ p_d6) == p_d6n + p_d6n
+    def test_rolls_with_counts_homogeneous(self) -> None:
+        assert tuple(P(2, 2).rolls_with_counts()) == (
+            ((1, 1), 1),
+            ((1, 2), 2),
+            ((2, 2), 1),
+        )
 
-    def test_validate_implementation_combinations_nonuniform_dice(self) -> None:
+    def test_validate_implementation_combinations_heterogeneous_dice(self) -> None:
         p_d3 = P(3)
         p_d3n = -p_d3
         p_d4 = P(4)
@@ -325,7 +322,7 @@ class TestP:
             _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 1))
         )
 
-    def test_validate_implementation_combinations_uniform_dice(self) -> None:
+    def test_validate_implementation_combinations_homogeneous_dice(self) -> None:
         # Use the inefficient mechanism to validate our hard-to-understand implementation
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df

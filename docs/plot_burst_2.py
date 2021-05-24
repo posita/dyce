@@ -1,19 +1,19 @@
 import os
-from dyce import P
+from dyce import H
 from dyce.plt import plot_burst
 
 
 def main():
     base, _ = os.path.splitext(__file__)
     png_path = base + ".png"
-    p_d20 = P(20)
+    d20 = H(20)
     fig, _ = plot_burst(
-        p_d20.h(),
+        d20,
         outer=(
-            ("crit. fail.", p_d20.le(1)[1]),
-            ("fail.", p_d20.within(2, 14)[0]),
-            ("succ.", p_d20.within(15, 19)[0]),
-            ("crit. succ.", p_d20.ge(20)[1]),
+            ("crit. fail.", d20.le(1)[1]),
+            ("fail.", d20.within(2, 14)[0]),
+            ("succ.", d20.within(15, 19)[0]),
+            ("crit. succ.", d20.ge(20)[1]),
         ),
         graph_color="RdYlBu_r",
     )

@@ -55,7 +55,7 @@ from operator import (
 from os import environ, get_terminal_size, linesep
 from random import randrange
 
-__all__ = "H"
+__all__ = ("H",)
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ __all__ = "H"
 
 _UnaryOperatorT = Callable[[int], int]
 _BinaryOperatorT = Callable[[int, int], int]
-_ExpandT = Callable[["H", int], Union["H", int]]
+_ExpandT = Callable[["H", int], Union[int, "H"]]
 _CoalesceT = Callable[["H", int], "H"]
 
 try:
@@ -81,8 +81,9 @@ except OSError:
 class H(Mapping[int, int]):
     r"""
     An immutable mapping for use as a histogram that supports arithmetic operations.
-    This is useful for modeling outcomes. The [initializer](#dyce.h.H.__init__) takes a
-    single parameter, *items*. In its most explicit form, *items* maps faces to counts.
+    This is useful for modeling individual dice and outcomes. The
+    [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
+    explicit form, *items* maps face values to counts.
 
     Modeling a single six-sided die (``1d6``) can be expressed as:
 
@@ -99,8 +100,8 @@ class H(Mapping[int, int]):
 
     ```
 
-    Two shorthands are provided. If *items* an iterable of ``int``s, counts of one will
-    be assumed:
+    Two shorthands are provided. If *items* is an iterable of ``int``s, counts of 1 are
+    assumed:
 
     ```python
     >>> d6 == H((1, 2, 3, 4, 5, 6))
@@ -108,7 +109,7 @@ class H(Mapping[int, int]):
 
     ```
 
-    Repeated items do what one would expect:
+    Repeated items are accumulated, as one would expect:
 
     ```python
     >>> H((2, 3, 3, 4, 4, 5))
@@ -136,8 +137,8 @@ class H(Mapping[int, int]):
     Simple indexes can be used to look up a face’s count:
 
     ```python
-    >>> d6[5]
-    1
+    >>> H((2, 3, 3, 4, 4, 5))[3]
+    2
 
     ```
 
@@ -148,12 +149,13 @@ class H(Mapping[int, int]):
     >>> d6 + 4
     H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
 
+    ```
+
+    ```python
     >>> d6 * -1
     H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-
     >>> d6 * -1 == -d6
     True
-
     >>> d6 * -1 == H(-6)
     True
 
@@ -190,7 +192,7 @@ class H(Mapping[int, int]):
 
     ```
 
-    The ``len`` built-in function can be used to show the number of distinct sums:
+    The ``len`` built-in function can be used to show the number of distinct faces:
 
     ```python
     >>> len(2@d6)
@@ -207,17 +209,12 @@ class H(Mapping[int, int]):
 
     ```
 
-    Counts are generally accumulated without reduction:
+    Counts are generally accumulated without reduction. To reduce, call the
+    [``lowest_terms`` method][dyce.h.H.lowest_terms]:
 
     ```python
-    >>> d6.concat(d6).concat(d6)
+    >>> d6.accumulate(d6).accumulate(d6)
     H({1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3})
-
-    ```
-
-    To reduce, call the [``lowest_terms`` method][dyce.h.H.lowest_terms]:
-
-    ```python
     >>> _.lowest_terms()
     H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
@@ -226,7 +223,7 @@ class H(Mapping[int, int]):
     Testing equivalence implicitly performs reductions of operands:
 
     ```python
-    >>> d6.concat(d6) == d6.concat(d6).concat(d6)
+    >>> d6.accumulate(d6) == d6.accumulate(d6).accumulate(d6)
     True
 
     ```
@@ -262,9 +259,9 @@ class H(Mapping[int, int]):
     ```python
     >>> d6.eq(2)  # how often a 2 shows on a single six-sided die
     H({0: 5, 1: 1})
-    >>> 4@(_)  # counts of how many 2s show on 4d6
+    >>> 4@(_)  # number of 2s that show on 4d6
     H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
-    >>> _.ge(1)  # how often the count is at least one
+    >>> _.ge(1)  # how often that number is at least one
     H({0: 625, 1: 671})
     >>> print(_.format(width=65))
     avg |    0.52
@@ -280,13 +277,14 @@ class H(Mapping[int, int]):
         ```python
         >>> 2@d6.le(7)  # probably not what was intended
         H({2: 36})
-
         >>> 2@d6.le(7) == 2@(d6.le(7))
         True
 
+        ```
+
+        ```python
         >>> (2@d6).le(7)
         H({0: 15, 1: 21})
-
         >>> 2@d6.le(7) == (2@d6).le(7)
         False
 
@@ -338,7 +336,9 @@ class H(Mapping[int, int]):
 
             items = h
 
-        self._h = OrderedDict((face, items[face]) for face in sorted(items))
+        self._h = OrderedDict(
+            (face, items[face]) for face in sorted(items) if items[face]
+        )
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -516,32 +516,31 @@ class H(Mapping[int, int]):
 
     def map(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
         r"""
-        Applies *oper* to each face of the histogram paired with *other*:
+        Applies *oper* to each face of the histogram paired with *other*. Shorthands exist
+        for many arithmetic operators and comparators.
 
         ```python
         >>> import operator
         >>> d6 = H(6)
         >>> d6.map(operator.add, d6)
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-
-        >>> d6.map(operator.mul, -1)
-        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-
-        >>> d6.map(operator.gt, 3)
-        H({0: 3, 1: 3})
+        >>> _ == d6 + d6
+        True
 
         ```
 
-        Note that shorthands exist for many arithmetic operators and comparators:
+        ```python
+        >>> d6.map(operator.mul, -1)
+        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+        >>> _ == d6 * -1
+        True
+
+        ```
 
         ```python
-        >>> d6 + d6 == d6.map(operator.add, d6)
-        True
-
-        >>> d6 * -1 == d6.map(operator.mul, -1)
-        True
-
-        >>> d6.gt(3) == d6.map(operator.gt, 3)
+        >>> d6.map(operator.gt, 3)
+        H({0: 3, 1: 3})
+        >>> _ == d6.gt(3)
         True
 
         ```
@@ -572,6 +571,21 @@ class H(Mapping[int, int]):
             raise NotImplementedError
 
     def umap(self, oper: _UnaryOperatorT) -> "H":
+        r"""
+        Applies *oper* to each face of the histogram:
+
+        ```python
+        >>> H(6).umap(lambda f: f * -1)
+        H(-6)
+
+        ```
+
+        ```python
+        >>> H(4).umap(lambda f: (-f) ** f)
+        H({-27: 1, -1: 1, 4: 1, 256: 1})
+
+        ```
+        """
         h = H((oper(face), count) for face, count in self.items())
 
         if self._simple_init is not None:
@@ -686,29 +700,37 @@ class H(Mapping[int, int]):
 
     def even(self) -> "H":
         r"""
+        Equivalent to ``self.umap(lambda f: int(f % 2 == 0))``.
+
         ```python
         >>> H((-4, -2, 0, 1, 2, 3)).even()
         H({0: 2, 1: 4})
 
         ```
+
+        See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_even(a: int) -> int:
-            return (a & 0b1) ^ 0b1
+        def is_even(f: int) -> int:
+            return (f & 0b1) ^ 0b1
 
         return self.umap(is_even)
 
     def odd(self) -> "H":
         r"""
+        Equivalent to ``self.umap(lambda f: int(f % 2 != 0))``.
+
         ```python
         >>> H((-4, -2, 0, 1, 2, 3)).odd()
         H({0: 4, 1: 2})
 
         ```
+
+        See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_odd(a: int) -> int:
-            return a & 0b1
+        def is_odd(f: int) -> int:
+            return f & 0b1
 
         return self.umap(is_odd)
 
@@ -721,12 +743,24 @@ class H(Mapping[int, int]):
 
         return numerator / (denominator or 1)
 
-    def concat(self, other: SourceT) -> "H":
+    def counts(self) -> Iterator[int]:
+        r"""
+        More descriptive synonym for the [``values`` method][dyce.h.H.values].
+        """
+        return self.values()
+
+    def faces(self) -> Iterator[int]:
+        r"""
+        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
+        """
+        return self.keys()
+
+    def accumulate(self, other: SourceT) -> "H":
         r"""
         Accumulates counts:
 
         ```python
-        >>> H(4).concat(H(6))
+        >>> H(4).accumulate(H(6))
         H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
 
         ```
@@ -737,12 +771,6 @@ class H(Mapping[int, int]):
             other = other.items()
 
         return H(chain(self.items(), cast(Iterable, other)))
-
-    def counts(self) -> Iterator[int]:
-        r"""
-        More descriptive synonym for the [``values`` method][dyce.h.H.values].
-        """
-        return self.values()
 
     def data(
         self,
@@ -756,7 +784,6 @@ class H(Mapping[int, int]):
         >>> d6 = H(6)
         >>> list(d6.gt(3).data())
         [(0, 3.0), (1, 3.0)]
-
         >>> list(d6.gt(3).data(relative=True))
         [(0, 0.5), (1, 0.5)]
 
@@ -767,7 +794,6 @@ class H(Mapping[int, int]):
         ```python
         >>> list(d6.gt(7).data())
         [(0, 6.0)]
-
         >>> list(d6.gt(7).data(fill_items={1: 0, 0: 0}))
         [(0, 6.0), (1, 0.0)]
 
@@ -824,24 +850,18 @@ class H(Mapping[int, int]):
 
         See the [``substitute`` method][dyce.h.H.substitute].
         """
-
-        def _reroll_greatest(h: H, face: int) -> Union[H, int]:
-            return h if face == max(h) else face
-
-        return self.substitute(_reroll_greatest, op_add, max_depth)
-
-    def faces(self) -> Iterator[int]:
-        r"""
-        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
-        """
-        return self.keys()
+        return self.substitute(
+            lambda h, f: h if f == max(h) else f,
+            op_add,
+            max_depth,
+        )
 
     def format(
         self,
         fill_items: Optional[Mapping[int, int]] = None,
         width: int = _ROW_WIDTH,
-        tick: str = "#",
         scaled: bool = False,
+        tick: str = "#",
         sep: str = linesep,
     ) -> str:
         r"""
@@ -854,6 +874,9 @@ class H(Mapping[int, int]):
         >>> print(H(6).format(width=0))
         {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
 
+        ```
+
+        ```python
         >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
         avg |    7.00
           1 |   0.00% |
@@ -930,6 +953,9 @@ class H(Mapping[int, int]):
         >>> _.lowest_terms()
         H({-1: 1, 0: 1, 1: 1})
 
+        ```
+
+        ```python
         >>> H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5))
         H({2: 2, 3: 4, 4: 4, 5: 2})
         >>> _.lowest_terms()
@@ -964,26 +990,73 @@ class H(Mapping[int, int]):
     ) -> "H":
         r"""
         Calls *expand* on each face, recursively up to *max_depth* times. If *expand*
-        returns an ``int``, it replaces the face. [``H`` object][dyce.h.H], *coalesce*
-        is called on the face and the expanded histogram, and the returned histogram is
-        folded into result. The default behavior for *coalesce* is to replace the face
-        with the expanded histogram.
+        returns an ``int``, it replaces the face. If it returns an [``H``
+        object][dyce.h.H], *coalesce* is called on the face and the expanded histogram,
+        and the returned histogram is folded into result. The default behavior for
+        *coalesce* is to replace the face with the expanded histogram. Returned
+        histograms are always reduced to their lowest terms. (See the [``lowest_terms``
+        method][dyce.h.H.lowest_terms].)
 
         This can be used to model complex rules. The following models re-rolling a face
         of 1 on the first roll:
 
         ```python
-        >>> def reroll_one(h: H, face: int) -> Union[H, int]:
+        >>> def reroll_one(h: H, face: int) -> Union[int, H]:
         ...   return h if face == 1 else face
+
         >>> H(6).substitute(reroll_one)
         H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
 
         ```
 
         See the [``explode`` method][dyce.h.H.explode] for a common shorthand for
-        exploding dice.
+        “exploding” dice (i.e., where, if the greatest face come up, the die is
+        re-rolled and the result is added to the running sum).
 
-        For a more complicated example, consider the following rules:
+        In nearly all cases, when a histogram is substituted for a face, it takes on the
+        substituted face’s “scale”. In other words, the sum of the counts of the
+        replacement retains the same proportion as the replaced face in relation to
+        other faces. This becomes clearer when there is no overlap between the original
+        histogram and the substitution:
+
+        ```python
+        >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
+        >>> sub = orig.substitute(lambda h, f: -h if f == 4 else f)
+        >>> sub
+        H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
+        >>> sum(c for f, c in orig.items() if f == 4) / sum(orig.counts())
+        0.4
+        >>> sum(c for f, c in sub.items() if f < 0) / sum(sub.counts())
+        0.4
+
+        ```
+
+        There is one important exception: If *coalesce* returns the empty histogram
+        (``H({})``), the corresponding face and its counts are omitted from the result
+        without substitution or scaling. A trivial example is modeling a d5 by
+        indefinitely re-rolling a d6 until something other than a 6 comes up:
+
+        ```python
+        >>> H(6).substitute(lambda h, f: H({}) if f == 6 else f)
+        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+
+        ```
+
+        This technique is more useful when modeling re-rolling certain derived outcomes,
+        like ties in a contest:
+
+        ```python
+        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
+        >>> d6_3.vs(d8_2)
+        H({-1: 4553, 0: 1153, 1: 8118})
+        >>> _.substitute(lambda h, f: H({}) if f == 0 else f)
+        H({-1: 4553, 1: 8118})
+
+        ```
+
+        Because ``substitute`` accepts arbitrary functions, it is well suited for
+        modeling (or at least approximating) logical progressions. Consider the
+        following rules:
 
           1. Start with a total of zero.
           2. Roll a six-sided die. Add the face to the total. If the face was a six, go
@@ -995,11 +1068,13 @@ class H(Mapping[int, int]):
 
         ```python
         >>> d4, d6 = H(4), H(6)
-        >>> def reroll_greatest_on_d4_d6(h: H, face: int) -> Union[H, int]:
+
+        >>> def reroll_greatest_on_d4_d6(h: H, face: int) -> Union[int, H]:
         ...   if face == max(h):
         ...     if h == d6: return d4
         ...     if h == d4: return d6
         ...   return face
+
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.add, max_depth=6)
         >>> h_even = h.even()
@@ -1008,8 +1083,14 @@ class H(Mapping[int, int]):
 
         ```
 
-        Because ``substitute`` accepts arbitrary functions, it is well suited for
-        modeling complicated logical progressions:
+        Surprised? Because both six and four are even numbers, the only way we keep
+        rolling is if the total is even. You might think this would lead to evens being
+        *more* likely. However, we only care about the final tally and the rules direct
+        us to re-roll certain evens (potentially nudging us to an odd number slightly
+        more often than not).
+
+        We can also use this method to model expected damage from a single attack in
+        d20-like roll playing games:
 
         ```python
         >>> bonus = 1
@@ -1018,13 +1099,15 @@ class H(Mapping[int, int]):
         >>> crit = dmg + dmg_dice
         >>> target = 15 - bonus
         >>> d20 = H(20)
-        >>> def dmg_from_attack_roll(h: H, face: int) -> Union[H, int]:
+
+        >>> def dmg_from_attack_roll(h: H, face: int) -> Union[int, H]:
         ...   if face == 20:
         ...     return crit
         ...   elif face >= target:
         ...     return dmg
         ...   else:
         ...     return 0
+
         >>> h = d20.substitute(dmg_from_attack_roll)
         >>> print(h.format(width=0))
         {avg: 2.15, 0: 65.00%, 2:  3.75%, 3:  3.83%, 4:  3.91%, ..., 15:  0.23%, 16:  0.16%, 17:  0.08%}
@@ -1058,13 +1141,16 @@ class H(Mapping[int, int]):
                     expanded = coalesce(expanded, face)
                     # Account for the impact of expansion on peers
                     expanded_scalar = sum(expanded.counts())
-                    total_scalar *= expanded_scalar
-                    # Account for the impact of the original count on the result, but
-                    # keep track of the impact on peers so we can factor it out for
-                    # these items later
-                    items_for_reassembly.extend(
-                        (f, c * count, expanded_scalar) for f, c in expanded.items()
-                    )
+
+                    if expanded_scalar:
+                        total_scalar *= expanded_scalar
+                        # Account for the impact of the original count on the result, but
+                        # keep track of the impact on peers so we can factor it out for
+                        # these items later
+                        items_for_reassembly.extend(
+                            (exp_f, exp_c * count, expanded_scalar)
+                            for exp_f, exp_c in expanded.items()
+                        )
 
             return H(
                 (
@@ -1076,12 +1162,30 @@ class H(Mapping[int, int]):
 
         return _substitute(self)
 
+    def vs(self, other: OperandT) -> "H":
+        r"""
+        Compares this histogram with *other*. -1 represents where *other* is greater. 0
+        represents where they are equal. 1 represents where *other* is less.
+
+        Shorthand for ``self.within(0, 0, other)``.
+
+        ```python
+        >>> H(6).vs(H(4))
+        H({-1: 6, 0: 4, 1: 14})
+        >>> _ == H(6).within(0, 0, H(4))
+        True
+
+        ```
+
+        See the [``within`` method][dyce.h.H.within].
+        """
+        return self.within(0, 0, other)
+
     def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
         r"""
-        Computes the difference between this histogram and *other*. -1 is represents where
-        that difference is less than *lo*. 0 represents where that difference between
-        *lo* and *hi* (inclusive). 1 represents where that difference is greater than
-        *hi*.
+        Computes the difference between this histogram and *other*. -1 represents where that
+        difference is less than *lo*. 0 represents where that difference between *lo*
+        and *hi* (inclusive). 1 represents where that difference is greater than *hi*.
 
         ```python
         >>> (2@H(6)).within(7, 9)
@@ -1092,6 +1196,9 @@ class H(Mapping[int, int]):
           0 |  41.67% |####################
           1 |  16.67% |########
 
+        ```
+
+        ```python
         >>> (3@H(6)).within(-1, 1, 2@H(8))  # 3d6 w/in 1 of 2d8
         H({-1: 3500, 0: 3412, 1: 6912})
         >>> print(_.format(width=65))
@@ -1118,12 +1225,7 @@ def _within(lo: int, hi: int) -> _BinaryOperatorT:
     def _cmp(a: int, b: int):
         diff = a - b
 
-        if diff < lo:
-            return -1
-        elif diff > hi:
-            return 1
-        else:
-            return 0
+        return int(diff > hi) - int(diff < lo)
 
     setattr(_cmp, "lo", lo)
     setattr(_cmp, "hi", hi)

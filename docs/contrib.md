@@ -17,13 +17,13 @@
 
 There are several ways you can contribute.
 
-## Filing Issues
+## Filing issues
 
 You can [file new issues](https://github.com/posita/dyce/issues) as you find them.
 Please avoid duplicating issues.
 [“Writing Effective Bug Reports” by Elisabeth Hendrickson](http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf) (PDF) may be helpful.
 
-## Submission Guidelines
+## Submission guidelines
 
 If you are willing and able, consider [submitting a pull request](https://github.com/posita/dyce/pulls) (PR) with a fix.
 There are only a few guidelines:
