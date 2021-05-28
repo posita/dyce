@@ -11,8 +11,10 @@ from __future__ import generator_stop
 from typing import Union
 
 import itertools
+import math
 import operator
 import os
+import statistics
 
 from dyce import H
 from dyce.h import _within
@@ -36,6 +38,20 @@ class TestH:
         assert H(-2) == H(range(-1, -3, -1))
         assert H(6) == H(range(1, 7))
 
+    def test_repr(self) -> None:
+        assert repr(H(())) == "H({})"
+        assert repr(H(0)) == "H({})"
+        assert repr(H(-6)) == "H(-6)"
+        assert repr(H(6)) == "H(6)"
+        assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({0: 1, 1: 3, 2: 2, 3: 1})"
+
+    def test_op_eq(self) -> None:
+        base = H(range(10))
+        assert base == base.accumulate(base)
+        assert base == base.accumulate(base).accumulate(base)
+        assert base.accumulate(base) == base.accumulate(base).accumulate(base)
+        assert base != base.accumulate((0,))
+
     def test_len_and_counts(self) -> None:
         d0 = H({})
         d6_d8 = H(6) + H(8)
@@ -51,20 +67,6 @@ class TestH:
         assert d6_2[2] == 1
         assert d6_2[7] == 6
         assert d6_2[12] == 1
-
-    def test_repr(self) -> None:
-        assert repr(H(())) == "H({})"
-        assert repr(H(0)) == "H({})"
-        assert repr(H(-6)) == "H(-6)"
-        assert repr(H(6)) == "H(6)"
-        assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({0: 1, 1: 3, 2: 2, 3: 1})"
-
-    def test_op_eq(self) -> None:
-        base = H(range(10))
-        assert base == base.accumulate(base)
-        assert base == base.accumulate(base).accumulate(base)
-        assert base.accumulate(base) == base.accumulate(base).accumulate(base)
-        assert base != base.accumulate((0,))
 
     def test_op_add_h(self) -> None:
         d2 = H(range(1, 3))
@@ -150,20 +152,6 @@ class TestH:
         base = H(range(10))
         assert dict(base) != dict(base.accumulate(base))
 
-    def test_format(self) -> None:
-        assert H((1, 2, 3, 1, 2, 1)).format(width=115) == os.linesep.join(
-            (
-                "avg |    1.67",
-                "  1 |  50.00% |##################################################",
-                "  2 |  33.33% |#################################",
-                "  3 |  16.67% |################",
-            )
-        )
-        assert (
-            H((1, 2, 3, 1, 2, 1)).format(width=0)
-            == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
-        )
-
     def test_lowest_terms_identity(self) -> None:
         lowest_terms = H({i: i for i in range(10)})
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
@@ -205,6 +193,49 @@ class TestH:
         )
         assert h.substitute(reroll_d4_threes, operator.mul, max_depth=2) == H(
             {36: 1, 27: 1, 18: 1, 12: 4, 9: 1, 6: 4, 4: 16, 3: 4, 2: 16, 1: 16}
+        )
+
+    def test_format(self) -> None:
+        assert H((1, 2, 3, 1, 2, 1)).format(width=115) == os.linesep.join(
+            (
+                "avg |    1.67",
+                "std |    0.75",
+                "var |    0.56",
+                "  1 |  50.00% |##################################################",
+                "  2 |  33.33% |#################################",
+                "  3 |  16.67% |################",
+            )
+        )
+        assert (
+            H((1, 2, 3, 1, 2, 1)).format(width=0)
+            == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
+        )
+
+    def test_mean(self) -> None:
+        h = H((i, i) for i in range(10))
+        assert math.isclose(
+            h.mean(),
+            statistics.mean(
+                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+            ),
+        )
+
+    def test_stdev(self) -> None:
+        h = H((i, i) for i in range(10))
+        assert math.isclose(
+            h.stdev(),
+            statistics.pstdev(
+                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+            ),
+        )
+
+    def test_variance(self) -> None:
+        h = H((i, i) for i in range(10))
+        assert math.isclose(
+            h.variance(),
+            statistics.pvariance(
+                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+            ),
         )
 
 

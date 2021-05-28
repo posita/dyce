@@ -181,6 +181,8 @@ Histograms provide rudimentary formatting for convenience:
 ```python
 >>> print((2@H(6)).format(width=65))
 avg |    7.00
+std |    2.42
+var |    5.83
   2 |   2.78% |#
   3 |   5.56% |##
   4 |   8.33% |####
@@ -202,6 +204,8 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
 H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
 >>> print(_.format(width=65))
 avg |    2.04
+std |    1.14
+var |    1.31
   1 |  42.13% |#####################
   2 |  28.24% |##############
   3 |  17.13% |########
@@ -216,6 +220,8 @@ avg |    2.04
 H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
 >>> print(_.format(width=65))
 avg |    3.50
+std |    1.37
+var |    1.88
   1 |   7.41% |###
   2 |  18.52% |#########
   3 |  24.07% |############
@@ -230,6 +236,8 @@ avg |    3.50
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
 >>> print(_.format(width=65))
 avg |    4.96
+std |    1.14
+var |    1.31
   1 |   0.46% |
   2 |   3.24% |#
   3 |   8.80% |####
@@ -247,6 +255,8 @@ H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
 >>> _ = P(4, 6, 8, _, 12, 20).h(0, -1)
 >>> print(_.format(width=65))
 avg |   13.48
+std |    4.40
+var |   19.39
   1 |   0.00% |
   2 |   0.01% |
   3 |   0.06% |
@@ -343,15 +353,14 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 [``H`` objects][dyce.h.H] provide a [``data`` method][dyce.h.H.data] and a [``data_xy`` method][dyce.h.H.data_xy] to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
 ```python
->>> faces, probabilities = (2 @ H(6)).data_xy(relative=True)
+>>> faces, probabilities = (2@H(6)).data_xy(relative=True)
 >>> matplotlib.pyplot.bar(
 ...   [str(f) for f in faces],
 ...   probabilities,
 ... )  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
-
-Calling ``matplotlib.pyplot.show`` presents:
 
 ![plot_histogram.png](plot_histogram.png)
 
@@ -360,10 +369,9 @@ Calling ``matplotlib.pyplot.show`` presents:
 ```python
 >>> from dyce.plt import plot_burst
 >>> fig, ax = plot_burst(2@H(6))  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
-
-Calling ``matplotlib.pyplot.show`` presents:
 
 ![plot_burst_1.png](plot_burst_1.png)
 
@@ -378,10 +386,9 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 ...   ("succ.", d20.within(15, 19)[0]),
 ...   ("crit. succ.", d20.ge(20)[1]),
 ... ), graph_color="RdYlBu_r")  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
-
-Calling ``matplotlib.pyplot.show`` presents:
 
 ![plot_burst_2.png](plot_burst_2.png)
 
@@ -424,7 +431,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...   rows = []  # type: List[Tuple[float, ...]]
 ...   for us in range(them, them + num_rows):
 ...     row_names.append("{}d6 …".format(us))
-...     rows.append((us @ H(6)).vs(them @ H(6)).data_xy(relative=True)[-1])
+...     rows.append((us@H(6)).vs(them@H(6)).data_xy(relative=True)[-1])
 ...   _ = ax.imshow(rows)  # doctest: +SKIP
 ...   ax.set_title("… vs {}d6".format(them))  # doctest: +SKIP
 ...   ax.set_xticks(col_ticks)  # doctest: +SKIP

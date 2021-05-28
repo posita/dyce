@@ -10,7 +10,8 @@
 from __future__ import generator_stop
 from typing import (
     Callable,
-    DefaultDict,
+    Counter,
+    Dict,  # OrderedDict is not supported in Python 3.6
     Iterable,
     Iterator,
     List,
@@ -22,7 +23,7 @@ from typing import (
 )
 from typing_extensions import Protocol, runtime_checkable
 
-from collections import OrderedDict, defaultdict
+from collections import Counter as counter, OrderedDict as ordereddict
 from collections.abc import Mapping as ABCMapping
 from functools import reduce
 from itertools import (
@@ -30,7 +31,7 @@ from itertools import (
     product,
     repeat,
 )
-from math import gcd
+from math import gcd, sqrt
 from operator import (
     abs as op_abs,
     add as op_add,
@@ -169,6 +170,8 @@ class H(Mapping[int, int]):
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
     >>> print(_.format(width=65))
     avg |    7.00
+    std |    2.42
+    var |    5.83
       2 |   2.78% |#
       3 |   5.56% |##
       4 |   8.33% |####
@@ -237,6 +240,8 @@ class H(Mapping[int, int]):
     H({0: 6, 1: 30})
     >>> print(_.format(width=65))
     avg |    0.83
+    std |    0.37
+    var |    0.14
       0 |  16.67% |########
       1 |  83.33% |#########################################
 
@@ -249,6 +254,8 @@ class H(Mapping[int, int]):
     H({0: 21, 1: 15})
     >>> print(_.format(width=65))
     avg |    0.42
+    std |    0.49
+    var |    0.24
       0 |  58.33% |#############################
       1 |  41.67% |####################
 
@@ -265,6 +272,8 @@ class H(Mapping[int, int]):
     H({0: 625, 1: 671})
     >>> print(_.format(width=65))
     avg |    0.52
+    std |    0.50
+    var |    0.25
       0 |  48.23% |########################
       1 |  51.77% |#########################
 
@@ -311,33 +320,31 @@ class H(Mapping[int, int]):
         r"Initializer."
         super().__init__()
         self._simple_init = None
+        tmp: Counter[int] = counter()
 
         if isinstance(items, int):
-            if items < 0:
+            if items != 0:
                 self._simple_init = items
-                items = range(-1, items - 1, -1)
-            elif items > 0:
-                self._simple_init = items
-                items = range(1, items + 1)
-            else:
-                items = {}
+                tmp.update(range(items, 0, 1 if items < 0 else -1))  # count toward zero
         elif isinstance(items, H.AbleT):
-            items = items.h()
-
-        if not isinstance(items, ABCMapping):
-            h = defaultdict(int)  # type: DefaultDict[int, int]
-
+            tmp.update(items.h())
+        elif isinstance(items, ABCMapping):
+            tmp.update(items)
+        else:
+            # Items is either an Iterable[int] or an Iterable[Tuple[int, int]] (although
+            # this technically supports Iterable[Union[int, Tuple[int, int]]])
             for item in items:
                 if isinstance(item, tuple):
                     face, count = item
-                    h[face] += count
+                    tmp[face] += count
                 else:
-                    h[item] += 1
+                    tmp[item] += 1
 
-            items = h
-
-        self._h = OrderedDict(
-            (face, items[face]) for face in sorted(items) if items[face]
+        # Sort and omit zero counts. We use an OrderedDict instead of a Counter to
+        # support Python versions earlier than 3.7 which did not guarantee order
+        # preservation for the latter.
+        self._h: Dict[int, int] = ordereddict(
+            {face: tmp[face] for face in sorted(tmp) if tmp[face]}
         )
 
     # ---- Overrides -------------------------------------------------------------------
@@ -502,6 +509,18 @@ class H(Mapping[int, int]):
 
     def __abs__(self) -> "H":
         return self.umap(op_abs)
+
+    def counts(self) -> Iterator[int]:
+        r"""
+        More descriptive synonym for the [``values`` method][dyce.h.H.values].
+        """
+        return self.values()
+
+    def faces(self) -> Iterator[int]:
+        r"""
+        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
+        """
+        return self.keys()
 
     def items(self):
         return self._h.items()
@@ -734,27 +753,6 @@ class H(Mapping[int, int]):
 
         return self.umap(is_odd)
 
-    def avg(self) -> float:
-        numerator = denominator = 0
-
-        for face, count in self.items():
-            numerator += face * count
-            denominator += count
-
-        return numerator / (denominator or 1)
-
-    def counts(self) -> Iterator[int]:
-        r"""
-        More descriptive synonym for the [``values`` method][dyce.h.H.values].
-        """
-        return self.values()
-
-    def faces(self) -> Iterator[int]:
-        r"""
-        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
-        """
-        return self.keys()
-
     def accumulate(self, other: SourceT) -> "H":
         r"""
         Accumulates counts:
@@ -771,68 +769,6 @@ class H(Mapping[int, int]):
             other = other.items()
 
         return H(chain(self.items(), cast(Iterable, other)))
-
-    def data(
-        self,
-        relative: bool = False,
-        fill_items: Optional[Mapping[int, int]] = None,
-    ) -> Iterator[Tuple[int, float]]:
-        r"""
-        Presentation helper function that returns an iterator for each face/frequency pair:
-
-        ```python
-        >>> d6 = H(6)
-        >>> list(d6.gt(3).data())
-        [(0, 3.0), (1, 3.0)]
-        >>> list(d6.gt(3).data(relative=True))
-        [(0, 0.5), (1, 0.5)]
-
-        ```
-
-        If provided, *fill_items* supplies defaults for any missing faces:
-
-        ```python
-        >>> list(d6.gt(7).data())
-        [(0, 6.0)]
-        >>> list(d6.gt(7).data(fill_items={1: 0, 0: 0}))
-        [(0, 6.0), (1, 0.0)]
-
-        ```
-        """
-        if fill_items is None:
-            fill_items = {}
-
-        if relative:
-            total = sum(self.counts()) or 1
-        else:
-            total = 1
-
-        combined = dict(chain(fill_items.items(), self.items()))
-
-        return ((face, count / total) for face, count in sorted(combined.items()))
-
-    def data_xy(
-        self,
-        relative: bool = False,
-        fill_items: Optional[Mapping[int, int]] = None,
-    ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
-        r"""
-        Presentation helper function that returns an iterator for a “zipped” arrangement of
-        the output from the [``data`` method][dyce.h.H.data]:
-
-        ```python
-        >>> d6 = H(6)
-        >>> list(d6.data())
-        [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
-        >>> d6.data_xy()
-        ((1, 2, 3, 4, 5, 6), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
-
-        ```
-        """
-        return cast(
-            Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.data(relative, fill_items))),
-        )
 
     def explode(
         self,
@@ -855,93 +791,6 @@ class H(Mapping[int, int]):
             op_add,
             max_depth,
         )
-
-    def format(
-        self,
-        fill_items: Optional[Mapping[int, int]] = None,
-        width: int = _ROW_WIDTH,
-        scaled: bool = False,
-        tick: str = "#",
-        sep: str = linesep,
-    ) -> str:
-        r"""
-        Returns a formatted string representation of the histogram. If provided,
-        *fill_items* supplies defaults for any missing faces. If *width* is greater than
-        zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which are
-        otherwise ignored if *width* is zero or less).
-
-        ```python
-        >>> print(H(6).format(width=0))
-        {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
-
-        ```
-
-        ```python
-        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
-        avg |    7.00
-          1 |   0.00% |
-          2 |   2.78% |@
-          3 |   5.56% |@@
-          4 |   8.33% |@@@@
-          5 |  11.11% |@@@@@
-          6 |  13.89% |@@@@@@
-          7 |  16.67% |@@@@@@@@
-          8 |  13.89% |@@@@@@
-          9 |  11.11% |@@@@@
-         10 |   8.33% |@@@@
-         11 |   5.56% |@@
-         12 |   2.78% |@
-         13 |   0.00% |
-         14 |   0.00% |
-         15 |   0.00% |
-         16 |   0.00% |
-         17 |   0.00% |
-         18 |   0.00% |
-         19 |   0.00% |
-         20 |   0.00% |
-
-        ```
-
-        If *scaled* is ``True``, horizontal bars are scaled to *width*:
-
-        ```python
-        >>> h = (2@H(6)).ge(7)
-        >>> print("{:->65}".format(" 65 chars wide -->|"))
-        ---------------------------------------------- 65 chars wide -->|
-        >>> print(h.format(width=65, scaled=False))
-        avg |    0.58
-          0 |  41.67% |####################
-          1 |  58.33% |#############################
-        >>> print(h.format(width=65, scaled=True))
-        avg |    0.58
-          0 |  41.67% |###################################
-          1 |  58.33% |##################################################
-
-        ```
-        """
-        if width <= 0:
-
-            def parts():
-                yield "avg: {:.2f}".format(self.avg())
-
-                for face, percentage in self.data(relative=True, fill_items=fill_items):
-                    yield "{}:{:7.2%}".format(face, percentage)
-
-            return "{" + ", ".join(parts()) + "}"
-        else:
-            w = width - 15
-
-            def lines():
-                yield "avg | {:7.2f}".format(self.avg())
-                total = sum(self.counts())
-                tick_scale = max(self.counts()) if scaled else total
-
-                for face, count in self.data(relative=False, fill_items=fill_items):
-                    percentage = count / total
-                    ticks = int(w * count / tick_scale)
-                    yield "{: 3} | {:7.2%} |{}".format(face, percentage, tick * ticks)
-
-            return sep.join(lines())
 
     def lowest_terms(self) -> "H":
         r"""
@@ -966,21 +815,6 @@ class H(Mapping[int, int]):
         counts_gcd = reduce(gcd, self.counts(), 0)
 
         return H({k: v // counts_gcd for k, v in self.items()})
-
-    def roll(self) -> int:
-        r"""
-        Returns a (weighted) random face.
-        """
-        val = randrange(0, sum(self.counts()))
-        total = 0
-
-        for face, count in self.items():
-            total += count
-
-            if val < total:
-                return face
-
-        assert False, "val ({}) ≥ total ({})".format(val, total)
 
     def substitute(
         self,
@@ -1192,6 +1026,8 @@ class H(Mapping[int, int]):
         H({-1: 15, 0: 15, 1: 6})
         >>> print(_.format(width=65))
         avg |   -0.25
+        std |    0.72
+        var |    0.52
          -1 |  41.67% |####################
           0 |  41.67% |####################
           1 |  16.67% |########
@@ -1203,6 +1039,8 @@ class H(Mapping[int, int]):
         H({-1: 3500, 0: 3412, 1: 6912})
         >>> print(_.format(width=65))
         avg |    0.25
+        std |    0.83
+        var |    0.69
          -1 |  25.32% |############
           0 |  24.68% |############
           1 |  50.00% |#########################
@@ -1210,6 +1048,211 @@ class H(Mapping[int, int]):
         ```
         """
         return self.map(_within(lo, hi), other)
+
+    def data(
+        self,
+        relative: bool = False,
+        fill_items: Optional[Mapping[int, int]] = None,
+    ) -> Iterator[Tuple[int, float]]:
+        r"""
+        Presentation helper function that returns an iterator for each face/frequency pair:
+
+        ```python
+        >>> d6 = H(6)
+        >>> list(d6.gt(3).data())
+        [(0, 3.0), (1, 3.0)]
+        >>> list(d6.gt(3).data(relative=True))
+        [(0, 0.5), (1, 0.5)]
+
+        ```
+
+        If provided, *fill_items* supplies defaults for any missing faces:
+
+        ```python
+        >>> list(d6.gt(7).data())
+        [(0, 6.0)]
+        >>> list(d6.gt(7).data(fill_items={1: 0, 0: 0}))
+        [(0, 6.0), (1, 0.0)]
+
+        ```
+        """
+        if fill_items is None:
+            fill_items = {}
+
+        if relative:
+            total = sum(self.counts()) or 1
+        else:
+            total = 1
+
+        combined = dict(chain(fill_items.items(), self.items()))
+
+        return ((face, count / total) for face, count in sorted(combined.items()))
+
+    def data_xy(
+        self,
+        relative: bool = False,
+        fill_items: Optional[Mapping[int, int]] = None,
+    ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
+        r"""
+        Presentation helper function that returns an iterator for a “zipped” arrangement of
+        the output from the [``data`` method][dyce.h.H.data]:
+
+        ```python
+        >>> d6 = H(6)
+        >>> list(d6.data())
+        [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
+        >>> d6.data_xy()
+        ((1, 2, 3, 4, 5, 6), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+
+        ```
+        """
+        return cast(
+            Tuple[Tuple[int, ...], Tuple[float, ...]],
+            tuple(zip(*self.data(relative, fill_items))),
+        )
+
+    def format(
+        self,
+        fill_items: Optional[Mapping[int, int]] = None,
+        width: int = _ROW_WIDTH,
+        scaled: bool = False,
+        tick: str = "#",
+        sep: str = linesep,
+    ) -> str:
+        r"""
+        Returns a formatted string representation of the histogram. If provided,
+        *fill_items* supplies defaults for any missing faces. If *width* is greater than
+        zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which are
+        otherwise ignored if *width* is zero or less).
+
+        ```python
+        >>> print(H(6).format(width=0))
+        {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
+
+        ```
+
+        ```python
+        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
+        avg |    7.00
+        std |    2.42
+        var |    5.83
+          1 |   0.00% |
+          2 |   2.78% |@
+          3 |   5.56% |@@
+          4 |   8.33% |@@@@
+          5 |  11.11% |@@@@@
+          6 |  13.89% |@@@@@@
+          7 |  16.67% |@@@@@@@@
+          8 |  13.89% |@@@@@@
+          9 |  11.11% |@@@@@
+         10 |   8.33% |@@@@
+         11 |   5.56% |@@
+         12 |   2.78% |@
+         13 |   0.00% |
+         14 |   0.00% |
+         15 |   0.00% |
+         16 |   0.00% |
+         17 |   0.00% |
+         18 |   0.00% |
+         19 |   0.00% |
+         20 |   0.00% |
+
+        ```
+
+        If *scaled* is ``True``, horizontal bars are scaled to *width*:
+
+        ```python
+        >>> h = (2@H(6)).ge(7)
+        >>> print("{:->65}".format(" 65 chars wide -->|"))
+        ---------------------------------------------- 65 chars wide -->|
+        >>> print(h.format(width=65, scaled=False))
+        avg |    0.58
+        std |    0.49
+        var |    0.24
+          0 |  41.67% |####################
+          1 |  58.33% |#############################
+        >>> print(h.format(width=65, scaled=True))
+        avg |    0.58
+        std |    0.49
+        var |    0.24
+          0 |  41.67% |###################################
+          1 |  58.33% |##################################################
+
+        ```
+        """
+        if width <= 0:
+
+            def parts():
+                yield "avg: {:.2f}".format(self.mean())
+
+                for face, percentage in self.data(relative=True, fill_items=fill_items):
+                    yield "{}:{:7.2%}".format(face, percentage)
+
+            return "{" + ", ".join(parts()) + "}"
+        else:
+            w = width - 15
+
+            def lines():
+                mu = self.mean()
+                yield "avg | {:7.2f}".format(mu)
+                yield "std | {:7.2f}".format(self.stdev(mu))
+                yield "var | {:7.2f}".format(self.variance(mu))
+                total = sum(self.counts())
+                tick_scale = max(self.counts()) if scaled else total
+
+                for face, count in self.data(relative=False, fill_items=fill_items):
+                    percentage = count / total
+                    ticks = int(w * count / tick_scale)
+                    yield "{: 3} | {:7.2%} |{}".format(face, percentage, tick * ticks)
+
+            return sep.join(lines())
+
+    def mean(self) -> float:
+        """
+        Returns the mean of the weighted faces (or 0.0 if there are no faces).
+        """
+        numerator = denominator = 0
+
+        for face, count in self.items():
+            numerator += face * count
+            denominator += count
+
+        return numerator / (denominator or 1)
+
+    def stdev(self, mu: Optional[float] = None) -> float:
+        """
+        Shorthand for ``math.sqrt(self.variance(mu))``.
+        """
+        return sqrt(self.variance(mu))
+
+    def variance(self, mu: Optional[float] = None) -> float:
+        """
+        Returns the variance of the weighted faces. If provided, *mu* is used as the mean
+        (to avoid duplicate computation).
+        """
+        mu = mu if mu else self.mean()
+        numerator = denominator = 0
+
+        for face, count in self.items():
+            numerator += (face - mu) ** 2 * count
+            denominator += count
+
+        return numerator / (denominator or 1)
+
+    def roll(self) -> int:
+        r"""
+        Returns a (weighted) random face.
+        """
+        val = randrange(0, sum(self.counts()))
+        total = 0
+
+        for face, count in self.items():
+            total += count
+
+            if val < total:
+                return face
+
+        assert False, "val ({}) ≥ total ({})".format(val, total)
 
 
 # ---- Functions -----------------------------------------------------------------------

@@ -54,8 +54,8 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 ## A taste
 
 ``dyce`` provides two key primitives.
-``H`` objects represent histograms for modeling individual dice and outcomes.
-``P`` objects represent pools (ordered sequences) of histograms.
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling individual dice and outcomes.
+[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
 Both support a variety of operations.
 
 ```python
@@ -87,6 +87,8 @@ One can "take" individual dice from pools, ordered least to greatest. (The [``H.
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 >>> print(_.format(width=65))
 avg |    2.53
+std |    1.40
+var |    1.97
   1 |  30.56% |###############
   2 |  25.00% |############
   3 |  19.44% |#########
@@ -101,6 +103,8 @@ avg |    2.53
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 >>> print(_.format(width=65))
 avg |    4.47
+std |    1.40
+var |    1.97
   1 |   2.78% |#
   2 |   8.33% |####
   3 |  13.89% |######
@@ -109,6 +113,36 @@ avg |    4.47
   6 |  30.56% |###############
 
 ```
+
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``data`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data) and a [``data_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
+
+```python
+>>> matplotlib.pyplot.style.use("dark_background")  # doctest: +SKIP
+
+>>> faces, probabilities = p_2d6.h(0).data_xy(relative=True)
+>>> matplotlib.pyplot.bar(
+...   [str(f) for f in faces],
+...   probabilities,
+...   alpha=0.75,
+...   width=0.5,
+...   label="Lowest die of 2d6",
+... )  # doctest: +SKIP
+
+>>> faces, probabilities = p_2d6.h(-1).data_xy(relative=True)
+>>> matplotlib.pyplot.bar(
+...   [str(f) for f in faces],
+...   probabilities,
+...   alpha=0.75,
+...   width=0.5,
+...   label="Highest die of 2d6",
+... )  # doctest: +SKIP
+
+>>> matplotlib.pyplot.legend()  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
+
+```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_2d6_lo_hi.png](https://github.com/posita/dyce/blob/master/docs/plot_2d6_lo_hi.png)
 
 See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough treatment, including detailed examples.
 
@@ -119,72 +153,26 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 ```python
 >>> p_4d6 = 4@P(6)
 >>> _ = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
->>> print(_.format(width=65))
- avg |   12.24
-   3 |   0.08% |
-   4 |   0.31% |
-   5 |   0.77% |
-   6 |   1.62% |
-   7 |   2.93% |#
-   8 |   4.78% |##
-   9 |   7.02% |###
-  10 |   9.41% |####
-  11 |  11.42% |#####
-  12 |  12.89% |######
-  13 |  13.27% |######
-  14 |  12.35% |######
-  15 |  10.11% |#####
-  16 |   7.25% |###
-  17 |   4.17% |##
-  18 |   1.62% |
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 
-```
-
-```python
 >>> d6_reroll_first_one = H(6).substitute(lambda h, f: H(6) if f == 1 else f)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> _ = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
->>> print(_.format(width=65))
-avg |   13.27
-  3 |   0.00% |
-  4 |   0.00% |
-  5 |   0.02% |
-  6 |   0.26% |
-  7 |   0.87% |
-  8 |   1.99% |
-  9 |   3.91% |#
- 10 |   6.73% |###
- 11 |   9.81% |####
- 12 |  12.88% |######
- 13 |  14.93% |#######
- 14 |  15.52% |#######
- 15 |  13.83% |######
- 16 |  10.50% |#####
- 17 |   6.25% |###
- 18 |   2.51% |#
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(faces, probabilities, marker=".", label="Re-roll first 1; discard lowest")  # doctest: +SKIP
 
-```
-
-```python
 >>> p_4d6_reroll_all_ones = 4@P(H(range(2, 7)))
 >>> _ = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
->>> print(_.format(width=65))
- avg |   13.43
-   6 |   0.16% |
-   7 |   0.64% |
-   8 |   1.60% |
-   9 |   3.36% |#
-  10 |   6.08% |###
-  11 |   9.28% |####
-  12 |  12.64% |######
-  13 |  15.04% |#######
-  14 |  16.00% |########
-  15 |  14.56% |#######
-  16 |  11.20% |#####
-  17 |   6.72% |###
-  18 |   2.72% |#
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(faces, probabilities, marker=".", label="Re-roll all 1s; discard lowest")  # doctest: +SKIP
+
+>>> matplotlib.pyplot.legend()  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_4d6_variants.png](https://github.com/posita/dyce/blob/master/docs/plot_4d6_variants.png)
 
 #### Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
@@ -210,10 +198,13 @@ Translation:
 >>> pass_save = save_roll.ge(10)
 >>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
 >>> res = damage_half_on_save
->>> print(res.format(width=0))
-{avg: 32.49, 10:  0.00%, ..., 18:  2.44%, 19:  4.02%, 20:  5.75%, 21:  7.21%, 22:  7.93%, 23:  7.68%, 24:  6.55%, 25:  4.89%, 26:  3.19%, ..., 41:  2.53%, 42:  2.83%, 43:  3.07%, 44:  3.22%, 45:  3.27%, 46:  3.22%, 47:  3.07%, 48:  2.83%, 49:  2.53%, ..., 70:  0.00%}
+>>> faces, probabilities = res.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_burning_arch.png](https://github.com/posita/dyce/blob/master/docs/plot_burning_arch.png)
 
 An alternative using the [``H.substitute`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.substitute):
 
@@ -312,17 +303,34 @@ Example 1 translation:
 
 ```python
 >>> single_attack = 2@H(6) + 5
->>> print(single_attack.format(width=0))
-{avg: 12.00, 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, 14: 11.11%, 15:  8.33%, 16:  5.56%, 17:  2.78%}
+>>> faces, probabilities = single_attack.data_xy(relative=True)
+>>> matplotlib.pyplot.bar(
+...   [f - 0.125 for f in faces],
+...   probabilities,
+...   alpha=0.75,
+...   width=0.5,
+...   label="Single Attack",
+... )  # doctest: +SKIP
 
 >>> def gwf(h: H, face: int):  # type: (...) -> Union[int, H]
 ...   return h if face in (1, 2) else face
 
 >>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it's a one or two
->>> print(great_weapon_fighting.format(width=0))
-{avg: 13.33, 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, 14: 19.75%, 15: 14.81%, 16:  9.88%, 17:  4.94%}
+>>> faces, probabilities = great_weapon_fighting.data_xy(relative=True)
+>>> matplotlib.pyplot.bar(
+...   [f + 0.125 for f in faces],
+...   probabilities,
+...   alpha=0.75,
+...   width=0.5,
+...   label="Great Weapon Fighting",
+... )  # doctest: +SKIP
+
+>>> matplotlib.pyplot.legend()  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_great_weapon_fighting.png](https://github.com/posita/dyce/blob/master/docs/plot_great_weapon_fighting.png)
 
 Example 2 source:
 
@@ -357,51 +365,76 @@ Example 2 translation:
 
 >>> advantage = (2@P(20)).h(-1)
 
->>> def crit(h: H, f: int):  # type: (...) -> Union[int, H]
+>>> def crit(_: H, f: int):  # type: (...) -> Union[int, H]
 ...   if f == 20: return critical_hit
 ...   elif f + 5 >= 14: return normal_hit
 ...   else: return 0
 
->>> print(advantage.substitute(crit).format(width=0))
-{avg: 10.93, 0: 16.00%, 6:  6.19%, 7:  6.19%, ..., 16:  6.44%, 17:  6.50%, 18:  0.37%, 19:  0.44%, ..., 40:  0.02%, 41:  0.01%}
+>>> _ = advantage.substitute(crit)
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.scatter(faces, probabilities, color="skyblue", marker="d")  # doctest: +SKIP
+>>> matplotlib.pyplot.bar(faces, probabilities, color="skyblue", width=0.25)  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
 
-#### Translation of the accepted answer to “[How to count near duplicates in a mixed pool using AnyDice?](https://rpg.stackexchange.com/questions/179046/how-to-count-near-duplicates-in-a-mixed-pool-using-anydice)”
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_advantage.png](https://github.com/posita/dyce/blob/master/docs/plot_advantage.png)
+
+#### Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/questions/166633/roll-and-keep-in-anydice)”
 
 Source:
 
 ```
-function: near dupes in A:s B:s C:s {
-  DICE: {A, B, C}
-  DUPES: 0
-  loop DIE over DICE {
-    SAME: [count DIE in DICE]
-    NEAR: [count {DIE-1, DIE+1} in DICE]
-    if SAME > 1 | NEAR > 0 { DUPES: DUPES + 1 }
-  }
-  result: DUPES
-}
-output [near dupes in 1d12 2d10 1d8]
+output [highest 3 of 5d [explode d10]] named "Exploded 5k3"
 ```
 
 Translation:
 
 ```python
->>> def near_dupes(p: P):  # type: (...) -> Iterator[Tuple[int, int]]
-...   for roll, count in p.rolls_with_counts():
-...     dupes = set()
-...     for i in range(1, len(roll)):
-...       # Faces are ordered, so we only have to look at one neighbor
-...       if roll[i - 1] >= roll[i] - 1:
-...         dupes.update((i - 1, i))
-...     yield len(dupes), count
-
->>> _ = H(near_dupes(P(H(8), H(10), H(10), H(12)))).lowest_terms()
->>> print(_.format(width=0))
-{..., 0: 11.50%, 2: 46.50%, 3: 24.62%, 4: 17.38%}
+>>> _ = (5@P(H(10).explode(max_depth=2))).h(slice(-3, None))
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_d10_explode.png](https://github.com/posita/dyce/blob/master/docs/plot_d10_explode.png)
+
+#### Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/questions/111414/how-do-i-count-the-number-of-duplicates-in-anydice/111421#111421)”
+
+Source:
+
+```
+function: dupes in DICE:s {
+  D: 0
+  loop X over {2..#DICE} {
+    if ((X-1)@DICE = X@DICE) { D: D + 1}
+  }
+  result: D
+}
+```
+
+Translation:
+
+```python
+>>> def dupes(p: P):  # type: (...) -> Iterator[Tuple[int, int]]
+...   for roll, count in p.rolls_with_counts():
+...     dupes = 0
+...     for i in range(1, len(roll)):
+...       # Faces are ordered, so we only have to look at one neighbor
+...       if roll[i] == roll[i - 1]:
+...         dupes += 1
+...     yield dupes, count
+
+>>> _ = H(dupes(8@P(10))).lowest_terms()
+>>> faces, probabilities = _.data_xy(relative=True)
+>>> matplotlib.pyplot.barh(faces, probabilities)  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Number of duplicates rolled in 8d10")  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
+
+```
+
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_dupes.png](https://github.com/posita/dyce/blob/master/docs/plot_dupes.png)
 
 #### Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:
 
@@ -434,8 +467,17 @@ Translation:
 ...     yield a_successes - b_successes, count_a * count_b
 
 >>> _ = H(brawl(3@P(6), 3@P(6))).lowest_terms()
->>> print(_.format(width=0))
-{avg: 0.00, -3:  7.86%, -2: 15.52%, -1: 16.64%, 0: 19.96%, 1: 16.64%, 2: 15.52%, 3:  7.86%}
+>>> print(_.format(width=65))
+avg |    0.00
+std |    1.73
+var |    2.99
+ -3 |   7.86% |###
+ -2 |  15.52% |#######
+ -1 |  16.64% |########
+  0 |  19.96% |#########
+  1 |  16.64% |########
+  2 |  15.52% |#######
+  3 |   7.86% |###
 
 ```
 
@@ -479,11 +521,27 @@ Translation:
 ...     yield result, count_a * count_b
 
 >>> _ = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
->>> print(_.format(width=0))
-{avg: 2.36, -1:  1.42%, 0:  0.59%, 1: 16.65%, 2: 23.19%, 3: 58.15%}
+>>> print(_.format(width=65))
+avg |    2.36
+std |    0.88
+var |    0.77
+ -1 |   1.42% |
+  0 |   0.59% |
+  1 |  16.65% |########
+  2 |  23.19% |###########
+  3 |  58.15% |#############################
 
 >>> _ = H(brawl_w_optional_swap(4@P(6), 4@P(6))).lowest_terms()
->>> print(_.format(width=0))
-{avg: 2.64, -2:  0.06%, -1:  2.94%, 0:  0.31%, 1: 18.16%, 2: 19.97%, 3: 25.19%, 4: 33.37%}
+>>> print(_.format(width=65))
+avg |    2.64
+std |    1.28
+var |    1.64
+ -2 |   0.06% |
+ -1 |   2.94% |#
+  0 |   0.31% |
+  1 |  18.16% |#########
+  2 |  19.97% |#########
+  3 |  25.19% |############
+  4 |  33.37% |################
 
 ```

@@ -54,26 +54,15 @@ class TestP:
         assert P(H({})) == P()
         assert P(2, H({}), 2, H({})) == P(2, 2)
 
-    def test_getitem(self) -> None:
-        d4n = H(-4)
-        d8 = H(8)
-        p_d4n_d8 = 3 @ P(d4n, d8)
-        assert p_d4n_d8[0] == d4n
-        assert p_d4n_d8[2] == d4n
-        assert p_d4n_d8[-3] == d8
-        assert p_d4n_d8[-1] == d8
-
-    def test_len(self) -> None:
-        p_d0_1 = P()
-        p_d0_2 = P(H({}))
-        p_d6 = P(6)
-        p_d8 = P(8)
-        assert len(p_d0_1) == 0
-        assert len(p_d0_2) == 0
-        assert len(p_d6) == 1
-        assert len(p_d8) == 1
-        assert len(P(p_d6, p_d8)) == 2
-        assert len(P(p_d6, p_d8, p_d6, p_d8)) == 4
+    def test_repr(self) -> None:
+        assert repr(P()) == "P()"
+        assert repr(P(0)) == "P()"
+        assert repr(P(-6)) == "P(-6)"
+        assert repr(P(6)) == "P(6)"
+        assert (
+            repr(P(P(6), P(8), P(H({3: 1, 2: 2, 1: 3, 0: 1}))))
+            == "P(H({0: 1, 1: 3, 2: 2, 3: 1}), 6, 8)"
+        )
 
     def test_equivalence(self) -> None:
         p_d6 = P(6)
@@ -86,16 +75,6 @@ class TestP:
         assert P(p_d6, -p_d6).h() == p_d6 + p_d6n
         assert 2 @ p_d6 - p_d6 == p_d6 + p_d6 + p_d6n
         assert -(2 @ p_d6) == p_d6n + p_d6n
-
-    def test_repr(self) -> None:
-        assert repr(P()) == "P()"
-        assert repr(P(0)) == "P()"
-        assert repr(P(-6)) == "P(-6)"
-        assert repr(P(6)) == "P(6)"
-        assert (
-            repr(P(P(6), P(8), P(H({3: 1, 2: 2, 1: 3, 0: 1}))))
-            == "P(H({0: 1, 1: 3, 2: 2, 3: 1}), 6, 8)"
-        )
 
     def test_op_eq(self) -> None:
         p_d6 = P(6)
@@ -118,6 +97,27 @@ class TestP:
         p_d6 = P(6)
         p_d6n = P(H(range(-1, -7, -1)))
         assert p_d6n != p_d6
+
+    def test_len(self) -> None:
+        p_d0_1 = P()
+        p_d0_2 = P(H({}))
+        p_d6 = P(6)
+        p_d8 = P(8)
+        assert len(p_d0_1) == 0
+        assert len(p_d0_2) == 0
+        assert len(p_d6) == 1
+        assert len(p_d8) == 1
+        assert len(P(p_d6, p_d8)) == 2
+        assert len(P(p_d6, p_d8, p_d6, p_d8)) == 4
+
+    def test_getitem(self) -> None:
+        d4n = H(-4)
+        d8 = H(8)
+        p_d4n_d8 = 3 @ P(d4n, d8)
+        assert p_d4n_d8[0] == d4n
+        assert p_d4n_d8[2] == d4n
+        assert p_d4n_d8[-3] == d8
+        assert p_d4n_d8[-1] == d8
 
     def test_op_add_h(self) -> None:
         p_d2 = P(2)

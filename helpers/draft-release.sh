@@ -34,7 +34,7 @@ set -ex
 ( cd "${_REPO_DIR}" ; tox )
 git checkout -b "${VERS_PATCH}-release"
 perl -pi -e 's{^__version__([^#=]*)=\s*\(\s*0\s*,\s*0\s*,\s*0\s*,?\s*\)(\s*#.*)?$}{__version__\1= ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\2}g ;' "${VERS_PY}"
-perl -pi -e 's{\.github\.io/dyce/latest/\)}{\.github\.io/dyce/'"${VERS}"'/)}g ; s{/master/}{/'"${TAG}"'/}g ; s{\?version=master\)}{?version='"${TAG}"')}g ; s{!\[master ([^\]]+)\]}{!['"${TAG}"' \1]}g ; s{/pypi/([^/]+/)?'"${PKG}"'(\.svg)?\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'\2)}g' README.md
+perl -pi -e 's{\.github\.io/dyce/latest/([^)]*)\)}{\.github\.io/dyce/'"${VERS}"'/\1)}g ; s{/master/}{/'"${TAG}"'/}g ; s{\?version=master\)}{?version='"${TAG}"')}g ; s{!\[master ([^\]]+)\]}{!['"${TAG}"' \1]}g ; s{/pypi/([^/]+/)?'"${PKG}"'(\.svg)?\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'\2)}g' README.md
 perl -pi -e 's{!\[master ([^\]]+)\]}{!['"${TAG}"' \1]}g ; s{/pypi/([^/]+/)?'"${PKG}"'(\.svg)?\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'\2)}g' docs/index.md
 git commit --all --message "Update version and release ${TAG}."
 git tag --sign --force --message "Release ${TAG}." "${TAG}"

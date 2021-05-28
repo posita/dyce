@@ -6,6 +6,7 @@ from dyce.plt import plot_burst
 def main():
     base, _ = os.path.splitext(__file__)
     png_path = base + ".png"
+
     d20 = H(20)
     fig, _ = plot_burst(
         d20,
@@ -17,6 +18,7 @@ def main():
         ),
         graph_color="RdYlBu_r",
     )
+
     print("saving {}".format(png_path))
     fig.savefig(png_path, dpi=72)
 

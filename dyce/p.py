@@ -148,6 +148,8 @@ class P(Sequence[H]):
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
     >>> print(_.format(width=65))
     avg |    8.46
+    std |    2.21
+    var |    4.91
       2 |   0.46% |
       3 |   1.39% |
       4 |   3.24% |#
@@ -334,6 +336,8 @@ class P(Sequence[H]):
         H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
         >>> print(_.format(width=65))
         avg |    4.47
+        std |    1.40
+        var |    1.97
           1 |   2.78% |#
           2 |   8.33% |####
           3 |  13.89% |######
@@ -369,6 +373,8 @@ class P(Sequence[H]):
         H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
         >>> print(_.format(width=65))
         avg |   10.00
+        std |    0.91
+        var |    0.84
           4 |   0.00% |
           5 |   0.00% |
           6 |   0.10% |
@@ -688,8 +694,7 @@ def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]
         if isinstance(key, int):
             yield op_getitem(sequence, key)
         else:
-            for val in op_getitem(sequence, key):
-                yield val
+            yield from op_getitem(sequence, key)
 
 
 def _rolls_with_counts_for_heterogeneous_histograms(
