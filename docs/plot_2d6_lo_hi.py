@@ -1,13 +1,8 @@
-import os
 from dyce import H, P
 
 
-def main():
+def do_it(_: str) -> None:
     import matplotlib.pyplot
-
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
-    matplotlib.pyplot.style.use("dark_background")
 
     p_2d6 = 2 @ P(H(6))
     faces, probabilities = p_2d6.h(0).data_xy(relative=True)
@@ -29,9 +24,3 @@ def main():
     )
 
     matplotlib.pyplot.legend()
-    print("saving {}".format(png_path))
-    matplotlib.pyplot.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()

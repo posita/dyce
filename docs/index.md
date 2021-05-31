@@ -362,7 +362,11 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 ```
 
-![plot_histogram.png](plot_histogram.png)
+<a href="plot_histogram_light.png"><picture>
+  <source srcset="plot_histogram_dark.png" media="(prefers-color-scheme: dark)" />
+  <source srcset="plot_histogram_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+  <img src="plot_histogram_light.png" />
+</picture></a>
 
 [``dyce.plt``](dyce.plt.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
 
@@ -373,7 +377,11 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 ```
 
-![plot_burst_1.png](plot_burst_1.png)
+<a href="plot_burst_1_light.png"><picture>
+  <source srcset="plot_burst_1_dark.png" media="(prefers-color-scheme: dark)" />
+  <source srcset="plot_burst_1_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+  <img src="plot_burst_1_light.png" />
+</picture></a>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
 Overrides apply counter-clockwise, starting from the 12 o‘clock position:
@@ -390,7 +398,11 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 ```
 
-![plot_burst_2.png](plot_burst_2.png)
+<a href="plot_burst_2_light.png"><picture>
+  <source srcset="plot_burst_2_dark.png" media="(prefers-color-scheme: dark)" />
+  <source srcset="plot_burst_2_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+  <img src="plot_burst_2_light.png" />
+</picture></a>
 
 ### Modeling *Risis*
 
@@ -451,7 +463,11 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 
 Calling ``matplotlib.pyplot.show`` presents:
 
-![plot_risus_first_round.png](plot_risus_first_round.png)
+<a href="plot_risus_first_round_light.png"><picture>
+  <source srcset="plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)" />
+  <source srcset="plot_risus_first_round_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+  <img src="plot_risus_first_round_light.png" />
+</picture></a>
 
 We can even model various starting configurations through to completion to get a better sense of the impact of any disparity (in this case, applying dynamic programming to avoid redundant computations):
 

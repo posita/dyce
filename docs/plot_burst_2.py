@@ -1,14 +1,11 @@
-import os
 from dyce import H
 from dyce.plt import plot_burst
 
 
-def main():
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
-
+def do_it(style: str) -> None:
+    text_color = "white" if style == "dark" else "black"
     d20 = H(20)
-    fig, _ = plot_burst(
+    plot_burst(
         d20,
         outer=(
             ("crit. fail.", d20.le(1)[1]),
@@ -17,11 +14,5 @@ def main():
             ("crit. succ.", d20.ge(20)[1]),
         ),
         graph_color="RdYlBu_r",
+        text_color=text_color,
     )
-
-    print("saving {}".format(png_path))
-    fig.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()

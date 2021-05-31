@@ -55,8 +55,19 @@ plugins:
   - search
 
 theme:
-  name: "material"  # Required by arithmatex and mkdocstrings
+  name: "material"  # required by arithmatex and mkdocstrings
   features:
     - navigation.expand
     - navigation.sections
     - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode

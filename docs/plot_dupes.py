@@ -1,13 +1,8 @@
-import os
 from dyce import H, P
 
 
-def main():
+def do_it(_: str) -> None:
     import matplotlib.pyplot
-
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
-    matplotlib.pyplot.style.use("dark_background")
 
     def dupes(p: P):
         for roll, count in p.rolls_with_counts():
@@ -22,9 +17,3 @@ def main():
     matplotlib.pyplot.barh(faces, probabilities)
 
     matplotlib.pyplot.title("Number of duplicates rolled in 8d10")
-    print("saving {}".format(png_path))
-    matplotlib.pyplot.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()
