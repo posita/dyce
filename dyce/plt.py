@@ -60,9 +60,9 @@ def display_burst(
     h_inner: H,
     outer: Optional[Iterable[LabelT]] = None,
     desc: Optional[str] = None,
-    graph_color: str = "RdYlGn",
-    text_color: str = "black",
-    alpha: float = 0.5,
+    graph_color: str = DEFAULT_GRAPH_COLOR,
+    text_color: str = DEFAULT_TEXT_COLOR,
+    alpha: float = DEFAULT_GRAPH_ALPHA,
 ) -> None:
     assert matplotlib
 

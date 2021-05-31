@@ -1,13 +1,8 @@
-import os
 from dyce import H, P
 
 
-def main():
+def do_it(_: str) -> None:
     import matplotlib.pyplot
-
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
-    matplotlib.pyplot.style.use("dark_background")
 
     normal_hit = H(12) + 5
     critical_hit = 3 @ H(12) + 5
@@ -25,10 +20,3 @@ def main():
     faces, probabilities = adv_w_crit.data_xy(relative=True)
     matplotlib.pyplot.scatter(faces, probabilities, color="skyblue", marker="d")
     matplotlib.pyplot.bar(faces, probabilities, color="skyblue", width=0.25)
-
-    print("saving {}".format(png_path))
-    matplotlib.pyplot.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()

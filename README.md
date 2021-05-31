@@ -142,7 +142,7 @@ var |    1.97
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_2d6_lo_hi.png](https://github.com/posita/dyce/blob/master/docs/plot_2d6_lo_hi.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_2d6_lo_hi_light.png](https://github.com/posita/dyce/blob/master/docs/plot_2d6_lo_hi_light.png)
 
 See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough treatment, including detailed examples.
 
@@ -172,7 +172,7 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_4d6_variants.png](https://github.com/posita/dyce/blob/master/docs/plot_4d6_variants.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_4d6_variants_light.png](https://github.com/posita/dyce/blob/master/docs/plot_4d6_variants_light.png)
 
 #### Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
@@ -204,7 +204,7 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_burning_arch.png](https://github.com/posita/dyce/blob/master/docs/plot_burning_arch.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_burning_arch_light.png](https://github.com/posita/dyce/blob/master/docs/plot_burning_arch_light.png)
 
 An alternative using the [``H.substitute`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.substitute):
 
@@ -330,7 +330,7 @@ Example 1 translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_great_weapon_fighting.png](https://github.com/posita/dyce/blob/master/docs/plot_great_weapon_fighting.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_great_weapon_fighting_light.png](https://github.com/posita/dyce/blob/master/docs/plot_great_weapon_fighting_light.png)
 
 Example 2 source:
 
@@ -378,7 +378,7 @@ Example 2 translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_advantage.png](https://github.com/posita/dyce/blob/master/docs/plot_advantage.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_advantage_light.png](https://github.com/posita/dyce/blob/master/docs/plot_advantage_light.png)
 
 #### Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/questions/166633/roll-and-keep-in-anydice)”
 
@@ -398,7 +398,7 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_d10_explode.png](https://github.com/posita/dyce/blob/master/docs/plot_d10_explode.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_d10_explode_light.png](https://github.com/posita/dyce/blob/master/docs/plot_d10_explode_light.png)
 
 #### Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/questions/111414/how-do-i-count-the-number-of-duplicates-in-anydice/111421#111421)”
 
@@ -434,7 +434,7 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_dupes.png](https://github.com/posita/dyce/blob/master/docs/plot_dupes.png)
+![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_dupes_light.png](https://github.com/posita/dyce/blob/master/docs/plot_dupes_light.png)
 
 #### Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:
 

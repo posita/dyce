@@ -1,13 +1,8 @@
-import os
 from dyce import H
 
 
-def main():
+def do_it(_: str) -> None:
     import matplotlib.pyplot
-
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
-    matplotlib.pyplot.style.use("dark_background")
 
     single_attack = 2 @ H(6) + 5
     faces, probabilities = single_attack.data_xy(relative=True)
@@ -33,9 +28,3 @@ def main():
     )
 
     matplotlib.pyplot.legend()
-    print("saving {}".format(png_path))
-    matplotlib.pyplot.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()

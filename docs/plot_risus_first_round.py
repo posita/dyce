@@ -1,13 +1,9 @@
 from typing import List, Tuple
-import os
 from dyce import H
 
 
-def main():
+def do_it(_: str) -> None:
     import matplotlib.pyplot
-
-    base, _ = os.path.splitext(__file__)
-    png_path = base + ".png"
 
     col_names = ["Loss", "Tie", "Win"]
     col_ticks = list(range(len(col_names)))
@@ -16,8 +12,8 @@ def main():
 
     for i, them in enumerate(range(3, 3 + num_scenarios)):
         ax = axes[i]
-        row_names = []  # type: List[str]
-        rows = []  # type: List[Tuple[float, ...]]
+        row_names: List[str] = []
+        rows: List[Tuple[float, ...]] = []
         num_rows = 3
 
         for us in range(them, them + num_rows):
@@ -43,9 +39,3 @@ def main():
                 )
 
     fig.tight_layout()
-    print("saving {}".format(png_path))
-    matplotlib.pyplot.savefig(png_path, dpi=72)
-
-
-if __name__ == "__main__":
-    main()
