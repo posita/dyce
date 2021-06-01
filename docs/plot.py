@@ -22,7 +22,11 @@ def import_fig(arg: str) -> Tuple[str, Callable[[str], None]]:
 
 
 PARSER = argparse.ArgumentParser(description="Generate PNG files for documentation")
-PARSER.add_argument("-s", "--style", choices=("dark", "light"), default="light")
+# TODO: Get rid of all instances of gh here, below, and with Makefile and *_gh.png once
+# [this dumpster
+# fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981)
+# gets resolved
+PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
 PARSER.add_argument("fig", type=import_fig)
 
 
@@ -35,6 +39,17 @@ def main():
 
     if args.style == "dark":
         matplotlib.pyplot.style.use("dark_background")
+    elif args.style == "gh":
+        text_color = "gray"
+        matplotlib.rcParams.update(
+            {
+                "text.color": text_color,
+                "axes.edgecolor": text_color,
+                "axes.labelcolor": text_color,
+                "xtick.color": text_color,
+                "ytick.color": text_color,
+            }
+        )
 
     mod_do_it(args.style)
     print("saving {}".format(png_path))

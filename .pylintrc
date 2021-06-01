@@ -8,7 +8,7 @@
 # ======================================================================================
 
 [MESSAGES CONTROL]
-disable=C,R,locally-disabled,missing-super-argument,no-init,no-member,relative-beyond-top-level
+disable=C,R,fixme,locally-disabled,missing-super-argument,no-init,no-member,relative-beyond-top-level
 enable=useless-suppression
 
 [REPORTS]
