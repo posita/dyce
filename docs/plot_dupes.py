@@ -14,6 +14,5 @@ def do_it(_: str) -> None:
 
     h = H(dupes(8 @ P(10))).lowest_terms()
     faces, probabilities = h.data_xy(relative=True)
-    matplotlib.pyplot.barh(faces, probabilities)
-
-    matplotlib.pyplot.title("Number of duplicates rolled in 8d10")
+    matplotlib.pyplot.bar(faces, probabilities)
+    matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")

@@ -5,7 +5,21 @@ def do_it(_: str) -> None:
     import matplotlib.pyplot
 
     normal_hit = H(12) + 5
+    faces, probabilities = normal_hit.data_xy(relative=True)
+    matplotlib.pyplot.plot(
+        faces,
+        probabilities,
+        marker=".",
+        label="normal hit",
+    )
     critical_hit = 3 @ H(12) + 5
+    faces, probabilities = critical_hit.data_xy(relative=True)
+    matplotlib.pyplot.plot(
+        faces,
+        probabilities,
+        marker=".",
+        label="critical hit",
+    )
     advantage = (2 @ P(20)).h(-1)
 
     def crit(_: H, f: int):
@@ -16,7 +30,11 @@ def do_it(_: str) -> None:
         else:
             return 0
 
-    adv_w_crit = advantage.substitute(crit)
-    faces, probabilities = adv_w_crit.data_xy(relative=True)
-    matplotlib.pyplot.scatter(faces, probabilities, color="skyblue", marker="d")
-    matplotlib.pyplot.bar(faces, probabilities, color="skyblue", width=0.25)
+    advantage_weighted = advantage.substitute(crit)
+    faces, probabilities = advantage_weighted.data_xy(relative=True)
+    matplotlib.pyplot.plot(
+        faces,
+        probabilities,
+        marker=".",
+        label="d20 advantage-weighted",
+    )

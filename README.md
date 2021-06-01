@@ -154,18 +154,33 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 >>> p_4d6 = 4@P(6)
 >>> _ = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
 >>> faces, probabilities = _.data_xy(relative=True)
->>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="Discard lowest",
+... )  # doctest: +SKIP
 
 >>> d6_reroll_first_one = H(6).substitute(lambda h, f: H(6) if f == 1 else f)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> _ = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
 >>> faces, probabilities = _.data_xy(relative=True)
->>> matplotlib.pyplot.plot(faces, probabilities, marker=".", label="Re-roll first 1; discard lowest")  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="Re-roll first 1; discard lowest",
+... )  # doctest: +SKIP
 
 >>> p_4d6_reroll_all_ones = 4@P(H(range(2, 7)))
 >>> _ = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
 >>> faces, probabilities = _.data_xy(relative=True)
->>> matplotlib.pyplot.plot(faces, probabilities, marker=".", label="Re-roll all 1s; discard lowest")  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="Re-roll all 1s; discard lowest",
+... )  # doctest: +SKIP
 
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
@@ -356,12 +371,22 @@ Example 2 translation:
 
 ```python
 >>> normal_hit = H(12) + 5
->>> print(normal_hit.format(width=0))
-{avg: 11.50, 6:  8.33%, 7:  8.33%, 8:  8.33%, ..., 16:  8.33%, 17:  8.33%}
+>>> faces, probabilities = normal_hit.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="normal hit",
+... )  # doctest: +SKIP
 
 >>> critical_hit = 3@H(12) + 5
->>> print(critical_hit.format(width=0))
-{avg: 24.50, 8:  0.06%, 9:  0.17%, 10:  0.35%, 11:  0.58%, ..., 38:  0.58%, 39:  0.35%, 40:  0.17%, 41:  0.06%}
+>>> faces, probabilities = critical_hit.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="critical hit",
+... )  # doctest: +SKIP
 
 >>> advantage = (2@P(20)).h(-1)
 
@@ -370,10 +395,14 @@ Example 2 translation:
 ...   elif f + 5 >= 14: return normal_hit
 ...   else: return 0
 
->>> _ = advantage.substitute(crit)
->>> faces, probabilities = _.data_xy(relative=True)
->>> matplotlib.pyplot.scatter(faces, probabilities, color="skyblue", marker="d")  # doctest: +SKIP
->>> matplotlib.pyplot.bar(faces, probabilities, color="skyblue", width=0.25)  # doctest: +SKIP
+>>> advantage_weighted = advantage.substitute(crit)
+>>> faces, probabilities = advantage_weighted.data_xy(relative=True)
+>>> matplotlib.pyplot.plot(
+...   faces,
+...   probabilities,
+...   marker=".",
+...   label="d20 advantage-weighted",
+... )  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -428,8 +457,8 @@ Translation:
 
 >>> _ = H(dupes(8@P(10))).lowest_terms()
 >>> faces, probabilities = _.data_xy(relative=True)
->>> matplotlib.pyplot.barh(faces, probabilities)  # doctest: +SKIP
->>> matplotlib.pyplot.title("Number of duplicates rolled in 8d10")  # doctest: +SKIP
+>>> matplotlib.pyplot.bar(faces, probabilities)  # doctest: +SKIP
+>>> matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
