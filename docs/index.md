@@ -364,7 +364,6 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 <a href="plot_histogram_light.png"><picture>
   <source srcset="plot_histogram_dark.png" media="(prefers-color-scheme: dark)" />
-  <source srcset="plot_histogram_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
   <img src="plot_histogram_light.png" />
 </picture></a>
 
@@ -379,7 +378,6 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 <a href="plot_burst_1_light.png"><picture>
   <source srcset="plot_burst_1_dark.png" media="(prefers-color-scheme: dark)" />
-  <source srcset="plot_burst_1_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
   <img src="plot_burst_1_light.png" />
 </picture></a>
 
@@ -400,7 +398,6 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 <a href="plot_burst_2_light.png"><picture>
   <source srcset="plot_burst_2_dark.png" media="(prefers-color-scheme: dark)" />
-  <source srcset="plot_burst_2_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
   <img src="plot_burst_2_light.png" />
 </picture></a>
 
@@ -465,7 +462,6 @@ Calling ``matplotlib.pyplot.show`` presents:
 
 <a href="plot_risus_first_round_light.png"><picture>
   <source srcset="plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)" />
-  <source srcset="plot_risus_first_round_light.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
   <img src="plot_risus_first_round_light.png" />
 </picture></a>
 
