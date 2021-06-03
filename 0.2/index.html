@@ -51,13 +51,17 @@
   
     
     
+      
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
   
     
     <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -101,6 +105,15 @@
         </div>
       </div>
     </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green" type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
     
     
     
@@ -415,11 +428,11 @@
   Thank you!
 -->
 
-<p><a href="https://pypi.python.org/pypi/dycelib/0.2.1"><img alt="v0.2.1 Version" src="https://img.shields.io/pypi/v/dycelib/0.2.1.svg" /></a>
-<a href="https://pypi.python.org/pypi/dycelib/0.2.1"><img alt="v0.2.1 Development Stage" src="https://img.shields.io/pypi/status/dycelib/0.2.1.svg" /></a>
-<a href="http://opensource.org/licenses/MIT"><img alt="v0.2.1 License" src="https://img.shields.io/pypi/l/dycelib/0.2.1.svg" /></a>
-<a href="https://pypi.python.org/pypi/dycelib/0.2.1"><img alt="v0.2.1 Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dycelib/0.2.1.svg" /></a>
-<a href="https://pypi.python.org/pypi/dycelib/0.2.1"><img alt="v0.2.1 Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dycelib/0.2.1.svg" /></a>
+<p><a href="https://pypi.python.org/pypi/dycelib/0.2.2"><img alt="v0.2.2 Version" src="https://img.shields.io/pypi/v/dycelib/0.2.2.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.2.2"><img alt="v0.2.2 Development Stage" src="https://img.shields.io/pypi/status/dycelib/0.2.2.svg" /></a>
+<a href="http://opensource.org/licenses/MIT"><img alt="v0.2.2 License" src="https://img.shields.io/pypi/l/dycelib/0.2.2.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.2.2"><img alt="v0.2.2 Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dycelib/0.2.2.svg" /></a>
+<a href="https://pypi.python.org/pypi/dycelib/0.2.2"><img alt="v0.2.2 Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dycelib/0.2.2.svg" /></a>
 <a href="https://github.com/posita/dyce"><img alt="source code" src="https://img.shields.io/github/stars/posita/dyce?style=social" /></a></p>
 <h1 id="introduction-to-dyce">Introduction to <code>dyce</code></h1>
 <p><code>dyce</code> is a pure-Python library for exploring dice probabilities designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
@@ -565,8 +578,12 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">10</span>
 <span class="normal">11</span>
 <span class="normal">12</span>
-<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">2.42</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">5.83</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
   <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
@@ -590,10 +607,14 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.04</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.31</span>
   <span class="mi">1</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
   <span class="mi">2</span> <span class="o">|</span>  <span class="mf">28.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############</span>
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">17.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
@@ -611,10 +632,14 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">3.50</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.37</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.88</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
   <span class="mi">2</span> <span class="o">|</span>  <span class="mf">18.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">24.07</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
@@ -632,10 +657,14 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">91</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.96</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.31</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
@@ -673,11 +702,15 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># a common “d10” with faces [0 .. 9]</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># a common “d10” with faces [0 .. 9]</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>   <span class="mf">13.48</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">4.40</span>
+<span class="n">var</span> <span class="o">|</span>   <span class="mf">19.39</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.00</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">0.01</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
@@ -788,23 +821,31 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">faces</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">data_xy</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">faces</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">data_xy</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
 <span class="o">...</span>   <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">],</span>
 <span class="o">...</span>   <span class="n">probabilities</span><span class="p">,</span>
 <span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
 </code></pre></div>
 </td></tr></table>
-<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
-<p><img alt="plot_histogram.png" src="plot_histogram.png" /></p>
+<p><a href="plot_histogram_light.png"><picture>
+  <source srcset="plot_histogram_dark.png" media="(prefers-color-scheme: dark)" />
+  <img src="plot_histogram_light.png" />
+</picture></a></p>
 <p><a href="dyce.plt/"><code>dyce.plt</code></a> provides some experimental, rudimentary conveniences if it detects that <code>matplotlib</code> is installed (e.g., via <a href="https://jupyter.org/">Jupyter</a>):</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.plt</span> <span class="kn">import</span> <span class="n">plot_burst</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.plt</span> <span class="kn">import</span> <span class="n">plot_burst</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_burst</span><span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
 </code></pre></div>
 </td></tr></table>
-<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
-<p><img alt="plot_burst_1.png" src="plot_burst_1.png" /></p>
+<p><a href="plot_burst_1_light.png"><picture>
+  <source srcset="plot_burst_1_dark.png" media="(prefers-color-scheme: dark)" />
+  <img src="plot_burst_1_light.png" />
+</picture></a></p>
 <p>The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
 Overrides apply counter-clockwise, starting from the 12 o‘clock position:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -813,17 +854,21 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:</p>
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
-<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d20</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d20</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_burst</span><span class="p">(</span><span class="n">d20</span><span class="p">,</span> <span class="n">outer</span><span class="o">=</span><span class="p">(</span>
 <span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
 <span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">14</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
 <span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">19</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
 <span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">20</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
 <span class="o">...</span> <span class="p">),</span> <span class="n">graph_color</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
 </code></pre></div>
 </td></tr></table>
-<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
-<p><img alt="plot_burst_2.png" src="plot_burst_2.png" /></p>
+<p><a href="plot_burst_2_light.png"><picture>
+  <source srcset="plot_burst_2_dark.png" media="(prefers-color-scheme: dark)" />
+  <img src="plot_burst_2_light.png" />
+</picture></a></p>
 <h3 id="modeling-risis">Modeling <em>Risis</em></h3>
 <p><em><a href="http://risus.cumberlandgames.com/">Risus</a></em> and its many <a href="http://www.risusiverse.com/home/optional-rules">community-developed alternative rules</a> are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
 We can easily model its opposed combat system for various starting configurations through the first round:</p>
@@ -897,7 +942,7 @@ We can easily model its opposed combat system for various starting configuration
 <span class="o">...</span>   <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[Tuple[float, ...]]</span>
 <span class="o">...</span>   <span class="k">for</span> <span class="n">us</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">them</span><span class="p">,</span> <span class="n">them</span> <span class="o">+</span> <span class="n">num_rows</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">row_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">d6 …&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">))</span>
-<span class="o">...</span>     <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">us</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">data_xy</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">us</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">data_xy</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="o">...</span>   <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;… vs </span><span class="si">{}</span><span class="s2">d6&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">them</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">col_ticks</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
@@ -915,7 +960,10 @@ We can easily model its opposed combat system for various starting configuration
 </code></pre></div>
 </td></tr></table>
 <p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
-<p><img alt="plot_risus_first_round.png" src="plot_risus_first_round.png" /></p>
+<p><a href="plot_risus_first_round_light.png"><picture>
+  <source srcset="plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)" />
+  <img src="plot_risus_first_round_light.png" />
+</picture></a></p>
 <p>We can even model various starting configurations through to completion to get a better sense of the impact of any disparity (in this case, applying dynamic programming to avoid redundant computations):</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1298,6 +1346,8 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
     
     
       <script src="assets/javascripts/bundle.a1609d9a.min.js"></script>
+      
+        <script src="img_theme.js"></script>
       
         <script src="mathjax.js"></script>
       
