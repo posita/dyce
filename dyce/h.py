@@ -423,6 +423,8 @@ class H(Mapping[int, int]):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
+        elif other == 0:
+            return H({})
         else:
             return cast(H, sum(repeat(self, other)))
 

@@ -98,6 +98,8 @@ class TestH:
         d6 = H(range(1, 7))
         d6_2 = d6 + d6
         d6_3 = d6_2 + d6
+        assert 0 @ d6 == H({})
+        assert H({}) == d6 @ 0
         assert 2 @ d6 == d6_2
         assert d6_2 == d6 @ 2
         assert d6_3 == 3 @ d6
