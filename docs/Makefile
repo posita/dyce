@@ -12,7 +12,8 @@ all : \
 	plot_great_weapon_fighting_gh.png \
 	plot_histogram_dark.png \
 	plot_histogram_light.png \
-	plot_risus_first_round_gh.png
+	plot_risus_first_round_dark.png \
+	plot_risus_first_round_light.png
 
 plot_%_dark.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
 	"$${PYTHON:-python}" plot.py --style=dark $*

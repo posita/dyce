@@ -9,5 +9,5 @@ def do_it(_: str) -> None:
     pass_save = save_roll.ge(10)
     damage_half_on_save = burning_arch_damage // (pass_save + 1)
     res = damage_half_on_save
-    faces, probabilities = res.data_xy(relative=True)
+    faces, probabilities = res.data_xy()
     matplotlib.pyplot.plot(faces, probabilities, marker=".")

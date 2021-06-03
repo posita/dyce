@@ -25,7 +25,7 @@ except ImportError:
 __all__ = ()
 
 
-# ---- Data ----------------------------------------------------------------------------
+# ---- Types ---------------------------------------------------------------------------
 
 
 ColorT = Tuple[float, float, float, float]
@@ -38,6 +38,10 @@ if matplotlib:
 else:
     AxesT = Any  # type: ignore
     FigureT = Any  # type: ignore
+
+
+# ---- Data ----------------------------------------------------------------------------
+
 
 DEFAULT_GRAPH_COLOR = "RdYlGn_r"
 DEFAULT_TEXT_COLOR = "black"
@@ -116,18 +120,18 @@ def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
     le_total, ge_total = 0.0, 1.0
-    for face, percentage in h.data(relative=True):
-        le_total += percentage
+    for face, probability in h.data(relative=True):
+        le_total += probability
 
-        if percentage >= _HIDE_LIM:
+        if probability >= _HIDE_LIM:
             label = "{} {:.2%}; ≥{:.2%}; ≤{:.2%}".format(
-                face, percentage, le_total, ge_total
+                face, probability, le_total, ge_total
             )
         else:
             label = ""
 
-        ge_total -= percentage
-        yield (label, percentage)
+        ge_total -= probability
+        yield (label, probability)
 
 
 def plot_burst(

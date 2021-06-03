@@ -69,11 +69,14 @@ class TestH:
         assert d6_2[12] == 1
 
     def test_op_add_h(self) -> None:
-        d2 = H(range(1, 3))
-        d3 = H(range(1, 4))
+        d2 = H(2)
+        d3 = H(3)
         assert d2 + d3 == {2: 1, 3: 2, 4: 2, 5: 1}
         assert d3 + d2 == {2: 1, 3: 2, 4: 2, 5: 1}
         assert d2 + d3 == d3 + d2
+
+        assert d2 + H({}) == d2
+        assert H({}) + d3 == d3
 
     def test_op_add_int(self) -> None:
         h1 = H(range(10, 20))
@@ -82,10 +85,13 @@ class TestH:
         assert 1 + h1 == h2
 
     def test_op_sub_h(self) -> None:
-        d2 = H(range(1, 3))
-        d3 = H(range(1, 4))
+        d2 = H(2)
+        d3 = H(3)
         assert d2 - d3 == {-2: 1, -1: 2, 0: 2, 1: 1}
         assert d3 - d2 == {-1: 1, 0: 2, 1: 2, 2: 1}
+
+        assert d2 - H({}) == d2
+        assert H({}) - d3 == -d3
 
     def test_op_sub_int(self) -> None:
         h1 = H(range(10, 20))
@@ -95,7 +101,7 @@ class TestH:
         assert 1 - h2 == h3
 
     def test_op_matmul(self) -> None:
-        d6 = H(range(1, 7))
+        d6 = H(6)
         d6_2 = d6 + d6
         d6_3 = d6_2 + d6
         assert 0 @ d6 == H({})
@@ -106,8 +112,8 @@ class TestH:
         assert 4 @ d6 == d6 @ 2 @ 2
 
     def test_map(self) -> None:
-        d6 = H(range(1, 7))
-        d8 = H(range(1, 9))
+        d6 = H(6)
+        d8 = H(8)
         within_filter = _within(-1, 1)
         d8_v_d6 = d8.map(within_filter, d6)
         assert d8_v_d6 == {-1: 10, 0: 17, 1: 21}

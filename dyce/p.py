@@ -11,13 +11,11 @@ from __future__ import generator_stop
 from typing import (
     Iterable,
     Iterator,
-    Mapping,
     Optional,
     Sequence,
     Tuple,
     TypeVar,
     Union,
-    cast,
     overload,
 )
 
@@ -30,25 +28,19 @@ from itertools import (
     repeat,
 )
 from math import factorial
+from numbers import Integral
 from operator import (
     abs as op_abs,
-    add as op_add,
-    and_ as op_and,
     eq as op_eq,
-    floordiv as op_floordiv,
     getitem as op_getitem,
-    or_ as op_or,
-    mod as op_mod,
     mul as op_mul,
     ne as op_ne,
     neg as op_neg,
     pos as op_pos,
-    pow as op_pow,
-    sub as op_sub,
-    xor as op_xor,
 )
 
-from .h import H, _ExpandT, _CoalesceT
+from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _FaceT, _MappingT
+from .symmetries import sum_w_start
 
 __all__ = ("P",)
 
@@ -58,19 +50,24 @@ __all__ = ("P",)
 
 _T = TypeVar("_T")
 _GetItemT = Union[int, slice]
+_OperandT = Union[_FaceT, "P"]
 
 
 # ---- Classes -------------------------------------------------------------------------
 
 
-class P(Sequence[H]):
+class P(Sequence[H], HAbleBinOpsMixin):
     r"""
-    An immutable pool (ordered sequence) of zero or more [``H`` objects][dyce.h.H]
-    supporting group operations. Objects can be flattened to a single histogram, either
-    explicitly via the [``h`` method][dyce.p.P.h], or by using binary arithmetic
-    operations. Unary operators and the ``@`` operator result in new ``P`` objects. If
-    any of the [initializer][dyce.p.P.__init__]’s *args* parameter is an ``int``, it is
-    passed to [``H``’s initializer][dyce.h.H.__init__].
+    An immutable pool (ordered sequence) supporting group operations for zero or more
+    [``H`` objects][dyce.h.H] (provided or created from the
+    [initializer][dyce.p.P.__init__]’s *args* parameter).
+
+    This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
+    [``HAbleBinOpsMixin`` class][dyce.h.HAbleBinOpsMixin], which means it can be
+    “flattened” into a single histogram, either explicitly via the
+    [``h`` method][dyce.p.P.h], or implicitly by using binary arithmetic operations.
+    Note that unary operators and the ``@`` operator result in new ``P`` objects, not
+    flattened histograms.
 
     ```python
     >>> p_d6 = P(6)  # shorthand for P(H(6))
@@ -130,7 +127,7 @@ class P(Sequence[H]):
 
     ```
 
-    Note that containers are opinionated about histogram ordering:
+    Note that pools are opinionated about histogram ordering:
 
     ```python
     >>> P(8, 6, 4)[0] == P(8, 4, 6)[0] == H(4)
@@ -138,10 +135,12 @@ class P(Sequence[H]):
 
     ```
 
-    The [``h`` method][dyce.p.P.h] also allows subsets of faces to be “taken” (selected)
-    by index from least to greatest. Negative indexes are supported and retain their
-    idiomatic meaning. Modeling the sum of the greatest two faces of three six-sided
-    dice (``3d6``) can be expressed as:
+    In an extension to (departure from) the [``HAbleT`` protocol][dyce.h.HAbleT], the
+    [``P.h`` method][dyce.p.P.h]’s implementation also affords subsets of faces to be
+    “taken” (selected) by passing in selection criteria. Values are indexed from least
+    to greatest. Negative indexes are supported and retain their idiomatic meaning.
+    Modeling the sum of the greatest two faces of three six-sided dice (``3d6``) can be
+    expressed as:
 
     ```python
     >>> (3@p_d6).h(-2, -1)
@@ -165,10 +164,6 @@ class P(Sequence[H]):
     ```
     """
 
-    # ---- Types -----------------------------------------------------------------------
-
-    OperandT = Union[int, "P"]
-
     # ---- Constructor -----------------------------------------------------------------
 
     def __init__(self, *args: Union[int, "P", H]) -> None:
@@ -177,7 +172,7 @@ class P(Sequence[H]):
 
         def _gen_hs():
             for a in args:
-                if isinstance(a, int):
+                if isinstance(a, Integral):
                     yield H(a)
                 elif isinstance(a, H):
                     yield a
@@ -237,26 +232,8 @@ class P(Sequence[H]):
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
 
-    def __add__(self, other: OperandT) -> H:
-        return op_add(self.h(), other)
-
-    def __radd__(self, other: int) -> H:
-        return op_add(other, self.h())
-
-    def __sub__(self, other: OperandT) -> H:
-        return op_sub(self.h(), other)
-
-    def __rsub__(self, other: int) -> H:
-        return op_sub(other, self.h())
-
-    def __mul__(self, other: OperandT) -> H:
-        return op_mul(self.h(), other)
-
-    def __rmul__(self, other: int) -> H:
-        return op_mul(other, self.h())
-
     def __matmul__(self, other: int) -> "P":
-        if not isinstance(other, int):
+        if not isinstance(other, Integral):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
@@ -265,42 +242,6 @@ class P(Sequence[H]):
 
     def __rmatmul__(self, other: int) -> "P":
         return self.__matmul__(other)
-
-    def __floordiv__(self, other: OperandT) -> H:
-        return op_floordiv(self.h(), other)
-
-    def __rfloordiv__(self, other: int) -> H:
-        return op_floordiv(other, self.h())
-
-    def __mod__(self, other: OperandT) -> H:
-        return op_mod(self.h(), other)
-
-    def __rmod__(self, other: int) -> H:
-        return op_mod(other, self.h())
-
-    def __pow__(self, other: OperandT) -> H:
-        return op_pow(self.h(), other)
-
-    def __rpow__(self, other: int) -> H:
-        return op_pow(other, self.h())
-
-    def __and__(self, other: OperandT) -> H:
-        return op_and(self.h(), other)
-
-    def __rand__(self, other: int) -> H:
-        return op_and(other, self.h())
-
-    def __xor__(self, other: OperandT) -> H:
-        return op_xor(self.h(), other)
-
-    def __rxor__(self, other: int) -> H:
-        return op_xor(other, self.h())
-
-    def __or__(self, other: OperandT) -> H:
-        return op_or(self.h(), other)
-
-    def __ror__(self, other: int) -> H:
-        return op_or(other, self.h())
 
     def __neg__(self) -> "P":
         return P(*(op_neg(h) for h in self._hs))
@@ -311,12 +252,10 @@ class P(Sequence[H]):
     def __abs__(self) -> "P":
         return P(*(op_abs(h) for h in self._hs))
 
-    # ---- Methods ---------------------------------------------------------------------
-
     def h(self, *dice: _GetItemT) -> H:
         r"""
-        When provided no arguments, ``h`` combines (or “flattens”) contained
-        histograms:
+        When provided no arguments, ``h`` combines (or “flattens”) contained histograms in
+        accordance with the [``HAbleT`` protocol][dyce.h.HAbleT]:
 
         ```python
         >>> (2@P(6)).h()
@@ -404,67 +343,46 @@ class P(Sequence[H]):
         if dice:
             return H(_take_and_sum_faces(self.rolls_with_counts(), dice))
         else:
-            if self._hs:
-                hs_sum = sum(self._hs)
-            else:
-                hs_sum = H(())
+            return sum_w_start(self._hs, start=H({}))
 
-            return cast(H, hs_sum)
+    # ---- Methods ---------------------------------------------------------------------
 
-    def lt(
-        self,
-        other: OperandT,
-    ) -> H:
+    def lt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().lt(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.lt``][dyce.h.H.lt].
         """
         return self.h().lt(other)
 
-    def le(
-        self,
-        other: OperandT,
-    ) -> H:
+    def le(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().le(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.le``][dyce.h.H.le].
         """
         return self.h().le(other)
 
-    def eq(
-        self,
-        other: OperandT,
-    ) -> H:
+    def eq(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().eq(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.eq``][dyce.h.H.eq].
         """
         return self.h().eq(other)
 
-    def ne(
-        self,
-        other: OperandT,
-    ) -> H:
+    def ne(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().ne(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.ne``][dyce.h.H.ne].
         """
         return self.h().ne(other)
 
-    def gt(
-        self,
-        other: OperandT,
-    ) -> H:
+    def gt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().gt(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.gt``][dyce.h.H.gt].
         """
         return self.h().gt(other)
 
-    def ge(
-        self,
-        other: OperandT,
-    ) -> H:
+    def ge(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.h().ge(other)``. See the [``h`` method][dyce.p.P.h] and
         [``H.ge``][dyce.h.H.ge].
@@ -485,16 +403,6 @@ class P(Sequence[H]):
         """
         return self.h().odd()
 
-    def explode(
-        self,
-        max_depth: int = 1,
-    ) -> H:
-        r"""
-        Shorthand for ``self.h().explode(max_depth)``. See the [``h`` method][dyce.p.P.h]
-        and [``H.explode``][dyce.h.H.explode].
-        """
-        return self.h().explode(max_depth)
-
     def substitute(
         self,
         expand: _ExpandT,
@@ -507,20 +415,20 @@ class P(Sequence[H]):
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
-    def within(self, lo: int, hi: int, other: OperandT = 0) -> H:
+    def explode(self, max_depth: int = 1) -> H:
         r"""
-        Shorthand for ``self.h().within(lo, hi, other)``. See the [``h`` method][dyce.p.P.h]
-        and [``H.within``][dyce.h.H.within].
+        Shorthand for ``self.h().explode(max_depth)``. See the [``h`` method][dyce.p.P.h]
+        and [``H.explode``][dyce.h.H.explode].
         """
-        return self.h().within(lo, hi, other)
+        return self.h().explode(max_depth)
 
-    def roll(self) -> Tuple[int, ...]:
+    def roll(self) -> Tuple[_FaceT, ...]:
         r"""
         Returns (weighted) random faces from contained histograms.
         """
         return tuple(h.roll() for h in self._hs)
 
-    def rolls_with_counts(self) -> Iterator[Tuple[Tuple[int, ...], int]]:
+    def rolls_with_counts(self) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
         r"""
         Returns an iterator that yields 2-tuples (pairs) that, collectively, enumerate all
         possible outcomes for the pool. The first item in the 2-tuple is a sorted
@@ -593,7 +501,7 @@ class P(Sequence[H]):
             ``n@P(H(m))``. Enumerating combinations with replacements would yield all
             unique rolls:
 
-            ``((1, 1, …, 1), (1, 1, …, 2), …, (1, 1, …, m), (2, 2, …, 2), …, (m - 1, m, m), (m, m, m))``
+            ``((1, 1, …, 1), (1, 1, …, 2), …, (1, 1, …, m), …, (m - 1, m, …, m), (m, m, …, m))``
 
             To determine the count for a particular roll ``(a, b, …, n)``, we compute
             the multinomial coefficient for that roll and multiply by the scalar
@@ -681,25 +589,32 @@ class P(Sequence[H]):
         else:
             return _rolls_with_counts_for_heterogeneous_histograms(groups)
 
+    def within(self, lo: _FaceT, hi: _FaceT, other: _OperandT = 0) -> H:
+        r"""
+        Shorthand for ``self.h().within(lo, hi, other)``. See the [``h`` method][dyce.p.P.h]
+        and [``H.within``][dyce.h.H.within].
+        """
+        return self.h().within(lo, hi, other)
+
 
 # ---- Functions -----------------------------------------------------------------------
 
 
-def _coalesce_replace(h: H, face: int) -> H:  # pylint: disable=unused-argument
+def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argument
     return h
 
 
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
-        if isinstance(key, int):
+        if isinstance(key, (int, Integral)):
             yield op_getitem(sequence, key)
         else:
             yield from op_getitem(sequence, key)
 
 
 def _rolls_with_counts_for_heterogeneous_histograms(
-    h_groups: Iterable[Tuple[Mapping[int, int], int]]
-) -> Iterator[Tuple[Tuple[int, ...], int]]:
+    h_groups: Iterable[Tuple[_MappingT, int]]
+) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
     r"""
     Given an iterable of histogram/count pairs, returns an iterator that yields 2-tuples
     (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
@@ -714,8 +629,8 @@ def _rolls_with_counts_for_heterogeneous_histograms(
         # It's possible v is () if h_groups is empty; see
         # https://stackoverflow.com/questions/3154301/ for a detailed discussion
         if v:
-            rolls_by_group: Iterable[Iterable[int]]
-            counts_by_group: Iterable[int]
+            rolls_by_group: Iterable[Iterable[_FaceT]]
+            counts_by_group: Iterable[_CountT]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_faces_for_roll = tuple(sorted(chain(*rolls_by_group)))
             total_count = reduce(op_mul, counts_by_group)
@@ -724,9 +639,9 @@ def _rolls_with_counts_for_heterogeneous_histograms(
 
 
 def _rolls_with_counts_for_n_homogeneous_histograms(
-    h: Mapping[int, int],
+    h: _MappingT,
     n: int,
-) -> Iterator[Tuple[Tuple[int, ...], int]]:
+) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
     r"""
     Given a group of *n* identical histograms *h*, returns an iterator that yields
     ordered 2-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
@@ -754,14 +669,14 @@ def _rolls_with_counts_for_n_homogeneous_histograms(
 
 
 def _take_and_sum_faces(
-    rolls_with_counts_iter: Iterator[Tuple[Sequence[int], int]],
-    faces: Iterable[_GetItemT],
-) -> Iterator[Tuple[int, int]]:
+    rolls_with_counts_iter: Iterator[Tuple[Sequence[_FaceT], _CountT]],
+    which: Iterable[_GetItemT],
+) -> Iterator[Tuple[_FaceT, _CountT]]:
     for (
         sorted_faces_for_roll,
         roll_count,
     ) in rolls_with_counts_iter:
-        taken_faces = tuple(_getitems(sorted_faces_for_roll, faces))
+        taken_faces = tuple(_getitems(sorted_faces_for_roll, which))
 
         if taken_faces:
             yield sum(taken_faces), roll_count

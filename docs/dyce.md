@@ -19,21 +19,15 @@
     selection:
       members: false
 
-``dyce`` provides two key primitives:
+``dyce`` provides two core primitives:
 
 * [``H``][dyce.h.H] for histograms (outcomes or individual dice)
 * [``P``][dyce.p.P] for collections of histograms (pools)
 
 ::: dyce.h.H
-    rendering:
-      show_root_full_path: false
-      show_root_heading: true
-    selection:
-      filters:
-        - "!^OperatorLT$"
-        - "!^OperatorRT$"
 
 ::: dyce.p.P
-    rendering:
-      show_root_full_path: false
-      show_root_heading: true
+
+::: dyce.h.HAbleT
+
+::: dyce.h.HAbleBinOpsMixin

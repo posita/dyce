@@ -253,33 +253,33 @@ Summing the greatest and the least faces when rolling a typical six-die polygona
 >>> H(10)-1  # a common “d10” with faces [0 .. 9]
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
 >>> _ = P(4, 6, 8, _, 12, 20).h(0, -1)
->>> print(_.format(width=65))
+>>> print(_.format(width=65, scaled=True))
 avg |   13.48
 std |    4.40
 var |   19.39
   1 |   0.00% |
   2 |   0.01% |
   3 |   0.06% |
-  4 |   0.30% |
-  5 |   0.92% |
-  6 |   2.03% |#
-  7 |   3.76% |#
-  8 |   5.57% |##
-  9 |   7.78% |###
- 10 |   8.99% |####
- 11 |   8.47% |####
- 12 |   8.64% |####
- 13 |   8.66% |####
- 14 |   6.64% |###
- 15 |   5.62% |##
- 16 |   5.16% |##
- 17 |   5.00% |##
- 18 |   5.00% |##
- 19 |   5.00% |##
- 20 |   5.00% |##
- 21 |   4.50% |##
- 22 |   2.01% |#
- 23 |   0.73% |
+  4 |   0.30% |#
+  5 |   0.92% |#####
+  6 |   2.03% |###########
+  7 |   3.76% |####################
+  8 |   5.57% |##############################
+  9 |   7.78% |###########################################
+ 10 |   8.99% |##################################################
+ 11 |   8.47% |###############################################
+ 12 |   8.64% |################################################
+ 13 |   8.66% |################################################
+ 14 |   6.64% |####################################
+ 15 |   5.62% |###############################
+ 16 |   5.16% |############################
+ 17 |   5.00% |###########################
+ 18 |   5.00% |###########################
+ 19 |   5.00% |###########################
+ 20 |   5.00% |###########################
+ 21 |   4.50% |#########################
+ 22 |   2.01% |###########
+ 23 |   0.73% |####
  24 |   0.18% |
 
 ```
@@ -353,7 +353,7 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 [``H`` objects][dyce.h.H] provide a [``data`` method][dyce.h.H.data] and a [``data_xy`` method][dyce.h.H.data_xy] to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
 ```python
->>> faces, probabilities = (2@H(6)).data_xy(relative=True)
+>>> faces, probabilities = (2@H(6)).data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [str(f) for f in faces],
 ...   probabilities,
@@ -440,7 +440,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...   rows = []  # type: List[Tuple[float, ...]]
 ...   for us in range(them, them + num_rows):
 ...     row_names.append("{}d6 …".format(us))
-...     rows.append((us@H(6)).vs(them@H(6)).data_xy(relative=True)[-1])
+...     rows.append((us@H(6)).vs(them@H(6)).data_xy()[-1])
 ...   _ = ax.imshow(rows)  # doctest: +SKIP
 ...   ax.set_title("… vs {}d6".format(them))  # doctest: +SKIP
 ...   ax.set_xticks(col_ticks)  # doctest: +SKIP
@@ -648,6 +648,8 @@ $$
 $$
 S = \frac{6}{10} = \frac{3}{5}
 $$
+
+Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈🤠🧮
 
 !!! info "As an aside, the Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case. It involves no algebra and is left as an exercise to the reader."
 

@@ -7,6 +7,9 @@
 # software in any capacity.
 # ======================================================================================
 
+[MASTER]
+ignore-patterns=flycheck_.*\.py,.*_flymake\.py
+
 [MESSAGES CONTROL]
 disable=C,R,fixme,locally-disabled,missing-super-argument,no-init,no-member,relative-beyond-top-level
 enable=useless-suppression

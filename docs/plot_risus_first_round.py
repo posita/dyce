@@ -18,7 +18,7 @@ def do_it(_: str) -> None:
 
         for us in range(them, them + num_rows):
             row_names.append("{}d6 …".format(us))
-            rows.append((us @ H(6)).vs(them @ H(6)).data_xy(relative=True)[-1])
+            rows.append((us @ H(6)).vs(them @ H(6)).data_xy()[-1])
         _ = ax.imshow(rows)
 
         ax.set_title("… vs {}d6".format(them))

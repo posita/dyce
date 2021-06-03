@@ -11,7 +11,6 @@ from __future__ import generator_stop
 from typing import (
     Callable,
     Counter,
-    Dict,  # OrderedDict is not supported in Python 3.6
     Iterable,
     Iterator,
     List,
@@ -25,13 +24,13 @@ from typing_extensions import Protocol, runtime_checkable
 
 from collections import Counter as counter, OrderedDict as ordereddict
 from collections.abc import Mapping as ABCMapping
-from functools import reduce
 from itertools import (
     chain,
     product,
     repeat,
 )
-from math import gcd, sqrt
+from math import sqrt
+from numbers import Integral
 from operator import (
     abs as op_abs,
     add as op_add,
@@ -56,16 +55,34 @@ from operator import (
 from os import environ, get_terminal_size, linesep
 from random import randrange
 
+from .symmetries import gcd, sum_w_start
+
+
 __all__ = ("H",)
+
+
+# ---- Types ---------------------------------------------------------------------------
+
+
+_FaceT = int
+_CountT = int
+_MappingT = Mapping[_FaceT, _CountT]
+_SourceT = Union[
+    int,
+    Iterable[_FaceT],
+    Iterable[Tuple[_FaceT, _CountT]],
+    _MappingT,
+    "HAbleT",
+]
+_OperandT = Union[_FaceT, "H", "HAbleT"]
+_UnaryOperatorT = Callable[[_FaceT], _FaceT]
+_BinaryOperatorT = Callable[[_FaceT, _FaceT], _FaceT]
+_ExpandT = Callable[["H", _FaceT], Union[_FaceT, "H"]]
+_CoalesceT = Callable[["H", _FaceT], "H"]
 
 
 # ---- Data ----------------------------------------------------------------------------
 
-
-_UnaryOperatorT = Callable[[int], int]
-_BinaryOperatorT = Callable[[int, int], int]
-_ExpandT = Callable[["H", int], Union[int, "H"]]
-_CoalesceT = Callable[["H", int], "H"]
 
 try:
     _ROW_WIDTH = get_terminal_size().columns
@@ -79,7 +96,7 @@ except OSError:
 # ---- Classes -------------------------------------------------------------------------
 
 
-class H(Mapping[int, int]):
+class H(_MappingT):
     r"""
     An immutable mapping for use as a histogram that supports arithmetic operations.
     This is useful for modeling individual dice and outcomes. The
@@ -118,8 +135,8 @@ class H(Mapping[int, int]):
 
     ```
 
-    If *items* is an ``int``, it is shorthand for creating a sequential range
-    $[{1} .. {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
+    If *items* is an ``int``, it is shorthand for creating a sequential range $[{1}
+    .. {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
 
     ```python
     >>> d6 == H(6)
@@ -300,39 +317,33 @@ class H(Mapping[int, int]):
         ```
     """
 
-    # ---- Types -----------------------------------------------------------------------
-
-    @runtime_checkable
-    class AbleT(Protocol):
-        def h(self) -> "H":
-            ...
-
-    OperandT = Union[int, "H", AbleT]
-    OperatorLT = Callable[[int, "H"], "H"]
-    OperatorRT = Callable[["H", int], "H"]
-    SourceT = Union[
-        int, Iterable[int], Iterable[Tuple[int, int]], Mapping[int, int], AbleT
-    ]
-
     # ---- Initializer -----------------------------------------------------------------
 
-    def __init__(self, items: SourceT) -> None:
+    def __init__(self, items: _SourceT) -> None:
         r"Initializer."
         super().__init__()
         self._simple_init = None
-        tmp: Counter[int] = counter()
+        tmp: Counter[_FaceT] = counter()
 
-        if isinstance(items, int):
+        # Tolerate Integrals for use with things like numpy and SageMath, but we can't
+        # add type annotations for them yet. See
+        # https://github.com/python/mypy/issues/3186. Similar checks are present
+        # elsewhere here and in dyce.p.P.
+        if isinstance(items, (int, Integral)):
             if items != 0:
                 self._simple_init = items
-                tmp.update(range(items, 0, 1 if items < 0 else -1))  # count toward zero
-        elif isinstance(items, H.AbleT):
+                items_range = range(
+                    items, 0, 1 if items < 0 else -1  # count toward zero
+                )
+                tmp.update({type(items)(i): type(items)(1) for i in items_range})
+        elif isinstance(items, HAbleT):
             tmp.update(items.h())
         elif isinstance(items, ABCMapping):
             tmp.update(items)
         else:
-            # Items is either an Iterable[int] or an Iterable[Tuple[int, int]] (although
-            # this technically supports Iterable[Union[int, Tuple[int, int]]])
+            # Items is either an Iterable[int] or an Iterable[Tuple[int,
+            # int]] (although this technically supports Iterable[Union[int,
+            # Tuple[int, int]]])
             for item in items:
                 if isinstance(item, tuple):
                     face, count = item
@@ -343,7 +354,7 @@ class H(Mapping[int, int]):
         # Sort and omit zero counts. We use an OrderedDict instead of a Counter to
         # support Python versions earlier than 3.7 which did not guarantee order
         # preservation for the latter.
-        self._h: Dict[int, int] = ordereddict(
+        self._h: _MappingT = ordereddict(
             {face: tmp[face] for face in sorted(tmp) if tmp[face]}
         )
 
@@ -358,7 +369,7 @@ class H(Mapping[int, int]):
         return "{}({})".format(self.__class__.__name__, arg)
 
     def __eq__(self, other) -> bool:
-        if isinstance(other, H.AbleT):
+        if isinstance(other, HAbleT):
             return op_eq(self, other.h())
         elif isinstance(other, H):
             return op_eq(self.lowest_terms()._h, other.lowest_terms()._h)
@@ -366,12 +377,15 @@ class H(Mapping[int, int]):
             return super().__eq__(other)
 
     def __ne__(self, other) -> bool:
-        if isinstance(other, H.AbleT):
+        if isinstance(other, HAbleT):
             return op_ne(self, other.h())
         elif isinstance(other, H):
             return not op_eq(self, other)
         else:
             return super().__ne__(other)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self._lowest_terms()))
 
     def __len__(self) -> int:
         return len(self._h)
@@ -382,122 +396,130 @@ class H(Mapping[int, int]):
     def __iter__(self) -> Iterator[int]:
         return iter(self._h)
 
-    def __add__(self, other: OperandT) -> "H":
+    def __add__(self, other: _OperandT) -> "H":
         try:
-            return self.map(op_add, other)
+            if self and not other:
+                return self.map(op_add, 0)
+            elif isinstance(other, (H, HAbleT)) and not self:
+                return op_add(0, other.h() if isinstance(other, HAbleT) else other)
+            else:
+                return self.map(op_add, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __radd__(self, other: OperandT) -> "H":
+    def __radd__(self, other: int) -> "H":
         try:
             return self.rmap(op_add, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __sub__(self, other: OperandT) -> "H":
+    def __sub__(self, other: _OperandT) -> "H":
         try:
-            return self.map(op_sub, other)
+            if self and not other:
+                return self.map(op_sub, 0)
+            elif isinstance(other, (H, HAbleT)) and not self:
+                return op_sub(0, other.h() if isinstance(other, HAbleT) else other)
+            else:
+                return self.map(op_sub, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rsub__(self, other: OperandT) -> "H":
+    def __rsub__(self, other: int) -> "H":
         try:
             return self.rmap(op_sub, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __mul__(self, other: OperandT) -> "H":
+    def __mul__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_mul, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rmul__(self, other: OperandT) -> "H":
+    def __rmul__(self, other: int) -> "H":
         try:
             return self.rmap(op_mul, other)
         except NotImplementedError:
             return NotImplemented
 
     def __matmul__(self, other: int) -> "H":
-        if not isinstance(other, int):
+        if not isinstance(other, (int, Integral)):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
-        elif other == 0:
-            return H({})
         else:
-            return cast(H, sum(repeat(self, other)))
+            return sum_w_start(repeat(self, other), start=H({}))
 
     def __rmatmul__(self, other: int) -> "H":
         return self.__matmul__(other)
 
-    def __floordiv__(self, other: OperandT) -> "H":
+    def __floordiv__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_floordiv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rfloordiv__(self, other: OperandT) -> "H":
+    def __rfloordiv__(self, other: int) -> "H":
         try:
             return self.rmap(op_floordiv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __mod__(self, other: OperandT) -> "H":
+    def __mod__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_mod, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rmod__(self, other: OperandT) -> "H":
+    def __rmod__(self, other: int) -> "H":
         try:
             return self.rmap(op_mod, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __pow__(self, other: OperandT) -> "H":
+    def __pow__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_pow, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rpow__(self, other: OperandT) -> "H":
+    def __rpow__(self, other: int) -> "H":
         try:
             return self.rmap(op_pow, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: OperandT) -> "H":
+    def __and__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_and, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rand__(self, other: OperandT) -> "H":
+    def __rand__(self, other: int) -> "H":
         try:
             return self.rmap(op_and, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __xor__(self, other: OperandT) -> "H":
+    def __xor__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_xor, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rxor__(self, other: OperandT) -> "H":
+    def __rxor__(self, other: int) -> "H":
         try:
             return self.rmap(op_xor, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __or__(self, other: OperandT) -> "H":
+    def __or__(self, other: _OperandT) -> "H":
         try:
             return self.map(op_or, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __ror__(self, other: OperandT) -> "H":
+    def __ror__(self, other: int) -> "H":
         try:
             return self.rmap(op_or, other)
         except NotImplementedError:
@@ -535,7 +557,7 @@ class H(Mapping[int, int]):
 
     # ---- Methods ---------------------------------------------------------------------
 
-    def map(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
+    def map(self, oper: _BinaryOperatorT, other: _OperandT) -> "H":
         r"""
         Applies *oper* to each face of the histogram paired with *other*. Shorthands exist
         for many arithmetic operators and comparators.
@@ -566,27 +588,25 @@ class H(Mapping[int, int]):
 
         ```
         """
-        if isinstance(other, H.AbleT):
+        if isinstance(other, HAbleT):
             other = other.h()
 
-        if isinstance(other, int):
-            return H((int(oper(face, other)), count) for face, count in self.items())
+        if isinstance(other, (int, Integral)):
+            return H(
+                (type(face)(oper(face, other)), count) for face, count in self.items()
+            )
         elif isinstance(other, H):
             return H(
-                (int(oper(a, b)), self[a] * other[b]) for a, b in product(self, other)
+                (type(s)(oper(s, o)), self[s] * other[o])
+                for s, o in product(self, other)
             )
         else:
             raise NotImplementedError
 
-    def rmap(self, oper: _BinaryOperatorT, other: OperandT) -> "H":
-        if isinstance(other, H.AbleT):
-            other = other.h()
-
-        if isinstance(other, int):
-            return H((int(oper(other, face)), count) for face, count in self.items())
-        elif isinstance(other, H):
+    def rmap(self, oper: _BinaryOperatorT, other: int) -> "H":
+        if isinstance(other, (int, Integral)):
             return H(
-                (int(oper(b, a)), other[b] * self[a]) for b, a in product(other, self)
+                (type(face)(oper(other, face)), count) for face, count in self.items()
             )
         else:
             raise NotImplementedError
@@ -617,10 +637,7 @@ class H(Mapping[int, int]):
 
         return h
 
-    def lt(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def lt(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.lt, other)``:
 
@@ -634,10 +651,7 @@ class H(Mapping[int, int]):
         """
         return self.map(op_lt, other)
 
-    def le(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def le(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.le, other)``.
 
@@ -651,10 +665,7 @@ class H(Mapping[int, int]):
         """
         return self.map(op_le, other)
 
-    def eq(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def eq(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.eq, other)``.
 
@@ -668,10 +679,7 @@ class H(Mapping[int, int]):
         """
         return self.map(op_eq, other)
 
-    def ne(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def ne(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.ne, other)``.
 
@@ -685,10 +693,7 @@ class H(Mapping[int, int]):
         """
         return self.map(op_ne, other)
 
-    def gt(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def gt(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.gt, other)``.
 
@@ -702,10 +707,7 @@ class H(Mapping[int, int]):
         """
         return self.map(op_gt, other)
 
-    def ge(
-        self,
-        other: OperandT,
-    ) -> "H":
+    def ge(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``self.map(operator.ge, other)``.
 
@@ -755,7 +757,7 @@ class H(Mapping[int, int]):
 
         return self.umap(is_odd)
 
-    def accumulate(self, other: SourceT) -> "H":
+    def accumulate(self, other: _SourceT) -> "H":
         r"""
         Accumulates counts:
 
@@ -765,17 +767,14 @@ class H(Mapping[int, int]):
 
         ```
         """
-        if isinstance(other, int):
+        if isinstance(other, (int, Integral)):
             other = (other,)
         elif isinstance(other, ABCMapping):
             other = other.items()
 
         return H(chain(self.items(), cast(Iterable, other)))
 
-    def explode(
-        self,
-        max_depth: int = 1,
-    ) -> "H":
+    def explode(self, max_depth: int = 1) -> "H":
         r"""
         Shorthand for ``self.substitute(lambda h, f: h if f == max(h) else f, operator.add,
         max_depth)``.
@@ -814,9 +813,7 @@ class H(Mapping[int, int]):
 
         ```
         """
-        counts_gcd = reduce(gcd, self.counts(), 0)
-
-        return H({k: v // counts_gcd for k, v in self.items()})
+        return H(self._lowest_terms())
 
     def substitute(
         self,
@@ -826,12 +823,12 @@ class H(Mapping[int, int]):
     ) -> "H":
         r"""
         Calls *expand* on each face, recursively up to *max_depth* times. If *expand*
-        returns an ``int``, it replaces the face. If it returns an [``H``
-        object][dyce.h.H], *coalesce* is called on the face and the expanded histogram,
-        and the returned histogram is folded into result. The default behavior for
-        *coalesce* is to replace the face with the expanded histogram. Returned
-        histograms are always reduced to their lowest terms. (See the [``lowest_terms``
-        method][dyce.h.H.lowest_terms].)
+        returns an ``int``, it replaces the face. If it returns an
+        [``H`` object][dyce.h.H], *coalesce* is called on the face and the expanded
+        histogram, and the returned histogram is folded into result. The default
+        behavior for *coalesce* is to replace the face with the expanded histogram.
+        Returned histograms are always reduced to their lowest terms. (See the
+        [``lowest_terms`` method][dyce.h.H.lowest_terms].)
 
         This can be used to model complex rules. The following models re-rolling a face
         of 1 on the first roll:
@@ -914,7 +911,7 @@ class H(Mapping[int, int]):
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.add, max_depth=6)
         >>> h_even = h.even()
-        >>> print("{:.3%}".format(h_even.get(1, 0) / sum(h_even.counts())))
+        >>> print("{:.3%}".format(h_even[1] / sum(h_even.counts())))
         39.131%
 
         ```
@@ -953,10 +950,7 @@ class H(Mapping[int, int]):
         if coalesce is None:
             coalesce = _coalesce_replace
 
-        def _substitute(
-            h: H,
-            depth: int = 0,
-        ) -> H:
+        def _substitute(h: H, depth: int = 0) -> H:
             assert coalesce is not None
 
             if depth == max_depth:
@@ -968,7 +962,7 @@ class H(Mapping[int, int]):
             for face, count in h.items():
                 expanded = expand(h, face)
 
-                if isinstance(expanded, int):
+                if isinstance(expanded, (int, Integral)):
                     items_for_reassembly.append((expanded, count, 1))
                 else:
                     # Keep expanding deeper, if we can
@@ -998,7 +992,7 @@ class H(Mapping[int, int]):
 
         return _substitute(self)
 
-    def vs(self, other: OperandT) -> "H":
+    def vs(self, other: _OperandT) -> "H":
         r"""
         Compares this histogram with *other*. -1 represents where *other* is greater. 0
         represents where they are equal. 1 represents where *other* is less.
@@ -1017,7 +1011,7 @@ class H(Mapping[int, int]):
         """
         return self.within(0, 0, other)
 
-    def within(self, lo: int, hi: int, other: OperandT = 0) -> "H":
+    def within(self, lo: int, hi: int, other: _OperandT = 0) -> "H":
         r"""
         Computes the difference between this histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
@@ -1054,10 +1048,11 @@ class H(Mapping[int, int]):
     def data(
         self,
         relative: bool = False,
-        fill_items: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[_MappingT] = None,
     ) -> Iterator[Tuple[int, float]]:
         r"""
-        Presentation helper function that returns an iterator for each face/frequency pair:
+        Presentation helper function that returns an iterator for each face/count or
+        face/probability pair:
 
         ```python
         >>> d6 = H(6)
@@ -1092,8 +1087,7 @@ class H(Mapping[int, int]):
 
     def data_xy(
         self,
-        relative: bool = False,
-        fill_items: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[_MappingT] = None,
     ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function that returns an iterator for a “zipped” arrangement of
@@ -1104,18 +1098,18 @@ class H(Mapping[int, int]):
         >>> list(d6.data())
         [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
         >>> d6.data_xy()
-        ((1, 2, 3, 4, 5, 6), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+        ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
 
         ```
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.data(relative, fill_items))),
+            tuple(zip(*self.data(relative=True, fill_items=fill_items))),
         )
 
     def format(
         self,
-        fill_items: Optional[Mapping[int, int]] = None,
+        fill_items: Optional[_MappingT] = None,
         width: int = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
@@ -1187,8 +1181,10 @@ class H(Mapping[int, int]):
             def parts():
                 yield "avg: {:.2f}".format(self.mean())
 
-                for face, percentage in self.data(relative=True, fill_items=fill_items):
-                    yield "{}:{:7.2%}".format(face, percentage)
+                for face, probability in self.data(
+                    relative=True, fill_items=fill_items
+                ):
+                    yield "{}:{:7.2%}".format(face, probability)
 
             return "{" + ", ".join(parts()) + "}"
         else:
@@ -1203,9 +1199,9 @@ class H(Mapping[int, int]):
                 tick_scale = max(self.counts()) if scaled else total
 
                 for face, count in self.data(relative=False, fill_items=fill_items):
-                    percentage = count / total
+                    probability = count / total
                     ticks = int(w * count / tick_scale)
-                    yield "{: 3} | {:7.2%} |{}".format(face, percentage, tick * ticks)
+                    yield "{: 3} | {:7.2%} |{}".format(face, probability, tick * ticks)
 
             return sep.join(lines())
 
@@ -1255,6 +1251,143 @@ class H(Mapping[int, int]):
                 return face
 
         assert False, "val ({}) ≥ total ({})".format(val, total)
+
+    def _lowest_terms(self) -> Iterable[Tuple[_FaceT, _CountT]]:
+        counts_gcd = gcd(*self.counts())
+
+        return ((k, v // counts_gcd) for k, v in self.items())
+
+
+@runtime_checkable
+class HAbleT(Protocol):
+    r"""
+    A protocol whose implementer can be expressed as (or reduced to) an
+    [``H`` object][dyce.h.H]) by calling its [``h`` method][dyce.h.HAbleT.h]. Currently,
+    only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
+    integration point for ``dyce`` users.
+    """
+
+    def h(self) -> H:
+        r"""
+        Express its implementer as an [``H`` object][dyce.h.H].
+        """
+        ...
+
+
+class HAbleBinOpsMixin:
+    r"""
+    A “mix-in” class which provides arithmetic operation implementations for
+    [``HAbleT`` protocol][dyce.h.HAbleT] implementers. The [``P`` class][dyce.p.P]
+    derives from this class.
+    """
+
+    def __add__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.add(self.h(), other)``.
+        """
+        return op_add(self.h(), other)
+
+    def __radd__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.add(other, self.h())``.
+        """
+        return op_add(other, self.h())
+
+    def __sub__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.sub(self.h(), other)``.
+        """
+        return op_sub(self.h(), other)
+
+    def __rsub__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.sub(other, self.h())``.
+        """
+        return op_sub(other, self.h())
+
+    def __mul__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.mul(self.h(), other)``.
+        """
+        return op_mul(self.h(), other)
+
+    def __rmul__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.mul(other, self.h())``.
+        """
+        return op_mul(other, self.h())
+
+    def __floordiv__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.floordiv(self.h(), other)``.
+        """
+        return op_floordiv(self.h(), other)
+
+    def __rfloordiv__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.floordiv(other, self.h())``.
+        """
+        return op_floordiv(other, self.h())
+
+    def __mod__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.mod(self.h(), other)``.
+        """
+        return op_mod(self.h(), other)
+
+    def __rmod__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.mod(other, self.h())``.
+        """
+        return op_mod(other, self.h())
+
+    def __pow__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.pow(self.h(), other)``.
+        """
+        return op_pow(self.h(), other)
+
+    def __rpow__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.pow(other, self.h())``.
+        """
+        return op_pow(other, self.h())
+
+    def __and__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.and_(self.h(), other)``.
+        """
+        return op_and(self.h(), other)
+
+    def __rand__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.and_(other, self.h())``.
+        """
+        return op_and(other, self.h())
+
+    def __xor__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.xor(self.h(), other)``.
+        """
+        return op_xor(self.h(), other)
+
+    def __rxor__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.xor(other, self.h())``.
+        """
+        return op_xor(other, self.h())
+
+    def __or__(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``operator.or_(self.h(), other)``.
+        """
+        return op_or(self.h(), other)
+
+    def __ror__(self: HAbleT, other: _FaceT) -> H:
+        r"""
+        Shorthand for ``operator.or_(other, self.h())``.
+        """
+        return op_or(other, self.h())
 
 
 # ---- Functions -----------------------------------------------------------------------

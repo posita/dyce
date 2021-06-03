@@ -13,6 +13,6 @@ def do_it(_: str) -> None:
             yield dupes, count
 
     h = H(dupes(8 @ P(10))).lowest_terms()
-    faces, probabilities = h.data_xy(relative=True)
+    faces, probabilities = h.data_xy()
     matplotlib.pyplot.bar(faces, probabilities)
     matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")

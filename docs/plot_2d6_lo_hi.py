@@ -5,7 +5,7 @@ def do_it(_: str) -> None:
     import matplotlib.pyplot
 
     p_2d6 = 2 @ P(H(6))
-    faces, probabilities = p_2d6.h(0).data_xy(relative=True)
+    faces, probabilities = p_2d6.h(0).data_xy()
     matplotlib.pyplot.bar(
         [f - 0.125 for f in faces],
         probabilities,
@@ -14,7 +14,7 @@ def do_it(_: str) -> None:
         label="Lowest die of 2d6",
     )
 
-    faces, probabilities = p_2d6.h(-1).data_xy(relative=True)
+    faces, probabilities = p_2d6.h(-1).data_xy()
     matplotlib.pyplot.bar(
         [f + 0.125 for f in faces],
         probabilities,

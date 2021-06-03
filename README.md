@@ -119,7 +119,7 @@ var |    1.97
 ```python
 >>> matplotlib.pyplot.style.use("dark_background")  # doctest: +SKIP
 
->>> faces, probabilities = p_2d6.h(0).data_xy(relative=True)
+>>> faces, probabilities = p_2d6.h(0).data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [str(f) for f in faces],
 ...   probabilities,
@@ -128,7 +128,7 @@ var |    1.97
 ...   label="Lowest die of 2d6",
 ... )  # doctest: +SKIP
 
->>> faces, probabilities = p_2d6.h(-1).data_xy(relative=True)
+>>> faces, probabilities = p_2d6.h(-1).data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [str(f) for f in faces],
 ...   probabilities,
@@ -153,7 +153,7 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 ```python
 >>> p_4d6 = 4@P(6)
 >>> _ = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
->>> faces, probabilities = _.data_xy(relative=True)
+>>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -164,7 +164,7 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 >>> d6_reroll_first_one = H(6).substitute(lambda h, f: H(6) if f == 1 else f)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> _ = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
->>> faces, probabilities = _.data_xy(relative=True)
+>>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -174,7 +174,7 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 
 >>> p_4d6_reroll_all_ones = 4@P(H(range(2, 7)))
 >>> _ = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
->>> faces, probabilities = _.data_xy(relative=True)
+>>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -213,7 +213,7 @@ Translation:
 >>> pass_save = save_roll.ge(10)
 >>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
 >>> res = damage_half_on_save
->>> faces, probabilities = res.data_xy(relative=True)
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
@@ -318,7 +318,7 @@ Example 1 translation:
 
 ```python
 >>> single_attack = 2@H(6) + 5
->>> faces, probabilities = single_attack.data_xy(relative=True)
+>>> faces, probabilities = single_attack.data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [f - 0.125 for f in faces],
 ...   probabilities,
@@ -331,7 +331,7 @@ Example 1 translation:
 ...   return h if face in (1, 2) else face
 
 >>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it's a one or two
->>> faces, probabilities = great_weapon_fighting.data_xy(relative=True)
+>>> faces, probabilities = great_weapon_fighting.data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [f + 0.125 for f in faces],
 ...   probabilities,
@@ -371,7 +371,7 @@ Example 2 translation:
 
 ```python
 >>> normal_hit = H(12) + 5
->>> faces, probabilities = normal_hit.data_xy(relative=True)
+>>> faces, probabilities = normal_hit.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -380,7 +380,7 @@ Example 2 translation:
 ... )  # doctest: +SKIP
 
 >>> critical_hit = 3@H(12) + 5
->>> faces, probabilities = critical_hit.data_xy(relative=True)
+>>> faces, probabilities = critical_hit.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -396,7 +396,7 @@ Example 2 translation:
 ...   else: return 0
 
 >>> advantage_weighted = advantage.substitute(crit)
->>> faces, probabilities = advantage_weighted.data_xy(relative=True)
+>>> faces, probabilities = advantage_weighted.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -421,7 +421,7 @@ Translation:
 
 ```python
 >>> _ = (5@P(H(10).explode(max_depth=2))).h(slice(-3, None))
->>> faces, probabilities = _.data_xy(relative=True)
+>>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
@@ -456,7 +456,7 @@ Translation:
 ...     yield dupes, count
 
 >>> _ = H(dupes(8@P(10))).lowest_terms()
->>> faces, probabilities = _.data_xy(relative=True)
+>>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.bar(faces, probabilities)  # doctest: +SKIP
 >>> matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP

@@ -51,6 +51,12 @@ plugins:
       version_selector: true
   - mkdocstrings:
       default_handler: python
+      handlers:
+        python:
+          rendering:
+            show_root_full_path: false
+            show_root_heading: true
+            show_signature_annotations: true
       watch:
         - dyce
   - search

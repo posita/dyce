@@ -5,7 +5,7 @@ def do_it(_: str) -> None:
     import matplotlib.pyplot
 
     normal_hit = H(12) + 5
-    faces, probabilities = normal_hit.data_xy(relative=True)
+    faces, probabilities = normal_hit.data_xy()
     matplotlib.pyplot.plot(
         faces,
         probabilities,
@@ -13,7 +13,7 @@ def do_it(_: str) -> None:
         label="normal hit",
     )
     critical_hit = 3 @ H(12) + 5
-    faces, probabilities = critical_hit.data_xy(relative=True)
+    faces, probabilities = critical_hit.data_xy()
     matplotlib.pyplot.plot(
         faces,
         probabilities,
@@ -31,7 +31,7 @@ def do_it(_: str) -> None:
             return 0
 
     advantage_weighted = advantage.substitute(crit)
-    faces, probabilities = advantage_weighted.data_xy(relative=True)
+    faces, probabilities = advantage_weighted.data_xy()
     matplotlib.pyplot.plot(
         faces,
         probabilities,

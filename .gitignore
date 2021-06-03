@@ -35,14 +35,12 @@
 *.tar
 *.xz
 *.zip
-*_flymake.py
 .mypy_cache/
 .pytest_cache/
 /.cache/
 /.eggs/
 __pycache__/
 dropin.cache
-flycheck_*.py
 node_modules/
 
 # Logs, databases, etc.

@@ -72,7 +72,8 @@ class TestP:
         assert -p_d6 + p_d6 == p_d6n + p_d6
         assert -p_d6 - p_d6 == p_d6n - p_d6
         assert p_d6 + p_d6 == p_d6 - p_d6n
-        assert P(p_d6, -p_d6).h() == p_d6 + p_d6n
+        assert P(p_d6, -p_d6) == p_d6 + p_d6n
+        assert P(p_d6n, -p_d6n) == p_d6n + p_d6
         assert 2 @ p_d6 - p_d6 == p_d6 + p_d6 + p_d6n
         assert -(2 @ p_d6) == p_d6n + p_d6n
 
@@ -82,6 +83,17 @@ class TestP:
         p_d6_3 = P(p_d6_2)
         assert p_d6_2 == p_d6
         assert p_d6_3 == p_d6_2
+
+        p_d4n = P(-4)
+        p_d6 = P(6)
+        p_d4n_d6 = P(p_d4n, p_d6)
+        p_d6_d4n = P(p_d6, p_d4n)
+        assert p_d4n_d6 == p_d6_d4n
+        assert p_d4n_d6.h() == p_d6_d4n
+        assert p_d4n_d6 == p_d6_d4n.h()
+        assert p_d4n_d6.h() == p_d6_d4n.h()
+        assert P(p_d6, -4) == p_d4n_d6
+        assert P(p_d4n, 6) == p_d4n_d6
 
     def test_op_eq_ignores_order(self) -> None:
         d4 = H(4)
@@ -120,13 +132,28 @@ class TestP:
         assert p_d4n_d8[-1] == d8
 
     def test_op_add_h(self) -> None:
-        p_d2 = P(2)
-        p_d3 = P(3)
-        assert p_d2 + p_d3 == H((2, 3, 4, 3, 4, 5))
-        assert p_d3 + p_d2 == H((2, 3, 3, 4, 4, 5))
-        assert p_d2 + p_d3 == p_d3 + p_d2
-        p_d2_d3 = P(p_d2, p_d3)
-        assert p_d2 + p_d3 == p_d2_d3.h()
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_add_d3n = d2 + d3n
+        d3n_add_d2 = d3n + d2
+        assert p_d2 + p_d3n == d2_add_d3n
+        assert p_d2 + d3n == d2_add_d3n
+        assert d2 + p_d3n == d2_add_d3n
+        assert p_d3n + p_d2 == d3n_add_d2
+        assert p_d3n + d2 == d3n_add_d2
+        assert d3n + p_d2 == d3n_add_d2
+        assert d2_add_d3n == d3n_add_d2
+        assert p_d2 + p_d3n == p_d3n + p_d2
+
+        assert p_d2 + P() == p_d2
+        assert P() + p_d2 == p_d2
+        assert P() + P() == P()
+
+        p_d2_d3n = P(p_d2, p_d3n)
+        assert p_d2 + p_d3n == p_d2_d3n
+        assert p_d2_d3n == p_d2 + p_d3n
 
     def test_op_add_int(self) -> None:
         p_d6 = P(6)
@@ -137,10 +164,23 @@ class TestP:
         assert p_d8_plus == p_d8 + 1
 
     def test_op_sub_h(self) -> None:
-        p_d2 = P(2)
-        p_d3 = P(3)
-        assert p_d2 - p_d3 == H((0, -1, -2, 1, 0, -1))
-        assert p_d3 - p_d2 == H((0, -1, 1, 0, 2, 1))
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_sub_d3n = d2 - d3n
+        d3n_sub_d2 = d3n - d2
+        assert p_d2 - p_d3n == d2_sub_d3n
+        assert p_d2 - d3n == d2_sub_d3n
+        assert d2 - p_d3n == d2_sub_d3n
+        assert p_d3n - p_d2 == d3n_sub_d2
+        assert p_d3n - d2 == d3n_sub_d2
+        assert d3n - p_d2 == d3n_sub_d2
+        assert p_d2 - p_d3n != p_d3n - p_d2
+
+        assert p_d2 - P() == p_d2
+        assert P() - p_d2 == -p_d2
+        assert P() - P() == P()
 
     def test_op_sub_int(self) -> None:
         p_d6 = P(6)
@@ -151,11 +191,24 @@ class TestP:
         assert p_d8_minus == p_d8 - 1
 
     def test_op_mul_h(self) -> None:
-        p_d2 = P(2)
-        p_d3 = P(3)
-        assert p_d2 * p_d3 == {1: 1, 2: 2, 3: 1, 4: 1, 6: 1}
-        assert p_d3 * p_d2 == {1: 1, 2: 2, 3: 1, 4: 1, 6: 1}
-        assert p_d2 * p_d3 == p_d3 * p_d2
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_mul_d3n = d2 * d3n
+        d3n_mul_d2 = d3n * d2
+        assert p_d2 * p_d3n == d2_mul_d3n
+        assert p_d2 * d3n == d2_mul_d3n
+        assert d2 * p_d3n == d2_mul_d3n
+        assert p_d3n * p_d2 == d3n_mul_d2
+        assert p_d3n * d2 == d3n_mul_d2
+        assert d3n * p_d2 == d3n_mul_d2
+        assert d2_mul_d3n == d3n_mul_d2
+        assert p_d2 * p_d3n == p_d3n * p_d2
+
+        assert p_d2 * P() == P()
+        assert P() * p_d2 == P()
+        assert P() * P() == P()
 
     def test_op_mul_int(self) -> None:
         p1 = P(H(range(10, 20)))
@@ -170,10 +223,23 @@ class TestP:
         assert d6_2 == d6 @ 2
 
     def test_op_floordiv_h(self) -> None:
-        p1 = P(H((1, 4)))
-        p2 = P(H((1, 2)))
-        assert p1 // p2 == H((1, 0, 4, 2))
-        assert p2 // p1 == H((1, 0, 2, 0))
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_floordiv_d3n = d2 // d3n
+        d3n_floordiv_d2 = d3n // d2
+        assert p_d2 // p_d3n == d2_floordiv_d3n
+        assert p_d2 // d3n == d2_floordiv_d3n
+        assert d2 // p_d3n == d2_floordiv_d3n
+        assert p_d3n // p_d2 == d3n_floordiv_d2
+        assert p_d3n // d2 == d3n_floordiv_d2
+        assert d3n // p_d2 == d3n_floordiv_d2
+        assert p_d2 // p_d3n != p_d3n // p_d2
+
+        assert p_d2 // P() == P()
+        assert P() // p_d2 == P()
+        assert P() // P() == P()
 
     def test_op_floordiv_int(self) -> None:
         p_d10 = P(10)
@@ -183,10 +249,23 @@ class TestP:
         assert 100 // p1 == p2
 
     def test_op_mod_h(self) -> None:
-        p_d4 = H((1, 5))
-        p_d2 = H((1, 3))
-        assert p_d4 % p_d2 == H((0, 1, 0, 2))
-        assert p_d2 % p_d4 == H((0, 1, 0, 3))
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_mod_d3n = d2 % d3n
+        d3n_mod_d2 = d3n % d2
+        assert p_d2 % p_d3n == d2_mod_d3n
+        assert p_d2 % d3n == d2_mod_d3n
+        assert d2 % p_d3n == d2_mod_d3n
+        assert p_d3n % p_d2 == d3n_mod_d2
+        assert p_d3n % d2 == d3n_mod_d2
+        assert d3n % p_d2 == d3n_mod_d2
+        assert p_d2 % p_d3n != p_d3n % p_d2
+
+        assert p_d2 % P() == P()
+        assert P() % p_d2 == P()
+        assert P() % P() == P()
 
     def test_op_mod_int(self) -> None:
         p_d10 = P(10)
@@ -194,10 +273,23 @@ class TestP:
         assert 5 % p_d10 == H((0, 1, 2, 1, 0, 5, 5, 5, 5, 5))
 
     def test_op_pow_h(self) -> None:
-        p1 = P(H((2, 5)))
-        p2 = P(H((3, 4)))
-        assert p1 ** p2 == H((8, 16, 125, 625))
-        assert p2 ** p1 == H((9, 243, 16, 1024))
+        d2 = H(2)
+        d3 = H(3)
+        p_d2 = P(d2)
+        p_d3 = P(d3)
+        d2_pow_d3 = d2 ** d3
+        d3_pow_d2 = d3 ** d2
+        assert p_d2 ** p_d3 == d2_pow_d3
+        assert p_d2 ** d3 == d2_pow_d3
+        assert d2 ** p_d3 == d2_pow_d3
+        assert p_d3 ** p_d2 == d3_pow_d2
+        assert p_d3 ** d2 == d3_pow_d2
+        assert d3 ** p_d2 == d3_pow_d2
+        assert p_d2 ** p_d3 != p_d3 ** p_d2
+
+        assert p_d2 ** P() == P()
+        assert P() ** p_d2 == P()
+        assert P() ** P() == P()
 
     def test_op_pow_int(self) -> None:
         p_d5 = P(5)
@@ -307,40 +399,41 @@ class TestP:
         p_d4n = -p_d4
         p_4d3_4d4 = 2 @ P(p_d3, p_d3n, p_d4n, p_d4)
         assert p_4d3_4d4.h(slice(0, 0)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(0, 0))
+            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(0, 0))
         )
         assert p_4d3_4d4.h(slice(-1, None)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(-1, None))
+            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(-1, None))
         )
         assert p_4d3_4d4.h(slice(-2, None)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(-2, None))
+            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(-2, None))
         )
         assert p_4d3_4d4.h(slice(2)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 2))
+            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 2))
         )
         assert p_4d3_4d4.h(slice(1)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 1))
+            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 1))
         )
 
     def test_validate_implementation_combinations_homogeneous_dice(self) -> None:
-        # Use the inefficient mechanism to validate our hard-to-understand implementation
+        # Use the brute force mechanism to validate our harder-to-understand
+        # implementation
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
         assert p_4df.h(slice(0, 0)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4df), slice(0, 0))
+            _brute_force_combinations_with_counts(tuple(p_4df), slice(0, 0))
         )
         assert p_4df.h(slice(2, 3)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4df), slice(2, 3))
+            _brute_force_combinations_with_counts(tuple(p_4df), slice(2, 3))
         )
         assert p_4df.h(slice(1, 2)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4df), slice(1, 2))
+            _brute_force_combinations_with_counts(tuple(p_4df), slice(1, 2))
         )
         assert p_4df.h(slice(0, 1)) == H(
-            _inefficient_combinations_with_counts(tuple(p_4df), slice(0, 1))
+            _brute_force_combinations_with_counts(tuple(p_4df), slice(0, 1))
         )
 
 
-def _inefficient_combinations_with_counts(hs: Sequence[H], key: slice):
+def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
     # Generate combinations naively, via Cartesian product, which is much less
     # efficient, but also much easier to read and reason about
     if len(operator.getitem(hs, key)) > 0:
