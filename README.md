@@ -17,15 +17,15 @@ Please see the accompanying `LICENSE` file for rights and restrictions governing
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.2.2 Version](https://img.shields.io/pypi/v/dycelib/0.2.2.svg)](https://pypi.python.org/pypi/dycelib/0.2.2)
+[![v0.2.2 Development Stage](https://img.shields.io/pypi/status/dycelib/0.2.2.svg)](https://pypi.python.org/pypi/dycelib/0.2.2)
+[![v0.2.2 License](https://img.shields.io/pypi/l/dycelib/0.2.2.svg)](http://opensource.org/licenses/MIT)
+[![v0.2.2 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.2.2.svg)](https://pypi.python.org/pypi/dycelib/0.2.2)
+[![v0.2.2 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.2.2.svg)](https://pypi.python.org/pypi/dycelib/0.2.2)
 
 # `dyce` - simple Python tools for dice-based probabilities
 
-[![Build Status](https://travis-ci.com/posita/dyce.svg?version=master)](https://travis-ci.com/posita/dyce?version=master)
+[![Build Status](https://travis-ci.com/posita/dyce.svg?version=v0.2.2)](https://travis-ci.com/posita/dyce?version=v0.2.2)
 
 > :point_up: *Curious about integrating your project with the above services?
   Jeff Knupp ([**@jeffknupp**](https://github.com/jeffknupp)) [describes how](https://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/).*
@@ -40,11 +40,11 @@ While any AnyDice generously affords a very convenient platform for simple compu
 Like AnyDice, it avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
 Unlike AnyDice, however, it is an open source library that can be run locally and modified as desired.
 Because it exposes Python primitives rather than defining a dedicated grammar and interpreter, one can easily integrate it with other Python tools and libraries.
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), it provides minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.lowest_terms) and various shorthands) and formatting conveniences (e.g., the [``H.data``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data), [``H.data_xy``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data_xy), and [``H.format``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) methods) for casual tinkering.
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), it provides minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.lowest_terms) and various shorthands) and formatting conveniences (e.g., the [``H.data``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.data), [``H.data_xy``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.data_xy), and [``H.format``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.format) methods) for casual tinkering.
 However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
 
 ``dyce`` should be sufficient to replicate or replace AnyDice and most other dice probability modeling libraries.
-It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
+It strives to be [fully documented](https://posita.github.io/dyce/0.2/) and relies heavily on examples to develop understanding.
 If you find its functionality or documentation confusing or lacking in any way, please consider [contributing an issue](docs/contrib.md) to start a discussion.
 
 `dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
@@ -54,8 +54,8 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 ## A taste
 
 ``dyce`` provides two key primitives.
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling individual dice and outcomes.
-[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
+[``H`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H) represent histograms for modeling individual dice and outcomes.
+[``P`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
 Both support a variety of operations.
 
 ```python
@@ -80,7 +80,7 @@ True
 
 ```
 
-One can "take" individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
+One can "take" individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
 ```python
 >>> p_2d6.h(0)
@@ -114,7 +114,7 @@ var |    1.97
 
 ```
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``data`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data) and a [``data_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
+[``H`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H) provide a [``data`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.data) and a [``data_xy`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.data_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
 ```python
 >>> matplotlib.pyplot.style.use("dark_background")  # doctest: +SKIP
@@ -142,9 +142,9 @@ var |    1.97
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_2d6_lo_hi_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_2d6_lo_hi_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_2d6_lo_hi_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_2d6_lo_hi_gh.png)
 
-See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough treatment, including detailed examples.
+See [the docs](https://posita.github.io/dyce/0.2/) for a much more thorough treatment, including detailed examples.
 
 ### Applications and translations
 
@@ -187,7 +187,7 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_4d6_variants_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_4d6_variants_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_4d6_variants_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_4d6_variants_gh.png)
 
 #### Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
@@ -219,9 +219,9 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_burning_arch_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_burning_arch_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_burning_arch_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_burning_arch_gh.png)
 
-An alternative using the [``H.substitute`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.substitute):
+An alternative using the [``H.substitute`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.substitute):
 
 ```python
 >>> _ = save_roll.substitute(
@@ -345,7 +345,7 @@ Example 1 translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_great_weapon_fighting_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_great_weapon_fighting_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_great_weapon_fighting_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_great_weapon_fighting_gh.png)
 
 Example 2 source:
 
@@ -407,7 +407,7 @@ Example 2 translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_advantage_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_advantage_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_advantage_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_advantage_gh.png)
 
 #### Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/questions/166633/roll-and-keep-in-anydice)”
 
@@ -427,7 +427,7 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_d10_explode_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_d10_explode_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_d10_explode_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_d10_explode_gh.png)
 
 #### Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/questions/111414/how-do-i-count-the-number-of-duplicates-in-anydice/111421#111421)”
 
@@ -463,7 +463,7 @@ Translation:
 
 ```
 
-![https://raw.githubusercontent.com/posita/dyce/master/docs/plot_dupes_gh.png](https://github.com/posita/dyce/blob/master/docs/plot_dupes_gh.png)
+![https://raw.githubusercontent.com/posita/dyce/v0.2.2/docs/plot_dupes_gh.png](https://github.com/posita/dyce/blob/v0.2.2/docs/plot_dupes_gh.png)
 
 #### Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:
 
