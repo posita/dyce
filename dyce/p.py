@@ -81,7 +81,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     ```
 
-    Arithmetic operators involving an ``int`` or another ``P`` object produce an
+    Arithmetic operators involving a number or another ``P`` object produce an
     [``H`` object][dyce.h.H]:
 
     ```python

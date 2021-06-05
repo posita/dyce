@@ -156,7 +156,7 @@ class TestP:
         assert p_d2 + p_d3n == p_d2_d3n
         assert p_d2_d3n == p_d2 + p_d3n
 
-    def test_op_add_int(self) -> None:
+    def test_op_add_num(self) -> None:
         p_d6 = P(6)
         p_d6_plus = P(H(range(2, 8)))
         p_d8 = P(8)
@@ -183,7 +183,7 @@ class TestP:
         assert P() - p_d2 == -p_d2
         assert P() - P() == P()
 
-    def test_op_sub_int(self) -> None:
+    def test_op_sub_num(self) -> None:
         p_d6 = P(6)
         p_minus_d6 = P(H(range(0, -6, -1)))
         p_d8 = P(8)
@@ -211,7 +211,7 @@ class TestP:
         assert P() * p_d2 == P()
         assert P() * P() == P()
 
-    def test_op_mul_int(self) -> None:
+    def test_op_mul_num(self) -> None:
         p1 = P(H(range(10, 20)))
         p2 = P(H(range(100, 200, 10)))
         assert p2 == p1 * 10
@@ -222,6 +222,40 @@ class TestP:
         d6_2 = P(d6, d6)
         assert 2 @ d6 == d6_2
         assert d6_2 == d6 @ 2
+
+    def test_op_truediv_h(self) -> None:
+        d2 = H(2)
+        d3n = H(-3)
+        p_d2 = P(d2)
+        p_d3n = P(d3n)
+        d2_truediv_d3n = d2 / d3n
+        d3n_truediv_d2 = d3n / d2
+        assert p_d2 / p_d3n == d2_truediv_d3n
+        assert p_d2 / d3n == d2_truediv_d3n
+        assert d2 / p_d3n == d2_truediv_d3n
+        assert p_d3n / p_d2 == d3n_truediv_d2
+        assert p_d3n / d2 == d3n_truediv_d2
+        assert d3n / p_d2 == d3n_truediv_d2
+        assert p_d2 / p_d3n != p_d3n / p_d2
+
+    def test_op_truediv_num(self) -> None:
+        p_d10 = P(10)
+        p1 = P(H(range(100, 0, -10)))
+        assert p_d10 == p1 / 10
+        assert (2 * 2 * 2 * 3 * 3 * 5 * 7) / p_d10 == H(
+            {
+                252.0: 1,
+                280.0: 1,
+                315.0: 1,
+                360.0: 1,
+                420.0: 1,
+                504.0: 1,
+                630.0: 1,
+                840.0: 1,
+                1260.0: 1,
+                2520.0: 1,
+            }
+        )
 
     def test_op_floordiv_h(self) -> None:
         d2 = H(2)
@@ -242,7 +276,7 @@ class TestP:
         assert P() // p_d2 == P()
         assert P() // P() == P()
 
-    def test_op_floordiv_int(self) -> None:
+    def test_op_floordiv_num(self) -> None:
         p_d10 = P(10)
         p1 = P(H(range(10, 110, 10)))
         p2 = P(H((10, 5, 3, 2, 2, 1, 1, 1, 1, 1)))
@@ -268,7 +302,7 @@ class TestP:
         assert P() % p_d2 == P()
         assert P() % P() == P()
 
-    def test_op_mod_int(self) -> None:
+    def test_op_mod_num(self) -> None:
         p_d10 = P(10)
         assert p_d10 % 5 == H((1, 2, 3, 4, 0, 1, 2, 3, 4, 0))
         assert 5 % p_d10 == H((0, 1, 2, 1, 0, 5, 5, 5, 5, 5))
@@ -292,11 +326,11 @@ class TestP:
         assert P() ** p_d2 == P()
         assert P() ** P() == P()
 
-    def test_op_pow_int(self) -> None:
+    def test_op_pow_num(self) -> None:
         p_d5 = P(5)
         assert p_d5 ** 2 == H((1, 4, 9, 16, 25))
         assert 2 ** p_d5 == H((2, 4, 8, 16, 32))
-        assert p_d5 ** -1 == H((1, 0, 0, 0, 0))
+        assert p_d5 ** -1 == H((1, 1 / 2, 1 / 3, 1 / 4, 1 / 5))
         assert (-1) ** p_d5 == H((-1, 1, -1, 1, -1))
 
     def test_op_bitwise(self) -> None:

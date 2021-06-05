@@ -64,7 +64,7 @@ Both support a variety of operations.
 >>> 2@d6 + 4  # 2d6 + 4
 H({6: 1, 7: 2, 8: 3, 9: 4, 10: 5, 11: 6, 12: 5, 13: 4, 14: 3, 15: 2, 16: 1})
 >>> d6.lt(d6)  # how often a first six-sided die shows a face less than a second
-H({0: 21, 1: 15})
+H({False: 21, True: 15})
 >>> abs(d6 - d6)  # subtract the least of two six-sided dice from the greatest
 H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 
@@ -261,7 +261,7 @@ True
 >>> # VAR g = (1d4 >= 2) AND !(1d20 == 2)
 >>> g = H(4).ge(2) & H(20).ne(2)
 >>> print(g.format(width=0))
-{..., 0: 28.75%, 1: 71.25%}
+{..., False: 28.75%, True: 71.25%}
 
 ```
 
@@ -269,7 +269,7 @@ True
 >>> # VAR h = (1d4 >= 2) OR !(1d20 == 2)
 >>> h = H(4).ge(2) | H(20).ne(2)
 >>> print(h.format(width=0))
-{..., 0:  1.25%, 1: 98.75%}
+{..., False:  1.25%, True: 98.75%}
 
 ```
 
@@ -328,7 +328,7 @@ Example 1 translation:
 ...   label="Single Attack",
 ... )  # doctest: +SKIP
 
->>> def gwf(h: H, face: int):
+>>> def gwf(h: H, face):
 ...   return h if face in (1, 2) else face
 
 >>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it's a one or two
@@ -391,9 +391,9 @@ Example 2 translation:
 
 >>> advantage = (2@P(20)).h(-1)
 
->>> def crit(_: H, f: int):
-...   if f == 20: return critical_hit
-...   elif f + 5 >= 14: return normal_hit
+>>> def crit(_: H, face):
+...   if face == 20: return critical_hit
+...   elif face + 5 >= 14: return normal_hit
 ...   else: return 0
 
 >>> advantage_weighted = advantage.substitute(crit)
@@ -447,8 +447,7 @@ function: dupes in DICE:s {
 Translation:
 
 ```python
->>> from typing import Iterator, Tuple
->>> def dupes(p: P) -> Iterator[Tuple[int, int]]:
+>>> def dupes(p: P):
 ...   for roll, count in p.rolls_with_counts():
 ...     dupes = 0
 ...     for i in range(1, len(roll)):
@@ -488,7 +487,7 @@ Translation:
 ```python
 >>> from itertools import product
 
->>> def brawl(a: P, b: P) -> Iterator[Tuple[int, int]]:
+>>> def brawl(a: P, b: P):
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
 ...       a.rolls_with_counts(),
 ...       b.rolls_with_counts(),
@@ -537,7 +536,7 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 Translation:
 
 ```python
->>> def brawl_w_optional_swap(a: P, b: P) -> Iterator[Tuple[int, int]]:
+>>> def brawl_w_optional_swap(a: P, b: P):
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
 ...       a.rolls_with_counts(),
 ...       b.rolls_with_counts(),
@@ -548,7 +547,7 @@ Translation:
 ...     roll_b = tuple(sorted(roll_b, reverse=True))
 ...     a_successes = sum(1 for f in roll_a if f >= roll_b[0])
 ...     b_successes = sum(1 for f in roll_b if f >= roll_a[0])
-...     result = a_successes - b_successes or int(roll_a > roll_b) - int(roll_a < roll_b)
+...     result = a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
 ...     yield result, count_a * count_b
 
 >>> _ = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()

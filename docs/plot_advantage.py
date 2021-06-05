@@ -22,10 +22,10 @@ def do_it(_: str) -> None:
     )
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(_: H, f: int):
-        if f == 20:
+    def crit(_: H, face):
+        if face == 20:
             return critical_hit
-        elif f + 5 >= 14:
+        elif face + 5 >= 14:
             return normal_hit
         else:
             return 0

@@ -490,7 +490,7 @@ We can even model various starting configurations through to completion to get a
 ...     elif them == 0: return H({1: 1})  # they're out of dice, we win
 ...     this_round = us_vs_them_func(us, them)
 ...
-...     def _next_round(h: H, f: int) -> H:
+...     def _next_round(_: H, f) -> H:
 ...       if f < 0: return _resolve(us - 1, them)
 ...       elif f > 0: return _resolve(us, them - 1)
 ...       else: return H({})  # ignore (immediately reroll) all ties
@@ -533,7 +533,7 @@ Using our ``risus_combat_driver`` from above, we can model the less death-spiral
 ...   best_them = (them@P(6)).h(-1)
 ...   h = best_us.vs(best_them)
 ...   # Goliath rule for resolving ties
-...   h = h.substitute(lambda h, f: int(us < them) - int(us > them) if f == 0 else f)
+...   h = h.substitute(lambda h, f: (us < them) - (us > them) if f == 0 else f)
 ...   return h
 
 >>> for t in range(3, 5):
@@ -667,7 +667,7 @@ Armed with this knowledge, we can now model “Evens Up” using our ``risus_com
 >>> def evens_up_vs(us: int, them: int, goliath: bool = False) -> H:
 ...   h = (us@d6_evens_exploding_on_six).vs(them@d6_evens_exploding_on_six)
 ...   if goliath:
-...     h = h.substitute(lambda h, f: int(us < them) - int(us > them) if f == 0 else f)
+...     h = h.substitute(lambda h, f: (us < them) - (us > them) if f == 0 else f)
 ...   return h
 
 >>> for t in range(3, 5):

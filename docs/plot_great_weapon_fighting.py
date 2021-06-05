@@ -14,7 +14,7 @@ def do_it(_: str) -> None:
         label="Single Attack",
     )
 
-    def gwf(h: H, face: int):
+    def gwf(h: H, face):
         return h if face in (1, 2) else face
 
     great_weapon_fighting = 2 @ (H(6).substitute(gwf)) + 5

@@ -78,7 +78,7 @@ class TestH:
         assert d2 + H({}) == d2
         assert H({}) + d3 == d3
 
-    def test_op_add_int(self) -> None:
+    def test_op_add_num(self) -> None:
         h1 = H(range(10, 20))
         h2 = H(range(11, 21))
         assert h2 == h1 + 1
@@ -93,7 +93,7 @@ class TestH:
         assert d2 - H({}) == d2
         assert H({}) - d3 == -d3
 
-    def test_op_sub_int(self) -> None:
+    def test_op_sub_num(self) -> None:
         h1 = H(range(10, 20))
         h2 = H(range(9, 19))
         h3 = H(range(-8, -18, -1))
@@ -167,8 +167,8 @@ class TestH:
     def test_substitute_double_odd_values(self) -> None:
         def double_odd_values(
             h: H,  # pylint: disable=unused-argument
-            face: int,
-        ) -> Union[H, int]:
+            face: float,
+        ) -> Union[float, H]:
             return face * 2 if face % 2 != 0 else face
 
         d8 = H(8)
@@ -182,8 +182,8 @@ class TestH:
     def test_substitute_never_expand(self) -> None:
         def never_expand(
             d: H,  # pylint: disable=unused-argument
-            face: int,
-        ) -> Union[H, int]:
+            face: float,
+        ) -> Union[float, H]:
             return face
 
         d20 = H(20)
@@ -191,7 +191,7 @@ class TestH:
         assert d20.substitute(never_expand, operator.add, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, face: int) -> Union[H, int]:
+        def reroll_d4_threes(h: H, face: float) -> Union[float, H]:
             return h if max(h) == 4 and face == 3 else face
 
         h = H(4)
