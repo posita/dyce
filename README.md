@@ -415,13 +415,13 @@ Example 2 translation:
 Source:
 
 ```
-output [highest 3 of 5d [explode d10]] named "Exploded 5k3"
+output [highest 3 of 10d [explode d10]] named "10k3"
 ```
 
 Translation:
 
 ```python
->>> _ = (5@P(H(10).explode(max_depth=2))).h(slice(-3, None))
+>>> _ = (10@P(H(10).explode(max_depth=3))).h(slice(-3, None))
 >>> faces, probabilities = _.data_xy()
 >>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP

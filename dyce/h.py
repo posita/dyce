@@ -364,7 +364,7 @@ class H(_MappingT):
         else:
             arg = dict.__repr__(self._h)
 
-        return "{}({})".format(self.__class__.__name__, arg)
+        return f"{self.__class__.__name__}({arg})"
 
     def __eq__(self, other) -> bool:
         if isinstance(other, HAbleT):
@@ -1184,12 +1184,13 @@ class H(_MappingT):
         if width <= 0:
 
             def parts():
-                yield "avg: {:.2f}".format(self.mean())
+                mu = self.mean()
+                yield f"avg: {mu:.2f}"
 
                 for face, probability in self.data(
                     relative=True, fill_items=fill_items
                 ):
-                    yield "{}:{:7.2%}".format(face, probability)
+                    yield f"{face}:{probability:7.2%}"
 
             return "{" + ", ".join(parts()) + "}"
         else:
@@ -1197,16 +1198,18 @@ class H(_MappingT):
 
             def lines():
                 mu = self.mean()
-                yield "avg | {:7.2f}".format(mu)
-                yield "std | {:7.2f}".format(self.stdev(mu))
-                yield "var | {:7.2f}".format(self.variance(mu))
+                std = self.stdev(mu)
+                var = self.variance(mu)
+                yield f"avg | {mu:7.2f}"
+                yield f"std | {std:7.2f}"
+                yield f"var | {var:7.2f}"
                 total = sum(self.counts())
                 tick_scale = max(self.counts()) if scaled else total
 
                 for face, count in self.data(relative=False, fill_items=fill_items):
                     probability = count / total
-                    ticks = int(w * count / tick_scale)
-                    yield "{: 3} | {:7.2%} |{}".format(face, probability, tick * ticks)
+                    ticks = tick * int(w * count / tick_scale)
+                    yield f"{face: 3} | {probability:7.2%} |{ticks}"
 
             return sep.join(lines())
 
@@ -1255,7 +1258,7 @@ class H(_MappingT):
             if val < total:
                 return face
 
-        assert False, "val ({}) ≥ total ({})".format(val, total)
+        assert False, f"val ({val}) ≥ total ({total})"
 
     def _lowest_terms(self) -> Iterable[Tuple[_FaceT, _CountT]]:
         counts_gcd = gcd(*self.counts())
@@ -1415,7 +1418,8 @@ def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argume
 
 
 def _within(lo: _FaceT, hi: _FaceT) -> _BinaryOperatorT:
-    assert lo <= hi
+    if lo > hi:
+        raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")
 
     def _cmp(a: _FaceT, b: _FaceT) -> int:
         diff = a - b

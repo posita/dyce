@@ -12,12 +12,13 @@ from __future__ import generator_stop
 import functools
 import itertools
 import operator
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import pytest
 
 from dyce import H, P
 from dyce.h import _FaceT
+from dyce.p import _analyze_selection, _select_from_end
 
 __all__ = ()
 
@@ -504,6 +505,46 @@ class TestP:
         assert p_4df.h(slice(0, 1)) == H(
             _brute_force_combinations_with_counts(tuple(p_4df), slice(0, 1))
         )
+
+
+def test_analyze_selection() -> None:
+    which: Tuple[int, ...]
+
+    which = (0,)
+    assert _analyze_selection(6, which) == 1
+    which = (0, 2, 1)
+    assert _analyze_selection(6, which) == 3
+    which = (0, 1, 0, 0, 1)
+    assert _analyze_selection(6, which) is None
+
+    which = (5,)
+    assert _analyze_selection(6, which) == -1
+    which = (5, 3, 4)
+    assert _analyze_selection(6, which) == -3
+    which = (5, 4, 5, 5, 4)
+    assert _analyze_selection(6, which) is None
+
+    which = ()
+    assert _analyze_selection(6, which) == 0
+    which = (0, 2, 4, 1, 3, 5)
+    assert _analyze_selection(6, which) == 6
+    which = (0, 2, 4, 1, 3, 5, 5, 3, 1, 4, 2, 0)
+    assert _analyze_selection(6, which) is None
+
+    which = (1, 3, 2, 4)
+    assert _analyze_selection(6, which) is None
+    which = (1, 3, 2, 4, 4, 3, 2, 1)
+    assert _analyze_selection(6, which) is None
+
+
+def test_select_from_end() -> None:
+    h, n, k = H(6), 4, 2
+    assert H((sum(roll), count) for roll, count in _select_from_end(h, n, k)) == (
+        n @ P(h)
+    ).h(slice(k))
+    assert H((sum(roll), count) for roll, count in _select_from_end(h, n, -k)) == (
+        n @ P(h)
+    ).h(slice(-k, None))
 
 
 def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
