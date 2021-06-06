@@ -64,8 +64,8 @@ def test_supports_bitwise_proto() -> None:
         assert isinstance(numpy.int64(-273), SupportsBitwise)
 
     # if sympy is not None:
-    #     assert isinstance(sympy.Integer(-273), SupportsBitwise)  # See https://github.com/sympy/sympy/issues/19311
-    #     assert isinstance(sympy.symbols("x"), SupportsBitwise)  # See https://github.com/sympy/sympy/issues/19311
+    #     assert isinstance(sympy.Integer(-273), SupportsBitwise)  # See <https://github.com/sympy/sympy/issues/19311>
+    #     assert isinstance(sympy.symbols("x"), SupportsBitwise)  # See <https://github.com/sympy/sympy/issues/19311>
 
     assert not isinstance("-273", SupportsBitwise)
 

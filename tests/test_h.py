@@ -69,7 +69,7 @@ else:
         sympy.RealNumber,
     )
     _INTEGRAL_OUTCOME_TYPES += (
-        # sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
+        # sympy.Integer,  # See <https://github.com/sympy/sympy/issues/19311>
     )
     _COUNT_TYPES += (sympy.Integer,)
 
@@ -171,13 +171,13 @@ class TestH:
             assert d2 - d3 == {
                 o_type(-2): 1,
                 o_type(-1): 2,
-                # See https://github.com/sympy/sympy/issues/6545
+                # See <https://github.com/sympy/sympy/issues/6545>
                 o_type(0) + o_type(0): 2,
                 o_type(1): 1,
             }, f"o_type: {o_type}; c_type: {c_type}"
             assert d3 - d2 == {
                 o_type(-1): 1,
-                # See https://github.com/sympy/sympy/issues/6545
+                # See <https://github.com/sympy/sympy/issues/6545>
                 o_type(0) + o_type(0): 2,
                 o_type(1): 2,
                 o_type(2): 1,

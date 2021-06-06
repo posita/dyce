@@ -13,6 +13,7 @@ import os
 from collections import Counter as counter
 from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
+from fractions import Fraction
 from itertools import chain, product, repeat
 from math import comb, sqrt
 from operator import abs as op_abs
@@ -55,6 +56,7 @@ from typing import (
     Union,
     ValuesView,
     cast,
+    overload,
     runtime_checkable,
 )
 
@@ -68,6 +70,7 @@ __all__ = ("H",)
 # ---- Types ---------------------------------------------------------------------------
 
 
+_T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _MappingT = Mapping[OutcomeP, int]
 _SourceT = Union[
@@ -82,6 +85,11 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeP], Union[OutcomeP, "H"]]
 _CoalesceT = Callable[["H", OutcomeP], "H"]
+
+
+class _RationalP(Protocol[_T_co]):
+    def __call__(self, numerator: int, denominator: int, /) -> _T_co:
+        ...
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -1237,27 +1245,90 @@ class H(_MappingT):
         """
         return self.map(_within(lo, hi), other)
 
+    @overload
     def distribution(
         self,
         fill_items: _MappingT = None,
-    ) -> Iterator[Tuple[OutcomeP, float]]:
+    ) -> Iterator[Tuple[OutcomeP, Fraction]]:
+        ...
+
+    @overload
+    def distribution(
+        self,
+        fill_items: _MappingT,
+        rational_t: _RationalP[_T],
+    ) -> Iterator[Tuple[OutcomeP, _T]]:
+        ...
+
+    @overload
+    def distribution(
+        self,
+        *,
+        rational_t: _RationalP[_T],
+    ) -> Iterator[Tuple[OutcomeP, _T]]:
+        ...
+
+    def distribution(
+        self,
+        fill_items: _MappingT = None,
+        # See <https://github.com/python/mypy/issues/10854> for context on all the
+        # @overload work-around nonsense above
+        rational_t: _RationalP[_T] = Fraction,
+    ) -> Iterator[Tuple[OutcomeP, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair:
 
         ```python
-        >>> list(H(6).gt(3).distribution())
-        [(False, 0.5), (True, 0.5)]
+        >>> h = H((1, 2, 3, 3, 4, 4, 5, 6))
+        >>> list(h.distribution())
+        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
+        >>> list(h.ge(3).distribution())
+        [(False, Fraction(1, 4)), (True, Fraction(3, 4))]
 
         ```
 
         If provided, *fill_items* supplies defaults for any “missing” outcomes:
 
         ```python
-        >>> list(H(6).gt(7).distribution())
-        [(False, 1.0)]
-        >>> list(H(6).gt(7).distribution(fill_items={True: 0, False: 0}))
-        [(False, 1.0), (True, 0.0)]
+        >>> list(h.distribution())
+        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
+        >>> list(h.distribution(fill_items={0: 0, 7: 0}))
+        [(0, Fraction(0, 1)), (1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8)), (7, Fraction(0, 1))]
+
+        ```
+
+        If provided, *rational_t* must be a callable that takes two ``int``s (a
+        numerator and denominator) and returns an instance of a desired (but otherwise
+        arbitrary) type:
+
+        ```python
+        >>> list(h.distribution(rational_t=lambda n, d: f"{n}/{d}"))
+        [(1, '1/8'), (2, '1/8'), (3, '2/8'), (4, '2/8'), (5, '1/8'), (6, '1/8')]
+
+        >>> import sympy
+        >>> list(h.distribution(rational_t=sympy.Rational))
+        [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
+
+        >>> import sage.rings.rational  # doctest: +SKIP
+        >>> list(h.distribution(rational_t=lambda n, d: sage.rings.rational.Rational((n, d))))  # doctest: +SKIP
+        [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
+
+        ```
+
+        Another way to accomplish something similar may be to leverage many number
+        implementations’ ability to convert from ``fractions.Fraction``s (e.g.,
+        [``sage.rings.rational.Rational``](https://doc.sagemath.org/html/en/reference/rings_standard/sage/rings/rational.html#sage.rings.rational.Rational),
+        [``sympy.core.numbers.Rational``](https://docs.sympy.org/latest/modules/core.html#rational)):
+
+        ```python
+        >>> import sympy.abc
+        >>> [(o, sympy.Rational(c)) for o, c in (h + sympy.abc.x).distribution()]
+        [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
+
+        >>> import sage.rings.rational  # doctest: +SKIP
+        >>> [(o, sage.rings.rational.Rational(c)) for o, c in h.distribution()]  # doctest: +SKIP
+        [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]
 
         ```
         """
@@ -1268,7 +1339,7 @@ class H(_MappingT):
         total = sum(combined.values()) or 1
 
         return (
-            (outcome, combined[outcome] / total)
+            (outcome, rational_t(combined[outcome], total))
             for outcome in sorted_outcomes(combined)
         )
 
@@ -1278,11 +1349,12 @@ class H(_MappingT):
     ) -> Tuple[Tuple[OutcomeP, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
-        output from the [``distribution`` method][dyce.h.H.distribution]:
+        output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
+        values are ``float``s:
 
         ```python
         >>> list(H(6).distribution())
-        [(1, 0.16666666), (2, 0.16666666), (3, 0.16666666), (4, 0.16666666), (5, 0.16666666), (6, 0.16666666)]
+        [(1, Fraction(1, 6)), (2, Fraction(1, 6)), (3, Fraction(1, 6)), (4, Fraction(1, 6)), (5, Fraction(1, 6)), (6, Fraction(1, 6))]
         >>> H(6).distribution_xy()
         ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
 
@@ -1290,7 +1362,16 @@ class H(_MappingT):
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.distribution(fill_items))),
+            tuple(
+                zip(
+                    *(
+                        (outcome, float(probability))
+                        for outcome, probability in self.distribution(  # pylint: disable=not-an-iterable
+                            fill_items
+                        )
+                    )
+                )
+            ),
         )
 
     def format(
@@ -1377,7 +1458,12 @@ class H(_MappingT):
             def _parts():
                 yield f"avg: {mu:.2f}"
 
-                for outcome, probability in self.distribution(fill_items):
+                for (
+                    outcome,
+                    probability,
+                ) in self.distribution(  # pylint: disable=not-an-iterable
+                    fill_items
+                ):
                     probability_f = float(probability)
                     yield f"{outcome}:{probability_f:7.2%}"
 
