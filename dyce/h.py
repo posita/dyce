@@ -13,6 +13,7 @@ import os
 from collections import Counter as counter
 from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
+from fractions import Fraction
 from itertools import chain, product, repeat
 from math import comb, sqrt
 from operator import abs as op_abs
@@ -1240,24 +1241,27 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: _MappingT = None,
-    ) -> Iterator[Tuple[OutcomeP, float]]:
+    ) -> Iterator[Tuple[OutcomeP, Fraction]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair:
 
         ```python
-        >>> list(H(6).gt(3).distribution())
-        [(False, 0.5), (True, 0.5)]
+        >>> d = H((1, 2, 3, 3, 4, 4, 5, 6))
+        >>> list(d.distribution())
+        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
+        >>> list(d.ge(3).distribution())
+        [(False, Fraction(1, 4)), (True, Fraction(3, 4))]
 
         ```
 
         If provided, *fill_items* supplies defaults for any “missing” outcomes:
 
         ```python
-        >>> list(H(6).gt(7).distribution())
-        [(False, 1.0)]
-        >>> list(H(6).gt(7).distribution(fill_items={True: 0, False: 0}))
-        [(False, 1.0), (True, 0.0)]
+        >>> list(d.distribution())
+        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
+        >>> list(d.distribution(fill_items={0: 0, 7: 0}))
+        [(0, Fraction(0, 1)), (1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8)), (7, Fraction(0, 1))]
 
         ```
         """
@@ -1268,7 +1272,7 @@ class H(_MappingT):
         total = sum(combined.values()) or 1
 
         return (
-            (outcome, combined[outcome] / total)
+            (outcome, Fraction(combined[outcome], total))
             for outcome in sorted_outcomes(combined)
         )
 
@@ -1278,11 +1282,12 @@ class H(_MappingT):
     ) -> Tuple[Tuple[OutcomeP, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
-        output from the [``distribution`` method][dyce.h.H.distribution]:
+        output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
+        values are ``float``s:
 
         ```python
         >>> list(H(6).distribution())
-        [(1, 0.16666666), (2, 0.16666666), (3, 0.16666666), (4, 0.16666666), (5, 0.16666666), (6, 0.16666666)]
+        [(1, Fraction(1, 6)), (2, Fraction(1, 6)), (3, Fraction(1, 6)), (4, Fraction(1, 6)), (5, Fraction(1, 6)), (6, Fraction(1, 6))]
         >>> H(6).distribution_xy()
         ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
 
@@ -1290,7 +1295,14 @@ class H(_MappingT):
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.distribution(fill_items))),
+            tuple(
+                zip(
+                    *(
+                        (outcome, float(probability))
+                        for outcome, probability in self.distribution(fill_items)
+                    )
+                )
+            ),
         )
 
     def format(

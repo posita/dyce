@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import fractions
 import warnings
 from typing import Any, Iterable, Iterator, List, Tuple, Type, Union
 
@@ -31,7 +32,7 @@ __all__ = ()
 
 ColorT = Tuple[float, float, float, float]
 ColorListT = List[ColorT]
-LabelT = Tuple[str, float]
+LabelT = Tuple[str, Union[float, fractions.Fraction]]
 
 if matplotlib:
     AxesT = Type[matplotlib.axes.Axes]
@@ -47,7 +48,7 @@ else:
 DEFAULT_GRAPH_COLOR = "RdYlGn_r"
 DEFAULT_TEXT_COLOR = "black"
 DEFAULT_GRAPH_ALPHA = 0.5
-_HIDE_LIM = 1 / 2 ** 6
+_HIDE_LIM = fractions.Fraction(1, 2 ** 6)
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -97,7 +98,7 @@ def display_burst(
 
     if outer is None:
         outer = (
-            ("{:.2%}".format(v) if v >= _HIDE_LIM else "", v)
+            ("{:.2%}".format(float(v)) if v >= _HIDE_LIM else "", v)
             for _, v in h_inner.distribution()
         )
     elif isinstance(outer, H):
@@ -179,7 +180,7 @@ def labels_cumulative(
     for outcome, probability in h.distribution():
         le_total += probability
         label = "{} {:.2%}; ≥{:.2%}; ≤{:.2%}".format(
-            outcome, probability, le_total, ge_total
+            outcome, float(probability), le_total, ge_total
         )
         ge_total -= probability
         yield (label, probability)
