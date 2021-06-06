@@ -17,6 +17,7 @@ from typing import Sequence
 import pytest
 
 from dyce import H, P
+from dyce.h import _FaceT
 
 __all__ = ()
 
@@ -406,6 +407,43 @@ class TestP:
 
         assert p_4df.h(slice(0, 0)) == {}
         assert p_4df.h(slice(None)) == p_4df.h()
+
+    def test_homogeneous(self) -> None:
+        assert P().homogeneous
+        assert P(2).homogeneous
+        assert P(2, 2).homogeneous
+        assert not P(2, -3).homogeneous
+
+    def test_appearances_in_rolls(self) -> None:
+        def _sum_method(p: P, face: _FaceT) -> H:
+            return H(
+                (sum(1 for f in roll if f == face), count)
+                for roll, count in p.rolls_with_counts()
+            )
+
+        p_empty = P()
+        assert p_empty.appearances_in_rolls(0) == _sum_method(p_empty, 0)
+        assert p_empty.appearances_in_rolls(0) == H({}).eq(0)
+
+        p_4d6 = 4 @ P(6)
+        assert p_4d6.appearances_in_rolls(2) == _sum_method(p_4d6, 2)
+        assert p_4d6.appearances_in_rolls(2) == 4 @ H(6).eq(2)
+        assert p_4d6.appearances_in_rolls(7) == _sum_method(p_4d6, 7)
+        assert p_4d6.appearances_in_rolls(7) == 4 @ H(6).eq(7)
+
+        p_mixed = P(4, 4, 6, 6, 6, H({}))
+        assert p_mixed.appearances_in_rolls(3) == _sum_method(p_mixed, 3)
+        assert p_mixed.appearances_in_rolls(3) == (
+            2 @ H(4).eq(3) + 3 @ H(6).eq(3) + H({}).eq(3)
+        )
+        assert p_mixed.appearances_in_rolls(5) == _sum_method(p_mixed, 5)
+        assert p_mixed.appearances_in_rolls(5) == (
+            2 @ H(4).eq(5) + 3 @ H(6).eq(5) + H({}).eq(5)
+        )
+        assert p_mixed.appearances_in_rolls(7) == _sum_method(p_mixed, 7)
+        assert p_mixed.appearances_in_rolls(7) == (
+            2 @ H(4).eq(7) + 3 @ H(6).eq(7) + H({}).eq(7)
+        )
 
     def test_rolls_with_counts_empty(self) -> None:
         assert tuple(P().rolls_with_counts()) == ()

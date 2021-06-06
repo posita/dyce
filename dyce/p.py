@@ -9,6 +9,7 @@
 
 from __future__ import generator_stop
 
+from collections import Counter as counter
 from functools import reduce
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
@@ -20,10 +21,20 @@ from operator import mul as op_mul
 from operator import ne as op_ne
 from operator import neg as op_neg
 from operator import pos as op_pos
-from typing import Iterable, Iterator, Sequence, Tuple, TypeVar, Union, overload
+from typing import (
+    Counter,
+    Iterable,
+    Iterator,
+    List,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _FaceT, _MappingT
-from .symmetries import sum_w_start
+from .symmetries import comb, sum_w_start
 
 __all__ = ("P",)
 
@@ -176,6 +187,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         hs = list(h for h in _gen_hs() if h)
         hs.sort(key=lambda h: tuple(h.items()))
         self._hs = tuple(hs)
+        self._homogeneous = len(set(self._hs)) <= 1
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -334,6 +346,12 @@ class P(Sequence[H], HAbleBinOpsMixin):
         else:
             return sum_w_start(self._hs, start=H({}))
 
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def homogeneous(self) -> bool:
+        return self._homogeneous
+
     # ---- Methods ---------------------------------------------------------------------
 
     def lt(self, other: _OperandT) -> H:
@@ -403,6 +421,92 @@ class P(Sequence[H], HAbleBinOpsMixin):
         [``h`` method][dyce.p.P.h] and [``H.substitute``][dyce.h.H.substitute].
         """
         return self.h().substitute(expand, coalesce, max_depth)
+
+    def appearances_in_rolls(self, face: _FaceT) -> H:
+        r"""
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may disappear in future
+            versions. While it does provide a performance improvement over other
+            techniques, it is not significant for most applications, and rarely
+            justifies the corresponding reduction in readability.
+
+        Returns a histogram where the “faces” (keys) are the number of times *face*
+        appears, and the counts are the number of rolls where *face* appears precisely
+        that number of times. Equivalent to ``H((sum(1 for f in roll if f == face),
+        count) for roll, count in self.rolls_with_counts())``, but much more efficient.
+
+        ```python
+        >>> p_2d6 = P(6, 6)
+        >>> tuple(p_2d6.rolls_with_counts())
+        (((1, 1), 1), ((1, 2), 2), ((1, 3), 2), ((1, 4), 2), ((1, 5), 2), ((1, 6), 2), ...)
+        >>> p_2d6.appearances_in_rolls(1)
+        H({0: 25, 1: 10, 2: 1})
+
+        >>> # Least efficient, by far
+        >>> d4, d6 = H(4), H(6)
+        >>> p_3d4_2d6 = P(d4, d4, d4, d6, d6)
+        >>> H((sum(1 for f in roll if f == 3), count) for roll, count in p_3d4_2d6.rolls_with_counts())
+        H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
+
+        >>> # Pretty darned efficient, generalizable to other boolean inquiries, and
+        >>> # arguably the most readable
+        >>> d4_eq3, d6_eq3 = d4.eq(2), d6.eq(2)
+        >>> 3@d4_eq3 + 2@d6_eq3
+        H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
+
+        >>> # Most efficient for large sets of dice
+        >>> p_3d4_2d6.appearances_in_rolls(3)
+        H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
+
+        ```
+
+        Based on some rudimentary testing, this method appears to converge on being
+        almost twice (about $\frac{7}{4}$) as efficient as the boolean accumulation
+        technique for larger sets:
+
+        ```python
+        In [3]: %timeit 3@d4_eq3 + 2@d6_eq3
+        287 µs ± 6.96 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+        In [4]: %timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)
+        402 µs ± 5.59 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+        In [5]: %timeit 9@d4_eq3 + 6@d6_eq3
+        845 µs ± 7.89 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+        In [6]: %timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)
+        597 µs ± 9.46 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+        In [7]: %timeit 90@d4_eq3 + 60@d6_eq3
+        24.7 ms ± 380 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+        In [8]: %timeit P(90@P(4), 60@P(6)).appearances_in_rolls(3)
+        7.5 ms ± 84.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+        In [9]: %timeit 900@d4_eq3 + 600@d6_eq3
+        3.34 s ± 19.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+        In [10]: %timeit P(900@P(4), 600@P(6)).appearances_in_rolls(3)
+        1.93 s ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+        ```
+        """
+        group_counters: List[Counter[_FaceT]] = []
+
+        for h, hs in groupby(self._hs):
+            group_counter: Counter[_FaceT] = counter()
+            n = sum(1 for _ in hs)
+
+            for k in range(0, n + 1):
+                group_counter[k] = _count_of_exactly_k_of_face_in_n_of_h(
+                    h, face, n, k
+                ) * (group_counter[k] if group_counter[k] else 1)
+
+            group_counters.append(group_counter)
+
+        return sum_w_start(
+            (H(group_counter) for group_counter in group_counters), start=H({})
+        )
 
     def explode(self, max_depth: int = 1) -> H:
         r"""
@@ -591,6 +695,18 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
 def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argument
     return h
+
+
+def _count_of_exactly_k_of_face_in_n_of_h(
+    h: H,
+    face: _FaceT,
+    n: int,
+    k: int,
+) -> _CountT:
+    c_face = h.get(face, 0)
+    c_total = sum(h.counts())
+
+    return comb(n, k) * c_face ** k * (c_total - c_face) ** (n - k)
 
 
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
