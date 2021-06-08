@@ -12,10 +12,17 @@ def import_fig(arg: str) -> Tuple[str, Callable[[str], None]]:
         mod_path = str(my_dir.joinpath("plot_{}.py".format(arg)))
         loader = importlib.machinery.SourceFileLoader(arg, mod_path)
         spec = importlib.util.spec_from_loader(arg, loader)
+        assert spec
         mod = importlib.util.module_from_spec(spec)
         loader.exec_module(mod)
         do_it = mod.do_it  # type: ignore
-    except (AttributeError, FileNotFoundError, ImportError, SyntaxError) as exc:
+    except (
+        AssertionError,
+        AttributeError,
+        FileNotFoundError,
+        ImportError,
+        SyntaxError,
+    ) as exc:
         raise argparse.ArgumentTypeError('unable to load "{}" ({})'.format(arg, exc))
     else:
         return (arg, do_it)
@@ -30,7 +37,7 @@ PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="l
 PARSER.add_argument("fig", type=import_fig)
 
 
-def main():
+def main() -> None:
     import matplotlib.pyplot
 
     args = PARSER.parse_args()

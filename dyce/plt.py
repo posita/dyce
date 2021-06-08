@@ -8,7 +8,7 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
+from typing import Any, Iterable, Iterator, List, Tuple, Type
 
 import warnings
 
@@ -62,8 +62,8 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
 def display_burst(
     ax: AxesT,
     h_inner: H,
-    outer: Optional[Iterable[LabelT]] = None,
-    desc: Optional[str] = None,
+    outer: Iterable[LabelT] = None,
+    desc: str = None,
     graph_color: str = DEFAULT_GRAPH_COLOR,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
@@ -136,8 +136,8 @@ def labels_cumulative(
 
 def plot_burst(
     h_inner: H,
-    outer: Optional[Iterable[LabelT]] = None,
-    desc: Optional[str] = None,
+    outer: Iterable[LabelT] = None,
+    desc: str = None,
     graph_color: str = DEFAULT_GRAPH_COLOR,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,

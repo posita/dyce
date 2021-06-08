@@ -11,7 +11,6 @@ from __future__ import generator_stop
 from typing import (
     Iterable,
     Iterator,
-    Optional,
     Sequence,
     Tuple,
     TypeVar,
@@ -70,6 +69,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
     flattened histograms.
 
     ```python
+    >>> from dyce import P
     >>> p_d6 = P(6)  # shorthand for P(H(6))
     >>> p_d6
     P(6)
@@ -89,9 +89,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
     ```
 
     ```python
-    >>> P(4, P(6, P(8, P(10, P(12, P(20))))))
+    >>> p = P(4, P(6, P(8, P(10, P(12, P(20))))))
+    >>> p
     P(4, 6, 8, 10, 12, 20)
-    >>> sum(_.roll()) in _.h()
+    >>> sum(p.roll()) in p.h()
     True
 
     ```
@@ -114,6 +115,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
     Comparisons with [``H`` objects][dyce.h.H] work as expected:
 
     ```python
+    >>> from dyce import H
     >>> 3@p_d6 == H(6) + H(6) + H(6)
     True
 
@@ -143,9 +145,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
     expressed as:
 
     ```python
-    >>> (3@p_d6).h(-2, -1)
+    >>> p_3d6 = 3@p_d6
+    >>> p_3d6.h(-2, -1)
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
-    >>> print(_.format(width=65))
+    >>> print(p_3d6.h(-2, -1).format(width=65))
     avg |    8.46
     std |    2.21
     var |    4.91
@@ -271,9 +274,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
         six-sided dice can be modeled as:
 
         ```python
-        >>> (2@P(6)).h(-1)
+        >>> p_2d6 = 2@P(6)
+        >>> p_2d6.h(-1)
         H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
-        >>> print(_.format(width=65))
+        >>> print(p_2d6.h(-1).format(width=65))
         avg |    4.47
         std |    1.40
         var |    1.97
@@ -308,9 +312,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
         can be modeled as:
 
         ```python
-        >>> (10@P(4)).h(slice(2), slice(-2, None))
+        >>> p_10d4 = 10@P(4)
+        >>> p_10d4.h(slice(2), slice(-2, None))
         H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
-        >>> print(_.format(width=65))
+        >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65))
         avg |   10.00
         std |    0.91
         var |    0.84
@@ -406,7 +411,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
     def substitute(
         self,
         expand: _ExpandT,
-        coalesce: Optional[_CoalesceT] = None,
+        coalesce: _CoalesceT = None,
         max_depth: int = 1,
     ) -> H:
         r"""

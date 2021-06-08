@@ -10,22 +10,19 @@
 
 from __future__ import generator_stop
 
-
-# ---- Imports -------------------------------------------------------------------------
-
-
 import codecs
 import inspect
 import os
 import setuptools
 
+__all__ = ()
+
 
 # ---- Data ----------------------------------------------------------------------------
 
 
-__all__ = ()
-
 _MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
+
 
 # ---- Initialization ------------------------------------------------------------------
 
@@ -103,6 +100,7 @@ SETUP_ARGS = {
         ],
     },
 }
+
 
 if __name__ == "__main__":
     setuptools.setup(**SETUP_ARGS)

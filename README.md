@@ -85,7 +85,7 @@ One can "take" individual dice from pools, ordered least to greatest. (The [``H.
 ```python
 >>> p_2d6.h(0)
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
->>> print(_.format(width=65))
+>>> print(p_2d6.h(0).format(width=65))
 avg |    2.53
 std |    1.40
 var |    1.97
@@ -101,7 +101,7 @@ var |    1.97
 ```python
 >>> p_2d6.h(-1)
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
->>> print(_.format(width=65))
+>>> print(p_2d6.h(-1).format(width=65))
 avg |    4.47
 std |    1.40
 var |    1.97
@@ -117,6 +117,7 @@ var |    1.97
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``data`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data) and a [``data_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.data_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
 ```python
+>>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.style.use("dark_background")  # doctest: +SKIP
 
 >>> faces, probabilities = p_2d6.h(0).data_xy()
@@ -327,7 +328,7 @@ Example 1 translation:
 ...   label="Single Attack",
 ... )  # doctest: +SKIP
 
->>> def gwf(h: H, face: int):  # type: (...) -> Union[int, H]
+>>> def gwf(h: H, face: int):
 ...   return h if face in (1, 2) else face
 
 >>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it's a one or two
@@ -390,7 +391,7 @@ Example 2 translation:
 
 >>> advantage = (2@P(20)).h(-1)
 
->>> def crit(_: H, f: int):  # type: (...) -> Union[int, H]
+>>> def crit(_: H, f: int):
 ...   if f == 20: return critical_hit
 ...   elif f + 5 >= 14: return normal_hit
 ...   else: return 0
@@ -446,7 +447,8 @@ function: dupes in DICE:s {
 Translation:
 
 ```python
->>> def dupes(p: P):  # type: (...) -> Iterator[Tuple[int, int]]
+>>> from typing import Iterator, Tuple
+>>> def dupes(p: P) -> Iterator[Tuple[int, int]]:
 ...   for roll, count in p.rolls_with_counts():
 ...     dupes = 0
 ...     for i in range(1, len(roll)):
@@ -486,7 +488,7 @@ Translation:
 ```python
 >>> from itertools import product
 
->>> def brawl(a: P, b: P):  # type: (...) -> Iterator[Tuple[int, int]]
+>>> def brawl(a: P, b: P) -> Iterator[Tuple[int, int]]:
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
 ...       a.rolls_with_counts(),
 ...       b.rolls_with_counts(),
@@ -535,15 +537,15 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 Translation:
 
 ```python
->>> def brawl_w_optional_swap(a: P, b: P):  # type: (...) -> Iterator[Tuple[int, int]]
+>>> def brawl_w_optional_swap(a: P, b: P) -> Iterator[Tuple[int, int]]:
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
 ...       a.rolls_with_counts(),
 ...       b.rolls_with_counts(),
 ...   ):
 ...     if roll_a[0] < roll_b[-1]:
 ...       roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]
-...     roll_a = sorted(roll_a, reverse=True)
-...     roll_b = sorted(roll_b, reverse=True)
+...     roll_a = tuple(sorted(roll_a, reverse=True))
+...     roll_b = tuple(sorted(roll_b, reverse=True))
 ...     a_successes = sum(1 for f in roll_a if f >= roll_b[0])
 ...     b_successes = sum(1 for f in roll_b if f >= roll_a[0])
 ...     result = a_successes - b_successes or int(roll_a > roll_b) - int(roll_a < roll_b)

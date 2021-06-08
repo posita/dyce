@@ -15,7 +15,6 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    Optional,
     Tuple,
     Union,
     cast,
@@ -56,7 +55,6 @@ from os import environ, get_terminal_size, linesep
 from random import randrange
 
 from .symmetries import gcd, sum_w_start
-
 
 __all__ = ("H",)
 
@@ -106,6 +104,7 @@ class H(_MappingT):
     Modeling a single six-sided die (``1d6``) can be expressed as:
 
     ```python
+    >>> from dyce import H
     >>> d6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
     ```
@@ -185,7 +184,7 @@ class H(_MappingT):
     ```python
     >>> d6 + d6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-    >>> print(_.format(width=65))
+    >>> print((d6 + d6).format(width=65))
     avg |    7.00
     std |    2.42
     var |    5.83
@@ -235,7 +234,7 @@ class H(_MappingT):
     ```python
     >>> d6.accumulate(d6).accumulate(d6)
     H({1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3})
-    >>> _.lowest_terms()
+    >>> d6.accumulate(d6).accumulate(d6).lowest_terms()
     H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
     ```
@@ -255,7 +254,7 @@ class H(_MappingT):
     ```python
     >>> d6.ne(d6)
     H({0: 6, 1: 30})
-    >>> print(_.format(width=65))
+    >>> print(d6.ne(d6).format(width=65))
     avg |    0.83
     std |    0.37
     var |    0.14
@@ -269,7 +268,7 @@ class H(_MappingT):
     ```python
     >>> d6.lt(d6)
     H({0: 21, 1: 15})
-    >>> print(_.format(width=65))
+    >>> print(d6.lt(d6).format(width=65))
     avg |    0.42
     std |    0.49
     var |    0.24
@@ -281,13 +280,13 @@ class H(_MappingT):
     Or how often at least one ``2`` will show when rolling four six-sided dice:
 
     ```python
-    >>> d6.eq(2)  # how often a 2 shows on a single six-sided die
+    >>> d6_eq2 = d6.eq(2); d6_eq2  # how often a 2 shows on a single six-sided die
     H({0: 5, 1: 1})
-    >>> 4@(_)  # number of 2s that show on 4d6
+    >>> 4@d6_eq2  # count of 2s that show on 4d6
     H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
-    >>> _.ge(1)  # how often that number is at least one
+    >>> (4@d6_eq2).ge(1)  # how often that count is at least one
     H({0: 625, 1: 671})
-    >>> print(_.format(width=65))
+    >>> print((4@d6_eq2).ge(1).format(width=65))
     avg |    0.52
     std |    0.50
     var |    0.25
@@ -567,7 +566,7 @@ class H(_MappingT):
         >>> d6 = H(6)
         >>> d6.map(operator.add, d6)
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-        >>> _ == d6 + d6
+        >>> d6.map(operator.add, d6) == d6 + d6
         True
 
         ```
@@ -575,7 +574,7 @@ class H(_MappingT):
         ```python
         >>> d6.map(operator.mul, -1)
         H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-        >>> _ == d6 * -1
+        >>> d6.map(operator.mul, -1) == d6 * -1
         True
 
         ```
@@ -583,7 +582,7 @@ class H(_MappingT):
         ```python
         >>> d6.map(operator.gt, 3)
         H({0: 3, 1: 3})
-        >>> _ == d6.gt(3)
+        >>> d6.map(operator.gt, 3) == d6.gt(3)
         True
 
         ```
@@ -798,17 +797,17 @@ class H(_MappingT):
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
 
         ```python
-        >>> H((-1, -1, 0, 0, 1, 1))
+        >>> df = H((-1, -1, 0, 0, 1, 1)); df
         H({-1: 2, 0: 2, 1: 2})
-        >>> _.lowest_terms()
+        >>> df.lowest_terms()
         H({-1: 1, 0: 1, 1: 1})
 
         ```
 
         ```python
-        >>> H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5))
+        >>> d233445 = H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5)) ; d233445
         H({2: 2, 3: 4, 4: 4, 5: 2})
-        >>> _.lowest_terms()
+        >>> d233445.lowest_terms()
         H({2: 1, 3: 2, 4: 2, 5: 1})
 
         ```
@@ -818,7 +817,7 @@ class H(_MappingT):
     def substitute(
         self,
         expand: _ExpandT,
-        coalesce: Optional[_CoalesceT] = None,
+        coalesce: _CoalesceT = None,
         max_depth: int = 1,
     ) -> "H":
         r"""
@@ -834,7 +833,7 @@ class H(_MappingT):
         of 1 on the first roll:
 
         ```python
-        >>> def reroll_one(h: H, face: int) -> Union[int, H]:
+        >>> def reroll_one(h: H, face: int):
         ...   return h if face == 1 else face
 
         >>> H(6).substitute(reroll_one)
@@ -882,7 +881,7 @@ class H(_MappingT):
         >>> d6_3, d8_2 = 3@H(6), 2@H(8)
         >>> d6_3.vs(d8_2)
         H({-1: 4553, 0: 1153, 1: 8118})
-        >>> _.substitute(lambda h, f: H({}) if f == 0 else f)
+        >>> d6_3.vs(d8_2).substitute(lambda h, f: H({}) if f == 0 else f)
         H({-1: 4553, 1: 8118})
 
         ```
@@ -902,7 +901,7 @@ class H(_MappingT):
         ```python
         >>> d4, d6 = H(4), H(6)
 
-        >>> def reroll_greatest_on_d4_d6(h: H, face: int) -> Union[int, H]:
+        >>> def reroll_greatest_on_d4_d6(h: H, face: int):
         ...   if face == max(h):
         ...     if h == d6: return d4
         ...     if h == d4: return d6
@@ -933,7 +932,7 @@ class H(_MappingT):
         >>> target = 15 - bonus
         >>> d20 = H(20)
 
-        >>> def dmg_from_attack_roll(h: H, face: int) -> Union[int, H]:
+        >>> def dmg_from_attack_roll(h: H, face: int):
         ...   if face == 20:
         ...     return crit
         ...   elif face >= target:
@@ -1002,7 +1001,7 @@ class H(_MappingT):
         ```python
         >>> H(6).vs(H(4))
         H({-1: 6, 0: 4, 1: 14})
-        >>> _ == H(6).within(0, 0, H(4))
+        >>> H(6).vs(H(4)) == H(6).within(0, 0, H(4))
         True
 
         ```
@@ -1018,9 +1017,10 @@ class H(_MappingT):
         and *hi* (inclusive). 1 represents where that difference is greater than *hi*.
 
         ```python
-        >>> (2@H(6)).within(7, 9)
+        >>> d6_2 = 2@H(6)
+        >>> d6_2.within(7, 9)
         H({-1: 15, 0: 15, 1: 6})
-        >>> print(_.format(width=65))
+        >>> print(d6_2.within(7, 9).format(width=65))
         avg |   -0.25
         std |    0.72
         var |    0.52
@@ -1031,9 +1031,10 @@ class H(_MappingT):
         ```
 
         ```python
-        >>> (3@H(6)).within(-1, 1, 2@H(8))  # 3d6 w/in 1 of 2d8
+        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
+        >>> d6_3.within(-1, 1, d8_2)  # 3d6 w/in 1 of 2d8
         H({-1: 3500, 0: 3412, 1: 6912})
-        >>> print(_.format(width=65))
+        >>> print(d6_3.within(-1, 1, d8_2).format(width=65))
         avg |    0.25
         std |    0.83
         var |    0.69
@@ -1048,7 +1049,7 @@ class H(_MappingT):
     def data(
         self,
         relative: bool = False,
-        fill_items: Optional[_MappingT] = None,
+        fill_items: _MappingT = None,
     ) -> Iterator[Tuple[int, float]]:
         r"""
         Presentation helper function that returns an iterator for each face/count or
@@ -1087,7 +1088,7 @@ class H(_MappingT):
 
     def data_xy(
         self,
-        fill_items: Optional[_MappingT] = None,
+        fill_items: _MappingT = None,
     ) -> Tuple[Tuple[int, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function that returns an iterator for a “zipped” arrangement of
@@ -1109,7 +1110,7 @@ class H(_MappingT):
 
     def format(
         self,
-        fill_items: Optional[_MappingT] = None,
+        fill_items: _MappingT = None,
         width: int = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
@@ -1217,13 +1218,13 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
-    def stdev(self, mu: Optional[float] = None) -> float:
+    def stdev(self, mu: float = None) -> float:
         """
         Shorthand for ``math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
-    def variance(self, mu: Optional[float] = None) -> float:
+    def variance(self, mu: float = None) -> float:
         """
         Returns the variance of the weighted faces. If provided, *mu* is used as the mean
         (to avoid duplicate computation).

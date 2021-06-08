@@ -200,9 +200,10 @@ var |    5.83
 Taking the least, middle, or greatest face when rolling three six-sided dice would be:
 
 ```python
->>> (3@P(6)).h(0)
+>>> p_3d6 = 3@P(6)
+>>> p_3d6.h(0)
 H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
->>> print(_.format(width=65))
+>>> print(p_3d6.h(0).format(width=65))
 avg |    2.04
 std |    1.14
 var |    1.31
@@ -216,9 +217,9 @@ var |    1.31
 ```
 
 ```python
->>> (3@P(6)).h(1)
+>>> p_3d6.h(1)
 H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
->>> print(_.format(width=65))
+>>> print(p_3d6.h(1).format(width=65))
 avg |    3.50
 std |    1.37
 var |    1.88
@@ -232,9 +233,9 @@ var |    1.88
 ```
 
 ```python
->>> (3@P(6)).h(-1)
+>>> p_3d6.h(-1)
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
->>> print(_.format(width=65))
+>>> print(p_3d6.h(-1).format(width=65))
 avg |    4.96
 std |    1.14
 var |    1.31
@@ -250,10 +251,11 @@ var |    1.31
 Summing the greatest and the least faces when rolling a typical six-die polygonal set would be:
 
 ```python
->>> H(10)-1  # a common “d10” with faces [0 .. 9]
+>>> d10 = H(10)-1  # a common “d10” with faces [0 .. 9]
+>>> d10
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
->>> _ = P(4, 6, 8, _, 12, 20).h(0, -1)
->>> print(_.format(width=65, scaled=True))
+>>> h = P(4, 6, 8, d10, 12, 20).h(0, -1)
+>>> print(h.format(width=65, scaled=True))
 avg |   13.48
 std |    4.40
 var |   19.39
@@ -354,6 +356,7 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 ```python
 >>> faces, probabilities = (2@H(6)).data_xy()
+>>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.bar(
 ...   [str(f) for f in faces],
 ...   probabilities,
@@ -385,7 +388,7 @@ The outer ring and corresponding labels can be overridden for interesting, at-a-
 Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 ```python
->>> d20 = P(20)
+>>> d20 = H(20)
 >>> fig, ax = plot_burst(d20, outer=(
 ...   ("crit. fail.", d20.le(1)[1]),
 ...   ("fail.", d20.within(2, 14)[0]),
@@ -430,14 +433,15 @@ We can easily model its opposed combat system for various starting configuration
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map:
 
 ```python
+>>> from typing import List, Tuple
 >>> col_names = ["Loss", "Tie", "Win"]  # mapping from [-1, 0, 1], respectively
 >>> col_ticks = list(range(len(col_names)))
 >>> num_rows = 3
 >>> fig, axes = matplotlib.pyplot.subplots(1, num_rows)  # doctest: +SKIP
 >>> for i, them in enumerate(range(3, 3 + num_rows)):
 ...   ax = axes[i]  # doctest: +SKIP
-...   row_names = []  # type: List[str]
-...   rows = []  # type: List[Tuple[float, ...]]
+...   row_names: List[str] = []
+...   rows: List[Tuple[float, ...]] = []
 ...   for us in range(them, them + num_rows):
 ...     row_names.append("{}d6 …".format(us))
 ...     rows.append((us@H(6)).vs(them@H(6)).data_xy()[-1])
@@ -468,16 +472,17 @@ Calling ``matplotlib.pyplot.show`` presents:
 We can even model various starting configurations through to completion to get a better sense of the impact of any disparity (in this case, applying dynamic programming to avoid redundant computations):
 
 ```python
+>>> from typing import Callable, Dict, Tuple
 >>> def risus_combat_driver(
 ...     us: int,
 ...     them: int,
-...     us_vs_them_func,  # type: Callable[[int, int], H]
+...     us_vs_them_func: Callable[[int, int], H],
 ... ) -> H:
 ...   if us < 0 or them < 0:
 ...     raise ValueError("can't have negative numbers (us: {}, them: {})".format(us, them))
 ...   if us == 0 and them == 0:
 ...     return H({0: 1})  # shouldn't happen unless combat(0, 0) is called from the start
-...   solved = {}  # type: Dict[Tuple[int, int], H]
+...   solved: Dict[Tuple[int, int], H] = {}
 ...
 ...   def _resolve(us: int, them: int) -> H:
 ...     if (us, them) in solved: return solved[(us, them)]
