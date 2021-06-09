@@ -19,7 +19,7 @@ import mypy.api
 
 
 PARSER = argparse.ArgumentParser(
-    description="Extract doctests and check them with mypy."
+    description="Extract doctests from PATH and check them with mypy.",
 )
 PARSER.add_argument(
     "-a",
@@ -40,44 +40,40 @@ PARSER.add_argument(
 )
 # Adapted from
 # <https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-exclude>
-_exclude_default = r"\A(\..*|__pycache__|node_modules|site-packages)\Z"
 PARSER.add_argument(
     "--exclude-dir-names",
     "--exclude",
     metavar="PATTERN",
-    help='exclude directories matching PATTERN from inspection (default is "{}")'.format(
-        _exclude_default
+    help='exclude directories matching PATTERN from inspection (default: "{}")'.format(
+        r"\A(\..*|__pycache__|node_modules|site-packages)\Z"
     ),
-    default=_exclude_default,
+    default=r"\A(\..*|__pycache__|node_modules|site-packages)\Z",
 )
-_include_default = r"\.(md|py|pyi|rst|txt)\Z"
 PARSER.add_argument(
     "--include-file-names",
     metavar="PATTERN",
-    help='include files matching PATTERN (default is "{}")'.format(_include_default),
-    default=_include_default,
+    help='include files matching PATTERN (default: "{}")'.format(
+        r"\.(md|py|pyi|rst|txt)\Z"
+    ),
+    default=r"\.(md|py|pyi|rst|txt)\Z",
 )
-_log_level_default = "WARNING"
 PARSER.add_argument(
     "--log-level",
     metavar="LEVEL",
-    help="set logging verbosity to LEVEL (default is {})".format(_log_level_default),
+    help="set logging verbosity to LEVEL (default: WARNING)",
     choices=["CRITICAL", "DEBUG", "ERROR", "INFO", "WARNING"],
-    default=_log_level_default,
+    default="WARNING",
 )
-_suffix_default = ".doctest.py"
 PARSER.add_argument(
     "--tmp-file-suffix",
     metavar="SUFFIX",
-    help='use SUFFIX when creating temporary files (default is "{}")'.format(
-        _suffix_default
-    ),
-    default=_suffix_default,
+    help='use SUFFIX when creating temporary files (default: ".doctest.py")',
+    default=".doctest.py",
 )
 PARSER.add_argument(
     "-k",
     "--keep-temp-files",
-    help="keep temporary files on exit (e.g., for debugging or inspection)",
+    help="keep temporary files on exit, e.g., for debugging or inspection (default)",
     action="store_true",
     default=False,
     dest="keep_temp_files",
@@ -85,15 +81,14 @@ PARSER.add_argument(
 PARSER.add_argument(
     "-K",
     "--no-keep-temp-files",
-    help="remove temporary files on exit (default)",
+    help="remove temporary files on exit",
     action="store_false",
     dest="keep_temp_files",
 )
 PARSER.add_argument(
     "paths",
-    metavar="PATH",
-    help="paths to check for doctests; PATH can be a file or directory",
     nargs="+",
+    metavar="PATH",
 )
 
 
@@ -173,26 +168,29 @@ def _copy_paths(
         dst_path = dst_dir_path.joinpath(src_path.relative_to(cwd_path))
         dst_path = dst_path.with_name(dst_path.name + parsed_args.tmp_file_suffix)
         dst_path.parent.mkdir(parents=True, exist_ok=True)
+        logging.debug("checking %s", orig_path)
 
         try:
-            logging.debug("checking %s", orig_path)
-
             with dst_path.open("w") as dst:
                 _copy_doctests(src_path, dst)
-
-            if dst_path.stat().st_size == 0:
-                if parsed_args.keep_temp_files:
-                    logging.debug("%s had no tests", dst_path)
-                else:
-                    logging.debug("%s had no tests, deleting", dst_path)
-                    dst_path.unlink()
-            else:
-                logging.debug("extracted tests from %s into %s", orig_path, dst_path)
-                dst_paths_to_orig_paths[dst_path] = orig_path
         except FileNotFoundError:
-            logging.warning("%s does not exist; skipping", dst_path)
+            logging.warning("%s does not exist; skipping", orig_path)
+            dst_path.unlink()
+            continue
         except UnicodeDecodeError:
-            logging.warning("unable to make sense of %s; skipping", dst_path)
+            logging.warning("unable to make sense of %s; skipping", orig_path)
+            dst_path.unlink()
+            continue
+
+        if dst_path.stat().st_size == 0:
+            if parsed_args.keep_temp_files:
+                logging.debug("%s had no tests", dst_path)
+            else:
+                logging.debug("%s had no tests, deleting", dst_path)
+                dst_path.unlink()
+        else:
+            logging.debug("extracted tests from %s into %s", orig_path, dst_path)
+            dst_paths_to_orig_paths[dst_path] = orig_path
 
     return dst_paths_to_orig_paths
 
