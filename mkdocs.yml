@@ -1,5 +1,6 @@
 site_name: dyce
 site_description: Simple Python tools for dice-based probabilities
+site_url: https://posita.github.io/dyce/
 site_author: Matt Bogosian
 copyright: <i>Copyright and other protections apply.
   Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.

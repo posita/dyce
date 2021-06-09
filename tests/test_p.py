@@ -8,11 +8,12 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import Sequence
 
 import functools
 import itertools
 import operator
+from typing import Sequence
+
 import pytest
 
 from dyce import H, P

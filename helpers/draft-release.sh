@@ -41,3 +41,4 @@ git tag --sign --force --message "Release ${TAG}." "${TAG}"
 python setup.py bdist_wheel sdist
 twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
 mike deploy --rebase --update-aliases "${VERS}" latest
+git tag --force latest

@@ -8,9 +8,9 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import Iterable, TypeVar, Union, overload
 
 import sys
+from typing import Iterable, TypeVar, Union, overload
 
 __all__ = (
     "comb",
@@ -60,8 +60,8 @@ else:
 if sys.version_info >= (3, 9):
     from math import gcd
 else:
-    from math import gcd as _gcd
     from functools import reduce
+    from math import gcd as _gcd
 
     def gcd(*integers: int) -> int:
         return reduce(_gcd, integers, 0)

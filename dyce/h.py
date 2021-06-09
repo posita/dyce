@@ -8,6 +8,34 @@
 # ======================================================================================
 
 from __future__ import generator_stop
+
+from collections import Counter as counter
+from collections import OrderedDict as ordereddict
+from collections.abc import Mapping as ABCMapping
+from itertools import chain, product, repeat
+from math import sqrt
+from numbers import Integral
+from operator import abs as op_abs
+from operator import add as op_add
+from operator import and_ as op_and
+from operator import eq as op_eq
+from operator import floordiv as op_floordiv
+from operator import ge as op_ge
+from operator import getitem as op_getitem
+from operator import gt as op_gt
+from operator import le as op_le
+from operator import lt as op_lt
+from operator import mod as op_mod
+from operator import mul as op_mul
+from operator import ne as op_ne
+from operator import neg as op_neg
+from operator import or_ as op_or
+from operator import pos as op_pos
+from operator import pow as op_pow
+from operator import sub as op_sub
+from operator import xor as op_xor
+from os import environ, get_terminal_size, linesep
+from random import randrange
 from typing import (
     Callable,
     Counter,
@@ -19,40 +47,8 @@ from typing import (
     Union,
     cast,
 )
-from typing_extensions import Protocol, runtime_checkable
 
-from collections import Counter as counter, OrderedDict as ordereddict
-from collections.abc import Mapping as ABCMapping
-from itertools import (
-    chain,
-    product,
-    repeat,
-)
-from math import sqrt
-from numbers import Integral
-from operator import (
-    abs as op_abs,
-    add as op_add,
-    and_ as op_and,
-    eq as op_eq,
-    floordiv as op_floordiv,
-    ge as op_ge,
-    getitem as op_getitem,
-    gt as op_gt,
-    or_ as op_or,
-    le as op_le,
-    lt as op_lt,
-    mod as op_mod,
-    mul as op_mul,
-    ne as op_ne,
-    neg as op_neg,
-    pos as op_pos,
-    pow as op_pow,
-    sub as op_sub,
-    xor as op_xor,
-)
-from os import environ, get_terminal_size, linesep
-from random import randrange
+from typing_extensions import Protocol, runtime_checkable
 
 from .symmetries import gcd, sum_w_start
 

@@ -8,13 +8,13 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import Union
 
 import itertools
 import math
 import operator
 import os
 import statistics
+from typing import Union
 
 from dyce import H
 from dyce.h import _within

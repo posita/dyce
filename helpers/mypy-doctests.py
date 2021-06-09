@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
 from __future__ import generator_stop
-from typing import Dict, Iterable, Iterator, Mapping, TextIO
 
 import argparse
 import doctest
 import logging
-import mypy.api
 import os
 import pathlib
 import re
 import shutil
 import sys
 import tempfile
+from typing import Dict, Iterable, Iterator, Mapping, TextIO
 
+import mypy.api
 
 # ---- Data ----------------------------------------------------------------------------
 

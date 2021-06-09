@@ -8,9 +8,9 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import Any, Iterable, Iterator, List, Tuple, Type
 
 import warnings
+from typing import Any, Iterable, Iterator, List, Tuple, Type
 
 from .h import H
 

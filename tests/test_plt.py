@@ -9,11 +9,13 @@
 
 from __future__ import generator_stop
 
-import pytest
 import random
 import warnings
 
-from dyce import H, plt as dyce_plt
+import pytest
+
+from dyce import H
+from dyce import plt as dyce_plt
 
 try:
     import matplotlib.patches

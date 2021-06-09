@@ -13,6 +13,7 @@ from __future__ import generator_stop
 import codecs
 import inspect
 import os
+
 import setuptools
 
 __all__ = ()
@@ -82,21 +83,9 @@ SETUP_ARGS = {
     "install_requires": ["typing", "typing_extensions"],
     "extras_require": {
         "dev": [
-            "black",
-            "debug",
-            "flake8",
-            "jedi",
-            "mypy",
-            "pylint",
-            "pytest-gitignore",
+            "pre-commit",
             "tox",
             "twine",
-        ],
-        "doc": [
-            "mike",
-            "mkdocs-exclude",
-            "mkdocs-material",
-            "mkdocstrings",
         ],
     },
 }

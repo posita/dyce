@@ -8,35 +8,19 @@
 # ======================================================================================
 
 from __future__ import generator_stop
-from typing import (
-    Iterable,
-    Iterator,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-    overload,
-)
 
 from functools import reduce
-from itertools import (
-    chain,
-    combinations_with_replacement,
-    groupby,
-    product,
-    repeat,
-)
+from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
 from numbers import Integral
-from operator import (
-    abs as op_abs,
-    eq as op_eq,
-    getitem as op_getitem,
-    mul as op_mul,
-    ne as op_ne,
-    neg as op_neg,
-    pos as op_pos,
-)
+from operator import abs as op_abs
+from operator import eq as op_eq
+from operator import getitem as op_getitem
+from operator import mul as op_mul
+from operator import ne as op_ne
+from operator import neg as op_neg
+from operator import pos as op_pos
+from typing import Iterable, Iterator, Sequence, Tuple, TypeVar, Union, overload
 
 from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _FaceT, _MappingT
 from .symmetries import sum_w_start

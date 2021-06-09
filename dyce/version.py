@@ -8,6 +8,7 @@
 # ======================================================================================
 
 from __future__ import generator_stop
+
 from typing import Tuple
 
 __all__ = ()

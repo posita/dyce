@@ -1,8 +1,8 @@
-from typing import Callable, Tuple
 import argparse
 import importlib.machinery
 import importlib.util
 import pathlib
+from typing import Callable, Tuple
 
 
 def import_fig(arg: str) -> Tuple[str, Callable[[str], None]]:
