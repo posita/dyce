@@ -15,6 +15,7 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
+from numbers import Integral
 from operator import abs as op_abs
 from operator import eq as op_eq
 from operator import getitem as op_getitem
@@ -175,7 +176,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         def _gen_hs():
             for a in args:
-                if isinstance(a, int):
+                if isinstance(a, (int, Integral)):
                     yield H(a)
                 elif isinstance(a, H):
                     yield a
@@ -239,7 +240,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         return iter(self._hs)
 
     def __matmul__(self, other: int) -> "P":
-        if not isinstance(other, int):
+        if not isinstance(other, (int, Integral)):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
@@ -788,7 +789,7 @@ def _count_of_exactly_k_of_face_in_n_of_h(
 
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
-        if isinstance(key, int):
+        if isinstance(key, (int, Integral)):
             yield op_getitem(sequence, key)
         else:
             yield from op_getitem(sequence, key)

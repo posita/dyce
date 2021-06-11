@@ -11,9 +11,11 @@ from __future__ import annotations, generator_stop
 
 from collections import Counter as counter
 from collections import OrderedDict as ordereddict
+from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
 from itertools import chain, product, repeat
 from math import sqrt
+from numbers import Integral, Number
 from operator import abs as op_abs
 from operator import add as op_add
 from operator import and_ as op_and
@@ -320,7 +322,7 @@ class H(_MappingT):
         self._simple_init = None
         tmp: Counter[_FaceT] = counter()
 
-        if isinstance(items, int):
+        if isinstance(items, (int, Integral)):
             if items != 0:
                 self._simple_init = items
                 face_type = type(items)
@@ -333,7 +335,7 @@ class H(_MappingT):
             tmp.update(items.h())
         elif isinstance(items, ABCMapping):
             tmp.update(items)
-        else:
+        elif isinstance(items, ABCIterable):
             # Items is either an Iterable[_FaceT] or an Iterable[Tuple[_FaceT, _CountT]]
             # (although this technically supports Iterable[Union[_FaceT, Tuple[_FaceT,
             # _CountT]]])
@@ -343,6 +345,8 @@ class H(_MappingT):
                     tmp[face] += count
                 else:
                     tmp[item] += 1
+        else:
+            raise ValueError("unrecognized initializer {}".format(type(items)))
 
         # Sort and omit zero counts. We use an OrderedDict instead of a Counter to
         # support Python versions earlier than 3.7 which did not guarantee order
@@ -436,7 +440,7 @@ class H(_MappingT):
             return NotImplemented
 
     def __matmul__(self, other: int) -> "H":
-        if not isinstance(other, int):
+        if not isinstance(other, (int, Integral)):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
@@ -596,7 +600,7 @@ class H(_MappingT):
         if isinstance(other, HAbleT):
             other = other.h()
 
-        if isinstance(other, (int, float)):
+        if isinstance(other, (int, float, Number)):
             return H((oper(face, other), count) for face, count in self.items())
         elif isinstance(other, H):
             return H((oper(s, o), self[s] * other[o]) for s, o in product(self, other))
@@ -604,7 +608,7 @@ class H(_MappingT):
             raise NotImplementedError
 
     def rmap(self, oper: _BinaryOperatorT, other: _FaceT) -> "H":
-        if isinstance(other, (int, float)):
+        if isinstance(other, (int, float, Number)):
             return H((oper(other, face), count) for face, count in self.items())
         else:
             raise NotImplementedError
@@ -765,10 +769,10 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, (int, float)):
-            other = cast(Iterable[_FaceT], (other,))
-        elif isinstance(other, ABCMapping):
+        if isinstance(other, ABCMapping):
             other = other.items()
+        elif not isinstance(other, ABCIterable):
+            other = cast(Iterable[_FaceT], (other,))
 
         return H(chain(self.items(), cast(Iterable, other)))
 
@@ -1176,35 +1180,53 @@ class H(_MappingT):
 
         ```
         """
+        # We convert various values herein to native ints and floats because number
+        # tower implementations sometimes neglect to implement __format__ properly (or
+        # at all). (I'm looking at you, sage.rings.…!)
+        try:
+            mu = float(self.mean())
+        except TypeError:
+            mu = self.mean()
+
         if width <= 0:
 
             def parts():
-                mu = self.mean()
                 yield f"avg: {mu:.2f}"
 
                 for face, probability in self.data(
                     relative=True, fill_items=fill_items
                 ):
-                    yield f"{face}:{probability:7.2%}"
+                    probability_f = float(probability)
+                    yield f"{face}:{probability_f:7.2%}"
 
             return "{" + ", ".join(parts()) + "}"
         else:
             w = width - 15
 
             def lines():
-                mu = self.mean()
-                std = self.stdev(mu)
-                var = self.variance(mu)
                 yield f"avg | {mu:7.2f}"
-                yield f"std | {std:7.2f}"
-                yield f"var | {var:7.2f}"
+
+                try:
+                    std = float(self.stdev(mu))
+                    var = float(self.variance(mu))
+                    yield f"std | {std:7.2f}"
+                    yield f"var | {var:7.2f}"
+                except TypeError:
+                    pass
+
                 total = sum(self.counts())
                 tick_scale = max(self.counts()) if scaled else total
 
                 for face, count in self.data(relative=False, fill_items=fill_items):
-                    probability = count / total
+                    try:
+                        face_str = f"{face: 3}"
+                    except (TypeError, ValueError):
+                        face_str = str(face)
+                        face_str = f"{face_str: >3}"
+
                     ticks = tick * int(w * count / tick_scale)
-                    yield f"{face: 3} | {probability:7.2%} |{ticks}"
+                    probability_f = float(count / total)
+                    yield f"{face_str} | {probability_f:7.2%} |{ticks}"
 
             return sep.join(lines())
 
