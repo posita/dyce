@@ -129,7 +129,7 @@ H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 ```
 
 The results show there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
-One way to model outcomes from subtracting the least of two six-sided dice from the greatest is:
+One way to model the outcomes of subtracting the least of two six-sided dice from the greatest is:
 
 ```python
 >>> abs(H(6) - H(6))
@@ -148,7 +148,7 @@ H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 ```
 
 Histograms should be sufficient for most calculations.
-However, pools are useful for “taking” (selecting) only some of the pool’s faces.
+However, pools are useful for “taking” (selecting) only some of a pool’s faces.
 This is done by providing one or more index arguments to the [``h`` method][dyce.p.P.h].
 Indexes can be integers, slices, or iterables thereof.
 Face indexes are ordered from least to greatest (i.e., ``0``, ``1``, …, ``-2``, ``-1``).
@@ -164,13 +164,19 @@ H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
 
 !!! warning "Mind your parentheses"
 
-    Parentheses are needed in the above example because ``@`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``[…]``.
+    Parentheses are needed in the above example because ``@`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``.`` and ``[…]``.
 
     ```python
+    >>> 2@P(6)[1]  # equivalent to 2@(P(6)[1])
+    Traceback (most recent call last):
+    ...
+    IndexError: tuple index out of range
     >>> 2@P(6).h(1)  # equivalent to 2@(P(6).h(1))
     Traceback (most recent call last):
     ...
     IndexError: tuple index out of range
+    >>> (2@P(6))[1]
+    H(6)
     >>> (2@P(6)).h(1)
     H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
@@ -233,7 +239,7 @@ var |    1.88
 ```
 
 ```python
->>> p_3d6.h(-1)
+>>> p_3d6.h(2)
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
 >>> print(p_3d6.h(-1).format(width=65))
 avg |    4.96
@@ -251,8 +257,7 @@ var |    1.31
 Summing the greatest and the least faces when rolling a typical six-die polygonal set would be:
 
 ```python
->>> d10 = H(10)-1  # a common “d10” with faces [0 .. 9]
->>> d10
+>>> d10 = H(10)-1 ; d10  # a common “d10” with faces [0 .. 9]
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
 >>> h = P(4, 6, 8, d10, 12, 20).h(0, -1)
 >>> print(h.format(width=65, scaled=True))
@@ -294,15 +299,19 @@ Note that pools are ordered and iterable:
 
 ```
 
-Indexing selects particular histograms in a pool:
+Indexing selects particular histograms into a new pool:
 
 ```python
->>> (2@P(8, 4, 6))[1:3]
-(H(4), H(6))
+>>> 2@P(8, 4, 6)
+P(4, 4, 6, 6, 8, 8)
+>>> (2@P(8, 4, 6))[:2]
+P(4, 4)
+>>> (2@P(8, 4, 6))[::2]
+P(4, 6, 8)
 
 ```
 
-If desired, one way to enumerate all possible rolls is:
+A brute-force way to enumerate all possible rolls is:
 
 ```python
 >>> import itertools
@@ -557,11 +566,11 @@ Using our ``risus_combat_driver`` from above, we can model the less death-spiral
 Modeling the “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic is currently beyond the capabilities of ``dyce`` without additional computation.
 This is for two reasons.
 First, ``dyce`` only provides mechanisms to approximate outcomes through a fixed number of iterations (not an infinite series).
-Most of the time, this is good enough, however.
+Most of the time, this is good enough.
 Second, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to substitute face values, not counts.
 
 Both of these limitations can be circumvented where probabilities can be computed and encoded as a histogram.
-In this case, we can observe that a single d6 has a $\frac{1}{2}$ chance of coming up even, thereby earning a “success”.
+In this case, we can observe that a single six-sided die (``1d6``) has a $\frac{1}{2}$ chance of coming up even, thereby earning a “success”.
 We can also observe that it has a $\frac{1}{6}$ chance of showing a six, earning an additional roll.
 That second roll has a $\frac{1}{2}$ chance of coming up even, as well as a $\frac{1}{6}$ chance of earning another roll, and so on.
 In other words, the number of successes you can expect to roll are:
@@ -654,7 +663,7 @@ $$
 S = \frac{6}{10} = \frac{3}{5}
 $$
 
-Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈🤠🧮
+Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
 
 !!! info "As an aside, the Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case. It involves no algebra and is left as an exercise to the reader."
 

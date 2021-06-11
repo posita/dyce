@@ -16,6 +16,8 @@ import os
 import statistics
 from typing import Union
 
+import pytest
+
 from dyce import H
 from dyce.h import _within
 
@@ -151,6 +153,20 @@ class TestH:
         h = H(range(-1, 2))
         assert h.ge(0) == H((0, 1, 1))
         assert h.ge(h) == H((1, 0, 0, 1, 1, 0, 1, 1, 1))
+
+    def test_even(self) -> None:
+        assert H(7).even() == {False: 4, True: 3}
+
+    def test_even_wrong_type(self) -> None:
+        with pytest.raises(TypeError):
+            _ = H((float(i) for i in range(7, 0, -1))).even()
+
+    def test_odd(self) -> None:
+        assert H(7).odd() == {False: 3, True: 4}
+
+    def test_odd_wrong_type(self) -> None:
+        with pytest.raises(TypeError):
+            _ = H((float(i) for i in range(7, 0, -1))).odd()
 
     def test_accumulate(self) -> None:
         h = H(itertools.chain(range(0, 6), range(3, 9)))

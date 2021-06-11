@@ -94,7 +94,7 @@ except OSError:
 
 class H(_MappingT):
     r"""
-    An immutable mapping for use as a histogram that supports arithmetic operations.
+    An immutable mapping for use as a histogram which supports arithmetic operations.
     This is useful for modeling individual dice and outcomes. The
     [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
     explicit form, *items* maps face values to counts.
@@ -132,7 +132,7 @@ class H(_MappingT):
 
     ```
 
-    If *items* is a number, it is shorthand for creating a sequential range $[{1} ..
+    If *items* is an integer, it is shorthand for creating a sequential range $[{1} ..
     {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
 
     ```python
@@ -217,31 +217,12 @@ class H(_MappingT):
 
     ```
 
-    The [``counts`` method][dyce.h.H.counts] can be used to show the total number of
+    The [``counts`` method][dyce.h.H.counts] can be used to compute the total number of
     combinations:
 
     ```python
     >>> sum((2@d6).counts())
     36
-
-    ```
-
-    Counts are generally accumulated without reduction. To reduce, call the
-    [``lowest_terms`` method][dyce.h.H.lowest_terms]:
-
-    ```python
-    >>> d6.accumulate(d6).accumulate(d6)
-    H({1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3})
-    >>> d6.accumulate(d6).accumulate(d6).lowest_terms()
-    H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
-
-    ```
-
-    Testing equivalence implicitly performs reductions of operands:
-
-    ```python
-    >>> d6.accumulate(d6) == d6.accumulate(d6).accumulate(d6)
-    True
 
     ```
 
@@ -280,7 +261,7 @@ class H(_MappingT):
     ```python
     >>> d6_eq2 = d6.eq(2); d6_eq2  # how often a 2 shows on a single six-sided die
     H({False: 5, True: 1})
-    >>> 4@d6_eq2  # count of 2s that show on 4d6
+    >>> 4@d6_eq2  # count of 2s showing on 4d6
     H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
     >>> (4@d6_eq2).ge(1)  # how often that count is at least one
     H({False: 625, True: 671})
@@ -312,6 +293,25 @@ class H(_MappingT):
         False
 
         ```
+
+    Counts are generally accumulated without reduction. To reduce, call the
+    [``lowest_terms`` method][dyce.h.H.lowest_terms]:
+
+    ```python
+    >>> d6.ge(4)
+    H({False: 3, True: 3})
+    >>> d6.ge(4).lowest_terms()
+    H({False: 1, True: 1})
+
+    ```
+
+    Testing equivalence implicitly performs reductions of operands:
+
+    ```python
+    >>> d6.accumulate(d6) == d6.accumulate(d6).accumulate(d6)
+    True
+
+    ```
     """
 
     # ---- Initializer -----------------------------------------------------------------
@@ -737,7 +737,12 @@ class H(_MappingT):
         """
 
         def is_even(f: _FaceT) -> bool:
-            return f % 2 == 0
+            if isinstance(f, (int, Integral)):
+                return f % 2 == 0
+            else:
+                raise TypeError(
+                    "not supported for faces of type {}".format(type(f).__name__)
+                )
 
         return self.umap(is_even)
 
@@ -755,7 +760,12 @@ class H(_MappingT):
         """
 
         def is_odd(f: _FaceT) -> bool:
-            return f % 2 != 0
+            if isinstance(f, (int, Integral)):
+                return f % 2 != 0
+            else:
+                raise TypeError(
+                    "not supported for faces of type {}".format(type(f).__name__)
+                )
 
         return self.umap(is_odd)
 
@@ -846,7 +856,7 @@ class H(_MappingT):
 
         See the [``explode`` method][dyce.h.H.explode] for a common shorthand for
         “exploding” dice (i.e., where, if the greatest face come up, the die is
-        re-rolled and the result is added to the running sum).
+        re-rolled and the result is added to a running sum).
 
         In nearly all cases, when a histogram is substituted for a face, it takes on the
         substituted face’s “scale”. In other words, the sum of the counts of the
@@ -856,8 +866,7 @@ class H(_MappingT):
 
         ```python
         >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
-        >>> sub = orig.substitute(lambda h, f: -h if f == 4 else f)
-        >>> sub
+        >>> sub = orig.substitute(lambda h, f: -h if f == 4 else f) ; sub
         H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
         >>> sum(c for f, c in orig.items() if f == 4) / sum(orig.counts())
         0.4
@@ -866,32 +875,34 @@ class H(_MappingT):
 
         ```
 
-        There is one important exception: If *coalesce* returns the empty histogram
-        (``H({})``), the corresponding face and its counts are omitted from the result
-        without substitution or scaling. A trivial example is modeling a d5 by
-        indefinitely re-rolling a d6 until something other than a 6 comes up:
+        !!! warning "An important exception"
 
-        ```python
-        >>> H(6).substitute(lambda h, f: H({}) if f == 6 else f)
-        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+            If *coalesce* returns the empty histogram (``H({})``), the corresponding
+            face and its counts are omitted from the result without substitution or
+            scaling. A trivial example is modeling a d5 by indefinitely re-rolling a d6
+            until something other than a 6 comes up:
 
-        ```
+            ```python
+            >>> H(6).substitute(lambda h, f: H({}) if f == 6 else f)
+            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
-        This technique is more useful when modeling re-rolling certain derived outcomes,
-        like ties in a contest:
+            ```
 
-        ```python
-        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
-        >>> d6_3.vs(d8_2)
-        H({-1: 4553, 0: 1153, 1: 8118})
-        >>> d6_3.vs(d8_2).substitute(lambda h, f: H({}) if f == 0 else f)
-        H({-1: 4553, 1: 8118})
+            This technique is more useful when modeling re-rolling certain derived
+            outcomes, like ties in a contest:
 
-        ```
+            ```python
+            >>> d6_3, d8_2 = 3@H(6), 2@H(8)
+            >>> d6_3.vs(d8_2)
+            H({-1: 4553, 0: 1153, 1: 8118})
+            >>> d6_3.vs(d8_2).substitute(lambda h, f: H({}) if f == 0 else f)
+            H({-1: 4553, 1: 8118})
 
-        Because ``substitute`` accepts arbitrary functions, it is well suited for
-        modeling (or at least approximating) logical progressions. Consider the
-        following rules:
+            ```
+
+        Because it delegates to a callback for refereeing substitution decisions,
+        ``substitute`` is quite flexible and well suited to modeling (or at least
+        approximating) logical progressions. Consider the following rules:
 
           1. Start with a total of zero.
           2. Roll a six-sided die. Add the face to the total. If the face was a six, go
@@ -921,8 +932,8 @@ class H(_MappingT):
         Surprised? Because both six and four are even numbers, the only way we keep
         rolling is if the total is even. You might think this would lead to evens being
         *more* likely. However, we only care about the final tally and the rules direct
-        us to re-roll certain evens (potentially nudging us to an odd number slightly
-        more often than not).
+        us to re-roll certain evens (nudging us toward an odd number more often than
+        not).
 
         We can also use this method to model expected damage from a single attack in
         d20-like roll playing games:
@@ -944,8 +955,27 @@ class H(_MappingT):
         ...     return 0
 
         >>> h = d20.substitute(dmg_from_attack_roll)
-        >>> print(h.format(width=0))
-        {avg: 2.15, 0: 65.00%, 2:  3.75%, 3:  3.83%, 4:  3.91%, ..., 15:  0.23%, 16:  0.16%, 17:  0.08%}
+        >>> print(h.format(width=65, scaled=True))
+        avg |    2.15
+        std |    3.40
+        var |   11.55
+          0 |  65.00% |##################################################
+          2 |   3.75% |##
+          3 |   3.83% |##
+          4 |   3.91% |###
+          5 |   3.98% |###
+          6 |   4.06% |###
+          7 |   4.14% |###
+          8 |   4.22% |###
+          9 |   4.30% |###
+         10 |   0.62% |
+         11 |   0.55% |
+         12 |   0.47% |
+         13 |   0.39% |
+         14 |   0.31% |
+         15 |   0.23% |
+         16 |   0.16% |
+         17 |   0.08% |
 
         ```
         """
@@ -1055,24 +1085,23 @@ class H(_MappingT):
         fill_items: _MappingT = None,
     ) -> Iterator[Tuple[_FaceT, float]]:
         r"""
-        Presentation helper function that returns an iterator for each face/count or
+        Presentation helper function returning an iterator for each face/count or
         face/probability pair:
 
         ```python
-        >>> d6 = H(6)
-        >>> list(d6.gt(3).data())
+        >>> list(H(6).gt(3).data())
         [(False, 3.0), (True, 3.0)]
-        >>> list(d6.gt(3).data(relative=True))
+        >>> list(H(6).gt(3).data(relative=True))
         [(False, 0.5), (True, 0.5)]
 
         ```
 
-        If provided, *fill_items* supplies defaults for any missing faces:
+        If provided, *fill_items* supplies defaults for any “missing” faces:
 
         ```python
-        >>> list(d6.gt(7).data())
+        >>> list(H(6).gt(7).data())
         [(False, 6.0)]
-        >>> list(d6.gt(7).data(fill_items={True: 0, False: 0}))
+        >>> list(H(6).gt(7).data(fill_items={True: 0, False: 0}))
         [(False, 6.0), (True, 0.0)]
 
         ```
@@ -1094,14 +1123,13 @@ class H(_MappingT):
         fill_items: _MappingT = None,
     ) -> Tuple[Tuple[_FaceT, ...], Tuple[float, ...]]:
         r"""
-        Presentation helper function that returns an iterator for a “zipped” arrangement of
-        the output from the [``data`` method][dyce.h.H.data]:
+        Presentation helper function returning an iterator for a “zipped” arrangement of the
+        output from the [``data`` method][dyce.h.H.data]:
 
         ```python
-        >>> d6 = H(6)
-        >>> list(d6.data())
+        >>> list(H(6).data())
         [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
-        >>> d6.data_xy()
+        >>> H(6).data_xy()
         ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
 
         ```
@@ -1287,7 +1315,7 @@ class H(_MappingT):
 class HAbleT(Protocol):
     r"""
     A protocol whose implementer can be expressed as (or reduced to) an
-    [``H`` object][dyce.h.H]) by calling its [``h`` method][dyce.h.HAbleT.h]. Currently,
+    [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HAbleT.h]. Currently,
     only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
     integration point for ``dyce`` users.
     """
@@ -1301,9 +1329,9 @@ class HAbleT(Protocol):
 
 class HAbleBinOpsMixin:
     r"""
-    A “mix-in” class which provides arithmetic operation implementations for
-    [``HAbleT`` protocol][dyce.h.HAbleT] implementers. The [``P`` class][dyce.p.P]
-    derives from this class.
+    A “mix-in” class providing arithmetic operations for implementers of the
+    [``HAbleT`` protocol][dyce.h.HAbleT]. The [``P`` class][dyce.p.P] derives from this
+    class.
     """
 
     def __add__(self: HAbleT, other: _OperandT) -> H:

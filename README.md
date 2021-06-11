@@ -153,8 +153,8 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 
 ```python
 >>> p_4d6 = 4@P(6)
->>> _ = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
->>> faces, probabilities = _.data_xy()
+>>> res = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -164,8 +164,8 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 
 >>> d6_reroll_first_one = H(6).substitute(lambda h, f: H(6) if f == 1 else f)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
->>> _ = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
->>> faces, probabilities = _.data_xy()
+>>> res = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -174,8 +174,8 @@ See [the docs](https://posita.github.io/dyce/latest/) for a much more thorough t
 ... )  # doctest: +SKIP
 
 >>> p_4d6_reroll_all_ones = 4@P(H(range(2, 7)))
->>> _ = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
->>> faces, probabilities = _.data_xy()
+>>> res = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.plot(
 ...   faces,
 ...   probabilities,
@@ -213,8 +213,7 @@ Translation:
 >>> burning_arch_damage = 10@H(6) + 10
 >>> pass_save = save_roll.ge(10)
 >>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
->>> res = damage_half_on_save
->>> faces, probabilities = res.data_xy()
+>>> faces, probabilities = damage_half_on_save.data_xy()
 >>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
@@ -225,16 +224,11 @@ Translation:
 An alternative using the [``H.substitute`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.substitute):
 
 ```python
->>> _ = save_roll.substitute(
-...   lambda h, f:
-...     burning_arch_damage // 2 if f >= 10
-...     else burning_arch_damage
-... )
 >>> save_roll.substitute(
 ...   lambda h, f:
 ...     burning_arch_damage // 2 if f >= 10
 ...     else burning_arch_damage
-... ) == res
+... ) == damage_half_on_save
 True
 
 ```
@@ -421,8 +415,8 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 Translation:
 
 ```python
->>> _ = (10@P(H(10).explode(max_depth=3))).h(slice(-3, None))
->>> faces, probabilities = _.data_xy()
+>>> res = (10@P(H(10).explode(max_depth=3))).h(slice(-3, None))
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.plot(faces, probabilities, marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
@@ -456,8 +450,8 @@ Translation:
 ...         dupes += 1
 ...     yield dupes, count
 
->>> _ = H(dupes(8@P(10))).lowest_terms()
->>> faces, probabilities = _.data_xy()
+>>> res = H(dupes(8@P(10))).lowest_terms()
+>>> faces, probabilities = res.data_xy()
 >>> matplotlib.pyplot.bar(faces, probabilities)  # doctest: +SKIP
 >>> matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
@@ -496,8 +490,8 @@ Translation:
 ...     b_successes = sum(1 for f in roll_b if f >= roll_a[-1])
 ...     yield a_successes - b_successes, count_a * count_b
 
->>> _ = H(brawl(3@P(6), 3@P(6))).lowest_terms()
->>> print(_.format(width=65))
+>>> res = H(brawl(3@P(6), 3@P(6))).lowest_terms()
+>>> print(res.format(width=65))
 avg |    0.00
 std |    1.73
 var |    2.99
@@ -550,8 +544,8 @@ Translation:
 ...     result = a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
 ...     yield result, count_a * count_b
 
->>> _ = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
->>> print(_.format(width=65))
+>>> res = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
+>>> print(res.format(width=65))
 avg |    2.36
 std |    0.88
 var |    0.77
@@ -561,8 +555,8 @@ var |    0.77
   2 |  23.19% |###########
   3 |  58.15% |#############################
 
->>> _ = H(brawl_w_optional_swap(4@P(6), 4@P(6))).lowest_terms()
->>> print(_.format(width=65))
+>>> res = H(brawl_w_optional_swap(4@P(6), 4@P(6))).lowest_terms()
+>>> print(res.format(width=65))
 avg |    2.64
 std |    1.28
 var |    1.64

@@ -125,14 +125,32 @@ class TestP:
         assert len(P(p_d6, p_d8)) == 2
         assert len(P(p_d6, p_d8, p_d6, p_d8)) == 4
 
-    def test_getitem(self) -> None:
+    def test_getitem_int(self) -> None:
         d4n = H(-4)
         d8 = H(8)
-        p_d4n_d8 = 3 @ P(d4n, d8)
-        assert p_d4n_d8[0] == d4n
-        assert p_d4n_d8[2] == d4n
-        assert p_d4n_d8[-3] == d8
-        assert p_d4n_d8[-1] == d8
+        p_3d4n_3d8 = 3 @ P(d4n, d8)
+        assert p_3d4n_3d8[0] == d4n
+        assert p_3d4n_3d8[2] == d4n
+        assert p_3d4n_3d8[-3] == d8
+        assert p_3d4n_3d8[-1] == d8
+
+        with pytest.raises(IndexError):
+            _ = p_3d4n_3d8[6]
+
+    def test_getitem_slice(self) -> None:
+        d4n = H(-4)
+        d8 = H(8)
+        p_3d4n_3d8 = 3 @ P(d4n, d8)
+        assert p_3d4n_3d8[:] == p_3d4n_3d8
+        assert p_3d4n_3d8[:0] == P()
+        assert p_3d4n_3d8[6:] == P()
+        assert p_3d4n_3d8[2:4] == P(d4n, d8)
+
+    def test_getitem_wrong_type(self) -> None:
+        p_d6 = P(6)
+
+        with pytest.raises(TypeError):
+            _ = p_d6[""]  # type: ignore
 
     def test_op_add_h(self) -> None:
         d2 = H(2)
@@ -408,6 +426,29 @@ class TestP:
 
         assert p_4df.h(slice(0, 0)) == {}
         assert p_4df.h(slice(None)) == p_4df.h()
+        assert p_4df.h(slice(2)) == H(
+            (sum(roll[slice(2)]), count) for roll, count in p_4df.rolls_with_counts()
+        )
+        assert p_4df.h(slice(-2, None)) == H(
+            (sum(roll[slice(-2, None)]), count)
+            for roll, count in p_4df.rolls_with_counts()
+        )
+        assert p_4df.h(0, 1, 1, 0) == H(
+            (sum(roll[i] for i in (1, 0, 0, 1)), count)
+            for roll, count in p_4df.rolls_with_counts()
+        )
+        assert p_4df.h(-2, -1, -1, -2) == H(
+            (sum(roll[i] for i in (-1, -2, -2, -1)), count)
+            for roll, count in p_4df.rolls_with_counts()
+        )
+
+    def test_h_take_n_twice_from_n_homogeneous_dice(self) -> None:
+        p_df = P(H((-1, 0, 1)))
+        p_4df = 4 @ p_df
+        assert p_4df.h(slice(None), slice(None)) == H(
+            (sum(f * 2 for f in roll), count)
+            for roll, count in p_4df.rolls_with_counts()
+        )
 
     def test_homogeneous(self) -> None:
         assert P().homogeneous
@@ -489,7 +530,7 @@ class TestP:
         )
 
     def test_validate_implementation_combinations_homogeneous_dice(self) -> None:
-        # Use the brute force mechanism to validate our harder-to-understand
+        # Use the brute-force mechanism to validate our harder-to-understand
         # implementation
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -511,30 +552,36 @@ def test_analyze_selection() -> None:
     which: Tuple[int, ...]
 
     which = (0,)
-    assert _analyze_selection(6, which) == 1
+    assert _analyze_selection(6, which) == (1, 1)
     which = (0, 2, 1)
-    assert _analyze_selection(6, which) == 3
+    assert _analyze_selection(6, which) == (3, 1)
+    which = (0, 2, 1, 2, 1, 0)
+    assert _analyze_selection(6, which) == (3, 2)
     which = (0, 1, 0, 0, 1)
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which) == (None, None)
 
     which = (5,)
-    assert _analyze_selection(6, which) == -1
+    assert _analyze_selection(6, which) == (-1, 1)
     which = (5, 3, 4)
-    assert _analyze_selection(6, which) == -3
+    assert _analyze_selection(6, which) == (-3, 1)
+    which = (5, 3, 4, 4, 3, 5)
+    assert _analyze_selection(6, which) == (-3, 2)
     which = (5, 4, 5, 5, 4)
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which) == (None, None)
 
     which = ()
-    assert _analyze_selection(6, which) == 0
+    assert _analyze_selection(6, which) == (0, 0)
     which = (0, 2, 4, 1, 3, 5)
-    assert _analyze_selection(6, which) == 6
+    assert _analyze_selection(6, which) == (6, 1)
     which = (0, 2, 4, 1, 3, 5, 5, 3, 1, 4, 2, 0)
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which) == (6, 2)
+    which = (0, 2, 4, 1, 3, 5, 3, 1, 4, 2, 0)
+    assert _analyze_selection(6, which) == (None, None)
 
     which = (1, 3, 2, 4)
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which) == (None, None)
     which = (1, 3, 2, 4, 4, 3, 2, 1)
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which) == (None, None)
 
 
 def test_select_from_end() -> None:

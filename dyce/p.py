@@ -30,7 +30,6 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    Optional,
     Sequence,
     Set,
     Tuple,
@@ -66,13 +65,12 @@ class P(Sequence[H], HAbleBinOpsMixin):
     [``HAbleBinOpsMixin`` class][dyce.h.HAbleBinOpsMixin], which means it can be
     “flattened” into a single histogram, either explicitly via the
     [``h`` method][dyce.p.P.h], or implicitly by using binary arithmetic operations.
-    Note that unary operators and the ``@`` operator result in new ``P`` objects, not
-    flattened histograms.
+    Note that this class also provides its own ``@`` and unary operator implementations
+    that result in new ``P`` objects, not flattened histograms.
 
     ```python
     >>> from dyce import P
-    >>> p_d6 = P(6)  # shorthand for P(H(6))
-    >>> p_d6
+    >>> p_d6 = P(6) ; p_d6  # shorthand for P(H(6))
     P(6)
     >>> -p_d6
     P(-6)
@@ -90,8 +88,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
     ```
 
     ```python
-    >>> p = P(4, P(6, P(8, P(10, P(12, P(20))))))
-    >>> p
+    >>> p = P(4, P(6, P(8, P(10, P(12, P(20)))))) ; p
     P(4, 6, 8, 10, 12, 20)
     >>> sum(p.roll()) in p.h()
     True
@@ -130,9 +127,11 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     ```
 
-    Note that pools are opinionated about histogram ordering:
+    Note that pools are opinionated about ordering:
 
     ```python
+    >>> P(8, 6, 4)
+    P(4, 6, 8)
     >>> P(8, 6, 4)[0] == P(8, 4, 6)[0] == H(4)
     True
 
@@ -230,11 +229,20 @@ class P(Sequence[H], HAbleBinOpsMixin):
         ...
 
     @overload
-    def __getitem__(self, key: slice) -> Tuple[H, ...]:
+    def __getitem__(self, key: slice) -> P:
         ...
 
-    def __getitem__(self, key: _GetItemT) -> Union[H, Tuple[H, ...]]:
-        return self._hs[key]
+    def __getitem__(self, key: _GetItemT) -> Union[H, P]:
+        if isinstance(key, (int, Integral)):
+            return self._hs[key]
+        elif isinstance(key, slice):
+            return P(*self._hs[key])
+        else:
+            raise TypeError(
+                "{} indices must be integers or slices, not {}".format(
+                    type(self).__name__, type(key).__name__
+                )
+            )
 
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
@@ -270,12 +278,12 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        If the optional *which* parameter is provided, ``h`` sums subsets of faces
-        identified by *which*. *which* can include ``int``s and ``slice``s.
+        If one or more arguments are provided, ``h`` sums subsets of faces those
+        arguments identify. Identifiers can be ``int``s or ``slice``s, and can be mixed.
 
         All outcomes are counted. For each outcome, dice are ordered from least (index
-        ``0``) to greatest (index ``-1`` or ``len(self)``). Taking the greatest of two
-        six-sided dice can be modeled as:
+        ``0``) to greatest (index ``-1`` or ``len(self) - 1``). Taking the greatest of
+        two six-sided dice can be modeled as:
 
         ```python
         >>> p_2d6 = 2@P(6)
@@ -294,7 +302,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        Slices and arbitrary iterables support more flexible face selections:
+        Slices and multiple arguments support more flexible face selections:
 
         ```python
         >>> p_6d6 = 6@P(6)
@@ -319,7 +327,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         >>> p_10d4 = 10@P(4)
         >>> p_10d4.h(slice(2), slice(-2, None))
         H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
-        >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65))
+        >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))
         avg |   10.00
         std |    0.91
         var |    0.84
@@ -327,11 +335,11 @@ class P(Sequence[H], HAbleBinOpsMixin):
           5 |   0.00% |
           6 |   0.10% |
           7 |   0.48% |
-          8 |   4.96% |##
-          9 |  16.09% |########
-         10 |  56.74% |############################
-         11 |  16.09% |########
-         12 |   4.96% |##
+          8 |   4.96% |####
+          9 |  16.09% |##############
+         10 |  56.74% |##################################################
+         11 |  16.09% |##############
+         12 |   4.96% |####
          13 |   0.48% |
          14 |   0.10% |
          15 |   0.00% |
@@ -344,16 +352,16 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```python
         In [2]: %timeit P(6, 6, 6, 6, 6, 6, 6, 6, 6, 6).h(slice(-2, None))  # homogeneous from end (optimized)
-        2.03 ms ± 24.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+        2.08 ms ± 17.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
         In [3]: %timeit P(6, 6, 6, 6, 6, 6, 6, 6, 6, 6).h(slice(3, 5))  # homogeneous from middle (less efficient)
-        24.1 ms ± 461 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        25.2 ms ± 653 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
         In [4]: %timeit P(4, 4, 4, 4, 4, 6, 6, 6, 6, 6).h(slice(-2, None))  # heterogeneous (least efficient)
-        41.8 ms ± 526 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        42.4 ms ± 86.4 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
         ```
 
-        Taking all faces is equivalent to our sum operation:
+        Taking all faces exactly once is equivalent to our sum operation:
 
         ```python
         >>> d6 = H(6)
@@ -367,7 +375,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         ```
         """
         n = len(self._hs)
-        from_end = _analyze_selection(n, which)
+        from_end, from_count = _analyze_selection(n, which)
 
         if not which:
             # The caller offered no selection
@@ -376,13 +384,16 @@ class P(Sequence[H], HAbleBinOpsMixin):
             # The caller explicitly selected zero dice
             return H({})
         elif from_end == n:
+            assert from_count is not None
+
             # The caller selected all dice in the pool exactly once
-            return self.h()
+            return self.h() * from_count
         elif self.homogeneous and n and from_end:
-            # Optimize when taking from an end of a non-zero length homogeneous
-            # pool
+            assert from_count is not None
+
+            # Optimize when taking from an end of a non-zero length homogeneous pool
             return H(
-                (sum(roll), count)
+                (sum(roll) * from_count, count)
                 for roll, count in _select_from_end(self._hs[0], n, from_end)
             )
         else:
@@ -566,7 +577,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     def rolls_with_counts(self) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
         r"""
-        Returns an iterator that yields 2-tuples (pairs) that, collectively, enumerate all
+        Returns an iterator yielding 2-tuples (pairs) that, collectively, enumerate all
         possible outcomes for the pool. The first item in the 2-tuple is a sorted
         sequence of the faces for a distinct roll. The second is the count for that
         roll. Faces in each roll are ordered least to greatest.
@@ -623,8 +634,8 @@ class P(Sequence[H], HAbleBinOpsMixin):
         !!! info "About the implementation"
 
             Enumeration is substantially more efficient for homogeneous pools than
-            heterogeneous ones. This is because, instead of merely computing the
-            Cartesian product, we are able to leverage the [*multinomial
+            heterogeneous ones. This is because—instead of merely computing the
+            Cartesian product—we are able to leverage the [*multinomial
             coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets):
 
             $$
@@ -648,11 +659,12 @@ class P(Sequence[H], HAbleBinOpsMixin):
             This implementation attempts to optimize heterogeneous pools by breaking
             them into homogeneous groups before computing the Cartesian product of those
             sub-results. This approach allows homogeneous pools to be ordered without
-            duplicates, while heterogeneous ones offer no such guarantees.
+            duplicates, where heterogeneous ones offer no such guarantees.
 
-            As expected, this optimization allows mixed pools’ performance to sit
-            between purely homogeneous and purely heterogeneous ones. However, note that
-            all three scale geometrically for arbitrary selections.
+            As expected, this optimization allows the performance of arbitrary selection
+            from mixed pools to sit between that of purely homogeneous and purely
+            heterogeneous ones. Note, however, that all three scale geometrically in
+            relation to $n$ for arbitrary selections.
 
             ```ipython
             In [1]: from dyce import H, P
@@ -733,25 +745,32 @@ class P(Sequence[H], HAbleBinOpsMixin):
 def _analyze_selection(
     n: int,
     which: Iterable[_GetItemT],
-) -> Optional[int]:
+) -> Union[Tuple[int, int], Tuple[None, None]]:
     r"""
-    Examines the selection *which* as applied to a sequence of length *n* and returns
-    one of:
+    Examines the selection *which* as applied to the values ``range(n)`` and returns one
+    of:
 
-    * `0` - *which* selects zero elements in the sequence
-    * `i` - *which* selects exactly `i` elements from the left side of the
-      sequence
-    * `-i` - *which* selects exactly `i` elements from the right side of the
-      sequence
-    * `n` - *which* selects each element of the sequence exactly once
-    * `None` - any other selection
+    * ``0, 0`` - *which* selects zero elements in the range
+    * ``i, k`` - *which* selects exactly ``i`` elements ``k`` times from the left
+      (least) side of the range
+    * ``-i, k`` - *which* selects exactly ``i`` elements ``k`` times from the right
+      (greatest) side of the range
+    * ``n, k`` - *which* selects each element ``k`` times of the range exactly once
+    * ``None, None`` - any other selection
     """
-    index_counts = counter(_getitems(list(range(n)), which))
+    counts_by_index = counter(_getitems(list(range(n)), which))
+    distinct_index_counts = set(counts_by_index.values())
+    assert 0 not in distinct_index_counts
 
-    if any(v for v in index_counts.values() if v != 1):
-        return None
+    if len(distinct_index_counts) > 1:
+        return None, None
 
-    indexes = set(index_counts)
+    try:
+        multiplier = distinct_index_counts.pop()
+    except KeyError:
+        return 0, 0
+
+    indexes = set(counts_by_index)
     from_lt: Set[int] = set()
     from_rt: Set[int] = set()
     contiguous_from_lt = False
@@ -764,11 +783,11 @@ def _analyze_selection(
         from_rt.add(n - i - 1)
 
     if contiguous_from_lt:
-        return len(indexes)
+        return len(indexes), multiplier
     elif contiguous_from_rt:
-        return -len(indexes)
+        return -len(indexes), multiplier
     else:
-        return None
+        return None, None
 
 
 def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argument
@@ -799,7 +818,7 @@ def _rolls_with_counts_for_heterogeneous_histograms(
     h_groups: Iterable[Tuple[_MappingT, int]]
 ) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
     r"""
-    Given an iterable of histogram/count pairs, returns an iterator that yields 2-tuples
+    Given an iterable of histogram/count pairs, returns an iterator yielding 2-tuples
     (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
 
     The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
@@ -826,7 +845,7 @@ def _rolls_with_counts_for_n_homogeneous_histograms(
     n: int,
 ) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
     r"""
-    Given a group of *n* identical histograms *h*, returns an iterator that yields
+    Given a group of *n* identical histograms *h*, returns an iterator yielding
     ordered 2-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
     See that method’s explanation of homogeneous pools for insight into this
     implementation.
@@ -942,9 +961,11 @@ def _select_from_end(
                     yield head, Fraction(1) - accounted_for_p
 
     total_c = sum(h.counts()) ** n
-    yield from (
-        (fs, int(c * total_c)) for fs, c in _selected_faces_with_probabilities(h, n, k)
-    )
+
+    for fs, c in _selected_faces_with_probabilities(h, n, k):
+        c *= total_c
+        assert c.denominator == 1
+        yield (fs, c.numerator)
 
 
 def _take_and_sum_faces(
