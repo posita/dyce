@@ -86,9 +86,12 @@ else:
 
 if sys.version_info >= (3, 9):
     from math import gcd
+    from typing import Annotated
 else:
     from functools import reduce
     from math import gcd as _gcd
+
+    from typing_extensions import Annotated  # noqa: F401
 
     def gcd(*integers: int) -> int:
         return reduce(_gcd, integers, 0)

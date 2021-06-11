@@ -59,6 +59,7 @@ from typing import (
     overload,
 )
 
+from .bt import beartype
 from .lifecycle import experimental
 from .symmetries import comb, gcd
 from .types import (
@@ -374,6 +375,7 @@ class H(_MappingT):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(self, items: _SourceT) -> None:
         r"Initializer."
         super().__init__()
@@ -422,6 +424,7 @@ class H(_MappingT):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         if self._simple_init is not None:
             arg = str(self._simple_init)
@@ -430,6 +433,7 @@ class H(_MappingT):
 
         return f"{self.__class__.__name__}({arg})"
 
+    @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, HableT):
             return __eq__(self, other.h())
@@ -438,6 +442,7 @@ class H(_MappingT):
         else:
             return super().__eq__(other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, HableT):
             return __ne__(self, other.h())
@@ -446,54 +451,65 @@ class H(_MappingT):
         else:
             return super().__ne__(other)
 
+    @beartype
     def __hash__(self) -> int:
         return hash(frozenset(self._lowest_terms()))
 
+    @beartype
     def __len__(self) -> int:
         return len(self._h)
 
+    @beartype
     def __getitem__(self, key: OutcomeT) -> int:
         return __getitem__(self._h, key)
 
+    @beartype
     def __iter__(self) -> Iterator[OutcomeT]:
         return iter(self._h)
 
+    @beartype
     def __add__(self, other: _OperandT) -> H:
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __radd__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __sub__(self, other: _OperandT) -> H:
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rsub__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mul__(self, other: _OperandT) -> H:
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmul__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __matmul__(self, other: IntT) -> H:
         try:
             other = as_int(other)
@@ -505,58 +521,68 @@ class H(_MappingT):
         else:
             return sum_h(repeat(self, other))
 
+    @beartype
     def __rmatmul__(self, other: IntT) -> H:
         return self.__matmul__(other)
 
+    @beartype
     def __truediv__(self, other: _OperandT) -> H:
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rtruediv__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __floordiv__(self, other: _OperandT) -> H:
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rfloordiv__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mod__(self, other: _OperandT) -> H:
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmod__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __pow__(self, other: _OperandT) -> H:
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rpow__(self, other: OutcomeT) -> H:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: Union[IntT, H, HableT]) -> H:
+    @beartype
+    def __and__(self, other: Union[IntT, "H", "HableT"]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -565,13 +591,15 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __rand__(self, other: IntT) -> H:
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __xor__(self, other: Union[IntT, H, HableT]) -> H:
+    @beartype
+    def __xor__(self, other: Union[IntT, "H", "HableT"]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -580,13 +608,15 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rxor__(self, other: IntT) -> H:
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __or__(self, other: Union[IntT, H, HableT]) -> H:
+    @beartype
+    def __or__(self, other: Union[IntT, "H", "HableT"]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -595,37 +625,46 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __ror__(self, other: IntT) -> H:
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __neg__(self) -> H:
         return self.umap(__neg__)
 
+    @beartype
     def __pos__(self) -> H:
         return self.umap(__pos__)
 
+    @beartype
     def __abs__(self) -> H:
         return self.umap(__abs__)
 
+    @beartype
     def __invert__(self) -> H:
         return self.umap(__invert__)
 
+    @beartype
     def counts(self) -> ValuesView[int]:
         r"""
         More descriptive synonym for the [``values`` method][dyce.h.H.values].
         """
         return self._h.values()
 
+    @beartype
     def items(self) -> ItemsView[OutcomeT, int]:
         # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
         return self._h.items()  # type: ignore
 
+    @beartype
     def keys(self) -> KeysView[OutcomeT]:
         return self.outcomes()
 
+    @beartype
     def outcomes(self) -> KeysView[OutcomeT]:
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
@@ -633,6 +672,7 @@ class H(_MappingT):
         # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
         return self._h.keys()  # type: ignore
 
+    @beartype
     def values(self) -> ValuesView[int]:
         return self.counts()
 
@@ -657,6 +697,7 @@ class H(_MappingT):
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @beartype
     def map(
         self,
         op: _BinaryOperatorT,
@@ -706,6 +747,7 @@ class H(_MappingT):
                 (op(outcome, right_operand), count) for outcome, count in self.items()
             )
 
+    @beartype
     def rmap(
         self,
         left_operand: OutcomeT,
@@ -731,6 +773,7 @@ class H(_MappingT):
         """
         return H((op(left_operand, outcome), count) for outcome, count in self.items())
 
+    @beartype
     def umap(
         self,
         op: _UnaryOperatorT,
@@ -764,6 +807,7 @@ class H(_MappingT):
 
         return h
 
+    @beartype
     def lt(
         self,
         other: _OperandT,
@@ -781,6 +825,7 @@ class H(_MappingT):
         """
         return self.map(__lt__, other).umap(bool)
 
+    @beartype
     def le(
         self,
         other: _OperandT,
@@ -798,6 +843,7 @@ class H(_MappingT):
         """
         return self.map(__le__, other).umap(bool)
 
+    @beartype
     def eq(
         self,
         other: _OperandT,
@@ -815,6 +861,7 @@ class H(_MappingT):
         """
         return self.map(__eq__, other).umap(bool)
 
+    @beartype
     def ne(
         self,
         other: _OperandT,
@@ -832,6 +879,7 @@ class H(_MappingT):
         """
         return self.map(__ne__, other).umap(bool)
 
+    @beartype
     def gt(
         self,
         other: _OperandT,
@@ -849,6 +897,7 @@ class H(_MappingT):
         """
         return self.map(__gt__, other).umap(bool)
 
+    @beartype
     def ge(
         self,
         other: _OperandT,
@@ -866,6 +915,7 @@ class H(_MappingT):
         """
         return self.map(__ge__, other).umap(bool)
 
+    @beartype
     def is_even(self) -> H:
         r"""
         Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 == 0)``.
@@ -884,6 +934,7 @@ class H(_MappingT):
 
         return self.umap(_is_even)
 
+    @beartype
     def is_odd(self) -> H:
         r"""
         Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 != 0)``.
@@ -902,6 +953,7 @@ class H(_MappingT):
 
         return self.umap(_is_odd)
 
+    @beartype
     def accumulate(self, other: _SourceT) -> H:
         r"""
         Accumulates counts.
@@ -920,6 +972,7 @@ class H(_MappingT):
         return H(chain(self.items(), cast(Iterable, other)))
 
     @experimental
+    @beartype
     def exactly_k_times_in_n(
         self,
         outcome: OutcomeT,
@@ -952,6 +1005,7 @@ class H(_MappingT):
 
         return comb(n, k) * c_outcome ** k * (self.total - c_outcome) ** (n - k)
 
+    @beartype
     def explode(self, max_depth: IntT = 1) -> H:
         r"""
         Shorthand for ``#!python self.substitute(lambda h, outcome: h if outcome == max(h)
@@ -971,6 +1025,7 @@ class H(_MappingT):
             max_depth,
         )
 
+    @beartype
     def lowest_terms(self) -> H:
         r"""
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
@@ -994,6 +1049,7 @@ class H(_MappingT):
         return H(self._lowest_terms())
 
     @experimental
+    @beartype
     def order_stat_for_n_at_pos(self, n: IntT, pos: IntT) -> H:
         r"""
         !!! warning "Experimental"
@@ -1006,7 +1062,8 @@ class H(_MappingT):
         return self.order_stat_func_for_n(n)(pos)
 
     @experimental
-    def order_stat_func_for_n(self, n: IntT) -> Callable[[IntT], H]:
+    @beartype
+    def order_stat_func_for_n(self, n: IntT) -> Callable[[IntT], "H"]:
         r"""
         !!! warning "Experimental"
 
@@ -1072,11 +1129,13 @@ class H(_MappingT):
                     h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
                 )
 
+        @beartype
         def order_stat_for_n_at_pos(pos: IntT) -> H:
             return H(_gen_h_items_at_pos(as_int(pos)))
 
         return order_stat_for_n_at_pos
 
+    @beartype
     def substitute(
         self,
         expand: _ExpandT,
@@ -1275,6 +1334,7 @@ class H(_MappingT):
 
         return _substitute(self)
 
+    @beartype
     def vs(self, other: _OperandT) -> H:
         r"""
         Compares the histogram with *other*. -1 represents where *other* is greater. 0
@@ -1294,6 +1354,7 @@ class H(_MappingT):
         """
         return self.within(0, 0, other)
 
+    @beartype
     def within(self, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
         r"""
         Computes the difference between the histogram and *other*. -1 represents where that
@@ -1354,6 +1415,7 @@ class H(_MappingT):
         ...
 
     @experimental
+    @beartype
     def distribution(
         self,
         fill_items: Optional[_MappingT] = None,
@@ -1455,6 +1517,7 @@ class H(_MappingT):
             for outcome in sorted_outcomes(combined)
         )
 
+    @beartype
     def distribution_xy(
         self,
         fill_items: Optional[_MappingT] = None,
@@ -1482,6 +1545,7 @@ class H(_MappingT):
             )
         )
 
+    @beartype
     def format(
         self,
         fill_items: Optional[_MappingT] = None,
@@ -1577,6 +1641,7 @@ class H(_MappingT):
         else:
             w = width - 15
 
+            @beartype
             def lines() -> Iterator[str]:
                 yield f"avg | {mu:7.2f}"
 
@@ -1605,6 +1670,7 @@ class H(_MappingT):
 
             return sep.join(lines())
 
+    @beartype
     def mean(self) -> OutcomeT:
         r"""
         Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
@@ -1619,12 +1685,14 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
+    @beartype
     def stdev(self, mu: Optional[OutcomeT] = None) -> OutcomeT:
         r"""
         Shorthand for ``#!python math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
+    @beartype
     def variance(self, mu: Optional[OutcomeT] = None) -> OutcomeT:
         r"""
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
@@ -1641,6 +1709,7 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
+    @beartype
     def roll(self) -> OutcomeT:
         r"""
         Returns a (weighted) random outcome, sorted.
@@ -1689,6 +1758,7 @@ class HableOpsMixin:
     class.
     """
 
+    @beartype
     def __add__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__add__(self.h(), other)``. See the
@@ -1696,6 +1766,7 @@ class HableOpsMixin:
         """
         return __add__(self.h(), other)
 
+    @beartype
     def __radd__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__add__(other, self.h())``. See the
@@ -1703,6 +1774,7 @@ class HableOpsMixin:
         """
         return __add__(other, self.h())
 
+    @beartype
     def __sub__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the
@@ -1710,6 +1782,7 @@ class HableOpsMixin:
         """
         return __sub__(self.h(), other)
 
+    @beartype
     def __rsub__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__sub__(other, self.h())``. See the
@@ -1717,6 +1790,7 @@ class HableOpsMixin:
         """
         return __sub__(other, self.h())
 
+    @beartype
     def __mul__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the
@@ -1724,6 +1798,7 @@ class HableOpsMixin:
         """
         return __mul__(self.h(), other)
 
+    @beartype
     def __rmul__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__mul__(other, self.h())``. See the
@@ -1731,6 +1806,7 @@ class HableOpsMixin:
         """
         return __mul__(other, self.h())
 
+    @beartype
     def __truediv__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the
@@ -1738,6 +1814,7 @@ class HableOpsMixin:
         """
         return __truediv__(self.h(), other)
 
+    @beartype
     def __rtruediv__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the
@@ -1745,6 +1822,7 @@ class HableOpsMixin:
         """
         return __truediv__(other, self.h())
 
+    @beartype
     def __floordiv__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the
@@ -1752,6 +1830,7 @@ class HableOpsMixin:
         """
         return __floordiv__(self.h(), other)
 
+    @beartype
     def __rfloordiv__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
@@ -1759,6 +1838,7 @@ class HableOpsMixin:
         """
         return __floordiv__(other, self.h())
 
+    @beartype
     def __mod__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the
@@ -1766,6 +1846,7 @@ class HableOpsMixin:
         """
         return __mod__(self.h(), other)
 
+    @beartype
     def __rmod__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__mod__(other, self.h())``. See the
@@ -1773,6 +1854,7 @@ class HableOpsMixin:
         """
         return __mod__(other, self.h())
 
+    @beartype
     def __pow__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the
@@ -1780,6 +1862,7 @@ class HableOpsMixin:
         """
         return __pow__(self.h(), other)
 
+    @beartype
     def __rpow__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__pow__(other, self.h())``. See the
@@ -1787,6 +1870,7 @@ class HableOpsMixin:
         """
         return __pow__(other, self.h())
 
+    @beartype
     def __and__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
@@ -1794,6 +1878,7 @@ class HableOpsMixin:
         """
         return __and__(self.h(), other)
 
+    @beartype
     def __rand__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(other, self.h())``. See the
@@ -1801,6 +1886,7 @@ class HableOpsMixin:
         """
         return __and__(other, self.h())
 
+    @beartype
     def __xor__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
@@ -1808,6 +1894,7 @@ class HableOpsMixin:
         """
         return __xor__(self.h(), other)
 
+    @beartype
     def __rxor__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(other, self.h())``. See the
@@ -1815,6 +1902,7 @@ class HableOpsMixin:
         """
         return __xor__(other, self.h())
 
+    @beartype
     def __or__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
@@ -1822,6 +1910,7 @@ class HableOpsMixin:
         """
         return __or__(self.h(), other)
 
+    @beartype
     def __ror__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(other, self.h())``. See the
@@ -1829,6 +1918,7 @@ class HableOpsMixin:
         """
         return __or__(other, self.h())
 
+    @beartype
     def __neg__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__neg__(self.h())``. See the
@@ -1836,6 +1926,7 @@ class HableOpsMixin:
         """
         return __neg__(self.h())
 
+    @beartype
     def __pos__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__pos__(self.h())``. See the
@@ -1843,6 +1934,7 @@ class HableOpsMixin:
         """
         return __pos__(self.h())
 
+    @beartype
     def __abs__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__abs__(self.h())``. See the
@@ -1850,6 +1942,7 @@ class HableOpsMixin:
         """
         return __abs__(self.h())
 
+    @beartype
     def __invert__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__invert__(self.h())``. See the
@@ -1857,6 +1950,7 @@ class HableOpsMixin:
         """
         return __invert__(self.h())
 
+    @beartype
     def lt(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().lt(other)``. See the
@@ -1864,6 +1958,7 @@ class HableOpsMixin:
         """
         return self.h().lt(other)
 
+    @beartype
     def le(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().le(other)``. See the
@@ -1871,6 +1966,7 @@ class HableOpsMixin:
         """
         return self.h().le(other)
 
+    @beartype
     def eq(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().eq(other)``. See the
@@ -1878,6 +1974,7 @@ class HableOpsMixin:
         """
         return self.h().eq(other)
 
+    @beartype
     def ne(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().ne(other)``. See the
@@ -1885,6 +1982,7 @@ class HableOpsMixin:
         """
         return self.h().ne(other)
 
+    @beartype
     def gt(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().gt(other)``. See the
@@ -1892,6 +1990,7 @@ class HableOpsMixin:
         """
         return self.h().gt(other)
 
+    @beartype
     def ge(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().ge(other)``. See the
@@ -1899,6 +1998,7 @@ class HableOpsMixin:
         """
         return self.h().ge(other)
 
+    @beartype
     def is_even(self: HableT) -> H:
         r"""
         Shorthand for ``#!python self.h().is_even()``. See the
@@ -1906,6 +2006,7 @@ class HableOpsMixin:
         """
         return self.h().is_even()
 
+    @beartype
     def is_odd(self: HableT) -> H:
         r"""
         Shorthand for ``#!python self.h().is_odd()``. See the
@@ -1913,6 +2014,7 @@ class HableOpsMixin:
         """
         return self.h().is_odd()
 
+    @beartype
     def explode(self: HableT, max_depth: IntT = 1) -> H:
         r"""
         Shorthand for ``#!python self.h().explode(max_depth)``. See the
@@ -1920,6 +2022,7 @@ class HableOpsMixin:
         """
         return self.h().explode(max_depth)
 
+    @beartype
     def substitute(
         self: HableT,
         expand: _ExpandT,
@@ -1932,6 +2035,7 @@ class HableOpsMixin:
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
+    @beartype
     def within(self: HableT, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
         r"""
         Shorthand for ``#!python self.h().within(lo, hi, other)``. See the
@@ -1943,6 +2047,7 @@ class HableOpsMixin:
 # ---- Functions -----------------------------------------------------------------------
 
 
+@beartype
 def sum_h(hs: Iterable[H]):
     """
     Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.
@@ -1954,6 +2059,7 @@ def sum_h(hs: Iterable[H]):
     return H({}) if h_sum == 0 else h_sum
 
 
+@beartype
 def _within(lo: OutcomeT, hi: OutcomeT) -> _BinaryOperatorT:
     if lo > hi:
         raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")

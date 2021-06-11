@@ -10,10 +10,12 @@
 from __future__ import annotations
 
 import re
+import sys
 from abc import abstractmethod
 from operator import __getitem__, __index__
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterable,
     Iterator,
@@ -25,6 +27,9 @@ from typing import (
     Union,
 )
 
+from .bt import __version_info__ as bt_version_info
+from .bt import identity  # noqa: F401
+from .bt import beartype
 from .symmetries import Protocol
 from .symmetries import SupportsAbs as _SupportsAbs
 from .symmetries import SupportsFloat as _SupportsFloat
@@ -313,19 +318,23 @@ _OutcomeCs = (int, float, bool, SupportsOutcome)
 
 _GetItemT = Union[IndexT, slice]
 
+if sys.version_info < (3, 8) and bt_version_info < (0, 8):
+    _RationalInitializerT = Callable[[int, int], _T_co]
+else:
 
-@runtime_checkable
-class _RationalInitializerT(
-    Protocol[_T_co],
-    metaclass=CachingProtocolMeta,
-):
-    def __call__(self, numerator: int, denominator: int) -> _T_co:
-        ...
+    @runtime_checkable
+    class _RationalInitializerT(
+        Protocol[_T_co],
+        metaclass=CachingProtocolMeta,
+    ):
+        def __call__(self, numerator: int, denominator: int) -> _T_co:
+            ...
 
 
 # ---- Functions -----------------------------------------------------------------------
 
 
+@beartype
 def as_int(val: IntT) -> int:
     r"""
     Helper function to losslessly coerce *val* into an ``#!python int``. Raises
@@ -339,6 +348,7 @@ def as_int(val: IntT) -> int:
     return int_val
 
 
+@beartype
 def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
         if isinstance(key, slice):
@@ -347,14 +357,12 @@ def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
             yield __getitem__(seq, __index__(key))
 
 
-def identity(x: _T) -> _T:
-    return x
-
-
+@beartype
 def natural_key(val: Any) -> Tuple[Union[int, str], ...]:
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
 
 
+@beartype
 def sorted_outcomes(vals: Iterable[_T]) -> List[_T]:
     vals = list(vals)
 

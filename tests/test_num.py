@@ -11,12 +11,14 @@ from __future__ import annotations
 
 import math
 import operator
+import sys
 from decimal import Decimal
 from fractions import Fraction
+from typing import Tuple
 
 import pytest
 
-from dyce.types import _BitwiseCs, _OutcomeCs
+from dyce.types import OutcomeT, _BitwiseCs, _OutcomeCs
 
 from .numberwang import Numberwang, Wangernumb
 
@@ -24,6 +26,67 @@ __all__ = ()
 
 
 # ---- Tests ---------------------------------------------------------------------------
+
+
+def test_beartype_detection() -> None:
+    roar = pytest.importorskip("beartype.roar", reason="requires beartype")
+    from dyce.bt import beartype
+
+    @beartype
+    def _outcome_identity(arg: OutcomeT) -> OutcomeT:
+        return arg
+
+    with pytest.raises(roar.BeartypeException):
+        _outcome_identity("-273")  # type: ignore
+
+    @beartype
+    def _lies_all_lies(arg: OutcomeT) -> Tuple[str]:
+        return (arg,)  # type: ignore
+
+    with pytest.raises(roar.BeartypeException):
+        _lies_all_lies(-273)
+
+
+def test_beartype_validators() -> None:
+    roar = pytest.importorskip("beartype.roar", reason="requires beartype")
+    from beartype.vale import Is
+
+    from dyce.bt import __version_info__ as bt_version_info
+    from dyce.bt import beartype
+    from dyce.symmetries import Annotated
+
+    if sys.version_info < (3, 9) and not bt_version_info >= (0, 8):
+        pytest.skip("requires beartype>=0.8 with python<3.9")
+
+    NonZero = Annotated[int, Is[lambda x: x != 0]]
+
+    @beartype
+    def _divide_it(n: int, d: NonZero) -> float:
+        return n / d
+
+    with pytest.raises(roar.BeartypeException):
+        _divide_it(0, 0)
+
+    If = Annotated[
+        Tuple[str, ...],
+        Is[
+            lambda x: x
+            == (
+                "If you can dream—and not make dreams your master;",
+                "If you can think—and not make thoughts your aim;",
+            )
+        ],
+    ]
+
+    @beartype
+    def _if(lines: If) -> Tuple[str, ...]:
+        return (
+            "If you can meet with Triumph and Disaster",
+            "And treat those two impostors just the same;",
+        )
+
+    with pytest.raises(roar.BeartypeException):
+        _if(())
 
 
 def test_outcome_proto() -> None:

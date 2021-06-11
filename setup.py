@@ -79,9 +79,10 @@ SETUP_ARGS = {
     ],
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": ["typing_extensions;python_version<'3.8'"],
+    "install_requires": ["typing-extensions;python_version<'3.9'"],
     "extras_require": {
         "dev": [
+            "beartype",
             "mike",
             # See:
             # * <https://github.com/mkdocs/mkdocs/issues/2448>
@@ -90,6 +91,7 @@ SETUP_ARGS = {
             "mkdocs-exclude",
             "mkdocs-material",
             "mkdocstrings",
+            "mypy",
             "numpy",
             "pre-commit",
             "pytest-gitignore",

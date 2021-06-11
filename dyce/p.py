@@ -30,6 +30,7 @@ from typing import (
     overload,
 )
 
+from .bt import beartype
 from .h import H, HableOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT, sum_h
 from .lifecycle import experimental
 from .types import (
@@ -193,7 +194,8 @@ class P(Sequence[H], HableOpsMixin):
 
     # ---- Initializer -----------------------------------------------------------------
 
-    def __init__(self, *args: Union[IntT, P, H]) -> None:
+    @beartype
+    def __init__(self, *args: Union[IntT, "P", H]) -> None:
         r"Initializer."
         super().__init__()
 
@@ -223,6 +225,7 @@ class P(Sequence[H], HableOpsMixin):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         def _parts() -> Iterator[str]:
             for h in self:
@@ -232,18 +235,21 @@ class P(Sequence[H], HableOpsMixin):
 
         return f"{self.__class__.__name__}({args})"
 
+    @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, P):
             return __eq__(self._hs, other._hs)
         else:
             return NotImplemented
 
+    @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, P):
             return __ne__(self._hs, other._hs)
         else:
             return NotImplemented
 
+    @beartype
     def __len__(self) -> int:
         return len(self._hs)
 
@@ -255,15 +261,21 @@ class P(Sequence[H], HableOpsMixin):
     def __getitem__(self, key: slice) -> P:
         ...
 
-    def __getitem__(self, key: _GetItemT) -> Union[H, P]:
+    @beartype
+    # TODO(posita): See:
+    # * <https://github.com/python/mypy/issues/8393>
+    # * <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore
         if isinstance(key, slice):
             return P(*self._hs[key])
         else:
             return self._hs[__index__(key)]
 
+    @beartype
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
 
+    @beartype
     def __matmul__(self, other: IntT) -> P:
         try:
             other = as_int(other)
@@ -275,9 +287,11 @@ class P(Sequence[H], HableOpsMixin):
         else:
             return P(*chain.from_iterable(repeat(self, other)))
 
+    @beartype
     def __rmatmul__(self, other: IntT) -> P:
         return self.__matmul__(other)
 
+    @beartype
     def h(self, *which: _GetItemT) -> H:
         r"""
         Roughly equivalent to ``#!python H((sum(roll), count) for roll, count in
@@ -399,6 +413,7 @@ class P(Sequence[H], HableOpsMixin):
     # ---- Methods ---------------------------------------------------------------------
 
     @experimental
+    @beartype
     def appearances_in_rolls(self, outcome: OutcomeT) -> H:
         r"""
         !!! warning "Experimental"
@@ -493,12 +508,14 @@ class P(Sequence[H], HableOpsMixin):
 
         return sum_h(H(group_counter) for group_counter in group_counters)
 
+    @beartype
     def roll(self) -> _RollT:
         r"""
         Returns (weighted) random outcomes from contained histograms.
         """
         return tuple(sorted_outcomes(h.roll() for h in self))
 
+    @beartype
     def rolls_with_counts(self, *which: _GetItemT) -> Iterator[_RollCountT]:
         r"""
         Returns an iterator yielding 2-tuples (pairs) that, collectively, enumerate all
@@ -780,6 +797,7 @@ class P(Sequence[H], HableOpsMixin):
 
             yield taken_outcomes, roll_count
 
+    @beartype
     def map(
         self,
         op: _BinaryOperatorT,
@@ -799,6 +817,7 @@ class P(Sequence[H], HableOpsMixin):
         """
         return P(*(h.map(op, right_operand) for h in self))
 
+    @beartype
     def rmap(
         self,
         left_operand: OutcomeT,
@@ -819,6 +838,7 @@ class P(Sequence[H], HableOpsMixin):
         """
         return P(*(h.rmap(left_operand, op) for h in self))
 
+    @beartype
     def umap(self, op: _UnaryOperatorT) -> P:
         r"""
         Shorthand for ``#!python P(*(h.umap(op) for h in self))``. See the
@@ -840,6 +860,7 @@ class P(Sequence[H], HableOpsMixin):
 # ---- Functions -----------------------------------------------------------------------
 
 
+@beartype
 def _analyze_selection(
     n: int,
     which: Iterable[_GetItemT],
@@ -855,7 +876,7 @@ def _analyze_selection(
     * ``#!python None`` – any other selection
     """
     indexes = tuple(range(n))
-    counts_by_index = counter(getitems(indexes, which))
+    counts_by_index: Counter[int] = counter(getitems(indexes, which))
     found_indexes = set(counts_by_index)
 
     if not found_indexes:
@@ -881,6 +902,7 @@ def _analyze_selection(
         assert False, "should never be here"
 
 
+@beartype
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[Tuple[_MappingT, int]],
     k: Optional[int],
@@ -920,6 +942,7 @@ def _rwc_heterogeneous_h_groups(
             yield sorted_outcomes_for_roll, total_count
 
 
+@beartype
 def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     h: H,
     n: int,
@@ -961,6 +984,8 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
     ```
     """
+    n = as_int(n)
+    k = as_int(k)
     from_upper = k < 0
     k = abs(k)
 
@@ -1045,6 +1070,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         yield (outcomes, count.numerator)
 
 
+@beartype
 def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     h: _MappingT,
     n: int,

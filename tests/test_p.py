@@ -19,6 +19,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dyce import H, OutcomeT, P
+from dyce.bt import __version_info__ as bt_version_info
+from dyce.bt import beartype
 from dyce.p import (
     _analyze_selection,
     _RollCountT,
@@ -164,9 +166,19 @@ class TestP:
         assert p_3d4n_3d8[2:4] == P(d4n, d8)
 
     def test_getitem_wrong_type(self) -> None:
+        if bt_version_info != (0,):
+            pytest.skip("requires beartype not be installed")
+
         p_d6 = P(6)
 
         with pytest.raises(TypeError):
+            _ = p_d6[""]  # type: ignore
+
+    def test_getitem_wrong_type_beartype(self) -> None:
+        roar = pytest.importorskip("beartype.roar", reason="requires beartype")
+        p_d6 = P(6)
+
+        with pytest.raises(roar.BeartypeException):
             _ = p_d6[""]  # type: ignore
 
     def test_op_add_h(self) -> None:
@@ -728,6 +740,7 @@ def test_analyze_selection() -> None:
         _ = _analyze_selection(0, which)
 
 
+@beartype
 def _brute_force_combinations_with_counts(
     hs: Sequence[H], key: slice
 ) -> Iterator[_RollCountT]:
@@ -741,6 +754,7 @@ def _brute_force_combinations_with_counts(
             yield sliced_outcomes, count
 
 
+@beartype
 def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have

@@ -16,6 +16,7 @@ from fractions import Fraction
 from numbers import Real
 from typing import Any, Dict, Iterable, Iterator, Optional, Sequence, Tuple, Union
 
+from .bt import beartype
 from .h import H
 from .lifecycle import experimental
 from .r import (
@@ -73,6 +74,7 @@ _VALUE_LEN = 24
 
 
 @experimental
+@beartype
 def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
     r"""
     !!! warning "Experimental"
@@ -90,6 +92,7 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
 
 
 @experimental
+@beartype
 def display_burst(
     ax: Axes,
     h_inner: H,
@@ -154,6 +157,7 @@ def display_burst(
 
 
 @experimental
+@beartype
 def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
     r"""
     !!! warning "Experimental"
@@ -179,6 +183,7 @@ def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
 
 
 @experimental
+@beartype
 def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
@@ -204,6 +209,7 @@ def labels_cumulative(
 
 
 @experimental
+@beartype
 def plot_burst(
     h_inner: H,
     outer: Optional[Union[H, Iterable[LabelT]]] = None,
@@ -233,6 +239,7 @@ def plot_burst(
 
 
 @experimental
+@beartype
 def walk_r(
     g: Digraph,
     obj: Union[R, Roll, RollOutcome],
@@ -392,6 +399,7 @@ def walk_r(
                     )
 
 
+@beartype
 def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) -> str:
     value = value if len(value) <= value_len else (value[: value_len - 3] + "...")
 

@@ -71,6 +71,8 @@
 
 * Documentation overhaul including augmented examples and reorganized images and JavaScript.
 * Fixed ``H({}).format()`` bug.
+* Adds [``beartype``](https://github.com/beartype/beartype) runtime type checking.
+* *Maintains* support for Python 3.7 (for now).
 
 ## [0.3.2](https://github.com/posita/dyce/releases/tag/v0.3.2)
 
@@ -80,7 +82,7 @@
 
 * Adds these release notes.
 * Boosts ``#!python isinstance`` performance with ``#!python dyce``’s proprietary numeric ``#!python Protocol``s.
-* Reinstates support for Python 3.7 (for now).
+* Reinstates support for Python 3.7 ~~(for now)~~.
 * Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
 * Deprecates synonym methods ``H.even`` and ``H.odd``.
 * Introduces experimental [``H.total``][dyce.h.H.total] property.

@@ -52,6 +52,7 @@ from typing import (
     overload,
 )
 
+from .bt import beartype
 from .h import H, _BinaryOperatorT, _UnaryOperatorT
 from .lifecycle import experimental
 from .p import P
@@ -258,9 +259,10 @@ class R:
     # ---- Initializer -----------------------------------------------------------------
 
     @experimental
+    @beartype
     def __init__(
         self,
-        sources: Iterable[R] = (),
+        sources: Iterable["R"] = (),
         annotation: Any = "",
     ):
         r"Initializer."
@@ -270,12 +272,14 @@ class R:
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   sources=({_seq_repr(self.sources)}),
   annotation={self.annotation!r},
 )"""
 
+    @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, R):
             return (
@@ -286,48 +290,56 @@ class R:
         else:
             return super().__eq__(other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, R):
             return not __eq__(self, other)
         else:
             return super().__ne__(other)
 
+    @beartype
     def __add__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __radd__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __sub__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rsub__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mul__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmul__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __matmul__(self, other: IntT) -> R:
         try:
             other = as_int(other)
@@ -339,58 +351,68 @@ class R:
         else:
             return RepeatRoller(other, self)
 
+    @beartype
     def __rmatmul__(self, other: IntT) -> R:
         return self.__matmul__(other)
 
+    @beartype
     def __truediv__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rtruediv__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __floordiv__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rfloordiv__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mod__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmod__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __pow__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rpow__(self, other: OutcomeT) -> BinaryOperationRoller:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: Union[R, IntT]) -> BinaryOperationRoller:
+    @beartype
+    def __and__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
         try:
             if isinstance(other, R):
                 return self.map(__and__, other)
@@ -399,13 +421,15 @@ class R:
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rand__(self, other: IntT) -> BinaryOperationRoller:
         try:
             return self.rmap(as_int(other), __and__)
         except NotImplementedError:
             return NotImplemented
 
-    def __xor__(self, other: Union[R, IntT]) -> BinaryOperationRoller:
+    @beartype
+    def __xor__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
         try:
             if isinstance(other, R):
                 return self.map(__xor__, other)
@@ -414,13 +438,15 @@ class R:
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rxor__(self, other: IntT) -> BinaryOperationRoller:
         try:
             return self.rmap(as_int(other), __xor__)
         except NotImplementedError:
             return NotImplemented
 
-    def __or__(self, other: Union[R, IntT]) -> BinaryOperationRoller:
+    @beartype
+    def __or__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
         try:
             if isinstance(other, R):
                 return self.map(__or__, other)
@@ -429,21 +455,26 @@ class R:
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __ror__(self, other: IntT) -> BinaryOperationRoller:
         try:
             return self.rmap(as_int(other), __or__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __neg__(self) -> UnaryOperationRoller:
         return self.umap(__neg__)
 
+    @beartype
     def __pos__(self) -> UnaryOperationRoller:
         return self.umap(__pos__)
 
+    @beartype
     def __abs__(self) -> UnaryOperationRoller:
         return self.umap(__abs__)
 
+    @beartype
     def __invert__(self) -> UnaryOperationRoller:
         return self.umap(__invert__)
 
@@ -474,6 +505,7 @@ class R:
     # ---- Methods ---------------------------------------------------------------------
 
     @classmethod
+    @beartype
     def from_rs(
         cls,
         *sources: R,
@@ -487,9 +519,10 @@ class R:
         return cls.from_rs_iterable(sources, annotation=annotation)
 
     @classmethod
+    @beartype
     def from_rs_iterable(
         cls,
-        sources: Iterable[R],
+        sources: Iterable["R"],
         annotation: Any = "",
     ) -> PoolRoller:
         r"""
@@ -541,6 +574,7 @@ class R:
         return PoolRoller(sources, annotation=annotation)
 
     @classmethod
+    @beartype
     def from_value(
         cls,
         value: _ValueT,
@@ -571,6 +605,7 @@ class R:
         return ValueRoller(value, annotation=annotation)
 
     @classmethod
+    @beartype
     def from_values(
         cls,
         *values: _ValueT,
@@ -584,6 +619,7 @@ class R:
         return cls.from_values_iterable(values, annotation=annotation)
 
     @classmethod
+    @beartype
     def from_values_iterable(
         cls,
         values: Iterable[_ValueT],
@@ -602,6 +638,7 @@ class R:
         )
 
     @classmethod
+    @beartype
     def select_from_rs(
         cls,
         which: Iterable[_GetItemT],
@@ -617,10 +654,11 @@ class R:
         return cls.select_from_rs_iterable(which, sources, annotation=annotation)
 
     @classmethod
+    @beartype
     def select_from_rs_iterable(
         cls,
         which: Iterable[_GetItemT],
-        sources: Iterable[R],
+        sources: Iterable["R"],
         annotation: Any = "",
     ) -> SelectionRoller:
         r"""
@@ -651,6 +689,7 @@ class R:
         return SelectionRoller(which, sources, annotation=annotation)
 
     @classmethod
+    @beartype
     def select_from_values(
         cls,
         which: Iterable[_GetItemT],
@@ -667,6 +706,7 @@ class R:
         return cls.select_from_values_iterable(which, values, annotation=annotation)
 
     @classmethod
+    @beartype
     def select_from_values_iterable(
         cls,
         which: Iterable[_GetItemT],
@@ -686,6 +726,7 @@ class R:
             annotation=annotation,
         )
 
+    @beartype
     def select(
         self,
         *which: _GetItemT,
@@ -698,6 +739,7 @@ class R:
         """
         return self.select_iterable(which, annotation=annotation)
 
+    @beartype
     def select_iterable(
         self,
         which: Iterable[_GetItemT],
@@ -733,6 +775,7 @@ class R:
         """
         return SelectionRoller(which, (self,), annotation=annotation)
 
+    @beartype
     def annotate(self, annotation: Any = "") -> R:
         r"""
         Generates a copy of the roller with the desired annotation.
@@ -750,6 +793,7 @@ class R:
 
         return r
 
+    @beartype
     def map(
         self,
         op: _BinaryRollerOperatorT,
@@ -783,6 +827,7 @@ class R:
         else:
             raise NotImplementedError
 
+    @beartype
     def rmap(
         self,
         left_operand: OutcomeT,
@@ -817,6 +862,7 @@ class R:
         else:
             raise NotImplementedError
 
+    @beartype
     def umap(
         self,
         op: _UnaryRollerOperatorT,
@@ -841,6 +887,7 @@ class R:
         """
         return UnaryOperationRoller(op, self, annotation=annotation)
 
+    @beartype
     def lt(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.lt(right), other)``.
@@ -853,6 +900,7 @@ class R:
 
         return self.map(_lt, other)
 
+    @beartype
     def le(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.le(right), other)``.
@@ -865,6 +913,7 @@ class R:
 
         return self.map(_le, other)
 
+    @beartype
     def eq(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.eq(right), other)``.
@@ -877,6 +926,7 @@ class R:
 
         return self.map(_eq, other)
 
+    @beartype
     def ne(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ne(right), other)``.
@@ -889,6 +939,7 @@ class R:
 
         return self.map(_ne, other)
 
+    @beartype
     def gt(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.gt(right), other)``.
@@ -901,6 +952,7 @@ class R:
 
         return self.map(_gt, other)
 
+    @beartype
     def ge(self, other: _ROperandT) -> BinaryOperationRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ge(right), other)``.
@@ -913,6 +965,7 @@ class R:
 
         return self.map(_ge, other)
 
+    @beartype
     def is_even(self) -> UnaryOperationRoller:
         r"""
         Shorthand for: ``#!python self.umap(lambda operand: (operand % 2).eq(0))``.
@@ -925,6 +978,7 @@ class R:
 
         return self.umap(_is_even)
 
+    @beartype
     def is_odd(self) -> UnaryOperationRoller:
         r"""
         Shorthand for: ``#!python self.umap(lambda operand: (operand % 2).ne(0))``.
@@ -946,6 +1000,7 @@ class ValueRoller(R):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         value: _ValueT,
@@ -964,9 +1019,11 @@ class ValueRoller(R):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(value={self.value!r}, annotation={self.annotation!r})"""
 
+    @beartype
     def roll(self) -> Roll:
         r""""""
         if isinstance(self.value, P):
@@ -998,6 +1055,7 @@ class OperationRollerBase(R):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         op: _RollOutcomeOperatorT,
@@ -1010,6 +1068,7 @@ class OperationRollerBase(R):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   op={self.op!r},
@@ -1017,6 +1076,7 @@ class OperationRollerBase(R):
   annotation={self.annotation!r},
 )"""
 
+    @beartype
     def __eq__(self, other) -> bool:
         return super().__eq__(other) and self.op == other.op
 
@@ -1038,6 +1098,7 @@ class ChainRoller(OperationRollerBase):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def roll(self) -> Roll:
         r""""""
         source_rolls = tuple(source.roll() for source in self.sources)
@@ -1066,6 +1127,7 @@ class SumRoller(OperationRollerBase):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def roll(self) -> Roll:
         r""""""
         source_rolls = tuple(source.roll() for source in self.sources)
@@ -1101,6 +1163,7 @@ class BinaryOperationRoller(SumRoller):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         op: _BinaryRollerOperatorT,
@@ -1115,6 +1178,7 @@ class BinaryOperationRoller(SumRoller):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         def _source_repr(source: R) -> str:
             return indent(repr(source), "    ").strip()
@@ -1137,6 +1201,7 @@ class UnaryOperationRoller(SumRoller):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         op: _UnaryRollerOperatorT,
@@ -1148,6 +1213,7 @@ class UnaryOperationRoller(SumRoller):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         (source,) = self.sources
 
@@ -1165,6 +1231,7 @@ class PoolRoller(ChainRoller):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         sources: Iterable[R] = (),
@@ -1183,12 +1250,14 @@ class PoolRoller(ChainRoller):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   sources=({_seq_repr(self.sources)}),
   annotation={self.annotation!r},
 )"""
 
+    @beartype
     def __eq__(self, other) -> bool:
         return super(OperationRollerBase, self).__eq__(other)
 
@@ -1288,6 +1357,7 @@ class SelectionRoller(ChainRoller):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         which: Iterable[_GetItemT],
@@ -1322,6 +1392,7 @@ class SelectionRoller(ChainRoller):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   which={self.which!r},
@@ -1329,6 +1400,7 @@ class SelectionRoller(ChainRoller):
   annotation={self.annotation!r},
 )"""
 
+    @beartype
     def __eq__(self, other) -> bool:
         return (
             super(OperationRollerBase, self).__eq__(other) and self.which == other.which
@@ -1367,6 +1439,7 @@ class RepeatRoller(R):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(
         self,
         n: IntT,
@@ -1379,6 +1452,7 @@ class RepeatRoller(R):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         (source,) = self.sources
 
@@ -1388,9 +1462,11 @@ class RepeatRoller(R):
   annotation={self.annotation!r},
 )"""
 
+    @beartype
     def __eq__(self, other) -> bool:
         return super().__eq__(other) and self.n == other.n
 
+    @beartype
     def roll(self) -> Roll:
         r""""""
         (source,) = self.sources
@@ -1429,11 +1505,11 @@ class RollOutcome:
 
     # ---- Initializer -----------------------------------------------------------------
 
-    @experimental
+    @beartype
     def __init__(
         self,
         value: Optional[OutcomeT],
-        sources: Iterable[RollOutcome] = (),
+        sources: Iterable["RollOutcome"] = (),
     ):
         r"Initializer."
         super().__init__()
@@ -1449,133 +1525,157 @@ class RollOutcome:
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   value={repr(self.value)},
   sources=({_seq_repr(self.sources)}),
 )"""
 
-    def __lt__(self, other: _RollOutcomeOperandT) -> bool:
+    @beartype
+    # TODO(posita): See: <https://github.com/python/mypy/issues/10943>
+    def __lt__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
             return __lt__(self.value, other.value)
         else:
             return NotImplemented
 
-    def __le__(self, other: _RollOutcomeOperandT) -> bool:
+    @beartype
+    # TODO(posita): See: <https://github.com/python/mypy/issues/10943>
+    def __le__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
             return __le__(self.value, other.value)
         else:
             return NotImplemented
 
+    @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, RollOutcome):
             return __eq__(self.value, other.value)
         else:
             return super().__eq__(other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, RollOutcome):
             return __ne__(self.value, other.value)
         else:
             return super().__ne__(other)
 
+    @beartype
     def __gt__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
             return __gt__(self.value, other.value)
         else:
             return NotImplemented
 
+    @beartype
     def __ge__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
             return __ge__(self.value, other.value)
         else:
             return NotImplemented
 
+    @beartype
     def __add__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __radd__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __sub__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rsub__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mul__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmul__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __truediv__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rtruediv__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __floordiv__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rfloordiv__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __mod__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rmod__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __pow__(self, other: _RollOutcomeOperandT) -> RollOutcome:
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __rpow__(self, other: OutcomeT) -> RollOutcome:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: Union[RollOutcome, IntT]) -> RollOutcome:
+    @beartype
+    def __and__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -1584,13 +1684,15 @@ class RollOutcome:
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __rand__(self, other: IntT) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __xor__(self, other: Union[RollOutcome, IntT]) -> RollOutcome:
+    @beartype
+    def __xor__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -1599,13 +1701,15 @@ class RollOutcome:
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __rxor__(self, other: IntT) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __or__(self, other: Union[RollOutcome, IntT]) -> RollOutcome:
+    @beartype
+    def __or__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -1614,21 +1718,26 @@ class RollOutcome:
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __ror__(self, other: IntT) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
+    @beartype
     def __neg__(self) -> RollOutcome:
         return self.umap(__neg__)
 
+    @beartype
     def __pos__(self) -> RollOutcome:
         return self.umap(__pos__)
 
+    @beartype
     def __abs__(self) -> RollOutcome:
         return self.umap(__abs__)
 
+    @beartype
     def __invert__(self) -> RollOutcome:
         return self.umap(__invert__)
 
@@ -1712,6 +1821,7 @@ class RollOutcome:
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @beartype
     def map(
         self,
         op: _BinaryOperatorT,
@@ -1753,6 +1863,7 @@ class RollOutcome:
         else:
             raise NotImplementedError
 
+    @beartype
     def rmap(
         self,
         left_operand: OutcomeT,
@@ -1786,6 +1897,7 @@ class RollOutcome:
         else:
             raise NotImplementedError
 
+    @beartype
     def umap(
         self,
         op: _UnaryOperatorT,
@@ -1815,6 +1927,7 @@ class RollOutcome:
         """
         return RollOutcome(op(self.value), sources=(self,))
 
+    @beartype
     def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1823,6 +1936,7 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__lt__(self.value, other)), sources=(self,))
 
+    @beartype
     def le(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1831,6 +1945,7 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__le__(self.value, other)), sources=(self,))
 
+    @beartype
     def eq(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1839,6 +1954,7 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__eq__(self.value, other)), sources=(self,))
 
+    @beartype
     def ne(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1847,6 +1963,7 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__ne__(self.value, other)), sources=(self,))
 
+    @beartype
     def gt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1855,6 +1972,7 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__gt__(self.value, other)), sources=(self,))
 
+    @beartype
     def ge(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
             return RollOutcome(
@@ -1879,11 +1997,12 @@ class Roll(Sequence[RollOutcome]):
     # ---- Initializer -----------------------------------------------------------------
 
     @experimental
+    @beartype
     def __init__(
         self,
         r: R,
         roll_outcomes: Iterable[RollOutcome],
-        sources: Iterable[Roll] = (),
+        sources: Iterable["Roll"] = (),
     ):
         r"""
         Initializer.
@@ -1957,6 +2076,7 @@ class Roll(Sequence[RollOutcome]):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
   r={indent(repr(self.r), "  ").strip()},
@@ -1964,6 +2084,7 @@ class Roll(Sequence[RollOutcome]):
   sources=({_seq_repr(self.sources)}),
 )"""
 
+    @beartype
     def __len__(self) -> int:
         return len(self._roll_outcomes)
 
@@ -1975,14 +2096,20 @@ class Roll(Sequence[RollOutcome]):
     def __getitem__(self, key: slice) -> Tuple[RollOutcome, ...]:
         ...
 
-    def __getitem__(
-        self, key: _GetItemT
+    @beartype
+    # TODO(posita): See:
+    # * <https://github.com/python/mypy/issues/8393>
+    # * <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    def __getitem__(  # type: ignore
+        self,
+        key: _GetItemT,
     ) -> Union[RollOutcome, Tuple[RollOutcome, ...]]:
         if isinstance(key, slice):
             return self._roll_outcomes[key]
         else:
             return self._roll_outcomes[__index__(key)]
 
+    @beartype
     def __iter__(self) -> Iterator[RollOutcome]:
         return iter(self._roll_outcomes)
 
@@ -2013,6 +2140,7 @@ class Roll(Sequence[RollOutcome]):
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @beartype
     def outcomes(self) -> Iterator[OutcomeT]:
         r"""
         Shorthand for
@@ -2041,6 +2169,7 @@ class Roll(Sequence[RollOutcome]):
             if roll_outcome.value is not None
         )
 
+    @beartype
     def total(self) -> OutcomeT:
         r"""
         Shorthand for ``#!python sum(self.outcomes())``.
@@ -2051,6 +2180,7 @@ class Roll(Sequence[RollOutcome]):
 # ---- Functions -----------------------------------------------------------------------
 
 
+@beartype
 def _seq_repr(s: Sequence) -> str:
     seq_repr = indent(",\n".join(repr(i) for i in s), "    ")
 

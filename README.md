@@ -22,12 +22,16 @@ If that file is missing or appears to be modified from its original, then please
 [![License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.org/project/dycelib/)
 [![Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.org/project/dycelib/)
+[![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
 Now you’re playing with…
 
 <img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce.svg" alt="dyce logo">
 
 # ``dyce`` – simple Python tools for exploring dice outcomes and other finite discrete probabilities
+
+**💥 _Now 100% [Bear-ified™](https://beartype.rtfd.io/)!_ 👌🏾🐻**
+([Details](#requirements) below.)
 
 ``dyce`` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
@@ -326,11 +330,18 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 
 It has the following runtime dependencies:
 
-* [``typing-extensions``](https://pypi.org/project/typing-extensions/) (with Python versions <3.8)
+* [``typing-extensions``](https://pypi.org/project/typing-extensions/) (with Python <3.9)
 
 ``dyce`` will opportunistically use the following, if available at runtime:
 
+* [``beartype``](https://pypi.org/project/beartype/) for yummy runtime type-checking goodness (0.8+)
+  [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 * [``graphviz``](https://pypi.org/project/graphviz/) for visualizing [rollers and rolls](https://posita.github.io/dyce/latest/rollin/)
 * [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
+
+If you install ``beartype`` for type checking your own code, but don’t want ``dyce`` to use it (e.g., for performance reasons), you can set the ``DYCE_BEARTYPE`` environment variable to a falsy[^9] value before ``dyce`` is imported.
+
+[^9]:
+    I.E., one of: ``0``, ``off``, ``f``, ``false``, and ``no``.
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
