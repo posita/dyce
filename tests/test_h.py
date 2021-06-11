@@ -43,7 +43,6 @@ _OUTCOME_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES + (
 )
 _COUNT_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES
 
-
 try:
     import numpy
 except ImportError:
@@ -87,8 +86,10 @@ class TestH:
         assert H((0, 0, 1, 0, 1)) == {0: 3, 1: 2}
         assert H((1, 2, 3, 1, 2, 1)) == {1: 3, 2: 2, 3: 1}
         assert H(((1, 2), (3, 1), (2, 1), (1, 1))) == {1: 3, 2: 1, 3: 1}
-        assert H(-2) == H(range(-1, -3, -1))
-        assert H(6) == H(range(1, 7))
+
+        for i_type in _INTEGRAL_OUTCOME_TYPES:
+            assert H(i_type(-2)) == H(i_type(i) for i in range(-2, 0, 1))
+            assert H(i_type(6)) == H(i_type(i) for i in range(6, 0, -1))
 
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
@@ -104,15 +105,22 @@ class TestH:
         assert base.accumulate(base) == base.accumulate(base).accumulate(base)
         assert base != base.accumulate((0,))
 
-    def test_len_and_counts(self) -> None:
+    def test_len_counts_outcomes(self) -> None:
         d0 = H({})
         d6_d8 = H(6) + H(8)
         assert len(d0) == 0
         assert sum(d0.counts()) == 0
-        assert len(d6_d8) == 13  # num distinct values
-        assert sum(d6_d8.counts()) == 48  # combinations
+        assert list(d0.counts()) == list(d0.values())
+        assert list(d0.outcomes()) == []
+        assert list(d0.outcomes()) == list(d0.keys())
+        assert len(d6_d8) == 13  # distinct values
+        assert sum(d6_d8.counts()) == 48  # total combinations
+        assert list(d6_d8.counts()) == list(d6_d8.values())
+        assert list(d6_d8.outcomes()) == list(range(2, 6 + 8 + 1))
+        assert list(d6_d8.outcomes()) == list(d6_d8.keys())
         assert len((d6_d8 + d6_d8)) == 25
         assert sum((d6_d8 + d6_d8).counts()) == 2304
+        assert list(d6_d8.items())
 
     def test_getitem(self) -> None:
         d6_2 = 2 @ H(6)
@@ -204,11 +212,7 @@ class TestH:
 
     def test_op_matmul(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
-            try:
-                d6 = H(o_type(6))
-            except ValueError:
-                d6 = H((o_type(i) for i in range(6, 0, -1)))
-
+            d6 = H((o_type(i) for i in range(6, 0, -1)))
             d6_2 = d6 + d6
             d6_3 = d6_2 + d6
             assert 0 @ d6 == H({}), f"o_type: {o_type}; c_type: {c_type}"

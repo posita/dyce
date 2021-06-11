@@ -9,14 +9,12 @@
 
 from __future__ import annotations
 
-from typing import Tuple
-
 __all__ = ()
 
 
 # ---- Data ----------------------------------------------------------------------------
 
 
-__version__: Tuple[int, int, int] = (0, 0, 0)
+__version__: tuple[int, int, int] = (0, 0, 0)
 __vers_str__ = ".".join(str(_) for _ in __version__)
 __release__ = "v" + __vers_str__

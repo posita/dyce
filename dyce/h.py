@@ -10,11 +10,18 @@
 from __future__ import annotations
 
 import os
-from collections import Counter as counter
-from collections.abc import Iterable as ABCIterable
-from collections.abc import Mapping as ABCMapping
+from collections import Counter
+from collections.abc import (
+    Callable,
+    ItemsView,
+    Iterable,
+    Iterator,
+    KeysView,
+    Mapping,
+    ValuesView,
+)
 from itertools import chain, product, repeat
-from math import comb, sqrt
+from math import comb, gcd, sqrt
 from operator import abs as op_abs
 from operator import add as op_add
 from operator import and_ as op_and
@@ -38,28 +45,18 @@ from operator import truediv as op_truediv
 from operator import xor as op_xor
 from random import choices
 from typing import (
-    Callable,
-    Counter,
-    Dict,
-    Iterable,
-    Iterator,
-    KeysView,
-    List,
-    Mapping,
     Optional,
     Protocol,
     SupportsInt,
-    Tuple,
     TypeVar,
     Union,
-    ValuesView,
     cast,
     runtime_checkable,
 )
 
+from .bt import beartype
 from .experimental import experimental
 from .numtypes import OutcomeP, as_int
-from .symmetries import gcd
 
 __all__ = ("H",)
 
@@ -72,7 +69,7 @@ _MappingT = Mapping[OutcomeP, int]
 _SourceT = Union[
     SupportsInt,
     Iterable[OutcomeP],
-    Iterable[Tuple[OutcomeP, SupportsInt]],
+    Iterable[tuple[OutcomeP, SupportsInt]],
     _MappingT,
     "HAbleT",
 ]
@@ -347,11 +344,15 @@ class H(_MappingT):
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @beartype
     def __init__(self, items: _SourceT) -> None:
         r"Initializer."
         super().__init__()
         self._simple_init: Optional[int] = None
-        tmp: Counter[OutcomeP] = counter()
+        tmp: Counter[OutcomeP] = Counter()
+
+        if isinstance(items, Mapping):
+            items = items.items()
 
         if isinstance(items, SupportsInt):
             if items != 0:
@@ -369,9 +370,7 @@ class H(_MappingT):
                     tmp.update({i: 1 for i in outcome_range})
         elif isinstance(items, HAbleT):
             tmp.update(items.h())
-        elif isinstance(items, ABCMapping):
-            tmp.update(items)
-        elif isinstance(items, ABCIterable):
+        elif isinstance(items, Iterable):
             # Items is either an Iterable[OutcomeP] or an Iterable[Tuple[OutcomeP,
             # SupportsInt]] (although this technically supports Iterable[Union[OutcomeP,
             # Tuple[OutcomeP, SupportsInt]]])
@@ -399,6 +398,7 @@ class H(_MappingT):
 
     # ---- Overrides -------------------------------------------------------------------
 
+    @beartype
     def __repr__(self) -> str:
         if self._simple_init is not None:
             arg = str(self._simple_init)
@@ -407,6 +407,7 @@ class H(_MappingT):
 
         return f"{self.__class__.__name__}({arg})"
 
+    @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, HAbleT):
             return op_eq(self, other.h())
@@ -415,6 +416,7 @@ class H(_MappingT):
         else:
             return super().__eq__(other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, HAbleT):
             return op_ne(self, other.h())
@@ -423,15 +425,19 @@ class H(_MappingT):
         else:
             return super().__ne__(other)
 
+    @beartype
     def __hash__(self) -> int:
         return hash(frozenset(self._lowest_terms()))
 
+    @beartype
     def __len__(self) -> int:
         return len(self._h)
 
+    @beartype
     def __getitem__(self, key: OutcomeP) -> int:
         return op_getitem(self._h, key)
 
+    @beartype
     def __iter__(self) -> Iterator[OutcomeP]:
         return iter(self._h)
 
@@ -481,6 +487,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
+    @beartype
     def __matmul__(self, other: SupportsInt) -> "H":
         try:
             other = as_int(other)
@@ -492,6 +499,7 @@ class H(_MappingT):
         else:
             return sum(repeat(self, other), start=H({}))
 
+    @beartype
     def __rmatmul__(self, other: SupportsInt) -> "H":
         return self.__matmul__(other)
 
@@ -545,7 +553,7 @@ class H(_MappingT):
 
     def __and__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_and, other)
@@ -560,7 +568,7 @@ class H(_MappingT):
 
     def __xor__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_xor, other)
@@ -575,7 +583,7 @@ class H(_MappingT):
 
     def __or__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_or, other)
@@ -600,29 +608,35 @@ class H(_MappingT):
     def __invert__(self) -> "H":
         return self.umap(op_invert)
 
+    @beartype
     def counts(self) -> ValuesView[int]:
         r"""
         More descriptive synonym for the [``values`` method][dyce.h.H.values].
         """
         return self.values()
 
-    def items(self):
-        return self._h.items()
+    @beartype
+    def items(self) -> ItemsView[OutcomeP, int]:
+        return cast(ItemsView[OutcomeP, int], self._h.items())
 
-    def keys(self):
-        return self._h.keys()
+    @beartype
+    def keys(self) -> KeysView[OutcomeP]:
+        return cast(KeysView[OutcomeP], self._h.keys())
 
+    @beartype
     def outcomes(self) -> KeysView[OutcomeP]:
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
         return self.keys()
 
-    def values(self):
+    @beartype
+    def values(self) -> ValuesView[int]:
         return self._h.values()
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @beartype
     def map(self, oper: _BinaryOperatorT, other: _OperandT) -> "H":
         r"""
         Applies *oper* to each outcome of the histogram paired with *other*. Shorthands
@@ -662,9 +676,11 @@ class H(_MappingT):
         else:
             return H((oper(outcome, other), count) for outcome, count in self.items())
 
+    @beartype
     def rmap(self, oper: _BinaryOperatorT, other: OutcomeP) -> "H":
         return H((oper(other, outcome), count) for outcome, count in self.items())
 
+    @beartype
     def umap(self, oper: _UnaryOperatorT) -> "H":
         r"""
         Applies *oper* to each outcome of the histogram:
@@ -811,6 +827,7 @@ class H(_MappingT):
 
         return self.umap(is_odd)
 
+    @beartype
     def accumulate(self, other: _SourceT) -> "H":
         r"""
         Accumulates counts:
@@ -821,14 +838,15 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, ABCMapping):
+        if isinstance(other, Mapping):
             other = other.items()
-        elif not isinstance(other, ABCIterable):
+        elif not isinstance(other, Iterable):
             other = cast(Iterable[OutcomeP], (other,))
 
         return H(chain(self.items(), cast(Iterable, other)))
 
     @experimental
+    @beartype
     def exactly_k_times_in_n(
         self,
         outcome: OutcomeP,
@@ -862,6 +880,7 @@ class H(_MappingT):
 
         return comb(n, k) * c_outcome ** k * (c_total - c_outcome) ** (n - k)
 
+    @beartype
     def explode(self, max_depth: SupportsInt = 1) -> "H":
         r"""
         Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
@@ -881,6 +900,7 @@ class H(_MappingT):
             max_depth,
         )
 
+    @beartype
     def lowest_terms(self) -> "H":
         r"""
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
@@ -904,6 +924,7 @@ class H(_MappingT):
         return H(self._lowest_terms())
 
     @experimental
+    @beartype
     def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> "H":
         """
         !!! warning "Experimental"
@@ -916,6 +937,7 @@ class H(_MappingT):
         return self.order_stat_func_for_n(n)(pos)
 
     @experimental
+    @beartype
     def order_stat_func_for_n(self, n: SupportsInt) -> Callable[[SupportsInt], "H"]:
         """
         !!! warning "Experimental"
@@ -967,7 +989,7 @@ class H(_MappingT):
         170 ms ± 3.41 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
         ```
         """
-        betas_by_outcome: Dict[OutcomeP, Tuple[H, H]] = {}
+        betas_by_outcome: dict[OutcomeP, tuple[H, H]] = {}
 
         for outcome in self.outcomes():
             betas_by_outcome[outcome] = (
@@ -975,18 +997,20 @@ class H(_MappingT):
                 n @ self.lt(outcome),
             )
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[OutcomeP, int]]:
+        def _gen_h_items_at_pos(pos: int) -> Iterator[tuple[OutcomeP, int]]:
             for outcome, (h_le, h_lt) in betas_by_outcome.items():
                 yield (
                     outcome,
                     h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
                 )
 
+        @beartype
         def order_stat_for_n_at_pos(pos: SupportsInt) -> H:
             return H(_gen_h_items_at_pos(as_int(pos)))
 
         return order_stat_for_n_at_pos
 
+    @beartype
     def substitute(
         self,
         expand: _ExpandT,
@@ -1151,7 +1175,7 @@ class H(_MappingT):
                 return h
 
             total_scalar = 1
-            items_for_reassembly: List[Tuple[OutcomeP, int, int]] = []
+            items_for_reassembly: list[tuple[OutcomeP, int, int]] = []
 
             for outcome, count in h.items():
                 expanded = expand(h, outcome)
@@ -1186,6 +1210,7 @@ class H(_MappingT):
 
         return _substitute(self)
 
+    @beartype
     def vs(self, other: _OperandT) -> "H":
         r"""
         Compares this histogram with *other*. -1 represents where *other* is greater. 0
@@ -1205,6 +1230,7 @@ class H(_MappingT):
         """
         return self.within(0, 0, other)
 
+    @beartype
     def within(self, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> "H":
         r"""
         Computes the difference between this histogram and *other*. -1 represents where that
@@ -1241,10 +1267,11 @@ class H(_MappingT):
         """
         return self.map(_within(lo, hi), other)
 
+    @beartype
     def distribution(
         self,
-        fill_items: _MappingT = None,
-    ) -> Iterator[Tuple[OutcomeP, float]]:
+        fill_items: Optional[_MappingT] = None,
+    ) -> Iterator[tuple[OutcomeP, float]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair:
@@ -1273,10 +1300,11 @@ class H(_MappingT):
 
         return ((outcome, count / total) for outcome, count in sorted(combined.items()))
 
+    @beartype
     def distribution_xy(
         self,
-        fill_items: _MappingT = None,
-    ) -> Tuple[Tuple[OutcomeP, ...], Tuple[float, ...]]:
+        fill_items: Optional[_MappingT] = None,
+    ) -> tuple[tuple[OutcomeP, ...], tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
         output from the [``distribution`` method][dyce.h.H.distribution]:
@@ -1290,10 +1318,11 @@ class H(_MappingT):
         ```
         """
         return cast(
-            Tuple[Tuple[int, ...], Tuple[float, ...]],
+            tuple[tuple[OutcomeP, ...], tuple[float, ...]],
             tuple(zip(*self.distribution(fill_items))),
         )
 
+    @beartype
     def format(
         self,
         fill_items: _MappingT = None,
@@ -1375,6 +1404,7 @@ class H(_MappingT):
 
         if width <= 0:
 
+            @beartype
             def parts():
                 yield f"avg: {mu:.2f}"
 
@@ -1386,6 +1416,7 @@ class H(_MappingT):
         else:
             w = width - 15
 
+            @beartype
             def lines():
                 yield f"avg | {mu:7.2f}"
 
@@ -1413,6 +1444,7 @@ class H(_MappingT):
 
             return sep.join(lines())
 
+    @beartype
     def mean(self) -> Union[float, OutcomeP]:
         """
         Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
@@ -1425,13 +1457,17 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
-    def stdev(self, mu: Union[float, OutcomeP] = None) -> Union[float, OutcomeP]:
+    @beartype
+    def stdev(self, mu: Union[None, float, OutcomeP] = None) -> Union[float, OutcomeP]:
         """
         Shorthand for ``math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
-    def variance(self, mu: Union[float, OutcomeP] = None) -> Union[float, OutcomeP]:
+    @beartype
+    def variance(
+        self, mu: Union[None, float, OutcomeP] = None
+    ) -> Union[float, OutcomeP]:
         """
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
@@ -1445,6 +1481,7 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
+    @beartype
     def roll(self) -> OutcomeP:
         r"""
         Returns a (weighted) random outcome.
@@ -1454,7 +1491,7 @@ class H(_MappingT):
 
         return choices(*self.distribution_xy())[0]
 
-    def _lowest_terms(self) -> Iterable[Tuple[OutcomeP, int]]:
+    def _lowest_terms(self) -> Iterable[tuple[OutcomeP, int]]:
         counts_gcd = gcd(*self.counts())
 
         return ((k, v // counts_gcd) for k, v in self.items())

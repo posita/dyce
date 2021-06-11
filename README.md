@@ -260,11 +260,12 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 
 ``dyce`` requires a relatively modern version of Python:
 
-* [cPython](https://www.python.org/) (3.8+)
-* [PyPy](http://pypy.org/) (Python 3.8+ compatible)
+* [cPython](https://www.python.org/) (3.9+)
+* [PyPy](http://pypy.org/) (Python 3.9+ compatible)
 
 ``dyce`` will make use the following optional libraries at runtime, if installed:
 
+* [``beartype``](https://pypi.org/project/beartype/)
 * [``matplotlib``](https://matplotlib.org/)
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib#hacking-quick-start) for additional development and testing dependencies.

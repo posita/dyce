@@ -71,7 +71,6 @@ SETUP_ARGS = {
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
@@ -80,6 +79,7 @@ SETUP_ARGS = {
     "include_package_data": True,
     "extras_require": {
         "dev": [
+            "beartype>=0.7.2",
             "mike",
             # See <https://github.com/mkdocs/mkdocs/issues/2448> and
             # <https://github.com/mkdocstrings/mkdocstrings/issues/295>

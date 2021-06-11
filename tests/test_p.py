@@ -13,10 +13,11 @@ import functools
 import itertools
 import operator
 from collections import defaultdict
-from typing import DefaultDict, Sequence, Tuple
+from collections.abc import Sequence
 from unittest.mock import Mock, patch
 
 import pytest
+from beartype import beartype, roar
 
 from dyce import H, OutcomeP, P
 from dyce.p import (
@@ -156,7 +157,7 @@ class TestP:
     def test_getitem_wrong_type(self) -> None:
         p_d6 = P(6)
 
-        with pytest.raises(TypeError):
+        with pytest.raises(roar.BeartypeException):
             _ = p_d6[""]  # type: ignore
 
     def test_op_add_h(self) -> None:
@@ -641,7 +642,7 @@ class TestP:
 
 
 def test_analyze_selection() -> None:
-    which: Tuple[_GetItemT, ...]
+    which: tuple[_GetItemT, ...]
 
     which = (0,)
     assert _analyze_selection(6, which) == 1
@@ -700,6 +701,7 @@ def test_analyze_selection() -> None:
         _ = _analyze_selection(0, which)
 
 
+@beartype
 def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
     # Generate combinations naively, via Cartesian product, which is much less
     # efficient, but also much easier to read and reason about
@@ -711,12 +713,13 @@ def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
             yield sliced_outcomes, count
 
 
-def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
+@beartype
+def _rwc_validation_helper(p: P, which: slice) -> tuple[Mock, Mock]:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
-    known_counts: DefaultDict[_RollCountT, int] = defaultdict(int)
-    test_counts: DefaultDict[_RollCountT, int] = defaultdict(int)
+    known_counts: defaultdict[_RollCountT, int] = defaultdict(int)
+    test_counts: defaultdict[_RollCountT, int] = defaultdict(int)
 
     for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
         known_counts[roll] += count

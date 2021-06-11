@@ -14,6 +14,8 @@ import operator
 from decimal import Decimal
 from fractions import Fraction
 
+import pytest
+
 from dyce.numtypes import OutcomeP, SupportsBitwise
 
 from .numberwang import Numberwang, Wangernumb
@@ -35,7 +37,26 @@ except ImportError:
 # ---- Tests ---------------------------------------------------------------------------
 
 
-def test_real_proto() -> None:
+def test_beartype_detection() -> None:
+    from beartype import beartype
+    from beartype.roar import BeartypeException
+
+    @beartype
+    def _outcome_identity(arg: OutcomeP) -> OutcomeP:
+        return arg
+
+    with pytest.raises(BeartypeException):
+        _outcome_identity("-273")  # type: ignore
+
+    @beartype
+    def _outcome_lies(arg: OutcomeP) -> str:
+        return arg  # type: ignore
+
+    with pytest.raises(BeartypeException):
+        _outcome_lies(-273)
+
+
+def test_outcome_proto() -> None:
     assert isinstance(-273.15, OutcomeP)
     assert isinstance(-273, OutcomeP)
     assert isinstance(Fraction(-27315, 100), OutcomeP)
@@ -56,7 +77,7 @@ def test_real_proto() -> None:
     assert not isinstance("-273.15", OutcomeP)
 
 
-def test_integral_proto() -> None:
+def test_supports_bitwise_proto() -> None:
     assert isinstance(-273, SupportsBitwise)
     assert isinstance(Numberwang(-273), SupportsBitwise)
 

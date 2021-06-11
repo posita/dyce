@@ -10,18 +10,23 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Iterable, Iterator, List, Tuple, Type, Union
+from collections.abc import Iterable, Iterator, Sequence
+from numbers import Real
+from typing import Optional, Union
 
+from .bt import beartype
 from .experimental import experimental
 from .h import H
 
 try:
-    import matplotlib.axes
-    import matplotlib.figure
     import matplotlib.pyplot
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
 except ImportError:
     warnings.warn("matplotlib not found; {} APIs disabled".format(__name__))
     matplotlib = None  # noqa: F811
+    Axes = None  # noqa: F811
+    Figure = None  # noqa: F811
 
 __all__ = ()
 
@@ -29,16 +34,9 @@ __all__ = ()
 # ---- Types ---------------------------------------------------------------------------
 
 
-ColorT = Tuple[float, float, float, float]
-ColorListT = List[ColorT]
-LabelT = Tuple[str, float]
-
-if matplotlib:
-    AxesT = Type[matplotlib.axes.Axes]
-    FigureT = Type[matplotlib.figure.Figure]
-else:
-    AxesT = Any  # type: ignore
-    FigureT = Any  # type: ignore
+ColorT = Sequence[float]
+ColorListT = Iterable[ColorT]
+LabelT = tuple[str, Union[float, Real]]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -54,6 +52,7 @@ _HIDE_LIM = 1 / 2 ** 6
 
 
 @experimental
+@beartype
 def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
     """
     !!! warning "Experimental"
@@ -71,13 +70,14 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
 
 
 @experimental
+@beartype
 def display_burst(
-    ax: AxesT,
+    ax: Axes,
     h_inner: H,
     outer: Union[H, Iterable[LabelT]] = None,
-    desc: str = None,
+    desc: Optional[str] = None,
     inner_color: str = DEFAULT_GRAPH_COLOR,
-    outer_color: str = None,
+    outer_color: Optional[str] = None,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
 ) -> None:
@@ -136,6 +136,7 @@ def display_burst(
 
 
 @experimental
+@beartype
 def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
     """
     !!! warning "Experimental"
@@ -161,6 +162,7 @@ def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
 
 
 @experimental
+@beartype
 def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
@@ -186,15 +188,16 @@ def labels_cumulative(
 
 
 @experimental
+@beartype
 def plot_burst(
     h_inner: H,
     outer: Union[H, Iterable[LabelT]] = None,
     desc: str = None,
     inner_color: str = DEFAULT_GRAPH_COLOR,
-    outer_color: str = None,
+    outer_color: Optional[str] = None,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
-) -> Tuple[FigureT, AxesT]:
+) -> tuple[Figure, Axes]:
     """
     !!! warning "Experimental"
 

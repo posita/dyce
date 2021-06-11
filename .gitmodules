@@ -1,0 +1,6 @@
+[submodule "modules/beartype"]
+	path = modules/beartype
+	url = https://github.com/beartype/beartype.git
+[submodule "modules/sympy"]
+	path = modules/sympy
+	url = https://github.com/sympy/sympy.git

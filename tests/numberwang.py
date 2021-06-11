@@ -1,3 +1,14 @@
+# -*- encoding: utf-8 -*-
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+from __future__ import annotations
+
 from decimal import Decimal
 from math import ceil, floor, trunc
 from numbers import Integral, Real
@@ -23,7 +34,9 @@ from operator import rshift as op_rshift
 from operator import sub as op_sub
 from operator import truediv as op_truediv
 from operator import xor as op_xor
-from typing import Union, overload
+from typing import Optional, Union, overload
+
+from beartype import beartype
 
 __all__ = ("Numberwang", "Wangernumb")
 
@@ -39,30 +52,39 @@ _RealT = Union[float, Real]
 
 
 class Numberwang(Integral):
+    @beartype
     def __init__(self, arg: _RealT = 0):
         self.val = int(arg)
 
+    @beartype
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.val})"
 
+    @beartype
     def __lt__(self, other) -> bool:
         return op_lt(self.val, other)
 
+    @beartype
     def __le__(self, other) -> bool:
         return op_le(self.val, other)
 
+    @beartype
     def __eq__(self, other) -> bool:
         return op_eq(self.val, other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         return op_ne(self.val, other)
 
+    @beartype
     def __ge__(self, other) -> bool:
         return op_ge(self.val, other)
 
+    @beartype
     def __gt__(self, other) -> bool:
         return op_gt(self.val, other)
 
+    @beartype
     def __hash__(self) -> int:
         return hash((self.__class__.__name__, self.val))
 
@@ -78,6 +100,7 @@ class Numberwang(Integral):
     def __add__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __add__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_add(self.val, other))
@@ -98,6 +121,7 @@ class Numberwang(Integral):
     def __radd__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __radd__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_add(other, self.val))
@@ -118,6 +142,7 @@ class Numberwang(Integral):
     def __sub__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __sub__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_sub(self.val, other))
@@ -138,6 +163,7 @@ class Numberwang(Integral):
     def __rsub__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rsub__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_sub(other, self.val))
@@ -158,6 +184,7 @@ class Numberwang(Integral):
     def __mul__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __mul__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mul(self.val, other))
@@ -178,6 +205,7 @@ class Numberwang(Integral):
     def __rmul__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rmul__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mul(other, self.val))
@@ -194,6 +222,7 @@ class Numberwang(Integral):
     def __truediv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __truediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
             return Wangernumb(op_truediv(self.val, other))
@@ -208,6 +237,7 @@ class Numberwang(Integral):
     def __rtruediv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rtruediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
             return Wangernumb(op_truediv(other, self.val))
@@ -226,6 +256,7 @@ class Numberwang(Integral):
     def __floordiv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __floordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_floordiv(self.val, other))
@@ -246,6 +277,7 @@ class Numberwang(Integral):
     def __rfloordiv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rfloordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_floordiv(other, self.val))
@@ -266,6 +298,7 @@ class Numberwang(Integral):
     def __mod__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __mod__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mod(self.val, other))
@@ -286,6 +319,7 @@ class Numberwang(Integral):
     def __rmod__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rmod__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mod(other, self.val))
@@ -308,6 +342,7 @@ class Numberwang(Integral):
     def __pow__(self, other: Decimal) -> Decimal:  # pylint: disable=signature-differs
         ...
 
+    @beartype
     def __pow__(self, other):  # pylint: disable=signature-differs
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_pow(self.val, other))
@@ -328,6 +363,7 @@ class Numberwang(Integral):
     def __rpow__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rpow__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_pow(other, self.val))
@@ -336,6 +372,7 @@ class Numberwang(Integral):
         else:
             return op_pow(other, self.val)
 
+    @beartype
     def __lshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_lshift(self.val, other))
@@ -344,6 +381,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __rlshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_lshift(other, self.val))
@@ -352,6 +390,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __rshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_rshift(self.val, other))
@@ -360,6 +399,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __rrshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_rshift(other, self.val))
@@ -368,6 +408,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __and__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_and(self.val, other))
@@ -376,6 +417,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __rand__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_and(other, self.val))
@@ -384,6 +426,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __xor__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_xor(self.val, other))
@@ -392,6 +435,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __rxor__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_xor(other, self.val))
@@ -400,6 +444,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __or__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_or(self.val, other))
@@ -408,6 +453,7 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __ror__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_or(other, self.val))
@@ -416,35 +462,44 @@ class Numberwang(Integral):
         else:
             return NotImplemented
 
+    @beartype
     def __neg__(self) -> "Numberwang":
         return Numberwang(op_neg(self.val))
 
+    @beartype
     def __pos__(self) -> "Numberwang":
         return Numberwang(op_pos(self.val))
 
+    @beartype
     def __abs__(self) -> "Numberwang":
         return Numberwang(op_abs(self.val))
 
+    @beartype
     def __invert__(self) -> "Numberwang":
         return Numberwang(op_invert(self.val))
 
+    @beartype
     def __int__(self) -> int:
         return self.val
 
-    def __round__(self, ndigits: _IntegralT = None) -> "Numberwang":  # type: ignore
+    @beartype
+    def __round__(self, ndigits: Optional[_IntegralT] = None) -> int:
         if ndigits is None:
-            return Numberwang(round(self.val))
+            return round(self.val)
         else:
-            return Numberwang(round(self.val, int(ndigits)))
+            return round(self.val, int(ndigits))
 
-    def __trunc__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(trunc(self.val))
+    @beartype
+    def __trunc__(self) -> int:
+        return trunc(self.val)
 
-    def __floor__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(floor(self.val))
+    @beartype
+    def __floor__(self) -> int:
+        return floor(self.val)
 
-    def __ceil__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(ceil(self.val))
+    @beartype
+    def __ceil__(self) -> int:
+        return ceil(self.val)
 
 
 Integral.register(Numberwang)
@@ -453,30 +508,39 @@ assert isinstance(Numberwang(0), Integral)
 
 
 class Wangernumb(Real):
+    @beartype
     def __init__(self, arg: _RealT = 0):
         self.val = float(arg)
 
+    @beartype
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.val})"
 
+    @beartype
     def __lt__(self, other) -> bool:
         return op_lt(self.val, other)
 
+    @beartype
     def __le__(self, other) -> bool:
         return op_le(self.val, other)
 
+    @beartype
     def __eq__(self, other) -> bool:
         return op_eq(self.val, other)
 
+    @beartype
     def __ne__(self, other) -> bool:
         return op_ne(self.val, other)
 
+    @beartype
     def __ge__(self, other) -> bool:
         return op_ge(self.val, other)
 
+    @beartype
     def __gt__(self, other) -> bool:
         return op_gt(self.val, other)
 
+    @beartype
     def __hash__(self) -> int:
         return hash(self.val)
 
@@ -488,6 +552,7 @@ class Wangernumb(Real):
     def __add__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __add__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_add(self.val, other))
@@ -502,6 +567,7 @@ class Wangernumb(Real):
     def __radd__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __radd__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_add(other, self.val))
@@ -516,6 +582,7 @@ class Wangernumb(Real):
     def __sub__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __sub__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_sub(self.val, other))
@@ -530,6 +597,7 @@ class Wangernumb(Real):
     def __rsub__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rsub__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_sub(other, self.val))
@@ -544,6 +612,7 @@ class Wangernumb(Real):
     def __mul__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __mul__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mul(self.val, other))
@@ -558,6 +627,7 @@ class Wangernumb(Real):
     def __rmul__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rmul__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mul(other, self.val))
@@ -572,6 +642,7 @@ class Wangernumb(Real):
     def __truediv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __truediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_truediv(self.val, other))
@@ -586,6 +657,7 @@ class Wangernumb(Real):
     def __rtruediv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rtruediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_truediv(other, self.val))
@@ -600,6 +672,7 @@ class Wangernumb(Real):
     def __floordiv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __floordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_floordiv(self.val, other))
@@ -614,6 +687,7 @@ class Wangernumb(Real):
     def __rfloordiv__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rfloordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_floordiv(other, self.val))
@@ -628,6 +702,7 @@ class Wangernumb(Real):
     def __mod__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __mod__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mod(self.val, other))
@@ -642,6 +717,7 @@ class Wangernumb(Real):
     def __rmod__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rmod__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mod(other, self.val))
@@ -656,6 +732,7 @@ class Wangernumb(Real):
     def __pow__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __pow__(self, other):
         val = op_pow(self.val, other)
 
@@ -672,6 +749,7 @@ class Wangernumb(Real):
     def __rpow__(self, other: Decimal) -> Decimal:
         ...
 
+    @beartype
     def __rpow__(self, other):
         val = op_pow(other, self.val)
 
@@ -680,42 +758,48 @@ class Wangernumb(Real):
         else:
             return val
 
+    @beartype
     def __neg__(self) -> Real:
         return Wangernumb(op_neg(self.val))
 
+    @beartype
     def __pos__(self) -> Real:
         return Wangernumb(op_pos(self.val))
 
+    @beartype
     def __abs__(self) -> Real:
         return Wangernumb(op_abs(self.val))
 
+    @beartype
     def __float__(self) -> float:
         return self.val
 
     @overload  # type: ignore
-    def __round__(self) -> Numberwang:  # pylint: disable=signature-differs
+    def __round__(self) -> int:
         ...
 
     @overload
-    def __round__(  # pylint: disable=signature-differs
-        self, ndigits: _IntegralT
-    ) -> Real:
+    def __round__(self, ndigits: _IntegralT) -> float:
         ...
 
-    def __round__(self, ndigits: _IntegralT = None) -> Real:
+    @beartype
+    def __round__(self, ndigits: Optional[_IntegralT] = None) -> Union[int, float]:  # type: ignore
         if ndigits is None:
-            return Numberwang(round(self.val))
+            return round(self.val)
         else:
-            return Wangernumb(round(self.val, int(ndigits)))
+            return round(self.val, int(ndigits))
 
-    def __trunc__(self) -> _IntegralT:  # type: ignore
-        return Numberwang(trunc(self.val))
+    @beartype
+    def __trunc__(self) -> int:
+        return trunc(self.val)
 
-    def __floor__(self) -> Real:  # type: ignore
-        return Wangernumb(floor(self.val))
+    @beartype
+    def __floor__(self) -> int:
+        return floor(self.val)
 
-    def __ceil__(self) -> Real:  # type: ignore
-        return Wangernumb(ceil(self.val))
+    @beartype
+    def __ceil__(self) -> int:
+        return ceil(self.val)
 
 
 Real.register(Wangernumb)

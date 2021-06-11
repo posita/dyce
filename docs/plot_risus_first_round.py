@@ -9,8 +9,6 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple
-
 from dyce import H
 
 
@@ -24,8 +22,8 @@ def do_it(_: str) -> None:
 
     for i, them in enumerate(range(3, 3 + num_scenarios)):
         ax = axes[i]
-        row_names: List[str] = []
-        rows: List[Tuple[float, ...]] = []
+        row_names: list[str] = []
+        rows: list[tuple[float, ...]] = []
         num_rows = 3
 
         for us in range(them, them + num_rows):

@@ -13,12 +13,12 @@ import argparse
 import importlib.machinery
 import importlib.util
 import pathlib
-from typing import Callable, Tuple
+from collections.abc import Callable
 
 __all__ = ("import_plug",)
 
 
-def import_plug(arg: str, pfx: str) -> Tuple[str, Callable[[str], None]]:
+def import_plug(arg: str, pfx: str) -> tuple[str, Callable[[str], None]]:
 
     try:
         my_dir = pathlib.Path(__file__).parent
