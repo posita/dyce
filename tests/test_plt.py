@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import generator_stop
+from __future__ import annotations, generator_stop
 
 import random
 import warnings

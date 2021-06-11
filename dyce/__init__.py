@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import generator_stop
+from __future__ import annotations, generator_stop
 
 from .h import *  # noqa: F401,F403 # pylint: disable=wildcard-import
 from .p import *  # noqa: F401,F403 # pylint: disable=wildcard-import

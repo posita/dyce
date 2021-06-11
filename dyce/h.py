@@ -7,14 +7,13 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import generator_stop
+from __future__ import annotations, generator_stop
 
 from collections import Counter as counter
 from collections import OrderedDict as ordereddict
 from collections.abc import Mapping as ABCMapping
 from itertools import chain, product, repeat
 from math import sqrt
-from numbers import Integral, Real
 from operator import abs as op_abs
 from operator import add as op_add
 from operator import and_ as op_and
@@ -59,7 +58,7 @@ __all__ = ("H",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_FaceT = float
+_FaceT = Union[int, float]
 _CountT = int
 _MappingT = Mapping[_FaceT, _CountT]
 _SourceT = Union[
@@ -321,11 +320,7 @@ class H(_MappingT):
         self._simple_init = None
         tmp: Counter[_FaceT] = counter()
 
-        # Tolerate Reals (and in some cases Integrals) for use with things like numpy
-        # and SageMath, but we can't add type annotations for them yet. See
-        # https://github.com/python/mypy/issues/3186. Similar checks are present
-        # elsewhere here and in dyce.p.P.
-        if isinstance(items, (int, Integral)):
+        if isinstance(items, int):
             if items != 0:
                 self._simple_init = items
                 face_type = type(items)
@@ -441,7 +436,7 @@ class H(_MappingT):
             return NotImplemented
 
     def __matmul__(self, other: int) -> "H":
-        if not isinstance(other, (int, Integral)):
+        if not isinstance(other, int):
             return NotImplemented
         elif other < 0:
             raise ValueError("argument cannot be negative")
@@ -601,7 +596,7 @@ class H(_MappingT):
         if isinstance(other, HAbleT):
             other = other.h()
 
-        if isinstance(other, Real):
+        if isinstance(other, (int, float)):
             return H((oper(face, other), count) for face, count in self.items())
         elif isinstance(other, H):
             return H((oper(s, o), self[s] * other[o]) for s, o in product(self, other))
@@ -609,7 +604,7 @@ class H(_MappingT):
             raise NotImplementedError
 
     def rmap(self, oper: _BinaryOperatorT, other: _FaceT) -> "H":
-        if isinstance(other, Real):
+        if isinstance(other, (int, float)):
             return H((oper(other, face), count) for face, count in self.items())
         else:
             raise NotImplementedError
@@ -770,7 +765,7 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, Real):
+        if isinstance(other, (int, float)):
             other = cast(Iterable[_FaceT], (other,))
         elif isinstance(other, ABCMapping):
             other = other.items()

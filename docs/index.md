@@ -719,8 +719,8 @@ Alternately, you can download the sources (e.g., [from GitHub](https://github.co
 
 A modern version of Python is required:
 
-* [cPython](https://www.python.org/) (3.6+)
-* [PyPy](http://pypy.org/) (Python 3.6+ compatible)
+* [cPython](https://www.python.org/) (3.7+)
+* [PyPy](http://pypy.org/) (Python 3.7+ compatible)
 
 ``dyce`` has the following dependencies (which will be installed automatically):
 

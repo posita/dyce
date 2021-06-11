@@ -1,3 +1,5 @@
+from __future__ import annotations, generator_stop
+
 from typing import List, Tuple
 
 from dyce import H

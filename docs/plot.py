@@ -1,3 +1,5 @@
+from __future__ import annotations, generator_stop
+
 import argparse
 import importlib.machinery
 import importlib.util

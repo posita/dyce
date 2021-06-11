@@ -1,3 +1,5 @@
+from __future__ import annotations, generator_stop
+
 from dyce import H, P
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import generator_stop
+from __future__ import annotations, generator_stop
 
 import argparse
 import doctest
