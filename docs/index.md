@@ -488,15 +488,15 @@ We can even model various starting configurations through to completion to get a
 ...     us_vs_them_func: Callable[[int, int], H],
 ... ) -> H:
 ...   if us < 0 or them < 0:
-...     raise ValueError("can't have negative numbers (us: {}, them: {})".format(us, them))
+...     raise ValueError("cannot have negative numbers (us: {}, them: {})".format(us, them))
 ...   if us == 0 and them == 0:
-...     return H({0: 1})  # shouldn't happen unless combat(0, 0) is called from the start
+...     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
 ...   solved: Dict[Tuple[int, int], H] = {}
 ...
 ...   def _resolve(us: int, them: int) -> H:
 ...     if (us, them) in solved: return solved[(us, them)]
-...     elif us == 0: return H({-1: 1})  # we're out of dice, they win
-...     elif them == 0: return H({1: 1})  # they're out of dice, we win
+...     elif us == 0: return H({-1: 1})  # we are out of dice, they win
+...     elif them == 0: return H({1: 1})  # they are out of dice, we win
 ...     this_round = us_vs_them_func(us, them)
 ...
 ...     def _next_round(_: H, f) -> H:

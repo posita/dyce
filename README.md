@@ -325,7 +325,7 @@ Example 1 translation:
 >>> def gwf(h: H, face):
 ...   return h if face in (1, 2) else face
 
->>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it's a one or two
+>>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it is a one or two
 >>> faces, probabilities = great_weapon_fighting.data_xy()
 >>> matplotlib.pyplot.bar(
 ...   [f + 0.125 for f in faces],

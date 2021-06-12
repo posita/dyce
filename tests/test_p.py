@@ -12,13 +12,21 @@ from __future__ import annotations, generator_stop
 import functools
 import itertools
 import operator
-from typing import Sequence, Tuple
+from collections import defaultdict
+from typing import DefaultDict, Sequence, Tuple
+from unittest.mock import Mock, patch
 
 import pytest
 
 from dyce import H, P
-from dyce.h import _FaceT
-from dyce.p import _analyze_selection, _select_from_end
+from dyce.h import _CountT, _FaceT
+from dyce.p import (
+    _analyze_selection,
+    _GetItemT,
+    _RollCountT,
+    _rwc_homogeneous_n_h_using_karonen_partial_selection,
+    _rwc_homogeneous_n_h_using_multinomial_coefficient,
+)
 
 __all__ = ()
 
@@ -442,6 +450,46 @@ class TestP:
             for roll, count in p_4df.rolls_with_counts()
         )
 
+    def test_h_take_heterogeneous_dice_vs_known_correct(self) -> None:
+        p_d3 = P(3)
+        p_d3n = -p_d3
+        p_d4 = P(4)
+        p_d4n = -p_d4
+        p_4d3_4d4 = 2 @ P(p_d3, p_d3n, p_d4n, p_d4)
+
+        for which in (
+            slice(0, 0),
+            slice(-1, None),
+            slice(-2, None),
+            slice(2),
+            slice(1),
+        ):
+            assert p_4d3_4d4.h(which) == H(
+                (sum(roll), count)
+                for roll, count in _brute_force_combinations_with_counts(
+                    tuple(p_4d3_4d4), which
+                )
+            )
+
+    def test_h_take_homogeneous_dice_vs_known_correct(self) -> None:
+        # Use the brute-force mechanism to validate our harder-to-understand
+        # implementation
+        p_df = P(H((-1, 0, 1)))
+        p_4df = 4 @ p_df
+
+        for which in (
+            slice(0, 0),
+            slice(2, 3),
+            slice(1, 2),
+            slice(0, 1),
+        ):
+            assert p_4df.h(which) == H(
+                (sum(roll), count)
+                for roll, count in _brute_force_combinations_with_counts(
+                    tuple(p_4df), which
+                )
+            )
+
     def test_h_take_n_twice_from_n_homogeneous_dice(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -491,107 +539,158 @@ class TestP:
         assert tuple(P().rolls_with_counts()) == ()
 
     def test_rolls_with_counts_heterogeneous(self) -> None:
-        assert tuple(P(2, 3).rolls_with_counts()) == (
+        assert sorted(P(2, 3).rolls_with_counts()) == [
             ((1, 1), 1),
             ((1, 2), 1),
+            ((1, 2), 1),  # originated as ((2, 1), 1), but faces get sorted in each roll
             ((1, 3), 1),
-            ((1, 2), 1),  # originated as ((2, 1), 1), but faces get sorted
             ((2, 2), 1),
             ((2, 3), 1),
-        )
+        ]
 
     def test_rolls_with_counts_homogeneous(self) -> None:
-        assert tuple(P(2, 2).rolls_with_counts()) == (
+        assert sorted(P(2, 2).rolls_with_counts()) == [
             ((1, 1), 1),
             ((1, 2), 2),
             ((2, 2), 1),
-        )
+        ]
 
-    def test_validate_implementation_combinations_heterogeneous_dice(self) -> None:
+    def test_rolls_with_counts_take_heterogeneous_dice_vs_known_correct(self) -> None:
         p_d3 = P(3)
-        p_d3n = -p_d3
-        p_d4 = P(4)
-        p_d4n = -p_d4
-        p_4d3_4d4 = 2 @ P(p_d3, p_d3n, p_d4n, p_d4)
-        assert p_4d3_4d4.h(slice(0, 0)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(0, 0))
-        )
-        assert p_4d3_4d4.h(slice(-1, None)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(-1, None))
-        )
-        assert p_4d3_4d4.h(slice(-2, None)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(-2, None))
-        )
-        assert p_4d3_4d4.h(slice(2)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 2))
-        )
-        assert p_4d3_4d4.h(slice(1)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4d3_4d4), slice(None, 1))
-        )
+        p_d4n = P(-4)
+        p_3d3_4d4n = P(3 @ p_d3, 4 @ p_d4n)
 
-    def test_validate_implementation_combinations_homogeneous_dice(self) -> None:
-        # Use the brute-force mechanism to validate our harder-to-understand
-        # implementation
+        for which in (
+            # All faces
+            slice(None),
+            # 4 faces
+            slice(4),
+            slice(-4, None),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
+            karonen.assert_not_called()
+            multinomial_coefficient.assert_called()
+
+        for which in (
+            # 3 faces
+            slice(3),
+            slice(-3, None),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
+            karonen.assert_called()  # called for 4d4n where k < n
+            multinomial_coefficient.assert_called()  # called for 3d3 where k == n
+
+        for which in (
+            # 2 faces
+            slice(2),
+            slice(-2, None),
+            # 1 face
+            slice(1),
+            slice(-1, None),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
+            karonen.assert_called()
+            multinomial_coefficient.assert_not_called()
+
+        for which in (
+            # No faces
+            slice(0, 0),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
+            karonen.assert_not_called()
+            multinomial_coefficient.assert_not_called()
+
+    def test_rolls_with_counts_take_homogeneous_dice_vs_known_correct(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
-        assert p_4df.h(slice(0, 0)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4df), slice(0, 0))
-        )
-        assert p_4df.h(slice(2, 3)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4df), slice(2, 3))
-        )
-        assert p_4df.h(slice(1, 2)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4df), slice(1, 2))
-        )
-        assert p_4df.h(slice(0, 1)) == H(
-            _brute_force_combinations_with_counts(tuple(p_4df), slice(0, 1))
-        )
+
+        for which in (
+            # All faces
+            slice(None),
+            slice(0, 4),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
+            karonen.assert_not_called()
+            multinomial_coefficient.assert_called()
+
+        for which in (
+            # 1 Face
+            slice(0, 1),
+            slice(1, 2),
+            slice(2, 3),
+            slice(3, 4),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
+            karonen.assert_called()
+            multinomial_coefficient.assert_not_called()
+
+        for which in (
+            # No faces
+            slice(0, 0),
+        ):
+            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
+            karonen.assert_not_called()
+            multinomial_coefficient.assert_not_called()
 
 
 def test_analyze_selection() -> None:
-    which: Tuple[int, ...]
+    which: Tuple[_GetItemT, ...]
 
     which = (0,)
-    assert _analyze_selection(6, which) == (1, 1)
-    which = (0, 2, 1)
-    assert _analyze_selection(6, which) == (3, 1)
-    which = (0, 2, 1, 2, 1, 0)
-    assert _analyze_selection(6, which) == (3, 2)
+    assert _analyze_selection(6, which) == 1
+    which = (-1,)
+    assert _analyze_selection(6, which) == -1
     which = (0, 1, 0, 0, 1)
-    assert _analyze_selection(6, which) == (None, None)
+    assert _analyze_selection(6, which) == 2
+    which = (0, 1, 0, 0, 1, 4)
+    assert _analyze_selection(6, which) == 5
+    which = (5, 1, 5, 5, 1, 4)
+    assert _analyze_selection(6, which) == -5
 
-    which = (5,)
-    assert _analyze_selection(6, which) == (-1, 1)
-    which = (5, 3, 4)
-    assert _analyze_selection(6, which) == (-3, 1)
-    which = (5, 3, 4, 4, 3, 5)
-    assert _analyze_selection(6, which) == (-3, 2)
-    which = (5, 4, 5, 5, 4)
-    assert _analyze_selection(6, which) == (None, None)
+    which = tuple(range(6))
+    assert _analyze_selection(6, which) == 6
+    which = tuple(range(0, -6, -1))
+    assert _analyze_selection(6, which) == 6
+    which = tuple(range(6)) + tuple(range(0, -6, -1))
+    assert _analyze_selection(6, which) == 12
+    which = (slice(None),)
+    assert _analyze_selection(6, which) == 6
+    which = (slice(0, None), slice(-6, None))
+    assert _analyze_selection(6, which) == 12
+
+    which = (-1, 0)
+    assert _analyze_selection(6, which) is None
+    which = tuple(range(6)) + tuple(range(3))
+    assert _analyze_selection(6, which) is None
+
+    which = (2,)
+    assert _analyze_selection(6, which) == 3
+    which = (3,)
+    assert _analyze_selection(6, which) == -3
+    which = (2, 3)
+    assert _analyze_selection(6, which) == 4
+    which = (1, 2, 3)
+    assert _analyze_selection(6, which) == 4
+    which = (2, 3, 4)
+    assert _analyze_selection(6, which) == -4
+
+    which = (2,)
+    assert _analyze_selection(5, which) == 3
+    which = (1, 2)
+    assert _analyze_selection(5, which) == 3
+    which = (2, 3)
+    assert _analyze_selection(5, which) == -3
 
     which = ()
-    assert _analyze_selection(6, which) == (0, 0)
-    which = (0, 2, 4, 1, 3, 5)
-    assert _analyze_selection(6, which) == (6, 1)
-    which = (0, 2, 4, 1, 3, 5, 5, 3, 1, 4, 2, 0)
-    assert _analyze_selection(6, which) == (6, 2)
-    which = (0, 2, 4, 1, 3, 5, 3, 1, 4, 2, 0)
-    assert _analyze_selection(6, which) == (None, None)
+    assert _analyze_selection(0, which) == 0
+    which = ()
+    assert _analyze_selection(6, which) == 0
+    which = (slice(0, 0),)
+    assert _analyze_selection(6, which) == 0
 
-    which = (1, 3, 2, 4)
-    assert _analyze_selection(6, which) == (None, None)
-    which = (1, 3, 2, 4, 4, 3, 2, 1)
-    assert _analyze_selection(6, which) == (None, None)
-
-
-def test_select_from_end() -> None:
-    h, n, k = H(6), 4, 2
-    assert H((sum(roll), count) for roll, count in _select_from_end(h, n, k)) == (
-        n @ P(h)
-    ).h(slice(k))
-    assert H((sum(roll), count) for roll, count in _select_from_end(h, n, -k)) == (
-        n @ P(h)
-    ).h(slice(-k, None))
+    with pytest.raises(IndexError):
+        which = (1,)
+        _ = _analyze_selection(0, which)
 
 
 def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
@@ -600,5 +699,31 @@ def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
     if len(operator.getitem(hs, key)) > 0:
         for rolls in itertools.product(*(h.items() for h in hs)):
             faces, counts = tuple(zip(*rolls))
-            sliced_faces = operator.getitem(sorted(faces), key)
-            yield sum(sliced_faces), functools.reduce(operator.mul, counts)
+            sliced_faces = tuple(operator.getitem(sorted(faces), key))
+            count = functools.reduce(operator.mul, counts)
+            yield sliced_faces, count
+
+
+def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
+    # Use the brute-force mechanism to validate our harder-to-understand implementation.
+    # Note that there can be repeats and order is not guaranteed, which is why we have
+    # to accumulate counts for rolls and then compare entire results.
+    known_counts: DefaultDict[_RollCountT, _CountT] = defaultdict(int)
+    test_counts: DefaultDict[_RollCountT, _CountT] = defaultdict(int)
+
+    for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
+        known_counts[roll] += count
+
+    with patch(
+        "dyce.p._rwc_homogeneous_n_h_using_karonen_partial_selection",
+        side_effect=_rwc_homogeneous_n_h_using_karonen_partial_selection,
+    ) as karonen, patch(
+        "dyce.p._rwc_homogeneous_n_h_using_multinomial_coefficient",
+        side_effect=_rwc_homogeneous_n_h_using_multinomial_coefficient,
+    ) as multinomial_coefficient:
+        for roll, count in p.rolls_with_counts(which):
+            test_counts[roll] += count
+
+    assert test_counts == known_counts, f"which: {which}"
+
+    return karonen, multinomial_coefficient

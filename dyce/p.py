@@ -30,8 +30,8 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    Optional,
     Sequence,
-    Set,
     Tuple,
     TypeVar,
     Union,
@@ -50,6 +50,8 @@ __all__ = ("P",)
 _T = TypeVar("_T")
 _GetItemT = Union[int, slice]
 _OperandT = Union[_FaceT, "P"]
+_RollT = Tuple[_FaceT, ...]
+_RollCountT = Tuple[_RollT, _CountT]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -269,6 +271,9 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     def h(self, *which: _GetItemT) -> H:
         r"""
+        Roughly equivalent to ``H( (sum(roll), count) for roll, count in
+        self.rolls_with_counts(*which) )`` with some short-circuit optimizations.
+
         When provided no arguments, ``h`` combines (or “flattens”) contained histograms in
         accordance with the [``HAbleT`` protocol][dyce.h.HAbleT]:
 
@@ -278,12 +283,12 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        If one or more arguments are provided, ``h`` sums subsets of faces those
-        arguments identify. Identifiers can be ``int``s or ``slice``s, and can be mixed.
+        If one or more arguments are provided, this method sums subsets of faces those
+        arguments identify for each roll. Faces are ordered from least (index ``0``) to
+        greatest (index ``-1`` or ``len(self) - 1``). Identifiers can be ``int``s or
+        ``slice``s, and can be mixed.
 
-        All outcomes are counted. For each outcome, dice are ordered from least (index
-        ``0``) to greatest (index ``-1`` or ``len(self) - 1``). Taking the greatest of
-        two six-sided dice can be modeled as:
+        Taking the greatest of two six-sided dice can be modeled as:
 
         ```python
         >>> p_2d6 = 2@P(6)
@@ -299,24 +304,6 @@ class P(Sequence[H], HAbleBinOpsMixin):
           4 |  19.44% |#########
           5 |  25.00% |############
           6 |  30.56% |###############
-
-        ```
-
-        Slices and multiple arguments support more flexible face selections:
-
-        ```python
-        >>> p_6d6 = 6@P(6)
-        >>> every_other_d6 = p_6d6.h(slice(None, None, -2))
-        >>> every_other_d6
-        H({3: 1, 4: 21, 5: 86, ..., 16: 1106, 17: 395, 18: 31})
-        >>> p_6d6.h(5, 3, 1) == every_other_d6
-        True
-        >>> p_6d6.h(*range(1, 6, 2)) == every_other_d6
-        True
-        >>> p_6d6.h(*(i for i in range(0, 6) if i % 2 == 1)) == every_other_d6
-        True
-        >>> p_6d6.h(*{1, 3, 5}) == every_other_d6
-        True
 
         ```
 
@@ -347,58 +334,32 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        Taking contiguous faces from either end of a homogeneous pool benefits from
-        [Ilmari Karonen’s optimization](https://rpg.stackexchange.com/a/166663/71245):
-
-        ```python
-        In [2]: %timeit P(6, 6, 6, 6, 6, 6, 6, 6, 6, 6).h(slice(-2, None))  # homogeneous from end (optimized)
-        2.08 ms ± 17.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-
-        In [3]: %timeit P(6, 6, 6, 6, 6, 6, 6, 6, 6, 6).h(slice(3, 5))  # homogeneous from middle (less efficient)
-        25.2 ms ± 653 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-
-        In [4]: %timeit P(4, 4, 4, 4, 4, 6, 6, 6, 6, 6).h(slice(-2, None))  # heterogeneous (least efficient)
-        42.4 ms ± 86.4 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-        ```
-
-        Taking all faces exactly once is equivalent to our sum operation:
+        Taking all faces exactly once is equivalent to summing the dice in the pool.
 
         ```python
         >>> d6 = H(6)
         >>> d233445 = H((2, 3, 3, 4, 4, 5))
         >>> p = 2@P(d6, d233445)
-        >>> p.h(slice(None)) == d6 + d6 + d233445 + d233445
-        True
-        >>> p.h(slice(None)) == p.h()
+        >>> p.h(slice(None)) == p.h() == d6 + d6 + d233445 + d233445
         True
 
         ```
         """
-        n = len(self._hs)
-        from_end, from_count = _analyze_selection(n, which)
+        if which:
+            n = len(self._hs)
+            i = _analyze_selection(n, which)
 
-        if not which:
+            if i and i >= n:
+                # The caller selected all dice in the pool exactly i // n times, so we
+                # can short-circuit roll enumeration
+                assert i % n == 0
+
+                return self.h() * i // n
+            else:
+                return H((sum(r), c) for r, c in self.rolls_with_counts(*which))
+        else:
             # The caller offered no selection
             return sum_w_start(self._hs, start=H({}))
-        elif from_end == 0:
-            # The caller explicitly selected zero dice
-            return H({})
-        elif from_end == n:
-            assert from_count is not None
-
-            # The caller selected all dice in the pool exactly once
-            return self.h() * from_count
-        elif self.homogeneous and n and from_end:
-            assert from_count is not None
-
-            # Optimize when taking from an end of a non-zero length homogeneous pool
-            return H(
-                (sum(roll) * from_count, count)
-                for roll, count in _select_from_end(self._hs[0], n, from_end)
-            )
-        else:
-            # Do it the hard way
-            return H(_take_and_sum_faces(self.rolls_with_counts(), which))
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -492,8 +453,8 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```python
         >>> p_2d6 = P(6, 6)
-        >>> tuple(p_2d6.rolls_with_counts())
-        (((1, 1), 1), ((1, 2), 2), ((1, 3), 2), ((1, 4), 2), ((1, 5), 2), ((1, 6), 2), ...)
+        >>> list(p_2d6.rolls_with_counts())
+        [((1, 1), 1), ((1, 2), 2), ((1, 3), 2), ((1, 4), 2), ((1, 5), 2), ((1, 6), 2), ...]
         >>> p_2d6.appearances_in_rolls(1)
         H({0: 25, 1: 10, 2: 1})
 
@@ -569,22 +530,45 @@ class P(Sequence[H], HAbleBinOpsMixin):
         """
         return self.h().explode(max_depth)
 
-    def roll(self) -> Tuple[_FaceT, ...]:
+    def roll(self) -> _RollT:
         r"""
         Returns (weighted) random faces from contained histograms.
         """
         return tuple(h.roll() for h in self._hs)
 
-    def rolls_with_counts(self) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
+    def rolls_with_counts(self, *which: _GetItemT) -> Iterator[_RollCountT]:
         r"""
         Returns an iterator yielding 2-tuples (pairs) that, collectively, enumerate all
         possible outcomes for the pool. The first item in the 2-tuple is a sorted
         sequence of the faces for a distinct roll. The second is the count for that
         roll. Faces in each roll are ordered least to greatest.
 
-        We can model the likelihood of achieving a “Yhatzee” (i.e., where five six-sided
-        dice show the same face) on a single roll by checking rolls for where the least
-        and greatest faces are the same:
+        If one or more arguments are provided, this methods selects subsets of faces for
+        each roll. Faces in each roll are ordered from least (index ``0``) to greatest
+        (index ``-1`` or ``len(self) - 1``). Identifiers can be ``int``s or ``slice``s,
+        and can be mixed for more flexible selections:
+
+        ```python
+        >>> from collections import Counter
+        >>> def accumulate_roll_counts(counter, roll_counts):
+        ...   for roll, count in roll_counts:
+        ...     counter[roll] += count
+        ...   return counter
+        >>> p_6d6 = 6@P(6)
+        >>> every_other_d6 = accumulate_roll_counts(Counter(), p_6d6.rolls_with_counts(slice(None, None, -2))) ; every_other_d6
+        Counter({(6, 4, 2): 4110, (6, 5, 3): 3390, (6, 4, 3): 3330, ..., (3, 3, 3): 13, (2, 2, 2): 7, (1, 1, 1): 1})
+        >>> accumulate_roll_counts(Counter(), p_6d6.rolls_with_counts(5, 3, 1)) == every_other_d6
+        True
+        >>> accumulate_roll_counts(Counter(), p_6d6.rolls_with_counts(*range(5, 0, -2))) == every_other_d6
+        True
+        >>> accumulate_roll_counts(Counter(), p_6d6.rolls_with_counts(*(i for i in range(6, 0, -1) if i % 2 == 1))) == every_other_d6
+        True
+
+        ```
+
+        One way to model the likelihood of achieving a “Yhatzee” (i.e., where five
+        six-sided dice show the same face) on a single roll by checking rolls for where
+        the least and greatest faces are the same:
 
         ```python
         >>> p_5d6 = 5@P(6)
@@ -598,8 +582,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        Note that, in the general case, rolls may appear more than once, and there are
-        no guarantees about their order.
+        !!! note "In the general case, rolls may appear more than once."
 
         ```python
         >>> list(P(H(2), H(3)).rolls_with_counts())
@@ -610,8 +593,8 @@ class P(Sequence[H], HAbleBinOpsMixin):
         In the above, `(1, 2)` appears a total of two times, each with counts of one.
 
         However, if the pool is homogeneous (meaning it only contains identical
-        histograms), faces are not repeated and are presented in order. (See the note
-        on implementation below.)
+        histograms), rolls (before selection) are not repeated. (See the note on
+        implementation below.)
 
         ```python
         >>> list((2@P(H((-1, 0, 1)))).rolls_with_counts())
@@ -619,14 +602,56 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        By summing and counting all rolls, we can confirm equivalence to taking all
-        faces:
+        Either way, by summing and counting all rolls, we can confirm identity:
 
         ```python
         >>> d6 = H(6)
         >>> d233445 = H((2, 3, 3, 4, 4, 5))
-        >>> pool = 2@P(d6, d233445)
-        >>> H((sum(r), c) for r, c in pool.rolls_with_counts()) == pool.h(slice(None))
+        >>> p = 2@P(d6, d233445)
+        >>> H((sum(roll), count) for roll, count in p.rolls_with_counts()) == p.h() == d6 + d6 + d233445 + d233445
+        True
+
+        ```
+
+        This method does not try to outsmart callers by (mis)interpreting selection
+        arguments. It honors selection identifier order and any redundancy:
+
+        ```python
+        >>> p_d3_d4 = P(H(3), H(4))
+        >>> # Select the second, first, then second (again) elements
+        >>> list(p_d3_d4.rolls_with_counts(-1, 0, 1))
+        [((1, 1, 1), 1), ((2, 1, 2), 1), ((3, 1, 3), 1), ((4, 1, 4), 1), ..., ((3, 1, 3), 1), ((3, 2, 3), 1), ((3, 3, 3), 1), ((4, 3, 4), 1)]
+
+        ```
+
+        Selecting the same faces, but in a different order is not immediately
+        comparable:
+
+        ```python
+        >>> select_0_1 = list(p_d3_d4.rolls_with_counts(0, 1))
+        >>> select_1_0 = list(p_d3_d4.rolls_with_counts(1, 0))
+        >>> select_0_1 == select_1_0
+        False
+
+        ```
+
+        Equivalence can be tested when selected faces are sorted:
+
+        ```python
+        >>> sorted_0_1 = [(sorted(roll), count) for roll, count in select_0_1]
+        >>> sorted_1_0 = [(sorted(roll), count) for roll, count in select_1_0]
+        >>> sorted_0_1 == sorted_1_0
+        True
+
+        ```
+
+        They can also be summed and counted which is equivalent to calling the
+        [``h`` method][dyce.p.P.h] with identical selection arguments.
+
+        ```python
+        >>> summed_0_1 = H((sum(roll), count) for roll, count in select_0_1)
+        >>> summed_1_0 = H((sum(roll), count) for roll, count in select_1_0)
+        >>> summed_0_1 == summed_1_0 == p_d3_d4.h(0, 1) == p_d3_d4.h(1, 0)
         True
 
         ```
@@ -634,9 +659,19 @@ class P(Sequence[H], HAbleBinOpsMixin):
         !!! info "About the implementation"
 
             Enumeration is substantially more efficient for homogeneous pools than
-            heterogeneous ones. This is because—instead of merely computing the
-            Cartesian product—we are able to leverage the [*multinomial
-            coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets):
+            heterogeneous ones, because we are able to avoid the expensive enumeration
+            of the Cartesian product using several techniques.
+
+            Taking $k$ faces, where $k$ selects fewer than all $n$ faces a homogeneous
+            pool benefits from [Ilmari Karonen’s
+            optimization](https://rpg.stackexchange.com/a/166663/71245), which appears
+            to scale geometrically with $k$ times some factor of $n$ (e.g., $\log n$,
+            but I haven’t bothered to figure that out yet), such that—in observed
+            testing, at least—it is generally the fastest approach for $k < n$.
+
+            Where $k = n$, we leverage the [*multinomial
+            coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets),
+            which appears to scale generally with $n$:
 
             $$
             {{n} \choose {{{k}_{1}},{{k}_{2}},\ldots,{{k}_{m}}}}
@@ -656,80 +691,126 @@ class P(Sequence[H], HAbleBinOpsMixin):
             [this](https://www.lucamoroni.it/the-dice-roll-sum-problem/) for an in-depth
             exploration of the topic.)
 
-            This implementation attempts to optimize heterogeneous pools by breaking
-            them into homogeneous groups before computing the Cartesian product of those
-            sub-results. This approach allows homogeneous pools to be ordered without
-            duplicates, where heterogeneous ones offer no such guarantees.
+            Further, this implementation attempts to optimize heterogeneous pools by
+            breaking them into homogeneous groups before computing the Cartesian product
+            of those sub-results. This approach allows homogeneous pools to be ordered
+            without duplicates, where heterogeneous ones offer no such guarantees.
 
             As expected, this optimization allows the performance of arbitrary selection
             from mixed pools to sit between that of purely homogeneous and purely
-            heterogeneous ones. Note, however, that all three scale geometrically in
-            relation to $n$ for arbitrary selections.
+            heterogeneous ones. Note, however, that all three appear to scale
+            geometrically in some way.
 
             ```ipython
             In [1]: from dyce import H, P
 
-            In [2]: for i in range(2, 11, 2):
-               ...:     p = i@P(6)
-               ...:     print("Pool len {} (homogeneous): {}".format(len(p), p))
-               ...:     %timeit p.h(slice(None, None, 2))
-               ...:
-            Pool len 2 (homogeneous): P(6, 6)
-            392 µs ± 14 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-            Pool len 4 (homogeneous): P(6, 6, 6, 6)
-            697 µs ± 17.5 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-            Pool len 6 (homogeneous): P(6, 6, 6, 6, 6, 6)
-            3.19 ms ± 626 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            Pool len 8 (homogeneous): P(6, 6, 6, 6, 6, 6, 6, 6)
-            9.07 ms ± 702 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            Pool len 10 (homogeneous): P(6, 6, 6, 6, 6, 6, 6, 6, 6, 6)
-            22.1 ms ± 511 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            In [2]: for n in (6, 8):
+               ...:   p = n@P(6)
+               ...:   for i in range(len(p) - 4, len(p)):
+               ...:     print(f"({p}).h(slice({i})):")
+               ...:     %timeit p.h(slice(i))
+            (P(6, 6, 6, 6, 6, 6)).h(slice(2)):
+            1.35 ms ± 23.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+            (P(6, 6, 6, 6, 6, 6)).h(slice(3)):
+            3.15 ms ± 516 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(6, 6, 6, 6, 6, 6)).h(slice(4)):
+            5.37 ms ± 182 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(6, 6, 6, 6, 6, 6)).h(slice(5)):
+            10.5 ms ± 1.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(4)):
+            5.58 ms ± 25.3 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(5)):
+            9.81 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(6)):
+            14.7 ms ± 430 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(7)):
+            20.4 ms ± 328 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
-            In [3]: for i in range(1, 6):
-               ...:     hs = [H(6) for _ in range(i)]
-               ...:     hs.extend(H(6) - j for j in range(1, i + 1))
-               ...:     p = P(*hs)
-               ...:     print("Pool len {} (mixed): {}".format(len(p), p))
-               ...:     %timeit p.h(slice(None, None, 2))
-               ...:
-            Pool len 2 (mixed): P(H({0: 1, ..., 5: 1}), 6)
-            273 µs ± 1.78 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-            Pool len 4 (mixed): P(H({-1: 1, ..., 4: 1}), H({0: 1, ..., 5: 1}), 6, 6)
-            2.45 ms ± 20.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            Pool len 6 (mixed): P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)
-            36.5 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            Pool len 8 (mixed): P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)
-            544 ms ± 109 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            Pool len 10 (mixed): P(H({-4: 1, ..., 1: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6, 6)
-            6.68 s ± 271 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            In [3]: for n in (3, 4):
+               ...:   p = P(n@P(6), *[H(6) - m for m in range(n, 0, -1)])
+               ...:   for i in range(len(p) - 4, len(p)):
+               ...:     print(f"({p}).h(slice({i})):")
+               ...:     %timeit p.h(slice(i))
+            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(2)):
+            16.1 ms ± 1.09 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(3)):
+            39 ms ± 602 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(4)):
+            40.3 ms ± 3.49 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(5)):
+            46.2 ms ± 7.43 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(4)):
+            538 ms ± 9.46 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(5)):
+            534 ms ± 30.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(6)):
+            536 ms ± 13.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(7)):
+            604 ms ± 52.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
-            In [4]: for i in range(2, 9, 2):  # larger takes too long on my laptop
-               ...:     p = P(*(H(6) - j for j in range(i)))
-               ...:     print("Pool len {} (heterogeneous): {}".format(len(p), p))
-               ...:     %timeit p.h(slice(None, None, 2))
-               ...:
-            Pool len 2 (heterogeneous): P(H({0: 1, ..., 5: 1}), H({1: 1, ..., 6: 1}))
-            269 µs ± 11.7 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-            Pool len 4 (heterogeneous): P(H({-2: 1, ..., 3: 1}), ..., H({1: 1, ..., 6: 1}))
-            3.93 ms ± 182 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            Pool len 6 (heterogeneous): P(H({-4: 1, ..., 1: 1}), ..., H({1: 1, ..., 6: 1}))
-            148 ms ± 5.2 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            Pool len 8 (heterogeneous): P(H({-6: 1, ..., -1: 1}), ..., H({1: 1, ..., 6: 1}))
-            5.91 s ± 205 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            In [4]: for n in (6, 8):
+               ...:   p = P(*[H(6) - m for m in range(n, 0, -1)])
+               ...:   for i in range(len(p) - 4, len(p)):
+               ...:     print(f"({p}).h(slice({i})):")
+               ...:     %timeit p.h(slice(i))
+            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(2)):
+            145 ms ± 4.59 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(3)):
+            147 ms ± 3.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
+            158 ms ± 1.38 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
+            147 ms ± 691 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
+            6.09 s ± 14.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
+            6.11 s ± 36.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(6)):
+            6.25 s ± 47.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(7)):
+            6.31 s ± 42.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
             ```
         """
-        groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self._hs))
+        n = len(self._hs)
 
-        if len(groups) == 1:
-            # Optimization to use _rolls_with_counts_for_n_homogeneous_histograms
-            # directly if there's only one group; roughly 15% time savings over
-            # delegating to _rolls_with_counts_for_heterogeneous_histograms based on
-            # cursory performance analysis
-            h, n = groups[0]
-
-            return _rolls_with_counts_for_n_homogeneous_histograms(h, n)
+        if not which:
+            i: Optional[int] = n
         else:
-            return _rolls_with_counts_for_heterogeneous_histograms(groups)
+            i = _analyze_selection(n, which)
+
+        if i == 0 or n == 0:
+            rolls_with_counts_iter: Iterable[_RollCountT] = iter(())
+        else:
+            groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self._hs))
+
+            if len(groups) == 1:
+                # Based on cursory performance analysis, calling the homogeneous
+                # implementation directly provides about a 15% performance savings over
+                # merely falling through to _rwc_heterogeneous_h_groups. Maybe
+                # itertools.product adds significant overhead?
+                h, hn = groups[0]
+                assert hn == n
+
+                if i and abs(i) < n:
+                    rolls_with_counts_iter = (
+                        _rwc_homogeneous_n_h_using_karonen_partial_selection(
+                            h, n, i, fill=0
+                        )
+                    )
+                else:
+                    rolls_with_counts_iter = (
+                        _rwc_homogeneous_n_h_using_multinomial_coefficient(h, n)
+                    )
+            else:
+                rolls_with_counts_iter = _rwc_heterogeneous_h_groups(groups, i)
+
+        for sorted_faces_for_roll, roll_count in rolls_with_counts_iter:
+            if which:
+                taken_faces = tuple(_getitems(sorted_faces_for_roll, which))
+            else:
+                taken_faces = sorted_faces_for_roll
+
+            yield taken_faces, roll_count
 
     def within(self, lo: _FaceT, hi: _FaceT, other: _OperandT = 0) -> H:
         r"""
@@ -745,49 +826,42 @@ class P(Sequence[H], HAbleBinOpsMixin):
 def _analyze_selection(
     n: int,
     which: Iterable[_GetItemT],
-) -> Union[Tuple[int, int], Tuple[None, None]]:
+) -> Optional[int]:
     r"""
     Examines the selection *which* as applied to the values ``range(n)`` and returns one
     of:
 
-    * ``0, 0`` - *which* selects zero elements in the range
-    * ``i, k`` - *which* selects exactly ``i`` elements ``k`` times from the left
-      (least) side of the range
-    * ``-i, k`` - *which* selects exactly ``i`` elements ``k`` times from the right
-      (greatest) side of the range
-    * ``n, k`` - *which* selects each element ``k`` times of the range exactly once
-    * ``None, None`` - any other selection
+    * $0$ - *which* selects zero elements in the range
+    * $\{ {i} \mid {i < n} \}$ - *which* favors elements $[0..i)$
+    * $\{ {-i} \mid {i < n} \}$ - *which* favors elements $[i..n)$
+    * $\{ {k} \mid {k \mod n = 0} \}$ - *which* selects each of $[0..n)$ exactly $k$ times
+    * ``None`` - any other selection
     """
-    counts_by_index = counter(_getitems(list(range(n)), which))
-    distinct_index_counts = set(counts_by_index.values())
-    assert 0 not in distinct_index_counts
+    indexes = list(range(n))
+    counts_by_index = counter(_getitems(indexes, which))
+    found_indexes = set(counts_by_index)
 
-    if len(distinct_index_counts) > 1:
-        return None, None
+    if not found_indexes:
+        return 0
 
-    try:
-        multiplier = distinct_index_counts.pop()
-    except KeyError:
-        return 0, 0
+    missing_indexes = set(indexes) - found_indexes
+    distinct_counts = set(counts_by_index.values())
+    assert 0 not in distinct_counts
 
-    indexes = set(counts_by_index)
-    from_lt: Set[int] = set()
-    from_rt: Set[int] = set()
-    contiguous_from_lt = False
-    contiguous_from_rt = False
+    min_index = min(found_indexes)
+    max_index = max(found_indexes) + 1
 
-    for i in range(n + 1):
-        contiguous_from_lt = contiguous_from_lt or not (indexes ^ from_lt)
-        contiguous_from_rt = contiguous_from_rt or not (indexes ^ from_rt)
-        from_lt.add(i)
-        from_rt.add(n - i - 1)
-
-    if contiguous_from_lt:
-        return len(indexes), multiplier
-    elif contiguous_from_rt:
-        return -len(indexes), multiplier
+    if max_index - min_index == n:
+        if not missing_indexes and len(distinct_counts) == 1:
+            return n * distinct_counts.pop()
+        else:
+            return None
+    elif min_index > n - max_index:
+        return min_index - n
+    elif min_index <= n - max_index:
+        return max_index
     else:
-        return None, None
+        assert False, "should never be here"
 
 
 def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argument
@@ -800,6 +874,7 @@ def _count_of_exactly_k_of_face_in_n_of_h(
     n: int,
     k: int,
 ) -> _CountT:
+    assert k <= n
     c_face = h.get(face, 0)
     c_total = sum(h.counts())
 
@@ -814,19 +889,32 @@ def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]
             yield from op_getitem(sequence, key)
 
 
-def _rolls_with_counts_for_heterogeneous_histograms(
-    h_groups: Iterable[Tuple[_MappingT, int]]
-) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
+def _rwc_heterogeneous_h_groups(
+    h_groups: Iterable[Tuple[_MappingT, int]],
+    k: Optional[int],
+) -> Iterator[_RollCountT]:
     r"""
     Given an iterable of histogram/count pairs, returns an iterator yielding 2-tuples
     (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
 
     The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
-    intended, since its implementation is optimized to leverage
-    [``_rolls_with_counts_for_n_homogeneous_histograms``][dyce.p._rolls_with_counts_for_n_homogeneous_histograms].
+    intended, since its implementation is optimized to leverage homogeneous
+    optimizations (e.g.,
+    [``_rwc_homogeneous_n_h_using_multinomial_coefficient``][dyce.p._rwc_homogeneous_n_h_using_multinomial_coefficient]).
+
+    If provided, *k* signals how which faces are to be selected from the produced rolls.
+    This affords an additional optimization where *k* is less than the size of a
+    homogeneous subgroup.
     """
+
+    def _choose_rwc_homogeneous_n_h_implementation(h, n) -> Iterator[_RollCountT]:
+        if k and abs(k) < n:
+            return _rwc_homogeneous_n_h_using_karonen_partial_selection(h, n, k)
+        else:
+            return _rwc_homogeneous_n_h_using_multinomial_coefficient(h, n)
+
     for v in product(
-        *(_rolls_with_counts_for_n_homogeneous_histograms(h, n) for h, n in h_groups)
+        *(_choose_rwc_homogeneous_n_h_implementation(h, n) for h, n in h_groups)
     ):
         # It's possible v is () if h_groups is empty; see
         # https://stackoverflow.com/questions/3154301/ for a detailed discussion
@@ -840,67 +928,55 @@ def _rolls_with_counts_for_heterogeneous_histograms(
             yield sorted_faces_for_roll, total_count
 
 
-def _rolls_with_counts_for_n_homogeneous_histograms(
-    h: _MappingT,
-    n: int,
-) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
-    r"""
-    Given a group of *n* identical histograms *h*, returns an iterator yielding
-    ordered 2-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
-    See that method’s explanation of homogeneous pools for insight into this
-    implementation.
-    """
-    # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
-    # order is preserved and H faces are already sorted
-    multinomial_coefficient_numerator = factorial(n)
-    rolls_iter = combinations_with_replacement(h, n)
-
-    for sorted_faces_for_roll in rolls_iter:
-        count_scalar = reduce(op_mul, (h[face] for face in sorted_faces_for_roll))
-        multinomial_coefficient_denominator = reduce(
-            op_mul,
-            (factorial(sum(1 for _ in g)) for _, g in groupby(sorted_faces_for_roll)),
-        )
-
-        yield (
-            sorted_faces_for_roll,
-            count_scalar
-            * multinomial_coefficient_numerator
-            // multinomial_coefficient_denominator,
-        )
-
-
-def _select_from_end(
+def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     h: H,
     n: int,
     k: int,
-) -> Iterator[Tuple[Tuple[_FaceT, ...], _CountT]]:
+    fill: Optional[_FaceT] = None,
+) -> Iterator[_RollCountT]:
     r"""
-    Yields 2-tuples (pairs) for partial rolls (of length `abs(k)`) analogous to
+    An memoized adaptation of [Ilmari Karonen’s
+    optimization](https://rpg.stackexchange.com/a/166663/71245) yielding 2-tuples
+    (pairs) for partial rolls. This is analogous to
     [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] reflecting taking *k* faces
-    from *n* histograms *h*. If *k* is positive, select the lowest `k` values. If *k* is
-    negative, select the highest `abs(k)` values. No particular ordering is guaranteed.
+    from *n* histograms *h* with some additional limitations. If *fill* is ``None``,
+    non-selected terms are omitted. Otherwise, if *k* is positive, the lowest $k$ values
+    are selected and higher ones will have *fill* as their values. If *k* is negative,
+    the highest $-k$ values are selected and lower ones will be filled. No particular
+    roll ordering is guaranteed, but there are no repetitions.
+
 
     ```python
-    >>> from dyce.p import _select_from_end
-    >>> sorted(_select_from_end(H(6), 3, 2))
-    [((1, 1), 16), ((1, 2), 27), ((1, 3), 21), ((1, 4), 15), ..., ((4, 6), 3), ((5, 5), 4), ((5, 6), 3), ((6, 6), 1)]
-    >>> sorted(_select_from_end(H(6), 3, -2))
-    [((1, 1), 1), ((1, 2), 3), ((1, 3), 3), ((1, 4), 3), ..., ((4, 6), 21), ((5, 5), 13), ((5, 6), 27), ((6, 6), 16)]
+    >>> from dyce.p import _rwc_homogeneous_n_h_using_karonen_partial_selection
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 0))
+    []
 
     ```
 
-    This is an adaptation of [Ilmari Karonen’s
-    optimization](https://rpg.stackexchange.com/a/166663/71245).
+    ```python
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=None))
+    [((1, 1), 16), ((1, 2), 27), ((1, 3), 21), ..., ((5, 5), 4), ((5, 6), 3), ((6, 6), 1)]
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=0))
+    [((1, 1, 0), 16), ((1, 2, 0), 27), ((1, 3, 0), 21), ..., ((5, 5, 0), 4), ((5, 6, 0), 3), ((6, 6, 0), 1)]
+
+    ```
+
+    ```python
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=None))
+    [((1, 1), 1), ((1, 2), 3), ((1, 3), 3), ..., ((5, 5), 13), ((5, 6), 27), ((6, 6), 16)]
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=-1))
+    [((-1, 1, 1), 1), ((-1, 1, 2), 3), ((-1, 1, 3), 3), ..., ((-1, 5, 5), 13), ((-1, 5, 6), 27), ((-1, 6, 6), 16)]
+
+    ```
     """
     from_upper = k < 0
     k = abs(k)
 
-    # Maintain Consistency with comb(n, n + 1) == 0
-    if k > n:
+    if k == 0 or k > n:
+        # Maintain consistency with comb(n, k) == 0 where k > n
         return iter(())
 
-    _SelectReturnEntryT = Tuple[Tuple[_FaceT, ...], Fraction]
+    _SelectReturnEntryT = Tuple[_RollT, Fraction]
     _SelectReturnT = Iterator[_SelectReturnEntryT]
     _SelectCallableT = Callable[[H, int, int], _SelectReturnT]
 
@@ -965,18 +1041,37 @@ def _select_from_end(
     for fs, c in _selected_faces_with_probabilities(h, n, k):
         c *= total_c
         assert c.denominator == 1
+
+        if fill is not None:
+            fs = (fill,) * (n - k) + fs if from_upper else fs + (fill,) * (n - k)
+
         yield (fs, c.numerator)
 
 
-def _take_and_sum_faces(
-    rolls_with_counts_iter: Iterator[Tuple[Sequence[_FaceT], _CountT]],
-    which: Iterable[_GetItemT],
-) -> Iterator[Tuple[_FaceT, _CountT]]:
-    for (
-        sorted_faces_for_roll,
-        roll_count,
-    ) in rolls_with_counts_iter:
-        taken_faces = tuple(_getitems(sorted_faces_for_roll, which))
+def _rwc_homogeneous_n_h_using_multinomial_coefficient(
+    h: _MappingT,
+    n: int,
+) -> Iterator[_RollCountT]:
+    r"""
+    Given a group of *n* identical histograms *h*, returns an iterator yielding ordered
+    2-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]. See that
+    method’s explanation of homogeneous pools for insight into this implementation.
+    """
+    # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
+    # order is preserved and H faces are already sorted
+    multinomial_coefficient_numerator = factorial(n)
+    rolls_iter = combinations_with_replacement(h, n)
 
-        if taken_faces:
-            yield sum(taken_faces), roll_count
+    for sorted_faces_for_roll in rolls_iter:
+        count_scalar = reduce(op_mul, (h[face] for face in sorted_faces_for_roll))
+        multinomial_coefficient_denominator = reduce(
+            op_mul,
+            (factorial(sum(1 for _ in g)) for _, g in groupby(sorted_faces_for_roll)),
+        )
+
+        yield (
+            sorted_faces_for_roll,
+            count_scalar
+            * multinomial_coefficient_numerator
+            // multinomial_coefficient_denominator,
+        )

@@ -1,34 +1,9 @@
 from __future__ import annotations, generator_stop
 
 import argparse
-import importlib.machinery
-import importlib.util
-import pathlib
-from typing import Callable, Tuple
+from functools import partial
 
-
-def import_fig(arg: str) -> Tuple[str, Callable[[str], None]]:
-
-    try:
-        my_dir = pathlib.Path(__file__).parent
-        mod_path = str(my_dir.joinpath("plot_{}.py".format(arg)))
-        loader = importlib.machinery.SourceFileLoader(arg, mod_path)
-        spec = importlib.util.spec_from_loader(arg, loader)
-        assert spec
-        mod = importlib.util.module_from_spec(spec)
-        loader.exec_module(mod)
-        do_it = mod.do_it  # type: ignore
-    except (
-        AssertionError,
-        AttributeError,
-        FileNotFoundError,
-        ImportError,
-        SyntaxError,
-    ) as exc:
-        raise argparse.ArgumentTypeError('unable to load "{}" ({})'.format(arg, exc))
-    else:
-        return (arg, do_it)
-
+from plug import import_plug
 
 PARSER = argparse.ArgumentParser(description="Generate PNG files for documentation")
 # TODO: Get rid of all instances of gh here, below, and with Makefile and *_gh.png once
@@ -36,7 +11,7 @@ PARSER = argparse.ArgumentParser(description="Generate PNG files for documentati
 # fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981)
 # gets resolved
 PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
-PARSER.add_argument("fig", type=import_fig)
+PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))
 
 
 def main() -> None:
