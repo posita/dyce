@@ -10,6 +10,8 @@ repo_url: https://github.com/posita/dyce
 
 nav:
   - Introduction: index.md
+  - Tutorial: tutorial.md
+  - Applications & translations: translations.md
   - API:
     - <tt>dyce</tt>: dyce.md
     - <tt>dyce.plt</tt>: dyce.plt.md
@@ -17,9 +19,9 @@ nav:
   - License: license.md
 
 # See:
-# * <https://www.mkdocs.org/>
-# * <https://squidfunk.github.io/mkdocs-material/>
+# * <https://squidfunk.github.io/mkdocs-material/reference/admonitions/>, etc.
 # * <https://mkdocstrings.github.io/>
+# * <https://www.mkdocs.org/>
 
 extra:
   version:
@@ -39,8 +41,11 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   # ----- END MathJax config -----
+  - pymdownx.emoji:
   - pymdownx.highlight:
       linenums: true
+  - pymdownx.snippets:
+      check_paths: true
   - pymdownx.superfences
 
 plugins:

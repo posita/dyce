@@ -183,9 +183,9 @@ class TestH:
     def test_substitute_double_odd_values(self) -> None:
         def double_odd_values(
             h: H,  # pylint: disable=unused-argument
-            face: float,
+            outcome: float,
         ) -> Union[float, H]:
-            return face * 2 if face % 2 != 0 else face
+            return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
         assert d8.substitute(double_odd_values) == H(
@@ -198,17 +198,17 @@ class TestH:
     def test_substitute_never_expand(self) -> None:
         def never_expand(
             d: H,  # pylint: disable=unused-argument
-            face: float,
+            outcome: float,
         ) -> Union[float, H]:
-            return face
+            return outcome
 
         d20 = H(20)
         assert d20.substitute(never_expand) == d20
         assert d20.substitute(never_expand, operator.add, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, face: float) -> Union[float, H]:
-            return h if max(h) == 4 and face == 3 else face
+        def reroll_d4_threes(h: H, outcome: float) -> Union[float, H]:
+            return h if max(h) == 4 and outcome == 3 else outcome
 
         h = H(4)
         assert h.substitute(reroll_d4_threes) == H({4: 5, 3: 1, 2: 5, 1: 5})
@@ -240,7 +240,9 @@ class TestH:
         assert math.isclose(
             h.mean(),
             statistics.mean(
-                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+                itertools.chain(
+                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                )
             ),
         )
 
@@ -249,7 +251,9 @@ class TestH:
         assert math.isclose(
             h.stdev(),
             statistics.pstdev(
-                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+                itertools.chain(
+                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                )
             ),
         )
 
@@ -258,7 +262,9 @@ class TestH:
         assert math.isclose(
             h.variance(),
             statistics.pvariance(
-                itertools.chain(*(itertools.repeat(f, c) for f, c in h.items()))
+                itertools.chain(
+                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                )
             ),
         )
 

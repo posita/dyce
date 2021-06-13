@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dyce import H, P
-from dyce.h import _CountT, _FaceT
+from dyce.h import _CountT, _OutcomeT
 from dyce.p import (
     _analyze_selection,
     _GetItemT,
@@ -494,7 +494,7 @@ class TestP:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
         assert p_4df.h(slice(None), slice(None)) == H(
-            (sum(f * 2 for f in roll), count)
+            (sum(v * 2 for v in roll), count)
             for roll, count in p_4df.rolls_with_counts()
         )
 
@@ -505,9 +505,9 @@ class TestP:
         assert not P(2, -3).homogeneous
 
     def test_appearances_in_rolls(self) -> None:
-        def _sum_method(p: P, face: _FaceT) -> H:
+        def _sum_method(p: P, outcome: _OutcomeT) -> H:
             return H(
-                (sum(1 for f in roll if f == face), count)
+                (sum(1 for v in roll if v == outcome), count)
                 for roll, count in p.rolls_with_counts()
             )
 
@@ -542,7 +542,10 @@ class TestP:
         assert sorted(P(2, 3).rolls_with_counts()) == [
             ((1, 1), 1),
             ((1, 2), 1),
-            ((1, 2), 1),  # originated as ((2, 1), 1), but faces get sorted in each roll
+            (
+                (1, 2),
+                1,
+            ),  # originated as ((2, 1), 1), but outcomes get sorted in each roll
             ((1, 3), 1),
             ((2, 2), 1),
             ((2, 3), 1),
@@ -561,9 +564,9 @@ class TestP:
         p_3d3_4d4n = P(3 @ p_d3, 4 @ p_d4n)
 
         for which in (
-            # All faces
+            # All outcomes
             slice(None),
-            # 4 faces
+            # 4 outcomes
             slice(4),
             slice(-4, None),
         ):
@@ -572,7 +575,7 @@ class TestP:
             multinomial_coefficient.assert_called()
 
         for which in (
-            # 3 faces
+            # 3 outcomes
             slice(3),
             slice(-3, None),
         ):
@@ -581,10 +584,10 @@ class TestP:
             multinomial_coefficient.assert_called()  # called for 3d3 where k == n
 
         for which in (
-            # 2 faces
+            # 2 outcomes
             slice(2),
             slice(-2, None),
-            # 1 face
+            # 1 outcome
             slice(1),
             slice(-1, None),
         ):
@@ -593,7 +596,7 @@ class TestP:
             multinomial_coefficient.assert_not_called()
 
         for which in (
-            # No faces
+            # No outcomes
             slice(0, 0),
         ):
             karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
@@ -605,7 +608,7 @@ class TestP:
         p_4df = 4 @ p_df
 
         for which in (
-            # All faces
+            # All outcomes
             slice(None),
             slice(0, 4),
         ):
@@ -614,7 +617,7 @@ class TestP:
             multinomial_coefficient.assert_called()
 
         for which in (
-            # 1 Face
+            # 1 Outcome
             slice(0, 1),
             slice(1, 2),
             slice(2, 3),
@@ -625,7 +628,7 @@ class TestP:
             multinomial_coefficient.assert_not_called()
 
         for which in (
-            # No faces
+            # No outcomes
             slice(0, 0),
         ):
             karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
@@ -698,10 +701,10 @@ def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
     # efficient, but also much easier to read and reason about
     if len(operator.getitem(hs, key)) > 0:
         for rolls in itertools.product(*(h.items() for h in hs)):
-            faces, counts = tuple(zip(*rolls))
-            sliced_faces = tuple(operator.getitem(sorted(faces), key))
+            outcomes, counts = tuple(zip(*rolls))
+            sliced_outcomes = tuple(operator.getitem(sorted(outcomes), key))
             count = functools.reduce(operator.mul, counts)
-            yield sliced_faces, count
+            yield sliced_outcomes, count
 
 
 def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:

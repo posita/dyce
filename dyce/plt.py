@@ -73,7 +73,7 @@ def display_burst(
     if outer is None:
         outer = (
             ("{:.2%}".format(v) if v >= _HIDE_LIM else "", v)
-            for _, v in h_inner.data(relative=True)
+            for _, v in h_inner.distribution()
         )
 
     outer_labels, outer_values = list(zip(*outer))
@@ -120,12 +120,12 @@ def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
     le_total, ge_total = 0.0, 1.0
-    for face, probability in h.data(relative=True):
+    for outcome, probability in h.distribution():
         le_total += probability
 
         if probability >= _HIDE_LIM:
             label = "{} {:.2%}; ≥{:.2%}; ≤{:.2%}".format(
-                face, probability, le_total, ge_total
+                outcome, probability, le_total, ge_total
             )
         else:
             label = ""

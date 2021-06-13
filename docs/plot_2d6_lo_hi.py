@@ -7,22 +7,24 @@ def do_it(_: str) -> None:
     import matplotlib.pyplot
 
     p_2d6 = 2 @ P(H(6))
-    faces, probabilities = p_2d6.h(0).data_xy()
+    outcomes, probabilities = p_2d6.h(0).distribution_xy()
     matplotlib.pyplot.bar(
-        [f - 0.125 for f in faces],
+        [v - 0.125 for v in outcomes],
         probabilities,
         alpha=0.75,
         width=0.5,
-        label="Lowest die of 2d6",
+        label="Lowest",
     )
 
-    faces, probabilities = p_2d6.h(-1).data_xy()
+    outcomes, probabilities = p_2d6.h(-1).distribution_xy()
     matplotlib.pyplot.bar(
-        [f + 0.125 for f in faces],
+        [v + 0.125 for v in outcomes],
         probabilities,
         alpha=0.75,
         width=0.5,
-        label="Highest die of 2d6",
+        label="Highest",
     )
 
     matplotlib.pyplot.legend()
+    # Should match the corresponding img[alt] text
+    matplotlib.pyplot.title(r"Taking the lowest or highest die of 2d6")

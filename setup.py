@@ -55,7 +55,7 @@ SETUP_ARGS = {
         "{}.{}".format(*__version__[:2]) if __version__ != (0, 0, 0) else "latest"
     ),
     "license": "MIT License",
-    "description": "Simple Python tools for dice-based probabilities",
+    "description": "Simple Python tools for exploring dice probabilities and outcomes",
     "long_description": README,
     "long_description_content_type": "text/markdown",
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
@@ -80,9 +80,16 @@ SETUP_ARGS = {
     ],
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": ["typing", "typing_extensions"],
+    "install_requires": ["typing_extensions"],
     "extras_require": {
         "dev": [
+            "mike",
+            # See <https://github.com/mkdocs/mkdocs/issues/2448> and
+            # <https://github.com/mkdocstrings/mkdocstrings/issues/295>
+            "mkdocs<1.2",
+            "mkdocs-exclude",
+            "mkdocs-material",
+            "mkdocstrings",
             "pre-commit",
             "tox",
             "twine",

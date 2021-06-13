@@ -9,6 +9,8 @@
 
 from __future__ import annotations, generator_stop
 
+import os
+import warnings
 from collections import Counter as counter
 from collections import OrderedDict as ordereddict
 from collections.abc import Iterable as ABCIterable
@@ -36,7 +38,6 @@ from operator import pow as op_pow
 from operator import sub as op_sub
 from operator import truediv as op_truediv
 from operator import xor as op_xor
-from os import environ, get_terminal_size, linesep
 from random import randrange
 from typing import (
     Callable,
@@ -60,31 +61,31 @@ __all__ = ("H",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_FaceT = Union[int, float]
+_OutcomeT = Union[int, float]
 _CountT = int
-_MappingT = Mapping[_FaceT, _CountT]
+_MappingT = Mapping[_OutcomeT, _CountT]
 _SourceT = Union[
     int,
-    Iterable[_FaceT],
-    Iterable[Tuple[_FaceT, _CountT]],
+    Iterable[_OutcomeT],
+    Iterable[Tuple[_OutcomeT, _CountT]],
     _MappingT,
     "HAbleT",
 ]
-_OperandT = Union[_FaceT, "H", "HAbleT"]
-_UnaryOperatorT = Callable[[_FaceT], _FaceT]
-_BinaryOperatorT = Callable[[_FaceT, _FaceT], _FaceT]
-_ExpandT = Callable[["H", _FaceT], Union[_FaceT, "H"]]
-_CoalesceT = Callable[["H", _FaceT], "H"]
+_OperandT = Union[_OutcomeT, "H", "HAbleT"]
+_UnaryOperatorT = Callable[[_OutcomeT], _OutcomeT]
+_BinaryOperatorT = Callable[[_OutcomeT, _OutcomeT], _OutcomeT]
+_ExpandT = Callable[["H", _OutcomeT], Union[_OutcomeT, "H"]]
+_CoalesceT = Callable[["H", _OutcomeT], "H"]
 
 
 # ---- Data ----------------------------------------------------------------------------
 
 
 try:
-    _ROW_WIDTH = get_terminal_size().columns
+    _ROW_WIDTH = os.get_terminal_size().columns
 except OSError:
     try:
-        _ROW_WIDTH = int(environ["COLUMNS"])
+        _ROW_WIDTH = int(os.environ["COLUMNS"])
     except (KeyError, ValueError):
         _ROW_WIDTH = 88
 
@@ -95,9 +96,20 @@ except OSError:
 class H(_MappingT):
     r"""
     An immutable mapping for use as a histogram which supports arithmetic operations.
-    This is useful for modeling individual dice and outcomes. The
-    [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
-    explicit form, *items* maps face values to counts.
+    This is useful for modeling discrete outcomes, like individual dice. ``H`` objects
+    encode discrete probability distributions as integer counts without any denominator.
+
+    !!! info
+
+        The lack of an explicit denominator is intentional and has two benefits. First,
+        it is redundant. Without it, one never has to worry about probabilities summing
+        to one (e.g., via miscalculation, floating point error, etc.). Second (and
+        perhaps more importantly), sometimes one wants to have an insight into
+        non-reduced counts, not just probabilities. If needed, probabilities can always
+        be derives, as shown below.
+
+    The [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
+    explicit form, *items* maps outcome values to counts.
 
     Modeling a single six-sided die (``1d6``) can be expressed as:
 
@@ -149,7 +161,7 @@ class H(_MappingT):
 
     ```
 
-    Simple indexes can be used to look up a face’s count:
+    Simple indexes can be used to look up an outcome’s count:
 
     ```python
     >>> H((2, 3, 3, 4, 4, 5))[3]
@@ -158,7 +170,7 @@ class H(_MappingT):
     ```
 
     Most arithmetic operators are supported and do what one would expect. If the operand
-    is a number, the operator applies to the faces:
+    is a number, the operator applies to the outcomes:
 
     ```python
     >>> d6 + 4
@@ -209,7 +221,7 @@ class H(_MappingT):
 
     ```
 
-    The ``len`` built-in function can be used to show the number of distinct faces:
+    The ``len`` built-in function can be used to show the number of distinct outcomes:
 
     ```python
     >>> len(2@d6)
@@ -218,11 +230,14 @@ class H(_MappingT):
     ```
 
     The [``counts`` method][dyce.h.H.counts] can be used to compute the total number of
-    combinations:
+    combinations and each outcome’s probability:
 
     ```python
-    >>> sum((2@d6).counts())
+    >>> from fractions import Fraction
+    >>> total = sum((2@d6).counts()) ; total
     36
+    >>> [(outcome, Fraction(count, total)) for outcome, count in (2@d6).items()]
+    [(2, Fraction(1, 36)), (3, Fraction(1, 18)), (4, Fraction(1, 12)), (5, Fraction(1, 9)), (6, Fraction(5, 36)), (7, Fraction(1, 6)), ..., (12, Fraction(1, 36))]
 
     ```
 
@@ -274,11 +289,20 @@ class H(_MappingT):
 
     ```
 
-    !!! warning "Mind your parentheses"
+    !!! tip "Mind your parentheses"
 
-        Parentheses are often necessary to enforce the desired order of operations:
+        Parentheses are often necessary to enforce the desired order of operations. This
+        is most often an issue with the ``@`` operator, because it behaves differently
+        than the ``d`` operator in most dedicated grammars. More specifically, in
+        Python, ``@`` has a [lower
+        precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence)
+        than ``.`` and ``[…]``:
 
         ```python
+        >>> 2@d6[7]  # type: ignore
+        Traceback (most recent call last):
+          ...
+        KeyError: 7
         >>> 2@d6.le(7)  # probably not what was intended
         H({2: 36})
         >>> 2@d6.le(7) == 2@(d6.le(7))
@@ -287,6 +311,8 @@ class H(_MappingT):
         ```
 
         ```python
+        >>> (2@d6)[7]
+        6
         >>> (2@d6).le(7)
         H({False: 15, True: 21})
         >>> 2@d6.le(7) == (2@d6).le(7)
@@ -320,29 +346,29 @@ class H(_MappingT):
         r"Initializer."
         super().__init__()
         self._simple_init = None
-        tmp: Counter[_FaceT] = counter()
+        tmp: Counter[_OutcomeT] = counter()
 
         if isinstance(items, (int, Integral)):
             if items != 0:
                 self._simple_init = items
-                face_type = type(items)
+                outcome_type = type(items)
                 count_1 = type(items)(1)
-                face_range = range(
+                outcome_range = range(
                     items, 0, 1 if items < 0 else -1  # count toward zero
                 )
-                tmp.update({face_type(i): count_1 for i in face_range})
+                tmp.update({outcome_type(i): count_1 for i in outcome_range})
         elif isinstance(items, HAbleT):
             tmp.update(items.h())
         elif isinstance(items, ABCMapping):
             tmp.update(items)
         elif isinstance(items, ABCIterable):
-            # Items is either an Iterable[_FaceT] or an Iterable[Tuple[_FaceT, _CountT]]
-            # (although this technically supports Iterable[Union[_FaceT, Tuple[_FaceT,
-            # _CountT]]])
+            # Items is either an Iterable[_OutcomeT] or an Iterable[Tuple[_OutcomeT,
+            # _CountT]] (although this technically supports Iterable[Union[_OutcomeT,
+            # Tuple[_OutcomeT, _CountT]]])
             for item in items:
                 if isinstance(item, tuple):
-                    face, count = item
-                    tmp[face] += count
+                    outcome, count = item
+                    tmp[outcome] += count
                 else:
                     tmp[item] += 1
         else:
@@ -352,7 +378,7 @@ class H(_MappingT):
         # support Python versions earlier than 3.7 which did not guarantee order
         # preservation for the latter.
         self._h: _MappingT = ordereddict(
-            {face: tmp[face] for face in sorted(tmp) if tmp[face]}
+            {outcome: tmp[outcome] for outcome in sorted(tmp) if tmp[outcome]}
         )
 
     # ---- Overrides -------------------------------------------------------------------
@@ -387,10 +413,10 @@ class H(_MappingT):
     def __len__(self) -> int:
         return len(self._h)
 
-    def __getitem__(self, key: _FaceT) -> _CountT:
+    def __getitem__(self, key: _OutcomeT) -> _CountT:
         return op_getitem(self._h, key)
 
-    def __iter__(self) -> Iterator[_FaceT]:
+    def __iter__(self) -> Iterator[_OutcomeT]:
         return iter(self._h)
 
     def __add__(self, other: _OperandT) -> "H":
@@ -404,7 +430,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __radd__(self, other: _FaceT) -> "H":
+    def __radd__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_add, other)
         except NotImplementedError:
@@ -421,7 +447,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rsub__(self, other: _FaceT) -> "H":
+    def __rsub__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_sub, other)
         except NotImplementedError:
@@ -433,7 +459,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rmul__(self, other: _FaceT) -> "H":
+    def __rmul__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_mul, other)
         except NotImplementedError:
@@ -456,7 +482,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rtruediv__(self, other: _FaceT) -> "H":
+    def __rtruediv__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_truediv, other)
         except NotImplementedError:
@@ -468,7 +494,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rfloordiv__(self, other: _FaceT) -> "H":
+    def __rfloordiv__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_floordiv, other)
         except NotImplementedError:
@@ -480,7 +506,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rmod__(self, other: _FaceT) -> "H":
+    def __rmod__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_mod, other)
         except NotImplementedError:
@@ -492,7 +518,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rpow__(self, other: _FaceT) -> "H":
+    def __rpow__(self, other: _OutcomeT) -> "H":
         try:
             return self.rmap(op_pow, other)
         except NotImplementedError:
@@ -549,17 +575,33 @@ class H(_MappingT):
         """
         return self.values()
 
-    def faces(self) -> Iterator[_FaceT]:
+    def faces(self) -> Iterator[_OutcomeT]:
         r"""
-        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
+        Synonym for [``outcomes``][dyce.h.H.outcomes].
+
+        !!! warning "Deprecated"
+
+            This alias is deprecated and will be removed in a future version.
+
         """
-        return self.keys()
+        warnings.warn(
+            "H.faces is deprecated; use H.outcomes",
+            DeprecationWarning,
+        )
+
+        return self.outcomes()
 
     def items(self):
         return self._h.items()
 
     def keys(self):
         return self._h.keys()
+
+    def outcomes(self) -> Iterator[_OutcomeT]:
+        r"""
+        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
+        """
+        return self.keys()
 
     def values(self):
         return self._h.values()
@@ -568,8 +610,8 @@ class H(_MappingT):
 
     def map(self, oper: _BinaryOperatorT, other: _OperandT) -> "H":
         r"""
-        Applies *oper* to each face of the histogram paired with *other*. Shorthands exist
-        for many arithmetic operators and comparators.
+        Applies *oper* to each outcome of the histogram paired with *other*. Shorthands
+        exist for many arithmetic operators and comparators.
 
         ```python
         >>> import operator
@@ -601,35 +643,35 @@ class H(_MappingT):
             other = other.h()
 
         if isinstance(other, (int, float, Number)):
-            return H((oper(face, other), count) for face, count in self.items())
+            return H((oper(outcome, other), count) for outcome, count in self.items())
         elif isinstance(other, H):
             return H((oper(s, o), self[s] * other[o]) for s, o in product(self, other))
         else:
             raise NotImplementedError
 
-    def rmap(self, oper: _BinaryOperatorT, other: _FaceT) -> "H":
+    def rmap(self, oper: _BinaryOperatorT, other: _OutcomeT) -> "H":
         if isinstance(other, (int, float, Number)):
-            return H((oper(other, face), count) for face, count in self.items())
+            return H((oper(other, outcome), count) for outcome, count in self.items())
         else:
             raise NotImplementedError
 
     def umap(self, oper: _UnaryOperatorT) -> "H":
         r"""
-        Applies *oper* to each face of the histogram:
+        Applies *oper* to each outcome of the histogram:
 
         ```python
-        >>> H(6).umap(lambda f: f * -1)
+        >>> H(6).umap(lambda outcome: outcome * -1)
         H(-6)
 
         ```
 
         ```python
-        >>> H(4).umap(lambda f: (-f) ** f)
+        >>> H(4).umap(lambda outcome: (-outcome) ** outcome)
         H({-27: 1, -1: 1, 4: 1, 256: 1})
 
         ```
         """
-        h = H((oper(face), count) for face, count in self.items())
+        h = H((oper(outcome), count) for outcome, count in self.items())
 
         if self._simple_init is not None:
             h_simple = H(type(self._simple_init)(oper(self._simple_init)))
@@ -725,7 +767,7 @@ class H(_MappingT):
 
     def even(self) -> "H":
         r"""
-        Equivalent to ``self.umap(lambda f: f % 2 == 0)``.
+        Equivalent to ``self.umap(lambda outcome: outcome % 2 == 0)``.
 
         ```python
         >>> H((-4, -2, 0, 1, 2, 3)).even()
@@ -736,19 +778,21 @@ class H(_MappingT):
         See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_even(f: _FaceT) -> bool:
-            if isinstance(f, (int, Integral)):
-                return f % 2 == 0
+        def is_even(outcome: _OutcomeT) -> bool:
+            if isinstance(outcome, (int, Integral)):
+                return outcome % 2 == 0
             else:
                 raise TypeError(
-                    "not supported for faces of type {}".format(type(f).__name__)
+                    "not supported for outcomes of type {}".format(
+                        type(outcome).__name__
+                    )
                 )
 
         return self.umap(is_even)
 
     def odd(self) -> "H":
         r"""
-        Equivalent to ``self.umap(lambda f: f % 2 != 0)``.
+        Equivalent to ``self.umap(lambda outcome: outcome % 2 != 0)``.
 
         ```python
         >>> H((-4, -2, 0, 1, 2, 3)).odd()
@@ -759,12 +803,14 @@ class H(_MappingT):
         See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_odd(f: _FaceT) -> bool:
-            if isinstance(f, (int, Integral)):
-                return f % 2 != 0
+        def is_odd(outcome: _OutcomeT) -> bool:
+            if isinstance(outcome, (int, Integral)):
+                return outcome % 2 != 0
             else:
                 raise TypeError(
-                    "not supported for faces of type {}".format(type(f).__name__)
+                    "not supported for outcomes of type {}".format(
+                        type(outcome).__name__
+                    )
                 )
 
         return self.umap(is_odd)
@@ -782,14 +828,14 @@ class H(_MappingT):
         if isinstance(other, ABCMapping):
             other = other.items()
         elif not isinstance(other, ABCIterable):
-            other = cast(Iterable[_FaceT], (other,))
+            other = cast(Iterable[_OutcomeT], (other,))
 
         return H(chain(self.items(), cast(Iterable, other)))
 
     def explode(self, max_depth: int = 1) -> "H":
         r"""
-        Shorthand for ``self.substitute(lambda h, f: h if f == max(h) else f, operator.add,
-        max_depth)``.
+        Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
+        outcome, operator.add, max_depth)``.
 
         ```python
         >>> H(6).explode(max_depth=2)
@@ -800,7 +846,7 @@ class H(_MappingT):
         See the [``substitute`` method][dyce.h.H.substitute].
         """
         return self.substitute(
-            lambda h, f: h if f == max(h) else f,
+            lambda h, outcome: h if outcome == max(h) else outcome,
             op_add,
             max_depth,
         )
@@ -834,11 +880,11 @@ class H(_MappingT):
         max_depth: int = 1,
     ) -> "H":
         r"""
-        Calls *expand* on each face, recursively up to *max_depth* times. If *expand*
-        returns a number, it replaces the face. If it returns an
-        [``H`` object][dyce.h.H], *coalesce* is called on the face and the expanded
+        Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*
+        returns a number, it replaces the outcome. If it returns an [``H``
+        object][dyce.h.H], *coalesce* is called on the outcome and the expanded
         histogram, and the returned histogram is folded into result. The default
-        behavior for *coalesce* is to replace the face with the expanded histogram.
+        behavior for *coalesce* is to replace the outcome with the expanded histogram.
         Returned histograms are always reduced to their lowest terms. (See the
         [``lowest_terms`` method][dyce.h.H.lowest_terms].)
 
@@ -846,8 +892,8 @@ class H(_MappingT):
         of 1 on the first roll:
 
         ```python
-        >>> def reroll_one(h: H, face):
-        ...   return h if face == 1 else face
+        >>> def reroll_one(h: H, outcome):
+        ...   return h if outcome == 1 else outcome
 
         >>> H(6).substitute(reroll_one)
         H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
@@ -858,32 +904,32 @@ class H(_MappingT):
         “exploding” dice (i.e., where, if the greatest face come up, the die is
         re-rolled and the result is added to a running sum).
 
-        In nearly all cases, when a histogram is substituted for a face, it takes on the
-        substituted face’s “scale”. In other words, the sum of the counts of the
-        replacement retains the same proportion as the replaced face in relation to
-        other faces. This becomes clearer when there is no overlap between the original
-        histogram and the substitution:
+        In nearly all cases, when a histogram is substituted for an outcome, it takes on
+        the substituted outcome’s “scale”. In other words, the sum of the counts of the
+        replacement retains the same proportion as the replaced outcome in relation to
+        other outcomes. This becomes clearer when there is no overlap between the
+        original histogram and the substitution:
 
         ```python
         >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
-        >>> sub = orig.substitute(lambda h, f: -h if f == 4 else f) ; sub
+        >>> sub = orig.substitute(lambda h, outcome: -h if outcome == 4 else outcome) ; sub
         H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
-        >>> sum(c for f, c in orig.items() if f == 4) / sum(orig.counts())
+        >>> sum(count for outcome, count in orig.items() if outcome == 4) / sum(orig.counts())
         0.4
-        >>> sum(c for f, c in sub.items() if f < 0) / sum(sub.counts())
+        >>> sum(count for outcome, count in sub.items() if outcome < 0) / sum(sub.counts())
         0.4
 
         ```
 
-        !!! warning "An important exception"
+        !!! tip "An important exception"
 
             If *coalesce* returns the empty histogram (``H({})``), the corresponding
-            face and its counts are omitted from the result without substitution or
-            scaling. A trivial example is modeling a d5 by indefinitely re-rolling a d6
+            outcome and its counts are omitted from the result without substitution or
+            scaling. A silly example is modeling a d5 by indefinitely re-rolling a d6
             until something other than a 6 comes up:
 
             ```python
-            >>> H(6).substitute(lambda h, f: H({}) if f == 6 else f)
+            >>> H(6).substitute(lambda h, outcome: H({}) if outcome == 6 else outcome)
             H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
             ```
@@ -895,7 +941,7 @@ class H(_MappingT):
             >>> d6_3, d8_2 = 3@H(6), 2@H(8)
             >>> d6_3.vs(d8_2)
             H({-1: 4553, 0: 1153, 1: 8118})
-            >>> d6_3.vs(d8_2).substitute(lambda h, f: H({}) if f == 0 else f)
+            >>> d6_3.vs(d8_2).substitute(lambda h, outcome: H({}) if outcome == 0 else outcome)
             H({-1: 4553, 1: 8118})
 
             ```
@@ -915,11 +961,11 @@ class H(_MappingT):
         ```python
         >>> d4, d6 = H(4), H(6)
 
-        >>> def reroll_greatest_on_d4_d6(h: H, face):
-        ...   if face == max(h):
+        >>> def reroll_greatest_on_d4_d6(h: H, outcome):
+        ...   if outcome == max(h):
         ...     if h == d6: return d4
         ...     if h == d4: return d6
-        ...   return face
+        ...   return outcome
 
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.add, max_depth=6)
@@ -936,7 +982,7 @@ class H(_MappingT):
         not).
 
         We can also use this method to model expected damage from a single attack in
-        d20-like roll playing games:
+        d20-like role playing games:
 
         ```python
         >>> bonus = 1
@@ -946,10 +992,10 @@ class H(_MappingT):
         >>> target = 15 - bonus
         >>> d20 = H(20)
 
-        >>> def dmg_from_attack_roll(h: H, face):
-        ...   if face == 20:
+        >>> def dmg_from_attack_roll(h: H, outcome):
+        ...   if outcome == 20:
         ...     return crit
-        ...   elif face >= target:
+        ...   elif outcome >= target:
         ...     return dmg
         ...   else:
         ...     return 0
@@ -989,16 +1035,16 @@ class H(_MappingT):
                 return h
 
             total_scalar = 1
-            items_for_reassembly: List[Tuple[_FaceT, _CountT, _CountT]] = []
+            items_for_reassembly: List[Tuple[_OutcomeT, _CountT, _CountT]] = []
 
-            for face, count in h.items():
-                expanded = expand(h, face)
+            for outcome, count in h.items():
+                expanded = expand(h, outcome)
 
                 if isinstance(expanded, H):
                     # Keep expanding deeper, if we can
                     expanded = _substitute(expanded, depth + 1)
                     # Coalesce the result
-                    expanded = coalesce(expanded, face)
+                    expanded = coalesce(expanded, outcome)
                     # Account for the impact of expansion on peers
                     expanded_scalar = sum(expanded.counts())
 
@@ -1017,8 +1063,8 @@ class H(_MappingT):
             return H(
                 (
                     # Apply the total_scalar, but factor out this item's contribution
-                    (f, c * total_scalar // s)
-                    for f, c, s in items_for_reassembly
+                    (outcome, count * total_scalar // s)
+                    for outcome, count, s in items_for_reassembly
                 )
             ).lowest_terms()
 
@@ -1043,7 +1089,7 @@ class H(_MappingT):
         """
         return self.within(0, 0, other)
 
-    def within(self, lo: _FaceT, hi: _FaceT, other: _OperandT = 0) -> "H":
+    def within(self, lo: _OutcomeT, hi: _OutcomeT, other: _OperandT = 0) -> "H":
         r"""
         Computes the difference between this histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
@@ -1081,62 +1127,93 @@ class H(_MappingT):
 
     def data(
         self,
-        relative: bool = False,
+        relative: bool = True,  # pylint: disable=unused-argument
         fill_items: _MappingT = None,
-    ) -> Iterator[Tuple[_FaceT, float]]:
+    ) -> Iterator[Tuple[_OutcomeT, float]]:
         r"""
-        Presentation helper function returning an iterator for each face/count or
-        face/probability pair:
+        Synonym for [``distribution``][dyce.h.H.distribution]. The *relative* parameter is
+        ignored.
+
+        !!! warning "Deprecated"
+
+            This alias is deprecated and will be removed in a future version.
+        """
+        warnings.warn(
+            "H.data is deprecated; use H.distribution",
+            DeprecationWarning,
+        )
+
+        return self.distribution(fill_items)
+
+    def data_xy(
+        self,
+        fill_items: _MappingT = None,
+    ) -> Tuple[Tuple[_OutcomeT, ...], Tuple[float, ...]]:
+        r"""
+        Synonym for [``distribution_xy``][dyce.h.H.distribution_xy].
+
+        !!! warning "Deprecated"
+
+            This alias is deprecated and will be removed in a future version.
+        """
+        warnings.warn(
+            "H.data_xy is deprecated; use H.distribution_xy",
+            DeprecationWarning,
+        )
+
+        return self.distribution_xy(fill_items)
+
+    def distribution(
+        self,
+        fill_items: _MappingT = None,
+    ) -> Iterator[Tuple[_OutcomeT, float]]:
+        r"""
+        Presentation helper function returning an iterator for each outcome/count or
+        outcome/probability pair:
 
         ```python
-        >>> list(H(6).gt(3).data())
-        [(False, 3.0), (True, 3.0)]
-        >>> list(H(6).gt(3).data(relative=True))
+        >>> list(H(6).gt(3).distribution())
         [(False, 0.5), (True, 0.5)]
 
         ```
 
-        If provided, *fill_items* supplies defaults for any “missing” faces:
+        If provided, *fill_items* supplies defaults for any “missing” outcomes:
 
         ```python
-        >>> list(H(6).gt(7).data())
-        [(False, 6.0)]
-        >>> list(H(6).gt(7).data(fill_items={True: 0, False: 0}))
-        [(False, 6.0), (True, 0.0)]
+        >>> list(H(6).gt(7).distribution())
+        [(False, 1.0)]
+        >>> list(H(6).gt(7).distribution(fill_items={True: 0, False: 0}))
+        [(False, 1.0), (True, 0.0)]
 
         ```
         """
         if fill_items is None:
             fill_items = {}
 
-        if relative:
-            total = sum(self.counts()) or 1
-        else:
-            total = 1
-
         combined = dict(chain(fill_items.items(), self.items()))
+        total = sum(combined.values()) or 1
 
-        return ((face, count / total) for face, count in sorted(combined.items()))
+        return ((outcome, count / total) for outcome, count in sorted(combined.items()))
 
-    def data_xy(
+    def distribution_xy(
         self,
         fill_items: _MappingT = None,
-    ) -> Tuple[Tuple[_FaceT, ...], Tuple[float, ...]]:
+    ) -> Tuple[Tuple[_OutcomeT, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
-        output from the [``data`` method][dyce.h.H.data]:
+        output from the [``distribution`` method][dyce.h.H.distribution]:
 
         ```python
-        >>> list(H(6).data())
-        [(1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0), (5, 1.0), (6, 1.0)]
-        >>> H(6).data_xy()
+        >>> list(H(6).distribution())
+        [(1, 0.16666666), (2, 0.16666666), (3, 0.16666666), (4, 0.16666666), (5, 0.16666666), (6, 0.16666666)]
+        >>> H(6).distribution_xy()
         ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
 
         ```
         """
         return cast(
             Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(zip(*self.data(relative=True, fill_items=fill_items))),
+            tuple(zip(*self.distribution(fill_items))),
         )
 
     def format(
@@ -1145,13 +1222,13 @@ class H(_MappingT):
         width: int = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
-        sep: str = linesep,
+        sep: str = os.linesep,
     ) -> str:
         r"""
         Returns a formatted string representation of the histogram. If provided,
-        *fill_items* supplies defaults for any missing faces. If *width* is greater than
-        zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which are
-        otherwise ignored if *width* is zero or less).
+        *fill_items* supplies defaults for any missing outcomes. If *width* is greater
+        than zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which
+        are otherwise ignored if *width* is zero or less).
 
         ```python
         >>> print(H(6).format(width=0))
@@ -1221,11 +1298,9 @@ class H(_MappingT):
             def parts():
                 yield f"avg: {mu:.2f}"
 
-                for face, probability in self.data(
-                    relative=True, fill_items=fill_items
-                ):
+                for outcome, probability in self.distribution(fill_items):
                     probability_f = float(probability)
-                    yield f"{face}:{probability_f:7.2%}"
+                    yield f"{outcome}:{probability_f:7.2%}"
 
             return "{" + ", ".join(parts()) + "}"
         else:
@@ -1242,30 +1317,30 @@ class H(_MappingT):
                 except TypeError:
                     pass
 
-                total = sum(self.counts())
-                tick_scale = max(self.counts()) if scaled else total
+                outcomes, probabilities = self.distribution_xy(fill_items)
+                tick_scale = max(probabilities) if scaled else 1.0
 
-                for face, count in self.data(relative=False, fill_items=fill_items):
+                for outcome, probability in zip(outcomes, probabilities):
                     try:
-                        face_str = f"{face: 3}"
+                        outcome_str = f"{outcome: 3}"
                     except (TypeError, ValueError):
-                        face_str = str(face)
-                        face_str = f"{face_str: >3}"
+                        outcome_str = str(outcome)
+                        outcome_str = f"{outcome_str: >3}"
 
-                    ticks = tick * int(w * count / tick_scale)
-                    probability_f = float(count / total)
-                    yield f"{face_str} | {probability_f:7.2%} |{ticks}"
+                    ticks = tick * int(w * probability / tick_scale)
+                    probability_f = float(probability)
+                    yield f"{outcome_str} | {probability_f:7.2%} |{ticks}"
 
             return sep.join(lines())
 
     def mean(self) -> float:
         """
-        Returns the mean of the weighted faces (or 0.0 if there are no faces).
+        Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
         """
         numerator = denominator = 0
 
-        for face, count in self.items():
-            numerator += face * count
+        for outcome, count in self.items():
+            numerator += outcome * count
             denominator += count
 
         return numerator / (denominator or 1)
@@ -1278,34 +1353,34 @@ class H(_MappingT):
 
     def variance(self, mu: float = None) -> float:
         """
-        Returns the variance of the weighted faces. If provided, *mu* is used as the mean
+        Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
         """
         mu = mu if mu else self.mean()
         numerator = denominator = 0
 
-        for face, count in self.items():
-            numerator += (face - mu) ** 2 * count
+        for outcome, count in self.items():
+            numerator += (outcome - mu) ** 2 * count
             denominator += count
 
         return numerator / (denominator or 1)
 
-    def roll(self) -> _FaceT:
+    def roll(self) -> _OutcomeT:
         r"""
-        Returns a (weighted) random face.
+        Returns a (weighted) random outcome.
         """
         val = randrange(0, sum(self.counts()))
         total = 0
 
-        for face, count in self.items():
+        for outcome, count in self.items():
             total += count
 
             if val < total:
-                return face
+                return outcome
 
         assert False, f"val ({val}) ≥ total ({total})"
 
-    def _lowest_terms(self) -> Iterable[Tuple[_FaceT, _CountT]]:
+    def _lowest_terms(self) -> Iterable[Tuple[_OutcomeT, _CountT]]:
         counts_gcd = gcd(*self.counts())
 
         return ((k, v // counts_gcd) for k, v in self.items())
@@ -1340,7 +1415,7 @@ class HAbleBinOpsMixin:
         """
         return op_add(self.h(), other)
 
-    def __radd__(self: HAbleT, other: _FaceT) -> H:
+    def __radd__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.add(other, self.h())``.
         """
@@ -1352,7 +1427,7 @@ class HAbleBinOpsMixin:
         """
         return op_sub(self.h(), other)
 
-    def __rsub__(self: HAbleT, other: _FaceT) -> H:
+    def __rsub__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.sub(other, self.h())``.
         """
@@ -1364,7 +1439,7 @@ class HAbleBinOpsMixin:
         """
         return op_mul(self.h(), other)
 
-    def __rmul__(self: HAbleT, other: _FaceT) -> H:
+    def __rmul__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.mul(other, self.h())``.
         """
@@ -1376,7 +1451,7 @@ class HAbleBinOpsMixin:
         """
         return op_truediv(self.h(), other)
 
-    def __rtruediv__(self: HAbleT, other: _FaceT) -> H:
+    def __rtruediv__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.truediv(other, self.h())``.
         """
@@ -1388,7 +1463,7 @@ class HAbleBinOpsMixin:
         """
         return op_floordiv(self.h(), other)
 
-    def __rfloordiv__(self: HAbleT, other: _FaceT) -> H:
+    def __rfloordiv__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.floordiv(other, self.h())``.
         """
@@ -1400,7 +1475,7 @@ class HAbleBinOpsMixin:
         """
         return op_mod(self.h(), other)
 
-    def __rmod__(self: HAbleT, other: _FaceT) -> H:
+    def __rmod__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.mod(other, self.h())``.
         """
@@ -1412,7 +1487,7 @@ class HAbleBinOpsMixin:
         """
         return op_pow(self.h(), other)
 
-    def __rpow__(self: HAbleT, other: _FaceT) -> H:
+    def __rpow__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.pow(other, self.h())``.
         """
@@ -1424,7 +1499,7 @@ class HAbleBinOpsMixin:
         """
         return op_and(self.h(), other)
 
-    def __rand__(self: HAbleT, other: _FaceT) -> H:
+    def __rand__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.and_(other, self.h())``.
         """
@@ -1436,7 +1511,7 @@ class HAbleBinOpsMixin:
         """
         return op_xor(self.h(), other)
 
-    def __rxor__(self: HAbleT, other: _FaceT) -> H:
+    def __rxor__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.xor(other, self.h())``.
         """
@@ -1448,7 +1523,7 @@ class HAbleBinOpsMixin:
         """
         return op_or(self.h(), other)
 
-    def __ror__(self: HAbleT, other: _FaceT) -> H:
+    def __ror__(self: HAbleT, other: _OutcomeT) -> H:
         r"""
         Shorthand for ``operator.or_(other, self.h())``.
         """
@@ -1458,15 +1533,15 @@ class HAbleBinOpsMixin:
 # ---- Functions -----------------------------------------------------------------------
 
 
-def _coalesce_replace(h: H, face: _FaceT) -> H:  # pylint: disable=unused-argument
+def _coalesce_replace(h: H, outcome: _OutcomeT) -> H:  # pylint: disable=unused-argument
     return h
 
 
-def _within(lo: _FaceT, hi: _FaceT) -> _BinaryOperatorT:
+def _within(lo: _OutcomeT, hi: _OutcomeT) -> _BinaryOperatorT:
     if lo > hi:
         raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")
 
-    def _cmp(a: _FaceT, b: _FaceT) -> int:
+    def _cmp(a: _OutcomeT, b: _OutcomeT) -> int:
         diff = a - b
 
         return (diff > hi) - (diff < lo)
