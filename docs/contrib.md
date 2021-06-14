@@ -38,7 +38,6 @@ There are only a few guidelines:
 
 * Use [Black](https://pypi.org/project/black/) to format your changes.
   Try to follow the source conventions as you observe them.
-  (Note: I have purposely avoided aspects of [PEP8](https://www.python.org/dev/peps/pep-0008/), in part because I have adopted conventions developed from my experiences with other languages, but mostly because I am growing older and more stubborn.)
 
 * Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.

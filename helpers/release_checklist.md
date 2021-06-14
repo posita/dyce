@@ -27,6 +27,8 @@ The following assumes you are working from the repository root and have a develo
   * updates `gh-pages`
   * see [`./helpers/draft-release.sh`](draft-release.sh) for details
 
+* [ ] `mike serve` and spot check docs (some images with external references might be missing)
+
 * [ ] `git push [--force] origin vX.Y.Z gh-pages`
 
 * [ ] `twine upload dist/*-X.Y.Z[-.]*`

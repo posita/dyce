@@ -4,18 +4,26 @@ const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
 function handleColorSchemeChange(event) {
   var body = document.querySelector("body[data-md-color-scheme]");
-  var color, theme;
-  if (event.matches) {
-    color = "light-green";
-    theme = "slate";
-  } else {
-    color = "green";
-    theme = "default";
-  }
-  if (body !== null && theme !== null) {
-    body.setAttribute("data-md-color-scheme", theme);
-    body.setAttribute("data-md-color-primary", color);
-    body.setAttribute("data-md-color-accent", color);
+
+  if (body !== null && typeof palette !== "undefined" && palette.hasOwnProperty("color")) {
+    var color, theme;
+
+    if (event.matches) {
+      // Dark
+      color = "light-green";
+      theme = "slate";
+    } else {
+      // Light
+      color = "green";
+      theme = "default";
+    }
+
+    palette.color.scheme = theme;
+    palette.color.primary = palette.color.accent = color;
+    localStorage.setItem(__prefix("__palette"), JSON.stringify(palette));
+    body.setAttribute("data-md-color-scheme", palette.color.scheme);
+    body.setAttribute("data-md-color-primary", palette.color.primary);
+    body.setAttribute("data-md-color-accent", palette.color.accent);
   }
 }
 

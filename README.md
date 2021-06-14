@@ -152,23 +152,28 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 The following is a best-effort¹ summary of the differences between various available tools in this space.
 Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations) for added color.
 
-| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [AnyDice](https://anydice.com/)<br>*Flick* | [python_dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
+| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Actively maintained and documented | ✅ | ⚠² | ✅   | ✅  | ✅  | ❌  | ✅  | ❌  | ❌  |
-| Discrete outcome enumeration       | ✅ | ✅  | ✅   | ✅  | ❌  | ✅  | ❌  | ❌  | ❌  |
-| Arbitrary expressions              | ✅ | ⚠³ | ✅   | ✅  | ✅  | ⚠⁴ | ❌  | ❌  | ❌  |
-| Arbitrary dice definitions         | ✅ | ✅  | ✅   | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |
-| Integrates with other tools        | ✅ | ✅  | ❌   | ⚠⁵ | ⚠⁵ | ✅  | ⚠⁵ | ⚠⁵ | ⚠⁵ |
-| Open source                        | ✅ | ✅  | ❌   | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |
-| Permissive licensing               | ✅ | ✅  | N/A | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |
+| Latest release                             | 2021 | N/A | Unknown | 2021 | 2021 | 2016 | 2021 | 2021 | 2009 |
+| Actively maintained and documented         | ✅   | ⚠² | ✅      | ✅   | ✅   | ❌   | ✅   | ❌   | ❌  |
+| Suitable as a dependency in other projects | ✅   | ⚠³ | ✅      | ❌   | ✅   | ⚠³  | ✅   | ❌   | ❌  |
+| Discrete outcome enumeration               | ✅   | ✅  | ✅      | ✅   | ❌   | ✅   | ❌   | ❌   | ❌  |
+| Arbitrary expressions                      | ✅   | ⚠⁴ | ✅      | ✅   | ✅   | ⚠⁵  | ❌   | ❌   | ❌  |
+| Arbitrary dice definitions                 | ✅   | ✅  | ✅      | ✅   | ❌   | ❌   | ❌   | ❌   | ❌  |
+| Integrates with other tools                | ✅   | ✅  | ⚠⁶     | ❌   | ⚠⁶  | ✅   | ⚠⁶  | ⚠⁶  | ⚠⁶ |
+| Open source (can inspect)                  | ✅   | ✅  | ✅      | ❌   | ✅   | ✅   | ✅   | ✅   | ✅  |
+| Permissive licensing (can use and extend)  | ✅   | ✅  | ✅      | N/A  | ✅   | ✅   | ✅   | ✅   | ✅  |
+<!--                                         🔺 dycelib   🔺 python-dice    🔺 d20         🔺 dice       🔺 dyce
+                                                    🔺 dyce_roll.py  🔺 AnyDice     🔺 DnDice     🔺 dice-notation -->
 
 |Notes|
 |---|
 | ¹ I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if there are discrepancies. |
 | ² Actively maintained, but sparsely documented. The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version. |
-| ³ Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice. That being said, the library is remarkably powerful, given its size. |
-| ⁴ Limited arithmetic operations are available. The library also provides game-specific functions. |
-| ⁵ Results only. Input is limited to specialized grammar. |
+| ³ Source can be downloaded and incorporated directly, but there is no packaging, versioning, or dependency tracking.
+| ⁴ Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice. That being said, the library is remarkably powerful, given its size. |
+| ⁵ Limited arithmetic operations are available. The library also provides game-specific functions. |
+| ⁶ Results only. Input is limited to specialized grammar. |
 
 ## License
 

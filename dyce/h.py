@@ -10,7 +10,6 @@
 from __future__ import annotations, generator_stop
 
 import os
-import warnings
 from collections import Counter as counter
 from collections import OrderedDict as ordereddict
 from collections.abc import Iterable as ABCIterable
@@ -575,22 +574,6 @@ class H(_MappingT):
         """
         return self.values()
 
-    def faces(self) -> Iterator[_OutcomeT]:
-        r"""
-        Synonym for [``outcomes``][dyce.h.H.outcomes].
-
-        !!! warning "Deprecated"
-
-            This alias is deprecated and will be removed in a future version.
-
-        """
-        warnings.warn(
-            "H.faces is deprecated; use H.outcomes",
-            DeprecationWarning,
-        )
-
-        return self.outcomes()
-
     def items(self):
         return self._h.items()
 
@@ -1124,44 +1107,6 @@ class H(_MappingT):
         ```
         """
         return self.map(_within(lo, hi), other)
-
-    def data(
-        self,
-        relative: bool = True,  # pylint: disable=unused-argument
-        fill_items: _MappingT = None,
-    ) -> Iterator[Tuple[_OutcomeT, float]]:
-        r"""
-        Synonym for [``distribution``][dyce.h.H.distribution]. The *relative* parameter is
-        ignored.
-
-        !!! warning "Deprecated"
-
-            This alias is deprecated and will be removed in a future version.
-        """
-        warnings.warn(
-            "H.data is deprecated; use H.distribution",
-            DeprecationWarning,
-        )
-
-        return self.distribution(fill_items)
-
-    def data_xy(
-        self,
-        fill_items: _MappingT = None,
-    ) -> Tuple[Tuple[_OutcomeT, ...], Tuple[float, ...]]:
-        r"""
-        Synonym for [``distribution_xy``][dyce.h.H.distribution_xy].
-
-        !!! warning "Deprecated"
-
-            This alias is deprecated and will be removed in a future version.
-        """
-        warnings.warn(
-            "H.data_xy is deprecated; use H.distribution_xy",
-            DeprecationWarning,
-        )
-
-        return self.distribution_xy(fill_items)
 
     def distribution(
         self,

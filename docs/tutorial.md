@@ -344,10 +344,10 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 ```
 
+<!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_histogram_dark.png" media="(prefers-color-scheme: dark)" />
-  <!-- Should match any title of the corresponding plot title -->
-  <img alt="Plot: Distribution for 2d6" src="../plot_histogram_light.png" />
+  <source srcset="../plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Distribution for 2d6" src="../plot_histogram_light.png">
 </picture>
 
 [``dyce.plt``](dyce.plt.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
@@ -359,10 +359,10 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 
 ```
 
+<!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burst_1_dark.png" media="(prefers-color-scheme: dark)" />
-  <!-- Should match any title of the corresponding plot title -->
-  <img alt="Plot: Basic plot_burst example" src="../plot_burst_1_light.png" />
+  <source srcset="../plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Basic plot_burst example" src="../plot_burst_1_light.png">
 </picture>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
@@ -380,10 +380,10 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 ```
 
+<!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burst_2_dark.png" media="(prefers-color-scheme: dark)" />
-  <!-- Should match any title of the corresponding plot title -->
-  <img alt="Plot: Advanced plot_burst example" src="../plot_burst_2_light.png" />
+  <source srcset="../plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Advanced plot_burst example" src="../plot_burst_2_light.png">
 </picture>
 
 ## Advanced exercise – modeling *Risis*
@@ -447,10 +447,10 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 
 Calling ``matplotlib.pyplot.show`` presents:
 
+<!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)" />
-  <!-- Should match any title of the corresponding plot title -->
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../plot_risus_first_round_light.png" />
+  <source srcset="../plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../plot_risus_first_round_light.png">
 </picture>
 
 We can even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):
