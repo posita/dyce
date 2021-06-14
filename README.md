@@ -17,11 +17,11 @@ Please see the accompanying `LICENSE` file for rights and restrictions governing
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![v0.2.3 Version](https://img.shields.io/pypi/v/dycelib/0.2.3.svg)](https://pypi.python.org/pypi/dycelib/0.2.3)
+[![v0.2.3 Development Stage](https://img.shields.io/pypi/status/dycelib/0.2.3.svg)](https://pypi.python.org/pypi/dycelib/0.2.3)
+[![v0.2.3 License](https://img.shields.io/pypi/l/dycelib/0.2.3.svg)](http://opensource.org/licenses/MIT)
+[![v0.2.3 Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib/0.2.3.svg)](https://pypi.python.org/pypi/dycelib/0.2.3)
+[![v0.2.3 Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib/0.2.3.svg)](https://pypi.python.org/pypi/dycelib/0.2.3)
 
 # ``dyce`` – simple Python tools for exploring dice probabilities and outcomes
 
@@ -31,8 +31,8 @@ While not as compact as a dedicated grammar, ``dyce``’s Python-based primitive
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
 
 ``dyce`` should be able to replicate or replace most other dice probability modeling tools.
-It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
-If you find it lacking in any way, please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) to start a discussion.
+It strives to be [fully documented](https://posita.github.io/dyce/0.2/) and relies heavily on examples to develop understanding.
+If you find it lacking in any way, please consider [contributing an issue](https://posita.github.io/dyce/0.2/contrib) to start a discussion.
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying ``LICENSE`` file for details.
@@ -41,8 +41,8 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 ## A taste
 
 ``dyce`` provides two key primitives.
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
-[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
+[``H`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
+[``P`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
 Both support a variety of operations.
 
 ```python
@@ -67,7 +67,7 @@ True
 
 ```
 
-By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
+By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
 ```python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
@@ -101,7 +101,7 @@ var |    1.97
 
 ```
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
+[``H`` objects](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
 ```python
 >>> import matplotlib  # doctest: +SKIP
@@ -132,9 +132,9 @@ var |    1.97
 ```
 
 <!-- Should match any title of the corresponding plot title -->
-![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/master/docs/plot_2d6_lo_hi_gh.png)
+![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/v0.2.3/docs/plot_2d6_lo_hi_gh.png)
 
-See the [tutorial](https://posita.github.io/dyce/latest/tutorial) and the [API guide](https://posita.github.io/dyce/latest/dyce) for a much more thorough treatment, including detailed examples.
+See the [tutorial](https://posita.github.io/dyce/0.2/tutorial) and the [API guide](https://posita.github.io/dyce/0.2/dyce) for a much more thorough treatment, including detailed examples.
 
 ## Design philosophy
 
@@ -145,12 +145,12 @@ It can be installed and run anywhere, and modified as desired.
 On its own, it is completely adequate for casual tinkering.
 However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
 
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), ``dyce`` includes some conveniences, such as minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [``H.distribution``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution), [``H.distribution_xy``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy), and [``H.format``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) methods).
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), ``dyce`` includes some conveniences, such as minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [``H.distribution``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.distribution), [``H.distribution_xy``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.distribution_xy), and [``H.format``](https://posita.github.io/dyce/0.2/dyce/#dyce.h.H.format) methods).
 
 ## Comparison to alternatives
 
 The following is a best-effort¹ summary of the differences between various available tools in this space.
-Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations) for added color.
+Consider exploring the [applications and translations](https://posita.github.io/dyce/0.2/translations) for added color.
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [AnyDice](https://anydice.com/)<br>*Flick* | [python_dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -164,7 +164,7 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
 |Notes|
 |---|
-| ¹ I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if there are discrepancies. |
+| ¹ I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/0.2/contrib) if there are discrepancies. |
 | ² Actively maintained, but sparsely documented. The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version. |
 | ³ Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice. That being said, the library is remarkably powerful, given its size. |
 | ⁴ Limited arithmetic operations are available. The library also provides game-specific functions. |
@@ -173,7 +173,7 @@ Consider exploring the [applications and translations](https://posita.github.io/
 ## License
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the included [``LICENSE``](https://posita.github.io/dyce/latest/license) file for details.
+See the included [``LICENSE``](https://posita.github.io/dyce/0.2/license) file for details.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
 ## Installation
