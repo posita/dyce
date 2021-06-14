@@ -13,8 +13,10 @@
         <meta name="author" content="Matt Bogosian">
       
       
+        <link rel="canonical" href="https://posita.github.io/dyce/0.2/dyce.plt/">
+      
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.5">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.8">
     
     
       
@@ -22,10 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.bde7dde4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
         
       
     
@@ -44,6 +46,8 @@
     
     
       
+
+
     
     
   </head>
@@ -110,7 +114,7 @@
         
           
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green" type="radio" name="__palette" id="__palette_1">
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
           
         
       </form>
@@ -229,6 +233,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        Tutorial
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translations/" class="md-nav__link">
+        Applications & translations
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -238,14 +272,14 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
-      <label class="md-nav__link" for="__nav_2">
+      <label class="md-nav__link" for="__nav_4">
         API
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           API
         </label>
@@ -302,29 +336,35 @@
       
         <li class="md-nav__item">
   <a href="#dyce.plt" class="md-nav__link">
-    dyce.plt
+    plt
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="plt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#dyce.plt.display_burst" class="md-nav__link">
     display_burst()
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#dyce.plt.labels_cumulative" class="md-nav__link">
     labels_cumulative()
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#dyce.plt.plot_burst" class="md-nav__link">
     plot_burst()
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -416,7 +456,15 @@ Be warned that future release may introduce incompatibilities or remove this pac
 
   <div class="doc doc-object doc-module">
 
-<a id="dyce.plt"></a>
+
+
+<h2 id="dyce.plt" class="doc doc-heading">
+        <code>plt</code>
+
+
+
+</h2>
+
     <div class="doc doc-contents first">
 
 
@@ -435,11 +483,11 @@ Be warned that future release may introduce incompatibilities or remove this pac
 
 
 
-<h2 id="dyce.plt.display_burst" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">display_burst</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">h_inner</span><span class="p">,</span> <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_color</span><span class="o">=</span><span class="s1">&#39;RdYlGn_r&#39;</span><span class="p">,</span> <span class="n">text_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
+<h3 id="dyce.plt.display_burst" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">display_burst</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">AxesT</span><span class="p">,</span> <span class="n">h_inner</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outer</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;RdYlGn_r&#39;</span><span class="p">,</span> <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 
-</h2>
+</h3>
 
     <div class="doc doc-contents ">
 
@@ -449,8 +497,8 @@ Be warned that future release may introduce incompatibilities or remove this pac
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">display_burst</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">:</span> <span class="n">AxesT</span><span class="p">,</span>
     <span class="n">h_inner</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
-    <span class="n">outer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">outer</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">graph_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_GRAPH_COLOR</span><span class="p">,</span>
     <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TEXT_COLOR</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_GRAPH_ALPHA</span><span class="p">,</span>
@@ -460,7 +508,7 @@ Be warned that future release may introduce incompatibilities or remove this pac
     <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">outer</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">_HIDE_LIM</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">h_inner</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">h_inner</span><span class="o">.</span><span class="n">distribution</span><span class="p">()</span>
         <span class="p">)</span>
 
     <span class="n">outer_labels</span><span class="p">,</span> <span class="n">outer_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">outer</span><span class="p">))</span>
@@ -500,11 +548,11 @@ Be warned that future release may introduce incompatibilities or remove this pac
 
 
 
-<h2 id="dyce.plt.labels_cumulative" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">labels_cumulative</span><span class="p">(</span><span class="n">h</span><span class="p">)</span></code>
+<h3 id="dyce.plt.labels_cumulative" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">labels_cumulative</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]</span></code>
 
 
-</h2>
+</h3>
 
     <div class="doc doc-contents ">
 
@@ -515,18 +563,18 @@ Be warned that future release may introduce incompatibilities or remove this pac
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]:</span>
     <span class="n">le_total</span><span class="p">,</span> <span class="n">ge_total</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
-    <span class="k">for</span> <span class="n">face</span><span class="p">,</span> <span class="n">percentage</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">le_total</span> <span class="o">+=</span> <span class="n">percentage</span>
+    <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">distribution</span><span class="p">():</span>
+        <span class="n">le_total</span> <span class="o">+=</span> <span class="n">probability</span>
 
-        <span class="k">if</span> <span class="n">percentage</span> <span class="o">&gt;=</span> <span class="n">_HIDE_LIM</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">probability</span> <span class="o">&gt;=</span> <span class="n">_HIDE_LIM</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{:.2%}</span><span class="s2">; ≥</span><span class="si">{:.2%}</span><span class="s2">; ≤</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">face</span><span class="p">,</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">le_total</span><span class="p">,</span> <span class="n">ge_total</span>
+                <span class="n">outcome</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">le_total</span><span class="p">,</span> <span class="n">ge_total</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-        <span class="n">ge_total</span> <span class="o">-=</span> <span class="n">percentage</span>
-        <span class="k">yield</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">percentage</span><span class="p">)</span>
+        <span class="n">ge_total</span> <span class="o">-=</span> <span class="n">probability</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">probability</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -539,11 +587,11 @@ Be warned that future release may introduce incompatibilities or remove this pac
 
 
 
-<h2 id="dyce.plt.plot_burst" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">plot_burst</span><span class="p">(</span><span class="n">h_inner</span><span class="p">,</span> <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_color</span><span class="o">=</span><span class="s1">&#39;RdYlGn_r&#39;</span><span class="p">,</span> <span class="n">text_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
+<h3 id="dyce.plt.plot_burst" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">plot_burst</span><span class="p">(</span><span class="n">h_inner</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outer</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;RdYlGn_r&#39;</span><span class="p">,</span> <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FigureT</span><span class="p">,</span> <span class="n">AxesT</span><span class="p">]</span></code>
 
 
-</h2>
+</h3>
 
     <div class="doc doc-contents ">
 
@@ -552,8 +600,8 @@ Be warned that future release may introduce incompatibilities or remove this pac
           <summary>Source code in <code>dyce/plt.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot_burst</span><span class="p">(</span>
     <span class="n">h_inner</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
-    <span class="n">outer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">outer</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LabelT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">graph_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_GRAPH_COLOR</span><span class="p">,</span>
     <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TEXT_COLOR</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_GRAPH_ALPHA</span><span class="p">,</span>
@@ -598,7 +646,8 @@ Be warned that future release may introduce incompatibilities or remove this pac
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
-        <a href="../dyce/" class="md-footer__link md-footer__link--prev" rel="prev">
+        
+        <a href="../dyce/" class="md-footer__link md-footer__link--prev" aria-label="Previous: &lt;tt&gt;dyce&lt;/tt&gt;" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -613,7 +662,8 @@ Be warned that future release may introduce incompatibilities or remove this pac
         </a>
       
       
-        <a href="../contrib/" class="md-footer__link md-footer__link--next" rel="next">
+        
+        <a href="../contrib/" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
@@ -652,10 +702,10 @@ Be warned that future release may introduce incompatibilities or remove this pac
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.d351de03.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.b0710199.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.a1609d9a.min.js"></script>
+      <script src="../assets/javascripts/bundle.76f349be.min.js"></script>
       
         <script src="../img_theme.js"></script>
       
