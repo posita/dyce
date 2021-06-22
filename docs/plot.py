@@ -36,6 +36,7 @@ def main() -> None:
         )
 
     mod_do_it(args.style)
+    matplotlib.pyplot.tight_layout()
     print("saving {}".format(png_path))
     matplotlib.pyplot.savefig(png_path, dpi=72, transparent=True)
 

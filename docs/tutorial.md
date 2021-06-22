@@ -102,6 +102,66 @@ H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 
 ```
 
+The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative_frequency) is:
+
+```python
+>>> miwin_iii = H((1, 2, 5, 6, 7, 9))
+>>> miwin_iv = H((1, 3, 4, 5, 8, 9))
+>>> miwin_v = H((2, 3, 4, 6, 7, 8))
+>>> miwin_iii + miwin_iv + miwin_v
+H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
+
+```
+
+Histograms provide rudimentary formatting for convenience:
+
+```python
+>>> print((2@H(6)).format(width=65))
+avg |    7.00
+std |    2.42
+var |    5.83
+  2 |   2.78% |#
+  3 |   5.56% |##
+  4 |   8.33% |####
+  5 |  11.11% |#####
+  6 |  13.89% |######
+  7 |  16.67% |########
+  8 |  13.89% |######
+  9 |  11.11% |#####
+ 10 |   8.33% |####
+ 11 |   5.56% |##
+ 12 |   2.78% |#
+
+>>> print((miwin_iii + miwin_iv + miwin_v).format(scaled=True, width=65))
+avg |   15.00
+std |    4.47
+var |   20.00
+  4 |   0.46% |##
+  5 |   0.93% |#####
+  6 |   1.39% |#######
+  7 |   1.85% |##########
+  8 |   3.24% |##################
+  9 |   4.17% |#######################
+ 10 |   4.63% |##########################
+ 11 |   5.09% |############################
+ 12 |   7.87% |############################################
+ 13 |   8.80% |#################################################
+ 14 |   8.33% |###############################################
+ 15 |   6.48% |####################################
+ 16 |   8.33% |###############################################
+ 17 |   8.80% |#################################################
+ 18 |   7.87% |############################################
+ 19 |   5.09% |############################
+ 20 |   4.63% |##########################
+ 21 |   4.17% |#######################
+ 22 |   3.24% |##################
+ 23 |   1.85% |##########
+ 24 |   1.39% |#######
+ 25 |   0.93% |#####
+ 26 |   0.46% |##
+
+```
+
 The results show there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
 One way to model the outcomes of subtracting the least of two six-sided dice from the greatest is:
 
@@ -149,27 +209,6 @@ H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
     H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
     ```
-
-Histograms provide rudimentary formatting for convenience:
-
-```python
->>> print((2@H(6)).format(width=65))
-avg |    7.00
-std |    2.42
-var |    5.83
-  2 |   2.78% |#
-  3 |   5.56% |##
-  4 |   8.33% |####
-  5 |  11.11% |#####
-  6 |  13.89% |######
-  7 |  16.67% |########
-  8 |  13.89% |######
-  9 |  11.11% |#####
- 10 |   8.33% |####
- 11 |   5.56% |##
- 12 |   2.78% |#
-
-```
 
 Taking the least, middle, or greatest face when rolling three six-sided dice would be:
 
@@ -347,7 +386,7 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Distribution for 2d6" src="../plot_histogram_light.png">
+  ![Plot: Distribution for 2d6](plot_histogram_light.png)
 </picture>
 
 [``dyce.plt``](dyce.plt.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
@@ -362,7 +401,7 @@ The odds of scoring at least one nine or higher when rolling $n$ “[exploding][
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Basic plot_burst example" src="../plot_burst_1_light.png">
+  ![Plot: Basic plot_burst example](plot_burst_1_light.png)
 </picture>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
@@ -370,7 +409,7 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 
 ```python
 >>> d20 = H(20)
->>> fig, ax = plot_burst(d20, outer=(
+>>> plot_burst(d20, outer=(
 ...   ("crit. fail.", d20.le(1)[1]),
 ...   ("fail.", d20.within(2, 14)[0]),
 ...   ("succ.", d20.within(15, 19)[0]),
@@ -383,7 +422,23 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Advanced plot_burst example" src="../plot_burst_2_light.png">
+  ![Plot: Advanced plot_burst example](plot_burst_2_light.png)
+</picture>
+
+The outer ring can also be used to compare two histograms directly:
+
+```python
+>>> d8 = H(8)
+>>> d12 = H(12)
+>>> plot_burst(d12, d8)  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
+
+```
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source srcset="../plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: plot_burst example (d12 vs. d8)](plot_burst_3_light.png)
 </picture>
 
 ## Advanced exercise – modeling *Risis*
@@ -450,7 +505,7 @@ Calling ``matplotlib.pyplot.show`` presents:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../plot_risus_first_round_light.png">
+  ![Plot: Modeling the Risus combat mechanic after the first roll](plot_risus_first_round_light.png)
 </picture>
 
 We can even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):

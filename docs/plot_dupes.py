@@ -1,9 +1,10 @@
 from __future__ import annotations, generator_stop
 
 from dyce import H, P
+from dyce.plt import plot_burst
 
 
-def do_it(_: str) -> None:
+def do_it(style: str) -> None:
     import matplotlib.pyplot
 
     def dupes(p: P):
@@ -14,8 +15,12 @@ def do_it(_: str) -> None:
                     dupes += 1
             yield dupes, count
 
-    res = H(dupes(8 @ P(10))).lowest_terms()
+    res = H(dupes(8 @ P(10)))
 
-    matplotlib.pyplot.bar(*res.distribution_xy())
-    # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")
+    plot_burst(
+        res,
+        # Should match the corresponding img[alt] text
+        desc=r"Chances of rolling $n$ duplicates in 8d10",
+        text_color="white" if style == "dark" else "black",
+    )
+    matplotlib.pyplot.tight_layout()

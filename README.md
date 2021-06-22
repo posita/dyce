@@ -67,6 +67,23 @@ True
 
 ```
 
+Each can generate random rolls as desired.
+
+```python
+>>> d6 = H(6)
+>>> d6.roll()  # doctest: +SKIP
+4
+
+```
+
+```python
+>>> d10 = H(10) - 1
+>>> p_6d10 = 6@P(d10)
+>>> p_6d10.roll()  # doctest: +SKIP
+(0, 1, 2, 3, 5, 7)
+
+```
+
 By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
 ```python
@@ -109,7 +126,7 @@ var |    1.97
 
 >>> outcomes, probabilities = p_2d6.h(0).distribution_xy()
 >>> matplotlib.pyplot.bar(
-...   [str(v) for v in outcomes],
+...   [v - 0.125 for v in outcomes],
 ...   probabilities,
 ...   alpha=0.75,
 ...   width=0.5,
@@ -118,7 +135,7 @@ var |    1.97
 
 >>> outcomes, probabilities = p_2d6.h(-1).distribution_xy()
 >>> matplotlib.pyplot.bar(
-...   [str(v) for v in outcomes],
+...   [v + 0.125 for v in outcomes],
 ...   probabilities,
 ...   alpha=0.75,
 ...   width=0.5,
@@ -154,17 +171,17 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Latest release                             | 2021 | N/A | Unknown | 2021 | 2021 | 2016 | 2021 | 2021 | 2009 |
-| Actively maintained and documented         | ✅   | ⚠² | ✅      | ✅   | ✅   | ❌   | ✅   | ❌   | ❌  |
-| Suitable as a dependency in other projects | ✅   | ⚠³ | ✅      | ❌   | ✅   | ⚠³  | ✅   | ❌   | ❌  |
-| Discrete outcome enumeration               | ✅   | ✅  | ✅      | ✅   | ❌   | ✅   | ❌   | ❌   | ❌  |
-| Arbitrary expressions                      | ✅   | ⚠⁴ | ✅      | ✅   | ✅   | ⚠⁵  | ❌   | ❌   | ❌  |
-| Arbitrary dice definitions                 | ✅   | ✅  | ✅      | ✅   | ❌   | ❌   | ❌   | ❌   | ❌  |
-| Integrates with other tools                | ✅   | ✅  | ⚠⁶     | ❌   | ⚠⁶  | ✅   | ⚠⁶  | ⚠⁶  | ⚠⁶ |
-| Open source (can inspect)                  | ✅   | ✅  | ✅      | ❌   | ✅   | ✅   | ✅   | ✅   | ✅  |
-| Permissive licensing (can use and extend)  | ✅   | ✅  | ✅      | N/A  | ✅   | ✅   | ✅   | ✅   | ✅  |
-<!--                                         🔺 dycelib   🔺 python-dice    🔺 d20         🔺 dice       🔺 dyce
-                                                    🔺 dyce_roll.py  🔺 AnyDice     🔺 DnDice     🔺 dice-notation -->
+| Latest release                             | 2021	| N/A		| 2021	| Unknown	| 2021		| 2016		| 2021		| 2021		| 2009		|
+| Actively maintained and documented         | ✅	| ⚠️²	| ✅	| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
+| Suitable as a dependency in other projects | ✅	| ⚠️³	| ✅	| ❌		| ✅		| ⚠️³	| ✅		| ❌		| ❌		|
+| Discrete outcome enumeration               | ✅	| ✅		| ✅	| ✅		| ❌		| ✅		| ❌		| ❌		| ❌		|
+| Arbitrary expressions                      | ✅	| ⚠️⁴	| ✅	| ✅		| ✅		| ⚠️⁵	| ❌		| ❌		| ❌		|
+| Arbitrary dice definitions                 | ✅	| ✅		| ✅	| ✅		| ❌		| ❌		| ❌		| ❌		| ❌		|
+| Integrates with other tools                | ✅	| ✅		| ⚠️⁶| ❌		| ⚠️⁶	| ✅		| ⚠️⁶	| ⚠️⁶	| ⚠️⁶	|
+| Open source (can inspect)                  | ✅	| ✅		| ✅	| ❌		| ✅		| ✅		| ✅		| ✅		| ✅		|
+| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅	| N/A		| ✅		| ✅		| ✅		| ✅		| ✅		|
+<!--                                         	🔺 dycelib			🔺 python-dice		🔺 d20					🔺 dice				🔺 dyce
+                                             			🔺 dyce_roll.py	🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
 
 |Notes|
 |---|

@@ -25,6 +25,7 @@ from operator import floordiv as op_floordiv
 from operator import ge as op_ge
 from operator import getitem as op_getitem
 from operator import gt as op_gt
+from operator import invert as op_invert
 from operator import le as op_le
 from operator import lt as op_lt
 from operator import mod as op_mod
@@ -37,22 +38,26 @@ from operator import pow as op_pow
 from operator import sub as op_sub
 from operator import truediv as op_truediv
 from operator import xor as op_xor
-from random import randrange
+from random import choices
 from typing import (
     Callable,
     Counter,
+    Dict,
     Iterable,
     Iterator,
+    KeysView,
     List,
     Mapping,
     Tuple,
     Union,
+    ValuesView,
     cast,
 )
 
 from typing_extensions import Protocol, runtime_checkable
 
-from .symmetries import gcd, sum_w_start
+from .experimental import experimental
+from .symmetries import comb, gcd, sum_w_start
 
 __all__ = ("H",)
 
@@ -376,8 +381,15 @@ class H(_MappingT):
         # Sort and omit zero counts. We use an OrderedDict instead of a Counter to
         # support Python versions earlier than 3.7 which did not guarantee order
         # preservation for the latter.
+        try:
+            tmp_keys: Iterable[_OutcomeT] = sorted(tmp)
+        except TypeError:
+            # This is for outcomes that don't support direct comparisons, like symbolic
+            # representations
+            tmp_keys = sorted(tmp, key=str)
+
         self._h: _MappingT = ordereddict(
-            {outcome: tmp[outcome] for outcome in sorted(tmp) if tmp[outcome]}
+            {outcome: tmp[outcome] for outcome in tmp_keys if tmp[outcome] != 0}
         )
 
     # ---- Overrides -------------------------------------------------------------------
@@ -407,7 +419,7 @@ class H(_MappingT):
             return super().__ne__(other)
 
     def __hash__(self) -> int:
-        return hash(tuple(self._lowest_terms()))
+        return hash(frozenset(self._lowest_terms()))
 
     def __len__(self) -> int:
         return len(self._h)
@@ -568,7 +580,10 @@ class H(_MappingT):
     def __abs__(self) -> "H":
         return self.umap(op_abs)
 
-    def counts(self) -> Iterator[_CountT]:
+    def __invert__(self) -> "H":
+        return self.umap(op_invert)
+
+    def counts(self) -> ValuesView[_CountT]:
         r"""
         More descriptive synonym for the [``values`` method][dyce.h.H.values].
         """
@@ -580,7 +595,7 @@ class H(_MappingT):
     def keys(self):
         return self._h.keys()
 
-    def outcomes(self) -> Iterator[_OutcomeT]:
+    def outcomes(self) -> KeysView[_OutcomeT]:
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
@@ -815,6 +830,38 @@ class H(_MappingT):
 
         return H(chain(self.items(), cast(Iterable, other)))
 
+    @experimental
+    def exactly_k_times_in_n(
+        self,
+        outcome: _OutcomeT,
+        n: int,
+        k: int,
+    ) -> _CountT:
+        """
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may disappear in future
+            versions.
+
+        Computes and returns the probability distribution where *outcome* appears
+        exactly *k* times among ``n@self``.
+
+        ```python
+        >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
+        150
+        >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=2, n=3, k=3)
+        1
+        >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=4, n=3, k=3)
+        8
+
+        ```
+        """
+        assert k <= n
+        c_outcome = self.get(outcome, 0)
+        c_total = sum(self.counts())
+
+        return comb(n, k) * c_outcome ** k * (c_total - c_outcome) ** (n - k)
+
     def explode(self, max_depth: int = 1) -> "H":
         r"""
         Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
@@ -847,14 +894,98 @@ class H(_MappingT):
         ```
 
         ```python
-        >>> d233445 = H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5)) ; d233445
+        >>> d6avg = H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5)) ; d6avg
         H({2: 2, 3: 4, 4: 4, 5: 2})
-        >>> d233445.lowest_terms()
+        >>> d6avg.lowest_terms()
         H({2: 1, 3: 2, 4: 2, 5: 1})
 
         ```
         """
         return H(self._lowest_terms())
+
+    @experimental
+    def order_stat_for_n_at_pos(self, n: int, pos: int) -> "H":
+        """
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may disappear in future
+            versions.
+
+        Shorthand for ``self.order_stat_func_for_n(n)(pos)``.
+        """
+        return self.order_stat_func_for_n(n)(pos)
+
+    @experimental
+    def order_stat_func_for_n(self, n: int) -> Callable[[int], "H"]:
+        """
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may disappear in future
+            versions.
+
+        Returns a function that takes a single argument (*pos*) and computes the
+        probability distribution for each outcome appearing in that position among
+        ``n@self``.
+
+        ```python
+        >>> d6avg = H((2, 3, 3, 4, 4, 5))
+        >>> order_stat_for_5d6avg = d6avg.order_stat_func_for_n(5)
+        >>> order_stat_for_5d6avg(3)  # counts where outcome appears at index 3
+        H({2: 26, 3: 1432, 4: 4792, 5: 1526})
+
+        ```
+
+        The results show that, when rolling five six-sided “averaging” dice and sorting
+        each roll, there are 26 ways where ``2`` appears at the fourth (index ``3``)
+        position, 1432 ways where ``3`` appears at the fourth position, etc. This can be
+        verified independently using the computationally expensive method of enumerating
+        rolls and counting those that meet the criteria:
+
+        ```python
+        >>> from dyce import P
+        >>> p_5d6avg = 5@P(d6avg)
+        >>> sum(count for roll, count in p_5d6avg.rolls_with_counts() if roll[3] == 5)
+        1526
+
+        ```
+
+        This method exists in addition to the
+        [``H.order_stat_for_n_at_pos`` method][dyce.h.H.order_stat_for_n_at_pos] because
+        computing the betas for each outcome in *n* is unnecessary for each *pos*. Where
+        different *pos* values are needed for the same *n* (e.g., in a loop) and where
+        *n* is large, that overhead can be significant. The returned function caches
+        those betas for *n* such that repeated querying or results at *pos* can be
+        computed much faster:
+
+        ```python
+        In [2]: %timeit [H(6).order_stat_for_n_at_pos(100, i) for i in range(10)]
+        1.61 s ± 31.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+        In [3]: %%timeit
+           ...: order_stat_for_100d6_at_pos = H(6).order_stat_func_for_n(100)
+           ...: [order_stat_for_100d6_at_pos(i) for i in range(10)]
+        170 ms ± 3.41 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        ```
+        """
+        betas_by_outcome: Dict[_OutcomeT, Tuple[H, H]] = {}
+
+        for outcome in self.outcomes():
+            betas_by_outcome[outcome] = (
+                n @ self.le(outcome),
+                n @ self.lt(outcome),
+            )
+
+        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[_OutcomeT, _CountT]]:
+            for outcome, (h_le, h_lt) in betas_by_outcome.items():
+                yield (
+                    outcome,
+                    h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
+                )
+
+        def order_stat_for_n_at_pos(pos: int) -> H:
+            return H(_gen_h_items_at_pos(pos))
+
+        return order_stat_for_n_at_pos
 
     def substitute(
         self,
@@ -1314,16 +1445,10 @@ class H(_MappingT):
         r"""
         Returns a (weighted) random outcome.
         """
-        val = randrange(0, sum(self.counts()))
-        total = 0
+        if not self:
+            return 0
 
-        for outcome, count in self.items():
-            total += count
-
-            if val < total:
-                return outcome
-
-        assert False, f"val ({val}) ≥ total ({total})"
+        return choices(*self.distribution_xy())[0]
 
     def _lowest_terms(self) -> Iterable[Tuple[_OutcomeT, _CountT]]:
         counts_gcd = gcd(*self.counts())
@@ -1487,6 +1612,7 @@ def _within(lo: _OutcomeT, hi: _OutcomeT) -> _BinaryOperatorT:
         raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")
 
     def _cmp(a: _OutcomeT, b: _OutcomeT) -> int:
+        # This approach will probably not work with most symbolic outcomes
         diff = a - b
 
         return (diff > hi) - (diff < lo)

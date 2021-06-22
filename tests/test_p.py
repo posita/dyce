@@ -535,6 +535,11 @@ class TestP:
             2 @ H(4).eq(7) + 3 @ H(6).eq(7) + H({}).eq(7)
         )
 
+    def test_roll(self) -> None:
+        d10 = H(10)
+        p_6d10 = 6 @ P(d10)
+        assert all(all(v in d10 for v in p_6d10.roll()) for _ in range(1000))
+
     def test_rolls_with_counts_empty(self) -> None:
         assert tuple(P().rolls_with_counts()) == ()
 

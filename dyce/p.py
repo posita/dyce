@@ -19,6 +19,7 @@ from numbers import Integral
 from operator import abs as op_abs
 from operator import eq as op_eq
 from operator import getitem as op_getitem
+from operator import invert as op_invert
 from operator import mul as op_mul
 from operator import ne as op_ne
 from operator import neg as op_neg
@@ -38,8 +39,9 @@ from typing import (
     overload,
 )
 
+from .experimental import experimental
 from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _MappingT, _OutcomeT
-from .symmetries import comb, sum_w_start
+from .symmetries import sum_w_start
 
 __all__ = ("P",)
 
@@ -231,10 +233,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
         ...
 
     @overload
-    def __getitem__(self, key: slice) -> P:
+    def __getitem__(self, key: slice) -> "P":
         ...
 
-    def __getitem__(self, key: _GetItemT) -> Union[H, P]:
+    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:
         if isinstance(key, (int, Integral)):
             return self._hs[key]
         elif isinstance(key, slice):
@@ -268,6 +270,9 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     def __abs__(self) -> "P":
         return P(*(op_abs(h) for h in self._hs))
+
+    def __invert__(self) -> "H":
+        return P(*(op_invert(h) for h in self._hs))
 
     def h(self, *which: _GetItemT) -> H:
         r"""
@@ -339,9 +344,9 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```python
         >>> d6 = H(6)
-        >>> d233445 = H((2, 3, 3, 4, 4, 5))
-        >>> p = 2@P(d6, d233445)
-        >>> p.h(slice(None)) == p.h() == d6 + d6 + d233445 + d233445
+        >>> d6avg = H((2, 3, 3, 4, 4, 5))
+        >>> p = 2@P(d6, d6avg)
+        >>> p.h(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
         True
 
         ```
@@ -440,6 +445,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
+    @experimental
     def appearances_in_rolls(self, outcome: _OutcomeT) -> H:
         r"""
         !!! warning "Experimental"
@@ -526,9 +532,9 @@ class P(Sequence[H], HAbleBinOpsMixin):
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
-                group_counter[k] = _count_of_exactly_k_of_outcome_in_n_of_h(
-                    h, outcome, n, k
-                ) * (group_counter[k] if group_counter[k] else 1)
+                group_counter[k] = h.exactly_k_times_in_n(outcome, n, k) * (
+                    group_counter[k] if group_counter[k] else 1
+                )
 
             group_counters.append(group_counter)
 
@@ -547,7 +553,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         r"""
         Returns (weighted) random outcomes from contained histograms.
         """
-        return tuple(h.roll() for h in self._hs)
+        return tuple(sorted(h.roll() for h in self._hs))
 
     def rolls_with_counts(self, *which: _GetItemT) -> Iterator[_RollCountT]:
         r"""
@@ -619,9 +625,9 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```python
         >>> d6 = H(6)
-        >>> d233445 = H((2, 3, 3, 4, 4, 5))
-        >>> p = 2@P(d6, d233445)
-        >>> H((sum(roll), count) for roll, count in p.rolls_with_counts()) == p.h() == d6 + d6 + d233445 + d233445
+        >>> d6avg = H((2, 3, 3, 4, 4, 5))
+        >>> p = 2@P(d6, d6avg)
+        >>> H((sum(roll), count) for roll, count in p.rolls_with_counts()) == p.h() == d6 + d6 + d6avg + d6avg
         True
 
         ```
@@ -881,19 +887,6 @@ def _coalesce_replace(h: H, outcome: _OutcomeT) -> H:  # pylint: disable=unused-
     return h
 
 
-def _count_of_exactly_k_of_outcome_in_n_of_h(
-    h: H,
-    outcome: _OutcomeT,
-    n: int,
-    k: int,
-) -> _CountT:
-    assert k <= n
-    c_outcome = h.get(outcome, 0)
-    c_total = sum(h.counts())
-
-    return comb(n, k) * c_outcome ** k * (c_total - c_outcome) ** (n - k)
-
-
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
         if isinstance(key, (int, Integral)):
@@ -1034,9 +1027,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
             for i in range(0, k + 1):
                 head = i * (this_outcome,)
-                head_count = _count_of_exactly_k_of_outcome_in_n_of_h(
-                    h, this_outcome, n, i
-                )
+                head_count = h.exactly_k_times_in_n(this_outcome, n, i)
                 head_p = Fraction(head_count, this_total)
 
                 if i < k:

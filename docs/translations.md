@@ -58,7 +58,7 @@ Visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../plot_4d6_variants_light.png">
+  ![Plot: Comparing various take-three-of-4d6 methods](plot_4d6_variants_light.png)
 </picture>
 
 ## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
@@ -101,7 +101,7 @@ Visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Expected outcomes for attack with saving throw for half damage" src="../plot_burning_arch_light.png">
+  ![Plot: Expected outcomes for attack with saving throw for half damage](plot_burning_arch_light.png)
 </picture>
 
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
@@ -212,18 +212,39 @@ Example 1 visualization:
 
 ```python
 >>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *single_attack.distribution_xy(),
-...   marker=".",
-...   label="Normal attack",
+>>> from dyce.plt import display_burst
+>>> plot_ax = matplotlib.pyplot.subplot2grid((2, 2), (0, 0), colspan=2)  # doctest: +SKIP
+>>> sa_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 0), colspan=1)  # doctest: +SKIP
+>>> gwf_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 1), colspan=1)  # doctest: +SKIP
+>>> sa_label = "Normal attack"
+>>> plot_ax.plot(
+...     *single_attack.distribution_xy(),
+...     color="tab:green",
+...     label=sa_label,
+...     marker=".",
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *great_weapon_fighting.distribution_xy(),
-...   marker=".",
-...   label="“Great Weapon Fighting”",
+>>> gwf_label = "“Great Weapon Fighting”"
+>>> plot_ax.plot(
+...     *great_weapon_fighting.distribution_xy(),
+...     color="tab:blue",
+...     label=gwf_label,
+...     marker=".",
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Comparing a normal attack to an enhanced one")  # doctest: +SKIP
+>>> plot_ax.legend()  # doctest: +SKIP
+>>> plot_ax.set_title(r"Comparing a normal attack to an enhanced one")  # doctest: +SKIP
+>>> display_burst(
+...     sa_burst_ax,
+...     single_attack,
+...     desc=sa_label,
+...     graph_color="RdYlGn_r",
+... )  # doctest: +SKIP
+>>> display_burst(
+...     gwf_burst_ax,
+...     great_weapon_fighting,
+...     desc=gwf_label,
+...     graph_color="RdYlBu_r",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.tight_layout()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -231,7 +252,7 @@ Example 1 visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../plot_great_weapon_fighting_light.png">
+  ![Plot: Comparing a normal attack to an enhanced one](plot_great_weapon_fighting_light.png)
 </picture>
 
 Example 2 source:
@@ -298,7 +319,7 @@ Example 2 visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Modeling an advantage-weighted attack with critical hits" src="../plot_advantage_light.png">
+  ![Plot: Modeling an advantage-weighted attack with critical hits](plot_advantage_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/questions/166633/roll-and-keep-in-anydice)”
@@ -329,7 +350,7 @@ Visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Modeling taking the three highest of ten exploding d10s" src="../plot_d10_explode_light.png">
+  ![Plot: Modeling taking the three highest of ten exploding d10s](plot_d10_explode_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/questions/111414/how-do-i-count-the-number-of-duplicates-in-anydice/111421#111421)”
@@ -358,16 +379,19 @@ Translation:
 ...         dupes += 1
 ...     yield dupes, count
 
->>> res = H(dupes(8@P(10))).lowest_terms()
+>>> res = H(dupes(8@P(10)))
 
 ```
 
 Visualization:
 
 ```python
->>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.bar(*res.distribution_xy())  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Chances of rolling $n$ duplicates in 8d10")  # doctest: +SKIP
+>>> from dyce.plt import plot_burst
+>>> plot_burst(
+...   res,
+...   desc=r"Chances of rolling $n$ duplicates in 8d10",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.tight_layout()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -375,7 +399,7 @@ Visualization:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Chances of rolling <i>n</i> duplicates in 8d10" src="../plot_dupes_light.png">
+  ![Plot: Chances of rolling <i>n</i> duplicates in 8d10](plot_dupes_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:

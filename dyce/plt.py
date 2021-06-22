@@ -10,7 +10,7 @@
 from __future__ import annotations, generator_stop
 
 import warnings
-from typing import Any, Iterable, Iterator, List, Tuple, Type
+from typing import Any, Iterable, Iterator, List, Tuple, Type, Union
 
 from .h import H
 
@@ -62,7 +62,7 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
 def display_burst(
     ax: AxesT,
     h_inner: H,
-    outer: Iterable[LabelT] = None,
+    outer: Union[H, Iterable[LabelT]] = None,
     desc: str = None,
     graph_color: str = DEFAULT_GRAPH_COLOR,
     text_color: str = DEFAULT_TEXT_COLOR,
@@ -75,6 +75,8 @@ def display_burst(
             ("{:.2%}".format(v) if v >= _HIDE_LIM else "", v)
             for _, v in h_inner.distribution()
         )
+    elif isinstance(outer, H):
+        outer = ((str(o), c) for o, c in outer.distribution())
 
     outer_labels, outer_values = list(zip(*outer))
 
@@ -136,7 +138,7 @@ def labels_cumulative(
 
 def plot_burst(
     h_inner: H,
-    outer: Iterable[LabelT] = None,
+    outer: Union[H, Iterable[LabelT]] = None,
     desc: str = None,
     graph_color: str = DEFAULT_GRAPH_COLOR,
     text_color: str = DEFAULT_TEXT_COLOR,

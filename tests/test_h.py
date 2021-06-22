@@ -268,6 +268,10 @@ class TestH:
             ),
         )
 
+    def test_roll(self) -> None:
+        d6 = H(6)
+        assert all(d6.roll() in d6 for _ in range(1000))
+
 
 def test_within() -> None:
     within_filter = _within(0, 2)
