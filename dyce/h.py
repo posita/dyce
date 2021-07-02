@@ -16,7 +16,7 @@ from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
 from itertools import chain, product, repeat
 from math import sqrt
-from numbers import Integral, Number
+from numbers import Integral, Real
 from operator import abs as op_abs
 from operator import add as op_add
 from operator import and_ as op_and
@@ -434,7 +434,7 @@ class H(_MappingT):
         try:
             if self and not other:
                 return self.map(op_add, 0)
-            elif isinstance(other, (H, HAbleT)) and not self:
+            elif not self and isinstance(other, (H, HAbleT)):
                 return op_add(0, other.h() if isinstance(other, HAbleT) else other)
             else:
                 return self.map(op_add, other)
@@ -451,7 +451,7 @@ class H(_MappingT):
         try:
             if self and not other:
                 return self.map(op_sub, 0)
-            elif isinstance(other, (H, HAbleT)) and not self:
+            elif not self and isinstance(other, (H, HAbleT)):
                 return op_sub(0, other.h() if isinstance(other, HAbleT) else other)
             else:
                 return self.map(op_sub, other)
@@ -640,18 +640,13 @@ class H(_MappingT):
         if isinstance(other, HAbleT):
             other = other.h()
 
-        if isinstance(other, (int, float, Number)):
-            return H((oper(outcome, other), count) for outcome, count in self.items())
-        elif isinstance(other, H):
+        if isinstance(other, H):
             return H((oper(s, o), self[s] * other[o]) for s, o in product(self, other))
         else:
-            raise NotImplementedError
+            return H((oper(outcome, other), count) for outcome, count in self.items())
 
     def rmap(self, oper: _BinaryOperatorT, other: _OutcomeT) -> "H":
-        if isinstance(other, (int, float, Number)):
-            return H((oper(other, outcome), count) for outcome, count in self.items())
-        else:
-            raise NotImplementedError
+        return H((oper(other, outcome), count) for outcome, count in self.items())
 
     def umap(self, oper: _UnaryOperatorT) -> "H":
         r"""
@@ -1365,7 +1360,7 @@ class H(_MappingT):
         # tower implementations sometimes neglect to implement __format__ properly (or
         # at all). (I'm looking at you, sage.rings.…!)
         try:
-            mu = float(self.mean())
+            mu: Union[float, Real] = float(self.mean())
         except TypeError:
             mu = self.mean()
 
@@ -1409,7 +1404,7 @@ class H(_MappingT):
 
             return sep.join(lines())
 
-    def mean(self) -> float:
+    def mean(self) -> Union[float, Real]:
         """
         Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
         """
@@ -1421,13 +1416,13 @@ class H(_MappingT):
 
         return numerator / (denominator or 1)
 
-    def stdev(self, mu: float = None) -> float:
+    def stdev(self, mu: Union[float, Real] = None) -> Union[float, Real]:
         """
         Shorthand for ``math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
-    def variance(self, mu: float = None) -> float:
+    def variance(self, mu: Union[float, Real] = None) -> Union[float, Real]:
         """
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
@@ -1615,7 +1610,7 @@ def _within(lo: _OutcomeT, hi: _OutcomeT) -> _BinaryOperatorT:
         # This approach will probably not work with most symbolic outcomes
         diff = a - b
 
-        return (diff > hi) - (diff < lo)
+        return bool(diff > hi) - bool(diff < lo)
 
     setattr(_cmp, "lo", lo)
     setattr(_cmp, "hi", hi)

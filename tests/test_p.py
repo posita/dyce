@@ -383,6 +383,8 @@ class TestP:
         assert (-p) == P(H((-10, 11, -12, 13, -14, 15, -16, 17, -18, 19)))
         assert isinstance(abs(p), type(p))
         assert abs(p) == P(H((10, 11, 12, 13, 14, 15, 16, 17, 18, 19)))
+        assert isinstance(~p, type(p))
+        assert ~p == P(H((~10, ~-11, ~12, ~-13, ~14, ~-15, ~16, ~-17, ~18, ~-19)))
 
     def test_h_flatten(self) -> None:
         r_d6 = range(1, 7)

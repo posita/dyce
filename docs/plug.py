@@ -4,7 +4,7 @@ import importlib.util
 import pathlib
 from typing import Callable, Tuple
 
-__all__ = "import_plug"
+__all__ = ("import_plug",)
 
 
 def import_plug(arg: str, pfx: str) -> Tuple[str, Callable[[str], None]]:

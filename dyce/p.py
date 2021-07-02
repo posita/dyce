@@ -271,7 +271,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
     def __abs__(self) -> "P":
         return P(*(op_abs(h) for h in self._hs))
 
-    def __invert__(self) -> "H":
+    def __invert__(self) -> "P":
         return P(*(op_invert(h) for h in self._hs))
 
     def h(self, *which: _GetItemT) -> H:

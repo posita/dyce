@@ -9,8 +9,8 @@
 
 from __future__ import annotations, generator_stop
 
-import functools
 import warnings
+from functools import wraps
 from typing import TypeVar
 
 __all__ = ()
@@ -39,7 +39,7 @@ def experimental(f: _WrappedT) -> _WrappedT:
     _wrapped: _WrappedT
     warned = False
 
-    @functools.wraps(f)  # type: ignore
+    @wraps(f)  # type: ignore
     def _wrapped(*args, **kw):
         nonlocal warned
 

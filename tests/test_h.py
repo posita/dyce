@@ -14,15 +14,42 @@ import math
 import operator
 import os
 import statistics
+from decimal import Decimal
+from fractions import Fraction
 from typing import Union
 
+import numpy
 import pytest
+import sympy
 
 from dyce import H
 from dyce.h import _within
 
+from .numberwang import Numberwang, Wangernumb
+
 __all__ = ()
 
+
+_INTEGRAL_TYPES = (
+    int,
+    Numberwang,
+    numpy.int64,
+    # sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
+)
+_COUNT_TYPES = _INTEGRAL_TYPES + (
+    sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
+)
+_NUMERICAL_OUTCOME_TYPES = _COUNT_TYPES + (
+    float,
+    Decimal,
+    Fraction,
+    Wangernumb,
+    numpy.float128,
+    sympy.Float,
+    sympy.Number,
+    sympy.Rational,
+    sympy.RealNumber,
+)
 
 # ---- Classes -------------------------------------------------------------------------
 
@@ -71,98 +98,199 @@ class TestH:
         assert d6_2[12] == 1
 
     def test_op_add_h(self) -> None:
-        d2 = H(2)
-        d3 = H(3)
-        assert d2 + d3 == {2: 1, 3: 2, 4: 2, 5: 1}
-        assert d3 + d2 == {2: 1, 3: 2, 4: 2, 5: 1}
-        assert d2 + d3 == d3 + d2
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            d2 = H({o_type(o): c_type(1) for o in range(2, 0, -1)})
+            d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
+            sum_d2_d3 = {
+                o_type(2): 1,
+                o_type(3): 2,
+                o_type(4): 2,
+                o_type(5): 1,
+            }
+            assert d2 + d3 == sum_d2_d3, f"o_type: {o_type}; c_type: {c_type}"
+            assert d3 + d2 == sum_d2_d3, f"o_type: {o_type}; c_type: {c_type}"
+            assert d2 + d3 == d3 + d2, f"o_type: {o_type}; c_type: {c_type}"
 
-        assert d2 + H({}) == d2
-        assert H({}) + d3 == d3
+            assert d2 + H({}) == d2, f"o_type: {o_type}; c_type: {c_type}"
+            assert H({}) + d3 == d3, f"o_type: {o_type}; c_type: {c_type}"
+
+    def test_op_add_sym(self) -> None:
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
+            x = sympy.symbols("x")
+            sum_d3_x = {o_type(o) + x: c_type(1) for o in range(3, 0, -1)}
+            assert d3 + x == sum_d3_x, f"o_type: {o_type}; c_type: {c_type}"
+            sum_x_d3 = {x + o_type(o): c_type(1) for o in range(3, 0, -1)}
+            assert x + d3 == sum_x_d3, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_add_num(self) -> None:
-        h1 = H(range(10, 20))
-        h2 = H(range(11, 21))
-        assert h2 == h1 + 1
-        assert 1 + h1 == h2
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h1 = H({o_type(i): c_type(1) for i in range(10, 20)})
+            h2 = H({o_type(i): c_type(1) for i in range(11, 21)})
+            assert h2 == h1 + 1, f"o_type: {o_type}; c_type: {c_type}"
+            assert 1 + h1 == h2, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_sub_h(self) -> None:
-        d2 = H(2)
-        d3 = H(3)
-        assert d2 - d3 == {-2: 1, -1: 2, 0: 2, 1: 1}
-        assert d3 - d2 == {-1: 1, 0: 2, 1: 2, 2: 1}
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            d2 = H({o_type(o): c_type(1) for o in range(2, 0, -1)})
+            d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
+            assert d2 - d3 == {
+                o_type(-2): 1,
+                o_type(-1): 2,
+                # See https://github.com/sympy/sympy/issues/6545
+                o_type(0) + o_type(0): 2,
+                o_type(1): 1,
+            }, f"o_type: {o_type}; c_type: {c_type}"
+            assert d3 - d2 == {
+                o_type(-1): 1,
+                # See https://github.com/sympy/sympy/issues/6545
+                o_type(0) + o_type(0): 2,
+                o_type(1): 2,
+                o_type(2): 1,
+            }, f"o_type: {o_type}; c_type: {c_type}"
+            assert d2 - H({}) == d2
+            assert H({}) - d3 == -d3
 
-        assert d2 - H({}) == d2
-        assert H({}) - d3 == -d3
+    def test_wn(self) -> None:
+        pass
+
+    def test_op_sub_sym(self) -> None:
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
+            x = sympy.symbols("x")
+            diff_d3_x = {o_type(o) - x: c_type(1) for o in range(3, 0, -1)}
+            assert d3 - x == diff_d3_x, f"o_type: {o_type}; c_type: {c_type}"
+            diff_x_d3 = {x - o_type(o): c_type(1) for o in range(3, 0, -1)}
+            assert x - d3 == diff_x_d3, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_sub_num(self) -> None:
-        h1 = H(range(10, 20))
-        h2 = H(range(9, 19))
-        h3 = H(range(-8, -18, -1))
-        assert h2 == h1 - 1
-        assert 1 - h2 == h3
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h1 = H({o_type(i): c_type(1) for i in range(10, 20)})
+            h2 = H({o_type(i): c_type(1) for i in range(9, 19)})
+            h3 = H({o_type(i): c_type(1) for i in range(-8, -18, -1)})
+            assert h2 == h1 - 1, f"o_type: {o_type}; c_type: {c_type}"
+            assert 1 - h2 == h3, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_matmul(self) -> None:
-        d6 = H(6)
-        d6_2 = d6 + d6
-        d6_3 = d6_2 + d6
-        assert 0 @ d6 == H({})
-        assert H({}) == d6 @ 0
-        assert 2 @ d6 == d6_2
-        assert d6_2 == d6 @ 2
-        assert d6_3 == 3 @ d6
-        assert 4 @ d6 == d6 @ 2 @ 2
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            try:
+                d6 = H(o_type(6))
+            except ValueError:
+                d6 = H((o_type(i) for i in range(6, 0, -1)))
+
+            d6_2 = d6 + d6
+            d6_3 = d6_2 + d6
+            assert 0 @ d6 == H({}), f"o_type: {o_type}; c_type: {c_type}"
+            assert H({}) == d6 @ 0, f"o_type: {o_type}; c_type: {c_type}"
+            assert 2 @ d6 == d6_2, f"o_type: {o_type}; c_type: {c_type}"
+            assert d6_2 == d6 @ 2, f"o_type: {o_type}; c_type: {c_type}"
+            assert d6_3 == 3 @ d6, f"o_type: {o_type}; c_type: {c_type}"
+            assert 4 @ d6 == d6 @ 2 @ 2, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_map(self) -> None:
-        d6 = H(6)
-        d8 = H(8)
-        within_filter = _within(-1, 1)
-        d8_v_d6 = d8.map(within_filter, d6)
-        assert d8_v_d6 == {-1: 10, 0: 17, 1: 21}
+        within_1_filter = _within(-1, 1)
+        d8_v_d6 = {
+            -1: 10,
+            0: 17,
+            1: 21,
+        }
 
-        within_filter = _within(7, 9)
-        d6_2_v_7_9 = (2 @ d6).map(within_filter, 0)
-        assert d6_2_v_7_9 == {-1: 15, 0: 15, 1: 6}
+        within_7_9_filter = _within(7, 9)
+        d6_2_v_7_9 = {
+            -1: 15,
+            0: 15,
+            1: 6,
+        }
+
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            d6 = H({o_type(i): c_type(1) for i in range(6, 0, -1)})
+            d8 = H({o_type(i): c_type(1) for i in range(8, 0, -1)})
+
+            assert (
+                d8.map(within_1_filter, d6) == d8_v_d6
+            ), f"o_type: {o_type}; c_type: {c_type}"
+
+            assert (2 @ d6).map(
+                within_7_9_filter, 0
+            ) == d6_2_v_7_9, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_eq(self) -> None:
-        h = H(range(-1, 2))
-        assert h.eq(0) == H((0, 1, 0))
-        assert h.eq(h) == H((1, 0, 0, 0, 1, 0, 0, 0, 1))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.eq(0) == H(
+                (False, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.eq(h) == H(
+                (True, False, False, False, True, False, False, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_ne(self) -> None:
-        h = H(range(-1, 2))
-        assert h.ne(0) == H((1, 0, 1))
-        assert h.ne(h) == H((0, 1, 1, 1, 0, 1, 1, 1, 0))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.ne(0) == H(
+                (True, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ne(h) == H(
+                (False, True, True, True, False, True, True, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_lt(self) -> None:
-        h = H(range(-1, 2))
-        assert h.lt(0) == H((1, 0, 0))
-        assert h.lt(h) == H((0, 1, 1, 0, 0, 1, 0, 0, 0))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.lt(0) == H(
+                (True, False, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.lt(h) == H(
+                (False, True, True, False, False, True, False, False, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_le(self) -> None:
-        h = H(range(-1, 2))
-        assert h.le(0) == H((1, 1, 0))
-        assert h.le(h) == H((1, 1, 1, 0, 1, 1, 0, 0, 1))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.le(0) == H(
+                (True, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.le(h) == H(
+                (True, True, True, False, True, True, False, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_gt(self) -> None:
-        h = H(range(-1, 2))
-        assert h.gt(0) == H((0, 0, 1))
-        assert h.gt(h) == H((0, 0, 0, 1, 0, 0, 1, 1, 0))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.gt(0) == H(
+                (False, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.gt(h) == H(
+                (False, False, False, True, False, False, True, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_ge(self) -> None:
-        h = H(range(-1, 2))
-        assert h.ge(0) == H((0, 1, 1))
-        assert h.ge(h) == H((1, 0, 0, 1, 1, 0, 1, 1, 1))
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.ge(0) == H(
+                (False, True, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ge(h) == H(
+                (True, False, False, True, True, False, True, True, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_even(self) -> None:
-        assert H(7).even() == {False: 4, True: 3}
+        for o_type in _INTEGRAL_TYPES:
+            assert H(o_type(7)).even() == {
+                False: 4,
+                True: 3,
+            }, f"o_type: {o_type}"
 
     def test_even_wrong_type(self) -> None:
         with pytest.raises(TypeError):
             _ = H((float(i) for i in range(7, 0, -1))).even()
 
     def test_odd(self) -> None:
-        assert H(7).odd() == {False: 3, True: 4}
+        for o_type in _INTEGRAL_TYPES:
+            assert H(o_type(7)).odd() == {
+                False: 3,
+                True: 4,
+            }, f"o_type: {o_type}"
 
     def test_odd_wrong_type(self) -> None:
         with pytest.raises(TypeError):
@@ -220,7 +348,8 @@ class TestH:
         )
 
     def test_format(self) -> None:
-        assert H((1, 2, 3, 1, 2, 1)).format(width=115) == os.linesep.join(
+        h = H({3: 1, 2: 2, 1: 3})
+        assert h.format(width=115) == os.linesep.join(
             (
                 "avg |    1.67",
                 "std |    0.75",
@@ -230,43 +359,58 @@ class TestH:
                 "  3 |  16.67% |################",
             )
         )
-        assert (
-            H((1, 2, 3, 1, 2, 1)).format(width=0)
-            == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
-        )
+        assert h.format(width=0) == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
 
     def test_mean(self) -> None:
-        h = H((i, i) for i in range(10))
-        assert math.isclose(
-            h.mean(),
-            statistics.mean(
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H((o_type(i), c_type(i)) for i in range(10))
+            h_mean = h.mean()
+            stat_mean = statistics.mean(
                 itertools.chain(
-                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                    *(
+                        itertools.repeat(float(outcome), count)
+                        for outcome, count in h.items()
+                    )
                 )
-            ),
-        )
+            )
+            assert math.isclose(
+                h_mean,
+                stat_mean,
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_stdev(self) -> None:
-        h = H((i, i) for i in range(10))
-        assert math.isclose(
-            h.stdev(),
-            statistics.pstdev(
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H((o_type(i), c_type(i)) for i in range(10))
+            h_stdev = h.stdev()
+            stat_stdev = statistics.pstdev(
                 itertools.chain(
-                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                    *(
+                        itertools.repeat(float(outcome), count)
+                        for outcome, count in h.items()
+                    )
                 )
-            ),
-        )
+            )
+            assert math.isclose(
+                h_stdev,
+                stat_stdev,
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_variance(self) -> None:
-        h = H((i, i) for i in range(10))
-        assert math.isclose(
-            h.variance(),
-            statistics.pvariance(
+        for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
+            h = H((o_type(i), c_type(i)) for i in range(10))
+            h_variance = h.variance()
+            stat_variance = statistics.pvariance(
                 itertools.chain(
-                    *(itertools.repeat(outcome, count) for outcome, count in h.items())
+                    *(
+                        itertools.repeat(float(outcome), count)
+                        for outcome, count in h.items()
+                    )
                 )
-            ),
-        )
+            )
+            assert math.isclose(
+                h_variance,
+                stat_variance,
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_roll(self) -> None:
         d6 = H(6)
