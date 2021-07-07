@@ -1,4 +1,13 @@
-from __future__ import annotations, generator_stop
+# -*- encoding: utf-8 -*-
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+from __future__ import annotations
 
 from dyce import H
 from dyce.plt import display_burst
@@ -15,10 +24,9 @@ def do_it(style: str) -> None:
     great_weapon_fighting = 2 @ (H(6).substitute(gwf)) + 5
 
     fig = matplotlib.pyplot.figure()
-    fig.set_size_inches(10, 10, forward=True)
-    plot_ax = matplotlib.pyplot.subplot2grid((2, 2), (0, 0), colspan=2)
-    sa_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 0), colspan=1)
-    gwf_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 1), colspan=1)
+    fig.set_size_inches(10, 5, forward=True)
+    plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))
+    burst_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
     sa_label = "Normal attack"
     plot_ax.plot(
         *single_attack.distribution_xy(),
@@ -37,16 +45,12 @@ def do_it(style: str) -> None:
     # Should match the corresponding img[alt] text
     plot_ax.set_title(r"Comparing a normal attack to an enhanced one")
     display_burst(
-        sa_burst_ax,
-        single_attack,
-        desc=sa_label,
-        graph_color="RdYlGn_r",
+        burst_ax,
+        h_inner=great_weapon_fighting,
+        outer=single_attack,
+        desc=f"{sa_label} vs. {gwf_label}",
+        inner_color="RdYlBu_r",
+        outer_color="RdYlGn_r",
         text_color="white" if style == "dark" else "black",
-    )
-    display_burst(
-        gwf_burst_ax,
-        great_weapon_fighting,
-        desc=gwf_label,
-        graph_color="RdYlBu_r",
-        text_color="white" if style == "dark" else "black",
+        alpha=0.9,
     )

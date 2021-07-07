@@ -7,26 +7,19 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 import random
-import warnings
 
 import pytest
 
 from dyce import H
 from dyce import plt as dyce_plt
 
-try:
-    import matplotlib.patches
-except ImportError:
-    warnings.warn("matplotlib not found; {} some tests disabled".format(__name__))
-    matplotlib = None  # noqa: F811
-
 __all__ = ()
 
 
-# ---- Classes -------------------------------------------------------------------------
+# ---- Tests ---------------------------------------------------------------------------
 
 
 class TestPlt:
@@ -40,15 +33,19 @@ class TestPlt:
         assert actual_colors == expected_colors
         assert dyce_plt.alphasize(colors, -1.0) == colors
 
-    @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst(self):
-        _, ax = dyce_plt.matplotlib.pyplot.subplots()
+        patches = pytest.importorskip(
+            "matplotlib.patches", reason="requires matplotlib"
+        )
+        pyplot = pytest.importorskip("matplotlib.pyplot", reason="requires matplotlib")
+
+        _, ax = pyplot.subplots()
         d6_2 = 2 @ H(6)
         dyce_plt.display_burst(ax, d6_2)
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
-            if isinstance(w, matplotlib.patches.Wedge)
+            if isinstance(w, patches.Wedge)
         ]
         assert len(wedge_labels) == 22
         assert wedge_labels == [
@@ -76,15 +73,19 @@ class TestPlt:
             "12",
         ]
 
-    @pytest.mark.skipif(matplotlib is None, reason="requires matplotlib")
     def test_display_burst_outer(self):
-        _, ax = dyce_plt.matplotlib.pyplot.subplots()
+        patches = pytest.importorskip(
+            "matplotlib.patches", reason="requires matplotlib"
+        )
+        pyplot = pytest.importorskip("matplotlib.pyplot", reason="requires matplotlib")
+
+        _, ax = pyplot.subplots()
         d6_2 = 2 @ H(6)
         dyce_plt.display_burst(ax, d6_2, dyce_plt.labels_cumulative(d6_2))
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
-            if isinstance(w, matplotlib.patches.Wedge)
+            if isinstance(w, patches.Wedge)
         ]
         assert len(wedge_labels) == 22
         assert wedge_labels == [

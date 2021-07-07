@@ -8,7 +8,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 import codecs
 import inspect
@@ -55,7 +55,7 @@ SETUP_ARGS = {
         "{}.{}".format(*__version__[:2]) if __version__ != (0, 0, 0) else "latest"
     ),
     "license": "MIT License",
-    "description": "Simple Python tools for exploring dice probabilities and outcomes",
+    "description": "Simple Python tools for exploring dice outcomes and other discrete probabilities",
     "long_description": README,
     "long_description_content_type": "text/markdown",
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
@@ -79,7 +79,7 @@ SETUP_ARGS = {
     ],
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": ["typing_extensions"],
+    "install_requires": ["typing_extensions;python_version<'3.8'"],
     "extras_require": {
         "dev": [
             "mike",

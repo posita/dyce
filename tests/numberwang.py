@@ -25,8 +25,6 @@ from operator import truediv as op_truediv
 from operator import xor as op_xor
 from typing import Union, overload
 
-from sympy import Expr
-
 __all__ = ("Numberwang", "Wangernumb")
 
 
@@ -80,11 +78,7 @@ class Numberwang(Integral):
     def __add__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __add__(self, other: Expr) -> Expr:
-        ...
-
-    def __add__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __add__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_add(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -104,11 +98,7 @@ class Numberwang(Integral):
     def __radd__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __radd__(self, other: Expr) -> Expr:
-        ...
-
-    def __radd__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __radd__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_add(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -128,11 +118,7 @@ class Numberwang(Integral):
     def __sub__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __sub__(self, other: Expr) -> Expr:
-        ...
-
-    def __sub__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __sub__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_sub(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -152,11 +138,7 @@ class Numberwang(Integral):
     def __rsub__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rsub__(self, other: Expr) -> Expr:
-        ...
-
-    def __rsub__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __rsub__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_sub(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -176,11 +158,7 @@ class Numberwang(Integral):
     def __mul__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __mul__(self, other: Expr) -> Expr:
-        ...
-
-    def __mul__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __mul__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mul(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -200,11 +178,7 @@ class Numberwang(Integral):
     def __rmul__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rmul__(self, other: Expr) -> Expr:
-        ...
-
-    def __rmul__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __rmul__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mul(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -212,19 +186,35 @@ class Numberwang(Integral):
         else:
             return op_mul(other, self.val)
 
-    def __truediv__(self, other) -> Union[Decimal, Expr, Real]:
+    @overload
+    def __truediv__(self, other: _RealT) -> Real:
+        ...
+
+    @overload
+    def __truediv__(self, other: Decimal) -> Decimal:
+        ...
+
+    def __truediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
             return Wangernumb(op_truediv(self.val, other))
         else:
             return op_truediv(self.val, other)
 
-    def __rtruediv__(self, other) -> Union[Decimal, Expr, Real]:
+    @overload
+    def __rtruediv__(self, other: _RealT) -> Real:
+        ...
+
+    @overload
+    def __rtruediv__(self, other: Decimal) -> Decimal:
+        ...
+
+    def __rtruediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
             return Wangernumb(op_truediv(other, self.val))
         else:
             return op_truediv(other, self.val)
 
-    @overload
+    @overload  # type: ignore
     def __floordiv__(self, other: _IntegralT) -> Integral:
         ...
 
@@ -236,11 +226,7 @@ class Numberwang(Integral):
     def __floordiv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __floordiv__(self, other: Expr) -> Expr:
-        ...
-
-    def __floordiv__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __floordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_floordiv(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -248,7 +234,7 @@ class Numberwang(Integral):
         else:
             return op_floordiv(self.val, other)
 
-    @overload
+    @overload  # type: ignore
     def __rfloordiv__(self, other: _IntegralT) -> Integral:  # type: ignore
         ...
 
@@ -260,11 +246,7 @@ class Numberwang(Integral):
     def __rfloordiv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rfloordiv__(self, other: Expr) -> Expr:
-        ...
-
-    def __rfloordiv__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __rfloordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_floordiv(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -284,11 +266,7 @@ class Numberwang(Integral):
     def __mod__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __mod__(self, other: Expr) -> Expr:
-        ...
-
-    def __mod__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __mod__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mod(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -308,11 +286,7 @@ class Numberwang(Integral):
     def __rmod__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rmod__(self, other: Expr) -> Expr:
-        ...
-
-    def __rmod__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __rmod__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_mod(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -334,13 +308,7 @@ class Numberwang(Integral):
     def __pow__(self, other: Decimal) -> Decimal:  # pylint: disable=signature-differs
         ...
 
-    @overload
-    def __pow__(self, other: Expr) -> Expr:  # pylint: disable=signature-differs
-        ...
-
-    def __pow__(  # pylint: disable=signature-differs
-        self, other
-    ) -> Union[Decimal, Expr, Integral, Real]:
+    def __pow__(self, other):  # pylint: disable=signature-differs
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_pow(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -360,11 +328,7 @@ class Numberwang(Integral):
     def __rpow__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rpow__(self, other: Expr) -> Expr:
-        ...
-
-    def __rpow__(self, other) -> Union[Decimal, Expr, Integral, Real]:
+    def __rpow__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_pow(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
@@ -521,11 +485,7 @@ class Wangernumb(Real):
     def __add__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __add__(self, other: Expr) -> Expr:
-        ...
-
-    def __add__(self, other) -> Union[Decimal, Expr, Real]:
+    def __add__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_add(self.val, other))
         else:
@@ -539,11 +499,7 @@ class Wangernumb(Real):
     def __radd__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __radd__(self, other: Expr) -> Expr:
-        ...
-
-    def __radd__(self, other) -> Union[Decimal, Expr, Real]:
+    def __radd__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_add(other, self.val))
         else:
@@ -557,11 +513,7 @@ class Wangernumb(Real):
     def __sub__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __sub__(self, other: Expr) -> Expr:
-        ...
-
-    def __sub__(self, other) -> Union[Decimal, Expr, Real]:
+    def __sub__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_sub(self.val, other))
         else:
@@ -575,11 +527,7 @@ class Wangernumb(Real):
     def __rsub__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rsub__(self, other: Expr) -> Expr:
-        ...
-
-    def __rsub__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rsub__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_sub(other, self.val))
         else:
@@ -593,11 +541,7 @@ class Wangernumb(Real):
     def __mul__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __mul__(self, other: Expr) -> Expr:
-        ...
-
-    def __mul__(self, other) -> Union[Decimal, Expr, Real]:
+    def __mul__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mul(self.val, other))
         else:
@@ -611,11 +555,7 @@ class Wangernumb(Real):
     def __rmul__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rmul__(self, other: Expr) -> Expr:
-        ...
-
-    def __rmul__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rmul__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mul(other, self.val))
         else:
@@ -629,11 +569,7 @@ class Wangernumb(Real):
     def __truediv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __truediv__(self, other: Expr) -> Expr:
-        ...
-
-    def __truediv__(self, other) -> Union[Decimal, Expr, Real]:
+    def __truediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_truediv(self.val, other))
         else:
@@ -647,17 +583,13 @@ class Wangernumb(Real):
     def __rtruediv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rtruediv__(self, other: Expr) -> Expr:
-        ...
-
-    def __rtruediv__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rtruediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_truediv(other, self.val))
         else:
             return op_truediv(other, self.val)
 
-    @overload
+    @overload  # type: ignore
     def __floordiv__(self, other: _RealT) -> Real:
         ...
 
@@ -665,17 +597,13 @@ class Wangernumb(Real):
     def __floordiv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __floordiv__(self, other: Expr) -> Expr:
-        ...
-
-    def __floordiv__(self, other) -> Union[Decimal, Expr, Real]:
+    def __floordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_floordiv(self.val, other))
         else:
             return op_floordiv(self.val, other)
 
-    @overload
+    @overload  # type: ignore
     def __rfloordiv__(self, other: _RealT) -> Real:  # type: ignore
         ...
 
@@ -683,11 +611,7 @@ class Wangernumb(Real):
     def __rfloordiv__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rfloordiv__(self, other: Expr) -> Expr:
-        ...
-
-    def __rfloordiv__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rfloordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_floordiv(other, self.val))
         else:
@@ -701,11 +625,7 @@ class Wangernumb(Real):
     def __mod__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __mod__(self, other: Expr) -> Expr:
-        ...
-
-    def __mod__(self, other) -> Union[Decimal, Expr, Real]:
+    def __mod__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mod(self.val, other))
         else:
@@ -719,11 +639,7 @@ class Wangernumb(Real):
     def __rmod__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rmod__(self, other: Expr) -> Expr:
-        ...
-
-    def __rmod__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rmod__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_mod(other, self.val))
         else:
@@ -737,11 +653,7 @@ class Wangernumb(Real):
     def __pow__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __pow__(self, other: Expr) -> Expr:
-        ...
-
-    def __pow__(self, other) -> Union[Decimal, Expr, Real]:
+    def __pow__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_pow(self.val, other))
         else:
@@ -755,11 +667,7 @@ class Wangernumb(Real):
     def __rpow__(self, other: Decimal) -> Decimal:
         ...
 
-    @overload
-    def __rpow__(self, other: Expr) -> Expr:
-        ...
-
-    def __rpow__(self, other) -> Union[Decimal, Expr, Real]:
+    def __rpow__(self, other):
         if isinstance(other, (float, Wangernumb)):
             return Wangernumb(op_pow(other, self.val))
         else:

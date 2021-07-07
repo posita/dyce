@@ -13,26 +13,26 @@
   Thank you!
 -->
 
-The following assumes you are working from the repository root and have a development environment similar to one created by `pip install install --editable '.[dev]'`. (See, e.g., [`./helpers/venvsetup.sh`](venvsetup.sh).)
+The following assumes you are working from the repository root and have a development environment similar to one created by ``pip install install --editable '.[dev]'``. (See, e.g., [``./helpers/venvsetup.sh``](venvsetup.sh).)
 
-* [ ] If necessary, update copyright in [`LICENSE`](../LICENSE) and [`mkdocs.yml`](../mkdocs.yml) and commit
+* [ ] If necessary, update copyright in [``LICENSE``](../LICENSE) and [``mkdocs.yml``](../mkdocs.yml) and commit
 
-* [ ] `git clean -Xdf [-n] [...]`
+* [ ] ``git clean -Xdf [-n] [...]``
 
-* [ ] `./helpers/draft-release.sh X Y Z`
+* [ ] ``./helpers/draft-release.sh X Y Z``
   * performs in-place version search/replace
-  * creates branch `X.Y.Z-release`
-  * tags it as `vX.Y.Z`
-  * creates and checks distribution files in `./dist`
-  * updates `gh-pages`
-  * see [`./helpers/draft-release.sh`](draft-release.sh) for details
+  * creates branch ``X.Y.Z-release``
+  * tags it as ``vX.Y.Z``
+  * creates and checks distribution files in ``./dist``
+  * updates ``gh-pages``
+  * see [``./helpers/draft-release.sh``](draft-release.sh) for details
 
-* [ ] `mike serve` and spot check docs (some images with external references might be missing)
+* [ ] ``mike serve`` and spot check docs (some images with external references might be missing)
 
-* [ ] `git push [--force] origin vX.Y.Z gh-pages`
+* [ ] ``git push [--force] origin vX.Y.Z gh-pages``
 
-* [ ] `twine upload dist/*-X.Y.Z[-.]*`
+* [ ] ``twine upload dist/*-X.Y.Z[-.]*``
 
-* [ ] `git checkout master`
+* [ ] ``git checkout master``
 
-* [ ] `git branch --delete [--force] X.Y.Z-release`
+* [ ] ``git branch --delete [--force] X.Y.Z-release``

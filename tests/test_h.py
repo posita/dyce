@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 import itertools
 import math
@@ -18,9 +18,7 @@ from decimal import Decimal
 from fractions import Fraction
 from typing import Union
 
-import numpy
 import pytest
-import sympy
 
 from dyce import H
 from dyce.h import _within
@@ -30,26 +28,48 @@ from .numberwang import Numberwang, Wangernumb
 __all__ = ()
 
 
-_INTEGRAL_TYPES = (
+_INTEGRAL_TYPES: tuple[type, ...] = (
     int,
     Numberwang,
-    numpy.int64,
-    # sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
 )
-_COUNT_TYPES = _INTEGRAL_TYPES + (
-    sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
-)
-_NUMERICAL_OUTCOME_TYPES = _COUNT_TYPES + (
+_COUNT_TYPES: tuple[type, ...] = _INTEGRAL_TYPES
+_NUMERICAL_OUTCOME_TYPES: tuple[type, ...] = _COUNT_TYPES + (
     float,
     Decimal,
     Fraction,
     Wangernumb,
-    numpy.float128,
-    sympy.Float,
-    sympy.Number,
-    sympy.Rational,
-    sympy.RealNumber,
 )
+
+
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+    _INTEGRAL_TYPES += (numpy.int64,)
+    _COUNT_TYPES += (numpy.int64,)
+    _NUMERICAL_OUTCOME_TYPES += (
+        numpy.int64,
+        numpy.float128,
+    )
+
+try:
+    import sympy
+except ImportError:
+    pass
+else:
+    _INTEGRAL_TYPES += (
+        # sympy.Integer,  # See https://github.com/sympy/sympy/issues/19311
+    )
+    _COUNT_TYPES += (sympy.Integer,)
+    _NUMERICAL_OUTCOME_TYPES += (
+        sympy.Integer,
+        sympy.Float,
+        sympy.Number,
+        sympy.Rational,
+        sympy.RealNumber,
+    )
+
 
 # ---- Classes -------------------------------------------------------------------------
 
@@ -115,6 +135,10 @@ class TestH:
             assert H({}) + d3 == d3, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_add_sym(self) -> None:
+        sympy = pytest.importorskip(  # pylint: disable=redefined-outer-name
+            "sympy", reason="requires sympy"
+        )
+
         for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
             d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
             x = sympy.symbols("x")
@@ -155,6 +179,10 @@ class TestH:
         pass
 
     def test_op_sub_sym(self) -> None:
+        sympy = pytest.importorskip(  # pylint: disable=redefined-outer-name
+            "sympy", reason="requires sympy"
+        )
+
         for o_type, c_type in itertools.product(_NUMERICAL_OUTCOME_TYPES, _COUNT_TYPES):
             d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
             x = sympy.symbols("x")

@@ -25,6 +25,11 @@
 [``H`` objects](dyce.md#dyce.h.H) represent histograms for modeling discrete outcomes.
 They encode discrete probability distributions as integer counts without any denominator.
 [``P`` objects](dyce.md#dyce.p.P) represent pools (ordered sequences) of histograms.
+If all you need is aggregate outcomes (sums) from rolling a bunch of dice (or calculations on aggregate outcomes), [``H`` objects](dyce.md#dyce.h.H) are probably sufficient.
+If you need to _select_ certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [``P`` objects](dyce.md#dyce.p.P) come in.
+
+As a wise person whose name has been lost to history once said: “Language is imperfect. If at all possible, shut up and point.”
+So with that illuminating (or perhaps impenetrable) introduction out of the way, let’s dive into some examples!
 
 A six-sided die can be modeled as:
 
@@ -84,7 +89,7 @@ P(6, 6)
 
 ```
 
-Pools (in this case [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms:
+Pools (in this case, [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms:
 
 ```python
 >>> d_sicherman = P(H((1, 2, 2, 3, 3, 4)), H((1, 3, 4, 5, 6, 8)))
@@ -102,17 +107,7 @@ H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 
 ```
 
-The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative_frequency) is:
-
-```python
->>> miwin_iii = H((1, 2, 5, 6, 7, 9))
->>> miwin_iv = H((1, 3, 4, 5, 8, 9))
->>> miwin_v = H((2, 3, 4, 6, 7, 8))
->>> miwin_iii + miwin_iv + miwin_v
-H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
-
-```
-
+The results show there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
 Histograms provide rudimentary formatting for convenience:
 
 ```python
@@ -132,6 +127,16 @@ var |    5.83
  11 |   5.56% |##
  12 |   2.78% |#
 
+```
+
+The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative_frequency) is:
+
+```python
+>>> miwin_iii = H((1, 2, 5, 6, 7, 9))
+>>> miwin_iv = H((1, 3, 4, 5, 8, 9))
+>>> miwin_v = H((2, 3, 4, 6, 7, 8))
+>>> miwin_iii + miwin_iv + miwin_v
+H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
 >>> print((miwin_iii + miwin_iv + miwin_v).format(scaled=True, width=65))
 avg |   15.00
 std |    4.47
@@ -162,8 +167,7 @@ var |   20.00
 
 ```
 
-The results show there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
-One way to model the outcomes of subtracting the least of two six-sided dice from the greatest is:
+One way to model the outcomes of subtracting the lesser of two six-sided dice from the greater is:
 
 ```python
 >>> abs(H(6) - H(6))
@@ -185,7 +189,7 @@ Histograms should be sufficient for most calculations.
 However, pools are useful for “taking” (selecting) only some of each roll’s outcomes.
 This is done by providing one or more index arguments to the [``P.h`` method][dyce.p.P.h] or the [``P.rolls_with_counts`` method][dyce.p.P.rolls_with_counts].
 Indexes can be integers, slices, or a mix thereof.
-Outcome indexes are ordered from least to greatest (i.e., ``0``, ``1``, …, ``-2``, ``-1``).
+Outcome indexes are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., ``[0]``, ``[1]``, …, ``[-2]``, ``[-1]``).
 Summing the least two faces when rolling three six-sided dice would be:
 
 ```python
@@ -345,7 +349,7 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
 
 ```
 
-The odds of scoring at least one nine or higher when rolling $n$ “[exploding][dyce.h.H.explode]” six-sided dice, for $n$ in $[1..10]$ is:
+The odds of scoring at least one nine or higher on any single die when rolling $n$ “[exploding][dyce.h.H.explode]” six-sided dice, for $n$ in $[1..10]$ is:
 
 ```python
 >>> exploding_d6 = H(6).explode(max_depth=2)
@@ -414,7 +418,7 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 ...   ("fail.", d20.within(2, 14)[0]),
 ...   ("succ.", d20.within(15, 19)[0]),
 ...   ("crit. succ.", d20.ge(20)[1]),
-... ), graph_color="RdYlBu_r")  # doctest: +SKIP
+... ), inner_color="RdYlBu_r")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -425,12 +429,15 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
   ![Plot: Advanced plot_burst example](plot_burst_2_light.png)
 </picture>
 
-The outer ring can also be used to compare two histograms directly:
+The outer ring can also be used to compare two histograms directly.
+Ever been curious how your four shiny new fudge dice stack up against your trusty ol’ double six-siders?
+Well wonder no more!
+The ``dyce`` abides:
 
 ```python
->>> d8 = H(8)
->>> d12 = H(12)
->>> plot_burst(d12, d8)  # doctest: +SKIP
+>>> df_4 = 4@H((-1, 0, 1))
+>>> d6_2 = 2@H(6)
+>>> plot_burst(df_4, d6_2, alpha=0.9)  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -438,12 +445,12 @@ The outer ring can also be used to compare two histograms directly:
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: plot_burst example (d12 vs. d8)](plot_burst_3_light.png)
+  ![Plot: plot_burst example (2d6 vs. d20)](plot_burst_3_light.png)
 </picture>
 
 ## Advanced exercise – modeling *Risis*
 
-*[Risus](http://risus.cumberlandgames.com/)* and its many [community-developed alternative rules](http://www.risusiverse.com/home/optional-rules) are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
+*[Risus](http://risus.cumberlandgames.com/)* and its many [community-developed alternative rules](http://www.risusiverse.com/home/optional-rules) not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
 We can easily model its opposed combat system for various starting configurations through the first round:
 
 ```python
@@ -508,7 +515,7 @@ Calling ``matplotlib.pyplot.show`` presents:
   ![Plot: Modeling the Risus combat mechanic after the first roll](plot_risus_first_round_light.png)
 </picture>
 
-We can even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):
+With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):
 
 ```python
 >>> from typing import Callable, Dict, Tuple
@@ -691,7 +698,10 @@ $$
 
 Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
 
-!!! info "As an aside, the Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case. It involves no algebra and is left as an exercise to the reader."
+!!! info
+
+    The Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case.
+    It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.
 
 Armed with this knowledge, we can now model “Evens Up” using our ``risus_combat_driver`` from above:
 

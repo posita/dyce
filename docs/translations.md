@@ -61,7 +61,7 @@ Visualization:
   ![Plot: Comparing various take-three-of-4d6 methods](plot_4d6_variants_light.png)
 </picture>
 
-## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
+## Translating one example from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
 
 Source:
 
@@ -116,7 +116,7 @@ True
 
 ```
 
-## More translations from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
+## More translations from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
 
 ```python
 >>> # VAR name = 1 + 2d3 - 3 * 4d2 // 5
@@ -174,7 +174,7 @@ True
 
 ```
 
-## Translations from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples)
+## Translations from [``LordSembor/DnDice``](https://github.com/LordSembor/DnDice#examples)
 
 Example 1 source:
 
@@ -202,9 +202,9 @@ Example 1 translation:
 
 >>> great_weapon_fighting = 2@(H(6).substitute(gwf)) + 5  # reroll either die if it is a one or two
 >>> print(single_attack.format(width=0))
-{avg: 12.00, 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, ...}
+{..., 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, ...}
 >>> print(great_weapon_fighting.format(width=0))
-{avg: 13.33, 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, ...}
+{..., 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, ...}
 
 ```
 
@@ -213,9 +213,8 @@ Example 1 visualization:
 ```python
 >>> import matplotlib  # doctest: +SKIP
 >>> from dyce.plt import display_burst
->>> plot_ax = matplotlib.pyplot.subplot2grid((2, 2), (0, 0), colspan=2)  # doctest: +SKIP
->>> sa_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 0), colspan=1)  # doctest: +SKIP
->>> gwf_burst_ax = matplotlib.pyplot.subplot2grid((2, 2), (1, 1), colspan=1)  # doctest: +SKIP
+>>> plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
+>>> burst_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))  # doctest: +SKIP
 >>> sa_label = "Normal attack"
 >>> plot_ax.plot(
 ...     *single_attack.distribution_xy(),
@@ -233,16 +232,13 @@ Example 1 visualization:
 >>> plot_ax.legend()  # doctest: +SKIP
 >>> plot_ax.set_title(r"Comparing a normal attack to an enhanced one")  # doctest: +SKIP
 >>> display_burst(
-...     sa_burst_ax,
-...     single_attack,
-...     desc=sa_label,
-...     graph_color="RdYlGn_r",
-... )  # doctest: +SKIP
->>> display_burst(
-...     gwf_burst_ax,
-...     great_weapon_fighting,
-...     desc=gwf_label,
-...     graph_color="RdYlBu_r",
+...     burst_ax,
+...     h_inner=great_weapon_fighting,
+...     outer=single_attack,
+...     desc=f"{sa_label} vs. {gwf_label}",
+...     inner_color="RdYlBu_r",
+...     outer_color="RdYlGn_r",
+...     alpha=0.9,
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.tight_layout()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
@@ -404,7 +400,7 @@ Visualization:
 
 ## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:
 
-Source of basic `brawl`:
+Source of basic ``brawl``:
 
 ```
 function: brawl A:s vs B:s {
@@ -452,7 +448,7 @@ var |    2.99
 
 ```
 
-Source of `brawl` with an optional dice swap:
+Source of ``brawl`` with an optional dice swap:
 
 ```
 function: set element I:n in SEQ:s to N:n {

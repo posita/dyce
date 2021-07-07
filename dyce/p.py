@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 from collections import Counter as counter
 from collections import defaultdict
@@ -609,7 +609,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         ```
 
-        In the above, `(1, 2)` appears a total of two times, each with counts of one.
+        In the above, ``(1, 2)`` appears a total of two times, each with counts of one.
 
         However, if the pool is homogeneous (meaning it only contains identical
         histograms), rolls (before selection) are not repeated. (See the note on

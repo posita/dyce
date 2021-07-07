@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 import os
 from collections import Counter as counter
@@ -54,7 +54,10 @@ from typing import (
     cast,
 )
 
-from typing_extensions import Protocol, runtime_checkable
+try:
+    from typing import Protocol, runtime_checkable
+except ImportError:
+    from typing_extensions import Protocol, runtime_checkable  # type: ignore
 
 from .experimental import experimental
 from .symmetries import comb, gcd, sum_w_start

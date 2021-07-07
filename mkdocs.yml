@@ -37,6 +37,7 @@ extra_javascript:
 
 markdown_extensions:
   - admonition
+  - footnotes
   # ---- BEGIN MathJax config ----
   - pymdownx.arithmatex:
       generic: true
@@ -47,6 +48,7 @@ markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
   - pymdownx.superfences
+  - pymdownx.tilde
 
 plugins:
   - exclude:

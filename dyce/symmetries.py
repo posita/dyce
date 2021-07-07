@@ -7,7 +7,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations, generator_stop
+from __future__ import annotations
 
 import sys
 from typing import Iterable, TypeVar, Union, overload

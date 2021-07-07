@@ -13,7 +13,7 @@
 -->
 
 *Copyright and other protections apply.
-Please see the accompanying `LICENSE` file for rights and restrictions governing use of this software.
+Please see the accompanying ``LICENSE`` file for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
@@ -23,7 +23,9 @@ If that file is missing or appears to be modified from its original, then please
 [![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
 [![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
 
-# ``dyce`` – simple Python tools for exploring dice probabilities and outcomes
+<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://github.com/posita/dyce/raw/master/docs/dyce.svg" alt="dyce logo">
+
+# ``dyce`` – simple Python tools for exploring dice outcomes and other discrete probabilities
 
 ``dyce`` is a pure-Python library for computing discrete probability distributions.
 It is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
@@ -84,7 +86,8 @@ Each can generate random rolls as desired.
 
 ```
 
-By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest. (The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
+By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest.
+(The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
 ```python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
@@ -157,40 +160,76 @@ See the [tutorial](https://posita.github.io/dyce/latest/tutorial) and the [API g
 
 ``dyce`` is fairly low-level by design, prioritizing ergonomics and composability.
 It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
-Because it exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.
-It can be installed and run anywhere, and modified as desired.
-On its own, it is completely adequate for casual tinkering.
+That’s a highfalutin way of saying it doesn’t guess.
+It *knows*, even if knowing is harder.
+Which, if we’re honest with ourselves, it often is.
+Or, at least, it *should* be.
+
+!!! quote
+
+    “It’s frightening to think that you might not know something, but more frightening to think that, by and large, the world is run by people who have faith that they know exactly what is going on.”
+
+    —Amos Tversky
+
+Because ``dyce`` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
+It can be installed and run anywhere[^2], and modified as desired.
+On its own, ``dyce`` is completely adequate for casual tinkering.
 However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
+
+[^1]:
+    You won’t find any lexers, parsers, or tokenizers here, other than straight-up Python.
+    That being said, if you *really* miss them, you can always roll your own and lean on ``dyce`` underneath to perform computations.
+    It doesn’t mind.
+    It actually kind of likes it.
+
+[^2]:
+    Okay, maybe not _literally_ anywhere, but [you’d be surprised](https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/).
+    Void where prohibited.
+    [Certain restrictions](#requirements) apply.
+    [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
 
 In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), ``dyce`` includes some conveniences, such as minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [``H.distribution``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution), [``H.distribution_xy``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy), and [``H.format``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) methods).
 
 ## Comparison to alternatives
 
-The following is a best-effort¹ summary of the differences between various available tools in this space.
+The following is a best-effort[^3] summary of the differences between various available tools in this space.
 Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations) for added color.
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Latest release                             | 2021	| N/A		| 2021	| Unknown	| 2021		| 2016		| 2021		| 2021		| 2009		|
-| Actively maintained and documented         | ✅	| ⚠️²	| ✅	| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
-| Suitable as a dependency in other projects | ✅	| ⚠️³	| ✅	| ❌		| ✅		| ⚠️³	| ✅		| ❌		| ❌		|
-| Discrete outcome enumeration               | ✅	| ✅		| ✅	| ✅		| ❌		| ✅		| ❌		| ❌		| ❌		|
-| Arbitrary expressions                      | ✅	| ⚠️⁴	| ✅	| ✅		| ✅		| ⚠️⁵	| ❌		| ❌		| ❌		|
-| Arbitrary dice definitions                 | ✅	| ✅		| ✅	| ✅		| ❌		| ❌		| ❌		| ❌		| ❌		|
-| Integrates with other tools                | ✅	| ✅		| ⚠️⁶| ❌		| ⚠️⁶	| ✅		| ⚠️⁶	| ⚠️⁶	| ⚠️⁶	|
-| Open source (can inspect)                  | ✅	| ✅		| ✅	| ❌		| ✅		| ✅		| ✅		| ✅		| ✅		|
-| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅	| N/A		| ✅		| ✅		| ✅		| ✅		| ✅		|
+| Actively maintained and documented         | ✅	| ⚠️[^4]	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
+| Suitable as a dependency in other projects | ✅	| ⚠️[^5]	| ✅		| ❌		| ✅		| ⚠️[^5]	| ✅		| ❌		| ❌		|
+| Discrete outcome enumeration               | ✅	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		| ❌		|
+| Arbitrary expressions                      | ✅	| ⚠️[^6]	| ✅		| ✅		| ✅		| ⚠️[^7]	| ❌		| ❌		| ❌		|
+| Arbitrary dice definitions                 | ✅	| ✅		| ✅		| ✅		| ❌		| ❌		| ❌		| ❌		| ❌		|
+| Integrates with other tools                | ✅	| ✅		| ⚠️[^8]	| ❌		| ⚠️[^8]	| ✅		| ⚠️[^8]	| ⚠️[^8]	| ⚠️[^8]	|
+| Open source (can inspect)                  | ✅	| ✅		| ✅		| ❌		| ✅		| ✅		| ✅		| ✅		| ✅		|
+| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅		| N/A		| ✅		| ✅		| ✅		| ✅		| ✅		|
 <!--                                         	🔺 dycelib			🔺 python-dice		🔺 d20					🔺 dice				🔺 dyce
-                                             			🔺 dyce_roll.py	🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
+                                             			🔺 dyce_roll.py		🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
 
-|Notes|
-|---|
-| ¹ I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if there are discrepancies. |
-| ² Actively maintained, but sparsely documented. The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version. |
-| ³ Source can be downloaded and incorporated directly, but there is no packaging, versioning, or dependency tracking.
-| ⁴ Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice. That being said, the library is remarkably powerful, given its size. |
-| ⁵ Limited arithmetic operations are available. The library also provides game-specific functions. |
-| ⁶ Results only. Input is limited to specialized grammar. |
+[^3]:
+    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if you observe discrepancies.
+
+[^4]:
+    Actively maintained, but sparsely documented.
+    The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version.
+
+[^5]:
+    Source can be downloaded and incorporated directly, but there is no packaging, versioning, or dependency tracking.
+
+[^6]:
+    Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice.
+    That being said, the library is remarkably powerful, given its size.
+
+[^7]:
+    Limited arithmetic operations are available.
+    The library also provides game-specific functions.
+
+[^8]:
+    Results only.
+    Input is limited to specialized grammar.
 
 ## License
 
@@ -210,10 +249,10 @@ Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/):
 Alternately, you can download [the source](https://github.com/posita/dyce) and run ``setup.py``:
 
 ```sh
-% git clone https://github.com/posita/dyce
+% git clone https://github.com/posita/dyce.git
 ...
 % cd dyce
-% python setup.py install  # --editable '.[dev]'
+% python setup.py install
 ...
 ```
 
@@ -224,6 +263,12 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 * [cPython](https://www.python.org/) (3.7+)
 * [PyPy](http://pypy.org/) (Python 3.7+ compatible)
 
-It has the following dependencies:
+It has the following runtime dependencies:
 
-* [``typing-extensions``](https://pypi.org/project/typing-extensions/)
+* [``typing-extensions``](https://pypi.org/project/typing-extensions/) (with Python versions <3.8)
+
+``dyce`` will make use the following optional libraries at runtime, if installed:
+
+* [``matplotlib``](https://matplotlib.org/)
+
+See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib#hacking-quick-start) for additional development and testing dependencies.
