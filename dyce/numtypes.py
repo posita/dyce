@@ -159,3 +159,17 @@ class OutcomeP(
     @abstractmethod
     def __hash__(self) -> int:
         ...
+
+
+# ---- Functions -----------------------------------------------------------------------
+
+
+def as_int(val: SupportsInt) -> int:
+    """
+    Helper function to losslessly coerce *val* into an ``int``. Raises
+    ``TypeError`` if that cannot be done.
+    """
+    if int(val) != val:
+        raise TypeError(f"cannot (losslessly) coerce {val} to an int")
+
+    return int(val)

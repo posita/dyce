@@ -18,8 +18,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from dyce import H, P
-from dyce.h import _CountT, _OutcomeT
+from dyce import H, OutcomeP, P
 from dyce.p import (
     _analyze_selection,
     _GetItemT,
@@ -31,7 +30,7 @@ from dyce.p import (
 __all__ = ()
 
 
-# ---- Classes -------------------------------------------------------------------------
+# ---- Tests ---------------------------------------------------------------------------
 
 
 class TestP:
@@ -507,7 +506,7 @@ class TestP:
         assert not P(2, -3).homogeneous
 
     def test_appearances_in_rolls(self) -> None:
-        def _sum_method(p: P, outcome: _OutcomeT) -> H:
+        def _sum_method(p: P, outcome: OutcomeP) -> H:
             return H(
                 (sum(1 for v in roll if v == outcome), count)
                 for roll, count in p.rolls_with_counts()
@@ -549,10 +548,8 @@ class TestP:
         assert sorted(P(2, 3).rolls_with_counts()) == [
             ((1, 1), 1),
             ((1, 2), 1),
-            (
-                (1, 2),
-                1,
-            ),  # originated as ((2, 1), 1), but outcomes get sorted in each roll
+            # originated as ((2, 1), 1), but outcomes get sorted in each roll
+            ((1, 2), 1),
             ((1, 3), 1),
             ((2, 2), 1),
             ((2, 3), 1),
@@ -718,8 +715,8 @@ def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
-    known_counts: DefaultDict[_RollCountT, _CountT] = defaultdict(int)
-    test_counts: DefaultDict[_RollCountT, _CountT] = defaultdict(int)
+    known_counts: DefaultDict[_RollCountT, int] = defaultdict(int)
+    test_counts: DefaultDict[_RollCountT, int] = defaultdict(int)
 
     for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
         known_counts[roll] += count

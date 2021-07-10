@@ -15,10 +15,10 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
-from numbers import Integral
 from operator import abs as op_abs
 from operator import eq as op_eq
 from operator import getitem as op_getitem
+from operator import index
 from operator import invert as op_invert
 from operator import mul as op_mul
 from operator import ne as op_ne
@@ -33,6 +33,8 @@ from typing import (
     List,
     Optional,
     Sequence,
+    SupportsIndex,
+    SupportsInt,
     Tuple,
     TypeVar,
     Union,
@@ -40,7 +42,8 @@ from typing import (
 )
 
 from .experimental import experimental
-from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _MappingT, _OutcomeT
+from .h import H, HAbleBinOpsMixin, _CoalesceT, _ExpandT, _MappingT
+from .numtypes import OutcomeP, as_int
 
 __all__ = ("P",)
 
@@ -49,10 +52,10 @@ __all__ = ("P",)
 
 
 _T = TypeVar("_T")
-_GetItemT = Union[int, slice]
-_OperandT = Union[_OutcomeT, "P"]
-_RollT = Tuple[_OutcomeT, ...]
-_RollCountT = Tuple[_RollT, _CountT]
+_GetItemT = Union[SupportsIndex, slice]
+_OperandT = Union["P", OutcomeP]
+_RollT = Tuple[OutcomeP, ...]
+_RollCountT = Tuple[_RollT, int]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -172,25 +175,19 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     # ---- Constructor -----------------------------------------------------------------
 
-    def __init__(self, *args: Union[int, "P", H]) -> None:
+    def __init__(self, *args: Union[SupportsInt, "P", H]) -> None:
         r"Initializer."
         super().__init__()
 
         def _gen_hs():
             for a in args:
-                if isinstance(a, (int, Integral)):
-                    yield H(a)
-                elif isinstance(a, H):
+                if isinstance(a, H):
                     yield a
                 elif isinstance(a, P):
                     for h in a._hs:  # pylint: disable=protected-access
                         yield h
                 else:
-                    raise TypeError(
-                        "type {} incompatible initializer for {}".format(
-                            type(a), type(self)
-                        )
-                    )
+                    yield H(as_int(a))
 
         hs = list(h for h in _gen_hs() if h)
         hs.sort(key=lambda h: tuple(h.items()))
@@ -228,7 +225,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         return len(self._hs)
 
     @overload
-    def __getitem__(self, key: int) -> H:
+    def __getitem__(self, key: SupportsIndex) -> H:
         ...
 
     @overload
@@ -236,29 +233,26 @@ class P(Sequence[H], HAbleBinOpsMixin):
         ...
 
     def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:
-        if isinstance(key, (int, Integral)):
-            return self._hs[key]
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             return P(*self._hs[key])
         else:
-            raise TypeError(
-                "{} indices must be integers or slices, not {}".format(
-                    type(self).__name__, type(key).__name__
-                )
-            )
+            return self._hs[index(key)]
 
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
 
-    def __matmul__(self, other: int) -> "P":
-        if not isinstance(other, (int, Integral)):
+    def __matmul__(self, other: SupportsInt) -> "P":
+        try:
+            other = as_int(other)
+        except TypeError:
             return NotImplemented
-        elif other < 0:
+
+        if other < 0:
             raise ValueError("argument cannot be negative")
         else:
             return P(*chain.from_iterable(repeat(self._hs, other)))
 
-    def __rmatmul__(self, other: int) -> "P":
+    def __rmatmul__(self, other: SupportsInt) -> "P":
         return self.__matmul__(other)
 
     def __neg__(self) -> "P":
@@ -436,7 +430,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         self,
         expand: _ExpandT,
         coalesce: _CoalesceT = None,
-        max_depth: int = 1,
+        max_depth: SupportsInt = 1,
     ) -> H:
         r"""
         Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``. See the
@@ -445,7 +439,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
         return self.h().substitute(expand, coalesce, max_depth)
 
     @experimental
-    def appearances_in_rolls(self, outcome: _OutcomeT) -> H:
+    def appearances_in_rolls(self, outcome: OutcomeP) -> H:
         r"""
         !!! warning "Experimental"
 
@@ -524,10 +518,10 @@ class P(Sequence[H], HAbleBinOpsMixin):
         1.93 s ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
         ```
         """
-        group_counters: List[Counter[_OutcomeT]] = []
+        group_counters: List[Counter[OutcomeP]] = []
 
         for h, hs in groupby(self._hs):
-            group_counter: Counter[_OutcomeT] = counter()
+            group_counter: Counter[OutcomeP] = counter()
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
@@ -539,7 +533,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
         return sum((H(group_counter) for group_counter in group_counters), start=H({}))
 
-    def explode(self, max_depth: int = 1) -> H:
+    def explode(self, max_depth: SupportsInt = 1) -> H:
         r"""
         Shorthand for ``self.h().explode(max_depth)``. See the [``h`` method][dyce.p.P.h]
         and [``H.explode``][dyce.h.H.explode].
@@ -807,6 +801,8 @@ class P(Sequence[H], HAbleBinOpsMixin):
                 h, hn = groups[0]
                 assert hn == n
 
+                # Still in search of a better (i.e., more efficient) way:
+                # https://math.stackexchange.com/questions/4173084/probability-distribution-of-k-1-k-2-cdots-k-m-selections-of-arbitrary-posi
                 if i and abs(i) < n:
                     rolls_with_counts_iter = (
                         _rwc_homogeneous_n_h_using_karonen_partial_selection(
@@ -828,7 +824,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
             yield taken_outcomes, roll_count
 
-    def within(self, lo: _OutcomeT, hi: _OutcomeT, other: _OperandT = 0) -> H:
+    def within(self, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> H:
         r"""
         Shorthand for ``self.h().within(lo, hi, other)``. See the [``h`` method][dyce.p.P.h]
         and [``H.within``][dyce.h.H.within].
@@ -880,16 +876,16 @@ def _analyze_selection(
         assert False, "should never be here"
 
 
-def _coalesce_replace(h: H, outcome: _OutcomeT) -> H:  # pylint: disable=unused-argument
+def _coalesce_replace(h: H, outcome: OutcomeP) -> H:  # pylint: disable=unused-argument
     return h
 
 
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
-        if isinstance(key, (int, Integral)):
-            yield op_getitem(sequence, key)
-        else:
+        if isinstance(key, slice):
             yield from op_getitem(sequence, key)
+        else:
+            yield op_getitem(sequence, index(key))
 
 
 def _rwc_heterogeneous_h_groups(
@@ -922,8 +918,8 @@ def _rwc_heterogeneous_h_groups(
         # It's possible v is () if h_groups is empty; see
         # https://stackoverflow.com/questions/3154301/ for a detailed discussion
         if v:
-            rolls_by_group: Iterable[Iterable[_OutcomeT]]
-            counts_by_group: Iterable[_CountT]
+            rolls_by_group: Iterable[Iterable[OutcomeP]]
+            counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
             total_count = reduce(op_mul, counts_by_group)
@@ -935,7 +931,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     h: H,
     n: int,
     k: int,
-    fill: Optional[_OutcomeT] = None,
+    fill: Optional[OutcomeP] = None,
 ) -> Iterator[_RollCountT]:
     r"""
     An memoized adaptation of [Ilmari Karonen’s
