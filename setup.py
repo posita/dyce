@@ -71,7 +71,6 @@ SETUP_ARGS = {
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
@@ -79,13 +78,12 @@ SETUP_ARGS = {
     ],
     "packages": setuptools.find_packages(exclude=("tests",)),
     "include_package_data": True,
-    "install_requires": ["typing_extensions;python_version<'3.8'"],
     "extras_require": {
         "dev": [
             "mike",
             # See <https://github.com/mkdocs/mkdocs/issues/2448> and
             # <https://github.com/mkdocstrings/mkdocstrings/issues/295>
-            "mkdocs<1.2",
+            "mkdocs!=1.2",
             "mkdocs-exclude",
             "mkdocs-material",
             "mkdocstrings",

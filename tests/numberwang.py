@@ -431,8 +431,11 @@ class Numberwang(Integral):
     def __int__(self) -> int:
         return self.val
 
-    def __round__(self, ndigits: _IntegralT) -> "Numberwang":  # type: ignore # pylint: disable=signature-differs
-        return Numberwang(round(self.val, int(ndigits)))
+    def __round__(self, ndigits: _IntegralT = None) -> "Numberwang":  # type: ignore
+        if ndigits is None:
+            return Numberwang(round(self.val))
+        else:
+            return Numberwang(round(self.val, int(ndigits)))
 
     def __trunc__(self) -> "Numberwang":  # type: ignore
         return Numberwang(trunc(self.val))
@@ -654,10 +657,12 @@ class Wangernumb(Real):
         ...
 
     def __pow__(self, other):
-        if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_pow(self.val, other))
+        val = op_pow(self.val, other)
+
+        if isinstance(val, Real):
+            return Wangernumb(val)
         else:
-            return op_pow(self.val, other)
+            return val
 
     @overload
     def __rpow__(self, other: _RealT) -> Real:
@@ -668,10 +673,12 @@ class Wangernumb(Real):
         ...
 
     def __rpow__(self, other):
-        if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_pow(other, self.val))
+        val = op_pow(other, self.val)
+
+        if isinstance(val, Real):
+            return Wangernumb(val)
         else:
-            return op_pow(other, self.val)
+            return val
 
     def __neg__(self) -> Real:
         return Wangernumb(op_neg(self.val))
@@ -685,11 +692,24 @@ class Wangernumb(Real):
     def __float__(self) -> float:
         return self.val
 
-    def __round__(self, ndigits: _IntegralT) -> Real:  # type: ignore # pylint: disable=signature-differs
-        return Wangernumb(round(self.val, int(ndigits)))
+    @overload  # type: ignore
+    def __round__(self) -> Numberwang:  # pylint: disable=signature-differs
+        ...
 
-    def __trunc__(self) -> Real:  # type: ignore
-        return Wangernumb(trunc(self.val))
+    @overload
+    def __round__(  # pylint: disable=signature-differs
+        self, ndigits: _IntegralT
+    ) -> Real:
+        ...
+
+    def __round__(self, ndigits: _IntegralT = None) -> Real:
+        if ndigits is None:
+            return Numberwang(round(self.val))
+        else:
+            return Wangernumb(round(self.val, int(ndigits)))
+
+    def __trunc__(self) -> _IntegralT:  # type: ignore
+        return Numberwang(trunc(self.val))
 
     def __floor__(self) -> Real:  # type: ignore
         return Wangernumb(floor(self.val))

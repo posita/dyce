@@ -41,7 +41,6 @@ from typing import (
 
 from .experimental import experimental
 from .h import H, HAbleBinOpsMixin, _CoalesceT, _CountT, _ExpandT, _MappingT, _OutcomeT
-from .symmetries import sum_w_start
 
 __all__ = ("P",)
 
@@ -367,7 +366,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
                 )
         else:
             # The caller offered no selection
-            return sum_w_start(self._hs, start=H({}))
+            return sum(self._hs, start=H({}))
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -538,9 +537,7 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
             group_counters.append(group_counter)
 
-        return sum_w_start(
-            (H(group_counter) for group_counter in group_counters), start=H({})
-        )
+        return sum((H(group_counter) for group_counter in group_counters), start=H({}))
 
     def explode(self, max_depth: int = 1) -> H:
         r"""

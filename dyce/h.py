@@ -15,7 +15,7 @@ from collections import OrderedDict as ordereddict
 from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
 from itertools import chain, product, repeat
-from math import sqrt
+from math import comb, sqrt
 from numbers import Integral, Real
 from operator import abs as op_abs
 from operator import add as op_add
@@ -60,7 +60,7 @@ except ImportError:
     from typing_extensions import Protocol, runtime_checkable  # type: ignore
 
 from .experimental import experimental
-from .symmetries import comb, gcd, sum_w_start
+from .symmetries import gcd
 
 __all__ = ("H",)
 
@@ -485,7 +485,7 @@ class H(_MappingT):
         elif other < 0:
             raise ValueError("argument cannot be negative")
         else:
-            return sum_w_start(repeat(self, other), start=H({}))
+            return sum(repeat(self, other), start=H({}))
 
     def __rmatmul__(self, other: int) -> "H":
         return self.__matmul__(other)
