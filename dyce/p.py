@@ -42,7 +42,7 @@ from typing import (
 )
 
 from .experimental import experimental
-from .h import H, HAbleBinOpsMixin, _CoalesceT, _ExpandT, _MappingT
+from .h import H, HAbleOpsMixin, _MappingT
 from .numtypes import OutcomeP, as_int
 
 __all__ = ("P",)
@@ -61,14 +61,14 @@ _RollCountT = Tuple[_RollT, int]
 # ---- Classes -------------------------------------------------------------------------
 
 
-class P(Sequence[H], HAbleBinOpsMixin):
+class P(Sequence[H], HAbleOpsMixin):
     r"""
     An immutable pool (ordered sequence) supporting group operations for zero or more
     [``H`` objects][dyce.h.H] (provided or created from the
     [initializer][dyce.p.P.__init__]’s *args* parameter).
 
     This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
-    [``HAbleBinOpsMixin`` class][dyce.h.HAbleBinOpsMixin], which means it can be
+    [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
     “flattened” into a single histogram, either explicitly via the
     [``h`` method][dyce.p.P.h], or implicitly by using binary arithmetic operations.
     Note that this class also provides its own ``@`` and unary operator implementations
@@ -370,74 +370,6 @@ class P(Sequence[H], HAbleBinOpsMixin):
 
     # ---- Methods ---------------------------------------------------------------------
 
-    def lt(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().lt(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.lt``][dyce.h.H.lt].
-        """
-        return self.h().lt(other)
-
-    def le(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().le(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.le``][dyce.h.H.le].
-        """
-        return self.h().le(other)
-
-    def eq(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().eq(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.eq``][dyce.h.H.eq].
-        """
-        return self.h().eq(other)
-
-    def ne(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().ne(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.ne``][dyce.h.H.ne].
-        """
-        return self.h().ne(other)
-
-    def gt(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().gt(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.gt``][dyce.h.H.gt].
-        """
-        return self.h().gt(other)
-
-    def ge(self, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``self.h().ge(other)``. See the [``h`` method][dyce.p.P.h] and
-        [``H.ge``][dyce.h.H.ge].
-        """
-        return self.h().ge(other)
-
-    def even(self) -> H:
-        r"""
-        Shorthand for ``self.h().even()``. See the [``h`` method][dyce.p.P.h] and
-        [``H.even``][dyce.h.H.even].
-        """
-        return self.h().even()
-
-    def odd(self) -> H:
-        r"""
-        Shorthand for ``self.h().odd()``. See the [``h`` method][dyce.p.P.h] and
-        [``H.odd``][dyce.h.H.odd].
-        """
-        return self.h().odd()
-
-    def substitute(
-        self,
-        expand: _ExpandT,
-        coalesce: _CoalesceT = None,
-        max_depth: SupportsInt = 1,
-    ) -> H:
-        r"""
-        Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``. See the
-        [``h`` method][dyce.p.P.h] and [``H.substitute``][dyce.h.H.substitute].
-        """
-        return self.h().substitute(expand, coalesce, max_depth)
-
     @experimental
     def appearances_in_rolls(self, outcome: OutcomeP) -> H:
         r"""
@@ -532,13 +464,6 @@ class P(Sequence[H], HAbleBinOpsMixin):
             group_counters.append(group_counter)
 
         return sum((H(group_counter) for group_counter in group_counters), start=H({}))
-
-    def explode(self, max_depth: SupportsInt = 1) -> H:
-        r"""
-        Shorthand for ``self.h().explode(max_depth)``. See the [``h`` method][dyce.p.P.h]
-        and [``H.explode``][dyce.h.H.explode].
-        """
-        return self.h().explode(max_depth)
 
     def roll(self) -> _RollT:
         r"""
@@ -823,13 +748,6 @@ class P(Sequence[H], HAbleBinOpsMixin):
                 taken_outcomes = sorted_outcomes_for_roll
 
             yield taken_outcomes, roll_count
-
-    def within(self, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> H:
-        r"""
-        Shorthand for ``self.h().within(lo, hi, other)``. See the [``h`` method][dyce.p.P.h]
-        and [``H.within``][dyce.h.H.within].
-        """
-        return self.h().within(lo, hi, other)
 
 
 # ---- Functions -----------------------------------------------------------------------

@@ -1476,7 +1476,7 @@ class HAbleT(Protocol):
         ...
 
 
-class HAbleBinOpsMixin:
+class HAbleOpsMixin:
     r"""
     A “mix-in” class providing arithmetic operations for implementers of the
     [``HAbleT`` protocol][dyce.h.HAbleT]. The [``P`` class][dyce.p.P] derives from this
@@ -1485,123 +1485,225 @@ class HAbleBinOpsMixin:
 
     def __add__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.add(self.h(), other)``.
+        Shorthand for ``operator.add(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_add(self.h(), other)
 
     def __radd__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.add(other, self.h())``.
+        Shorthand for ``operator.add(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_add(other, self.h())
 
     def __sub__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.sub(self.h(), other)``.
+        Shorthand for ``operator.sub(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_sub(self.h(), other)
 
     def __rsub__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.sub(other, self.h())``.
+        Shorthand for ``operator.sub(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_sub(other, self.h())
 
     def __mul__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.mul(self.h(), other)``.
+        Shorthand for ``operator.mul(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_mul(self.h(), other)
 
     def __rmul__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.mul(other, self.h())``.
+        Shorthand for ``operator.mul(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_mul(other, self.h())
 
     def __truediv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.truediv(self.h(), other)``.
+        Shorthand for ``operator.truediv(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_truediv(self.h(), other)
 
     def __rtruediv__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.truediv(other, self.h())``.
+        Shorthand for ``operator.truediv(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_truediv(other, self.h())
 
     def __floordiv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.floordiv(self.h(), other)``.
+        Shorthand for ``operator.floordiv(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_floordiv(self.h(), other)
 
     def __rfloordiv__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.floordiv(other, self.h())``.
+        Shorthand for ``operator.floordiv(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_floordiv(other, self.h())
 
     def __mod__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.mod(self.h(), other)``.
+        Shorthand for ``operator.mod(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_mod(self.h(), other)
 
     def __rmod__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.mod(other, self.h())``.
+        Shorthand for ``operator.mod(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_mod(other, self.h())
 
     def __pow__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.pow(self.h(), other)``.
+        Shorthand for ``operator.pow(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_pow(self.h(), other)
 
     def __rpow__(self: HAbleT, other: OutcomeP) -> H:
         r"""
-        Shorthand for ``operator.pow(other, self.h())``.
+        Shorthand for ``operator.pow(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_pow(other, self.h())
 
     def __and__(self: HAbleT, other: Union[SupportsInt, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.and_(self.h(), other)``.
+        Shorthand for ``operator.and_(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_and(self.h(), other)
 
     def __rand__(self: HAbleT, other: SupportsInt) -> H:
         r"""
-        Shorthand for ``operator.and_(other, self.h())``.
+        Shorthand for ``operator.and_(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_and(other, self.h())
 
     def __xor__(self: HAbleT, other: Union[SupportsInt, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.xor(self.h(), other)``.
+        Shorthand for ``operator.xor(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_xor(self.h(), other)
 
     def __rxor__(self: HAbleT, other: SupportsInt) -> H:
         r"""
-        Shorthand for ``operator.xor(other, self.h())``.
+        Shorthand for ``operator.xor(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_xor(other, self.h())
 
     def __or__(self: HAbleT, other: Union[SupportsInt, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.or_(self.h(), other)``.
+        Shorthand for ``operator.or_(self.h(), other)``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_or(self.h(), other)
 
     def __ror__(self: HAbleT, other: SupportsInt) -> H:
         r"""
-        Shorthand for ``operator.or_(other, self.h())``.
+        Shorthand for ``operator.or_(other, self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
         """
         return op_or(other, self.h())
+
+    def lt(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().lt(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.lt``][dyce.h.H.lt].
+        """
+        return self.h().lt(other)
+
+    def le(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().le(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.le``][dyce.h.H.le].
+        """
+        return self.h().le(other)
+
+    def eq(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().eq(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.eq``][dyce.h.H.eq].
+        """
+        return self.h().eq(other)
+
+    def ne(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().ne(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.ne``][dyce.h.H.ne].
+        """
+        return self.h().ne(other)
+
+    def gt(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().gt(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.gt``][dyce.h.H.gt].
+        """
+        return self.h().gt(other)
+
+    def ge(self: HAbleT, other: _OperandT) -> H:
+        r"""
+        Shorthand for ``self.h().ge(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.ge``][dyce.h.H.ge].
+        """
+        return self.h().ge(other)
+
+    def even(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``self.h().even()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.even``][dyce.h.H.even].
+        """
+        return self.h().even()
+
+    def odd(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``self.h().odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.odd``][dyce.h.H.odd].
+        """
+        return self.h().odd()
+
+    def explode(self: HAbleT, max_depth: SupportsInt = 1) -> H:
+        r"""
+        Shorthand for ``self.h().explode(max_depth)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.explode``][dyce.h.H.explode].
+        """
+        return self.h().explode(max_depth)
+
+    def substitute(
+        self: HAbleT,
+        expand: _ExpandT,
+        coalesce: _CoalesceT = None,
+        max_depth: SupportsInt = 1,
+    ) -> H:
+        r"""
+        Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.substitute``][dyce.h.H.substitute].
+        """
+        return self.h().substitute(expand, coalesce, max_depth)
+
+    def within(self: HAbleT, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> H:
+        r"""
+        Shorthand for ``self.h().within(lo, hi, other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.within``][dyce.h.H.within].
+        """
+        return self.h().within(lo, hi, other)
 
 
 # ---- Functions -----------------------------------------------------------------------

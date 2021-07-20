@@ -30,4 +30,4 @@
 
 ::: dyce.h.HAbleT
 
-::: dyce.h.HAbleBinOpsMixin
+::: dyce.h.HAbleOpsMixin
