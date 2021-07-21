@@ -89,6 +89,7 @@ SETUP_ARGS = {
             "mkdocstrings",
             "numpy",
             "pre-commit",
+            "pytest-gitignore",
             "sympy",
             "tox",
             "twine",

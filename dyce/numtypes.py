@@ -9,17 +9,29 @@
 
 from __future__ import annotations
 
+import re
 from abc import ABCMeta, abstractmethod
 from typing import (
+    Iterable,
+    List,
     Protocol,
     SupportsAbs,
     SupportsFloat,
     SupportsInt,
+    Tuple,
     TypeVar,
+    Union,
     runtime_checkable,
 )
 
-__all__ = ("OutcomeP", "SupportsArithmetic", "SupportsBitwise")
+__all__ = (
+    "OutcomeP",
+    "SupportsArithmetic",
+    "SupportsBitwise",
+    "as_int",
+    "natural_key",
+    "sorted_outcomes",
+)
 
 
 # ---- Types ---------------------------------------------------------------------------
@@ -173,3 +185,20 @@ def as_int(val: SupportsInt) -> int:
         raise TypeError(f"cannot (losslessly) coerce {val} to an int")
 
     return int(val)
+
+
+def natural_key(val: OutcomeP) -> Tuple[Union[int, str], ...]:
+    return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
+
+
+def sorted_outcomes(vals: Iterable[OutcomeP]) -> List[OutcomeP]:
+    vals = list(vals)
+
+    try:
+        vals.sort()
+    except TypeError:
+        # This is for outcomes that don't support direct comparisons, like symbolic
+        # representations
+        vals.sort(key=natural_key)
+
+    return vals

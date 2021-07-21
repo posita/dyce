@@ -42,8 +42,8 @@ from typing import (
 )
 
 from .experimental import experimental
-from .h import H, HAbleOpsMixin, _MappingT
-from .numtypes import OutcomeP, as_int
+from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
+from .numtypes import OutcomeP, as_int, sorted_outcomes
 
 __all__ = ("P",)
 
@@ -190,7 +190,14 @@ class P(Sequence[H], HAbleOpsMixin):
                     yield H(as_int(a))
 
         hs = list(h for h in _gen_hs() if h)
-        hs.sort(key=lambda h: tuple(h.items()))
+
+        try:
+            hs.sort(key=lambda h: tuple(h.items()))
+        except TypeError:
+            # This is for outcomes that don't support direct comparisons, like symbolic
+            # representations
+            hs.sort(key=lambda h: str(tuple(h.items())))
+
         self._hs = tuple(hs)
         self._homogeneous = len(set(self._hs)) <= 1
 
@@ -198,7 +205,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     def __repr__(self) -> str:
         def parts():
-            for h in self._hs:
+            for h in self:
                 yield (
                     str(h._simple_init)  # pylint: disable=protected-access
                     if h._simple_init is not None  # pylint: disable=protected-access
@@ -250,22 +257,22 @@ class P(Sequence[H], HAbleOpsMixin):
         if other < 0:
             raise ValueError("argument cannot be negative")
         else:
-            return P(*chain.from_iterable(repeat(self._hs, other)))
+            return P(*chain.from_iterable(repeat(self, other)))
 
     def __rmatmul__(self, other: SupportsInt) -> "P":
         return self.__matmul__(other)
 
     def __neg__(self) -> "P":
-        return P(*(op_neg(h) for h in self._hs))
+        return P(*(op_neg(h) for h in self))
 
     def __pos__(self) -> "P":
-        return P(*(op_pos(h) for h in self._hs))
+        return P(*(op_pos(h) for h in self))
 
     def __abs__(self) -> "P":
-        return P(*(op_abs(h) for h in self._hs))
+        return P(*(op_abs(h) for h in self))
 
     def __invert__(self) -> "P":
-        return P(*(op_invert(h) for h in self._hs))
+        return P(*(op_invert(h) for h in self))
 
     def h(self, *which: _GetItemT) -> H:
         r"""
@@ -345,7 +352,7 @@ class P(Sequence[H], HAbleOpsMixin):
         ```
         """
         if which:
-            n = len(self._hs)
+            n = len(self)
             i = _analyze_selection(n, which)
 
             if i and i >= n:
@@ -353,14 +360,14 @@ class P(Sequence[H], HAbleOpsMixin):
                 # can short-circuit roll enumeration
                 assert i % n == 0
 
-                return self.h() * i // n
+                return self.h() * (i // n)
             else:
                 return H(
                     (sum(roll), count) for roll, count in self.rolls_with_counts(*which)
                 )
         else:
             # The caller offered no selection
-            return sum(self._hs, start=H({}))
+            return sum(self, start=H({}))
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -452,7 +459,7 @@ class P(Sequence[H], HAbleOpsMixin):
         """
         group_counters: List[Counter[OutcomeP]] = []
 
-        for h, hs in groupby(self._hs):
+        for h, hs in groupby(self):
             group_counter: Counter[OutcomeP] = counter()
             n = sum(1 for _ in hs)
 
@@ -469,7 +476,7 @@ class P(Sequence[H], HAbleOpsMixin):
         r"""
         Returns (weighted) random outcomes from contained histograms.
         """
-        return tuple(sorted(h.roll() for h in self._hs))
+        return tuple(sorted_outcomes(h.roll() for h in self))
 
     def rolls_with_counts(self, *which: _GetItemT) -> Iterator[_RollCountT]:
         r"""
@@ -706,7 +713,7 @@ class P(Sequence[H], HAbleOpsMixin):
             6.31 s ± 42.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
             ```
         """
-        n = len(self._hs)
+        n = len(self)
 
         if not which:
             i: Optional[int] = n
@@ -716,7 +723,7 @@ class P(Sequence[H], HAbleOpsMixin):
         if i == 0 or n == 0:
             rolls_with_counts_iter: Iterable[_RollCountT] = iter(())
         else:
-            groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self._hs))
+            groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self))
 
             if len(groups) == 1:
                 # Based on cursory performance analysis, calling the homogeneous
@@ -748,6 +755,13 @@ class P(Sequence[H], HAbleOpsMixin):
                 taken_outcomes = sorted_outcomes_for_roll
 
             yield taken_outcomes, roll_count
+
+    def umap(self, oper: _UnaryOperatorT) -> "P":
+        r"""
+        Shorthand for ``P(*(h.umap(oper) for h in self))``. See the
+        [``H.umap`` method][dyce.h.H.umap].
+        """
+        return P(*(h.umap(oper) for h in self))
 
 
 # ---- Functions -----------------------------------------------------------------------

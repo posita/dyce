@@ -17,6 +17,7 @@ from typing import DefaultDict, Sequence, Tuple
 from unittest.mock import Mock, patch
 
 import pytest
+import sympy.abc
 
 from dyce import H, OutcomeP, P
 from dyce.p import (
@@ -59,6 +60,13 @@ class TestP:
         assert P(p_d6, p_d6) == p_2d6
         assert P(p_d6, d6) == p_2d6
         assert P(d6, p_d6) == p_2d6
+
+    def test_init_symbols(self) -> None:
+        d6x = H(6) + sympy.abc.x
+        d8x = H(8) + sympy.abc.x
+        p_d6x_d8x = P(d8x, d6x)
+        assert p_d6x_d8x == P(d6x, d8x)
+        assert repr(p_d6x_d8x) == repr(P(d6x, d8x))
 
     def test_init_exclude_empty_histograms(self) -> None:
         assert P(H({})) == P()
@@ -395,6 +403,18 @@ class TestP:
         assert p_d6_d8.h() == d6_d8
         assert P().h() == H({})
 
+    def test_h_flatten_symbol(self) -> None:
+        r_d6 = range(1, 7)
+        r_d8 = range(1, 9)
+        d6x_d8x = H(
+            sum(v) + 2 * sympy.abc.x for v in itertools.product(r_d6, r_d8) if v
+        )
+        p_d6x = P(H(6) + sympy.abc.x)
+        p_d8x = P(H(8) + sympy.abc.x)
+        p_d6x_d8x = P(p_d6x, p_d8x)
+        assert p_d6x_d8x.h() == d6x_d8x
+        assert p_d6x_d8x.h(slice(None)) == d6x_d8x
+
     def test_h_take_identity(self) -> None:
         p_d0 = P()
         assert p_d0.h(slice(None)) == p_d0.h()
@@ -539,7 +559,20 @@ class TestP:
     def test_roll(self) -> None:
         d10 = H(10)
         p_6d10 = 6 @ P(d10)
-        assert all(all(v in d10 for v in p_6d10.roll()) for _ in range(1000))
+
+        for _ in range(1000):
+            roll = p_6d10.roll()
+            assert len(roll) == len(p_6d10)
+            assert all(v in d10 for v in roll)
+
+    def test_roll_symbols(self) -> None:
+        d10x = H(10) + sympy.abc.x
+        p_6d10x = 6 @ P(d10x)
+
+        for _ in range(50):
+            roll = p_6d10x.roll()
+            assert len(roll) == len(p_6d10x)
+            assert all(v in d10x for v in roll)
 
     def test_rolls_with_counts_empty(self) -> None:
         assert tuple(P().rolls_with_counts()) == ()

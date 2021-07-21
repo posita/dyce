@@ -731,6 +731,122 @@ Armed with this knowledge, we can now model “Evens Up” using our ``risus_com
 
 ```
 
+## Time to get meta-evil on those outcomes!
+
+``dyce`` offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as [SymPy](https://www.sympy.org/).
+
+```python
+>>> import sympy.abc
+>>> d6x = H(6) + sympy.abc.x
+>>> d8y = H(8) + sympy.abc.y
+>>> P(d6x, d8y, d6x).h()
+H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y + 19: 3, 2*x + y + 20: 1})
+
+```
+
+[![Love you, Doris!](doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260)
+
+Be aware that performance can be quite slow, however.
+
+``dyce`` remains opinionated about ordering.
+For non-critical contexts, ``dyce`` will attempt a “natural” ordering based on the string representation of each outcome if relative values are indeterminate.
+This is to accommodate symbolic expressions whose relative values are often unknowable:
+
+```python
+>>> expr = sympy.abc.x < sympy.abc.x * 3
+>>> expr
+x < 3*x
+>>> bool(expr)  # nope
+Traceback (most recent call last):
+  ...
+TypeError: cannot determine truth value of Relational
+>>> s = sympy.abc.x - 1
+>>> d3x = H(3) * sympy.abc.x
+>>> d3x2 = H(i * sympy.abc.x for i in range(3, 0, -1))
+>>> d3x == d3x2  # stll results in consistent ordering
+True
+>>> P(d3x, d3x2)
+P(H({2*x: 1, 3*x: 1, x: 1}), H({2*x: 1, 3*x: 1, x: 1}))
+>>> sympy.abc.x * 3 in d3x
+True
+>>> sympy.abc.x - 1 in d3x
+False
+
+```
+
+SymPy does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
+Instead, it relies on the caller to invoke its proprietary solver APIs:
+
+```python
+>>> bool(sympy.abc.x < sympy.abc.x + 1)
+Traceback (most recent call last):
+  ...
+TypeError: cannot determine truth value of Relational
+>>> import sympy.solvers.inequalities
+>>> sympy.solvers.inequalities.reduce_inequalities(sympy.abc.x < sympy.abc.x + 1, [sympy.abc.x])
+True
+
+```
+
+``dyce``, of course, is happily ignorant of all that keenness.
+(As it should be.)
+In practice, that means that certain operations won’t work with symbolic expressions where correctness depends on ordering outcomes according to relative value (e.g., dice selection from pools).
+Flattening pools works:
+
+```python
+>>> p = P(d3x, (d3x + 1) / 3, (d3x + 2) / 3)
+>>> p.h()
+H({2*x + 1: 2, 3*x + 1: 3, 4*x + 1: 3, ..., 11*x/3 + 1: 3, 13*x/3 + 1: 3, 14*x/3 + 1: 2})
+
+```
+
+Selecting the “lowest” die doesn’t:
+
+```python
+>>> p.h(0)
+Traceback (most recent call last):
+  ...
+TypeError: cannot determine truth value of Relational
+
+```
+
+Selecting all dice works, since it’s equivalent to flattening (no sorting is required):
+
+```python
+>>> p.h(slice(None))
+H({2*x + 1: 2, 3*x + 1: 3, 4*x + 1: 3, ..., 11*x/3 + 1: 3, 13*x/3 + 1: 3, 14*x/3 + 1: 2})
+
+```
+
+Enumerating rolls doesn’t, even where there is no selection, because each roll’s outcomes must be sorted least-to-greatest:
+
+```python
+>>> list(p.rolls_with_counts())
+Traceback (most recent call last):
+  ...
+TypeError: cannot determine truth value of Relational
+
+```
+
+[``P.roll``][dyce.p.P.roll] works, but that is a deliberate compromise of convenience:
+
+```python
+>>> p.roll()  # doctest: +SKIP
+(2*x/3 + 2/3, 3*x, x + 1/3)
+
+```
+
+[``P.umap``][dyce.p.P.umap] can help pave the way back to concrete outcomes:
+
+```python
+>>> f = lambda o: o.subs({sympy.abc.x: sympy.Rational(1, 3)})
+>>> p.umap(f)
+P(H({1/3: 1, 2/3: 1, 1: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
+>>> p.umap(f).h(-1)
+H({7/9: 6, 8/9: 6, 1: 15})
+
+```
+
 ## Further exploration
 
 Consider exploring the [applications and translations](translations.md) for more examples, or jump right into the [API][dyce].

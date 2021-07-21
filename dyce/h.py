@@ -58,7 +58,7 @@ from typing import (
 )
 
 from .experimental import experimental
-from .numtypes import OutcomeP, as_int
+from .numtypes import OutcomeP, as_int, sorted_outcomes
 from .symmetries import gcd
 
 __all__ = ("H",)
@@ -386,15 +386,10 @@ class H(_MappingT):
 
         # Sort and omit zero counts. As of Python 3.7, insertion order of keys is
         # preserved.
-        try:
-            tmp_keys: Iterable[OutcomeP] = sorted(tmp)
-        except TypeError:
-            # This is for outcomes that don't support direct comparisons, like symbolic
-            # representations
-            tmp_keys = sorted(tmp, key=str)
-
         self._h: _MappingT = {
-            outcome: tmp[outcome] for outcome in tmp_keys if tmp[outcome] != 0
+            outcome: tmp[outcome]
+            for outcome in sorted_outcomes(tmp)
+            if tmp[outcome] != 0
         }
 
     # ---- Overrides -------------------------------------------------------------------
@@ -1271,7 +1266,10 @@ class H(_MappingT):
         combined = dict(chain(fill_items.items(), self.items()))
         total = sum(combined.values()) or 1
 
-        return ((outcome, count / total) for outcome, count in sorted(combined.items()))
+        return (
+            (outcome, combined[outcome] / total)
+            for outcome in sorted_outcomes(combined)
+        )
 
     def distribution_xy(
         self,
