@@ -104,15 +104,22 @@ class TestH:
         assert base.accumulate(base) == base.accumulate(base).accumulate(base)
         assert base != base.accumulate((0,))
 
-    def test_len_and_counts(self) -> None:
+    def test_len_counts_outcomes(self) -> None:
         d0 = H({})
         d6_d8 = H(6) + H(8)
         assert len(d0) == 0
         assert sum(d0.counts()) == 0
-        assert len(d6_d8) == 13  # num distinct values
-        assert sum(d6_d8.counts()) == 48  # combinations
+        assert list(d0.counts()) == list(d0.values())
+        assert list(d0.outcomes()) == []
+        assert list(d0.outcomes()) == list(d0.keys())
+        assert len(d6_d8) == 13  # distinct values
+        assert sum(d6_d8.counts()) == 48  # total combinations
+        assert list(d6_d8.counts()) == list(d6_d8.values())
+        assert list(d6_d8.outcomes()) == list(range(2, 6 + 8 + 1))
+        assert list(d6_d8.outcomes()) == list(d6_d8.keys())
         assert len((d6_d8 + d6_d8)) == 25
         assert sum((d6_d8 + d6_d8).counts()) == 2304
+        assert list(d6_d8.items())
 
     def test_getitem(self) -> None:
         d6_2 = 2 @ H(6)
