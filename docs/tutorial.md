@@ -22,11 +22,11 @@
 
 ```
 
-[``H`` objects](dyce.md#dyce.h.H) represent histograms for modeling discrete outcomes.
+[``H`` objects][dyce.h.H] represent histograms for modeling discrete outcomes.
 They encode discrete probability distributions as integer counts without any denominator.
-[``P`` objects](dyce.md#dyce.p.P) represent pools (ordered sequences) of histograms.
-If all you need is aggregate outcomes (sums) from rolling a bunch of dice (or calculations on aggregate outcomes), [``H`` objects](dyce.md#dyce.h.H) are probably sufficient.
-If you need to _select_ certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [``P`` objects](dyce.md#dyce.p.P) come in.
+[``P`` objects][dyce.p.P] represent pools (ordered sequences) of histograms.
+If all you need is aggregate outcomes (sums) from rolling a bunch of dice (or calculations on aggregate outcomes), [``H`` objects][dyce.h.H] are probably sufficient.
+If you need to _select_ certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [``P`` objects][dyce.p.P] come in.
 
 As a wise person whose name has been lost to history once said: “Language is imperfect. If at all possible, shut up and point.”
 So with that illuminating (or perhaps impenetrable) introduction out of the way, let’s dive into some examples!
@@ -774,7 +774,7 @@ False
 
 ```
 
-SymPy does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
+SymPy, for example, does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
 Instead, it relies on the caller to invoke its proprietary solver APIs:
 
 ```python
@@ -791,12 +791,13 @@ True
 ``dyce``, of course, is happily ignorant of all that keenness.
 (As it should be.)
 In practice, that means that certain operations won’t work with symbolic expressions where correctness depends on ordering outcomes according to relative value (e.g., dice selection from pools).
+
 Flattening pools works:
 
 ```python
->>> p = P(d3x, (d3x + 1) / 3, (d3x + 2) / 3)
+>>> p = P(d3x / 3, (d3x + 1) / 3, (d3x + 2) / 3)
 >>> p.h()
-H({2*x + 1: 2, 3*x + 1: 3, 4*x + 1: 3, ..., 11*x/3 + 1: 3, 13*x/3 + 1: 3, 14*x/3 + 1: 2})
+H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 3, x + 1: 1})
 
 ```
 
@@ -814,7 +815,7 @@ Selecting all dice works, since it’s equivalent to flattening (no sorting is r
 
 ```python
 >>> p.h(slice(None))
-H({2*x + 1: 2, 3*x + 1: 3, 4*x + 1: 3, ..., 11*x/3 + 1: 3, 13*x/3 + 1: 3, 14*x/3 + 1: 2})
+H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 3, x + 1: 1})
 
 ```
 
@@ -828,11 +829,11 @@ TypeError: cannot determine truth value of Relational
 
 ```
 
-[``P.roll``][dyce.p.P.roll] works, but that is a deliberate compromise of convenience:
+[``P.roll``][dyce.p.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience:
 
 ```python
 >>> p.roll()  # doctest: +SKIP
-(2*x/3 + 2/3, 3*x, x + 1/3)
+(2*x/3, 2*x/3 + 1/3, x/3 + 2/3)
 
 ```
 
@@ -841,9 +842,9 @@ TypeError: cannot determine truth value of Relational
 ```python
 >>> f = lambda o: o.subs({sympy.abc.x: sympy.Rational(1, 3)})
 >>> p.umap(f)
-P(H({1/3: 1, 2/3: 1, 1: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
+P(H({1/9: 1, 2/9: 1, 1/3: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
 >>> p.umap(f).h(-1)
-H({7/9: 6, 8/9: 6, 1: 15})
+H({7/9: 9, 8/9: 9, 1: 9})
 
 ```
 

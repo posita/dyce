@@ -35,7 +35,7 @@ except ImportError:
 # ---- Tests ---------------------------------------------------------------------------
 
 
-def test_real_proto() -> None:
+def test_outcome_proto() -> None:
     assert isinstance(-273.15, OutcomeP)
     assert isinstance(-273, OutcomeP)
     assert isinstance(Fraction(-27315, 100), OutcomeP)
@@ -56,7 +56,7 @@ def test_real_proto() -> None:
     assert not isinstance("-273.15", OutcomeP)
 
 
-def test_integral_proto() -> None:
+def test_supports_bitwise_proto() -> None:
     assert isinstance(-273, SupportsBitwise)
     assert isinstance(Numberwang(-273), SupportsBitwise)
 

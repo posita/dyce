@@ -431,20 +431,20 @@ class Numberwang(Integral):
     def __int__(self) -> int:
         return self.val
 
-    def __round__(self, ndigits: _IntegralT = None) -> "Numberwang":  # type: ignore
+    def __round__(self, ndigits: _IntegralT = None) -> int:
         if ndigits is None:
-            return Numberwang(round(self.val))
+            return round(self.val)
         else:
-            return Numberwang(round(self.val, int(ndigits)))
+            return round(self.val, int(ndigits))
 
-    def __trunc__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(trunc(self.val))
+    def __trunc__(self) -> int:
+        return trunc(self.val)
 
-    def __floor__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(floor(self.val))
+    def __floor__(self) -> int:
+        return floor(self.val)
 
-    def __ceil__(self) -> "Numberwang":  # type: ignore
-        return Numberwang(ceil(self.val))
+    def __ceil__(self) -> int:
+        return ceil(self.val)
 
 
 Integral.register(Numberwang)
@@ -693,29 +693,29 @@ class Wangernumb(Real):
         return self.val
 
     @overload  # type: ignore
-    def __round__(self) -> Numberwang:  # pylint: disable=signature-differs
+    def __round__(self) -> int:  # pylint: disable=signature-differs
         ...
 
     @overload
     def __round__(  # pylint: disable=signature-differs
         self, ndigits: _IntegralT
-    ) -> Real:
+    ) -> float:
         ...
 
-    def __round__(self, ndigits: _IntegralT = None) -> Real:
+    def __round__(self, ndigits: _IntegralT = None) -> Union[int, float]:
         if ndigits is None:
-            return Numberwang(round(self.val))
+            return round(self.val)
         else:
-            return Wangernumb(round(self.val, int(ndigits)))
+            return round(self.val, int(ndigits))
 
-    def __trunc__(self) -> _IntegralT:  # type: ignore
-        return Numberwang(trunc(self.val))
+    def __trunc__(self) -> int:
+        return trunc(self.val)
 
-    def __floor__(self) -> Real:  # type: ignore
-        return Wangernumb(floor(self.val))
+    def __floor__(self) -> int:
+        return floor(self.val)
 
-    def __ceil__(self) -> Real:  # type: ignore
-        return Wangernumb(ceil(self.val))
+    def __ceil__(self) -> int:
+        return ceil(self.val)
 
 
 Real.register(Wangernumb)

@@ -41,6 +41,7 @@ from typing import (
     Callable,
     Counter,
     Dict,
+    ItemsView,
     Iterable,
     Iterator,
     KeysView,
@@ -540,7 +541,7 @@ class H(_MappingT):
 
     def __and__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_and, other)
@@ -555,7 +556,7 @@ class H(_MappingT):
 
     def __xor__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_xor, other)
@@ -570,7 +571,7 @@ class H(_MappingT):
 
     def __or__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
         try:
-            if not isinstance(other, (H, HAbleT)):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(op_or, other)
@@ -601,11 +602,11 @@ class H(_MappingT):
         """
         return self.values()
 
-    def items(self):
-        return self._h.items()
+    def items(self) -> ItemsView[OutcomeP, int]:
+        return cast(ItemsView[OutcomeP, int], self._h.items())
 
-    def keys(self):
-        return self._h.keys()
+    def keys(self) -> KeysView[OutcomeP]:
+        return cast(KeysView[OutcomeP], self._h.keys())
 
     def outcomes(self) -> KeysView[OutcomeP]:
         r"""
@@ -613,7 +614,7 @@ class H(_MappingT):
         """
         return self.keys()
 
-    def values(self):
+    def values(self) -> ValuesView[int]:
         return self._h.values()
 
     # ---- Methods ---------------------------------------------------------------------
@@ -1373,14 +1374,14 @@ class H(_MappingT):
 
         if width <= 0:
 
-            def parts():
+            def _parts():
                 yield f"avg: {mu:.2f}"
 
                 for outcome, probability in self.distribution(fill_items):
                     probability_f = float(probability)
                     yield f"{outcome}:{probability_f:7.2%}"
 
-            return "{" + ", ".join(parts()) + "}"
+            return "{" + ", ".join(_parts()) + "}"
         else:
             w = width - 15
 
@@ -1445,7 +1446,14 @@ class H(_MappingT):
 
     def roll(self) -> OutcomeP:
         r"""
-        Returns a (weighted) random outcome.
+        Returns a (weighted) random outcome, sorted.
+
+        !!! tip "On ordering"
+
+            This method “works” (i.e., falls back to a “natural” ordering of string
+            representations) for outcomes whose relative values cannot be known (e.g.,
+            symbolic expressions). This is deliberate to allow random roll functionality
+            where symbolic resolution is not needed or will happen later.
         """
         if not self:
             return 0
