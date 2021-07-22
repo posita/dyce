@@ -34,7 +34,7 @@ vers_info = {
 
 if os.path.isfile(vers_info["__path__"]):
     with open(vers_info["__path__"]) as _version_file:
-        exec(  # pylint: disable=exec-used
+        exec(
             compile(_version_file.read(), vers_info["__path__"], "exec"),
             vers_info,
             vers_info,

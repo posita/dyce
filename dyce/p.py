@@ -184,7 +184,7 @@ class P(Sequence[H], HAbleOpsMixin):
                 if isinstance(a, H):
                     yield a
                 elif isinstance(a, P):
-                    for h in a._hs:  # pylint: disable=protected-access
+                    for h in a._hs:
                         yield h
                 else:
                     yield H(as_int(a))
@@ -206,11 +206,7 @@ class P(Sequence[H], HAbleOpsMixin):
     def __repr__(self) -> str:
         def parts():
             for h in self:
-                yield (
-                    str(h._simple_init)  # pylint: disable=protected-access
-                    if h._simple_init is not None  # pylint: disable=protected-access
-                    else repr(h)
-                )
+                yield (str(h._simple_init) if h._simple_init is not None else repr(h))
 
         args = ", ".join(parts())
 
@@ -806,10 +802,6 @@ def _analyze_selection(
         return max_index
     else:
         assert False, "should never be here"
-
-
-def _coalesce_replace(h: H, outcome: OutcomeP) -> H:  # pylint: disable=unused-argument
-    return h
 
 
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:

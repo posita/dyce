@@ -165,7 +165,6 @@ class OutcomeP(
     # Must be able to instantiate it
     @abstractmethod
     def __init__(self, *args, **kw):
-        # pylint: disable=super-init-not-called
         ...
 
     @abstractmethod

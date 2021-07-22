@@ -104,6 +104,17 @@ except OSError:
         _ROW_WIDTH = 88
 
 
+# ---- Functions -----------------------------------------------------------------------
+
+
+def coalesce_replace(h: H, outcome: OutcomeP) -> H:
+    """
+    Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified
+    (*outcome* is ignored).
+    """
+    return h
+
+
 # ---- Classes -------------------------------------------------------------------------
 
 
@@ -994,13 +1005,13 @@ class H(_MappingT):
     def substitute(
         self,
         expand: _ExpandT,
-        coalesce: _CoalesceT = None,
+        coalesce: _CoalesceT = coalesce_replace,
         max_depth: SupportsInt = 1,
     ) -> "H":
         r"""
         Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*
-        returns a number, it replaces the outcome. If it returns an [``H``
-        object][dyce.h.H], *coalesce* is called on the outcome and the expanded
+        returns a number, it replaces the outcome. If it returns an
+        [``H`` object][dyce.h.H], *coalesce* is called on the outcome and the expanded
         histogram, and the returned histogram is folded into result. The default
         behavior for *coalesce* is to replace the outcome with the expanded histogram.
         Returned histograms are always reduced to their lowest terms. (See the
@@ -1144,9 +1155,6 @@ class H(_MappingT):
         ```
         """
         max_depth = as_int(max_depth)
-
-        if coalesce is None:
-            coalesce = _coalesce_replace
 
         def _substitute(h: H, depth: int = 0) -> H:
             assert coalesce is not None
@@ -1366,9 +1374,7 @@ class H(_MappingT):
                 zip(
                     *(
                         (outcome, float(probability))
-                        for outcome, probability in self.distribution(  # pylint: disable=not-an-iterable
-                            fill_items
-                        )
+                        for outcome, probability in self.distribution(fill_items)
                     )
                 )
             ),
@@ -1461,9 +1467,7 @@ class H(_MappingT):
                 for (
                     outcome,
                     probability,
-                ) in self.distribution(  # pylint: disable=not-an-iterable
-                    fill_items
-                ):
+                ) in self.distribution(fill_items):
                     probability_f = float(probability)
                     yield f"{outcome}:{probability_f:7.2%}"
 
@@ -1781,7 +1785,7 @@ class HAbleOpsMixin:
     def substitute(
         self: HAbleT,
         expand: _ExpandT,
-        coalesce: _CoalesceT = None,
+        coalesce: _CoalesceT = coalesce_replace,
         max_depth: SupportsInt = 1,
     ) -> H:
         r"""
@@ -1799,10 +1803,6 @@ class HAbleOpsMixin:
 
 
 # ---- Functions -----------------------------------------------------------------------
-
-
-def _coalesce_replace(h: H, outcome: OutcomeP) -> H:  # pylint: disable=unused-argument
-    return h
 
 
 def _within(lo: OutcomeP, hi: OutcomeP) -> _BinaryOperatorT:

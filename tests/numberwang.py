@@ -295,20 +295,18 @@ class Numberwang(Integral):
             return op_mod(other, self.val)
 
     @overload  # type: ignore
-    def __pow__(  # pylint: disable=signature-differs
-        self, other: _IntegralT
-    ) -> Integral:
+    def __pow__(self, other: _IntegralT) -> Integral:
         ...
 
     @overload
-    def __pow__(self, other: _RealT) -> Real:  # pylint: disable=signature-differs
+    def __pow__(self, other: _RealT) -> Real:
         ...
 
     @overload
-    def __pow__(self, other: Decimal) -> Decimal:  # pylint: disable=signature-differs
+    def __pow__(self, other: Decimal) -> Decimal:
         ...
 
-    def __pow__(self, other):  # pylint: disable=signature-differs
+    def __pow__(self, other):
         if isinstance(other, (int, Numberwang)):
             return Numberwang(op_pow(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
@@ -693,13 +691,11 @@ class Wangernumb(Real):
         return self.val
 
     @overload  # type: ignore
-    def __round__(self) -> int:  # pylint: disable=signature-differs
+    def __round__(self) -> int:
         ...
 
     @overload
-    def __round__(  # pylint: disable=signature-differs
-        self, ndigits: _IntegralT
-    ) -> float:
+    def __round__(self, ndigits: _IntegralT) -> float:
         ...
 
     def __round__(self, ndigits: _IntegralT = None) -> Union[int, float]:

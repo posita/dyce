@@ -145,9 +145,7 @@ class TestH:
             assert H({}) + d3 == d3, f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_add_sym(self) -> None:
-        sympy = pytest.importorskip(  # pylint: disable=redefined-outer-name
-            "sympy", reason="requires sympy"
-        )
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
 
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
@@ -189,9 +187,7 @@ class TestH:
         pass
 
     def test_op_sub_sym(self) -> None:
-        sympy = pytest.importorskip(  # pylint: disable=redefined-outer-name
-            "sympy", reason="requires sympy"
-        )
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
 
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             d3 = H({o_type(o): c_type(1) for o in range(3, 0, -1)})
@@ -347,10 +343,7 @@ class TestH:
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(
-            h: H,  # pylint: disable=unused-argument
-            outcome: OutcomeP,
-        ) -> Union[H, OutcomeP]:
+        def double_odd_values(h: H, outcome: OutcomeP) -> Union[H, OutcomeP]:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -362,10 +355,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(
-            d: H,  # pylint: disable=unused-argument
-            outcome: OutcomeP,
-        ) -> Union[H, OutcomeP]:
+        def never_expand(d: H, outcome: OutcomeP) -> Union[H, OutcomeP]:
             return outcome
 
         d20 = H(20)
