@@ -15,6 +15,7 @@ nav:
   - API:
     - <tt>dyce</tt>: dyce.md
     - <tt>dyce.plt</tt>: dyce.plt.md
+  - Release notes: notes.md
   - Contributing: contrib.md
   - License: license.md
 

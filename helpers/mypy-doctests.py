@@ -53,9 +53,9 @@ PARSER.add_argument(
     "--exclude",
     metavar="PATTERN",
     help='exclude directories matching PATTERN from inspection (default: "{}")'.format(
-        r"\A(\..*|__pycache__|node_modules|site-packages)\Z"
+        r"\A(\..*|__pycache__|dist|site|.*\.egg-info)\Z"
     ),
-    default=r"\A(\..*|__pycache__|node_modules|site-packages)\Z",
+    default=r"\A(\..*|__pycache__|dist|site|.*\.egg-info)\Z",
 )
 PARSER.add_argument(
     "--include-file-names",

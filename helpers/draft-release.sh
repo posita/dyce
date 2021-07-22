@@ -44,5 +44,9 @@ python setup.py bdist_wheel sdist
 twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
 mike deploy --rebase --update-aliases "${VERS}" latest
 git commit --all --message "Update version and release ${TAG}."
-git tag --sign --force --message "Release ${TAG}." "${TAG}"
-git tag --force latest
+git tag --force --message "$( cat <<EOF
+Release ${TAG}.
+
+<TODO: Copy ${VERS_PATCH} [release notes](docs/notes.md) here. Hope you were keeping track!>
+EOF
+)" "${TAG}"

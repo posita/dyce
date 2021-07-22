@@ -175,7 +175,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     # ---- Constructor -----------------------------------------------------------------
 
-    def __init__(self, *args: Union[SupportsInt, "P", H]) -> None:
+    def __init__(self, *args: Union[SupportsInt, P, H]) -> None:
         r"Initializer."
         super().__init__()
 
@@ -204,11 +204,11 @@ class P(Sequence[H], HAbleOpsMixin):
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        def parts():
+        def _parts():
             for h in self:
                 yield (str(h._simple_init) if h._simple_init is not None else repr(h))
 
-        args = ", ".join(parts())
+        args = ", ".join(_parts())
 
         return f"{self.__class__.__name__}({args})"
 
@@ -232,10 +232,10 @@ class P(Sequence[H], HAbleOpsMixin):
         ...
 
     @overload
-    def __getitem__(self, key: slice) -> "P":
+    def __getitem__(self, key: slice) -> P:
         ...
 
-    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:
+    def __getitem__(self, key: _GetItemT) -> Union[H, P]:
         if isinstance(key, slice):
             return P(*self._hs[key])
         else:
@@ -244,7 +244,7 @@ class P(Sequence[H], HAbleOpsMixin):
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
 
-    def __matmul__(self, other: SupportsInt) -> "P":
+    def __matmul__(self, other: SupportsInt) -> P:
         try:
             other = as_int(other)
         except TypeError:
@@ -255,19 +255,19 @@ class P(Sequence[H], HAbleOpsMixin):
         else:
             return P(*chain.from_iterable(repeat(self, other)))
 
-    def __rmatmul__(self, other: SupportsInt) -> "P":
+    def __rmatmul__(self, other: SupportsInt) -> P:
         return self.__matmul__(other)
 
-    def __neg__(self) -> "P":
+    def __neg__(self) -> P:
         return P(*(op_neg(h) for h in self))
 
-    def __pos__(self) -> "P":
+    def __pos__(self) -> P:
         return P(*(op_pos(h) for h in self))
 
-    def __abs__(self) -> "P":
+    def __abs__(self) -> P:
         return P(*(op_abs(h) for h in self))
 
-    def __invert__(self) -> "P":
+    def __invert__(self) -> P:
         return P(*(op_invert(h) for h in self))
 
     def h(self, *which: _GetItemT) -> H:
@@ -752,7 +752,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
             yield taken_outcomes, roll_count
 
-    def umap(self, oper: _UnaryOperatorT) -> "P":
+    def umap(self, oper: _UnaryOperatorT) -> P:
         r"""
         Shorthand for ``P(*(h.umap(oper) for h in self))``. See the
         [``H.umap`` method][dyce.h.H.umap].

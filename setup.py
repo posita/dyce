@@ -81,8 +81,9 @@ SETUP_ARGS = {
     "extras_require": {
         "dev": [
             "mike",
-            # See <https://github.com/mkdocs/mkdocs/issues/2448> and
-            # <https://github.com/mkdocstrings/mkdocstrings/issues/295>
+            # See:
+            # * <https://github.com/mkdocs/mkdocs/issues/2448>
+            # * <https://github.com/mkdocstrings/mkdocstrings/issues/295>
             "mkdocs!=1.2",
             "mkdocs-exclude",
             "mkdocs-material",

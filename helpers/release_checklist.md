@@ -27,6 +27,8 @@ The following assumes you are working from the repository root and have a develo
   * updates ``gh-pages``
   * see [``./helpers/draft-release.sh``](draft-release.sh) for details
 
+* [ ] ``git tag --force --sign vX.Y.X && git tag --force latest`` and add [release notes](../docs/notes.md)
+
 * [ ] ``mike serve`` and spot check docs (some images with external references might be missing)
 
 * [ ] ``git push [--force] origin vX.Y.Z gh-pages``

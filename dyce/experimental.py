@@ -33,7 +33,7 @@ class ExperimentalWarning(PendingDeprecationWarning):
 
 
 def experimental(f: _WrappedT) -> _WrappedT:
-    """
+    r"""
     Decorator to mark an interface as experimental. Warns on *f*'s first use.
     """
     _wrapped: _WrappedT
@@ -45,7 +45,7 @@ def experimental(f: _WrappedT) -> _WrappedT:
 
         if not warned:
             warnings.warn(
-                f"{f.__qualname__} should be considered experimental and may disappear in future versions",
+                f"{f.__qualname__} should be considered experimental and may change or disappear in future versions",
                 category=ExperimentalWarning,
                 stacklevel=2,
             )

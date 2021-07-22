@@ -15,7 +15,7 @@
 
 ## Basic examples
 
-``dyce`` provides two key primitives:
+``dyce`` provides two core primitives:
 
 ```python
 >>> from dyce import H, P

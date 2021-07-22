@@ -56,7 +56,7 @@ _HIDE_LIM = fractions.Fraction(1, 2 ** 6)
 
 @experimental
 def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
-    """
+    r"""
     !!! warning "Experimental"
 
         This method should be considered experimental and may disappear in future
@@ -82,7 +82,7 @@ def display_burst(
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
 ) -> None:
-    """
+    r"""
     !!! warning "Experimental"
 
         This method should be considered experimental and may disappear in future
@@ -138,7 +138,7 @@ def display_burst(
 
 @experimental
 def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
-    """
+    r"""
     !!! warning "Experimental"
 
         This method should be considered experimental and may disappear in future
@@ -165,7 +165,7 @@ def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
 def labels_cumulative(
     h: H,
 ) -> Iterator[LabelT]:
-    """
+    r"""
     !!! warning "Experimental"
 
         This method should be considered experimental and may disappear in future
@@ -196,7 +196,7 @@ def plot_burst(
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
 ) -> Tuple[FigureT, AxesT]:
-    """
+    r"""
     !!! warning "Experimental"
 
         This method should be considered experimental and may disappear in future

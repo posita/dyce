@@ -176,7 +176,7 @@ class OutcomeP(
 
 
 def as_int(val: SupportsInt) -> int:
-    """
+    r"""
     Helper function to losslessly coerce *val* into an ``int``. Raises
     ``TypeError`` if that cannot be done.
     """

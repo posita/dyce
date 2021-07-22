@@ -69,7 +69,7 @@ else:
         sympy.RealNumber,
     )
     _INTEGRAL_OUTCOME_TYPES += (
-        # sympy.Integer,  # See <https://github.com/sympy/sympy/issues/19311>
+        # sympy.Integer,  # TODO: See <https://github.com/sympy/sympy/issues/19311>
     )
     _COUNT_TYPES += (sympy.Integer,)
 

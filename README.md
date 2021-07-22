@@ -38,11 +38,20 @@ If you find it lacking in any way, please consider [contributing an issue](https
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying ``LICENSE`` file for details.
+Non-experimental features should be considered stable (but an unquenchable thirst to increase performance remains).
+See the [release notes](https://posita.github.io/dyce/latest/notes) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
+
+## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/master/docs/dyce_powered.svg)](https://github.com/posita/dyce)
+
+* This could be _you_! 👋
+
+Do you have a project that uses ``dyce``?
+Let me know, and I’ll promote it here!
 
 ## A taste
 
-``dyce`` provides two key primitives.
+``dyce`` provides core key primitives.
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
 Both support a variety of operations.
@@ -125,7 +134,6 @@ var |    1.97
 
 ```python
 >>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.style.use("dark_background")  # doctest: +SKIP
 
 >>> outcomes, probabilities = p_2d6.h(0).distribution_xy()
 >>> matplotlib.pyplot.bar(
@@ -263,8 +271,8 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 * [cPython](https://www.python.org/) (3.8+)
 * [PyPy](http://pypy.org/) (Python 3.8+ compatible)
 
-``dyce`` will make use the following optional libraries at runtime, if installed:
+``dyce`` will opportunistically use the following, if available at runtime:
 
-* [``matplotlib``](https://matplotlib.org/)
+* [``matplotlib``](https://matplotlib.org/) for providing some (hopefully helpful) display conveniences
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib#hacking-quick-start) for additional development and testing dependencies.

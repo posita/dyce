@@ -108,7 +108,7 @@ except OSError:
 
 
 def coalesce_replace(h: H, outcome: OutcomeP) -> H:
-    """
+    r"""
     Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified
     (*outcome* is ignored).
     """
@@ -450,7 +450,7 @@ class H(_MappingT):
     def __iter__(self) -> Iterator[OutcomeP]:
         return iter(self._h)
 
-    def __add__(self, other: _OperandT) -> "H":
+    def __add__(self, other: _OperandT) -> H:
         try:
             if self and not other:
                 return self.map(op_add, 0)
@@ -461,13 +461,13 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __radd__(self, other: OutcomeP) -> "H":
+    def __radd__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_add, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __sub__(self, other: _OperandT) -> "H":
+    def __sub__(self, other: _OperandT) -> H:
         try:
             if self and not other:
                 return self.map(op_sub, 0)
@@ -478,25 +478,25 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rsub__(self, other: OutcomeP) -> "H":
+    def __rsub__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_sub, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __mul__(self, other: _OperandT) -> "H":
+    def __mul__(self, other: _OperandT) -> H:
         try:
             return self.map(op_mul, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rmul__(self, other: OutcomeP) -> "H":
+    def __rmul__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_mul, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __matmul__(self, other: SupportsInt) -> "H":
+    def __matmul__(self, other: SupportsInt) -> H:
         try:
             other = as_int(other)
         except TypeError:
@@ -507,58 +507,58 @@ class H(_MappingT):
         else:
             return sum(repeat(self, other), start=H({}))
 
-    def __rmatmul__(self, other: SupportsInt) -> "H":
+    def __rmatmul__(self, other: SupportsInt) -> H:
         return self.__matmul__(other)
 
-    def __truediv__(self, other: _OperandT) -> "H":
+    def __truediv__(self, other: _OperandT) -> H:
         try:
             return self.map(op_truediv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rtruediv__(self, other: OutcomeP) -> "H":
+    def __rtruediv__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_truediv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __floordiv__(self, other: _OperandT) -> "H":
+    def __floordiv__(self, other: _OperandT) -> H:
         try:
             return self.map(op_floordiv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rfloordiv__(self, other: OutcomeP) -> "H":
+    def __rfloordiv__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_floordiv, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __mod__(self, other: _OperandT) -> "H":
+    def __mod__(self, other: _OperandT) -> H:
         try:
             return self.map(op_mod, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rmod__(self, other: OutcomeP) -> "H":
+    def __rmod__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_mod, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __pow__(self, other: _OperandT) -> "H":
+    def __pow__(self, other: _OperandT) -> H:
         try:
             return self.map(op_pow, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __rpow__(self, other: OutcomeP) -> "H":
+    def __rpow__(self, other: OutcomeP) -> H:
         try:
             return self.rmap(op_pow, other)
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
+    def __and__(self, other: Union[SupportsInt, H, HAbleT]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -567,13 +567,13 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __rand__(self, other: SupportsInt) -> "H":
+    def __rand__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(op_and, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __xor__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
+    def __xor__(self, other: Union[SupportsInt, H, HAbleT]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -582,13 +582,13 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __rxor__(self, other: SupportsInt) -> "H":
+    def __rxor__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(op_xor, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __or__(self, other: Union[SupportsInt, "H", "HAbleT"]) -> "H":
+    def __or__(self, other: Union[SupportsInt, H, HAbleT]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -597,22 +597,22 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __ror__(self, other: SupportsInt) -> "H":
+    def __ror__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(op_or, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __neg__(self) -> "H":
+    def __neg__(self) -> H:
         return self.umap(op_neg)
 
-    def __pos__(self) -> "H":
+    def __pos__(self) -> H:
         return self.umap(op_pos)
 
-    def __abs__(self) -> "H":
+    def __abs__(self) -> H:
         return self.umap(op_abs)
 
-    def __invert__(self) -> "H":
+    def __invert__(self) -> H:
         return self.umap(op_invert)
 
     def counts(self) -> ValuesView[int]:
@@ -638,7 +638,7 @@ class H(_MappingT):
 
     # ---- Methods ---------------------------------------------------------------------
 
-    def map(self, oper: _BinaryOperatorT, other: _OperandT) -> "H":
+    def map(self, oper: _BinaryOperatorT, other: _OperandT) -> H:
         r"""
         Applies *oper* to each outcome of the histogram paired with *other*. Shorthands
         exist for many arithmetic operators and comparators.
@@ -677,10 +677,10 @@ class H(_MappingT):
         else:
             return H((oper(outcome, other), count) for outcome, count in self.items())
 
-    def rmap(self, oper: _BinaryOperatorT, other: OutcomeP) -> "H":
+    def rmap(self, oper: _BinaryOperatorT, other: OutcomeP) -> H:
         return H((oper(other, outcome), count) for outcome, count in self.items())
 
-    def umap(self, oper: _UnaryOperatorT) -> "H":
+    def umap(self, oper: _UnaryOperatorT) -> H:
         r"""
         Applies *oper* to each outcome of the histogram:
 
@@ -706,7 +706,7 @@ class H(_MappingT):
 
         return h
 
-    def lt(self, other: _OperandT) -> "H":
+    def lt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.lt, other)``:
 
@@ -720,7 +720,7 @@ class H(_MappingT):
         """
         return self.map(op_lt, other)
 
-    def le(self, other: _OperandT) -> "H":
+    def le(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.le, other)``.
 
@@ -734,7 +734,7 @@ class H(_MappingT):
         """
         return self.map(op_le, other)
 
-    def eq(self, other: _OperandT) -> "H":
+    def eq(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.eq, other)``.
 
@@ -748,7 +748,7 @@ class H(_MappingT):
         """
         return self.map(op_eq, other)
 
-    def ne(self, other: _OperandT) -> "H":
+    def ne(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.ne, other)``.
 
@@ -762,7 +762,7 @@ class H(_MappingT):
         """
         return self.map(op_ne, other)
 
-    def gt(self, other: _OperandT) -> "H":
+    def gt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.gt, other)``.
 
@@ -776,7 +776,7 @@ class H(_MappingT):
         """
         return self.map(op_gt, other)
 
-    def ge(self, other: _OperandT) -> "H":
+    def ge(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``self.map(operator.ge, other)``.
 
@@ -790,7 +790,7 @@ class H(_MappingT):
         """
         return self.map(op_ge, other)
 
-    def even(self) -> "H":
+    def even(self) -> H:
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 == 0)``.
 
@@ -808,7 +808,7 @@ class H(_MappingT):
 
         return self.umap(is_even)
 
-    def odd(self) -> "H":
+    def odd(self) -> H:
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 != 0)``.
 
@@ -826,7 +826,7 @@ class H(_MappingT):
 
         return self.umap(is_odd)
 
-    def accumulate(self, other: _SourceT) -> "H":
+    def accumulate(self, other: _SourceT) -> H:
         r"""
         Accumulates counts:
 
@@ -850,7 +850,7 @@ class H(_MappingT):
         n: SupportsInt,
         k: SupportsInt,
     ) -> int:
-        """
+        r"""
         !!! warning "Experimental"
 
             This method should be considered experimental and may disappear in future
@@ -877,7 +877,7 @@ class H(_MappingT):
 
         return comb(n, k) * c_outcome ** k * (c_total - c_outcome) ** (n - k)
 
-    def explode(self, max_depth: SupportsInt = 1) -> "H":
+    def explode(self, max_depth: SupportsInt = 1) -> H:
         r"""
         Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
         outcome, operator.add, max_depth)``.
@@ -896,7 +896,7 @@ class H(_MappingT):
             max_depth,
         )
 
-    def lowest_terms(self) -> "H":
+    def lowest_terms(self) -> H:
         r"""
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
 
@@ -919,8 +919,8 @@ class H(_MappingT):
         return H(self._lowest_terms())
 
     @experimental
-    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> "H":
-        """
+    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> H:
+        r"""
         !!! warning "Experimental"
 
             This method should be considered experimental and may disappear in future
@@ -931,8 +931,8 @@ class H(_MappingT):
         return self.order_stat_func_for_n(n)(pos)
 
     @experimental
-    def order_stat_func_for_n(self, n: SupportsInt) -> Callable[[SupportsInt], "H"]:
-        """
+    def order_stat_func_for_n(self, n: SupportsInt) -> Callable[[SupportsInt], H]:
+        r"""
         !!! warning "Experimental"
 
             This method should be considered experimental and may disappear in future
@@ -1007,7 +1007,7 @@ class H(_MappingT):
         expand: _ExpandT,
         coalesce: _CoalesceT = coalesce_replace,
         max_depth: SupportsInt = 1,
-    ) -> "H":
+    ) -> H:
         r"""
         Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*
         returns a number, it replaces the outcome. If it returns an
@@ -1198,7 +1198,7 @@ class H(_MappingT):
 
         return _substitute(self)
 
-    def vs(self, other: _OperandT) -> "H":
+    def vs(self, other: _OperandT) -> H:
         r"""
         Compares this histogram with *other*. -1 represents where *other* is greater. 0
         represents where they are equal. 1 represents where *other* is less.
@@ -1217,7 +1217,7 @@ class H(_MappingT):
         """
         return self.within(0, 0, other)
 
-    def within(self, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> "H":
+    def within(self, lo: OutcomeP, hi: OutcomeP, other: _OperandT = 0) -> H:
         r"""
         Computes the difference between this histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
@@ -1276,11 +1276,13 @@ class H(_MappingT):
     ) -> Iterator[Tuple[OutcomeP, _T]]:
         ...
 
+    @experimental
     def distribution(
         self,
         fill_items: _MappingT = None,
-        # See <https://github.com/python/mypy/issues/10854> for context on all the
-        # @overload work-around nonsense above
+        # TODO: See <https://github.com/python/mypy/issues/10854> for context on all the
+        # @overload work-around nonsense above and remove those once that issue is
+        # addressed.
         rational_t: _RationalP[_T] = Fraction,
     ) -> Iterator[Tuple[OutcomeP, _T]]:
         r"""
@@ -1306,6 +1308,11 @@ class H(_MappingT):
 
         ```
 
+        !!! warning "Experimental"
+
+            The *rational_t* argument to this method should be considered experimental
+            and may disappear in future versions.
+
         If provided, *rational_t* must be a callable that takes two ``int``s (a
         numerator and denominator) and returns an instance of a desired (but otherwise
         arbitrary) type:
@@ -1324,18 +1331,28 @@ class H(_MappingT):
 
         ```
 
-        Another way to accomplish something similar may be to leverage many number
-        implementations’ ability to convert from ``fractions.Fraction``s (e.g.,
-        [``sage.rings.rational.Rational``](https://doc.sagemath.org/html/en/reference/rings_standard/sage/rings/rational.html#sage.rings.rational.Rational),
-        [``sympy.core.numbers.Rational``](https://docs.sympy.org/latest/modules/core.html#rational)):
+        !!! tip
+
+            The arguments passed to *rational_t* are not reduced to the lowest terms.
+
+        The *rational_t* argument is a convenience. Iteration or comprehension can be
+        used to accomplish something similar:
+
+        ```python
+        >>> [(o, f"{p.numerator}/{p.denominator}") for o, p in (h).distribution()]
+        [(1, '1/8'), (2, '1/8'), (3, '1/4'), (4, '1/4'), (5, '1/8'), (6, '1/8')]
+
+        ```
+
+        Many number implementations can convert directly from ``fractions.Fraction``s:
 
         ```python
         >>> import sympy.abc
-        >>> [(o, sympy.Rational(c)) for o, c in (h + sympy.abc.x).distribution()]
+        >>> [(o, sympy.Rational(p)) for o, p in (h + sympy.abc.x).distribution()]
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
         >>> import sage.rings.rational  # doctest: +SKIP
-        >>> [(o, sage.rings.rational.Rational(c)) for o, c in h.distribution()]  # doctest: +SKIP
+        >>> [(o, sage.rings.rational.Rational(p)) for o, p in h.distribution()]  # doctest: +SKIP
         [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]
 
         ```
@@ -1503,7 +1520,7 @@ class H(_MappingT):
             return sep.join(lines())
 
     def mean(self) -> Union[float, OutcomeP]:
-        """
+        r"""
         Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
         """
         numerator = denominator = 0
@@ -1515,13 +1532,13 @@ class H(_MappingT):
         return numerator / (denominator or 1)
 
     def stdev(self, mu: Union[float, OutcomeP] = None) -> Union[float, OutcomeP]:
-        """
+        r"""
         Shorthand for ``math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
     def variance(self, mu: Union[float, OutcomeP] = None) -> Union[float, OutcomeP]:
-        """
+        r"""
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
         """
