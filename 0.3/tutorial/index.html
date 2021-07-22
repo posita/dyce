@@ -1,0 +1,1567 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for dice-based probabilities">
+      
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+        <link rel="canonical" href="https://posita.github.io/dyce/0.3/tutorial/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+    
+    
+      
+        <title>Tutorial - dyce</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3754935a.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#basic-examples" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tutorial
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Tutorial
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Tutorial
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-examples" class="md-nav__link">
+    Basic examples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualization" class="md-nav__link">
+    Visualization
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-exercise-modeling-risis" class="md-nav__link">
+    Advanced exercise – modeling Risis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-to-get-meta-evil-on-those-outcomes" class="md-nav__link">
+    Time to get meta-evil on those outcomes!
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-exploration" class="md-nav__link">
+    Further exploration
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translations/" class="md-nav__link">
+        Applications & translations
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" data-md-state="indeterminate" type="checkbox" id="__nav_4" checked>
+      
+      <label class="md-nav__link" for="__nav_4">
+        API
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.plt/" class="md-nav__link">
+        <tt>dyce.plt</tt>
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/posita/dyce/edit/master/docs/tutorial.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Tutorial</h1>
+                
+                <!--- -*- encoding: utf-8 -*-
+  Copyright and other protections apply. Please see the accompanying LICENSE file for
+  rights and restrictions governing use of this software. All rights not expressly
+  waived or licensed are reserved. If that file is missing or appears to be modified
+  from its original, then please contact the author before viewing or using this
+  software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+-->
+
+<h2 id="basic-examples">Basic examples</h2>
+<p><code>dyce</code> provides two key primitives:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+</code></pre></div>
+</td></tr></table>
+<p><a href="../dyce/#dyce.h.H"><code>H</code> objects</a> represent histograms for modeling discrete outcomes.
+They encode discrete probability distributions as integer counts without any denominator.
+<a href="../dyce/#dyce.p.P"><code>P</code> objects</a> represent pools (ordered sequences) of histograms.
+If all you need is aggregate outcomes (sums) from rolling a bunch of dice (or calculations on aggregate outcomes), <a href="../dyce/#dyce.h.H"><code>H</code> objects</a> are probably sufficient.
+If you need to <em>select</em> certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of <em>n</em> dice), that’s where <a href="../dyce/#dyce.p.P"><code>P</code> objects</a> come in.</p>
+<p>As a wise person whose name has been lost to history once said: “Language is imperfect. If at all possible, shut up and point.”
+So with that illuminating (or perhaps impenetrable) introduction out of the way, let’s dive into some examples!</p>
+<p>A six-sided die can be modeled as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><code>H(n)</code> is shorthand for explicitly enumerating outcomes <span class="arithmatex">\([{{1} .. {n}}]\)</span>, each with a frequency of 1:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">==</span> <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p>Tuples with repeating outcomes are accumulated.
+A six-sided “2, 3, 3, 4, 4, 5” die can be modeled as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>A fudge die can be modeled as:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Python’s matrix multiplication operator (<code>@</code>) is used to express the number of a particular die (roughly equivalent to the “<code>d</code>” operator in common notations). The outcomes of rolling two six-sided dice (<code>2d6</code>) are:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>A pool of two six-sided dice is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Where <code>n</code> is an integer, <code>P(n, ...)</code> is shorthand for <code>P(H(n), ...)</code>.
+The above can be expressed more succinctly:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Pools (in this case, <a href="https://en.wikipedia.org/wiki/Sicherman_dice">Sicherman dice</a>) can be compared to histograms:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d_sicherman</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d_sicherman</span> <span class="o">==</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p>Both histograms and pools support arithmetic operations.
+<code>3×(2d6+4)</code> is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>The results show there is one way to make <code>18</code>, two ways to make <code>21</code>, three ways to make <code>24</code>, etc.
+Histograms provide rudimentary formatting for convenience:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">2.42</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">5.83</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">11.11</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+  <span class="mi">6</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">7</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">8</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">9</span> <span class="o">|</span>  <span class="mf">11.11</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+ <span class="mi">12</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+</code></pre></div>
+</td></tr></table>
+<p>The <a href="https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative_frequency">Miwin-Distribution</a> is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">miwin_iii</span> <span class="o">=</span> <span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">miwin_iv</span> <span class="o">=</span> <span class="n">H</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">miwin_v</span> <span class="o">=</span> <span class="n">H</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">miwin_iii</span> <span class="o">+</span> <span class="n">miwin_iv</span> <span class="o">+</span> <span class="n">miwin_v</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">25</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">26</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="n">miwin_iii</span> <span class="o">+</span> <span class="n">miwin_iv</span> <span class="o">+</span> <span class="n">miwin_v</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>   <span class="mf">15.00</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">4.47</span>
+<span class="n">var</span> <span class="o">|</span>   <span class="mf">20.00</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+  <span class="mi">5</span> <span class="o">|</span>   <span class="mf">0.93</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">1.39</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+  <span class="mi">7</span> <span class="o">|</span>   <span class="mf">1.85</span><span class="o">%</span> <span class="o">|</span><span class="c1">##########</span>
+  <span class="mi">8</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################</span>
+  <span class="mi">9</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######################</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">4.63</span><span class="o">%</span> <span class="o">|</span><span class="c1">##########################</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">5.09</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################</span>
+ <span class="mi">12</span> <span class="o">|</span>   <span class="mf">7.87</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################################</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############################################</span>
+ <span class="mi">15</span> <span class="o">|</span>   <span class="mf">6.48</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################################</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############################################</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+ <span class="mi">18</span> <span class="o">|</span>   <span class="mf">7.87</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################################</span>
+ <span class="mi">19</span> <span class="o">|</span>   <span class="mf">5.09</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################</span>
+ <span class="mi">20</span> <span class="o">|</span>   <span class="mf">4.63</span><span class="o">%</span> <span class="o">|</span><span class="c1">##########################</span>
+ <span class="mi">21</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######################</span>
+ <span class="mi">22</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################</span>
+ <span class="mi">23</span> <span class="o">|</span>   <span class="mf">1.85</span><span class="o">%</span> <span class="o">|</span><span class="c1">##########</span>
+ <span class="mi">24</span> <span class="o">|</span>   <span class="mf">1.39</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+ <span class="mi">25</span> <span class="o">|</span>   <span class="mf">0.93</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">26</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+</code></pre></div>
+</td></tr></table>
+<p>One way to model the outcomes of subtracting the lesser of two six-sided dice from the greater is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Arithmetic operations implicitly “flatten” pools into histograms:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Histograms should be sufficient for most calculations.
+However, pools are useful for “taking” (selecting) only some of each roll’s outcomes.
+This is done by providing one or more index arguments to the <a href="../dyce/#dyce.p.P.h"><code>P.h</code> method</a> or the <a href="../dyce/#dyce.p.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
+Indexes can be integers, slices, or a mix thereof.
+Outcome indexes are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., <code>[0]</code>, <code>[1]</code>, …, <code>[-2]</code>, <code>[-1]</code>).
+Summing the least two faces when rolling three six-sided dice would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># see warning below about parentheses</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<div class="admonition tip">
+<p class="admonition-title">Mind your parentheses</p>
+<p>Parentheses are needed in the above example because <code>@</code> has a <a href="https://docs.python.org/3/reference/expressions.html#operator-precedence">lower precedence</a> than <code>.</code> and <code>[…]</code>.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># equivalent to 2@(P(6).h(1))</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<span class="o">...</span>
+<span class="ne">IndexError</span><span class="p">:</span> <span class="nb">tuple</span> <span class="n">index</span> <span class="n">out</span> <span class="n">of</span> <span class="nb">range</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+<p>Taking the least, middle, or greatest face when rolling three six-sided dice would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span> <span class="o">=</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.04</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.31</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">28.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">17.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">5</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">3.50</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.37</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.88</span>
+  <span class="mi">1</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">18.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">24.07</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">24.07</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">18.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">91</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.96</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.31</span>
+  <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">3.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">8.80</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">17.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">28.24</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############</span>
+  <span class="mi">6</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
+</code></pre></div>
+</td></tr></table>
+<p>Summing the greatest and the least faces when rolling a typical six-die polygonal set would be:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d10</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="p">;</span> <span class="n">d10</span>  <span class="c1"># a common “d10” with faces [0 .. 9]</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">d10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>   <span class="mf">13.48</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">4.40</span>
+<span class="n">var</span> <span class="o">|</span>   <span class="mf">19.39</span>
+  <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.00</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">0.01</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">0.30</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">5</span> <span class="o">|</span>   <span class="mf">0.92</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+  <span class="mi">6</span> <span class="o">|</span>   <span class="mf">2.03</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########</span>
+  <span class="mi">7</span> <span class="o">|</span>   <span class="mf">3.76</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################</span>
+  <span class="mi">8</span> <span class="o">|</span>   <span class="mf">5.57</span><span class="o">%</span> <span class="o">|</span><span class="c1">##############################</span>
+  <span class="mi">9</span> <span class="o">|</span>   <span class="mf">7.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########################################</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">8.99</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">8.47</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############################################</span>
+ <span class="mi">12</span> <span class="o">|</span>   <span class="mf">8.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">################################################</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">8.66</span><span class="o">%</span> <span class="o">|</span><span class="c1">################################################</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">6.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################################</span>
+ <span class="mi">15</span> <span class="o">|</span>   <span class="mf">5.62</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############################</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">5.16</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">5.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########################</span>
+ <span class="mi">18</span> <span class="o">|</span>   <span class="mf">5.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########################</span>
+ <span class="mi">19</span> <span class="o">|</span>   <span class="mf">5.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########################</span>
+ <span class="mi">20</span> <span class="o">|</span>   <span class="mf">5.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########################</span>
+ <span class="mi">21</span> <span class="o">|</span>   <span class="mf">4.50</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########################</span>
+ <span class="mi">22</span> <span class="o">|</span>   <span class="mf">2.01</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########</span>
+ <span class="mi">23</span> <span class="o">|</span>   <span class="mf">0.73</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
+ <span class="mi">24</span> <span class="o">|</span>   <span class="mf">0.18</span><span class="o">%</span> <span class="o">|</span>
+</code></pre></div>
+</td></tr></table>
+<p>Pools are ordered and iterable:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+</code></pre></div>
+</td></tr></table>
+<p>Indexing selects particular histograms into a new pool:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))[:</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))[::</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>A brute-force way to enumerate all possible rolls is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">P</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="p">[(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+</code></pre></div>
+</td></tr></table>
+<p>Both histograms and pools support various comparison operations as well as substitution.
+The odds of observing all even faces when rolling <span class="arithmatex">\(n\)</span> six-sided dice, for <span class="arithmatex">\(n\)</span> in <span class="arithmatex">\([1..6]\)</span> is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_even</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">even</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">number_of_evens_in_nd6</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@d6_even</span>
+<span class="o">...</span>   <span class="n">all_even</span> <span class="o">=</span> <span class="n">number_of_evens_in_nd6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;2}</span><span class="s2">d6: </span><span class="si">{: &gt;6.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">all_even</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">all_even</span><span class="o">.</span><span class="n">counts</span><span class="p">())))</span>
+ <span class="mi">6</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">1.56</span><span class="o">%</span>
+ <span class="mi">5</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">3.12</span><span class="o">%</span>
+ <span class="mi">4</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">6.25</span><span class="o">%</span>
+ <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="mf">12.50</span><span class="o">%</span>
+ <span class="mi">2</span><span class="n">d6</span><span class="p">:</span> <span class="mf">25.00</span><span class="o">%</span>
+ <span class="mi">1</span><span class="n">d6</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span>
+</code></pre></div>
+</td></tr></table>
+<p>The odds of scoring at least one nine or higher on any single die when rolling <span class="arithmatex">\(n\)</span> “<a href="../dyce/#dyce.h.H.explode">exploding</a>” six-sided dice, for <span class="arithmatex">\(n\)</span> in <span class="arithmatex">\([1..10]\)</span> is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">exploding_d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">d6e_ge_9</span> <span class="o">=</span> <span class="n">exploding_d6</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">number_of_nines_or_higher_in_nd6e</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@d6e_ge_9</span>
+<span class="o">...</span>   <span class="n">at_least_one_9</span> <span class="o">=</span> <span class="n">number_of_nines_or_higher_in_nd6e</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;2}</span><span class="s2">d6-exploding: </span><span class="si">{: &gt;6.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">at_least_one_9</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">at_least_one_9</span><span class="o">.</span><span class="n">counts</span><span class="p">())))</span>
+<span class="mi">10</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">69.21</span><span class="o">%</span>
+ <span class="mi">9</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">65.36</span><span class="o">%</span>
+ <span class="mi">8</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">61.03</span><span class="o">%</span>
+ <span class="mi">7</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">56.15</span><span class="o">%</span>
+ <span class="mi">6</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">50.67</span><span class="o">%</span>
+ <span class="mi">5</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">44.51</span><span class="o">%</span>
+ <span class="mi">4</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">37.57</span><span class="o">%</span>
+ <span class="mi">3</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">29.77</span><span class="o">%</span>
+ <span class="mi">2</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">20.99</span><span class="o">%</span>
+ <span class="mi">1</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">11.11</span><span class="o">%</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="visualization">Visualization</h2>
+<p><a href="../dyce/#dyce.h.H"><code>H</code> objects</a> provide a <a href="../dyce/#dyce.h.H.distribution"><code>distribution</code> method</a> and a <a href="../dyce/#dyce.h.H.distribution_xy"><code>distribution_xy</code> method</a> to ease integration with plotting packages like <a href="https://matplotlib.org/stable/api/index.html"><code>matplotlib</code></a>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="o">...</span>   <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outcomes</span><span class="p">],</span>
+<span class="o">...</span>   <span class="n">probabilities</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Distribution for 2d6&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Distribution for 2d6" src="../plot_histogram_light.png" />
+</picture></p>
+<p><a href="../dyce.plt/"><code>dyce.plt</code></a> provides some experimental, rudimentary conveniences if it detects that <code>matplotlib</code> is installed (e.g., via <a href="https://jupyter.org/">Jupyter</a>):</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.plt</span> <span class="kn">import</span> <span class="n">plot_burst</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_burst</span><span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Basic plot_burst example" src="../plot_burst_1_light.png" />
+</picture></p>
+<p>The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
+Overrides apply counter-clockwise, starting from the 12 o‘clock position:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d20</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_burst</span><span class="p">(</span><span class="n">d20</span><span class="p">,</span> <span class="n">outer</span><span class="o">=</span><span class="p">(</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;fail.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">14</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">19</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="o">...</span>   <span class="p">(</span><span class="s2">&quot;crit. succ.&quot;</span><span class="p">,</span> <span class="n">d20</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">20</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+<span class="o">...</span> <span class="p">),</span> <span class="n">inner_color</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Advanced plot_burst example" src="../plot_burst_2_light.png" />
+</picture></p>
+<p>The outer ring can also be used to compare two histograms directly.
+Ever been curious how your four shiny new fudge dice stack up against your trusty ol’ double six-siders?
+Well wonder no more!
+The <code>dyce</code> abides:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">df_4</span> <span class="o">=</span> <span class="mi">4</span><span class="nd">@H</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_2</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_burst</span><span class="p">(</span><span class="n">df_4</span><span class="p">,</span> <span class="n">d6_2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: plot_burst example (2d6 vs. d20)" src="../plot_burst_3_light.png" />
+</picture></p>
+<h2 id="advanced-exercise-modeling-risis">Advanced exercise – modeling <em>Risis</em></h2>
+<p><em><a href="http://risus.cumberlandgames.com/">Risus</a></em> and its many <a href="http://www.risusiverse.com/home/optional-rules">community-developed alternative rules</a> not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
+We can easily model its opposed combat system for various starting configurations through the first round:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">them</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">us</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">them</span><span class="p">,</span> <span class="n">them</span> <span class="o">+</span> <span class="mi">3</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">first_round</span> <span class="o">=</span> <span class="p">(</span><span class="n">us</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>  <span class="c1"># -1 is a loss, 0 is a tie, 1 is a win</span>
+<span class="o">...</span>     <span class="n">results</span> <span class="o">=</span> <span class="n">first_round</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">us</span><span class="si">}</span><span class="s2">d6 vs </span><span class="si">{</span><span class="n">them</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">---</span>
+<span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">45.36</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">9.28</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">45.36</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">19.17</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">6.55</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">74.28</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">6.07</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">2.99</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">90.93</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">45.95</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">8.09</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">45.95</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">22.04</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">6.15</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">71.81</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">8.34</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">3.26</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">88.40</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">46.37</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">7.27</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">46.37</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">24.24</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">5.79</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">69.96</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">7</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">10.36</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span>  <span class="mf">3.40</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">86.24</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Loss&quot;</span><span class="p">,</span> <span class="s2">&quot;Tie&quot;</span><span class="p">,</span> <span class="s2">&quot;Win&quot;</span><span class="p">]</span>  <span class="c1"># mapping from [-1, 0, 1], respectively</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">col_ticks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">num_rows</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">them</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">num_rows</span><span class="p">)):</span>
+<span class="o">...</span>   <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">row_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="o">...</span>   <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">us</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">them</span><span class="p">,</span> <span class="n">them</span> <span class="o">+</span> <span class="n">num_rows</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">row_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">d6 …&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">))</span>
+<span class="o">...</span>     <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">us</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>   <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;… vs </span><span class="si">{}</span><span class="s2">d6&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">them</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">col_ticks</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">row_names</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_names</span><span class="p">)):</span>
+<span class="o">...</span>     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)):</span>
+<span class="o">...</span>       <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+<span class="o">...</span>         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+<span class="o">...</span>         <span class="s2">&quot;</span><span class="si">{:.0%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]),</span>
+<span class="o">...</span>         <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+<span class="o">...</span>       <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<p>Calling <code>matplotlib.pyplot.show</code> presents:</p>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../plot_risus_first_round_light.png" />
+</picture></p>
+<p>With a little <del>elbow</del> <em>finger</em> grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">risus_combat_driver</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">us</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">them</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">us_vs_them_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">],</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="o">...</span>   <span class="k">if</span> <span class="n">us</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">them</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot have negative numbers (us: </span><span class="si">{}</span><span class="s2">, them: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">))</span>
+<span class="o">...</span>   <span class="k">if</span> <span class="n">us</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">them</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># should not happen unless combat(0, 0) is called from the start</span>
+<span class="o">...</span>   <span class="n">already_solved</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="o">...</span>
+<span class="o">...</span>   <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="n">us</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">them</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)</span> <span class="ow">in</span> <span class="n">already_solved</span><span class="p">:</span> <span class="k">return</span> <span class="n">already_solved</span><span class="p">[(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)]</span>
+<span class="o">...</span>     <span class="k">elif</span> <span class="n">us</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># we are out of dice, they win</span>
+<span class="o">...</span>     <span class="k">elif</span> <span class="n">them</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># they are out of dice, we win</span>
+<span class="o">...</span>     <span class="n">this_round</span> <span class="o">=</span> <span class="n">us_vs_them_func</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="o">...</span>     <span class="k">def</span> <span class="nf">_next_round</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="o">...</span>       <span class="k">if</span> <span class="n">outcome</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">us</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">them</span><span class="p">)</span>  <span class="c1"># we lost this round, and one die</span>
+<span class="o">...</span>       <span class="k">elif</span> <span class="n">outcome</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># they lost this round, and one die</span>
+<span class="o">...</span>       <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">H</span><span class="p">({})</span>  <span class="c1"># ignore (immediately reroll) all ties</span>
+<span class="o">...</span>
+<span class="o">...</span>     <span class="n">already_solved</span><span class="p">[(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)]</span> <span class="o">=</span> <span class="n">this_round</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">_next_round</span><span class="p">)</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">already_solved</span><span class="p">[(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)]</span>
+<span class="o">...</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">3</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">results</span> <span class="o">=</span> <span class="n">risus_combat_driver</span><span class="p">(</span>
+<span class="o">...</span>       <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span>
+<span class="o">...</span>       <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">u</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">t</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="o">...</span>     <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s2">d6 vs </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">---</span>
+<span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">10.50</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">89.50</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">0.66</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">99.34</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">12.25</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">87.75</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">1.07</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">98.93</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">13.66</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">86.34</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">7</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">5</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">1.49</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">98.51</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Using our <code>risus_combat_driver</code> from above, we can model the less death-spirally “Best of Set” alternative mechanic from <em><a href="https://ghalev.itch.io/risus-companion">The Risus Companion</a></em> with the optional “Goliath Rule”:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">deadly_combat_vs</span><span class="p">(</span><span class="n">us</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">them</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="o">...</span>   <span class="n">best_us</span> <span class="o">=</span> <span class="p">(</span><span class="n">us</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">best_them</span> <span class="o">=</span> <span class="p">(</span><span class="n">them</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">h</span> <span class="o">=</span> <span class="n">best_us</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">best_them</span><span class="p">)</span>
+<span class="o">...</span>   <span class="c1"># Goliath rule for resolving ties</span>
+<span class="o">...</span>   <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="p">(</span><span class="n">us</span> <span class="o">&lt;</span> <span class="n">them</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">us</span> <span class="o">&gt;</span> <span class="n">them</span><span class="p">)</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="n">h</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">3</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">results</span> <span class="o">=</span> <span class="n">risus_combat_driver</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">deadly_combat_vs</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s2">d6 vs </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">---</span>
+<span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">36.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">64.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">23.23</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">76.77</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">40.67</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">59.33</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">30.59</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">69.41</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Modeling the “<a href="http://www.risusiverse.com/home/optional-rules/evens-up">Evens Up</a>” alternative dice mechanic is currently beyond the capabilities of <code>dyce</code> without additional computation.
+This is for two reasons.
+First, <code>dyce</code> only provides mechanisms to approximate outcomes through a fixed number of iterations (not an infinite series).
+Most of the time, this is good enough.
+Second, with <a href="../dyce/#dyce.h.H.substitute">one narrow exception</a>, <code>dyce</code> only provides a mechanism to substitute outcomes, not counts.</p>
+<p>Both of these limitations can be circumvented where distributions can be computed and encoded as histograms.
+For this mechanic, we can observe that a single six-sided die (<code>1d6</code>) has a <span class="arithmatex">\(\frac{1}{2}\)</span> chance of coming up even, thereby earning a “success”.
+We can also observe that it has a <span class="arithmatex">\(\frac{1}{6}\)</span> chance of showing a six, earning an additional roll.
+That second roll has a <span class="arithmatex">\(\frac{1}{2}\)</span> chance of coming up even, as well as a <span class="arithmatex">\(\frac{1}{6}\)</span> chance of earning another roll, and so on.
+In other words, the number of successes you can expect to roll are:</p>
+<div class="arithmatex">\[
+\frac{1}{2}
++ \frac{1}{6} \left( \frac{1}{2}
+  + \frac{1}{6} \left( \frac{1}{2}
+    + \frac{1}{6} \left( \frac{1}{2}
+      + \ldots
+    \right)
+  \right)
+\right)
+\]</div>
+<p>Or, in the alternative:</p>
+<div class="arithmatex">\[
+\frac{1}{2}
++ \frac{1}{2}\frac{1}{6}
++ \frac{1}{2}\frac{1}{6}\frac{1}{6}
++ \frac{1}{2}\frac{1}{6}\frac{1}{6}\frac{1}{6}
++ \ldots
+\]</div>
+<p>Or simply:</p>
+<div class="arithmatex">\[
+\frac{1}{{2} \times {6}^{0}}
++ \frac{1}{{2} \times {6}^{1}}
++ \frac{1}{{2} \times {6}^{2}}
++ \frac{1}{{2} \times {6}^{3}}
++ \ldots
+\]</div>
+<p>So what is that? We probably don’t know unless we do math for a living, or at least as an active hobby.
+(The author does neither, which is partially what motivated the creation of this library.)
+Computing the value to the first hundred iterations offers a clue:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">6</span> <span class="o">**</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="mf">0.59999999999999975575093458246556110680103302001953125</span>
+</code></pre></div>
+</td></tr></table>
+<p>It appears convergent around <span class="arithmatex">\(\frac{3}{5}\)</span>.
+Let’s see if we can validate that.
+An <a href="https://www.mathsisfun.com/algebra/infinite-series.html">article from MathIsFun.com</a> provides useful guidance.
+The section on geometric series is easily adapted to our problem:</p>
+<div class="arithmatex">\[
+\begin{matrix}
+S
+&amp; = &amp;
+\frac{1}{{2} \times {6}^{0}}
++ \frac{1}{{2} \times {6}^{1}}
++ \frac{1}{{2} \times {6}^{2}}
++ \frac{1}{{2} \times {6}^{3}}
++ \frac{1}{{2} \times {6}^{4}}
++ \ldots \\
+&amp; = &amp;
+\overbrace{ \frac{1}{2} }
++ \underbrace{ \frac{1}{12} + \frac{1}{72} + \frac{1}{432} + \frac{1}{2\,592} + \ldots } \\
+\end{matrix}
+\]</div>
+<div class="arithmatex">\[
+\begin{matrix}
+\frac{1}{6}S
+&amp; = &amp;
+\frac{1}{6}\frac{1}{{2} \times {6}^{0}}
++ \frac{1}{6}\frac{1}{{2} \times {6}^{1}}
++ \frac{1}{6}\frac{1}{{2} \times {6}^{2}}
++ \frac{1}{6}\frac{1}{{2} \times {6}^{3}}
++ \ldots \\
+&amp; = &amp;
+\underbrace{ \frac{1}{12} + \frac{1}{72} + \frac{1}{432} + \frac{1}{2\,592} + \ldots } \\
+\end{matrix}
+\]</div>
+<div class="arithmatex">\[
+S = \overbrace{ \frac{1}{2} } + \underbrace{ \frac{1}{6}S }
+\]</div>
+<div class="arithmatex">\[
+S - \frac{1}{6}S = \frac{5}{6}S = \frac{1}{2}
+\]</div>
+<div class="arithmatex">\[
+S = \frac{6}{10} = \frac{3}{5}
+\]</div>
+<p>Well, butter my butt and call me a biscuit! Math really <em>is</em> fun! 🧈 🤠 🧮</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The Archimedean visualization technique mentioned in the <a href="https://www.mathsisfun.com/algebra/infinite-series.html">aforementioned article</a> also adapts well to this case.
+It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.</p>
+</div>
+<p>Armed with this knowledge, we can now model “Evens Up” using our <code>risus_combat_driver</code> from above:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_evens_exploding_on_six</span> <span class="o">=</span> <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>  <span class="c1"># 3 dubyas, 2 doughnuts</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">evens_up_vs</span><span class="p">(</span><span class="n">us</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">them</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">goliath</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="o">...</span>   <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">us</span><span class="nd">@d6_evens_exploding_on_six</span><span class="p">)</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span><span class="nd">@d6_evens_exploding_on_six</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">if</span> <span class="n">goliath</span><span class="p">:</span>
+<span class="o">...</span>     <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="p">(</span><span class="n">us</span> <span class="o">&lt;</span> <span class="n">them</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">us</span> <span class="o">&gt;</span> <span class="n">them</span><span class="p">)</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="n">h</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">3</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">results</span> <span class="o">=</span> <span class="n">risus_combat_driver</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">evens_up_vs</span><span class="p">,</span> <span class="n">goliath</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s2">d6 vs </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">---</span>
+<span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">27.49</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">72.51</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">9.27</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">90.73</span><span class="o">%</span><span class="p">}</span>
+<span class="o">---</span>
+<span class="mi">4</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">5</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">28.50</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">71.50</span><span class="o">%</span><span class="p">}</span>
+<span class="mi">6</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">4</span><span class="n">d6</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">10.50</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">89.50</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="time-to-get-meta-evil-on-those-outcomes">Time to get meta-evil on those outcomes!</h2>
+<p><code>dyce</code> offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sympy.abc</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6x</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d8y</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">y</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">P</span><span class="p">(</span><span class="n">d6x</span><span class="p">,</span> <span class="n">d8y</span><span class="p">,</span> <span class="n">d6x</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p><a href="https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260"><img alt="Love you, Doris!" src="../doris.png" /></a></p>
+<p>Be aware that performance can be quite slow, however.</p>
+<p><code>dyce</code> remains opinionated about ordering.
+For non-critical contexts, <code>dyce</code> will attempt a “natural” ordering based on the string representation of each outcome if relative values are indeterminate.
+This is to accommodate symbolic expressions whose relative values are often unknowable:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expr</span>
+<span class="n">x</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">bool</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>  <span class="c1"># nope</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">determine</span> <span class="n">truth</span> <span class="n">value</span> <span class="n">of</span> <span class="n">Relational</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d3x</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d3x2</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d3x</span> <span class="o">==</span> <span class="n">d3x2</span>  <span class="c1"># stll results in consistent ordering</span>
+<span class="kc">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">P</span><span class="p">(</span><span class="n">d3x</span><span class="p">,</span> <span class="n">d3x2</span><span class="p">)</span>
+<span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="mi">3</span> <span class="ow">in</span> <span class="n">d3x</span>
+<span class="kc">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">d3x</span>
+<span class="kc">False</span>
+</code></pre></div>
+</td></tr></table>
+<p>SymPy, for example, does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
+Instead, it relies on the caller to invoke its proprietary solver APIs:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">bool</span><span class="p">(</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">determine</span> <span class="n">truth</span> <span class="n">value</span> <span class="n">of</span> <span class="n">Relational</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sympy.solvers.inequalities</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">inequalities</span><span class="o">.</span><span class="n">reduce_inequalities</span><span class="p">(</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span><span class="p">])</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p><code>dyce</code>, of course, is happily ignorant of all that keenness.
+(As it should be.)
+In practice, that means that certain operations won’t work with symbolic expressions where correctness depends on ordering outcomes according to relative value (e.g., dice selection from pools).</p>
+<p>Flattening pools works:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">d3x</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">d3x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">d3x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Selecting the “lowest” die doesn’t:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">determine</span> <span class="n">truth</span> <span class="n">value</span> <span class="n">of</span> <span class="n">Relational</span>
+</code></pre></div>
+</td></tr></table>
+<p>Selecting all dice works, since it’s equivalent to flattening (no sorting is required):</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Enumerating rolls doesn’t, even where there is no selection, because each roll’s outcomes must be sorted least-to-greatest:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">())</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">determine</span> <span class="n">truth</span> <span class="n">value</span> <span class="n">of</span> <span class="n">Relational</span>
+</code></pre></div>
+</td></tr></table>
+<p><a href="../dyce/#dyce.p.P.roll"><code>P.roll</code></a> “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><a href="../dyce/#dyce.p.P.umap"><code>P.umap</code></a> can help pave the way back to concrete outcomes:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span><span class="p">:</span> <span class="n">sympy</span><span class="o">.</span><span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">4</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">7</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">7</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">9</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="further-exploration">Further exploration</h2>
+<p>Consider exploring the <a href="../translations/">applications and translations</a> for more examples, or jump right into the <a href="../dyce/#dyce">API</a>.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Introduction
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../translations/" class="md-footer__link md-footer__link--next" aria-label="Next: Applications &amp; translations" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Applications & translations
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.ddd52ceb.min.js"></script>
+      
+        <script src="../img_theme.js"></script>
+      
+        <script src="../mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
