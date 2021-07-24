@@ -33,8 +33,6 @@ from typing import (
     List,
     Optional,
     Sequence,
-    SupportsIndex,
-    SupportsInt,
     Tuple,
     TypeVar,
     Union,
@@ -43,7 +41,7 @@ from typing import (
 
 from .experimental import experimental
 from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
-from .numtypes import OutcomeP, as_int, sorted_outcomes
+from .numtypes import IndexT, IntT, OutcomeT, as_int, sorted_outcomes
 
 __all__ = ("P",)
 
@@ -52,9 +50,9 @@ __all__ = ("P",)
 
 
 _T = TypeVar("_T")
-_GetItemT = Union[SupportsIndex, slice]
-_OperandT = Union["P", OutcomeP]
-_RollT = Tuple[OutcomeP, ...]
+_GetItemT = Union[IndexT, slice]
+_OperandT = Union["P", OutcomeT]
+_RollT = Tuple[OutcomeT, ...]
 _RollCountT = Tuple[_RollT, int]
 
 
@@ -175,7 +173,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     # ---- Constructor -----------------------------------------------------------------
 
-    def __init__(self, *args: Union[SupportsInt, P, H]) -> None:
+    def __init__(self, *args: Union[IntT, P, H]) -> None:
         r"Initializer."
         super().__init__()
 
@@ -228,7 +226,7 @@ class P(Sequence[H], HAbleOpsMixin):
         return len(self._hs)
 
     @overload
-    def __getitem__(self, key: SupportsIndex) -> H:
+    def __getitem__(self, key: IndexT) -> H:
         ...
 
     @overload
@@ -244,7 +242,7 @@ class P(Sequence[H], HAbleOpsMixin):
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
 
-    def __matmul__(self, other: SupportsInt) -> P:
+    def __matmul__(self, other: IntT) -> P:
         try:
             other = as_int(other)
         except TypeError:
@@ -255,7 +253,7 @@ class P(Sequence[H], HAbleOpsMixin):
         else:
             return P(*chain.from_iterable(repeat(self, other)))
 
-    def __rmatmul__(self, other: SupportsInt) -> P:
+    def __rmatmul__(self, other: IntT) -> P:
         return self.__matmul__(other)
 
     def __neg__(self) -> P:
@@ -374,7 +372,7 @@ class P(Sequence[H], HAbleOpsMixin):
     # ---- Methods ---------------------------------------------------------------------
 
     @experimental
-    def appearances_in_rolls(self, outcome: OutcomeP) -> H:
+    def appearances_in_rolls(self, outcome: OutcomeT) -> H:
         r"""
         !!! warning "Experimental"
 
@@ -453,10 +451,10 @@ class P(Sequence[H], HAbleOpsMixin):
         1.93 s ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
         ```
         """
-        group_counters: List[Counter[OutcomeP]] = []
+        group_counters: List[Counter[OutcomeT]] = []
 
         for h, hs in groupby(self):
-            group_counter: Counter[OutcomeP] = counter()
+            group_counter: Counter[OutcomeT] = Counter()
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
@@ -842,7 +840,7 @@ def _rwc_heterogeneous_h_groups(
         # It's possible v is () if h_groups is empty; see
         # https://stackoverflow.com/questions/3154301/ for a detailed discussion
         if v:
-            rolls_by_group: Iterable[Iterable[OutcomeP]]
+            rolls_by_group: Iterable[Iterable[OutcomeT]]
             counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
@@ -855,7 +853,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     h: H,
     n: int,
     k: int,
-    fill: Optional[OutcomeP] = None,
+    fill: Optional[OutcomeT] = None,
 ) -> Iterator[_RollCountT]:
     r"""
     An memoized adaptation of [Ilmari Karonen’s

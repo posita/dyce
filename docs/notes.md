@@ -18,6 +18,7 @@
 ## 0.3.1 (pending)
 
 * Adds these release notes.
+* Boosts `isinstance` performance with `dyce`’s proprietary numeric `Protocol`s.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

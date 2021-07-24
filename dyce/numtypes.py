@@ -10,24 +10,35 @@
 from __future__ import annotations
 
 import re
-from abc import ABCMeta, abstractmethod
-from typing import (
-    Iterable,
-    List,
-    Protocol,
-    SupportsAbs,
-    SupportsFloat,
-    SupportsInt,
-    Tuple,
-    TypeVar,
-    Union,
-    runtime_checkable,
-)
+from abc import abstractmethod
+from collections.abc import Iterable
+from typing import Any, Dict, List, Protocol
+from typing import SupportsAbs as _SupportsAbs
+from typing import SupportsFloat as _SupportsFloat
+from typing import SupportsIndex as _SupportsIndex
+from typing import SupportsInt as _SupportsInt
+from typing import Tuple, TypeVar, Union, runtime_checkable
 
 __all__ = (
-    "OutcomeP",
+    "CachingProtocolMeta",
+    "AbsCs",
+    "AbsT",
+    "ArithmeticCs",
+    "ArithmeticT",
+    "BitwiseCs",
+    "BitwiseT",
+    "FloatCs",
+    "FloatT",
+    "IntCs",
+    "IntT",
+    "OutcomeCs",
+    "OutcomeT",
+    "SupportsAbs",
     "SupportsArithmetic",
     "SupportsBitwise",
+    "SupportsFloat",
+    "SupportsInt",
+    "SupportsOutcome",
     "as_int",
     "natural_key",
     "sorted_outcomes",
@@ -38,10 +49,117 @@ __all__ = (
 
 
 _T_co = TypeVar("_T_co", covariant=True)
+_ProtocolMeta: Any = type(Protocol)
+
+
+class CachingProtocolMeta(_ProtocolMeta):
+    """
+    Stand-in for ``Protocol``’s base class that caches results of ``__instancecheck__``,
+    (which is otherwise [really @#$%ing
+    expensive](https://github.com/python/mypy/issues/3186#issuecomment-885718629)). (At
+    the time this was introduced, it resulted in about a 5× performance increase for
+    unit tests.) The downside is that this will yield unpredictable results for objects
+    whose methods don’t stem from any type (e.g., are assembled at runtime). I don’t
+    know of any real-world case where that would be true. We’ll jump off that bridge
+    when we come to it.
+    """
+
+    def __new__(mcls, name, bases, namespace, **kwargs):
+        cls = super().__new__(mcls, name, bases, namespace, **kwargs)
+        # Prefixing this class member with "_abc_" is necessary to prevent it from being
+        # considered part of the Protocol. (See
+        # <https://github.com/python/cpython/blob/main/Lib/typing.py>.)
+        cls._abc_inst_check_cache: Dict[Tuple[type, type], bool] = {}
+
+        return cls
+
+    def __instancecheck__(self, inst):
+        inst_t = type(inst)
+
+        if (self, inst_t) not in self._abc_inst_check_cache:
+            self._abc_inst_check_cache[self, inst_t] = super().__instancecheck__(inst)
+
+        return self._abc_inst_check_cache[self, inst_t]
+
+
+def _assert_isinstance(*num_ts: type, target_t: type):
+    for num_t in num_ts:
+        assert isinstance(num_t, _SupportsInt)
+        assert isinstance(num_t(0), target_t)
 
 
 @runtime_checkable
-class SupportsArithmetic(Protocol[_T_co], metaclass=ABCMeta):
+class SupportsAbs(
+    _SupportsAbs[_T_co],
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    ...
+
+
+# For each Protocol herein, we also define a type annotation of the form "...T" and a
+# tuple of classes of the form "...Cs" such as that which follows. While theoretically
+# redundant, in practice these provide more efficient lookups for basic types:
+#
+#   def do_something(val: Union[str, AbsT]):
+#     if instance(val, AbsCs):  # <- fastest if val is an int, float, or bool
+#       ...
+#     ...
+#
+# Two entries are needed to accommodate the asymmetry between type annotations and
+# runtime-checkable instances.
+_assert_isinstance(int, float, bool, target_t=SupportsAbs)
+AbsT = Union[int, float, bool, SupportsAbs]
+AbsCs = (int, float, bool, SupportsAbs)
+
+
+@runtime_checkable
+class SupportsFloat(
+    _SupportsFloat,
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    ...
+
+
+_assert_isinstance(int, float, bool, target_t=SupportsFloat)
+FloatT = Union[int, float, bool, SupportsFloat]
+FloatCs = (int, float, bool, SupportsFloat)
+
+
+@runtime_checkable
+class SupportsInt(
+    _SupportsInt,
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    ...
+
+
+_assert_isinstance(int, float, bool, target_t=SupportsInt)
+IntT = Union[int, float, bool, SupportsInt]
+IntCs = (int, float, bool, SupportsInt)
+
+
+@runtime_checkable
+class SupportsIndex(
+    _SupportsIndex,
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    ...
+
+
+_assert_isinstance(int, bool, target_t=SupportsIndex)
+IndexT = Union[int, bool, SupportsIndex]
+IndexCs = (int, bool, SupportsIndex)
+
+
+@runtime_checkable
+class SupportsArithmetic(
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
     @abstractmethod
     def __lt__(self, other) -> bool:
         ...
@@ -123,30 +241,38 @@ class SupportsArithmetic(Protocol[_T_co], metaclass=ABCMeta):
         ...
 
 
+_assert_isinstance(int, float, bool, target_t=SupportsArithmetic)
+ArithmeticT = Union[int, float, bool, SupportsArithmetic]
+ArithmeticCs = (int, float, bool, SupportsArithmetic)
+
+
 @runtime_checkable
-class SupportsBitwise(Protocol[_T_co], metaclass=ABCMeta):
+class SupportsBitwise(
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
     @abstractmethod
-    def __and__(self, other: SupportsInt) -> _T_co:
+    def __and__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
-    def __rand__(self, other: SupportsInt) -> _T_co:
+    def __rand__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
-    def __xor__(self, other: SupportsInt) -> _T_co:
+    def __xor__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
-    def __rxor__(self, other: SupportsInt) -> _T_co:
+    def __rxor__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
-    def __or__(self, other: SupportsInt) -> _T_co:
+    def __or__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
-    def __ror__(self, other: SupportsInt) -> _T_co:
+    def __ror__(self, other: IntT) -> _T_co:
         ...
 
     @abstractmethod
@@ -154,13 +280,18 @@ class SupportsBitwise(Protocol[_T_co], metaclass=ABCMeta):
         ...
 
 
+_assert_isinstance(int, bool, target_t=SupportsBitwise)
+BitwiseT = Union[int, bool, SupportsBitwise]
+BitwiseCs = (int, bool, SupportsBitwise)
+
+
 @runtime_checkable
-class OutcomeP(
+class SupportsOutcome(
     SupportsAbs[_T_co],
     SupportsFloat,
     SupportsArithmetic[_T_co],
     Protocol[_T_co],
-    metaclass=ABCMeta,
+    metaclass=CachingProtocolMeta,
 ):
     # Must be able to instantiate it
     @abstractmethod
@@ -172,10 +303,15 @@ class OutcomeP(
         ...
 
 
+_assert_isinstance(int, float, bool, target_t=SupportsOutcome)
+OutcomeT = Union[int, float, bool, SupportsOutcome]
+OutcomeCs = (int, float, bool, SupportsOutcome)
+
+
 # ---- Functions -----------------------------------------------------------------------
 
 
-def as_int(val: SupportsInt) -> int:
+def as_int(val: IntT) -> int:
     r"""
     Helper function to losslessly coerce *val* into an ``int``. Raises
     ``TypeError`` if that cannot be done.
@@ -186,11 +322,11 @@ def as_int(val: SupportsInt) -> int:
     return int(val)
 
 
-def natural_key(val: OutcomeP) -> Tuple[Union[int, str], ...]:
+def natural_key(val: OutcomeT) -> Tuple[Union[int, str], ...]:
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
 
 
-def sorted_outcomes(vals: Iterable[OutcomeP]) -> List[OutcomeP]:
+def sorted_outcomes(vals: Iterable[OutcomeT]) -> List[OutcomeT]:
     vals = list(vals)
 
     try:

@@ -14,7 +14,7 @@ import operator
 from decimal import Decimal
 from fractions import Fraction
 
-from dyce.numtypes import OutcomeP, SupportsBitwise
+from dyce.numtypes import BitwiseCs, OutcomeCs
 
 from .numberwang import Numberwang, Wangernumb
 
@@ -36,39 +36,39 @@ except ImportError:
 
 
 def test_outcome_proto() -> None:
-    assert isinstance(-273.15, OutcomeP)
-    assert isinstance(-273, OutcomeP)
-    assert isinstance(Fraction(-27315, 100), OutcomeP)
-    assert isinstance(Decimal("-273.15"), OutcomeP)
-    assert isinstance(Wangernumb(-273.15), OutcomeP)
-    assert isinstance(Numberwang(-273), OutcomeP)
+    assert isinstance(-273.15, OutcomeCs)
+    assert isinstance(-273, OutcomeCs)
+    assert isinstance(Fraction(-27315, 100), OutcomeCs)
+    assert isinstance(Decimal("-273.15"), OutcomeCs)
+    assert isinstance(Wangernumb(-273.15), OutcomeCs)
+    assert isinstance(Numberwang(-273), OutcomeCs)
 
     if numpy is not None:
-        assert isinstance(numpy.float128(-273.15), OutcomeP)
-        assert isinstance(numpy.int64(-273), OutcomeP)
+        assert isinstance(numpy.float128(-273.15), OutcomeCs)
+        assert isinstance(numpy.int64(-273), OutcomeCs)
 
     if sympy is not None:
-        assert isinstance(sympy.Float(-273.15), OutcomeP)
-        assert isinstance(sympy.Rational(-27315, 100), OutcomeP)
-        assert isinstance(sympy.Integer(-273), OutcomeP)
-        assert isinstance(sympy.symbols("x"), OutcomeP)
+        assert isinstance(sympy.Float(-273.15), OutcomeCs)
+        assert isinstance(sympy.Rational(-27315, 100), OutcomeCs)
+        assert isinstance(sympy.Integer(-273), OutcomeCs)
+        assert isinstance(sympy.symbols("x"), OutcomeCs)
 
-    assert not isinstance("-273.15", OutcomeP)
+    assert not isinstance("-273.15", OutcomeCs)
 
 
 def test_supports_bitwise_proto() -> None:
-    assert isinstance(-273, SupportsBitwise)
-    assert isinstance(Numberwang(-273), SupportsBitwise)
+    assert isinstance(-273, BitwiseCs)
+    assert isinstance(Numberwang(-273), BitwiseCs)
 
     if numpy is not None:
-        assert isinstance(numpy.int64(-273), SupportsBitwise)
+        assert isinstance(numpy.int64(-273), BitwiseCs)
 
     # TODO: See <https://github.com/sympy/sympy/issues/19311>
     # if sympy is not None:
-    #     assert isinstance(sympy.Integer(-273), SupportsBitwise)
-    #     assert isinstance(sympy.symbols("x"), SupportsBitwise)
+    #     assert isinstance(sympy.Integer(-273), BitwiseCs)
+    #     assert isinstance(sympy.symbols("x"), BitwiseCs)
 
-    assert not isinstance("-273", SupportsBitwise)
+    assert not isinstance("-273", BitwiseCs)
 
 
 def test_numberwang() -> None:

@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch
 import pytest
 import sympy.abc
 
-from dyce import H, OutcomeP, P
+from dyce import H, OutcomeT, P
 from dyce.p import (
     _analyze_selection,
     _GetItemT,
@@ -526,7 +526,7 @@ class TestP:
         assert not P(2, -3).homogeneous
 
     def test_appearances_in_rolls(self) -> None:
-        def _sum_method(p: P, outcome: OutcomeP) -> H:
+        def _sum_method(p: P, outcome: OutcomeT) -> H:
             return H(
                 (sum(1 for v in roll if v == outcome), count)
                 for roll, count in p.rolls_with_counts()

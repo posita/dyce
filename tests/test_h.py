@@ -20,7 +20,7 @@ from typing import Union
 
 import pytest
 
-from dyce import H, OutcomeP
+from dyce import H, OutcomeT
 from dyce.h import _within
 
 from .numberwang import Numberwang, Wangernumb
@@ -343,7 +343,7 @@ class TestH:
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(h: H, outcome: OutcomeP) -> Union[H, OutcomeP]:
+        def double_odd_values(h: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -355,7 +355,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(d: H, outcome: OutcomeP) -> Union[H, OutcomeP]:
+        def never_expand(d: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
             return outcome
 
         d20 = H(20)
@@ -363,7 +363,7 @@ class TestH:
         assert d20.substitute(never_expand, operator.add, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, outcome: OutcomeP) -> Union[H, OutcomeP]:
+        def reroll_d4_threes(h: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
             return h if max(h) == 4 and outcome == 3 else outcome
 
         h = H(4)
