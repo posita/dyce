@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import os
 from collections import Counter as counter
-from collections.abc import Iterable as ABCIterable
-from collections.abc import Mapping as ABCMapping
+from collections.abc import Iterable as IterableC
+from collections.abc import Mapping as MappingC
 from fractions import Fraction
 from itertools import chain, product, repeat
 from math import sqrt
@@ -403,9 +403,9 @@ class H(_MappingT):
                     tmp.update({i: 1 for i in outcome_range})
         elif isinstance(items, HAbleT):
             tmp.update(items.h())
-        elif isinstance(items, ABCMapping):
+        elif isinstance(items, MappingC):
             tmp.update(items)
-        elif isinstance(items, ABCIterable):
+        elif isinstance(items, IterableC):
             # Items is either an Iterable[OutcomeT] or an Iterable[Tuple[OutcomeT,
             # IntT]] (although this technically supports Iterable[Union[OutcomeT,
             # Tuple[OutcomeT, IntT]]])
@@ -988,9 +988,9 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, ABCMapping):
+        if isinstance(other, MappingC):
             other = other.items()
-        elif not isinstance(other, ABCIterable):
+        elif not isinstance(other, IterableC):
             other = cast(Iterable[OutcomeT], (other,))
 
         return H(chain(self.items(), cast(Iterable, other)))

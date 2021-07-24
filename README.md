@@ -51,10 +51,12 @@ Let me know, and I’ll promote it here!
 
 ## A taste
 
-``dyce`` provides core key primitives.
+``dyce`` provides several core primitives.
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
-[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) objects represent pools (ordered sequences) of histograms.
-Both support a variety of operations.
+[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
+[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) represent nodes in arbitrary roller trees useful for translating from proprietary grammars.
+[``Roll`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.Roll) represent random rolls generated from roller trees.
+All support a variety of operations.
 
 ```python
 >>> from dyce import H
@@ -75,23 +77,6 @@ H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 >>> p_2d6 == 2@d6  # pools and histograms are comparable
 True
-
-```
-
-Each can generate random rolls as desired.
-
-```python
->>> d6 = H(6)
->>> d6.roll()  # doctest: +SKIP
-4
-
-```
-
-```python
->>> d10 = H(10) - 1
->>> p_6d10 = 6@P(d10)
->>> p_6d10.roll()  # doctest: +SKIP
-(0, 1, 2, 3, 5, 7)
 
 ```
 
@@ -161,6 +146,53 @@ var |    1.97
 
 <!-- Should match any title of the corresponding plot title -->
 ![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/master/docs/plot_2d6_lo_hi_gh.png)
+
+[``H`` objects][dyce.h.H] and [``P`` objects][dyce.p.P] can generate random rolls.
+
+```python
+>>> d6 = H(6)
+>>> d6.roll()  # doctest: +SKIP
+4
+
+```
+
+```python
+>>> d10 = H(10) - 1
+>>> p_6d10 = 6@P(d10)
+>>> p_6d10.roll()  # doctest: +SKIP
+(0, 1, 2, 3, 5, 7)
+
+```
+
+Where more transparency is required or where enumeration is prohibitive, [``R`` objects][dyce.r.R] can be used to construct arbitrary roller trees.
+Such trees can be used to generate [``Roll`` objects][dyce.r.Roll] objects, which “show their work”:
+
+```python
+>>> from dyce import R
+>>> r_d100 = 2@R.from_value(H(10) - 1)
+>>> r_d100.roll()  # doctest: +SKIP
+Roll(
+  r=RepeatRoller(
+      n=2,
+      child=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
+      annotation=None,
+    ),
+  values=(6, 9),
+  children=(
+    Roll(
+      r=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
+      values=(6,),
+      children=(),
+    ),
+    Roll(
+      r=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
+      values=(9,),
+      children=(),
+    ),
+  ),
+)
+
+```
 
 See the [tutorial](https://posita.github.io/dyce/latest/tutorial) and the [API guide](https://posita.github.io/dyce/latest/dyce) for a much more thorough treatment, including detailed examples.
 
