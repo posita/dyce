@@ -17,7 +17,6 @@ from typing import DefaultDict, Sequence, Tuple
 from unittest.mock import Mock, patch
 
 import pytest
-import sympy.abc
 
 from dyce import H, OutcomeT, P
 from dyce.p import (
@@ -62,8 +61,10 @@ class TestP:
         assert P(d6, p_d6) == p_2d6
 
     def test_init_symbols(self) -> None:
-        d6x = H(6) + sympy.abc.x
-        d8x = H(8) + sympy.abc.x
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d6x = H(6) + x
+        d8x = H(8) + x
         p_d6x_d8x = P(d8x, d6x)
         assert p_d6x_d8x == P(d6x, d8x)
         assert repr(p_d6x_d8x) == repr(P(d6x, d8x))
@@ -404,13 +405,13 @@ class TestP:
         assert P().h() == H({})
 
     def test_h_flatten_symbol(self) -> None:
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
         r_d6 = range(1, 7)
         r_d8 = range(1, 9)
-        d6x_d8x = H(
-            sum(v) + 2 * sympy.abc.x for v in itertools.product(r_d6, r_d8) if v
-        )
-        p_d6x = P(H(6) + sympy.abc.x)
-        p_d8x = P(H(8) + sympy.abc.x)
+        d6x_d8x = H(sum(v) + 2 * x for v in itertools.product(r_d6, r_d8) if v)
+        p_d6x = P(H(6) + x)
+        p_d8x = P(H(8) + x)
         p_d6x_d8x = P(p_d6x, p_d8x)
         assert p_d6x_d8x.h() == d6x_d8x
         assert p_d6x_d8x.h(slice(None)) == d6x_d8x
@@ -566,7 +567,9 @@ class TestP:
             assert all(v in d10 for v in roll)
 
     def test_roll_symbols(self) -> None:
-        d10x = H(10) + sympy.abc.x
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d10x = H(10) + x
         p_6d10x = 6 @ P(d10x)
 
         for _ in range(50):

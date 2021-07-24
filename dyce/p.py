@@ -42,6 +42,7 @@ from typing import (
 from .experimental import experimental
 from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
 from .numtypes import IndexT, IntT, OutcomeT, as_int, sorted_outcomes
+from .symmetries import sum_w_start
 
 __all__ = ("P",)
 
@@ -361,7 +362,7 @@ class P(Sequence[H], HAbleOpsMixin):
                 )
         else:
             # The caller offered no selection
-            return sum(self, start=H({}))
+            return sum_w_start(self, start=H({}))
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -464,7 +465,9 @@ class P(Sequence[H], HAbleOpsMixin):
 
             group_counters.append(group_counter)
 
-        return sum((H(group_counter) for group_counter in group_counters), start=H({}))
+        return sum_w_start(
+            (H(group_counter) for group_counter in group_counters), start=H({})
+        )
 
     def roll(self) -> _RollT:
         r"""

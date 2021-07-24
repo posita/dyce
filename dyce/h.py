@@ -15,7 +15,7 @@ from collections.abc import Iterable as ABCIterable
 from collections.abc import Mapping as ABCMapping
 from fractions import Fraction
 from itertools import chain, product, repeat
-from math import comb, sqrt
+from math import sqrt
 from operator import abs as op_abs
 from operator import add as op_add
 from operator import and_ as op_and
@@ -50,14 +50,12 @@ from typing import (
     List,
     Mapping,
     Optional,
-    Protocol,
     Tuple,
     TypeVar,
     Union,
     ValuesView,
     cast,
     overload,
-    runtime_checkable,
 )
 
 from .experimental import experimental
@@ -70,7 +68,7 @@ from .numtypes import (
     as_int,
     sorted_outcomes,
 )
-from .symmetries import gcd
+from .symmetries import Protocol, comb, gcd, runtime_checkable, sum_w_start
 
 __all__ = ("H",)
 
@@ -101,7 +99,7 @@ class _RationalP(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    def __call__(self, numerator: int, denominator: int, /) -> _T_co:
+    def __call__(self, numerator: int, denominator: int) -> _T_co:
         ...
 
 
@@ -518,7 +516,7 @@ class H(_MappingT):
         if other < 0:
             raise ValueError("argument cannot be negative")
         else:
-            return sum(repeat(self, other), start=H({}))
+            return sum_w_start(repeat(self, other), start=H({}))
 
     def __rmatmul__(self, other: IntT) -> H:
         return self.__matmul__(other)
@@ -1403,8 +1401,8 @@ class H(_MappingT):
         Many number implementations can convert directly from ``fractions.Fraction``s:
 
         ```python
-        >>> import sympy.abc
-        >>> [(o, sympy.Rational(p)) for o, p in (h + sympy.abc.x).distribution()]
+        >>> import sympy.abc  # doctest: +SKIP
+        >>> [(o, sympy.Rational(p)) for o, p in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
         >>> import sage.rings.rational  # doctest: +SKIP

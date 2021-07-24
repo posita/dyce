@@ -21,8 +21,6 @@ import sys
 import tempfile
 from typing import Dict, Iterable, Iterator, Mapping, TextIO
 
-import mypy.api
-
 # ---- Data ----------------------------------------------------------------------------
 
 
@@ -104,6 +102,8 @@ PARSER.add_argument(
 
 
 def main(*args: str) -> int:
+    import mypy.api
+
     parsed_args = PARSER.parse_args(args) if args else PARSER.parse_args()
     logging.getLogger().setLevel(parsed_args.log_level)
     dst_dir = tempfile.mkdtemp()

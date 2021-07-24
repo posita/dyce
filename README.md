@@ -268,8 +268,12 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 
 ``dyce`` requires a relatively modern version of Python:
 
-* [cPython](https://www.python.org/) (3.8+)
-* [PyPy](http://pypy.org/) (Python 3.8+ compatible)
+* [cPython](https://www.python.org/) (3.7+)
+* [PyPy](http://pypy.org/) (Python 3.7+ compatible)
+
+It has the following runtime dependencies:
+
+* [``typing-extensions``](https://pypi.org/project/typing-extensions/) (with Python versions <3.8)
 
 ``dyce`` will opportunistically use the following, if available at runtime:
 

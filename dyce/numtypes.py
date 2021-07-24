@@ -12,12 +12,14 @@ from __future__ import annotations
 import re
 from abc import abstractmethod
 from collections.abc import Iterable
-from typing import Any, Dict, List, Protocol
-from typing import SupportsAbs as _SupportsAbs
-from typing import SupportsFloat as _SupportsFloat
-from typing import SupportsIndex as _SupportsIndex
-from typing import SupportsInt as _SupportsInt
-from typing import Tuple, TypeVar, Union, runtime_checkable
+from typing import Any, Dict, List, Tuple, TypeVar, Union
+
+from .symmetries import Protocol
+from .symmetries import SupportsAbs as _SupportsAbs
+from .symmetries import SupportsFloat as _SupportsFloat
+from .symmetries import SupportsIndex as _SupportsIndex
+from .symmetries import SupportsInt as _SupportsInt
+from .symmetries import runtime_checkable
 
 __all__ = (
     "CachingProtocolMeta",
@@ -160,6 +162,8 @@ class SupportsArithmetic(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
+    __slots__ = ()
+
     @abstractmethod
     def __lt__(self, other) -> bool:
         ...
@@ -251,6 +255,8 @@ class SupportsBitwise(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
+    __slots__ = ()
+
     @abstractmethod
     def __and__(self, other: IntT) -> _T_co:
         ...
