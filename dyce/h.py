@@ -267,14 +267,14 @@ class H(_MappingT):
 
     ```
 
-    The [``counts`` method][dyce.h.H.counts] can be used to compute the total number of
+    The [``total`` property][dyce.h.H.total] can be used to compute the total number of
     combinations and each outcome’s probability:
 
     ```python
     >>> from fractions import Fraction
-    >>> total = sum((2@d6).counts()) ; total
+    >>> (2@d6).total
     36
-    >>> [(outcome, Fraction(count, total)) for outcome, count in (2@d6).items()]
+    >>> [(outcome, Fraction(count, (2@d6).total)) for outcome, count in (2@d6).items()]
     [(2, Fraction(1, 36)), (3, Fraction(1, 18)), (4, Fraction(1, 12)), (5, Fraction(1, 9)), (6, Fraction(5, 36)), (7, Fraction(1, 6)), ..., (12, Fraction(1, 36))]
 
     ```
@@ -424,6 +424,7 @@ class H(_MappingT):
             for outcome in sorted_outcomes(tmp)
             if tmp[outcome] != 0
         }
+        self._total = sum(tmp.values())
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -648,6 +649,26 @@ class H(_MappingT):
 
     def values(self) -> ValuesView[int]:
         return self._h.values()
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def total(self) -> int:
+        r"""
+        !!! warning "Experimental"
+
+            This propertyshould be considered experimental and may change or disappear
+            in future versions.
+
+        Equivalent to ``sum(self.counts())``, but calculated once in
+        [``H.__init__``][dyce.h.H.__init__].
+        """
+
+        @experimental
+        def _total():
+            return self._total
+
+        return _total()
 
     # ---- Methods ---------------------------------------------------------------------
 
@@ -953,9 +974,8 @@ class H(_MappingT):
         k = as_int(k)
         assert k <= n
         c_outcome = self.get(outcome, 0)
-        c_total = sum(self.counts())
 
-        return comb(n, k) * c_outcome ** k * (c_total - c_outcome) ** (n - k)
+        return comb(n, k) * c_outcome ** k * (self.total - c_outcome) ** (n - k)
 
     def explode(self, max_depth: IntT = 1) -> H:
         r"""
@@ -1123,9 +1143,9 @@ class H(_MappingT):
         >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
         >>> sub = orig.substitute(lambda h, outcome: -h if outcome == 4 else outcome) ; sub
         H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
-        >>> sum(count for outcome, count in orig.items() if outcome == 4) / sum(orig.counts())
+        >>> sum(count for outcome, count in orig.items() if outcome == 4) / orig.total
         0.4
-        >>> sum(count for outcome, count in sub.items() if outcome < 0) / sum(sub.counts())
+        >>> sum(count for outcome, count in sub.items() if outcome < 0) / sub.total
         0.4
 
         ```
@@ -1179,7 +1199,7 @@ class H(_MappingT):
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.__add__, max_depth=6)
         >>> h_even = h.is_even()
-        >>> print("{:.3%}".format(h_even[1] / sum(h_even.counts())))
+        >>> print("{:.3%}".format(h_even[1] / h_even.total))
         39.131%
 
         ```
@@ -1254,7 +1274,7 @@ class H(_MappingT):
                     # Coalesce the result
                     expanded = coalesce(expanded, outcome)
                     # Account for the impact of expansion on peers
-                    expanded_scalar = sum(expanded.counts())
+                    expanded_scalar = expanded.total
 
                     if expanded_scalar:
                         total_scalar *= expanded_scalar

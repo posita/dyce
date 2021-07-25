@@ -273,8 +273,8 @@ class P(Sequence[H], HAbleOpsMixin):
 
     def h(self, *which: _GetItemT) -> H:
         r"""
-        Roughly equivalent to ``H( (sum(roll), count) for roll, count in
-        self.rolls_with_counts(*which) )`` with some short-circuit optimizations.
+        Roughly equivalent to ``H((sum(roll), count) for roll, count in
+        self.rolls_with_counts(*which))`` with some short-circuit optimizations.
 
         When provided no arguments, ``h`` combines (or “flattens”) contained histograms in
         accordance with the [``HAbleT`` protocol][dyce.h.HAbleT]:
@@ -930,8 +930,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
             whole = k * tuple(h)
             yield whole, Fraction(1)
         else:
-            this_count = sum(h.counts())
-            this_total = this_count ** n
+            this_total = h.total ** n
 
             if from_upper:
                 this_outcome = max(h)
@@ -964,7 +963,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
                 else:
                     yield head, Fraction(1) - accounted_for_p
 
-    total_count = sum(h.counts()) ** n
+    total_count = h.total ** n
 
     for outcomes, count in _selected_distributions(h, n, k):
         count *= total_count
