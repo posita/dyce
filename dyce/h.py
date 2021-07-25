@@ -16,27 +16,29 @@ from collections.abc import Mapping as ABCMapping
 from fractions import Fraction
 from itertools import chain, product, repeat
 from math import sqrt
-from operator import abs as op_abs
-from operator import add as op_add
-from operator import and_ as op_and
-from operator import eq as op_eq
-from operator import floordiv as op_floordiv
-from operator import ge as op_ge
-from operator import getitem as op_getitem
-from operator import gt as op_gt
-from operator import invert as op_invert
-from operator import le as op_le
-from operator import lt as op_lt
-from operator import mod as op_mod
-from operator import mul as op_mul
-from operator import ne as op_ne
-from operator import neg as op_neg
-from operator import or_ as op_or
-from operator import pos as op_pos
-from operator import pow as op_pow
-from operator import sub as op_sub
-from operator import truediv as op_truediv
-from operator import xor as op_xor
+from operator import (
+    __abs__,
+    __add__,
+    __and__,
+    __eq__,
+    __floordiv__,
+    __ge__,
+    __getitem__,
+    __gt__,
+    __invert__,
+    __le__,
+    __lt__,
+    __mod__,
+    __mul__,
+    __ne__,
+    __neg__,
+    __or__,
+    __pos__,
+    __pow__,
+    __sub__,
+    __truediv__,
+    __xor__,
+)
 from random import choices
 from typing import (
     Any,
@@ -435,17 +437,17 @@ class H(_MappingT):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, HAbleT):
-            return op_eq(self, other.h())
+            return __eq__(self, other.h())
         elif isinstance(other, H):
-            return op_eq(self.lowest_terms()._h, other.lowest_terms()._h)
+            return __eq__(self.lowest_terms()._h, other.lowest_terms()._h)
         else:
             return super().__eq__(other)
 
     def __ne__(self, other) -> bool:
         if isinstance(other, HAbleT):
-            return op_ne(self, other.h())
+            return __ne__(self, other.h())
         elif isinstance(other, H):
-            return not op_eq(self, other)
+            return not __eq__(self, other)
         else:
             return super().__ne__(other)
 
@@ -456,7 +458,7 @@ class H(_MappingT):
         return len(self._h)
 
     def __getitem__(self, key: OutcomeT) -> int:
-        return op_getitem(self._h, key)
+        return __getitem__(self._h, key)
 
     def __iter__(self) -> Iterator[OutcomeT]:
         return iter(self._h)
@@ -464,46 +466,46 @@ class H(_MappingT):
     def __add__(self, other: _OperandT) -> H:
         try:
             if self and not other:
-                return self.map(op_add, 0)
+                return self.map(__add__, 0)
             elif not self and isinstance(other, (H, HAbleT)):
-                return op_add(0, other.h() if isinstance(other, HAbleT) else other)
+                return __add__(0, other.h() if isinstance(other, HAbleT) else other)
             else:
-                return self.map(op_add, other)
+                return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __radd__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_add, other)
+            return self.rmap(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __sub__(self, other: _OperandT) -> H:
         try:
             if self and not other:
-                return self.map(op_sub, 0)
+                return self.map(__sub__, 0)
             elif not self and isinstance(other, (H, HAbleT)):
-                return op_sub(0, other.h() if isinstance(other, HAbleT) else other)
+                return __sub__(0, other.h() if isinstance(other, HAbleT) else other)
             else:
-                return self.map(op_sub, other)
+                return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rsub__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_sub, other)
+            return self.rmap(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __mul__(self, other: _OperandT) -> H:
         try:
-            return self.map(op_mul, other)
+            return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rmul__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_mul, other)
+            return self.rmap(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
@@ -523,49 +525,49 @@ class H(_MappingT):
 
     def __truediv__(self, other: _OperandT) -> H:
         try:
-            return self.map(op_truediv, other)
+            return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rtruediv__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_truediv, other)
+            return self.rmap(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __floordiv__(self, other: _OperandT) -> H:
         try:
-            return self.map(op_floordiv, other)
+            return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rfloordiv__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_floordiv, other)
+            return self.rmap(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __mod__(self, other: _OperandT) -> H:
         try:
-            return self.map(op_mod, other)
+            return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rmod__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_mod, other)
+            return self.rmap(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __pow__(self, other: _OperandT) -> H:
         try:
-            return self.map(op_pow, other)
+            return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rpow__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(op_pow, other)
+            return self.rmap(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
@@ -574,13 +576,13 @@ class H(_MappingT):
             if isinstance(other, IntCs):
                 other = as_int(other)
 
-            return self.map(op_and, other)
+            return self.map(__and__, other)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     def __rand__(self, other: IntT) -> H:
         try:
-            return self.rmap(op_and, as_int(other))
+            return self.rmap(__and__, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
@@ -589,13 +591,13 @@ class H(_MappingT):
             if isinstance(other, IntCs):
                 other = as_int(other)
 
-            return self.map(op_xor, other)
+            return self.map(__xor__, other)
         except NotImplementedError:
             return NotImplemented
 
     def __rxor__(self, other: IntT) -> H:
         try:
-            return self.rmap(op_xor, as_int(other))
+            return self.rmap(__xor__, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
@@ -604,27 +606,27 @@ class H(_MappingT):
             if isinstance(other, IntCs):
                 other = as_int(other)
 
-            return self.map(op_or, other)
+            return self.map(__or__, other)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     def __ror__(self, other: IntT) -> H:
         try:
-            return self.rmap(op_or, as_int(other))
+            return self.rmap(__or__, as_int(other))
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     def __neg__(self) -> H:
-        return self.umap(op_neg)
+        return self.umap(__neg__)
 
     def __pos__(self) -> H:
-        return self.umap(op_pos)
+        return self.umap(__pos__)
 
     def __abs__(self) -> H:
-        return self.umap(op_abs)
+        return self.umap(__abs__)
 
     def __invert__(self) -> H:
-        return self.umap(op_invert)
+        return self.umap(__invert__)
 
     def counts(self) -> ValuesView[int]:
         r"""
@@ -662,25 +664,25 @@ class H(_MappingT):
         ```python
         >>> import operator
         >>> d6 = H(6)
-        >>> d6.map(operator.add, d6)
+        >>> d6.map(operator.__add__, d6)
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-        >>> d6.map(operator.add, d6) == d6 + d6
+        >>> d6.map(operator.__add__, d6) == d6 + d6
         True
 
         ```
 
         ```python
-        >>> d6.map(operator.mul, -1)
+        >>> d6.map(operator.__mul__, -1)
         H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-        >>> d6.map(operator.mul, -1) == d6 * -1
+        >>> d6.map(operator.__mul__, -1) == d6 * -1
         True
 
         ```
 
         ```python
-        >>> d6.map(operator.gt, 3)
+        >>> d6.map(operator.__gt__, 3)
         H({False: 3, True: 3})
-        >>> d6.map(operator.gt, 3) == d6.gt(3)
+        >>> d6.map(operator.__gt__, 3) == d6.gt(3)
         True
 
         ```
@@ -747,7 +749,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.lt, other, coerce=bool)``:
+        Shorthand for ``self.map(operator.__lt__, other, coerce=bool)``:
 
         ```python
         >>> H(6).lt(3)
@@ -757,14 +759,14 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_lt, other, coerce=bool)
+        return self.map(__lt__, other, coerce=bool)
 
     def le(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.le, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__le__, other, coerce=bool)``.
 
         ```python
         >>> H(6).le(3)
@@ -774,14 +776,14 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_le, other, coerce=bool)
+        return self.map(__le__, other, coerce=bool)
 
     def eq(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.eq, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__eq__, other, coerce=bool)``.
 
         ```python
         >>> H(6).eq(3)
@@ -791,14 +793,14 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_eq, other, coerce=bool)
+        return self.map(__eq__, other, coerce=bool)
 
     def ne(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.ne, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__ne__, other, coerce=bool)``.
 
         ```python
         >>> H(6).ne(3)
@@ -808,14 +810,14 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_ne, other, coerce=bool)
+        return self.map(__ne__, other, coerce=bool)
 
     def gt(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.gt, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__gt__, other, coerce=bool)``.
 
         ```python
         >>> H(6).gt(3)
@@ -825,14 +827,14 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_gt, other, coerce=bool)
+        return self.map(__gt__, other, coerce=bool)
 
     def ge(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.ge, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__ge__, other, coerce=bool)``.
 
         ```python
         >>> H(6).ge(3)
@@ -842,7 +844,7 @@ class H(_MappingT):
 
         See the [``map`` method][dyce.h.H.map].
         """
-        return self.map(op_ge, other, coerce=bool)
+        return self.map(__ge__, other, coerce=bool)
 
     def is_even(self) -> H:
         r"""
@@ -958,7 +960,7 @@ class H(_MappingT):
     def explode(self, max_depth: IntT = 1) -> H:
         r"""
         Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
-        outcome, operator.add, max_depth)``.
+        outcome, operator.__add__, max_depth)``.
 
         ```python
         >>> H(6).explode(max_depth=2)
@@ -970,7 +972,7 @@ class H(_MappingT):
         """
         return self.substitute(
             lambda h, outcome: h if outcome == max(h) else outcome,
-            op_add,
+            __add__,
             max_depth,
         )
 
@@ -1175,7 +1177,7 @@ class H(_MappingT):
         ...   return outcome
 
         >>> import operator
-        >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.add, max_depth=6)
+        >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.__add__, max_depth=6)
         >>> h_even = h.is_even()
         >>> print("{:.3%}".format(h_even[1] / sum(h_even.counts())))
         39.131%
@@ -1683,143 +1685,143 @@ class HAbleOpsMixin:
 
     def __add__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.add(self.h(), other)``. See the
+        Shorthand for ``operator.__add__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_add(self.h(), other)
+        return __add__(self.h(), other)
 
     def __radd__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.add(other, self.h())``. See the
+        Shorthand for ``operator.__add__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_add(other, self.h())
+        return __add__(other, self.h())
 
     def __sub__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.sub(self.h(), other)``. See the
+        Shorthand for ``operator.__sub__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_sub(self.h(), other)
+        return __sub__(self.h(), other)
 
     def __rsub__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.sub(other, self.h())``. See the
+        Shorthand for ``operator.__sub__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_sub(other, self.h())
+        return __sub__(other, self.h())
 
     def __mul__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.mul(self.h(), other)``. See the
+        Shorthand for ``operator.__mul__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_mul(self.h(), other)
+        return __mul__(self.h(), other)
 
     def __rmul__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.mul(other, self.h())``. See the
+        Shorthand for ``operator.__mul__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_mul(other, self.h())
+        return __mul__(other, self.h())
 
     def __truediv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.truediv(self.h(), other)``. See the
+        Shorthand for ``operator.__truediv__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_truediv(self.h(), other)
+        return __truediv__(self.h(), other)
 
     def __rtruediv__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.truediv(other, self.h())``. See the
+        Shorthand for ``operator.__truediv__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_truediv(other, self.h())
+        return __truediv__(other, self.h())
 
     def __floordiv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.floordiv(self.h(), other)``. See the
+        Shorthand for ``operator.__floordiv__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_floordiv(self.h(), other)
+        return __floordiv__(self.h(), other)
 
     def __rfloordiv__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.floordiv(other, self.h())``. See the
+        Shorthand for ``operator.__floordiv__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_floordiv(other, self.h())
+        return __floordiv__(other, self.h())
 
     def __mod__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.mod(self.h(), other)``. See the
+        Shorthand for ``operator.__mod__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_mod(self.h(), other)
+        return __mod__(self.h(), other)
 
     def __rmod__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.mod(other, self.h())``. See the
+        Shorthand for ``operator.__mod__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_mod(other, self.h())
+        return __mod__(other, self.h())
 
     def __pow__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.pow(self.h(), other)``. See the
+        Shorthand for ``operator.__pow__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_pow(self.h(), other)
+        return __pow__(self.h(), other)
 
     def __rpow__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.pow(other, self.h())``. See the
+        Shorthand for ``operator.__pow__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_pow(other, self.h())
+        return __pow__(other, self.h())
 
     def __and__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.and_(self.h(), other)``. See the
+        Shorthand for ``operator.__and__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_and(self.h(), other)
+        return __and__(self.h(), other)
 
     def __rand__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.and_(other, self.h())``. See the
+        Shorthand for ``operator.__and__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_and(other, self.h())
+        return __and__(other, self.h())
 
     def __xor__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.xor(self.h(), other)``. See the
+        Shorthand for ``operator.__xor__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_xor(self.h(), other)
+        return __xor__(self.h(), other)
 
     def __rxor__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.xor(other, self.h())``. See the
+        Shorthand for ``operator.__xor__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_xor(other, self.h())
+        return __xor__(other, self.h())
 
     def __or__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.or_(self.h(), other)``. See the
+        Shorthand for ``operator.__or__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_or(self.h(), other)
+        return __or__(self.h(), other)
 
     def __ror__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.or_(other, self.h())``. See the
+        Shorthand for ``operator.__or__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
-        return op_or(other, self.h())
+        return __or__(other, self.h())
 
     def lt(self: HAbleT, other: _OperandT) -> H:
         r"""

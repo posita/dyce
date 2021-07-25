@@ -357,7 +357,7 @@ class TestH:
 
         d20 = H(20)
         assert d20.substitute(never_expand) == d20
-        assert d20.substitute(never_expand, operator.add, 20) == d20
+        assert d20.substitute(never_expand, operator.__add__, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
         def reroll_d4_threes(h: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
@@ -365,10 +365,10 @@ class TestH:
 
         h = H(4)
         assert h.substitute(reroll_d4_threes) == H({4: 5, 3: 1, 2: 5, 1: 5})
-        assert h.substitute(reroll_d4_threes, operator.add) == H(
+        assert h.substitute(reroll_d4_threes, operator.__add__) == H(
             {7: 1, 6: 1, 5: 1, 4: 5, 2: 4, 1: 4}
         )
-        assert h.substitute(reroll_d4_threes, operator.mul, max_depth=2) == H(
+        assert h.substitute(reroll_d4_threes, operator.__mul__, max_depth=2) == H(
             {36: 1, 27: 1, 18: 1, 12: 4, 9: 1, 6: 4, 4: 16, 3: 4, 2: 16, 1: 16}
         )
 

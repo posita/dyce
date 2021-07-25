@@ -15,15 +15,17 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
-from operator import abs as op_abs
-from operator import eq as op_eq
-from operator import getitem as op_getitem
-from operator import index
-from operator import invert as op_invert
-from operator import mul as op_mul
-from operator import ne as op_ne
-from operator import neg as op_neg
-from operator import pos as op_pos
+from operator import (
+    __abs__,
+    __eq__,
+    __getitem__,
+    __invert__,
+    __mul__,
+    __ne__,
+    __neg__,
+    __pos__,
+    index,
+)
 from typing import (
     Callable,
     Counter,
@@ -213,13 +215,13 @@ class P(Sequence[H], HAbleOpsMixin):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, P):
-            return op_eq(self._hs, other._hs)
+            return __eq__(self._hs, other._hs)
         else:
             return NotImplemented
 
     def __ne__(self, other) -> bool:
         if isinstance(other, P):
-            return op_ne(self._hs, other._hs)
+            return __ne__(self._hs, other._hs)
         else:
             return NotImplemented
 
@@ -258,16 +260,16 @@ class P(Sequence[H], HAbleOpsMixin):
         return self.__matmul__(other)
 
     def __neg__(self) -> P:
-        return P(*(op_neg(h) for h in self))
+        return P(*(__neg__(h) for h in self))
 
     def __pos__(self) -> P:
-        return P(*(op_pos(h) for h in self))
+        return P(*(__pos__(h) for h in self))
 
     def __abs__(self) -> P:
-        return P(*(op_abs(h) for h in self))
+        return P(*(__abs__(h) for h in self))
 
     def __invert__(self) -> P:
-        return P(*(op_invert(h) for h in self))
+        return P(*(__invert__(h) for h in self))
 
     def h(self, *which: _GetItemT) -> H:
         r"""
@@ -808,9 +810,9 @@ def _analyze_selection(
 def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
     for key in keys:
         if isinstance(key, slice):
-            yield from op_getitem(sequence, key)
+            yield from __getitem__(sequence, key)
         else:
-            yield op_getitem(sequence, index(key))
+            yield __getitem__(sequence, index(key))
 
 
 def _rwc_heterogeneous_h_groups(
@@ -847,7 +849,7 @@ def _rwc_heterogeneous_h_groups(
             counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
-            total_count = reduce(op_mul, counts_by_group)
+            total_count = reduce(__mul__, counts_by_group)
 
             yield sorted_outcomes_for_roll, total_count
 
@@ -994,10 +996,10 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
 
     for sorted_outcomes_for_roll in rolls_iter:
         count_scalar = reduce(
-            op_mul, (h[outcome] for outcome in sorted_outcomes_for_roll)
+            __mul__, (h[outcome] for outcome in sorted_outcomes_for_roll)
         )
         multinomial_coefficient_denominator = reduce(
-            op_mul,
+            __mul__,
             (
                 factorial(sum(1 for _ in g))
                 for _, g in groupby(sorted_outcomes_for_roll)

@@ -1,28 +1,30 @@
 from decimal import Decimal
 from math import ceil, floor, trunc
 from numbers import Integral, Real
-from operator import abs as op_abs
-from operator import add as op_add
-from operator import and_ as op_and
-from operator import eq as op_eq
-from operator import floordiv as op_floordiv
-from operator import ge as op_ge
-from operator import gt as op_gt
-from operator import invert as op_invert
-from operator import le as op_le
-from operator import lshift as op_lshift
-from operator import lt as op_lt
-from operator import mod as op_mod
-from operator import mul as op_mul
-from operator import ne as op_ne
-from operator import neg as op_neg
-from operator import or_ as op_or
-from operator import pos as op_pos
-from operator import pow as op_pow
-from operator import rshift as op_rshift
-from operator import sub as op_sub
-from operator import truediv as op_truediv
-from operator import xor as op_xor
+from operator import (
+    __abs__,
+    __add__,
+    __and__,
+    __eq__,
+    __floordiv__,
+    __ge__,
+    __gt__,
+    __invert__,
+    __le__,
+    __lshift__,
+    __lt__,
+    __mod__,
+    __mul__,
+    __ne__,
+    __neg__,
+    __or__,
+    __pos__,
+    __pow__,
+    __rshift__,
+    __sub__,
+    __truediv__,
+    __xor__,
+)
 from typing import Union, overload
 
 __all__ = ("Numberwang", "Wangernumb")
@@ -46,22 +48,22 @@ class Numberwang(Integral):
         return f"{self.__class__.__name__}({self.val})"
 
     def __lt__(self, other) -> bool:
-        return op_lt(self.val, other)
+        return __lt__(self.val, other)
 
     def __le__(self, other) -> bool:
-        return op_le(self.val, other)
+        return __le__(self.val, other)
 
     def __eq__(self, other) -> bool:
-        return op_eq(self.val, other)
+        return __eq__(self.val, other)
 
     def __ne__(self, other) -> bool:
-        return op_ne(self.val, other)
+        return __ne__(self.val, other)
 
     def __ge__(self, other) -> bool:
-        return op_ge(self.val, other)
+        return __ge__(self.val, other)
 
     def __gt__(self, other) -> bool:
-        return op_gt(self.val, other)
+        return __gt__(self.val, other)
 
     def __hash__(self) -> int:
         return hash((self.__class__.__name__, self.val))
@@ -80,11 +82,11 @@ class Numberwang(Integral):
 
     def __add__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_add(self.val, other))
+            return Numberwang(__add__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_add(self.val, other))
+            return Wangernumb(__add__(self.val, other))
         else:
-            return op_add(self.val, other)
+            return __add__(self.val, other)
 
     @overload
     def __radd__(self, other: _IntegralT) -> Integral:
@@ -100,11 +102,11 @@ class Numberwang(Integral):
 
     def __radd__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_add(other, self.val))
+            return Numberwang(__add__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_add(other, self.val))
+            return Wangernumb(__add__(other, self.val))
         else:
-            return op_add(other, self.val)
+            return __add__(other, self.val)
 
     @overload
     def __sub__(self, other: _IntegralT) -> Integral:
@@ -120,11 +122,11 @@ class Numberwang(Integral):
 
     def __sub__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_sub(self.val, other))
+            return Numberwang(__sub__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_sub(self.val, other))
+            return Wangernumb(__sub__(self.val, other))
         else:
-            return op_sub(self.val, other)
+            return __sub__(self.val, other)
 
     @overload
     def __rsub__(self, other: _IntegralT) -> Integral:
@@ -140,11 +142,11 @@ class Numberwang(Integral):
 
     def __rsub__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_sub(other, self.val))
+            return Numberwang(__sub__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_sub(other, self.val))
+            return Wangernumb(__sub__(other, self.val))
         else:
-            return op_sub(other, self.val)
+            return __sub__(other, self.val)
 
     @overload
     def __mul__(self, other: _IntegralT) -> Integral:
@@ -160,11 +162,11 @@ class Numberwang(Integral):
 
     def __mul__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_mul(self.val, other))
+            return Numberwang(__mul__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mul(self.val, other))
+            return Wangernumb(__mul__(self.val, other))
         else:
-            return op_mul(self.val, other)
+            return __mul__(self.val, other)
 
     @overload
     def __rmul__(self, other: _IntegralT) -> Integral:
@@ -180,11 +182,11 @@ class Numberwang(Integral):
 
     def __rmul__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_mul(other, self.val))
+            return Numberwang(__mul__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mul(other, self.val))
+            return Wangernumb(__mul__(other, self.val))
         else:
-            return op_mul(other, self.val)
+            return __mul__(other, self.val)
 
     @overload
     def __truediv__(self, other: _RealT) -> Real:
@@ -196,9 +198,9 @@ class Numberwang(Integral):
 
     def __truediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
-            return Wangernumb(op_truediv(self.val, other))
+            return Wangernumb(__truediv__(self.val, other))
         else:
-            return op_truediv(self.val, other)
+            return __truediv__(self.val, other)
 
     @overload
     def __rtruediv__(self, other: _RealT) -> Real:
@@ -210,9 +212,9 @@ class Numberwang(Integral):
 
     def __rtruediv__(self, other):
         if isinstance(other, (float, Numberwang, Wangernumb, Real)):
-            return Wangernumb(op_truediv(other, self.val))
+            return Wangernumb(__truediv__(other, self.val))
         else:
-            return op_truediv(other, self.val)
+            return __truediv__(other, self.val)
 
     @overload  # type: ignore
     def __floordiv__(self, other: _IntegralT) -> Integral:
@@ -228,11 +230,11 @@ class Numberwang(Integral):
 
     def __floordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_floordiv(self.val, other))
+            return Numberwang(__floordiv__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_floordiv(self.val, other))
+            return Wangernumb(__floordiv__(self.val, other))
         else:
-            return op_floordiv(self.val, other)
+            return __floordiv__(self.val, other)
 
     @overload  # type: ignore
     def __rfloordiv__(self, other: _IntegralT) -> Integral:  # type: ignore
@@ -248,11 +250,11 @@ class Numberwang(Integral):
 
     def __rfloordiv__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_floordiv(other, self.val))
+            return Numberwang(__floordiv__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_floordiv(other, self.val))
+            return Wangernumb(__floordiv__(other, self.val))
         else:
-            return op_floordiv(other, self.val)
+            return __floordiv__(other, self.val)
 
     @overload
     def __mod__(self, other: _IntegralT) -> Integral:
@@ -268,11 +270,11 @@ class Numberwang(Integral):
 
     def __mod__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_mod(self.val, other))
+            return Numberwang(__mod__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mod(self.val, other))
+            return Wangernumb(__mod__(self.val, other))
         else:
-            return op_mod(self.val, other)
+            return __mod__(self.val, other)
 
     @overload
     def __rmod__(self, other: _IntegralT) -> Integral:
@@ -288,11 +290,11 @@ class Numberwang(Integral):
 
     def __rmod__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_mod(other, self.val))
+            return Numberwang(__mod__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mod(other, self.val))
+            return Wangernumb(__mod__(other, self.val))
         else:
-            return op_mod(other, self.val)
+            return __mod__(other, self.val)
 
     @overload  # type: ignore
     def __pow__(self, other: _IntegralT) -> Integral:
@@ -308,11 +310,11 @@ class Numberwang(Integral):
 
     def __pow__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_pow(self.val, other))
+            return Numberwang(__pow__(self.val, other))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_pow(self.val, other))
+            return Wangernumb(__pow__(self.val, other))
         else:
-            return op_pow(self.val, other)
+            return __pow__(self.val, other)
 
     @overload
     def __rpow__(self, other: _IntegralT) -> Integral:
@@ -328,103 +330,103 @@ class Numberwang(Integral):
 
     def __rpow__(self, other):
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_pow(other, self.val))
+            return Numberwang(__pow__(other, self.val))
         elif isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_pow(other, self.val))
+            return Wangernumb(__pow__(other, self.val))
         else:
-            return op_pow(other, self.val)
+            return __pow__(other, self.val)
 
     def __lshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_lshift(self.val, other))
+            return Numberwang(__lshift__(self.val, other))
         elif isinstance(other, Integral):
-            return op_lshift(self.val, other)
+            return __lshift__(self.val, other)
         else:
             return NotImplemented
 
     def __rlshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_lshift(other, self.val))
+            return Numberwang(__lshift__(other, self.val))
         elif isinstance(other, Integral):
-            return op_lshift(other, self.val)
+            return __lshift__(other, self.val)
         else:
             return NotImplemented
 
     def __rshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_rshift(self.val, other))
+            return Numberwang(__rshift__(self.val, other))
         elif isinstance(other, Integral):
-            return op_rshift(self.val, other)
+            return __rshift__(self.val, other)
         else:
             return NotImplemented
 
     def __rrshift__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_rshift(other, self.val))
+            return Numberwang(__rshift__(other, self.val))
         elif isinstance(other, Integral):
-            return op_rshift(other, self.val)
+            return __rshift__(other, self.val)
         else:
             return NotImplemented
 
     def __and__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_and(self.val, other))
+            return Numberwang(__and__(self.val, other))
         elif isinstance(other, Integral):
-            return op_and(self.val, other)
+            return __and__(self.val, other)
         else:
             return NotImplemented
 
     def __rand__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_and(other, self.val))
+            return Numberwang(__and__(other, self.val))
         elif isinstance(other, Integral):
-            return op_and(other, self.val)
+            return __and__(other, self.val)
         else:
             return NotImplemented
 
     def __xor__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_xor(self.val, other))
+            return Numberwang(__xor__(self.val, other))
         elif isinstance(other, Integral):
-            return op_xor(self.val, other)
+            return __xor__(self.val, other)
         else:
             return NotImplemented
 
     def __rxor__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_xor(other, self.val))
+            return Numberwang(__xor__(other, self.val))
         elif isinstance(other, Integral):
-            return op_xor(other, self.val)
+            return __xor__(other, self.val)
         else:
             return NotImplemented
 
     def __or__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_or(self.val, other))
+            return Numberwang(__or__(self.val, other))
         elif isinstance(other, Integral):
-            return op_or(self.val, other)
+            return __or__(self.val, other)
         else:
             return NotImplemented
 
     def __ror__(self, other) -> Integral:
         if isinstance(other, (int, Numberwang)):
-            return Numberwang(op_or(other, self.val))
+            return Numberwang(__or__(other, self.val))
         elif isinstance(other, Integral):
-            return op_or(other, self.val)
+            return __or__(other, self.val)
         else:
             return NotImplemented
 
     def __neg__(self) -> "Numberwang":
-        return Numberwang(op_neg(self.val))
+        return Numberwang(__neg__(self.val))
 
     def __pos__(self) -> "Numberwang":
-        return Numberwang(op_pos(self.val))
+        return Numberwang(__pos__(self.val))
 
     def __abs__(self) -> "Numberwang":
-        return Numberwang(op_abs(self.val))
+        return Numberwang(__abs__(self.val))
 
     def __invert__(self) -> "Numberwang":
-        return Numberwang(op_invert(self.val))
+        return Numberwang(__invert__(self.val))
 
     def __int__(self) -> int:
         return self.val
@@ -458,22 +460,22 @@ class Wangernumb(Real):
         return f"{self.__class__.__name__}({self.val})"
 
     def __lt__(self, other) -> bool:
-        return op_lt(self.val, other)
+        return __lt__(self.val, other)
 
     def __le__(self, other) -> bool:
-        return op_le(self.val, other)
+        return __le__(self.val, other)
 
     def __eq__(self, other) -> bool:
-        return op_eq(self.val, other)
+        return __eq__(self.val, other)
 
     def __ne__(self, other) -> bool:
-        return op_ne(self.val, other)
+        return __ne__(self.val, other)
 
     def __ge__(self, other) -> bool:
-        return op_ge(self.val, other)
+        return __ge__(self.val, other)
 
     def __gt__(self, other) -> bool:
-        return op_gt(self.val, other)
+        return __gt__(self.val, other)
 
     def __hash__(self) -> int:
         return hash(self.val)
@@ -488,9 +490,9 @@ class Wangernumb(Real):
 
     def __add__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_add(self.val, other))
+            return Wangernumb(__add__(self.val, other))
         else:
-            return op_add(self.val, other)
+            return __add__(self.val, other)
 
     @overload
     def __radd__(self, other: _RealT) -> Real:
@@ -502,9 +504,9 @@ class Wangernumb(Real):
 
     def __radd__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_add(other, self.val))
+            return Wangernumb(__add__(other, self.val))
         else:
-            return op_add(other, self.val)
+            return __add__(other, self.val)
 
     @overload
     def __sub__(self, other: _RealT) -> Real:
@@ -516,9 +518,9 @@ class Wangernumb(Real):
 
     def __sub__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_sub(self.val, other))
+            return Wangernumb(__sub__(self.val, other))
         else:
-            return op_sub(self.val, other)
+            return __sub__(self.val, other)
 
     @overload
     def __rsub__(self, other: _RealT) -> Real:
@@ -530,9 +532,9 @@ class Wangernumb(Real):
 
     def __rsub__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_sub(other, self.val))
+            return Wangernumb(__sub__(other, self.val))
         else:
-            return op_sub(other, self.val)
+            return __sub__(other, self.val)
 
     @overload
     def __mul__(self, other: _RealT) -> Real:
@@ -544,9 +546,9 @@ class Wangernumb(Real):
 
     def __mul__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mul(self.val, other))
+            return Wangernumb(__mul__(self.val, other))
         else:
-            return op_mul(self.val, other)
+            return __mul__(self.val, other)
 
     @overload
     def __rmul__(self, other: _RealT) -> Real:
@@ -558,9 +560,9 @@ class Wangernumb(Real):
 
     def __rmul__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mul(other, self.val))
+            return Wangernumb(__mul__(other, self.val))
         else:
-            return op_mul(other, self.val)
+            return __mul__(other, self.val)
 
     @overload
     def __truediv__(self, other: _RealT) -> Real:
@@ -572,9 +574,9 @@ class Wangernumb(Real):
 
     def __truediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_truediv(self.val, other))
+            return Wangernumb(__truediv__(self.val, other))
         else:
-            return op_truediv(self.val, other)
+            return __truediv__(self.val, other)
 
     @overload
     def __rtruediv__(self, other: _RealT) -> Real:
@@ -586,9 +588,9 @@ class Wangernumb(Real):
 
     def __rtruediv__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_truediv(other, self.val))
+            return Wangernumb(__truediv__(other, self.val))
         else:
-            return op_truediv(other, self.val)
+            return __truediv__(other, self.val)
 
     @overload  # type: ignore
     def __floordiv__(self, other: _RealT) -> Real:
@@ -600,9 +602,9 @@ class Wangernumb(Real):
 
     def __floordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_floordiv(self.val, other))
+            return Wangernumb(__floordiv__(self.val, other))
         else:
-            return op_floordiv(self.val, other)
+            return __floordiv__(self.val, other)
 
     @overload  # type: ignore
     def __rfloordiv__(self, other: _RealT) -> Real:  # type: ignore
@@ -614,9 +616,9 @@ class Wangernumb(Real):
 
     def __rfloordiv__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_floordiv(other, self.val))
+            return Wangernumb(__floordiv__(other, self.val))
         else:
-            return op_floordiv(other, self.val)
+            return __floordiv__(other, self.val)
 
     @overload
     def __mod__(self, other: _RealT) -> Real:
@@ -628,9 +630,9 @@ class Wangernumb(Real):
 
     def __mod__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mod(self.val, other))
+            return Wangernumb(__mod__(self.val, other))
         else:
-            return op_mod(self.val, other)
+            return __mod__(self.val, other)
 
     @overload
     def __rmod__(self, other: _RealT) -> Real:
@@ -642,9 +644,9 @@ class Wangernumb(Real):
 
     def __rmod__(self, other):
         if isinstance(other, (float, Wangernumb)):
-            return Wangernumb(op_mod(other, self.val))
+            return Wangernumb(__mod__(other, self.val))
         else:
-            return op_mod(other, self.val)
+            return __mod__(other, self.val)
 
     @overload
     def __pow__(self, other: _RealT) -> Real:
@@ -655,7 +657,7 @@ class Wangernumb(Real):
         ...
 
     def __pow__(self, other):
-        val = op_pow(self.val, other)
+        val = __pow__(self.val, other)
 
         if isinstance(val, Real):
             return Wangernumb(val)
@@ -671,7 +673,7 @@ class Wangernumb(Real):
         ...
 
     def __rpow__(self, other):
-        val = op_pow(other, self.val)
+        val = __pow__(other, self.val)
 
         if isinstance(val, Real):
             return Wangernumb(val)
@@ -679,13 +681,13 @@ class Wangernumb(Real):
             return val
 
     def __neg__(self) -> Real:
-        return Wangernumb(op_neg(self.val))
+        return Wangernumb(__neg__(self.val))
 
     def __pos__(self) -> Real:
-        return Wangernumb(op_pos(self.val))
+        return Wangernumb(__pos__(self.val))
 
     def __abs__(self) -> Real:
-        return Wangernumb(op_abs(self.val))
+        return Wangernumb(__abs__(self.val))
 
     def __float__(self) -> float:
         return self.val

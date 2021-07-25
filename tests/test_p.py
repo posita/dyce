@@ -739,11 +739,11 @@ def test_analyze_selection() -> None:
 def _brute_force_combinations_with_counts(hs: Sequence[H], key: slice):
     # Generate combinations naively, via Cartesian product, which is much less
     # efficient, but also much easier to read and reason about
-    if len(operator.getitem(hs, key)) > 0:
+    if len(operator.__getitem__(hs, key)) > 0:
         for rolls in itertools.product(*(h.items() for h in hs)):
             outcomes, counts = tuple(zip(*rolls))
-            sliced_outcomes = tuple(operator.getitem(sorted(outcomes), key))
-            count = functools.reduce(operator.mul, counts)
+            sliced_outcomes = tuple(operator.__getitem__(sorted(outcomes), key))
+            count = functools.reduce(operator.__mul__, counts)
             yield sliced_outcomes, count
 
 

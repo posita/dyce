@@ -73,24 +73,24 @@ def test_supports_bitwise_proto() -> None:
 
 def test_numberwang() -> None:
     for binop in (
-        operator.add,
-        operator.and_,
-        operator.eq,
-        operator.floordiv,
-        operator.ge,
-        operator.gt,
-        operator.le,
-        operator.lshift,
-        operator.lt,
-        operator.mod,
-        operator.mul,
-        operator.ne,
-        operator.or_,
-        operator.pow,
-        operator.rshift,
-        operator.sub,
-        operator.truediv,
-        operator.xor,
+        operator.__add__,
+        operator.__and__,
+        operator.__eq__,
+        operator.__floordiv__,
+        operator.__ge__,
+        operator.__gt__,
+        operator.__le__,
+        operator.__lshift__,
+        operator.__lt__,
+        operator.__mod__,
+        operator.__mul__,
+        operator.__ne__,
+        operator.__or__,
+        operator.__pow__,
+        operator.__rshift__,
+        operator.__sub__,
+        operator.__truediv__,
+        operator.__xor__,
     ):
         assert binop(Numberwang(-273), Numberwang(42)) == binop(
             -273, 42
@@ -104,30 +104,30 @@ def test_numberwang() -> None:
         math.ceil,
         math.floor,
         math.trunc,
-        operator.abs,
-        operator.index,
-        operator.invert,
-        operator.neg,
-        operator.pos,
+        operator.__abs__,
+        operator.__index__,
+        operator.__invert__,
+        operator.__neg__,
+        operator.__pos__,
     ):
         assert unop(Numberwang(-273)) == unop(-273), "op: {}".format(unop)  # type: ignore
 
 
 def test_wangernum() -> None:
     for binop in (
-        operator.add,
-        operator.eq,
-        operator.floordiv,
-        operator.ge,
-        operator.gt,
-        operator.le,
-        operator.lt,
-        operator.mod,
-        operator.mul,
-        operator.ne,
-        operator.pow,
-        operator.sub,
-        operator.truediv,
+        operator.__add__,
+        operator.__eq__,
+        operator.__floordiv__,
+        operator.__ge__,
+        operator.__gt__,
+        operator.__le__,
+        operator.__lt__,
+        operator.__mod__,
+        operator.__mul__,
+        operator.__ne__,
+        operator.__pow__,
+        operator.__sub__,
+        operator.__truediv__,
     ):
         assert binop(Wangernumb(-273.15), Wangernumb(1.618)) == binop(
             -273.15, 1.618
@@ -141,8 +141,8 @@ def test_wangernum() -> None:
         math.ceil,
         math.floor,
         math.trunc,
-        operator.abs,
-        operator.neg,
-        operator.pos,
+        operator.__abs__,
+        operator.__neg__,
+        operator.__pos__,
     ):
         assert unop(Wangernumb(-273.15)) == unop(-273.15), "op: {}".format(unop)  # type: ignore
