@@ -335,7 +335,7 @@ Both histograms and pools support various comparison operations as well as subst
 The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in $[1..6]$ is:
 
 ```python
->>> d6_even = H(6).even()
+>>> d6_even = H(6).is_even()
 >>> for n in range(6, 0, -1):
 ...   number_of_evens_in_nd6 = n@d6_even
 ...   all_even = number_of_evens_in_nd6.eq(n)
@@ -753,8 +753,7 @@ For non-critical contexts, ``dyce`` will attempt a “natural” ordering based 
 This is to accommodate symbolic expressions whose relative values are often unknowable:
 
 ```python
->>> expr = sympy.abc.x < sympy.abc.x * 3
->>> expr
+>>> expr = sympy.abc.x < sympy.abc.x * 3 ; expr
 x < 3*x
 >>> bool(expr)  # nope
 Traceback (most recent call last):
@@ -763,7 +762,7 @@ TypeError: cannot determine truth value of Relational
 >>> s = sympy.abc.x - 1
 >>> d3x = H(3) * sympy.abc.x
 >>> d3x2 = H(i * sympy.abc.x for i in range(3, 0, -1))
->>> d3x == d3x2  # stll results in consistent ordering
+>>> d3x == d3x2  # still results in consistent ordering
 True
 >>> P(d3x, d3x2)
 P(H({2*x: 1, 3*x: 1, x: 1}), H({2*x: 1, 3*x: 1, x: 1}))

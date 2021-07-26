@@ -39,15 +39,15 @@ from typing import (
     overload,
 )
 
-from .experimental import experimental
 from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
+from .lifecycle import experimental
 from .numtypes import IndexT, IntT, OutcomeT, as_int, sorted_outcomes
 from .symmetries import sum_w_start
 
 __all__ = ("P",)
 
 
-# ---- Data ----------------------------------------------------------------------------
+# ---- Types ---------------------------------------------------------------------------
 
 
 _T = TypeVar("_T")
@@ -143,7 +143,7 @@ class P(Sequence[H], HAbleOpsMixin):
     ```
 
     In an extension to (departure from) the [``HAbleT`` protocol][dyce.h.HAbleT], the
-    [``P.h`` method][dyce.p.P.h]’s implementation also affords subsets of outcomes to be
+    [``h`` method][dyce.p.P.h]’s implementation also affords subsets of outcomes to be
     “taken” (selected) by passing in selection criteria. Values are indexed from least
     to greatest. Negative indexes are supported and retain their idiomatic meaning.
     Modeling the sum of the greatest two faces of three six-sided dice (``3d6``) can be
@@ -377,8 +377,8 @@ class P(Sequence[H], HAbleOpsMixin):
         r"""
         !!! warning "Experimental"
 
-            This method should be considered experimental and may disappear in future
-            versions. While it does provide a performance improvement over other
+            This method should be considered experimental and may change or disappear in
+            future versions. While it does provide a performance improvement over other
             techniques, it is not significant for most applications, and rarely
             justifies the corresponding reduction in readability.
 

@@ -20,6 +20,8 @@
 * Adds these release notes.
 * Boosts ``isinstance`` performance with ``dyce``’s proprietary numeric ``Protocol``s.
 * Reinstates support for Python 3.7 (for now).
+* Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
+* Deprecates [``H.even``][dyce.h.H.even] and [``H.odd``][dyce.h.H.odd].
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

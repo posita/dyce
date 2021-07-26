@@ -13,8 +13,8 @@ import fractions
 import warnings
 from typing import Any, Iterable, Iterator, List, Tuple, Type, Union
 
-from .experimental import experimental
 from .h import H
+from .lifecycle import experimental
 
 try:
     import matplotlib.axes
@@ -59,8 +59,8 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
     r"""
     !!! warning "Experimental"
 
-        This method should be considered experimental and may disappear in future
-        versions.
+        This method should be considered experimental and may change or disappear in
+        future versions.
 
     Returns a new color list where *alpha* has been applied to each color in *colors*.
     If *alpha* is negative, *colors* is returned unmodified.
@@ -85,8 +85,8 @@ def display_burst(
     r"""
     !!! warning "Experimental"
 
-        This method should be considered experimental and may disappear in future
-        versions.
+        This method should be considered experimental and may change or disappear in
+        future versions.
 
     Creates a dual, overlapping, cocentric pie chart in *ax*, which can be useful for
     visualizing relative probability distributions. See the
@@ -141,8 +141,8 @@ def graph_colors(name: str, vals: Iterable, alpha: float = -1.0) -> ColorListT:
     r"""
     !!! warning "Experimental"
 
-        This method should be considered experimental and may disappear in future
-        versions.
+        This method should be considered experimental and may change or disappear in
+        future versions.
 
     Returns a color list computed from a [``matplotlib``
     colormap](https://matplotlib.org/stable/gallery/color/colormap_reference.html)
@@ -168,8 +168,8 @@ def labels_cumulative(
     r"""
     !!! warning "Experimental"
 
-        This method should be considered experimental and may disappear in future
-        versions.
+        This method should be considered experimental and may change or disappear in
+        future versions.
 
     Enumerates label, probability pairs for each outcome in *h* where each label
     contains several percentages. This can be useful for passing as the *outer* value to
@@ -199,8 +199,8 @@ def plot_burst(
     r"""
     !!! warning "Experimental"
 
-        This method should be considered experimental and may disappear in future
-        versions.
+        This method should be considered experimental and may change or disappear in
+        future versions.
 
     Wrapper around [``display_burst``][dyce.plt.display_burst] that creates a figure,
     axis pair and calls

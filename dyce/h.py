@@ -58,7 +58,7 @@ from typing import (
     overload,
 )
 
-from .experimental import experimental
+from .lifecycle import deprecated, experimental
 from .numtypes import (
     CachingProtocolMeta,
     IntCs,
@@ -310,7 +310,7 @@ class H(_MappingT):
     Or how often at least one ``2`` will show when rolling four six-sided dice:
 
     ```python
-    >>> d6_eq2 = d6.eq(2); d6_eq2  # how often a 2 shows on a single six-sided die
+    >>> d6_eq2 = d6.eq(2) ; d6_eq2  # how often a 2 shows on a single six-sided die
     H({False: 5, True: 1})
     >>> 4@d6_eq2  # count of 2s showing on 4d6
     H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
@@ -844,12 +844,12 @@ class H(_MappingT):
         """
         return self.map(op_ge, other, coerce=bool)
 
-    def even(self) -> H:
+    def is_even(self) -> H:
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 == 0)``.
 
         ```python
-        >>> H((-4, -2, 0, 1, 2, 3)).even()
+        >>> H((-4, -2, 0, 1, 2, 3)).is_even()
         H({False: 2, True: 4})
 
         ```
@@ -857,17 +857,29 @@ class H(_MappingT):
         See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_even(outcome: IntT) -> bool:
+        def _is_even(outcome: IntT) -> bool:
             return as_int(outcome) % 2 == 0
 
-        return self.umap(is_even)
+        return self.umap(_is_even)
 
-    def odd(self) -> H:
+    @deprecated
+    def even(self) -> H:
+        r"""
+        !!! warning "Deprecated"
+
+            This method is deprecated and will likely be removed in the next major
+            release.
+
+        Alias for the [``is_even`` method][dyce.h.H.is_even].
+        """
+        return self.is_even()
+
+    def is_odd(self) -> H:
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 != 0)``.
 
         ```python
-        >>> H((-4, -2, 0, 1, 2, 3)).odd()
+        >>> H((-4, -2, 0, 1, 2, 3)).is_odd()
         H({False: 4, True: 2})
 
         ```
@@ -875,10 +887,22 @@ class H(_MappingT):
         See the [``umap`` method][dyce.h.H.umap].
         """
 
-        def is_odd(outcome: IntT) -> bool:
+        def _is_odd(outcome: IntT) -> bool:
             return as_int(outcome) % 2 != 0
 
-        return self.umap(is_odd)
+        return self.umap(_is_odd)
+
+    @deprecated
+    def odd(self) -> H:
+        r"""
+        !!! warning "Deprecated"
+
+            This method is deprecated and will likely be removed in the next major
+            release.
+
+        Alias for the [``is_odd`` method][dyce.h.H.is_odd].
+        """
+        return self.is_odd()
 
     def accumulate(self, other: _SourceT) -> H:
         r"""
@@ -907,8 +931,8 @@ class H(_MappingT):
         r"""
         !!! warning "Experimental"
 
-            This method should be considered experimental and may disappear in future
-            versions.
+            This method should be considered experimental and may change or disappear in
+            future versions.
 
         Computes and returns the probability distribution where *outcome* appears
         exactly *k* times among ``n@self``.
@@ -955,7 +979,7 @@ class H(_MappingT):
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
 
         ```python
-        >>> df = H((-1, -1, 0, 0, 1, 1)); df
+        >>> df = H((-1, -1, 0, 0, 1, 1)) ; df
         H({-1: 2, 0: 2, 1: 2})
         >>> df.lowest_terms()
         H({-1: 1, 0: 1, 1: 1})
@@ -977,8 +1001,8 @@ class H(_MappingT):
         r"""
         !!! warning "Experimental"
 
-            This method should be considered experimental and may disappear in future
-            versions.
+            This method should be considered experimental and may change or disappear in
+            future versions.
 
         Shorthand for ``self.order_stat_func_for_n(n)(pos)``.
         """
@@ -989,8 +1013,8 @@ class H(_MappingT):
         r"""
         !!! warning "Experimental"
 
-            This method should be considered experimental and may disappear in future
-            versions.
+            This method should be considered experimental and may change or disappear in
+            future versions.
 
         Returns a function that takes a single argument (*pos*) and computes the
         probability distribution for each outcome appearing in that position among
@@ -1152,7 +1176,7 @@ class H(_MappingT):
 
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.add, max_depth=6)
-        >>> h_even = h.even()
+        >>> h_even = h.is_even()
         >>> print("{:.3%}".format(h_even[1] / sum(h_even.counts())))
         39.131%
 
@@ -1365,7 +1389,7 @@ class H(_MappingT):
         !!! warning "Experimental"
 
             The *rational_t* argument to this method should be considered experimental
-            and may disappear in future versions.
+            and may change or disappear in future versions.
 
         If provided, *rational_t* must be a callable that takes two ``int``s (a
         numerator and denominator) and returns an instance of a desired (but otherwise
@@ -1839,19 +1863,45 @@ class HAbleOpsMixin:
         """
         return self.h().ge(other)
 
+    def is_even(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``self.h().is_even()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.is_even``][dyce.h.H.is_even].
+        """
+        return self.h().is_even()
+
+    @deprecated
     def even(self: HAbleT) -> H:
         r"""
-        Shorthand for ``self.h().even()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.even``][dyce.h.H.even].
-        """
-        return self.h().even()
+        !!! warning "Deprecated"
 
+            This method is deprecated and will likely be removed in the next major
+            release.
+
+        Shorthand for ``self.h().is_even()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.is_even``][dyce.h.H.is_even].
+        """
+        return self.h().is_even()
+
+    def is_odd(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``self.h().is_odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.is_odd``][dyce.h.H.is_odd].
+        """
+        return self.h().is_odd()
+
+    @deprecated
     def odd(self: HAbleT) -> H:
         r"""
-        Shorthand for ``self.h().odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.odd``][dyce.h.H.odd].
+        !!! warning "Deprecated"
+
+            This method is deprecated and will likely be removed in the next major
+            release.
+
+        Shorthand for ``self.h().is_odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
+        [``H.is_odd``][dyce.h.H.is_odd].
         """
-        return self.h().odd()
+        return self.h().is_odd()
 
     def explode(self: HAbleT, max_depth: IntT = 1) -> H:
         r"""

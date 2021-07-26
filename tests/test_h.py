@@ -183,9 +183,6 @@ class TestH:
             assert d2 - H({}) == d2
             assert H({}) - d3 == -d3
 
-    def test_wn(self) -> None:
-        pass
-
     def test_op_sub_sym(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
 
@@ -310,25 +307,25 @@ class TestH:
 
     def test_even(self) -> None:
         for o_type in _INTEGRAL_OUTCOME_TYPES:
-            assert H(o_type(7)).even() == {
+            assert H(o_type(7)).is_even() == {
                 False: 4,
                 True: 3,
             }, f"o_type: {o_type}"
 
     def test_even_wrong_type(self) -> None:
         with pytest.raises(TypeError):
-            _ = H((i + 0.5 for i in range(7, 0, -1))).even()
+            _ = H((i + 0.5 for i in range(7, 0, -1))).is_even()
 
     def test_odd(self) -> None:
         for o_type in _INTEGRAL_OUTCOME_TYPES:
-            assert H(o_type(7)).odd() == {
+            assert H(o_type(7)).is_odd() == {
                 False: 3,
                 True: 4,
             }, f"o_type: {o_type}"
 
     def test_odd_wrong_type(self) -> None:
         with pytest.raises(TypeError):
-            _ = H((i + 0.5 for i in range(7, 0, -1))).odd()
+            _ = H((i + 0.5 for i in range(7, 0, -1))).is_odd()
 
     def test_accumulate(self) -> None:
         h = H(itertools.chain(range(0, 6), range(3, 9)))
