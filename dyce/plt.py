@@ -102,7 +102,7 @@ def display_burst(
             for _, v in h_inner.distribution()
         )
     elif isinstance(outer, H):
-        outer = ((str(o), c) for o, c in outer.distribution())
+        outer = ((str(outcome), count) for outcome, count in outer.distribution())
 
     outer_labels, outer_values = list(zip(*outer))
     outer_colors = graph_colors(

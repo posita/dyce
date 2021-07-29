@@ -23,6 +23,9 @@
 * Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
 * Deprecates [``H.even``][dyce.h.H.even] and [``H.odd``][dyce.h.H.odd].
 * Introduces experimental [``H.total``][dyce.h.H.total] property.
+* Removes incorrectly non-flattening unary operation methods ``P.__abs__`` and ``P.__invert__``.
+* Deprecates non-flattening unary operation methods [``P.__neg__``][dyce.p.P.__neg__] and [``P.__pos__``][dyce.p.P.__pos__].
+* Renames experimental ``P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

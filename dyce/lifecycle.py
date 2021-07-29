@@ -36,7 +36,7 @@ def deprecated(f: _WrappedT) -> _WrappedT:
     r"""
     Decorator to mark an interface as deprecated. Warns on *f*'s first use.
     """
-    return _warn_once(
+    return warn_once(
         f,
         DeprecationWarning,
         f"{f.__qualname__} is deprecated and will likely be removed in the next major release",
@@ -47,14 +47,14 @@ def experimental(f: _WrappedT) -> _WrappedT:
     r"""
     Decorator to mark an interface as experimental. Warns on *f*'s first use.
     """
-    return _warn_once(
+    return warn_once(
         f,
         ExperimentalWarning,
         f"{f.__qualname__} should be considered experimental and may change or disappear in future versions",
     )
 
 
-def _warn_once(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
+def warn_once(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
     _wrapped: _WrappedT
     warned = False
 

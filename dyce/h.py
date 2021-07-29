@@ -61,16 +61,17 @@ from typing import (
 )
 
 from .lifecycle import deprecated, experimental
-from .numtypes import (
+from .symmetries import Protocol, comb, gcd, runtime_checkable, sum_w_start
+from .types import (
     CachingProtocolMeta,
-    IntCs,
     IntT,
-    OutcomeCs,
     OutcomeT,
+    _IntCs,
+    _OutcomeCs,
     as_int,
+    identity,
     sorted_outcomes,
 )
-from .symmetries import Protocol, comb, gcd, runtime_checkable, sum_w_start
 
 __all__ = ("H",)
 
@@ -140,11 +141,11 @@ class H(_MappingT):
     !!! info
 
         The lack of an explicit denominator is intentional and has two benefits. First,
-        it is redundant. Without it, one never has to worry about probabilities summing
-        to one (e.g., via miscalculation, floating point error, etc.). Second (and
-        perhaps more importantly), sometimes one wants to have an insight into
-        non-reduced counts, not just probabilities. If needed, probabilities can always
-        be derives, as shown below.
+        a denominator is redundant. Without it, one never has to worry about
+        probabilities summing to one (e.g., via miscalculation, floating point error,
+        etc.). Second (and perhaps more importantly), sometimes one wants to have an
+        insight into non-reduced counts, not just probabilities. If needed,
+        probabilities can always be derived, as shown below.
 
     The [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
     explicit form, *items* maps outcome values to counts.
@@ -386,7 +387,7 @@ class H(_MappingT):
         self._simple_init: Optional[int] = None
         tmp: Counter[OutcomeT] = counter()
 
-        if isinstance(items, IntCs):
+        if isinstance(items, _IntCs):
             if items != 0:
                 self._simple_init = as_int(items)
                 outcome_range = range(
@@ -395,7 +396,7 @@ class H(_MappingT):
                     1 if self._simple_init < 0 else -1,  # count toward zero
                 )
 
-                if isinstance(items, OutcomeCs):
+                if isinstance(items, _OutcomeCs):
                     outcome_type = type(items)
                     tmp.update({outcome_type(i): 1 for i in outcome_range})
                 else:
@@ -477,7 +478,7 @@ class H(_MappingT):
 
     def __radd__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__add__, other)
+            return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
@@ -494,7 +495,7 @@ class H(_MappingT):
 
     def __rsub__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__sub__, other)
+            return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
@@ -506,7 +507,7 @@ class H(_MappingT):
 
     def __rmul__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__mul__, other)
+            return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
@@ -532,7 +533,7 @@ class H(_MappingT):
 
     def __rtruediv__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__truediv__, other)
+            return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
@@ -544,7 +545,7 @@ class H(_MappingT):
 
     def __rfloordiv__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__floordiv__, other)
+            return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
@@ -556,7 +557,7 @@ class H(_MappingT):
 
     def __rmod__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__mod__, other)
+            return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
@@ -568,13 +569,13 @@ class H(_MappingT):
 
     def __rpow__(self, other: OutcomeT) -> H:
         try:
-            return self.rmap(__pow__, other)
+            return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     def __and__(self, other: Union[IntT, H, HAbleT]) -> H:
         try:
-            if isinstance(other, IntCs):
+            if isinstance(other, _IntCs):
                 other = as_int(other)
 
             return self.map(__and__, other)
@@ -583,13 +584,13 @@ class H(_MappingT):
 
     def __rand__(self, other: IntT) -> H:
         try:
-            return self.rmap(__and__, as_int(other))
+            return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     def __xor__(self, other: Union[IntT, H, HAbleT]) -> H:
         try:
-            if isinstance(other, IntCs):
+            if isinstance(other, _IntCs):
                 other = as_int(other)
 
             return self.map(__xor__, other)
@@ -598,13 +599,13 @@ class H(_MappingT):
 
     def __rxor__(self, other: IntT) -> H:
         try:
-            return self.rmap(__xor__, as_int(other))
+            return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     def __or__(self, other: Union[IntT, H, HAbleT]) -> H:
         try:
-            if isinstance(other, IntCs):
+            if isinstance(other, _IntCs):
                 other = as_int(other)
 
             return self.map(__or__, other)
@@ -613,7 +614,7 @@ class H(_MappingT):
 
     def __ror__(self, other: IntT) -> H:
         try:
-            return self.rmap(__or__, as_int(other))
+            return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
@@ -674,13 +675,14 @@ class H(_MappingT):
 
     def map(
         self,
-        oper: _BinaryOperatorT,
-        other: _OperandT,
-        coerce: _CoerceT = lambda x: x,
+        op: _BinaryOperatorT,
+        right_operand: _OperandT,
+        coerce: _CoerceT = identity,
     ) -> H:
         r"""
-        Applies *oper* to each outcome of the histogram paired with *other*. Shorthands
-        exist for many arithmetic operators and comparators.
+        Applies *op* to each outcome of the histogram as the left operand and
+        *right_operand* as the right. Shorthands exist for many arithmetic operators and
+        comparators.
 
         ```python
         >>> import operator
@@ -693,9 +695,9 @@ class H(_MappingT):
         ```
 
         ```python
-        >>> d6.map(operator.__mul__, -1)
-        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-        >>> d6.map(operator.__mul__, -1) == d6 * -1
+        >>> d6.map(operator.__pow__, 2)
+        H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1})
+        >>> d6.map(operator.__pow__, 2) == d6 ** 2
         True
 
         ```
@@ -708,36 +710,85 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, HAbleT):
-            other = other.h()
+        if isinstance(right_operand, HAbleT):
+            right_operand = right_operand.h()
 
-        if isinstance(other, H):
+        if isinstance(right_operand, H):
             return H(
-                (coerce(oper(s, o)), self[s] * other[o])
-                for s, o in product(self, other)
+                (coerce(op(s, o)), self[s] * right_operand[o])
+                for s, o in product(self, right_operand)
             )
         else:
             return H(
-                (coerce(oper(outcome, other)), count) for outcome, count in self.items()
+                (coerce(op(outcome, right_operand)), count)
+                for outcome, count in self.items()
             )
 
     def rmap(
         self,
-        oper: _BinaryOperatorT,
-        other: OutcomeT,
-        coerce: _CoerceT = lambda x: x,
+        left_operand: OutcomeT,
+        op: _BinaryOperatorT,
+        coerce: _CoerceT = identity,
     ) -> H:
+        r"""
+        Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
+        *left_operand*:
+
+        ```python
+        >>> import operator
+        >>> d6 = H(6)
+        >>> d6.rmap(2, operator.__pow__)
+        H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
+        >>> d6.rmap(2, operator.__pow__) == 2 ** d6
+        True
+
+        ```
+
+        Note that the positions of *left_operand* and *op* are different from
+        [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
+        of operand ordering.
+
+        !!! warning "Deprecated"
+
+            This method originally accepted the *op* parameter in the first position,
+            and the *left_operand* parameter in the second. While that is still silently
+            supported, that ordering is deprecated and will likely be removed in the
+            next major release.
+        """
+        if isinstance(op, _OutcomeCs):
+            # Warning! It's opposite day! Things are all mixed up! op is the operand and
+            # left_operand is the operator!
+            return self._deprecated_rmap_signature(left_operand, op)
+
         return H(
-            (coerce(oper(other, outcome)), count) for outcome, count in self.items()
+            (coerce(op(left_operand, outcome)), count)
+            for outcome, count in self.items()
         )
+
+    @deprecated
+    def _deprecated_rmap_signature(
+        self,
+        op: _BinaryOperatorT,
+        other: OutcomeT,
+        coerce: _CoerceT = identity,
+    ) -> H:
+        r"""
+        ```python
+        >>> import operator
+        >>> H(6).rmap(operator.__pow__, 2)  # type: ignore
+        H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
+
+        ```
+        """
+        return self.rmap(other, op, coerce)
 
     def umap(
         self,
-        oper: _UnaryOperatorT,
-        coerce: _CoerceT = lambda x: x,
+        op: _UnaryOperatorT,
+        coerce: _CoerceT = identity,
     ) -> H:
         r"""
-        Applies *oper* to each outcome of the histogram:
+        Applies *op* to each outcome of the histogram:
 
         ```python
         >>> H(6).umap(lambda outcome: outcome * -1)
@@ -751,13 +802,13 @@ class H(_MappingT):
 
         ```
         """
-        h = H((coerce(oper(outcome)), count) for outcome, count in self.items())
+        h = H((coerce(op(outcome)), count) for outcome, count in self.items())
 
         if self._simple_init is not None:
-            simple_init = oper(self._simple_init)
+            simple_init = op(self._simple_init)
             coerced_simple_init = coerce(simple_init)
 
-            if isinstance(coerced_simple_init, IntCs):
+            if isinstance(coerced_simple_init, _IntCs):
                 h_simple = H(coerced_simple_init)
 
                 if h_simple == h:
@@ -1300,7 +1351,7 @@ class H(_MappingT):
 
     def vs(self, other: _OperandT) -> H:
         r"""
-        Compares this histogram with *other*. -1 represents where *other* is greater. 0
+        Compares the histogram with *other*. -1 represents where *other* is greater. 0
         represents where they are equal. 1 represents where *other* is less.
 
         Shorthand for ``self.within(0, 0, other)``.
@@ -1319,7 +1370,7 @@ class H(_MappingT):
 
     def within(self, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
         r"""
-        Computes the difference between this histogram and *other*. -1 represents where that
+        Computes the difference between the histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
         and *hi* (inclusive). 1 represents where that difference is greater than *hi*.
 
@@ -1439,7 +1490,7 @@ class H(_MappingT):
         used to accomplish something similar:
 
         ```python
-        >>> [(o, f"{p.numerator}/{p.denominator}") for o, p in (h).distribution()]
+        >>> [(outcome, f"{probability.numerator}/{probability.denominator}") for outcome, probability in (h).distribution()]
         [(1, '1/8'), (2, '1/8'), (3, '1/4'), (4, '1/4'), (5, '1/8'), (6, '1/8')]
 
         ```
@@ -1448,11 +1499,11 @@ class H(_MappingT):
 
         ```python
         >>> import sympy.abc  # doctest: +SKIP
-        >>> [(o, sympy.Rational(p)) for o, p in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
+        >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
         >>> import sage.rings.rational  # doctest: +SKIP
-        >>> [(o, sage.rings.rational.Rational(p)) for o, p in h.distribution()]  # doctest: +SKIP
+        >>> [(outcome, sage.rings.rational.Rational(probability)) for outcome, probability in h.distribution()]  # doctest: +SKIP
         [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]
 
         ```
@@ -1842,6 +1893,34 @@ class HAbleOpsMixin:
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __or__(other, self.h())
+
+    def __neg__(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``operator.__neg__(self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
+        """
+        return __neg__(self.h())
+
+    def __pos__(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``operator.__pos__(self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
+        """
+        return __pos__(self.h())
+
+    def __abs__(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``operator.__abs__(self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
+        """
+        return __abs__(self.h())
+
+    def __invert__(self: HAbleT) -> H:
+        r"""
+        Shorthand for ``operator.__invert__(self.h())``. See the
+        [``h`` method][dyce.h.HAbleT.h].
+        """
+        return __invert__(self.h())
 
     def lt(self: HAbleT, other: _OperandT) -> H:
         r"""

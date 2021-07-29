@@ -1,9 +1,15 @@
 repos:
+  - repo: meta
+    hooks:
+    - id: check-hooks-apply
+    - id: check-useless-excludes
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
     - id: trailing-whitespace
+      exclude: ^docs/dyce-powered\.svg$
     - id: end-of-file-fixer
+      exclude: ^docs/dyce-powered\.svg$
     - id: check-yaml
     - id: check-added-large-files
   - repo: https://github.com/psf/black

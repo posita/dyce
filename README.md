@@ -42,7 +42,7 @@ Non-experimental features should be considered stable (but an unquenchable thirs
 See the [release notes](https://posita.github.io/dyce/latest/notes) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
-## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/master/docs/dyce_powered.svg)](https://github.com/posita/dyce)
+## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/master/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
 
 * This could be _you_! 👋
 

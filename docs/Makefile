@@ -33,5 +33,5 @@ plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/
 plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
-dyce_powered.svg : Makefile
-	curl >dyce_powered.svg 'https://img.shields.io/badge/%F0%9F%8E%B2-dyce--powered%21-green'
+dyce-powered.svg : Makefile
+	curl --output dyce-powered.svg 'https://img.shields.io/badge/%F0%9F%8E%B2%F0%9F%92%A5-dyce--powered%21-77cc44'

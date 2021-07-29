@@ -15,17 +15,7 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
-from operator import (
-    __abs__,
-    __eq__,
-    __getitem__,
-    __invert__,
-    __mul__,
-    __ne__,
-    __neg__,
-    __pos__,
-    index,
-)
+from operator import __eq__, __getitem__, __index__, __mul__, __ne__, __neg__, __pos__
 from typing import (
     Callable,
     Counter,
@@ -42,9 +32,9 @@ from typing import (
 )
 
 from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
-from .lifecycle import experimental
-from .numtypes import IndexT, IntT, OutcomeT, as_int, sorted_outcomes
+from .lifecycle import deprecated, experimental
 from .symmetries import sum_w_start
+from .types import IndexT, IntT, OutcomeT, _GetItemT, as_int, sorted_outcomes
 
 __all__ = ("P",)
 
@@ -53,7 +43,6 @@ __all__ = ("P",)
 
 
 _T = TypeVar("_T")
-_GetItemT = Union[IndexT, slice]
 _OperandT = Union["P", OutcomeT]
 _RollT = Tuple[OutcomeT, ...]
 _RollCountT = Tuple[_RollT, int]
@@ -71,9 +60,7 @@ class P(Sequence[H], HAbleOpsMixin):
     This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
     [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
     “flattened” into a single histogram, either explicitly via the
-    [``h`` method][dyce.p.P.h], or implicitly by using binary arithmetic operations.
-    Note that this class also provides its own ``@`` and unary operator implementations
-    that result in new ``P`` objects, not flattened histograms.
+    [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
 
     ```python
     >>> from dyce import P
@@ -200,7 +187,7 @@ class P(Sequence[H], HAbleOpsMixin):
             hs.sort(key=lambda h: str(tuple(h.items())))
 
         self._hs = tuple(hs)
-        self._homogeneous = len(set(self._hs)) <= 1
+        self._is_homogeneous = len(set(self._hs)) <= 1
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -240,7 +227,7 @@ class P(Sequence[H], HAbleOpsMixin):
         if isinstance(key, slice):
             return P(*self._hs[key])
         else:
-            return self._hs[index(key)]
+            return self._hs[__index__(key)]
 
     def __iter__(self) -> Iterator[H]:
         return iter(self._hs)
@@ -259,17 +246,25 @@ class P(Sequence[H], HAbleOpsMixin):
     def __rmatmul__(self, other: IntT) -> P:
         return self.__matmul__(other)
 
-    def __neg__(self) -> P:
-        return P(*(__neg__(h) for h in self))
+    @deprecated
+    def __neg__(self) -> P:  # type: ignore
+        r"""
+        !!! warning "Deprecated"
 
-    def __pos__(self) -> P:
-        return P(*(__pos__(h) for h in self))
+            This overridden method is deprecated and will likely be removed in the next
+            major release. Use [``P.umap(__neg__)``][dyce.p.P.umap] instead.
+        """
+        return self.umap(__neg__)
 
-    def __abs__(self) -> P:
-        return P(*(__abs__(h) for h in self))
+    @deprecated
+    def __pos__(self) -> P:  # type: ignore
+        r"""
+        !!! warning "Deprecated"
 
-    def __invert__(self) -> P:
-        return P(*(__invert__(h) for h in self))
+            This overridden method is deprecated and will likely be removed in the next
+            major release. Use [``P.umap(__pos__)``][dyce.p.P.umap] instead.
+        """
+        return self.umap(__pos__)
 
     def h(self, *which: _GetItemT) -> H:
         r"""
@@ -369,8 +364,24 @@ class P(Sequence[H], HAbleOpsMixin):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def homogeneous(self) -> bool:
-        return self._homogeneous
+    def is_homogeneous(self) -> bool:
+        r"""
+        !!! warning "Experimental"
+
+            This property should be considered experimental and may change or disappear
+            in future versions.
+
+        A flag indicating whether the pool’s population of histograms is homogeneous.
+
+        ```python
+        >>> P(6, 6).is_homogeneous
+        True
+        >>> P(4, 6, 8).is_homogeneous
+        False
+
+        ```
+        """
+        return self._is_homogeneous
 
     # ---- Methods ---------------------------------------------------------------------
 
@@ -755,12 +766,22 @@ class P(Sequence[H], HAbleOpsMixin):
 
             yield taken_outcomes, roll_count
 
-    def umap(self, oper: _UnaryOperatorT) -> P:
+    def umap(self, op: _UnaryOperatorT) -> P:
         r"""
-        Shorthand for ``P(*(h.umap(oper) for h in self))``. See the
+        Shorthand for ``P(*(h.umap(op) for h in self))``. See the
         [``H.umap`` method][dyce.h.H.umap].
+
+        ```python
+        >>> import operator
+        >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
+        >>> p_3d6.umap(operator.__neg__)
+        P(H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}))
+        >>> p_3d6.umap(operator.__abs__)
+        P(H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1}))
+
+        ```
         """
-        return P(*(h.umap(oper) for h in self))
+        return P(*(h.umap(op) for h in self))
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -812,7 +833,7 @@ def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]
         if isinstance(key, slice):
             yield from __getitem__(sequence, key)
         else:
-            yield __getitem__(sequence, index(key))
+            yield __getitem__(sequence, __index__(key))
 
 
 def _rwc_heterogeneous_h_groups(

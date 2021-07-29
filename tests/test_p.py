@@ -21,11 +21,11 @@ import pytest
 from dyce import H, OutcomeT, P
 from dyce.p import (
     _analyze_selection,
-    _GetItemT,
     _RollCountT,
     _rwc_homogeneous_n_h_using_karonen_partial_selection,
     _rwc_homogeneous_n_h_using_multinomial_coefficient,
 )
+from dyce.types import _GetItemT
 
 __all__ = ()
 
@@ -384,15 +384,17 @@ class TestP:
         assert P(H((1, 0, 1))) ^ 1 == H((0, 1, 0))
 
     def test_op_unary(self) -> None:
-        p = P(H(-v if v % 2 else v for v in range(10, 20)))
-        assert isinstance(+p, type(p))
-        assert (+p) == P(H((10, -11, 12, -13, 14, -15, 16, -17, 18, -19)))
+        h = H(-v if v % 2 else v for v in range(10, 20))
+        p = P(h)
+        assert -(2 @ p) == -(2 @ h)
+        assert +(2 @ p) == +(2 @ h)
+        assert abs(2 @ p) == abs(2 @ h)
+        assert ~(2 @ p) == ~(2 @ h)
+        # Deprecated; TODO: remove these
         assert isinstance(-p, type(p))
-        assert (-p) == P(H((-10, 11, -12, 13, -14, 15, -16, 17, -18, 19)))
-        assert isinstance(abs(p), type(p))
-        assert abs(p) == P(H((10, 11, 12, 13, 14, 15, 16, 17, 18, 19)))
-        assert isinstance(~p, type(p))
-        assert ~p == P(H((~10, ~-11, ~12, ~-13, ~14, ~-15, ~16, ~-17, ~18, ~-19)))
+        assert (-p).h() == -h
+        assert isinstance(+p, type(p))
+        assert (+p).h() == +h
 
     def test_h_flatten(self) -> None:
         r_d6 = range(1, 7)
@@ -521,10 +523,10 @@ class TestP:
         )
 
     def test_homogeneous(self) -> None:
-        assert P().homogeneous
-        assert P(2).homogeneous
-        assert P(2, 2).homogeneous
-        assert not P(2, -3).homogeneous
+        assert P().is_homogeneous
+        assert P(2).is_homogeneous
+        assert P(2, 2).is_homogeneous
+        assert not P(2, -3).is_homogeneous
 
     def test_appearances_in_rolls(self) -> None:
         def _sum_method(p: P, outcome: OutcomeT) -> H:

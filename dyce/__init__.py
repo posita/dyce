@@ -10,8 +10,8 @@
 from __future__ import annotations
 
 from .h import *  # noqa: F401,F403
-from .numtypes import *  # noqa: F401,F403
 from .p import *  # noqa: F401,F403
+from .types import *  # noqa: F401,F403
 from .version import __version__  # noqa: F401
 
 __all__ = ()

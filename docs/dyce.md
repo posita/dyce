@@ -31,3 +31,5 @@
 ::: dyce.h.HAbleT
 
 ::: dyce.h.HAbleOpsMixin
+
+::: dyce.types.OutcomeT

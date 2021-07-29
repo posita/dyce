@@ -21,35 +21,13 @@ from .symmetries import SupportsIndex as _SupportsIndex
 from .symmetries import SupportsInt as _SupportsInt
 from .symmetries import runtime_checkable
 
-__all__ = (
-    "CachingProtocolMeta",
-    "AbsCs",
-    "AbsT",
-    "ArithmeticCs",
-    "ArithmeticT",
-    "BitwiseCs",
-    "BitwiseT",
-    "FloatCs",
-    "FloatT",
-    "IntCs",
-    "IntT",
-    "OutcomeCs",
-    "OutcomeT",
-    "SupportsAbs",
-    "SupportsArithmetic",
-    "SupportsBitwise",
-    "SupportsFloat",
-    "SupportsInt",
-    "SupportsOutcome",
-    "as_int",
-    "natural_key",
-    "sorted_outcomes",
-)
+__all__ = ("OutcomeT",)
 
 
 # ---- Types ---------------------------------------------------------------------------
 
 
+_T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _ProtocolMeta: Any = type(Protocol)
 
@@ -57,7 +35,7 @@ _ProtocolMeta: Any = type(Protocol)
 class CachingProtocolMeta(_ProtocolMeta):
     """
     Stand-in for ``Protocol``’s base class that caches results of ``__instancecheck__``,
-    (which is otherwise [really @#$%ing
+    (which is otherwise [really 🤬ing
     expensive](https://github.com/python/mypy/issues/3186#issuecomment-885718629)). (At
     the time this was introduced, it resulted in about a 5× performance increase for
     unit tests.) The downside is that this will yield unpredictable results for objects
@@ -100,11 +78,11 @@ class SupportsAbs(
 
 
 # For each Protocol herein, we also define a type annotation of the form "...T" and a
-# tuple of classes of the form "...Cs" such as that which follows. While theoretically
+# tuple of classes of the form `_...Cs` such as that which follows. While theoretically
 # redundant, in practice these provide more efficient lookups for basic types:
 #
 #   def do_something(val: Union[str, AbsT]):
-#     if instance(val, AbsCs):  # <- fastest if val is an int, float, or bool
+#     if instance(val, _AbsCs):  # <- fastest if val is an int, float, or bool
 #       ...
 #     ...
 #
@@ -112,7 +90,7 @@ class SupportsAbs(
 # runtime-checkable instances.
 _assert_isinstance(int, float, bool, target_t=SupportsAbs)
 AbsT = Union[int, float, bool, SupportsAbs]
-AbsCs = (int, float, bool, SupportsAbs)
+_AbsCs = (int, float, bool, SupportsAbs)
 
 
 @runtime_checkable
@@ -126,7 +104,7 @@ class SupportsFloat(
 
 _assert_isinstance(int, float, bool, target_t=SupportsFloat)
 FloatT = Union[int, float, bool, SupportsFloat]
-FloatCs = (int, float, bool, SupportsFloat)
+_FloatCs = (int, float, bool, SupportsFloat)
 
 
 @runtime_checkable
@@ -140,7 +118,7 @@ class SupportsInt(
 
 _assert_isinstance(int, float, bool, target_t=SupportsInt)
 IntT = Union[int, float, bool, SupportsInt]
-IntCs = (int, float, bool, SupportsInt)
+_IntCs = (int, float, bool, SupportsInt)
 
 
 @runtime_checkable
@@ -154,7 +132,7 @@ class SupportsIndex(
 
 _assert_isinstance(int, bool, target_t=SupportsIndex)
 IndexT = Union[int, bool, SupportsIndex]
-IndexCs = (int, bool, SupportsIndex)
+_IndexCs = (int, bool, SupportsIndex)
 
 
 @runtime_checkable
@@ -247,7 +225,7 @@ class SupportsArithmetic(
 
 _assert_isinstance(int, float, bool, target_t=SupportsArithmetic)
 ArithmeticT = Union[int, float, bool, SupportsArithmetic]
-ArithmeticCs = (int, float, bool, SupportsArithmetic)
+_ArithmeticCs = (int, float, bool, SupportsArithmetic)
 
 
 @runtime_checkable
@@ -288,7 +266,7 @@ class SupportsBitwise(
 
 _assert_isinstance(int, bool, target_t=SupportsBitwise)
 BitwiseT = Union[int, bool, SupportsBitwise]
-BitwiseCs = (int, bool, SupportsBitwise)
+_BitwiseCs = (int, bool, SupportsBitwise)
 
 
 @runtime_checkable
@@ -311,7 +289,9 @@ class SupportsOutcome(
 
 _assert_isinstance(int, float, bool, target_t=SupportsOutcome)
 OutcomeT = Union[int, float, bool, SupportsOutcome]
-OutcomeCs = (int, float, bool, SupportsOutcome)
+_OutcomeCs = (int, float, bool, SupportsOutcome)
+
+_GetItemT = Union[IndexT, slice]
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -319,13 +299,17 @@ OutcomeCs = (int, float, bool, SupportsOutcome)
 
 def as_int(val: IntT) -> int:
     r"""
-    Helper function to losslessly coerce *val* into an ``int``. Raises
-    ``TypeError`` if that cannot be done.
+    Helper function to losslessly coerce *val* into an ``int``. Raises ``TypeError`` if
+    that cannot be done.
     """
     if int(val) != val:
         raise TypeError(f"cannot (losslessly) coerce {val} to an int")
 
     return int(val)
+
+
+def identity(x: _T) -> _T:
+    return x
 
 
 def natural_key(val: OutcomeT) -> Tuple[Union[int, str], ...]:
