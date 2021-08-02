@@ -31,7 +31,7 @@ from typing import (
     overload,
 )
 
-from .h import H, HAbleOpsMixin, _MappingT, _UnaryOperatorT
+from .h import H, HAbleOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT
 from .lifecycle import deprecated, experimental
 from .symmetries import sum_w_start
 from .types import IndexT, IntT, OutcomeT, _GetItemT, as_int, sorted_outcomes
@@ -765,6 +765,45 @@ class P(Sequence[H], HAbleOpsMixin):
                 taken_outcomes = sorted_outcomes_for_roll
 
             yield taken_outcomes, roll_count
+
+    def map(
+        self,
+        op: _BinaryOperatorT,
+        right_operand: _OperandT,
+    ) -> P:
+        r"""
+        Shorthand for ``P(*(h.map(op, right_operand) for h in self))``. See the
+        [``H.map`` method][dyce.h.H.map].
+
+        ```python
+        >>> import operator
+        >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
+        >>> p_3d6.map(operator.__mul__, -1)
+        P(H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}))
+
+        ```
+        """
+        return P(*(h.map(op, right_operand) for h in self))
+
+    def rmap(
+        self,
+        left_operand: OutcomeT,
+        op: _BinaryOperatorT,
+    ) -> P:
+        r"""
+        Shorthand for ``P(*(h.rmap(left_operand, op) for h in self))``. See the
+        [``H.rmap`` method][dyce.h.H.rmap].
+
+        ```python
+        >>> import operator
+        >>> from fractions import Fraction
+        >>> p_3d6 = 2@P(H((-3, -1, 2, 4)))
+        >>> p_3d6.umap(Fraction).rmap(1, operator.__truediv__)
+        P(H({Fraction(-1, 1): 1, Fraction(-1, 3): 1, Fraction(1, 4): 1, Fraction(1, 2): 1}), H({Fraction(-1, 1): 1, Fraction(-1, 3): 1, Fraction(1, 4): 1, Fraction(1, 2): 1}))
+
+        ```
+        """
+        return P(*(h.rmap(left_operand, op) for h in self))
 
     def umap(self, op: _UnaryOperatorT) -> P:
         r"""

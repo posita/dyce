@@ -27,6 +27,7 @@
 * Deprecates non-flattening unary operation methods [``P.__neg__``][dyce.p.P.__neg__] and [``P.__pos__``][dyce.p.P.__pos__].
 * Renames experimental ``P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
+* Removes ``coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

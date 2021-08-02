@@ -41,7 +41,6 @@ from operator import (
 )
 from random import choices
 from typing import (
-    Any,
     Callable,
     Counter,
     Dict,
@@ -69,7 +68,6 @@ from .types import (
     _IntCs,
     _OutcomeCs,
     as_int,
-    identity,
     sorted_outcomes,
 )
 
@@ -94,7 +92,6 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
 _CoalesceT = Callable[["H", OutcomeT], "H"]
-_CoerceT = Callable[[Any], OutcomeT]
 
 
 @runtime_checkable
@@ -677,7 +674,6 @@ class H(_MappingT):
         self,
         op: _BinaryOperatorT,
         right_operand: _OperandT,
-        coerce: _CoerceT = identity,
     ) -> H:
         r"""
         Applies *op* to each outcome of the histogram as the left operand and
@@ -715,20 +711,18 @@ class H(_MappingT):
 
         if isinstance(right_operand, H):
             return H(
-                (coerce(op(s, o)), self[s] * right_operand[o])
+                (op(s, o), self[s] * right_operand[o])
                 for s, o in product(self, right_operand)
             )
         else:
             return H(
-                (coerce(op(outcome, right_operand)), count)
-                for outcome, count in self.items()
+                (op(outcome, right_operand), count) for outcome, count in self.items()
             )
 
     def rmap(
         self,
         left_operand: OutcomeT,
         op: _BinaryOperatorT,
-        coerce: _CoerceT = identity,
     ) -> H:
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
@@ -760,17 +754,13 @@ class H(_MappingT):
             # left_operand is the operator!
             return self._deprecated_rmap_signature(left_operand, op)
 
-        return H(
-            (coerce(op(left_operand, outcome)), count)
-            for outcome, count in self.items()
-        )
+        return H((op(left_operand, outcome), count) for outcome, count in self.items())
 
     @deprecated
     def _deprecated_rmap_signature(
         self,
         op: _BinaryOperatorT,
         other: OutcomeT,
-        coerce: _CoerceT = identity,
     ) -> H:
         r"""
         ```python
@@ -780,18 +770,18 @@ class H(_MappingT):
 
         ```
         """
-        return self.rmap(other, op, coerce)
+        return self.rmap(other, op)
 
     def umap(
         self,
         op: _UnaryOperatorT,
-        coerce: _CoerceT = identity,
     ) -> H:
         r"""
         Applies *op* to each outcome of the histogram:
 
         ```python
-        >>> H(6).umap(lambda outcome: outcome * -1)
+        >>> import operator
+        >>> H(6).umap(operator.__neg__)
         H(-6)
 
         ```
@@ -802,14 +792,13 @@ class H(_MappingT):
 
         ```
         """
-        h = H((coerce(op(outcome)), count) for outcome, count in self.items())
+        h = H((op(outcome), count) for outcome, count in self.items())
 
         if self._simple_init is not None:
             simple_init = op(self._simple_init)
-            coerced_simple_init = coerce(simple_init)
 
-            if isinstance(coerced_simple_init, _IntCs):
-                h_simple = H(coerced_simple_init)
+            if isinstance(simple_init, _IntCs):
+                h_simple = H(simple_init)
 
                 if h_simple == h:
                     return h_simple
@@ -821,7 +810,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__lt__, other, coerce=bool)``:
+        Shorthand for ``self.map(operator.__lt__, other).umap(bool)``:
 
         ```python
         >>> H(6).lt(3)
@@ -829,16 +818,16 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__lt__, other, coerce=bool)
+        return self.map(__lt__, other).umap(bool)
 
     def le(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__le__, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__le__, other).umap(bool)``.
 
         ```python
         >>> H(6).le(3)
@@ -846,16 +835,16 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__le__, other, coerce=bool)
+        return self.map(__le__, other).umap(bool)
 
     def eq(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__eq__, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__eq__, other).umap(bool)``.
 
         ```python
         >>> H(6).eq(3)
@@ -863,16 +852,16 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__eq__, other, coerce=bool)
+        return self.map(__eq__, other).umap(bool)
 
     def ne(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__ne__, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__ne__, other).umap(bool)``.
 
         ```python
         >>> H(6).ne(3)
@@ -880,16 +869,16 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__ne__, other, coerce=bool)
+        return self.map(__ne__, other).umap(bool)
 
     def gt(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__gt__, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__gt__, other).umap(bool)``.
 
         ```python
         >>> H(6).gt(3)
@@ -897,16 +886,16 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__gt__, other, coerce=bool)
+        return self.map(__gt__, other).umap(bool)
 
     def ge(
         self,
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__ge__, other, coerce=bool)``.
+        Shorthand for ``self.map(operator.__ge__, other).umap(bool)``.
 
         ```python
         >>> H(6).ge(3)
@@ -914,9 +903,9 @@ class H(_MappingT):
 
         ```
 
-        See the [``map`` method][dyce.h.H.map].
+        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
         """
-        return self.map(__ge__, other, coerce=bool)
+        return self.map(__ge__, other).umap(bool)
 
     def is_even(self) -> H:
         r"""
