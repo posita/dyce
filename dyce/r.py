@@ -41,7 +41,6 @@ from typing import Any, Iterable, Iterator, List, Sequence, Tuple, Union, overlo
 from .h import H, _BinaryOperatorT, _UnaryOperatorT
 from .lifecycle import experimental
 from .p import P
-from .symmetries import sum_w_start
 from .types import IndexT, IntT, OutcomeT, _GetItemT, _OutcomeCs, as_int
 
 __all__ = (
@@ -109,8 +108,6 @@ class R(Sequence["R"]):
       right_child=ValueRoller(value=2, annotation=None),
       annotation=None,
     )
-    >>> (((4 * r_d6 + 3) ** 2 % 5).gt(2)).h() == ((4 * d6 + 3) ** 2 % 5).gt(2)
-    True
 
     ```
 
@@ -123,8 +120,6 @@ class R(Sequence["R"]):
         >>> r_6 = R.from_value(6)
         >>> r_6_abs_3 = 3 @ abs(r_6)
         >>> r_6_3_abs = abs(3 @ r_6)
-        >>> r_6_abs_3.h() == r_6_3_abs.h()  # their histograms are the same
-        True
         >>> tuple(r_6_abs_3.roll().outcomes()), tuple(r_6_3_abs.roll().outcomes())  # they generate the same rolls
         ((6, 6, 6), (6, 6, 6))
         >>> r_6_abs_3 == r_6_3_abs  # and yet, they're different animals
@@ -217,9 +212,6 @@ class R(Sequence["R"]):
         super().__init__()
         self._children = tuple(children)
         self._annotation = annotation
-        # It is probably an abuse of lists to use them as pointers, but this allows
-        # copies (e.g., made from R.annotate) to benefit from siblings' efforts
-        self._cached_h: List[H] = []
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -426,39 +418,11 @@ class R(Sequence["R"]):
     def __invert__(self) -> UnaryOperationRoller:
         return self.umap(__invert__)
 
-    def h(self) -> H:
-        r"""
-        Implements the [``HAbleT`` protocol][dyce.h.HAbleT]. This method calls the abstract
-        ``_h`` method and caches (memoizes) the result to avoid potentially intensive,
-        redundant computation. Derived classes wishing to preserve this behavior should
-        override the ``_h`` method instead of this one.
-
-        Internally, this method should only ever be called from ``_h`` method
-        implementations.
-        """
-        if not self._cached_h:
-            self._cached_h.append(self._h())
-
-        return self._cached_h[0]
-
     @abstractmethod
     def roll(self) -> Roll:
         r"""
         Sub-classes should implement this to return a new [``Roll`` object][dyce.r.Roll]
         appropriate for a particular node (taking into account any children).
-        """
-        raise NotImplementedError
-
-    def _h(self) -> H:
-        r"""
-        Sub-clases should implement this to return an [``H`` object][dyce.h.H] reflective of
-        a particular node (taking into account any children). This method should only
-        ever be called from the [``h`` method][dyce.r.R.h].
-
-        The default implementation for this method is to raise a
-        ``NotImplementedError``. This is by design. Not all rollers can efficiently
-        compute their own histograms, even if their children can. If you want to
-        implement rollers and don’t need this functionality, you can safely ignore it.
         """
         raise NotImplementedError
 
@@ -617,8 +581,6 @@ class R(Sequence["R"]):
           right_child=ValueRoller(value=2, annotation=None),
           annotation=None,
         )
-        >>> r_binop.h()
-        H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1})
 
         ```
         """
@@ -649,8 +611,6 @@ class R(Sequence["R"]):
           right_child=ValueRoller(value=H(6), annotation=None),
           annotation=None,
         )
-        >>> r_binop.h()
-        H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
 
         ```
         """
@@ -680,8 +640,6 @@ class R(Sequence["R"]):
           child=ValueRoller(value=H(6), annotation=None),
           annotation=None,
         )
-        >>> r_unop.h()
-        H(-6)
 
         ```
         """
@@ -911,14 +869,6 @@ class ValueRoller(R):
         elif isinstance(self.value, _OutcomeCs):
             return Roll(self, items=(((self.value,), ()),))
 
-    def _h(self) -> H:
-        if isinstance(self.value, P):
-            return self.value.h()
-        elif isinstance(self.value, H):
-            return self.value
-        elif isinstance(self.value, _OutcomeCs):
-            return H({self.value: 1})
-
     # ---- Properties ------------------------------------------------------------------
 
     @property
@@ -946,7 +896,7 @@ class BinaryOperationRoller(R):
     ):
         r"Initializer."
         super().__init__((left_child, right_child), annotation)
-        self._operator = op
+        self._op = op
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -957,14 +907,14 @@ class BinaryOperationRoller(R):
         left_child, right_child = self.children
 
         return f"""{type(self).__name__}(
-  op={self.operator!r},
+  op={self.op!r},
   left_child={_child_repr(left_child)},
   right_child={_child_repr(right_child)},
   annotation={self.annotation!r},
 )"""
 
     def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.operator == other.operator
+        return super().__eq__(other) and self.op == other.op
 
     def roll(self) -> Roll:
         left_child, right_child = self.children
@@ -976,7 +926,7 @@ class BinaryOperationRoller(R):
             items=(
                 (
                     tuple(
-                        self.operator(left_outcome, right_outcome)
+                        self.op(left_outcome, right_outcome)
                         for left_outcome in left_roll.outcomes()
                         for right_outcome in right_roll.outcomes()
                     ),
@@ -985,19 +935,14 @@ class BinaryOperationRoller(R):
             ),
         )
 
-    def _h(self) -> H:
-        left_child, right_child = self.children
-
-        return self.operator(left_child.h(), right_child.h())
-
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def operator(self) -> _BinaryOperatorT:
+    def op(self) -> _BinaryOperatorT:
         r"""
         The binary operator this roller applies to its children.
         """
-        return self._operator
+        return self._op
 
 
 class UnaryOperationRoller(R):
@@ -1015,7 +960,7 @@ class UnaryOperationRoller(R):
     ):
         r"Initializer."
         super().__init__((child,), annotation)
-        self._operator = op
+        self._op = op
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1026,13 +971,13 @@ class UnaryOperationRoller(R):
         (child,) = self.children
 
         return f"""{type(self).__name__}(
-  op={self.operator!r},
+  op={self.op!r},
   child={_child_repr(child)},
   annotation={self.annotation!r},
 )"""
 
     def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.operator == other.operator
+        return super().__eq__(other) and self.op == other.op
 
     def roll(self) -> Roll:
         (child,) = self.children
@@ -1042,25 +987,20 @@ class UnaryOperationRoller(R):
             self,
             items=(
                 (
-                    tuple(self.operator(outcome) for outcome in child_roll.outcomes()),
+                    tuple(self.op(outcome) for outcome in child_roll.outcomes()),
                     (child_roll,),
                 ),
             ),
         )
 
-    def _h(self) -> H:
-        (child,) = self.children
-
-        return self.operator(child.h())
-
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def operator(self) -> _UnaryOperatorT:
+    def op(self) -> _UnaryOperatorT:
         r"""
         The unary operator this roller applies to each outcome of its sole child.
         """
-        return self._operator
+        return self._op
 
 
 class RepeatRoller(R):
@@ -1119,11 +1059,6 @@ class RepeatRoller(R):
 
         return Roll(self, items=_items())
 
-    def _h(self) -> H:
-        (child,) = self.children
-
-        return self.n @ child.h()
-
     # ---- Properties ------------------------------------------------------------------
 
     @property
@@ -1158,9 +1093,6 @@ class PoolRoller(R):
                 yield (tuple(child_roll.outcomes()), (child_roll,))
 
         return Roll(self, items=_items())
-
-    def _h(self) -> H:
-        return sum_w_start((child.h() for child in self.children), start=H({}))
 
 
 class Roll(Sequence[_RollItemT]):
