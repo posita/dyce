@@ -15,7 +15,7 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
-from operator import __eq__, __getitem__, __index__, __mul__, __ne__, __neg__, __pos__
+from operator import __eq__, __index__, __mul__, __ne__, __neg__, __pos__
 from typing import (
     Callable,
     Counter,
@@ -26,7 +26,6 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypeVar,
     Union,
     overload,
 )
@@ -34,7 +33,7 @@ from typing import (
 from .h import H, HAbleOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT
 from .lifecycle import deprecated, experimental
 from .symmetries import sum_w_start
-from .types import IndexT, IntT, OutcomeT, _GetItemT, as_int, sorted_outcomes
+from .types import IndexT, IntT, OutcomeT, _GetItemT, as_int, getitems, sorted_outcomes
 
 __all__ = ("P",)
 
@@ -42,7 +41,6 @@ __all__ = ("P",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_T = TypeVar("_T")
 _OperandT = Union["P", OutcomeT]
 _RollT = Tuple[OutcomeT, ...]
 _RollCountT = Tuple[_RollT, int]
@@ -760,7 +758,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         for sorted_outcomes_for_roll, roll_count in rolls_with_counts_iter:
             if which:
-                taken_outcomes = tuple(_getitems(sorted_outcomes_for_roll, which))
+                taken_outcomes = tuple(getitems(sorted_outcomes_for_roll, which))
             else:
                 taken_outcomes = sorted_outcomes_for_roll
 
@@ -841,7 +839,7 @@ def _analyze_selection(
     * ``None`` - any other selection
     """
     indexes = list(range(n))
-    counts_by_index = counter(_getitems(indexes, which))
+    counts_by_index = counter(getitems(indexes, which))
     found_indexes = set(counts_by_index)
 
     if not found_indexes:
@@ -865,14 +863,6 @@ def _analyze_selection(
         return max_index
     else:
         assert False, "should never be here"
-
-
-def _getitems(sequence: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
-    for key in keys:
-        if isinstance(key, slice):
-            yield from __getitem__(sequence, key)
-        else:
-            yield __getitem__(sequence, __index__(key))
 
 
 def _rwc_heterogeneous_h_groups(

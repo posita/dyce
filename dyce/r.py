@@ -36,12 +36,23 @@ from operator import (
     __xor__,
 )
 from textwrap import indent
-from typing import Any, Iterable, Iterator, List, Sequence, Tuple, Union, overload
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    List,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from .h import H, _BinaryOperatorT, _UnaryOperatorT
 from .lifecycle import experimental
 from .p import P
-from .types import IndexT, IntT, OutcomeT, _GetItemT, _OutcomeCs, as_int
+from .types import IndexT, IntT, OutcomeT, _GetItemT, _OutcomeCs, as_int, getitems
 
 __all__ = (
     "R",
@@ -52,9 +63,11 @@ __all__ = (
 # ---- Types ---------------------------------------------------------------------------
 
 
+_T_co = TypeVar("_T_co", covariant=True)
 _OperandT = Union[OutcomeT, "R"]
 _ValueT = Union[OutcomeT, H, P]
 _RollItemT = Tuple[Tuple[OutcomeT, ...], Tuple["Roll", ...]]
+_NaryOperatorT = Callable[[Iterable[_T_co]], Iterable[_T_co]]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -445,57 +458,6 @@ class R(Sequence["R"]):
     # ---- Methods ---------------------------------------------------------------------
 
     @classmethod
-    def from_value(
-        cls,
-        value: _ValueT,
-        annotation: Any = None,
-    ) -> ValueRoller:
-        r"""
-        Creates and returns a roller without any children for representing a single *value*
-        (i.e., scalar or histogram).
-
-        ```python
-        >>> R.from_value(6)
-        ValueRoller(value=6, annotation=None)
-        >>> R.from_value(H(6))
-        ValueRoller(value=H(6), annotation=None)
-
-        ```
-        """
-        return ValueRoller(value, annotation=annotation)
-
-    @classmethod
-    def from_values(
-        cls,
-        *values: _ValueT,
-        annotation: Any = None,
-    ) -> PoolRoller:
-        r"""
-        Shorthand for ``cls.from_values_iterable(values, annotation=annotation)``.
-
-        See the [``from_values_iterable`` method][dyce.r.R.from_values_iterable].
-        """
-        return cls.from_values_iterable(values, annotation=annotation)
-
-    @classmethod
-    def from_values_iterable(
-        cls,
-        values: Iterable[_ValueT],
-        annotation: Any = None,
-    ) -> PoolRoller:
-        r"""
-        Shorthand for ``cls.from_rs_iterable((cls.from_value(value) for value in values),
-        annotation=annotation)``.
-
-        See the [``from_value``][dyce.r.R.from_value] and
-        [``from_rs_iterable``][dyce.r.R.from_rs_iterable] methods.
-        """
-        return cls.from_rs_iterable(
-            (cls.from_value(value) for value in values),
-            annotation=annotation,
-        )
-
-    @classmethod
     def from_rs(
         cls,
         *children: R,
@@ -561,6 +523,74 @@ class R(Sequence["R"]):
         ```
         """
         return PoolRoller(children, annotation=annotation)
+
+    @classmethod
+    def from_value(
+        cls,
+        value: _ValueT,
+        annotation: Any = None,
+    ) -> ValueRoller:
+        r"""
+        Creates and returns a roller without any children for representing a single *value*
+        (i.e., scalar or histogram).
+
+        ```python
+        >>> R.from_value(6)
+        ValueRoller(value=6, annotation=None)
+        >>> R.from_value(H(6))
+        ValueRoller(value=H(6), annotation=None)
+
+        ```
+        """
+        return ValueRoller(value, annotation=annotation)
+
+    @classmethod
+    def from_values(
+        cls,
+        *values: _ValueT,
+        annotation: Any = None,
+    ) -> PoolRoller:
+        r"""
+        Shorthand for ``cls.from_values_iterable(values, annotation=annotation)``.
+
+        See the [``from_values_iterable`` method][dyce.r.R.from_values_iterable].
+        """
+        return cls.from_values_iterable(values, annotation=annotation)
+
+    @classmethod
+    def from_values_iterable(
+        cls,
+        values: Iterable[_ValueT],
+        annotation: Any = None,
+    ) -> PoolRoller:
+        r"""
+        Shorthand for ``cls.from_rs_iterable((cls.from_value(value) for value in values),
+        annotation=annotation)``.
+
+        See the [``from_value``][dyce.r.R.from_value] and
+        [``from_rs_iterable``][dyce.r.R.from_rs_iterable] methods.
+        """
+        return cls.from_rs_iterable(
+            (cls.from_value(value) for value in values),
+            annotation=annotation,
+        )
+
+    def annotate(self, annotation: Any = None) -> R:
+        r"""
+        Generates a copy of the roller with the desired annotation.
+
+        ```python
+        >>> r_just_the_n_of_us = R.from_value(5, annotation="But I'm 42!") ; r_just_the_n_of_us
+        ValueRoller(value=5, annotation="But I'm 42!")
+        >>> r_just_the_n_of_us.annotate("I'm a 42-year-old investment banker!")
+        ValueRoller(value=5, annotation="I'm a 42-year-old investment banker!")
+
+        ```
+        """
+        r = copy(self)
+        r._annotation = annotation
+
+        return r
 
     def map(
         self,
@@ -644,6 +674,56 @@ class R(Sequence["R"]):
         ```
         """
         return UnaryOperationRoller(op, self, annotation=annotation)
+
+    def select(
+        self,
+        *which: _GetItemT,
+        annotation: Any = None,
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``self.select_iterable(which, annotation=annotation)``.
+
+        See the [``select_iterable`` method][dyce.r.R.select_iterable].
+        """
+        return self.select_iterable(which, annotation=annotation)
+
+    def select_iterable(
+        self,
+        which: Iterable[_GetItemT],
+        annotation: Any = None,
+    ) -> SelectionRoller:
+        r"""
+        Creates and returns a parent roller for applying an *n*-ary selection *which* to
+        sorted outcomes from this roller.
+
+        ```python
+        >>> r = R.from_values(5, 4, 6, 3, 7, 2, 8, 1, 9, 0)
+        >>> r_select = r.select(0, -1, slice(3, 6), slice(6, 3, -1), -1, 0) ; r_select
+        SelectionRoller(
+          which=(0, -1, slice(3, 6, None), slice(6, 3, -1), -1, 0),
+          child=PoolRoller(
+            children=(
+              ValueRoller(value=5, annotation=None),
+              ValueRoller(value=4, annotation=None),
+              ValueRoller(value=6, annotation=None),
+              ValueRoller(value=3, annotation=None),
+              ValueRoller(value=7, annotation=None),
+              ValueRoller(value=2, annotation=None),
+              ValueRoller(value=8, annotation=None),
+              ValueRoller(value=1, annotation=None),
+              ValueRoller(value=9, annotation=None),
+              ValueRoller(value=0, annotation=None),
+            ),
+            annotation=None,
+          ),
+          annotation=None,
+        )
+        >>> tuple(r_select.roll().outcomes())
+        (0, 9, 3, 4, 5, 6, 5, 4, 9, 0)
+
+        ```
+        """
+        return SelectionRoller(which, self, annotation=annotation)
 
     def lt(
         self,
@@ -821,23 +901,6 @@ class R(Sequence["R"]):
 
         return self.umap(_is_odd)
 
-    def annotate(self, annotation: Any = None) -> R:
-        r"""
-        Generates a copy of the roller with the desired annotation.
-
-        ```python
-        >>> r_just_the_n_of_us = R.from_value(5, annotation="But I'm 42!") ; r_just_the_n_of_us
-        ValueRoller(value=5, annotation="But I'm 42!")
-        >>> r_just_the_n_of_us.annotate("I'm a 42-year-old investment banker!")
-        ValueRoller(value=5, annotation="I'm a 42-year-old investment banker!")
-
-        ```
-        """
-        r = copy(self)
-        r._annotation = annotation
-
-        return r
-
 
 class ValueRoller(R):
     r"""
@@ -965,14 +1028,11 @@ class UnaryOperationRoller(R):
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        def _child_repr(child: R) -> str:
-            return indent(repr(child), "  ").strip()
-
         (child,) = self.children
 
         return f"""{type(self).__name__}(
   op={self.op!r},
-  child={_child_repr(child)},
+  child={indent(repr(child), "  ").strip()},
   annotation={self.annotation!r},
 )"""
 
@@ -1001,6 +1061,88 @@ class UnaryOperationRoller(R):
         The unary operator this roller applies to each outcome of its sole child.
         """
         return self._op
+
+
+class NaryOperationRoller(R):
+    r"""
+    A roller for applying an *n*-ary operator *op* to all outcomes from its sole
+    *child*.
+    """
+
+    # ---- Constructor -----------------------------------------------------------------
+
+    def __init__(
+        self,
+        op: _NaryOperatorT,
+        child: R,
+        annotation: Any = None,
+    ):
+        r"Initializer."
+        super().__init__((child,), annotation)
+        self._op = op
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    def __repr__(self) -> str:
+        (child,) = self.children
+
+        return f"""{type(self).__name__}(
+  op={self.op!r},
+  child={indent(repr(child), "  ").strip()},
+  annotation={self.annotation!r},
+)"""
+
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and self.op == other.op
+
+    def roll(self) -> Roll:
+        (child,) = self.children
+        child_roll = child.roll()
+
+        return Roll(
+            self,
+            items=(
+                (
+                    tuple(self.op(child_roll.outcomes())),
+                    (child_roll,),
+                ),
+            ),
+        )
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def op(self) -> _NaryOperatorT:
+        r"""
+        The *n*-ary operator this roller applies to all outcomes from its sole child.
+        """
+        return self._op
+
+
+class PoolRoller(R):
+    r"""
+    A roller for “pooling” zero or more *children* rollers.
+    """
+
+    # ---- Constructor -----------------------------------------------------------------
+
+    def __init__(
+        self,
+        children: Iterable[R] = (),
+        annotation: Any = None,
+    ):
+        r"Initializer."
+        super().__init__(children, annotation)
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    def roll(self) -> Roll:
+        def _items() -> Iterator[_RollItemT]:
+            for child in self._children:
+                child_roll = child.roll()
+                yield (tuple(child_roll.outcomes()), (child_roll,))
+
+        return Roll(self, items=_items())
 
 
 class RepeatRoller(R):
@@ -1035,14 +1177,11 @@ class RepeatRoller(R):
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        def _child_repr(child: R) -> str:
-            return indent(repr(child), "  ").strip()
-
         (child,) = self.children
 
         return f"""{type(self).__name__}(
   n={self.n!r},
-  child={_child_repr(child)},
+  child={indent(repr(child), "  ").strip()},
   annotation={self.annotation!r},
 )"""
 
@@ -1069,30 +1208,50 @@ class RepeatRoller(R):
         return self._n
 
 
-class PoolRoller(R):
+class SelectionRoller(NaryOperationRoller):
     r"""
-    A roller for “pooling” zero or more *children* rollers.
+    A roller for sorting outcomes from its sole *child* and applying a selector *which*.
     """
 
     # ---- Constructor -----------------------------------------------------------------
 
     def __init__(
         self,
-        children: Iterable[R] = (),
+        which: Iterable[_GetItemT],
+        child: R,
         annotation: Any = None,
     ):
         r"Initializer."
-        super().__init__(children, annotation)
+        super().__init__(self._sort_and_select, child, annotation)
+        self._which = tuple(which)
 
     # ---- Overrides -------------------------------------------------------------------
 
-    def roll(self) -> Roll:
-        def _items() -> Iterator[_RollItemT]:
-            for child in self._children:
-                child_roll = child.roll()
-                yield (tuple(child_roll.outcomes()), (child_roll,))
+    def __repr__(self) -> str:
+        (child,) = self.children
 
-        return Roll(self, items=_items())
+        return f"""{type(self).__name__}(
+  which={self.which!r},
+  child={indent(repr(child), "  ").strip()},
+  annotation={self.annotation!r},
+)"""
+
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and self.which == other.which
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def which(self) -> Tuple[_GetItemT, ...]:
+        r"""
+        The selector this roller applies to the sorted outcomes of its sole child.
+        """
+        return self._which
+
+    # ---- Methods ---------------------------------------------------------------------
+
+    def _sort_and_select(self, outcomes: Iterable[OutcomeT]) -> Iterable[OutcomeT]:
+        return getitems(sorted(outcomes), self.which)
 
 
 class Roll(Sequence[_RollItemT]):

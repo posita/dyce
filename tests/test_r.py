@@ -221,14 +221,18 @@ class TestBinaryOperationRoller:
                 left, right = two_floordiv_r.children
                 assert left == ValueRoller(2)
                 assert right == r
-                assert tuple(two_floordiv_r.roll().outcomes()) == 2 // o, two_floordiv_r
+                assert tuple(two_floordiv_r.roll().outcomes()) == (
+                    2 // o,
+                ), two_floordiv_r
 
                 r_floordiv_two = r // 2
                 assert r_floordiv_two.op == operator.__floordiv__
                 left, right = r_floordiv_two.children
                 assert left == r
                 assert right == ValueRoller(2)
-                assert tuple(r_floordiv_two.roll().outcomes()) == o // 2, r_floordiv_two
+                assert tuple(r_floordiv_two.roll().outcomes()) == (
+                    o // 2,
+                ), r_floordiv_two
 
     def test_op_mod(self) -> None:
         for o_type in _OUTCOME_TYPES:
@@ -502,50 +506,6 @@ class TestUnaryOperationRoller:
                 assert r_neg_roll.total in h_neg, r_neg
 
 
-class TestRepeatRoller:
-    def test_repr(self) -> None:
-        r_42 = R.from_value(42)
-        r_42_3 = r_42 @ 3
-        assert (
-            repr(r_42_3)
-            == """RepeatRoller(
-  n=3,
-  child=ValueRoller(value=42, annotation=None),
-  annotation=None,
-)"""
-        )
-
-        r_d6 = R.from_value(H(6), annotation="d6")
-        r_d6_2 = 2 @ r_d6
-        assert (
-            repr(r_d6_2)
-            == """RepeatRoller(
-  n=2,
-  child=ValueRoller(value=H(6), annotation='d6'),
-  annotation=None,
-)"""
-        )
-
-    def test_op_eq(self) -> None:
-        r_42 = R.from_value(42)
-        r_42_annotated = r_42.annotate("42")
-        assert 3 @ r_42 == 3 @ r_42
-        assert 3 @ r_42 != 3 @ r_42_annotated
-        assert 3 @ r_42_annotated == 3 @ r_42.annotate("42")
-
-    def test_roll(self) -> None:
-        for o_type in _OUTCOME_TYPES:
-            for i_type in _INTEGRAL_OUTCOME_TYPES:
-                h = H(o_type(o) for o in range(-2, 3))
-                r = R.from_value(h, annotation=f"{o_type}")
-                r_1000 = (i_type(1000) @ r).annotate(f"{i_type}")
-                r_1000_roll = r_1000.roll()
-                assert len(r_1000_roll) == 1000
-
-                for outcome in r_1000_roll.outcomes():
-                    assert outcome in h, r_1000_roll
-
-
 class TestPoolRoller:
     def test_repr(self) -> None:
         r_4_6_8 = R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
@@ -602,6 +562,83 @@ class TestPoolRoller:
                 r_3_roll = r_3.roll()
                 assert r_3_roll.r == r_3
                 assert r_3_roll.total in h_3, r_3_roll
+
+
+class TestRepeatRoller:
+    def test_repr(self) -> None:
+        r_42 = R.from_value(42)
+        r_42_3 = r_42 @ 3
+        assert (
+            repr(r_42_3)
+            == """RepeatRoller(
+  n=3,
+  child=ValueRoller(value=42, annotation=None),
+  annotation=None,
+)"""
+        )
+
+        r_d6 = R.from_value(H(6), annotation="d6")
+        r_d6_2 = 2 @ r_d6
+        assert (
+            repr(r_d6_2)
+            == """RepeatRoller(
+  n=2,
+  child=ValueRoller(value=H(6), annotation='d6'),
+  annotation=None,
+)"""
+        )
+
+    def test_op_eq(self) -> None:
+        r_42 = R.from_value(42)
+        r_42_annotated = r_42.annotate("42")
+        assert 3 @ r_42 == 3 @ r_42
+        assert 3 @ r_42 != 3 @ r_42_annotated
+        assert 3 @ r_42_annotated == 3 @ r_42.annotate("42")
+
+    def test_roll(self) -> None:
+        for o_type in _OUTCOME_TYPES:
+            for i_type in _INTEGRAL_OUTCOME_TYPES:
+                h = H(o_type(o) for o in range(-2, 3))
+                r = R.from_value(h, annotation=f"{o_type}")
+                r_1000 = (i_type(1000) @ r).annotate(f"{i_type}")
+                r_1000_roll = r_1000.roll()
+                assert len(r_1000_roll) == 1000
+
+                for outcome in r_1000_roll.outcomes():
+                    assert outcome in h, r_1000_roll
+
+
+class TestSelectRoller:
+    def test_repr(self) -> None:
+        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares_select = r_squares.select(0, -1)
+        assert (
+            repr(r_squares_select)
+            == """SelectionRoller(
+  which=(0, -1),
+  child=PoolRoller(
+    children=(
+      ValueRoller(value=36, annotation=None),
+      ValueRoller(value=25, annotation=None),
+      ValueRoller(value=16, annotation=None),
+      ValueRoller(value=9, annotation=None),
+      ValueRoller(value=4, annotation=None),
+      ValueRoller(value=1, annotation=None),
+    ),
+    annotation=None,
+  ),
+  annotation=None,
+)"""
+        )
+
+    def test_roll(self) -> None:
+        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares_select = r_squares.select(0, -1, 1, -2)
+        r_squares_select_roll = r_squares_select.roll()
+        assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
+        assert r_squares_select_roll.r == r_squares_select
+        (r_squares_roll,) = tuple(r_squares_select_roll.rolls())
+        assert r_squares_roll.r == r_squares
 
 
 class TestRoll:

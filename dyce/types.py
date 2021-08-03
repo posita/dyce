@@ -12,7 +12,8 @@ from __future__ import annotations
 import re
 from abc import abstractmethod
 from collections.abc import Iterable
-from typing import Any, Dict, List, Tuple, TypeVar, Union
+from operator import __getitem__, __index__
+from typing import Any, Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .symmetries import Protocol
 from .symmetries import SupportsAbs as _SupportsAbs
@@ -306,6 +307,14 @@ def as_int(val: IntT) -> int:
         raise TypeError(f"cannot (losslessly) coerce {val} to an int")
 
     return int(val)
+
+
+def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
+    for key in keys:
+        if isinstance(key, slice):
+            yield from __getitem__(seq, key)
+        else:
+            yield __getitem__(seq, __index__(key))
 
 
 def identity(x: _T) -> _T:
