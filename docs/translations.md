@@ -25,7 +25,7 @@ If you have exposure to [another tool](), they may also help with transition.
 >>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: H(6) if outcome == 1 else outcome)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> res2 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
->>> p_4d6_reroll_all_ones = 4@P(H(range(2, 7)))
+>>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
 >>> res3 = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
 
 ```

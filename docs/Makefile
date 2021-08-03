@@ -29,9 +29,9 @@ plot_%_dark.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/p
 plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
 	"$${PYTHON:-python}" plot.py --style=light $*
 
-# See TODO in plot.py
+# TODO(posita): This should go away at some point. (See TODO in plot.py.)
 plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
 dyce-powered.svg : Makefile
-	curl --output dyce-powered.svg 'https://img.shields.io/badge/%F0%9F%8E%B2%F0%9F%92%A5-dyce--powered%21-77cc44'
+	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-dyce--powered%21-gold'

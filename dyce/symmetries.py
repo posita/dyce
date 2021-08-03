@@ -12,7 +12,10 @@ from __future__ import annotations
 import sys
 from typing import Iterable, TypeVar, Union, overload
 
-__all__ = ()
+__all__ = (
+    "comb",
+    "gcd",
+)
 
 
 # ---- Types ---------------------------------------------------------------------------

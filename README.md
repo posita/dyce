@@ -55,7 +55,7 @@ Let me know, and I’ll promote it here!
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
 [``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) represent nodes in arbitrary roller trees useful for translating from proprietary grammars.
-[``Roll`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.Roll) represent random rolls generated from roller trees.
+[``Roll`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.Roll) represent random rolls (sequences of outcomes) generated from roller trees.
 All support a variety of operations.
 
 ```python
@@ -300,8 +300,8 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and r
 
 ``dyce`` requires a relatively modern version of Python:
 
-* [cPython](https://www.python.org/) (3.7+)
-* [PyPy](http://pypy.org/) (Python 3.7+ compatible)
+* [CPython](https://www.python.org/) (3.7+)
+* [PyPy](http://pypy.org/) (CPython 3.7+ compatible)
 
 It has the following runtime dependencies:
 

@@ -21,7 +21,7 @@
 * Boosts ``isinstance`` performance with ``dyce``’s proprietary numeric ``Protocol``s.
 * Reinstates support for Python 3.7 (for now).
 * Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
-* Deprecates [``H.even``][dyce.h.H.even] and [``H.odd``][dyce.h.H.odd].
+* Deprecates synonym methods [``H.even``][dyce.h.H.even] and [``H.odd``][dyce.h.H.odd].
 * Introduces experimental [``H.total``][dyce.h.H.total] property.
 * Removes incorrectly non-flattening unary operation methods ``P.__abs__`` and ``P.__invert__``.
 * Deprecates non-flattening unary operation methods [``P.__neg__``][dyce.p.P.__neg__] and [``P.__pos__``][dyce.p.P.__pos__].

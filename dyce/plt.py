@@ -9,20 +9,23 @@
 
 from __future__ import annotations
 
-import fractions
 import warnings
-from typing import Any, Iterable, Iterator, List, Tuple, Type, Union
+from fractions import Fraction
+from numbers import Real
+from typing import Any, Iterable, Iterator, Optional, Sequence, Tuple, Union
 
 from .h import H
 from .lifecycle import experimental
 
 try:
-    import matplotlib.axes
-    import matplotlib.figure
     import matplotlib.pyplot
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
 except ImportError:
     warnings.warn("matplotlib not found; {} APIs disabled".format(__name__))
     matplotlib = None  # noqa: F811
+    Axes = Any  # noqa: F811
+    Figure = Any  # noqa: F811
 
 __all__ = ()
 
@@ -30,16 +33,9 @@ __all__ = ()
 # ---- Types ---------------------------------------------------------------------------
 
 
-ColorT = Tuple[float, float, float, float]
-ColorListT = List[ColorT]
-LabelT = Tuple[str, Union[float, fractions.Fraction]]
-
-if matplotlib:
-    AxesT = Type[matplotlib.axes.Axes]
-    FigureT = Type[matplotlib.figure.Figure]
-else:
-    AxesT = Any  # type: ignore
-    FigureT = Any  # type: ignore
+ColorT = Sequence[float]
+ColorListT = Iterable[ColorT]
+LabelT = Tuple[str, Union[float, Real]]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -48,7 +44,7 @@ else:
 DEFAULT_GRAPH_COLOR = "RdYlGn_r"
 DEFAULT_TEXT_COLOR = "black"
 DEFAULT_GRAPH_ALPHA = 0.5
-_HIDE_LIM = fractions.Fraction(1, 2 ** 6)
+_HIDE_LIM = Fraction(1, 2 ** 6)
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -73,12 +69,12 @@ def alphasize(colors: ColorListT, alpha: float) -> ColorListT:
 
 @experimental
 def display_burst(
-    ax: AxesT,
+    ax: Axes,
     h_inner: H,
-    outer: Union[H, Iterable[LabelT]] = None,
-    desc: str = None,
+    outer: Optional[Union[H, Iterable[LabelT]]] = None,
+    desc: Optional[str] = None,
     inner_color: str = DEFAULT_GRAPH_COLOR,
-    outer_color: str = None,
+    outer_color: Optional[str] = None,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
 ) -> None:
@@ -93,7 +89,6 @@ def display_burst(
     [visualization tutorial](tutorial.md#visualization) for examples.
     """
     assert matplotlib
-
     inner_colors = graph_colors(inner_color, h_inner, alpha)
 
     if outer is None:
@@ -189,13 +184,13 @@ def labels_cumulative(
 @experimental
 def plot_burst(
     h_inner: H,
-    outer: Union[H, Iterable[LabelT]] = None,
-    desc: str = None,
+    outer: Optional[Union[H, Iterable[LabelT]]] = None,
+    desc: Optional[str] = None,
     inner_color: str = DEFAULT_GRAPH_COLOR,
-    outer_color: str = None,
+    outer_color: Optional[str] = None,
     text_color: str = DEFAULT_TEXT_COLOR,
     alpha: float = DEFAULT_GRAPH_ALPHA,
-) -> Tuple[FigureT, AxesT]:
+) -> Tuple[Figure, Axes]:
     r"""
     !!! warning "Experimental"
 

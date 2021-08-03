@@ -71,7 +71,7 @@ class TestValueRoller:
             h = H(o_type(o) for o in range(-2, 3))
             r = R.from_value(h, annotation=f"{o_type}")
 
-            for _ in range(1000):
+            for _ in range(100):
                 r_roll = r.roll()
                 assert r_roll.r == r
                 assert r_roll.total in h, r
@@ -390,7 +390,7 @@ class TestBinaryOperationRoller:
             r = R.from_value(h, annotation=f"{o_type}")
             r_mul_r = r * r
 
-            for _ in range(1000):
+            for _ in range(100):
                 r_mul_r_roll = r_mul_r.roll()
                 assert r_mul_r_roll.r == r_mul_r
                 assert r_mul_r_roll.total in h_mul_h, r_mul_r
@@ -500,7 +500,7 @@ class TestUnaryOperationRoller:
             r = R.from_value(h, annotation=f"{o_type}")
             r_neg = -r
 
-            for _ in range(1000):
+            for _ in range(100):
                 r_neg_roll = r_neg.roll()
                 assert r_neg_roll.r == r_neg
                 assert r_neg_roll.total in h_neg, r_neg
@@ -558,7 +558,7 @@ class TestPoolRoller:
             r = R.from_value(h, annotation=f"{o_type}")
             r_3 = R.from_rs(r, r, r)
 
-            for _ in range(1000):
+            for _ in range(100):
                 r_3_roll = r_3.roll()
                 assert r_3_roll.r == r_3
                 assert r_3_roll.total in h_3, r_3_roll
@@ -600,12 +600,12 @@ class TestRepeatRoller:
             for i_type in _INTEGRAL_OUTCOME_TYPES:
                 h = H(o_type(o) for o in range(-2, 3))
                 r = R.from_value(h, annotation=f"{o_type}")
-                r_1000 = (i_type(1000) @ r).annotate(f"{i_type}")
-                r_1000_roll = r_1000.roll()
-                assert len(r_1000_roll) == 1000
+                r_100 = (i_type(100) @ r).annotate(f"{i_type}")
+                r_100_roll = r_100.roll()
+                assert len(r_100_roll) == 100
 
-                for outcome in r_1000_roll.outcomes():
-                    assert outcome in h, r_1000_roll
+                for outcome in r_100_roll.outcomes():
+                    assert outcome in h, r_100_roll
 
 
 class TestSelectRoller:

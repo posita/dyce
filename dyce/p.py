@@ -33,7 +33,16 @@ from typing import (
 from .h import H, HAbleOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT
 from .lifecycle import deprecated, experimental
 from .symmetries import sum_w_start
-from .types import IndexT, IntT, OutcomeT, _GetItemT, as_int, getitems, sorted_outcomes
+from .types import (
+    IndexT,
+    IntT,
+    OutcomeT,
+    _GetItemT,
+    _IntCs,
+    as_int,
+    getitems,
+    sorted_outcomes,
+)
 
 __all__ = ("P",)
 
@@ -54,11 +63,6 @@ class P(Sequence[H], HAbleOpsMixin):
     An immutable pool (ordered sequence) supporting group operations for zero or more
     [``H`` objects][dyce.h.H] (provided or created from the
     [initializer][dyce.p.P.__init__]’s *args* parameter).
-
-    This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
-    [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
-    “flattened” into a single histogram, either explicitly via the
-    [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
 
     ```python
     >>> from dyce import P
@@ -87,8 +91,10 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    Arithmetic operators involving a number or another ``P`` object produce an
-    [``H`` object][dyce.h.H]:
+    This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
+    [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
+    “flattened” into a single histogram, either explicitly via the
+    [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
 
     ```python
     >>> p_d6 + p_d6
@@ -99,6 +105,29 @@ class P(Sequence[H], HAbleOpsMixin):
     ```python
     >>> 2 * P(8) - 1
     H({1: 1, 3: 1, 5: 1, 7: 1, 9: 1, 11: 1, 13: 1, 15: 1})
+
+    ```
+
+    To perform arithmetic on individual [``H`` objects][dyce.h.H] in a pool without
+    flattening, use the [``map``][dyce.p.P.map], [``rmap``][dyce.p.P.rmap], and
+    [``umap``][dyce.p.P.umap] methods:
+
+    ```
+    >>> import operator
+    >>> P(4, 6, 8).umap(operator.__neg__)
+    P(-8, -6, -4)
+
+    ```
+
+    ```python
+    >>> P(4, 6).map(operator.__pow__, 2)
+    P(H({1: 1, 4: 1, 9: 1, 16: 1}), H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1}))
+
+    ```
+
+    ```python
+    >>> P(4, 6).rmap(2, operator.__pow__)
+    P(H({2: 1, 4: 1, 8: 1, 16: 1}), H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1}))
 
     ```
 
@@ -172,8 +201,10 @@ class P(Sequence[H], HAbleOpsMixin):
                 elif isinstance(a, P):
                     for h in a._hs:
                         yield h
+                elif isinstance(a, _IntCs):
+                    yield H(a)
                 else:
-                    yield H(as_int(a))
+                    raise ValueError(f"unrecognized initializer {args}")
 
         hs = list(h for h in _gen_hs() if h)
 
@@ -466,7 +497,7 @@ class P(Sequence[H], HAbleOpsMixin):
         group_counters: List[Counter[OutcomeT]] = []
 
         for h, hs in groupby(self):
-            group_counter: Counter[OutcomeT] = Counter()
+            group_counter: Counter[OutcomeT] = counter()
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
@@ -838,7 +869,7 @@ def _analyze_selection(
     * $\{ {k} \mid {k \mod n = 0} \}$ - *which* selects each of $[0..n)$ exactly $k$ times
     * ``None`` - any other selection
     """
-    indexes = list(range(n))
+    indexes = tuple(range(n))
     counts_by_index = counter(getitems(indexes, which))
     found_indexes = set(counts_by_index)
 

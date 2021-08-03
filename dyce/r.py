@@ -149,15 +149,16 @@ class R(Sequence["R"]):
 
     ```python
     >>> roll = r_d6.roll()
+    >>> tuple(roll.outcomes())  # doctest: +SKIP
+    (4,)
     >>> roll.total  # doctest: +SKIP
     4
-    >>> roll  # doctest: +SKIP
-    Roll(
-      r=ValueRoller(value=H(6), annotation=None),
-      items=(
-        ((4,), ()),
-      ),
-    )
+
+    ```
+
+    ```python
+    >>> d6 + 3
+    H({4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
     >>> (r_d6 + 3).roll().total in (d6 + 3)
     True
 
@@ -200,10 +201,10 @@ class R(Sequence["R"]):
     ```
 
     Rollers provide optional arbitrary annotations as a convenience to callers. They are
-    considered during roller tree comparison, but otherwise ignored internally. One use
-    is to capture references to corresponding nodes in an abstract syntax tree generated
-    from parsing a proprietary grammar. Any provided *annotation* can be retrieved using
-    the [``annotation`` property][dyce.r.R.annotation]. The
+    taken into account when comparing roller trees, but otherwise ignored internally.
+    One use is to capture references to corresponding nodes in an abstract syntax tree
+    generated from parsing a proprietary grammar. Any provided *annotation* can be
+    retrieved using the [``annotation`` property][dyce.r.R.annotation]. The
     [``annotate`` method][dyce.r.R.annotate] can be used to modify an annotation for
     existing roller.
 
@@ -537,6 +538,10 @@ class R(Sequence["R"]):
         ```python
         >>> R.from_value(6)
         ValueRoller(value=6, annotation=None)
+
+        ```
+
+        ```python
         >>> R.from_value(H(6))
         ValueRoller(value=H(6), annotation=None)
 
@@ -600,7 +605,8 @@ class R(Sequence["R"]):
     ) -> BinaryOperationRoller:
         r"""
         Creates and returns a parent roller for applying binary operator *op* to this roller
-        and *right_operand*.
+        and *right_operand*. Shorthands exist for many arithmetic operators and
+        comparators.
 
         ```python
         >>> import operator
@@ -611,6 +617,8 @@ class R(Sequence["R"]):
           right_child=ValueRoller(value=2, annotation=None),
           annotation=None,
         )
+        >>> r_binop == R.from_value(H(6)) ** 2
+        True
 
         ```
         """
@@ -641,6 +649,8 @@ class R(Sequence["R"]):
           right_child=ValueRoller(value=H(6), annotation=None),
           annotation=None,
         )
+        >>> r_binop == 2 ** R.from_value(H(6))
+        True
 
         ```
         """
@@ -670,6 +680,8 @@ class R(Sequence["R"]):
           child=ValueRoller(value=H(6), annotation=None),
           annotation=None,
         )
+        >>> r_unop == -R.from_value(H(6))
+        True
 
         ```
         """
@@ -705,12 +717,7 @@ class R(Sequence["R"]):
             children=(
               ValueRoller(value=5, annotation=None),
               ValueRoller(value=4, annotation=None),
-              ValueRoller(value=6, annotation=None),
-              ValueRoller(value=3, annotation=None),
-              ValueRoller(value=7, annotation=None),
-              ValueRoller(value=2, annotation=None),
-              ValueRoller(value=8, annotation=None),
-              ValueRoller(value=1, annotation=None),
+              ...,
               ValueRoller(value=9, annotation=None),
               ValueRoller(value=0, annotation=None),
             ),
@@ -1151,13 +1158,16 @@ class RepeatRoller(R):
     ``PoolRoller`` containing *n* copies of its sole *child*.
 
     ```python
-    >>> r_d6 = R.from_value(H(6))
-    >>> 1000 @ r_d6
+    >>> d20 = H(20)
+    >>> r_d20 = R.from_value(d20)
+    >>> r_d20_100 = 100 @ r_d20 ; r_d20_100
     RepeatRoller(
-      n=1000,
-      child=ValueRoller(value=H(6), annotation=None),
+      n=100,
+      child=ValueRoller(value=H(20), annotation=None),
       annotation=None,
     )
+    >>> all(outcome in d20 for outcome in r_d20_100.roll().outcomes())
+    True
 
     ```
     """

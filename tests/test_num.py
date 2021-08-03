@@ -14,22 +14,13 @@ import operator
 from decimal import Decimal
 from fractions import Fraction
 
+import pytest
+
 from dyce.types import _BitwiseCs, _OutcomeCs
 
 from .numberwang import Numberwang, Wangernumb
 
 __all__ = ()
-
-
-try:
-    import numpy
-except ImportError:
-    numpy = None  # type: ignore
-
-try:
-    import sympy
-except ImportError:
-    sympy = None
 
 
 # ---- Tests ---------------------------------------------------------------------------
@@ -43,32 +34,40 @@ def test_outcome_proto() -> None:
     assert isinstance(Wangernumb(-273.15), _OutcomeCs)
     assert isinstance(Numberwang(-273), _OutcomeCs)
 
-    if numpy is not None:
-        assert isinstance(numpy.float128(-273.15), _OutcomeCs)
-        assert isinstance(numpy.int64(-273), _OutcomeCs)
-
-    if sympy is not None:
-        assert isinstance(sympy.Float(-273.15), _OutcomeCs)
-        assert isinstance(sympy.Rational(-27315, 100), _OutcomeCs)
-        assert isinstance(sympy.Integer(-273), _OutcomeCs)
-        assert isinstance(sympy.symbols("x"), _OutcomeCs)
-
     assert not isinstance("-273.15", _OutcomeCs)
+
+
+def test_outcome_proto_numpy() -> None:
+    numpy = pytest.importorskip("numpy", reason="requires numpy")
+    assert isinstance(numpy.float128(-273.15), _OutcomeCs)
+    assert isinstance(numpy.int64(-273), _OutcomeCs)
+
+
+def test_outcome_proto_sympy() -> None:
+    sympy = pytest.importorskip("sympy", reason="requires numpy")
+    assert isinstance(sympy.Float(-273.15), _OutcomeCs)
+    assert isinstance(sympy.Rational(-27315, 100), _OutcomeCs)
+    assert isinstance(sympy.Integer(-273), _OutcomeCs)
+    assert isinstance(sympy.symbols("x"), _OutcomeCs)
 
 
 def test_supports_bitwise_proto() -> None:
     assert isinstance(-273, _BitwiseCs)
     assert isinstance(Numberwang(-273), _BitwiseCs)
 
-    if numpy is not None:
-        assert isinstance(numpy.int64(-273), _BitwiseCs)
-
-    # TODO: See <https://github.com/sympy/sympy/issues/19311>
-    # if sympy is not None:
-    #     assert isinstance(sympy.Integer(-273), _BitwiseCs)
-    #     assert isinstance(sympy.symbols("x"), _BitwiseCs)
-
     assert not isinstance("-273", _BitwiseCs)
+
+
+def test_supports_bitwise_proto_numpy() -> None:
+    numpy = pytest.importorskip("numpy", reason="requires numpy")
+    assert isinstance(numpy.int64(-273), _BitwiseCs)
+
+
+def test_supports_bitwise_proto_sympy() -> None:
+    pytest.importorskip("sympy", reason="requires numpy")
+    # TODO(posita): See <https://github.com/sympy/sympy/issues/19311>
+    # assert isinstance(sympy.Integer(-273), _BitwiseCs)
+    # assert isinstance(sympy.symbols("x"), _BitwiseCs)
 
 
 def test_numberwang() -> None:

@@ -1,3 +1,14 @@
+# -*- encoding: utf-8 -*-
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+from __future__ import annotations
+
 from decimal import Decimal
 from math import ceil, floor, trunc
 from numbers import Integral, Real
@@ -25,7 +36,7 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from typing import Union, overload
+from typing import Optional, Union, overload
 
 __all__ = ("Numberwang", "Wangernumb")
 
@@ -431,7 +442,7 @@ class Numberwang(Integral):
     def __int__(self) -> int:
         return self.val
 
-    def __round__(self, ndigits: _IntegralT = None) -> int:
+    def __round__(self, ndigits: Optional[_IntegralT] = None) -> int:
         if ndigits is None:
             return round(self.val)
         else:
@@ -700,7 +711,7 @@ class Wangernumb(Real):
     def __round__(self, ndigits: _IntegralT) -> float:
         ...
 
-    def __round__(self, ndigits: _IntegralT = None) -> Union[int, float]:
+    def __round__(self, ndigits: Optional[_IntegralT] = None) -> Union[int, float]:
         if ndigits is None:
             return round(self.val)
         else:

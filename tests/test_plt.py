@@ -26,7 +26,7 @@ __all__ = ()
 class TestPlt:
     def test_alphasize(self):
         colors = [
-            (r / 10, g / 10, b / 10, random.random())
+            [r / 10, g / 10, b / 10, random.random()]
             for r, g, b in zip(*(range(0, 10, 2), range(3, 9), range(10, 0, -2)))
         ]
         actual_colors = dyce_plt.alphasize(colors, 0.8)

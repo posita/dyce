@@ -60,14 +60,17 @@ from typing import (
 )
 
 from .lifecycle import deprecated, experimental
-from .symmetries import Protocol, comb, gcd, runtime_checkable, sum_w_start
+from .symmetries import comb, gcd, sum_w_start
 from .types import (
     CachingProtocolMeta,
     IntT,
     OutcomeT,
+    Protocol,
     _IntCs,
     _OutcomeCs,
+    _RationalConstructorT,
     as_int,
+    runtime_checkable,
     sorted_outcomes,
 )
 
@@ -92,15 +95,6 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
 _CoalesceT = Callable[["H", OutcomeT], "H"]
-
-
-@runtime_checkable
-class _RationalP(
-    Protocol[_T_co],
-    metaclass=CachingProtocolMeta,
-):
-    def __call__(self, numerator: int, denominator: int) -> _T_co:
-        ...
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -370,7 +364,7 @@ class H(_MappingT):
     Testing equivalence implicitly performs reductions of operands:
 
     ```python
-    >>> d6.accumulate(d6) == d6.accumulate(d6).accumulate(d6)
+    >>> d6.ge(4) == d6.ge(4).lowest_terms()
     True
 
     ```
@@ -383,6 +377,9 @@ class H(_MappingT):
         super().__init__()
         self._simple_init: Optional[int] = None
         tmp: Counter[OutcomeT] = counter()
+
+        if isinstance(items, MappingC):
+            items = items.items()
 
         if isinstance(items, _IntCs):
             if items != 0:
@@ -400,8 +397,6 @@ class H(_MappingT):
                     tmp.update({i: 1 for i in outcome_range})
         elif isinstance(items, HAbleT):
             tmp.update(items.h())
-        elif isinstance(items, MappingC):
-            tmp.update(items)
         elif isinstance(items, IterableC):
             # Items is either an Iterable[OutcomeT] or an Iterable[Tuple[OutcomeT,
             # IntT]] (although this technically supports Iterable[Union[OutcomeT,
@@ -1404,7 +1399,7 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: _MappingT,
-        rational_t: _RationalP[_T],
+        rational_t: _RationalConstructorT[_T],
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         ...
 
@@ -1412,7 +1407,7 @@ class H(_MappingT):
     def distribution(
         self,
         *,
-        rational_t: _RationalP[_T],
+        rational_t: _RationalConstructorT[_T],
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         ...
 
@@ -1420,10 +1415,10 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: Optional[_MappingT] = None,
-        # TODO: See <https://github.com/python/mypy/issues/10854> for context on all the
-        # @overload work-around nonsense above and remove those once that issue is
-        # addressed.
-        rational_t: _RationalP[_T] = Fraction,
+        # TODO(posita): See <https://github.com/python/mypy/issues/10854> for context on
+        # all the @overload work-around nonsense above and remove those once that issue
+        # is addressed.
+        rational_t: _RationalConstructorT[_T] = Fraction,
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
@@ -1461,10 +1456,16 @@ class H(_MappingT):
         >>> list(h.distribution(rational_t=lambda n, d: f"{n}/{d}"))
         [(1, '1/8'), (2, '1/8'), (3, '2/8'), (4, '2/8'), (5, '1/8'), (6, '1/8')]
 
+        ```
+
+        ```python
         >>> import sympy
         >>> list(h.distribution(rational_t=sympy.Rational))
         [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
 
+        ```
+
+        ```python
         >>> import sage.rings.rational  # doctest: +SKIP
         >>> list(h.distribution(rational_t=lambda n, d: sage.rings.rational.Rational((n, d))))  # doctest: +SKIP
         [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
@@ -1491,6 +1492,9 @@ class H(_MappingT):
         >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
+        ```
+
+        ```python
         >>> import sage.rings.rational  # doctest: +SKIP
         >>> [(outcome, sage.rings.rational.Rational(probability)) for outcome, probability in h.distribution()]  # doctest: +SKIP
         [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]

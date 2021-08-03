@@ -15,9 +15,9 @@ from functools import partial
 from plug import import_plug
 
 PARSER = argparse.ArgumentParser(description="Generate PNG files for documentation")
-# TODO: Get rid of all instances of gh here, below, and with Makefile and *_gh.png once
-# [this dumpster
-# fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981)
+# TODO(posita): Get rid of all instances of gh here, below, and with Makefile and
+# *_gh.png once this dumpster fire
+# <https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981>
 # gets resolved
 PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
 PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))

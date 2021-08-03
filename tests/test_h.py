@@ -16,7 +16,7 @@ import os
 import statistics
 from decimal import Decimal
 from fractions import Fraction
-from typing import Union
+from typing import Tuple, Type, Union
 
 import pytest
 
@@ -31,17 +31,17 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-_INTEGRAL_OUTCOME_TYPES: tuple[type, ...] = (
+_INTEGRAL_OUTCOME_TYPES: Tuple[Type, ...] = (
     int,
     Numberwang,
 )
-_OUTCOME_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES + (
+_OUTCOME_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
     float,
     Decimal,
     Fraction,
     Wangernumb,
 )
-_COUNT_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES
+_COUNT_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
 
 
 try:
@@ -69,7 +69,8 @@ else:
         sympy.RealNumber,
     )
     _INTEGRAL_OUTCOME_TYPES += (
-        # sympy.Integer,  # TODO: See <https://github.com/sympy/sympy/issues/19311>
+        # TODO(posita): See <https://github.com/sympy/sympy/issues/19311>
+        # sympy.Integer,
     )
     _COUNT_TYPES += (sympy.Integer,)
 
@@ -87,8 +88,10 @@ class TestH:
         assert H((0, 0, 1, 0, 1)) == {0: 3, 1: 2}
         assert H((1, 2, 3, 1, 2, 1)) == {1: 3, 2: 2, 3: 1}
         assert H(((1, 2), (3, 1), (2, 1), (1, 1))) == {1: 3, 2: 1, 3: 1}
-        assert H(-2) == H(range(-1, -3, -1))
-        assert H(6) == H(range(1, 7))
+
+        for i_type in _INTEGRAL_OUTCOME_TYPES:
+            assert H(i_type(-2)) == H(i_type(i) for i in range(-2, 0, 1))
+            assert H(i_type(6)) == H(i_type(i) for i in range(6, 0, -1))
 
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
@@ -204,11 +207,7 @@ class TestH:
 
     def test_op_matmul(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
-            try:
-                d6 = H(o_type(6))
-            except ValueError:
-                d6 = H((o_type(i) for i in range(6, 0, -1)))
-
+            d6 = H((o_type(i) for i in range(6, 0, -1)))
             d6_2 = d6 + d6
             d6_3 = d6_2 + d6
             assert 0 @ d6 == H({}), f"o_type: {o_type}; c_type: {c_type}"

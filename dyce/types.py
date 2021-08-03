@@ -11,9 +11,8 @@ from __future__ import annotations
 
 import re
 from abc import abstractmethod
-from collections.abc import Iterable
 from operator import __getitem__, __index__
-from typing import Any, Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
+from typing import Any, Dict, Iterable, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .symmetries import Protocol
 from .symmetries import SupportsAbs as _SupportsAbs
@@ -50,7 +49,8 @@ class CachingProtocolMeta(_ProtocolMeta):
         # Prefixing this class member with "_abc_" is necessary to prevent it from being
         # considered part of the Protocol. (See
         # <https://github.com/python/cpython/blob/main/Lib/typing.py>.)
-        cls._abc_inst_check_cache: Dict[Tuple[type, type], bool] = {}
+        cache: Dict[Tuple[type, type], bool] = {}
+        cls._abc_inst_check_cache = cache
 
         return cls
 
@@ -295,6 +295,15 @@ _OutcomeCs = (int, float, bool, SupportsOutcome)
 _GetItemT = Union[IndexT, slice]
 
 
+@runtime_checkable
+class _RationalConstructorT(
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    def __call__(self, numerator: int, denominator: int) -> _T_co:
+        ...
+
+
 # ---- Functions -----------------------------------------------------------------------
 
 
@@ -303,10 +312,12 @@ def as_int(val: IntT) -> int:
     Helper function to losslessly coerce *val* into an ``int``. Raises ``TypeError`` if
     that cannot be done.
     """
-    if int(val) != val:
+    int_val = int(val)
+
+    if int_val != val:
         raise TypeError(f"cannot (losslessly) coerce {val} to an int")
 
-    return int(val)
+    return int_val
 
 
 def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
@@ -321,11 +332,11 @@ def identity(x: _T) -> _T:
     return x
 
 
-def natural_key(val: OutcomeT) -> Tuple[Union[int, str], ...]:
+def natural_key(val: Any) -> Tuple[Union[int, str], ...]:
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
 
 
-def sorted_outcomes(vals: Iterable[OutcomeT]) -> List[OutcomeT]:
+def sorted_outcomes(vals: Iterable[_T]) -> List[_T]:
     vals = list(vals)
 
     try:

@@ -21,7 +21,7 @@ _venvsetup() {
                 || [ ! -e "${_VENVSETUP_DIR}/bin/pip" ] ; then
             if [ "$( "${_VENVSETUP_BASE_PYTHON}" -c 'import sys ; print(sys.version_info.major)' )" -lt 3 ] \
                     || [ "$( "${_VENVSETUP_BASE_PYTHON}" -c 'import sys ; print(sys.version_info.minor)' )" -lt 7 ] ; then
-                echo 1>&2 "${0}: Python 3.8+ is required; but $( bash -c "which ${_VENVSETUP_BASE_PYTHON}" ) is:"
+                echo 1>&2 "${0}: Python 3.7+ is required; but $( bash -c "which ${_VENVSETUP_BASE_PYTHON}" ) is:"
                 "${_VENVSETUP_BASE_PYTHON}" 2>&1 --version --version \
                     | sed 1>&2 '-es%^%    %'
                 echo 1>&2 "${0}: Override with:"

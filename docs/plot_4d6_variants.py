@@ -22,7 +22,7 @@ def do_it(_: str) -> None:
     )
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     res2 = p_4d6_reroll_first_one.h(slice(1, None))
-    p_4d6_reroll_all_ones = 4 @ P(H(range(2, 7)))
+    p_4d6_reroll_all_ones = 4 @ P(H((2, 3, 4, 5, 6)))
     res3 = p_4d6_reroll_all_ones.h(slice(1, None))
 
     matplotlib.pyplot.plot(
