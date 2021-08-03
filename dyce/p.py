@@ -15,7 +15,7 @@ from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
-from operator import __eq__, __index__, __mul__, __ne__, __neg__, __pos__
+from operator import __eq__, __index__, __mul__, __ne__
 from typing import (
     Callable,
     Counter,
@@ -31,7 +31,7 @@ from typing import (
 )
 
 from .h import H, HAbleOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT
-from .lifecycle import deprecated, experimental
+from .lifecycle import experimental
 from .symmetries import sum_w_start
 from .types import (
     IndexT,
@@ -68,8 +68,6 @@ class P(Sequence[H], HAbleOpsMixin):
     >>> from dyce import P
     >>> p_d6 = P(6) ; p_d6  # shorthand for P(H(6))
     P(6)
-    >>> -p_d6
-    P(-6)
 
     ```
 
@@ -95,6 +93,12 @@ class P(Sequence[H], HAbleOpsMixin):
     [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
     “flattened” into a single histogram, either explicitly via the
     [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
+
+    ``` python
+    >>> -p_d6
+    H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+
+    ```
 
     ``` python
     >>> p_d6 + p_d6
@@ -274,26 +278,6 @@ class P(Sequence[H], HAbleOpsMixin):
 
     def __rmatmul__(self, other: IntT) -> P:
         return self.__matmul__(other)
-
-    @deprecated
-    def __neg__(self) -> P:  # type: ignore
-        r"""
-        !!! warning "Deprecated"
-
-            This overridden method is deprecated and will likely be removed in the next
-            major release. Use [``P.umap(__neg__)``][dyce.p.P.umap] instead.
-        """
-        return self.umap(__neg__)
-
-    @deprecated
-    def __pos__(self) -> P:  # type: ignore
-        r"""
-        !!! warning "Deprecated"
-
-            This overridden method is deprecated and will likely be removed in the next
-            major release. Use [``P.umap(__pos__)``][dyce.p.P.umap] instead.
-        """
-        return self.umap(__pos__)
 
     def h(self, *which: _GetItemT) -> H:
         r"""

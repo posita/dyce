@@ -391,11 +391,6 @@ class TestP:
         assert +(2 @ p) == +(2 @ h)
         assert abs(2 @ p) == abs(2 @ h)
         assert ~(2 @ p) == ~(2 @ h)
-        # Deprecated; TODO(posita): remove these
-        assert isinstance(-p, type(p))
-        assert (-p).h() == -h
-        assert isinstance(+p, type(p))
-        assert (+p).h() == +h
 
     def test_h_flatten(self) -> None:
         r_d6 = range(1, 7)

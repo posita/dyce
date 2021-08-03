@@ -59,7 +59,7 @@ from typing import (
     overload,
 )
 
-from .lifecycle import deprecated, experimental
+from .lifecycle import experimental
 from .symmetries import comb, gcd, sum_w_start
 from .types import (
     CachingProtocolMeta,
@@ -738,36 +738,8 @@ class H(_MappingT):
         Note that the positions of *left_operand* and *op* are different from
         [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
         of operand ordering.
-
-        !!! warning "Deprecated"
-
-            This method originally accepted the *op* parameter in the first position,
-            and the *left_operand* parameter in the second. While that is still silently
-            supported, that ordering is deprecated and will likely be removed in the
-            next major release.
         """
-        if isinstance(op, _OutcomeCs):
-            # Warning! It's opposite day! Things are all mixed up! op is the operand and
-            # left_operand is the operator!
-            return self._deprecated_rmap_signature(left_operand, op)
-
         return H((op(left_operand, outcome), count) for outcome, count in self.items())
-
-    @deprecated
-    def _deprecated_rmap_signature(
-        self,
-        op: _BinaryOperatorT,
-        other: OutcomeT,
-    ) -> H:
-        r"""
-        ``` python
-        >>> import operator
-        >>> H(6).rmap(operator.__pow__, 2)  # type: ignore
-        H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
-
-        ```
-        """
-        return self.rmap(other, op)
 
     def umap(
         self,
@@ -922,18 +894,6 @@ class H(_MappingT):
 
         return self.umap(_is_even)
 
-    @deprecated
-    def even(self) -> H:
-        r"""
-        !!! warning "Deprecated"
-
-            This method is deprecated and will likely be removed in the next major
-            release.
-
-        Alias for the [``is_even`` method][dyce.h.H.is_even].
-        """
-        return self.is_even()
-
     def is_odd(self) -> H:
         r"""
         Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 != 0)``.
@@ -951,18 +911,6 @@ class H(_MappingT):
             return as_int(outcome) % 2 != 0
 
         return self.umap(_is_odd)
-
-    @deprecated
-    def odd(self) -> H:
-        r"""
-        !!! warning "Deprecated"
-
-            This method is deprecated and will likely be removed in the next major
-            release.
-
-        Alias for the [``is_odd`` method][dyce.h.H.is_odd].
-        """
-        return self.is_odd()
 
     def accumulate(self, other: _SourceT) -> H:
         r"""
@@ -1968,34 +1916,8 @@ class HAbleOpsMixin:
         """
         return self.h().is_even()
 
-    @deprecated
-    def even(self: HAbleT) -> H:
-        r"""
-        !!! warning "Deprecated"
-
-            This method is deprecated and will likely be removed in the next major
-            release.
-
-        Shorthand for ``#!python self.h().is_even()``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.is_even``][dyce.h.H.is_even].
-        """
-        return self.h().is_even()
-
     def is_odd(self: HAbleT) -> H:
         r"""
-        Shorthand for ``#!python self.h().is_odd()``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.is_odd``][dyce.h.H.is_odd].
-        """
-        return self.h().is_odd()
-
-    @deprecated
-    def odd(self: HAbleT) -> H:
-        r"""
-        !!! warning "Deprecated"
-
-            This method is deprecated and will likely be removed in the next major
-            release.
-
         Shorthand for ``#!python self.h().is_odd()``. See the
         [``h`` method][dyce.h.HAbleT.h] and [``H.is_odd``][dyce.h.H.is_odd].
         """
