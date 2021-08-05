@@ -12,7 +12,7 @@ from __future__ import annotations
 import operator
 
 from dyce import H, P, R
-from dyce.r import ValueRoller
+from dyce.r import PoolRoller, ValueRoller
 
 from .test_h import _INTEGRAL_OUTCOME_TYPES, _OUTCOME_TYPES
 
@@ -57,6 +57,7 @@ class TestValueRoller:
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
+        assert isinstance(r_42, ValueRoller)
         r_42_annotated = R.from_value(42, annotation="42")
         assert r_42 == r_42
         assert r_42 != r_42_annotated
@@ -73,8 +74,9 @@ class TestValueRoller:
 
             for _ in range(100):
                 r_roll = r.roll()
-                assert r_roll.r == r
-                assert r_roll.total in h, r
+                (roll_outcome,) = r_roll
+                assert roll_outcome.r == r
+                assert r_roll.total() in h, r
 
 
 class TestBinaryOperationRoller:
@@ -392,8 +394,9 @@ class TestBinaryOperationRoller:
 
             for _ in range(100):
                 r_mul_r_roll = r_mul_r.roll()
-                assert r_mul_r_roll.r == r_mul_r
-                assert r_mul_r_roll.total in h_mul_h, r_mul_r
+                (roll_outcome,) = r_mul_r_roll
+                assert roll_outcome.r == r_mul_r
+                assert r_mul_r_roll.total() in h_mul_h, r_mul_r
 
 
 class TestUnaryOperationRoller:
@@ -502,8 +505,9 @@ class TestUnaryOperationRoller:
 
             for _ in range(100):
                 r_neg_roll = r_neg.roll()
-                assert r_neg_roll.r == r_neg
-                assert r_neg_roll.total in h_neg, r_neg
+                (roll_outcome,) = r_neg_roll
+                assert roll_outcome.r == r_neg
+                assert r_neg_roll.total() in h_neg, r_neg
 
 
 class TestPoolRoller:
@@ -536,14 +540,17 @@ class TestPoolRoller:
 
     def test_op_eq(self) -> None:
         r_4_6_8 = R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
+        assert isinstance(r_4_6_8, PoolRoller)
         r_4_6_8_annotated = r_4_6_8.annotate("4-6-8")
-        assert r_4_6_8 == r_4_6_8
+        assert r_4_6_8 == R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
         assert r_4_6_8 != r_4_6_8_annotated
-        assert r_4_6_8_annotated == r_4_6_8.annotate("4-6-8")
+        assert r_4_6_8_annotated == R.from_rs_iterable(
+            (R.from_value(i) for i in (4, 6, 8)), annotation="4-6-8"
+        )
 
     def test_getitem(self) -> None:
         r_d4_d6_d8 = R.from_values(H(4), H(6), H(8))
-        assert len(r_d4_d6_d8) == 3
+        assert len(r_d4_d6_d8) == 3, r_d4_d6_d8
         assert isinstance(r_d4_d6_d8[0], ValueRoller)
         assert r_d4_d6_d8[0].value == H(4)
         assert isinstance(r_d4_d6_d8[1], ValueRoller)
@@ -560,8 +567,56 @@ class TestPoolRoller:
 
             for _ in range(100):
                 r_3_roll = r_3.roll()
-                assert r_3_roll.r == r_3
-                assert r_3_roll.total in h_3, r_3_roll
+                assert len(r_3_roll) == 3, r_3_roll
+
+                for roll_outcome in r_3_roll:
+                    assert roll_outcome.r == r_3
+
+                assert r_3_roll.total() in h_3, r_3_roll
+
+
+class TestSelectRoller:
+    def test_repr(self) -> None:
+        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares_select = r_squares.select(0, -1)
+        assert (
+            repr(r_squares_select)
+            == """SelectionRoller(
+  which=(0, -1),
+  child=PoolRoller(
+    children=(
+      ValueRoller(value=36, annotation=None),
+      ValueRoller(value=25, annotation=None),
+      ValueRoller(value=16, annotation=None),
+      ValueRoller(value=9, annotation=None),
+      ValueRoller(value=4, annotation=None),
+      ValueRoller(value=1, annotation=None),
+    ),
+    annotation=None,
+  ),
+  annotation=None,
+)"""
+        )
+
+    def test_op_eq(self) -> None:
+        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares_select = r_squares.select(0, -1, 1, -2)
+        r_squares_select_annotated = r_squares_select.annotate("0, -1, 1, 2")
+        assert r_squares_select == r_squares.select(0, -1, 1, -2)
+        assert r_squares_select != r_squares_select_annotated
+        assert r_squares_select_annotated == r_squares_select.annotate("0, -1, 1, 2")
+
+    def test_roll(self) -> None:
+        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares_select = r_squares.select(0, -1, 1, -2)
+        r_squares_select_roll = r_squares_select.roll()
+        assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
+
+        for roll_outcome in r_squares_select_roll:
+            assert roll_outcome.r == r_squares_select
+
+            for parent_roll_outcome in roll_outcome.parents:
+                assert parent_roll_outcome.r == r_squares
 
 
 class TestRepeatRoller:
@@ -608,105 +663,87 @@ class TestRepeatRoller:
                     assert outcome in h, r_100_roll
 
 
-class TestSelectRoller:
+class TestRoll:
     def test_repr(self) -> None:
-        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
-        r_squares_select = r_squares.select(0, -1)
+        r_42 = R.from_value(42)
+        r_42_neg = -r_42
+        r_42_neg_roll = r_42_neg.roll()
         assert (
-            repr(r_squares_select)
-            == """SelectionRoller(
-  which=(0, -1),
-  child=PoolRoller(
-    children=(
-      ValueRoller(value=36, annotation=None),
-      ValueRoller(value=25, annotation=None),
-      ValueRoller(value=16, annotation=None),
-      ValueRoller(value=9, annotation=None),
-      ValueRoller(value=4, annotation=None),
-      ValueRoller(value=1, annotation=None),
-    ),
+            repr(r_42_neg_roll)
+            == """Roll(
+  r=UnaryOperationRoller(
+    op=<built-in function neg>,
+    child=ValueRoller(value=42, annotation=None),
     annotation=None,
   ),
-  annotation=None,
+  roll_outcomes=(
+    RollOutcome(
+      value=-42,
+      parents=(
+        RollOutcome(
+          value=42,
+          parents=(),
+        ),
+      ),
+    ),
+  ),
+  parents=(
+    Roll(
+      r=ValueRoller(value=42, annotation=None),
+      roll_outcomes=(
+        RollOutcome(
+          value=42,
+          parents=(),
+        ),
+      ),
+      parents=(),
+    ),
+  ),
 )"""
         )
-
-    def test_roll(self) -> None:
-        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
-        r_squares_select = r_squares.select(0, -1, 1, -2)
-        r_squares_select_roll = r_squares_select.roll()
-        assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
-        assert r_squares_select_roll.r == r_squares_select
-        (r_squares_roll,) = tuple(r_squares_select_roll.rolls())
-        assert r_squares_roll.r == r_squares
-
-
-class TestRoll:
-    def test_hierarchy(self) -> None:
-        d6 = H(6)
-        r_d6 = R.from_value(d6)
-        d6_mul_2 = d6 * 2
-        r_d6_mul_2 = r_d6 * 2
-        d6_mul_2_neg = -d6_mul_2
-        r_d6_mul_2_neg = -r_d6_mul_2
-        d6_mul_2_neg_add_4 = d6_mul_2_neg + 4
-        r_d6_mul_2_neg_add_4 = r_d6_mul_2_neg + 4
-        d6_mul_2_neg_add_4_3 = 3 @ d6_mul_2_neg_add_4
-        r_d6_mul_2_neg_add_4_3 = 3 @ r_d6_mul_2_neg_add_4
-
-        r_d6_mul_2_neg_add_4_3_roll = r_d6_mul_2_neg_add_4_3.roll()
-        assert r_d6_mul_2_neg_add_4_3_roll.total in d6_mul_2_neg_add_4_3
-
-        assert (
-            r_d6_mul_2_neg_add_4_3_roll.r == r_d6_mul_2_neg_add_4_3
-        ), r_d6_mul_2_neg_add_4_3_roll
-        assert len(r_d6_mul_2_neg_add_4_3_roll) == 3, r_d6_mul_2_neg_add_4_3_roll
-        assert all(
-            outcome in d6_mul_2_neg_add_4
-            for outcome in r_d6_mul_2_neg_add_4_3_roll.outcomes()
-        ), r_d6_mul_2_neg_add_4_3_roll
-
-        for _, n_rolls in r_d6_mul_2_neg_add_4_3_roll:
-            assert len(n_rolls) == 1
-            (r_d6_mul_2_neg_add_4_roll,) = n_rolls
-            assert r_d6_mul_2_neg_add_4_roll.r == r_d6_mul_2_neg_add_4
-            assert len(r_d6_mul_2_neg_add_4_roll) == 1, r_d6_mul_2_neg_add_4_roll
-            assert all(
-                outcome in d6_mul_2_neg_add_4
-                for outcome in r_d6_mul_2_neg_add_4_roll.outcomes()
-            ), r_d6_mul_2_neg_add_4_roll
-
-            ((_, add_rolls),) = tuple(r_d6_mul_2_neg_add_4_roll)
-            assert len(add_rolls) == 2
-            r_d6_mul_2_neg_roll, _ = add_rolls  # look at the left side
-            assert r_d6_mul_2_neg_roll.r == r_d6_mul_2_neg, r_d6_mul_2_neg_roll
-            assert len(r_d6_mul_2_neg_roll) == 1, r_d6_mul_2_neg_roll
-            assert all(
-                outcome in d6_mul_2_neg for outcome in r_d6_mul_2_neg_roll.outcomes()
-            ), r_d6_mul_2_neg_roll
-
-            ((_, neg_rolls),) = tuple(r_d6_mul_2_neg_roll)
-            assert len(neg_rolls) == 1
-            (r_d6_mul_2_roll,) = neg_rolls
-            assert r_d6_mul_2_roll.r == r_d6_mul_2, r_d6_mul_2_roll
-            assert len(r_d6_mul_2_roll) == 1, r_d6_mul_2_roll
-            assert all(
-                outcome in d6_mul_2 for outcome in r_d6_mul_2_roll.outcomes()
-            ), r_d6_mul_2_roll
-
-            ((_, mul_rolls),) = tuple(r_d6_mul_2_roll)
-            assert len(mul_rolls) == 2
-            r_d6_roll, _ = mul_rolls  # look at the left side
-            assert r_d6_roll.r == r_d6, r_d6_roll
-            assert len(r_d6_roll) == 1, r_d6_roll
-            assert all(outcome in d6 for outcome in r_d6_roll.outcomes()), r_d6_roll
 
     def test_getitem(self) -> None:
         r_123 = R.from_values(1, 2, 3)
         r_123_roll = r_123.roll()
-        assert len(r_123_roll) == 3
+        assert len(r_123_roll) == 3, r_123_roll
         assert (
             r_123_roll[:]
             == tuple(r_123_roll[i] for i in range(len(r_123_roll)))
             == tuple(r_123_roll)
         )
+
+    def test_hierarchy(self) -> None:
+        d6 = H(6)
+        r_d6 = R.from_value(d6)
+        d6_mul2 = 2 * d6
+        r_d6_mul2 = 2 * r_d6
+        d6_mul2_neg = -d6_mul2
+        r_d6_mul2_neg = -r_d6_mul2
+        d6_mul2_neg_add4 = d6_mul2_neg + 4
+        r_d6_mul2_neg_add4 = r_d6_mul2_neg + 4
+        d6_mul2_neg_add4_3 = 3 @ d6_mul2_neg_add4
+        r_d6_mul2_neg_add4_3 = 3 @ r_d6_mul2_neg_add4
+
+        r_d6_mul2_neg_add4_3_roll = r_d6_mul2_neg_add4_3.roll()
+        assert r_d6_mul2_neg_add4_3_roll.total() in d6_mul2_neg_add4_3
+        assert len(r_d6_mul2_neg_add4_3_roll) == 3, r_d6_mul2_neg_add4_3_roll
+
+        for r_d6_mul2_neg_add4_3_ro in r_d6_mul2_neg_add4_3_roll:
+            r_d6_mul2_neg_add4_3_ro.value in d6_mul2_neg_add4
+            assert r_d6_mul2_neg_add4_3_ro.r == r_d6_mul2_neg_add4_3
+
+            (r_d6_mul2_neg_add4_ro,) = r_d6_mul2_neg_add4_3_ro.parents
+            r_d6_mul2_neg_add4_ro.value in d6_mul2_neg_add4
+            assert r_d6_mul2_neg_add4_ro.r == r_d6_mul2_neg_add4
+
+            (r_d6_mul2_neg_ro, _) = r_d6_mul2_neg_add4_ro.parents
+            r_d6_mul2_neg_ro.value in d6_mul2_neg
+            assert r_d6_mul2_neg_ro.r == r_d6_mul2_neg
+
+            (r_d6_mul2_ro,) = r_d6_mul2_neg_ro.parents
+            r_d6_mul2_ro.value in d6_mul2
+            assert r_d6_mul2_ro.r == r_d6_mul2
+
+            (_, r_d6_ro) = r_d6_mul2_ro.parents
+            r_d6_ro.value in d6
+            assert r_d6_ro.r == r_d6

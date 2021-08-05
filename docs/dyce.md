@@ -34,6 +34,8 @@
 
 ::: dyce.r.Roll
 
+::: dyce.r.RollOutcome
+
 ::: dyce.h.HAbleT
 
 ::: dyce.h.HAbleOpsMixin
