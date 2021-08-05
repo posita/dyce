@@ -28,6 +28,41 @@
 * Removes deprecated synonym package ``dyce.plt``.
     Use [``dyce.viz``][dyce.viz] instead.
 
+* Removes special case handling of ``H({})`` for addition and subtraction.
+    Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
+    It is probably not correct.
+    If the behavior is desired, consider eliminating empty histograms before performing calculations.
+    E.G., ``#!python h1 + h2 if h2 else h1``.
+
+    See also the [``sum_h`` function][dyce.h.sum_h], which ensures the result is always a histogram:
+
+    ``` python
+    >>> from dyce.h import sum_h
+    >>> sum(())
+    0
+    >>> sum_h(())
+    H({})
+
+    ```
+
+    Note, however, that sums including empty histograms will be always result in empty histograms:
+
+    ``` python
+    >>> from dyce import H
+    >>> hs = (H(6), H(6), H(6), H({}))
+    >>> sum_h(hs)
+    H({})
+
+    ```
+
+    If a different result was desired, adapting our advice from above would yield something like:
+
+    ``` python
+    >>> sum_h(h for h in hs if h)
+    H({3: 1, 4: 3, 5: 6, 6: 10, ..., 16: 6, 17: 3, 18: 1})
+
+    ```
+
 ### Other changes
 
 * TODO(posita)

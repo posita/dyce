@@ -60,7 +60,7 @@ from typing import (
 )
 
 from .lifecycle import experimental
-from .symmetries import comb, gcd, sum_w_start
+from .symmetries import comb, gcd
 from .types import (
     CachingProtocolMeta,
     IntT,
@@ -460,12 +460,7 @@ class H(_MappingT):
 
     def __add__(self, other: _OperandT) -> H:
         try:
-            if self and not other:
-                return self.map(__add__, 0)
-            elif not self and isinstance(other, (H, HAbleT)):
-                return __add__(0, other.h() if isinstance(other, HAbleT) else other)
-            else:
-                return self.map(__add__, other)
+            return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
@@ -477,12 +472,7 @@ class H(_MappingT):
 
     def __sub__(self, other: _OperandT) -> H:
         try:
-            if self and not other:
-                return self.map(__sub__, 0)
-            elif not self and isinstance(other, (H, HAbleT)):
-                return __sub__(0, other.h() if isinstance(other, HAbleT) else other)
-            else:
-                return self.map(__sub__, other)
+            return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
@@ -513,7 +503,7 @@ class H(_MappingT):
         if other < 0:
             raise ValueError("argument cannot be negative")
         else:
-            return sum_w_start(repeat(self, other), start=H({}))
+            return sum_h(repeat(self, other))
 
     def __rmatmul__(self, other: IntT) -> H:
         return self.__matmul__(other)
@@ -1951,6 +1941,17 @@ class HAbleOpsMixin:
 
 
 # ---- Functions -----------------------------------------------------------------------
+
+
+def sum_h(hs: Iterable[H]):
+    """
+    Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.
+
+    This is to ensure that summing zero or more histograms always returns a histograms.
+    """
+    h_sum = sum(hs)
+
+    return H({}) if h_sum == 0 else h_sum
 
 
 def _within(lo: OutcomeT, hi: OutcomeT) -> _BinaryOperatorT:

@@ -144,8 +144,8 @@ class TestH:
             assert d3 + d2 == sum_d2_d3, f"o_type: {o_type}; c_type: {c_type}"
             assert d2 + d3 == d3 + d2, f"o_type: {o_type}; c_type: {c_type}"
 
-            assert d2 + H({}) == d2, f"o_type: {o_type}; c_type: {c_type}"
-            assert H({}) + d3 == d3, f"o_type: {o_type}; c_type: {c_type}"
+            assert d2 + H({}) == H({}), f"o_type: {o_type}; c_type: {c_type}"
+            assert H({}) + d3 == H({}), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_op_add_sym(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
@@ -183,8 +183,8 @@ class TestH:
                 o_type(1): 2,
                 o_type(2): 1,
             }, f"o_type: {o_type}; c_type: {c_type}"
-            assert d2 - H({}) == d2
-            assert H({}) - d3 == -d3
+            assert d2 - H({}) == H({})
+            assert H({}) - d3 == H({})
 
     def test_op_sub_sym(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")

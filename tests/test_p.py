@@ -185,8 +185,8 @@ class TestP:
         assert d2_add_d3n == d3n_add_d2
         assert p_d2 + p_d3n == p_d3n + p_d2
 
-        assert p_d2 + P() == p_d2
-        assert P() + p_d2 == p_d2
+        assert p_d2 + P() == P()
+        assert P() + p_d2 == P()
         assert P() + P() == P()
 
         p_d2_d3n = P(p_d2, p_d3n)
@@ -216,8 +216,8 @@ class TestP:
         assert d3n - p_d2 == d3n_sub_d2
         assert p_d2 - p_d3n != p_d3n - p_d2
 
-        assert p_d2 - P() == p_d2
-        assert P() - p_d2 == -p_d2
+        assert p_d2 - P() == P()
+        assert P() - p_d2 == P()
         assert P() - P() == P()
 
     def test_op_sub_num(self) -> None:
@@ -541,19 +541,13 @@ class TestP:
         assert p_4d6.appearances_in_rolls(7) == _sum_method(p_4d6, 7)
         assert p_4d6.appearances_in_rolls(7) == 4 @ H(6).eq(7)
 
-        p_mixed = P(4, 4, 6, 6, 6, H({}))
+        p_mixed = P(4, 4, 6, 6, 6)
         assert p_mixed.appearances_in_rolls(3) == _sum_method(p_mixed, 3)
-        assert p_mixed.appearances_in_rolls(3) == (
-            2 @ H(4).eq(3) + 3 @ H(6).eq(3) + H({}).eq(3)
-        )
+        assert p_mixed.appearances_in_rolls(3) == (2 @ H(4).eq(3) + 3 @ H(6).eq(3))
         assert p_mixed.appearances_in_rolls(5) == _sum_method(p_mixed, 5)
-        assert p_mixed.appearances_in_rolls(5) == (
-            2 @ H(4).eq(5) + 3 @ H(6).eq(5) + H({}).eq(5)
-        )
+        assert p_mixed.appearances_in_rolls(5) == (2 @ H(4).eq(5) + 3 @ H(6).eq(5))
         assert p_mixed.appearances_in_rolls(7) == _sum_method(p_mixed, 7)
-        assert p_mixed.appearances_in_rolls(7) == (
-            2 @ H(4).eq(7) + 3 @ H(6).eq(7) + H({}).eq(7)
-        )
+        assert p_mixed.appearances_in_rolls(7) == (2 @ H(4).eq(7) + 3 @ H(6).eq(7))
 
     def test_roll(self) -> None:
         d10 = H(10)

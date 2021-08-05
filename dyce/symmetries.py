@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Iterable, TypeVar, Union, overload
+from typing import TypeVar
 
 __all__ = (
     "comb",
@@ -39,12 +39,9 @@ if sys.version_info >= (3, 8):
         SupportsInt,
         runtime_checkable,
     )
-
-    sum_w_start = sum
 else:
     from abc import abstractmethod
     from fractions import Fraction
-    from itertools import chain
     from math import factorial
 
     from typing_extensions import Protocol, runtime_checkable
@@ -85,17 +82,6 @@ else:
         return int(
             Fraction(Fraction(factorial(__n), factorial(__k)), factorial(__n - __k))
         )
-
-    @overload
-    def sum_w_start(__iterable: Iterable[_T]) -> Union[_T, int]:
-        ...
-
-    @overload
-    def sum_w_start(__iterable: Iterable[_T], start: _S) -> Union[_T, _S]:
-        ...
-
-    def sum_w_start(__iterable, start=0):
-        return sum(chain((start,), __iterable))
 
 
 if sys.version_info >= (3, 9):

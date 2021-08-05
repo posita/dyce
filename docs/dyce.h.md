@@ -23,3 +23,4 @@
         - "HAbleT"
         - "HAbleOpsMixin"
         - "coalesce_replace"
+        - "sum_h"
