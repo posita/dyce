@@ -86,7 +86,7 @@ def display_burst(
 
     Creates a dual, overlapping, cocentric pie chart in *ax*, which can be useful for
     visualizing relative probability distributions. See the
-    [visualization tutorial](tutorial.md#visualization) for examples.
+    [visualization tutorial](countin.md#visualization) for examples.
     """
     assert matplotlib
     inner_colors = graph_colors(inner_color, h_inner, alpha)

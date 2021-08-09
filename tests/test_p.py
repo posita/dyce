@@ -390,7 +390,7 @@ class TestP:
         assert +(2 @ p) == +(2 @ h)
         assert abs(2 @ p) == abs(2 @ h)
         assert ~(2 @ p) == ~(2 @ h)
-        # Deprecated; TODO: remove these
+        # Deprecated; TODO(posita): remove these
         assert isinstance(-p, type(p))
         assert (-p).h() == -h
         assert isinstance(+p, type(p))

@@ -64,7 +64,7 @@ class P(Sequence[H], HAbleOpsMixin):
     [``H`` objects][dyce.h.H] (provided or created from the
     [initializer][dyce.p.P.__init__]’s *args* parameter).
 
-    ```python
+    ``` python
     >>> from dyce import P
     >>> p_d6 = P(6) ; p_d6  # shorthand for P(H(6))
     P(6)
@@ -73,7 +73,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    ```python
+    ``` python
     >>> P(p_d6, p_d6)  # 2d6
     P(6, 6)
     >>> 2@p_d6  # also 2d6
@@ -83,7 +83,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    ```python
+    ``` python
     >>> p = P(4, P(6, P(8, P(10, P(12, P(20)))))) ; p
     P(4, 6, 8, 10, 12, 20)
     >>> sum(p.roll()) in p.h()
@@ -96,13 +96,13 @@ class P(Sequence[H], HAbleOpsMixin):
     “flattened” into a single histogram, either explicitly via the
     [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
 
-    ```python
+    ``` python
     >>> p_d6 + p_d6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 
     ```
 
-    ```python
+    ``` python
     >>> 2 * P(8) - 1
     H({1: 1, 3: 1, 5: 1, 7: 1, 9: 1, 11: 1, 13: 1, 15: 1})
 
@@ -119,13 +119,13 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    ```python
+    ``` python
     >>> P(4, 6).map(operator.__pow__, 2)
     P(H({1: 1, 4: 1, 9: 1, 16: 1}), H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1}))
 
     ```
 
-    ```python
+    ``` python
     >>> P(4, 6).rmap(2, operator.__pow__)
     P(H({2: 1, 4: 1, 8: 1, 16: 1}), H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1}))
 
@@ -133,7 +133,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     Comparisons with [``H`` objects][dyce.h.H] work as expected:
 
-    ```python
+    ``` python
     >>> from dyce import H
     >>> 3@p_d6 == H(6) + H(6) + H(6)
     True
@@ -142,7 +142,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     Indexing selects a contained histogram:
 
-    ```python
+    ``` python
     >>> P(4, 6, 8)[0]
     H(4)
 
@@ -150,7 +150,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     Note that pools are opinionated about ordering:
 
-    ```python
+    ``` python
     >>> P(8, 6, 4)
     P(4, 6, 8)
     >>> P(8, 6, 4)[0] == P(8, 4, 6)[0] == H(4)
@@ -165,7 +165,7 @@ class P(Sequence[H], HAbleOpsMixin):
     Modeling the sum of the greatest two faces of three six-sided dice (``3d6``) can be
     expressed as:
 
-    ```python
+    ``` python
     >>> p_3d6 = 3@p_d6
     >>> p_3d6.h(-2, -1)
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
@@ -303,7 +303,7 @@ class P(Sequence[H], HAbleOpsMixin):
         When provided no arguments, ``h`` combines (or “flattens”) contained histograms in
         accordance with the [``HAbleT`` protocol][dyce.h.HAbleT]:
 
-        ```python
+        ``` python
         >>> (2@P(6)).h()
         H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 
@@ -316,7 +316,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         Taking the greatest of two six-sided dice can be modeled as:
 
-        ```python
+        ``` python
         >>> p_2d6 = 2@P(6)
         >>> p_2d6.h(-1)
         H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
@@ -336,7 +336,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Taking the greatest two and least two faces of ten four-sided dice (``10d4``)
         can be modeled as:
 
-        ```python
+        ``` python
         >>> p_10d4 = 10@P(4)
         >>> p_10d4.h(slice(2), slice(-2, None))
         H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
@@ -363,7 +363,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Taking all outcomes exactly once is equivalent to summing the histograms in the
         pool.
 
-        ```python
+        ``` python
         >>> d6 = H(6)
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
         >>> p = 2@P(d6, d6avg)
@@ -402,7 +402,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         A flag indicating whether the pool’s population of histograms is homogeneous.
 
-        ```python
+        ``` python
         >>> P(6, 6).is_homogeneous
         True
         >>> P(4, 6, 8).is_homogeneous
@@ -430,7 +430,7 @@ class P(Sequence[H], HAbleOpsMixin):
         outcome), count) for roll, count in self.rolls_with_counts())``, but much more
         efficient.
 
-        ```python
+        ``` python
         >>> p_2d6 = P(6, 6)
         >>> list(p_2d6.rolls_with_counts())
         [((1, 1), 1), ((1, 2), 2), ((1, 3), 2), ((1, 4), 2), ((1, 5), 2), ((1, 6), 2), ...]
@@ -439,7 +439,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         ```
 
-        ```python
+        ``` python
         >>> # Least efficient, by far
         >>> d4, d6 = H(4), H(6)
         >>> p_3d4_2d6 = P(d4, d4, d4, d6, d6)
@@ -448,7 +448,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         ```
 
-        ```python
+        ``` python
         >>> # Pretty darned efficient, generalizable to other boolean inquiries, and
         >>> # arguably the most readable
         >>> d4_eq3, d6_eq3 = d4.eq(2), d6.eq(2)
@@ -457,7 +457,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         ```
 
-        ```python
+        ``` python
         >>> # Most efficient for large sets of dice
         >>> p_3d4_2d6.appearances_in_rolls(3)
         H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
@@ -468,7 +468,7 @@ class P(Sequence[H], HAbleOpsMixin):
         almost twice (about $\frac{7}{4}$) as efficient as the boolean accumulation
         technique for larger sets:
 
-        ```python
+        ``` python
         In [3]: %timeit 3@d4_eq3 + 2@d6_eq3
         287 µs ± 6.96 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 
@@ -529,7 +529,7 @@ class P(Sequence[H], HAbleOpsMixin):
         greatest (index ``-1`` or ``len(self) - 1``). Identifiers can be ``int``s or
         ``slice``s, and can be mixed for more flexible selections:
 
-        ```python
+        ``` python
         >>> from collections import Counter
         >>> def accumulate_roll_counts(counter, roll_counts):
         ...   for roll, count in roll_counts:
@@ -551,7 +551,7 @@ class P(Sequence[H], HAbleOpsMixin):
         six-sided dice show the same face) on a single roll by checking rolls for where
         the least and greatest outcomes are the same:
 
-        ```python
+        ``` python
         >>> p_5d6 = 5@P(6)
         >>> yhatzee_on_single_roll = H(
         ...   (1 if roll[0] == roll[-1] else 0, count)
@@ -565,7 +565,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         !!! note "In the general case, rolls may appear more than once."
 
-        ```python
+        ``` python
         >>> list(P(H(2), H(3)).rolls_with_counts())
         [((1, 1), 1), ((1, 2), 1), ((1, 3), 1), ((1, 2), 1), ((2, 2), 1), ((2, 3), 1)]
 
@@ -577,7 +577,7 @@ class P(Sequence[H], HAbleOpsMixin):
         histograms), rolls (before selection) are not repeated. (See the note on
         implementation below.)
 
-        ```python
+        ``` python
         >>> list((2@P(H((-1, 0, 1)))).rolls_with_counts())
         [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
 
@@ -585,7 +585,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         Either way, by summing and counting all rolls, we can confirm identity:
 
-        ```python
+        ``` python
         >>> d6 = H(6)
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
         >>> p = 2@P(d6, d6avg)
@@ -597,7 +597,7 @@ class P(Sequence[H], HAbleOpsMixin):
         This method does not try to outsmart callers by (mis)interpreting selection
         arguments. It honors selection identifier order and any redundancy:
 
-        ```python
+        ``` python
         >>> p_d3_d4 = P(H(3), H(4))
         >>> # Select the second, first, then second (again) elements
         >>> list(p_d3_d4.rolls_with_counts(-1, 0, 1))
@@ -608,7 +608,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Selecting the same outcomes, but in a different order is not immediately
         comparable:
 
-        ```python
+        ``` python
         >>> select_0_1 = list(p_d3_d4.rolls_with_counts(0, 1))
         >>> select_1_0 = list(p_d3_d4.rolls_with_counts(1, 0))
         >>> select_0_1 == select_1_0
@@ -618,7 +618,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
         Equivalence can be tested when selected outcomes are sorted:
 
-        ```python
+        ``` python
         >>> sorted_0_1 = [(sorted(roll), count) for roll, count in select_0_1]
         >>> sorted_1_0 = [(sorted(roll), count) for roll, count in select_1_0]
         >>> sorted_0_1 == sorted_1_0
@@ -629,7 +629,7 @@ class P(Sequence[H], HAbleOpsMixin):
         They can also be summed and counted which is equivalent to calling the
         [``h`` method][dyce.p.P.h] with identical selection arguments.
 
-        ```python
+        ``` python
         >>> summed_0_1 = H((sum(roll), count) for roll, count in select_0_1)
         >>> summed_1_0 = H((sum(roll), count) for roll, count in select_1_0)
         >>> summed_0_1 == summed_1_0 == p_d3_d4.h(0, 1) == p_d3_d4.h(1, 0)
@@ -804,7 +804,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Shorthand for ``P(*(h.map(op, right_operand) for h in self))``. See the
         [``H.map`` method][dyce.h.H.map].
 
-        ```python
+        ``` python
         >>> import operator
         >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
         >>> p_3d6.map(operator.__mul__, -1)
@@ -823,7 +823,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Shorthand for ``P(*(h.rmap(left_operand, op) for h in self))``. See the
         [``H.rmap`` method][dyce.h.H.rmap].
 
-        ```python
+        ``` python
         >>> import operator
         >>> from fractions import Fraction
         >>> p_3d6 = 2@P(H((-3, -1, 2, 4)))
@@ -839,7 +839,7 @@ class P(Sequence[H], HAbleOpsMixin):
         Shorthand for ``P(*(h.umap(op) for h in self))``. See the
         [``H.umap`` method][dyce.h.H.umap].
 
-        ```python
+        ``` python
         >>> import operator
         >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
         >>> p_3d6.umap(operator.__neg__)
@@ -863,11 +863,11 @@ def _analyze_selection(
     Examines the selection *which* as applied to the values ``range(n)`` and returns one
     of:
 
-    * $0$ - *which* selects zero elements in the range
-    * $\{ {i} \mid {i < n} \}$ - *which* favors elements $[0..i)$
-    * $\{ {-i} \mid {i < n} \}$ - *which* favors elements $[i..n)$
-    * $\{ {k} \mid {k \mod n = 0} \}$ - *which* selects each of $[0..n)$ exactly $k$ times
-    * ``None`` - any other selection
+    * $0$ – *which* selects zero elements in the range
+    * $\{ {i} \mid {i < n} \}$ – *which* favors elements $[0..i)$
+    * $\{ {-i} \mid {i < n} \}$ – *which* favors elements $[i..n)$
+    * $\{ {k} \mid {k \mod n = 0} \}$ – *which* selects each of $[0..n)$ exactly $k$ times
+    * ``None`` – any other selection
     """
     indexes = tuple(range(n))
     counts_by_index = counter(getitems(indexes, which))
@@ -953,14 +953,14 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     roll ordering is guaranteed, but there are no repetitions.
 
 
-    ```python
+    ``` python
     >>> from dyce.p import _rwc_homogeneous_n_h_using_karonen_partial_selection
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 0))
     []
 
     ```
 
-    ```python
+    ``` python
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=None))
     [((1, 1), 16), ((1, 2), 27), ((1, 3), 21), ..., ((5, 5), 4), ((5, 6), 3), ((6, 6), 1)]
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=0))
@@ -968,7 +968,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
     ```
 
-    ```python
+    ``` python
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=None))
     [((1, 1), 1), ((1, 2), 3), ((1, 3), 3), ..., ((5, 5), 13), ((5, 6), 27), ((6, 6), 16)]
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=-1))

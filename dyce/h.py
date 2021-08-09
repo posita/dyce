@@ -143,7 +143,7 @@ class H(_MappingT):
 
     Modeling a single six-sided die (``1d6``) can be expressed as:
 
-    ```python
+    ``` python
     >>> from dyce import H
     >>> d6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
@@ -151,7 +151,7 @@ class H(_MappingT):
 
     An iterable of pairs can also be used (similar to ``dict``):
 
-    ```python
+    ``` python
     >>> d6 == H(((1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)))
     True
 
@@ -160,7 +160,7 @@ class H(_MappingT):
     Two shorthands are provided. If *items* is an iterable of numbers, counts of 1 are
     assumed:
 
-    ```python
+    ``` python
     >>> d6 == H((1, 2, 3, 4, 5, 6))
     True
 
@@ -168,7 +168,7 @@ class H(_MappingT):
 
     Repeated items are accumulated, as one would expect:
 
-    ```python
+    ``` python
     >>> H((2, 3, 3, 4, 4, 5))
     H({2: 1, 3: 2, 4: 2, 5: 1})
 
@@ -177,7 +177,7 @@ class H(_MappingT):
     If *items* is an integer, it is shorthand for creating a sequential range $[{1} ..
     {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
 
-    ```python
+    ``` python
     >>> d6 == H(6)
     True
 
@@ -185,7 +185,7 @@ class H(_MappingT):
 
     Histograms are maps, so we can test equivalence against other maps:
 
-    ```python
+    ``` python
     >>> H(6) == {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
     True
 
@@ -193,7 +193,7 @@ class H(_MappingT):
 
     Simple indexes can be used to look up an outcome’s count:
 
-    ```python
+    ``` python
     >>> H((2, 3, 3, 4, 4, 5))[3]
     2
 
@@ -202,13 +202,13 @@ class H(_MappingT):
     Most arithmetic operators are supported and do what one would expect. If the operand
     is a number, the operator applies to the outcomes:
 
-    ```python
+    ``` python
     >>> d6 + 4
     H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
 
     ```
 
-    ```python
+    ``` python
     >>> d6 * -1
     H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
     >>> d6 * -1 == -d6
@@ -221,7 +221,7 @@ class H(_MappingT):
     If the operand is another histogram, combinations are computed. Modeling the sum of
     two six-sided dice (``2d6``) can be expressed as:
 
-    ```python
+    ``` python
     >>> d6 + d6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
     >>> print((d6 + d6).format(width=65))
@@ -245,7 +245,7 @@ class H(_MappingT):
     To sum ${n}$ identical histograms, the matrix multiplication operator (``@``)
     provides a shorthand:
 
-    ```python
+    ``` python
     >>> 3@d6 == d6 + d6 + d6
     True
 
@@ -253,7 +253,7 @@ class H(_MappingT):
 
     The ``len`` built-in function can be used to show the number of distinct outcomes:
 
-    ```python
+    ``` python
     >>> len(2@d6)
     11
 
@@ -262,7 +262,7 @@ class H(_MappingT):
     The [``total`` property][dyce.h.H.total] can be used to compute the total number of
     combinations and each outcome’s probability:
 
-    ```python
+    ``` python
     >>> from fractions import Fraction
     >>> (2@d6).total
     36
@@ -275,7 +275,7 @@ class H(_MappingT):
     [``ne``][dyce.h.H.ne], etc.). One way to count how often a first six-sided die
     shows a different face than a second is:
 
-    ```python
+    ``` python
     >>> d6.ne(d6)
     H({False: 6, True: 30})
     >>> print(d6.ne(d6).format(width=65))
@@ -289,7 +289,7 @@ class H(_MappingT):
 
     Or, how often a first six-sided die shows a face less than a second is:
 
-    ```python
+    ``` python
     >>> d6.lt(d6)
     H({False: 21, True: 15})
     >>> print(d6.lt(d6).format(width=65))
@@ -303,7 +303,7 @@ class H(_MappingT):
 
     Or how often at least one ``2`` will show when rolling four six-sided dice:
 
-    ```python
+    ``` python
     >>> d6_eq2 = d6.eq(2) ; d6_eq2  # how often a 2 shows on a single six-sided die
     H({False: 5, True: 1})
     >>> 4@d6_eq2  # count of 2s showing on 4d6
@@ -328,7 +328,7 @@ class H(_MappingT):
         precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence)
         than ``.`` and ``[…]``:
 
-        ```python
+        ``` python
         >>> 2@d6[7]  # type: ignore
         Traceback (most recent call last):
           ...
@@ -340,7 +340,7 @@ class H(_MappingT):
 
         ```
 
-        ```python
+        ``` python
         >>> (2@d6)[7]
         6
         >>> (2@d6).le(7)
@@ -353,7 +353,7 @@ class H(_MappingT):
     Counts are generally accumulated without reduction. To reduce, call the
     [``lowest_terms`` method][dyce.h.H.lowest_terms]:
 
-    ```python
+    ``` python
     >>> d6.ge(4)
     H({False: 3, True: 3})
     >>> d6.ge(4).lowest_terms()
@@ -363,7 +363,7 @@ class H(_MappingT):
 
     Testing equivalence implicitly performs reductions of operands:
 
-    ```python
+    ``` python
     >>> d6.ge(4) == d6.ge(4).lowest_terms()
     True
 
@@ -675,7 +675,7 @@ class H(_MappingT):
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
         comparators.
 
-        ```python
+        ``` python
         >>> import operator
         >>> d6 = H(6)
         >>> d6.map(operator.__add__, d6)
@@ -685,7 +685,7 @@ class H(_MappingT):
 
         ```
 
-        ```python
+        ``` python
         >>> d6.map(operator.__pow__, 2)
         H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1})
         >>> d6.map(operator.__pow__, 2) == d6 ** 2
@@ -693,7 +693,7 @@ class H(_MappingT):
 
         ```
 
-        ```python
+        ``` python
         >>> d6.map(operator.__gt__, 3)
         H({False: 3, True: 3})
         >>> d6.map(operator.__gt__, 3) == d6.gt(3)
@@ -723,7 +723,7 @@ class H(_MappingT):
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
         *left_operand*:
 
-        ```python
+        ``` python
         >>> import operator
         >>> d6 = H(6)
         >>> d6.rmap(2, operator.__pow__)
@@ -758,7 +758,7 @@ class H(_MappingT):
         other: OutcomeT,
     ) -> H:
         r"""
-        ```python
+        ``` python
         >>> import operator
         >>> H(6).rmap(operator.__pow__, 2)  # type: ignore
         H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
@@ -774,14 +774,14 @@ class H(_MappingT):
         r"""
         Applies *op* to each outcome of the histogram:
 
-        ```python
+        ``` python
         >>> import operator
         >>> H(6).umap(operator.__neg__)
         H(-6)
 
         ```
 
-        ```python
+        ``` python
         >>> H(4).umap(lambda outcome: (-outcome) ** outcome)
         H({-27: 1, -1: 1, 4: 1, 256: 1})
 
@@ -807,7 +807,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__lt__, other).umap(bool)``:
 
-        ```python
+        ``` python
         >>> H(6).lt(3)
         H({False: 4, True: 2})
 
@@ -824,7 +824,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__le__, other).umap(bool)``.
 
-        ```python
+        ``` python
         >>> H(6).le(3)
         H({False: 3, True: 3})
 
@@ -841,7 +841,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__eq__, other).umap(bool)``.
 
-        ```python
+        ``` python
         >>> H(6).eq(3)
         H({False: 5, True: 1})
 
@@ -858,7 +858,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__ne__, other).umap(bool)``.
 
-        ```python
+        ``` python
         >>> H(6).ne(3)
         H({False: 1, True: 5})
 
@@ -875,7 +875,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__gt__, other).umap(bool)``.
 
-        ```python
+        ``` python
         >>> H(6).gt(3)
         H({False: 3, True: 3})
 
@@ -892,7 +892,7 @@ class H(_MappingT):
         r"""
         Shorthand for ``self.map(operator.__ge__, other).umap(bool)``.
 
-        ```python
+        ``` python
         >>> H(6).ge(3)
         H({False: 2, True: 4})
 
@@ -906,7 +906,7 @@ class H(_MappingT):
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 == 0)``.
 
-        ```python
+        ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_even()
         H({False: 2, True: 4})
 
@@ -936,7 +936,7 @@ class H(_MappingT):
         r"""
         Equivalent to ``self.umap(lambda outcome: outcome % 2 != 0)``.
 
-        ```python
+        ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_odd()
         H({False: 4, True: 2})
 
@@ -966,7 +966,7 @@ class H(_MappingT):
         r"""
         Accumulates counts:
 
-        ```python
+        ``` python
         >>> H(4).accumulate(H(6))
         H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
 
@@ -995,7 +995,7 @@ class H(_MappingT):
         Computes and returns the probability distribution where *outcome* appears
         exactly *k* times among ``n@self``.
 
-        ```python
+        ``` python
         >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
         150
         >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=2, n=3, k=3)
@@ -1017,7 +1017,7 @@ class H(_MappingT):
         Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
         outcome, operator.__add__, max_depth)``.
 
-        ```python
+        ``` python
         >>> H(6).explode(max_depth=2)
         H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
 
@@ -1035,7 +1035,7 @@ class H(_MappingT):
         r"""
         Computes and returns a histogram whose counts share a greatest common divisor of 1.
 
-        ```python
+        ``` python
         >>> df = H((-1, -1, 0, 0, 1, 1)) ; df
         H({-1: 2, 0: 2, 1: 2})
         >>> df.lowest_terms()
@@ -1043,7 +1043,7 @@ class H(_MappingT):
 
         ```
 
-        ```python
+        ``` python
         >>> d6avg = H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5)) ; d6avg
         H({2: 2, 3: 4, 4: 4, 5: 2})
         >>> d6avg.lowest_terms()
@@ -1077,7 +1077,7 @@ class H(_MappingT):
         probability distribution for each outcome appearing in that position among
         ``n@self``.
 
-        ```python
+        ``` python
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
         >>> order_stat_for_5d6avg = d6avg.order_stat_func_for_n(5)
         >>> order_stat_for_5d6avg(3)  # counts where outcome appears at index 3
@@ -1091,7 +1091,7 @@ class H(_MappingT):
         verified independently using the computationally expensive method of enumerating
         rolls and counting those that meet the criteria:
 
-        ```python
+        ``` python
         >>> from dyce import P
         >>> p_5d6avg = 5@P(d6avg)
         >>> sum(count for roll, count in p_5d6avg.rolls_with_counts() if roll[3] == 5)
@@ -1107,7 +1107,7 @@ class H(_MappingT):
         those betas for *n* such that repeated querying or results at *pos* can be
         computed much faster:
 
-        ```python
+        ``` python
         In [2]: %timeit [H(6).order_stat_for_n_at_pos(100, i) for i in range(10)]
         1.61 s ± 31.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
@@ -1149,13 +1149,15 @@ class H(_MappingT):
         [``H`` object][dyce.h.H], *coalesce* is called on the outcome and the expanded
         histogram, and the returned histogram is folded into result. The default
         behavior for *coalesce* is to replace the outcome with the expanded histogram.
-        Returned histograms are always reduced to their lowest terms. (See the
-        [``lowest_terms`` method][dyce.h.H.lowest_terms].)
+        Returned histograms are always reduced to their lowest terms.
 
-        This can be used to model complex rules. The following models re-rolling a face
-        of 1 on the first roll:
+        See [``coalesce_replace``][dyce.h.coalesce_replace] and the
+        [``lowest_terms`` method][dyce.h.H.lowest_terms].
 
-        ```python
+        This method can be used to model complex rules. The following models re-rolling
+        a face of 1 on the first roll:
+
+        ``` python
         >>> def reroll_one(h: H, outcome):
         ...   return h if outcome == 1 else outcome
 
@@ -1174,7 +1176,7 @@ class H(_MappingT):
         other outcomes. This becomes clearer when there is no overlap between the
         original histogram and the substitution:
 
-        ```python
+        ``` python
         >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
         >>> sub = orig.substitute(lambda h, outcome: -h if outcome == 4 else outcome) ; sub
         H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
@@ -1192,7 +1194,7 @@ class H(_MappingT):
             scaling. A silly example is modeling a d5 by indefinitely re-rolling a d6
             until something other than a 6 comes up:
 
-            ```python
+            ``` python
             >>> H(6).substitute(lambda h, outcome: H({}) if outcome == 6 else outcome)
             H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
@@ -1201,7 +1203,7 @@ class H(_MappingT):
             This technique is more useful when modeling re-rolling certain derived
             outcomes, like ties in a contest:
 
-            ```python
+            ``` python
             >>> d6_3, d8_2 = 3@H(6), 2@H(8)
             >>> d6_3.vs(d8_2)
             H({-1: 4553, 0: 1153, 1: 8118})
@@ -1222,7 +1224,7 @@ class H(_MappingT):
 
         What is the likelihood of an even final tally? This can be approximated by:
 
-        ```python
+        ``` python
         >>> d4, d6 = H(4), H(6)
 
         >>> def reroll_greatest_on_d4_d6(h: H, outcome):
@@ -1248,7 +1250,7 @@ class H(_MappingT):
         We can also use this method to model expected damage from a single attack in
         d20-like role playing games:
 
-        ```python
+        ``` python
         >>> bonus = 1
         >>> dmg_dice = H(8)
         >>> dmg = dmg_dice + bonus
@@ -1340,7 +1342,7 @@ class H(_MappingT):
 
         Shorthand for ``self.within(0, 0, other)``.
 
-        ```python
+        ``` python
         >>> H(6).vs(H(4))
         H({-1: 6, 0: 4, 1: 14})
         >>> H(6).vs(H(4)) == H(6).within(0, 0, H(4))
@@ -1358,7 +1360,7 @@ class H(_MappingT):
         difference is less than *lo*. 0 represents where that difference between *lo*
         and *hi* (inclusive). 1 represents where that difference is greater than *hi*.
 
-        ```python
+        ``` python
         >>> d6_2 = 2@H(6)
         >>> d6_2.within(7, 9)
         H({-1: 15, 0: 15, 1: 6})
@@ -1372,7 +1374,7 @@ class H(_MappingT):
 
         ```
 
-        ```python
+        ``` python
         >>> d6_3, d8_2 = 3@H(6), 2@H(8)
         >>> d6_3.within(-1, 1, d8_2)  # 3d6 w/in 1 of 2d8
         H({-1: 3500, 0: 3412, 1: 6912})
@@ -1424,7 +1426,7 @@ class H(_MappingT):
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair:
 
-        ```python
+        ``` python
         >>> h = H((1, 2, 3, 3, 4, 4, 5, 6))
         >>> list(h.distribution())
         [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
@@ -1435,7 +1437,7 @@ class H(_MappingT):
 
         If provided, *fill_items* supplies defaults for any “missing” outcomes:
 
-        ```python
+        ``` python
         >>> list(h.distribution())
         [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
         >>> list(h.distribution(fill_items={0: 0, 7: 0}))
@@ -1452,20 +1454,20 @@ class H(_MappingT):
         numerator and denominator) and returns an instance of a desired (but otherwise
         arbitrary) type:
 
-        ```python
+        ``` python
         >>> list(h.distribution(rational_t=lambda n, d: f"{n}/{d}"))
         [(1, '1/8'), (2, '1/8'), (3, '2/8'), (4, '2/8'), (5, '1/8'), (6, '1/8')]
 
         ```
 
-        ```python
+        ``` python
         >>> import sympy
         >>> list(h.distribution(rational_t=sympy.Rational))
         [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
 
         ```
 
-        ```python
+        ``` python
         >>> import sage.rings.rational  # doctest: +SKIP
         >>> list(h.distribution(rational_t=lambda n, d: sage.rings.rational.Rational((n, d))))  # doctest: +SKIP
         [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
@@ -1479,7 +1481,7 @@ class H(_MappingT):
         The *rational_t* argument is a convenience. Iteration or comprehension can be
         used to accomplish something similar:
 
-        ```python
+        ``` python
         >>> [(outcome, f"{probability.numerator}/{probability.denominator}") for outcome, probability in (h).distribution()]
         [(1, '1/8'), (2, '1/8'), (3, '1/4'), (4, '1/4'), (5, '1/8'), (6, '1/8')]
 
@@ -1487,14 +1489,14 @@ class H(_MappingT):
 
         Many number implementations can convert directly from ``fractions.Fraction``s:
 
-        ```python
+        ``` python
         >>> import sympy.abc  # doctest: +SKIP
         >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
         ```
 
-        ```python
+        ``` python
         >>> import sage.rings.rational  # doctest: +SKIP
         >>> [(outcome, sage.rings.rational.Rational(probability)) for outcome, probability in h.distribution()]  # doctest: +SKIP
         [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]
@@ -1521,7 +1523,7 @@ class H(_MappingT):
         output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
         values are ``float``s:
 
-        ```python
+        ``` python
         >>> list(H(6).distribution())
         [(1, Fraction(1, 6)), (2, Fraction(1, 6)), (3, Fraction(1, 6)), (4, Fraction(1, 6)), (5, Fraction(1, 6)), (6, Fraction(1, 6))]
         >>> H(6).distribution_xy()
@@ -1555,13 +1557,13 @@ class H(_MappingT):
         than zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which
         are otherwise ignored if *width* is zero or less).
 
-        ```python
+        ``` python
         >>> print(H(6).format(width=0))
         {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
 
         ```
 
-        ```python
+        ``` python
         >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
         avg |    7.00
         std |    2.42
@@ -1591,7 +1593,7 @@ class H(_MappingT):
 
         If *scaled* is ``True``, horizontal bars are scaled to *width*:
 
-        ```python
+        ``` python
         >>> h = (2@H(6)).ge(7)
         >>> print("{:->65}".format(" 65 chars wide -->|"))
         ---------------------------------------------- 65 chars wide -->|

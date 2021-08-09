@@ -18,7 +18,7 @@ If you have exposure to [another tool](), they may also help with transition.
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
-```python
+``` python
 >>> from dyce import H, P
 >>> p_4d6 = 4@P(6)
 >>> res1 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
@@ -32,7 +32,7 @@ If you have exposure to [another tool](), they may also help with transition.
 
 Visualization:
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(
 ...   *res1.distribution_xy(),
@@ -65,7 +65,7 @@ Visualization:
 
 Source:
 
-```python
+``` python
 # …
 program = [
   "VAR save_roll = d20",
@@ -79,7 +79,7 @@ program = [
 
 Translation:
 
-```python
+``` python
 >>> save_roll = H(20)
 >>> burning_arch_damage = 10@H(6) + 10
 >>> pass_save = save_roll.ge(10)
@@ -89,7 +89,7 @@ Translation:
 
 Visualization:
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> outcomes, probabilities = damage_half_on_save.distribution_xy()
 >>> matplotlib.pyplot.plot(outcomes, probabilities, marker=".")  # doctest: +SKIP
@@ -106,7 +106,7 @@ Visualization:
 
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
 
-```python
+``` python
 >>> save_roll.substitute(
 ...   lambda h, outcome:
 ...     burning_arch_damage // 2 if outcome >= 10
@@ -118,7 +118,7 @@ True
 
 ## More translations from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
 
-```python
+``` python
 >>> # VAR name = 1 + 2d3 - 3 * 4d2 // 5
 >>> name = 1 + (2@H(3)) - 3 * (4@H(2)) // 5
 >>> print(name.format(width=0))
@@ -126,7 +126,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # VAR out = 3 * ( 1 + 1d4 )
 >>> out = 3 * (1 + 2@H(4))
 >>> print(out.format(width=0))
@@ -134,7 +134,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # VAR g = (1d4 >= 2) AND !(1d20 == 2)
 >>> g = H(4).ge(2) & H(20).ne(2)
 >>> print(g.format(width=0))
@@ -142,7 +142,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # VAR h = (1d4 >= 2) OR !(1d20 == 2)
 >>> h = H(4).ge(2) | H(20).ne(2)
 >>> print(h.format(width=0))
@@ -150,7 +150,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # VAR abs = ABS( 1d6 - 1d6 )
 >>> abs_ = abs(H(6) - H(6))
 >>> print(abs_.format(width=0))
@@ -158,7 +158,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # MAX(4d7, 2d10)
 >>> _ = P(4@H(7), 2@H(10)).h(-1)
 >>> print(_.format(width=0))
@@ -166,7 +166,7 @@ True
 
 ```
 
-```python
+``` python
 >>> # MIN(50, d%)
 >>> _ = P(H((50,)), P(100)).h(0)
 >>> print(_.format(width=0))
@@ -178,7 +178,7 @@ True
 
 Example 1 source:
 
-```python
+``` python
 from DnDice import d, gwf
 single_attack = 2*d(6) + 5
 # …
@@ -194,7 +194,7 @@ print(great_weapon_fighting.expectancies())
 
 Example 1 translation:
 
-```python
+``` python
 >>> single_attack = 2@H(6) + 5
 
 >>> def gwf(h: H, outcome):
@@ -210,7 +210,7 @@ Example 1 translation:
 
 Example 1 visualization:
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> from dyce.plt import display_burst
 >>> plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
@@ -253,7 +253,7 @@ Example 1 visualization:
 
 Example 2 source:
 
-```python
+``` python
 from DnDice import d, advantage, plot
 
 normal_hit = 1*d(12) + 5
@@ -273,7 +273,7 @@ result.normalizeExpectancies()
 
 Example 2 translation:
 
-```python
+``` python
 >>> normal_hit = H(12) + 5
 >>> critical_hit = 3@H(12) + 5
 >>> advantage = (2@P(20)).h(-1)
@@ -289,7 +289,7 @@ Example 2 translation:
 
 Example 2 visualization:
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(
 ...   *normal_hit.distribution_xy(),
@@ -328,14 +328,14 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 
 Translation:
 
-```python
+``` python
 >>> res = (10@P(H(10).explode(max_depth=3))).h(slice(-3, None))
 
 ```
 
 Visualization:
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(*res.distribution_xy(), marker=".")  # doctest: +SKIP
 >>> matplotlib.pyplot.title(r"Modeling taking the three highest of ten exploding d10s")  # doctest: +SKIP
@@ -365,7 +365,7 @@ function: dupes in DICE:s {
 
 Translation:
 
-```python
+``` python
 >>> def dupes(p: P):
 ...   for roll, count in p.rolls_with_counts():
 ...     dupes = 0
@@ -381,7 +381,7 @@ Translation:
 
 Visualization:
 
-```python
+``` python
 >>> from dyce.plt import plot_burst
 >>> plot_burst(
 ...   res,
@@ -416,7 +416,7 @@ output [brawl 3d6 vs 3d6] named "A vs B Damage"
 
 Translation:
 
-```python
+``` python
 >>> from itertools import product
 
 >>> def brawl(a: P, b: P):
@@ -432,7 +432,7 @@ Translation:
 
 Rudimentary visualization using built-in methods:
 
-```python
+``` python
 >>> res = H(brawl(3@P(6), 3@P(6))).lowest_terms()
 >>> print(res.format(width=65))
 avg |    0.00
@@ -472,7 +472,7 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 
 Translation:
 
-```python
+``` python
 >>> def brawl_w_optional_swap(a: P, b: P):
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
 ...       a.rolls_with_counts(),
@@ -491,7 +491,7 @@ Translation:
 
 Rudimentary visualization using built-in methods:
 
-```python
+``` python
 >>> res = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
 >>> print(res.format(width=65))
 avg |    2.36

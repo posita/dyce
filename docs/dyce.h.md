@@ -13,22 +13,13 @@
   Thank you!
 -->
 
-# ``dyce`` package reference
+# ``dyce.h`` package reference
 
-::: dyce
+::: dyce.h
+    rendering:
+      show_if_no_docstring: true
     selection:
-      members: false
-
-``dyce`` provides several core primitives:
-
-* [``H``][dyce.h.H] – histograms (outcomes or individual dice)
-* [``P``][dyce.p.P] – collections of histograms (pools)
-* [``R``][dyce.r.R] – scalars, histograms, pools, operators, etc. for assembling roller trees (see [``dyce.r``](dyce.r.md) for details)
-
-::: dyce.h.H
-    rendering:
-      show_root_heading: true
-
-::: dyce.p.P
-    rendering:
-      show_root_heading: true
+      members:
+        - "HAbleT"
+        - "HAbleOpsMixin"
+        - "coalesce_replace"

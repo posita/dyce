@@ -93,7 +93,7 @@ There are only a few additional guidelines:
 
 ```md
 ...
-* [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce); GitHub - [**@posita**](https://github.com/posita)
+* [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce); GitHub – [**@posita**](https://github.com/posita)
 ...
 ```
 
@@ -109,12 +109,12 @@ There are only a few additional guidelines:
   Unit tests live in [``tests``](https://github.com/posita/dyce/tree/master/tests).
 
 * If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
-  Consider prefixing your pull request’s title with something like, “``NEED FEEDBACK - ``”.
+  Consider prefixing your pull request’s title with something like, “``NEED FEEDBACK – ``”.
 
 * If your pull request is still in progress, but you are not blocked on anything, consider using the [draft feature](https://github.blog/2019-02-14-introducing-draft-pull-requests/).
 
 * Once you are ready for a merge, resolve any conflicts, squash your commits, and provide a useful commit message.
   ([This](https://robots.thoughtbot.com/git-interactive-rebase-squash-amend-rewriting-history) and [this](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) may be helpful.)
   If your pull request started out as a draft, promote it by requesting a review.
-  Consider prefixing the pull request’s title to something like, “``READY FOR MERGE - ``”.
+  Consider prefixing the pull request’s title to something like, “``READY FOR MERGE – ``”.
   I will try to get to it as soon as I can.

@@ -10,11 +10,14 @@ repo_url: https://github.com/posita/dyce
 
 nav:
   - Introduction: index.md
-  - Tutorial: tutorial.md
-  - Applications & translations: translations.md
+  - Countin’ with histograms and pools: countin.md
+  - Rollin’ with rollers and rolls: rollin.md
+  - Applications and translations: translations.md
   - API:
     - <tt>dyce</tt>: dyce.md
+    - <tt>dyce.h</tt>: dyce.h.md
     - <tt>dyce.plt</tt>: dyce.plt.md
+    - <tt>dyce.r</tt>: dyce.r.md
   - Release notes: notes.md
   - Contributing: contrib.md
   - License: license.md
@@ -29,8 +32,8 @@ extra:
     provider: mike
 
 extra_javascript:
-  # ---- BEGIN MathJax config ----
   - img_theme.js
+  # ---- BEGIN MathJax config ----
   - mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
@@ -38,14 +41,16 @@ extra_javascript:
 
 markdown_extensions:
   - admonition
+  - def_list
   - footnotes
   # ---- BEGIN MathJax config ----
   - pymdownx.arithmatex:
       generic: true
   # ----- END MathJax config -----
-  - pymdownx.emoji:
+  - pymdownx.emoji
   - pymdownx.highlight:
       linenums: true
+  - pymdownx.inlinehilite
   - pymdownx.snippets:
       check_paths: true
   - pymdownx.superfences
@@ -53,6 +58,8 @@ markdown_extensions:
 
 plugins:
   - exclude:
+      # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>
+      # gitignore: true
       glob:
         - "Makefile"
         - "*.py"
@@ -63,8 +70,8 @@ plugins:
       handlers:
         python:
           rendering:
+            show_if_no_docstring: true
             show_root_full_path: false
-            show_root_heading: true
             show_signature_annotations: true
       watch:
         - dyce
@@ -73,6 +80,7 @@ plugins:
 theme:
   name: "material"  # required by arithmatex and mkdocstrings
   features:
+    - content.code.annotate
     - navigation.expand
     - navigation.sections
     - toc.integrate

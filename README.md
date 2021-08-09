@@ -54,11 +54,10 @@ Let me know, and I’ll promote it here!
 ``dyce`` provides several core primitives.
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
-[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) represent nodes in arbitrary roller trees useful for translating from proprietary grammars.
-[``Roll`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.Roll) represent random rolls (sequences of outcomes) generated from roller trees.
+[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls without costly enumeration.
 All support a variety of operations.
 
-```python
+``` python
 >>> from dyce import H
 >>> d6 = H(6)  # a standard six-sided die
 >>> 2@d6 * 3 - 4  # 2d6 × 3 - 4
@@ -70,7 +69,7 @@ H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 
 ```
 
-```python
+``` python
 >>> from dyce import P
 >>> p_2d6 = 2@P(d6)  # a pool of two six-sided dice
 >>> p_2d6.h()  # pools can be collapsed into histograms
@@ -83,7 +82,7 @@ True
 By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest.
 (The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
-```python
+``` python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 >>> print(p_2d6.h(0).format(width=65))
@@ -99,7 +98,7 @@ var |    1.97
 
 ```
 
-```python
+``` python
 >>> p_2d6.h(-1)  # take the highest die of 2d6
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 >>> print(p_2d6.h(-1).format(width=65))
@@ -117,7 +116,7 @@ var |    1.97
 
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
 
-```python
+``` python
 >>> import matplotlib  # doctest: +SKIP
 
 >>> outcomes, probabilities = p_2d6.h(0).distribution_xy()
@@ -147,16 +146,16 @@ var |    1.97
 <!-- Should match any title of the corresponding plot title -->
 ![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/master/docs/plot_2d6_lo_hi_gh.png)
 
-[``H`` objects][dyce.h.H] and [``P`` objects][dyce.p.P] can generate random rolls.
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
 
-```python
+``` python
 >>> d6 = H(6)
 >>> d6.roll()  # doctest: +SKIP
 4
 
 ```
 
-```python
+``` python
 >>> d10 = H(10) - 1
 >>> p_6d10 = 6@P(d10)
 >>> p_6d10.roll()  # doctest: +SKIP
@@ -164,37 +163,66 @@ var |    1.97
 
 ```
 
-Where more transparency is required or where enumeration is prohibitive, [``R`` objects][dyce.r.R] can be used to construct arbitrary roller trees.
-Such trees can be used to generate [``Roll`` objects][dyce.r.Roll] objects, which “show their work”:
+Where more transparency is required or where enumeration is prohibitive, [``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) can be used to construct arbitrary roller trees.
+Such trees can be used to generate rolls which “show their work”:
 
-```python
+``` python
 >>> from dyce import R
->>> r_d100 = 2@R.from_value(H(10) - 1)
->>> r_d100.roll()  # doctest: +SKIP
+>>> r_d6 = R.from_value(H(6))
+>>> r_1000d6_plus_2 = 1000@(r_d6 + 2)
+>>> roll = r_1000d6_plus_2.roll()
+>>> tuple(roll.outcomes())  # doctest: +SKIP
+(5, 7, 8, 7, 8, 4, ..., 8, 4, 3, 5, 4, 4)
+>>> roll.sources[1]  # doctest: +SKIP
 Roll(
-  r=RepeatRoller(
-      n=2,
-      child=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
-      annotation=None,
+  r=BinaryOperationRoller(
+    op=<built-in function add>,
+    left_source=ValueRoller(value=H(6), annotation=''),
+    right_source=ValueRoller(value=2, annotation=''),
+    annotation='',
+  ),
+  roll_outcomes=(
+    RollOutcome(
+      value=7,
+      sources=(
+        RollOutcome(
+          value=5,
+          sources=(),
+        ),
+        RollOutcome(
+          value=2,
+          sources=(),
+        ),
+      ),
     ),
-  values=(6, 9),
-  children=(
+  ),
+  sources=(
     Roll(
-      r=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
-      values=(6,),
-      children=(),
+      r=ValueRoller(value=H(6), annotation=''),
+      roll_outcomes=(
+        RollOutcome(
+          value=5,
+          sources=(),
+        ),
+      ),
+      sources=(),
     ),
     Roll(
-      r=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=None),
-      values=(9,),
-      children=(),
+      r=ValueRoller(value=2, annotation=''),
+      roll_outcomes=(
+        RollOutcome(
+          value=2,
+          sources=(),
+        ),
+      ),
+      sources=(),
     ),
   ),
 )
 
 ```
 
-See the [tutorial](https://posita.github.io/dyce/latest/tutorial) and the [API guide](https://posita.github.io/dyce/latest/dyce) for a much more thorough treatment, including detailed examples.
+See the tutorials on [counting](https://posita.github.io/dyce/latest/countin) and [rolling](https://posita.github.io/dyce/latest/rollin), as well as the [API guide](https://posita.github.io/dyce/latest/dyce) for much more thorough treatments, including detailed examples.
 
 ## Design philosophy
 
@@ -217,12 +245,14 @@ On its own, ``dyce`` is completely adequate for casual tinkering.
 However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
 
 [^1]:
-    You won’t find any lexers, parsers, or tokenizers here, other than straight-up Python.
-    That being said, if you *really* miss them, you can always roll your own and lean on ``dyce`` underneath to perform computations.
+
+    You won’t find any lexers, parsers, or tokenizers in ``dyce``’s core, other than straight-up Python.
+    That being said, you can always “roll” your own (see what we did there?) and lean on ``dyce`` underneath to perform computations.
     It doesn’t mind.
-    It actually kind of likes it.
+    It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin).
 
 [^2]:
+
     Okay, maybe not _literally_ anywhere, but [you’d be surprised](https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/).
     Void where prohibited.
     [Certain restrictions](#requirements) apply.
@@ -234,6 +264,10 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 
 The following is a best-effort[^3] summary of the differences between various available tools in this space.
 Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations) for added color.
+
+[^3]:
+
+    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if you observe discrepancies.
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -249,25 +283,27 @@ Consider exploring the [applications and translations](https://posita.github.io/
 <!--                                         	🔺 dycelib			🔺 python-dice		🔺 d20					🔺 dice				🔺 dyce
                                              			🔺 dyce_roll.py		🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
 
-[^3]:
-    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if you observe discrepancies.
-
 [^4]:
+
     Actively maintained, but sparsely documented.
     The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version.
 
 [^5]:
+
     Source can be downloaded and incorporated directly, but there is no packaging, versioning, or dependency tracking.
 
 [^6]:
+
     Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice.
     That being said, the library is remarkably powerful, given its size.
 
 [^7]:
+
     Limited arithmetic operations are available.
     The library also provides game-specific functions.
 
 [^8]:
+
     Results only.
     Input is limited to specialized grammar.
 
