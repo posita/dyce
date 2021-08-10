@@ -13,7 +13,7 @@
   Thank you!
 -->
 
-# ``dyce.plt`` package reference
+# ``dyce.viz`` package reference
 
 !!! warning "Experimental"
 
@@ -22,7 +22,7 @@
     Be warned that future release may introduce incompatibilities or remove this package altogether.
     [Suggestions and contributions](contrib.md) are welcome.
 
-::: dyce.plt
+::: dyce.viz
     rendering:
       show_if_no_docstring: true
     selection:

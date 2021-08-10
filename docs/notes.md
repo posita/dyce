@@ -28,6 +28,8 @@
 * Renames experimental ``P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
 * Removes ``coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
+* Renames ``dyce.plt`` to [``dyce.viz``][dyce.viz].
+* Deprecates ``dyce.plt``.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

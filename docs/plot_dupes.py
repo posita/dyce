@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from dyce import H, P
-from dyce.plt import plot_burst
+from dyce.viz import plot_burst
 
 
 def do_it(style: str) -> None:

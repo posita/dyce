@@ -212,7 +212,7 @@ Example 1 visualization:
 
 ``` python
 >>> import matplotlib  # doctest: +SKIP
->>> from dyce.plt import display_burst
+>>> from dyce.viz import display_burst
 >>> plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
 >>> burst_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))  # doctest: +SKIP
 >>> sa_label = "Normal attack"
@@ -382,7 +382,7 @@ Translation:
 Visualization:
 
 ``` python
->>> from dyce.plt import plot_burst
+>>> from dyce.viz import plot_burst
 >>> plot_burst(
 ...   res,
 ...   desc=r"Chances of rolling $n$ duplicates in 8d10",

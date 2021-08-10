@@ -14,8 +14,7 @@ import random
 
 import pytest
 
-from dyce import H
-from dyce import plt as dyce_plt
+from dyce import H, viz
 
 __all__ = ()
 
@@ -23,16 +22,16 @@ __all__ = ()
 # ---- Tests ---------------------------------------------------------------------------
 
 
-class TestPlt:
+class TestViz:
     def test_alphasize(self):
         colors = [
             [r / 10, g / 10, b / 10, random.random()]
             for r, g, b in zip(*(range(0, 10, 2), range(3, 9), range(10, 0, -2)))
         ]
-        actual_colors = dyce_plt.alphasize(colors, 0.8)
+        actual_colors = viz.alphasize(colors, 0.8)
         expected_colors = [(r, g, b, 0.8) for r, g, b, _ in colors]
         assert actual_colors == expected_colors
-        assert dyce_plt.alphasize(colors, -1.0) == colors
+        assert viz.alphasize(colors, -1.0) == colors
 
     def test_display_burst(self):
         patches = pytest.importorskip(
@@ -42,7 +41,7 @@ class TestPlt:
 
         _, ax = pyplot.subplots()
         d6_2 = 2 @ H(6)
-        dyce_plt.display_burst(ax, d6_2)
+        viz.display_burst(ax, d6_2)
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
@@ -82,7 +81,7 @@ class TestPlt:
 
         _, ax = pyplot.subplots()
         d6_2 = 2 @ H(6)
-        dyce_plt.display_burst(ax, d6_2, dyce_plt.labels_cumulative(d6_2))
+        viz.display_burst(ax, d6_2, viz.labels_cumulative(d6_2))
         wedge_labels = [
             w.get_label()
             for w in ax.get_children()[:22]
@@ -115,7 +114,7 @@ class TestPlt:
         ]
 
     def test_labels_cumulative(self):
-        labels = tuple(dyce_plt.labels_cumulative(2 @ H(6)))
+        labels = tuple(viz.labels_cumulative(2 @ H(6)))
         assert labels == (
             ("2 2.78%; ≥2.78%; ≤100.00%", fractions.Fraction(1, 36)),
             ("3 5.56%; ≥8.33%; ≤97.22%", fractions.Fraction(1, 18)),

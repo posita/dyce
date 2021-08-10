@@ -399,10 +399,10 @@ The odds of scoring at least one nine or higher on any single die when rolling $
   ![Plot: Distribution for 2d6](plot_histogram_light.png)
 </picture>
 
-[``dyce.plt``](dyce.plt.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
+[``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
 
 ``` python
->>> from dyce.plt import plot_burst
+>>> from dyce.viz import plot_burst
 >>> fig, ax = plot_burst(2@H(6))  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 

@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from dyce import H
-from dyce.plt import display_burst
+from dyce.viz import display_burst
 
 
 def do_it(style: str) -> None:

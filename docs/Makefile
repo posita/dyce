@@ -25,20 +25,20 @@ all : \
 	plot_risus_first_round_dark.png \
 	plot_risus_first_round_light.png
 
-plot_%_dark.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
+plot_%_dark.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=dark $*
 
-plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
+plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=light $*
 
 # TODO(posita): This should go away at some point. (See TODO in plot.py.)
-plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/plt.py
+plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
-graph_%_dark.svg : graph_%.dot Makefile
+graph_%_dark.svg : graph_%.dot Makefile ../dyce/r.py ../dyce/viz.py
 	dot -Tsvg graph_$*.dot | perl >$@ -pe 's{ fill="#ffffff"}{ fill="transparent"}g ; s{"#000000"}{"Azure"}g ; s{"#000001"}{"Orchid"}g ; s{"#000002"}{"SkyBlue"}g ; s{"#000003"}{"IndianRed"}g ; s{"#000004"}{"PaleGreen"}g'
 
-graph_%_light.svg : graph_%.dot Makefile
+graph_%_light.svg : graph_%.dot Makefile ../dyce/r.py ../dyce/viz.py
 	dot -Tsvg graph_$*.dot | perl >$@ -pe 's{ fill="#ffffff"}{ fill="transparent"}g ; s{"#000000"}{"DarkSlateGray"}g ; s{"#000001"}{"Indigo"}g ; s{"#000002"}{"MediumBlue"}g ; s{"#000003"}{"MediumVioletRed"}g ; s{"#000004"}{"MediumSeaGreen"}g'
 
 dyce-powered.svg : Makefile
