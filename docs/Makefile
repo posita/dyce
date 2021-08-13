@@ -1,6 +1,18 @@
 all : \
+	classes_dyce_dark.svg \
+	classes_dyce_light.svg \
+	graph_rollin_value_dark.svg \
+	graph_rollin_value_light.svg \
+	graph_rollin_expr_dark.svg \
+	graph_rollin_expr_light.svg \
 	graph_rollin_pool_dark.svg \
 	graph_rollin_pool_light.svg \
+	graph_rollin_select_1_dark.svg \
+	graph_rollin_select_1_light.svg \
+	graph_rollin_select_2_dark.svg \
+	graph_rollin_select_2_light.svg \
+	graph_rollin_select_3_dark.svg \
+	graph_rollin_select_3_light.svg \
 	plot_2d6_lo_hi_gh.png \
 	plot_4d6_variants_dark.png \
 	plot_4d6_variants_light.png \
@@ -35,11 +47,19 @@ plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/
 plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
-graph_%_dark.svg : graph_%.dot Makefile ../dyce/r.py ../dyce/viz.py
-	dot -Tsvg graph_$*.dot | perl >$@ -pe 's{ fill="#ffffff"}{ fill="transparent"}g ; s{"#000000"}{"Azure"}g ; s{"#000001"}{"Orchid"}g ; s{"#000002"}{"SkyBlue"}g ; s{"#000003"}{"IndianRed"}g ; s{"#000004"}{"PaleGreen"}g'
+graph_%_dark.svg : graph_%.py Makefile graph.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+	"$${PYTHON:-python}" graph.py --style=dark $*
+	rm -f graph_$*_dark
 
-graph_%_light.svg : graph_%.dot Makefile ../dyce/r.py ../dyce/viz.py
-	dot -Tsvg graph_$*.dot | perl >$@ -pe 's{ fill="#ffffff"}{ fill="transparent"}g ; s{"#000000"}{"DarkSlateGray"}g ; s{"#000001"}{"Indigo"}g ; s{"#000002"}{"MediumBlue"}g ; s{"#000003"}{"MediumVioletRed"}g ; s{"#000004"}{"MediumSeaGreen"}g'
+graph_%_light.svg : graph_%.py Makefile graph.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+	"$${PYTHON:-python}" graph.py --style=light $*
+	rm -f graph_$*_light
+
+classes_dyce_dark.svg : classes_dyce.svg Makefile
+	perl >$@ -pe 's{"#000000"}{"Azure"}g' $<
+
+classes_dyce_light.svg : classes_dyce.svg Makefile
+	perl >$@ -pe 's{"#000000"}{"DarkSlateGray"}g' $<
 
 dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-dyce--powered%21-gold'

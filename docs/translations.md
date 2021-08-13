@@ -398,7 +398,7 @@ Visualization:
   ![Plot: Chances of rolling <i>n</i> duplicates in 8d10](plot_dupes_light.png)
 </picture>
 
-## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”:
+## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”
 
 Source of basic ``brawl``:
 

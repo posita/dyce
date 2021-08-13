@@ -126,8 +126,9 @@ def coalesce_replace(h: H, outcome: OutcomeT) -> H:
 class H(_MappingT):
     r"""
     An immutable mapping for use as a histogram which supports arithmetic operations.
-    This is useful for modeling discrete outcomes, like individual dice. ``H`` objects
-    encode discrete probability distributions as integer counts without any denominator.
+    This is useful for modeling discrete outcomes, like individual dice. ``#!python H``
+    objects encode discrete probability distributions as integer counts without any
+    denominator.
 
     !!! info
 
@@ -149,7 +150,7 @@ class H(_MappingT):
 
     ```
 
-    An iterable of pairs can also be used (similar to ``dict``):
+    An iterable of pairs can also be used (similar to ``#!python dict``).
 
     ``` python
     >>> d6 == H(((1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)))
@@ -158,7 +159,7 @@ class H(_MappingT):
     ```
 
     Two shorthands are provided. If *items* is an iterable of numbers, counts of 1 are
-    assumed:
+    assumed.
 
     ``` python
     >>> d6 == H((1, 2, 3, 4, 5, 6))
@@ -166,7 +167,7 @@ class H(_MappingT):
 
     ```
 
-    Repeated items are accumulated, as one would expect:
+    Repeated items are accumulated, as one would expect.
 
     ``` python
     >>> H((2, 3, 3, 4, 4, 5))
@@ -175,7 +176,7 @@ class H(_MappingT):
     ```
 
     If *items* is an integer, it is shorthand for creating a sequential range $[{1} ..
-    {items}]$ (or $[{items} .. {-1}]$ if *items* is negative):
+    {items}]$ (or $[{items} .. {-1}]$ if *items* is negative).
 
     ``` python
     >>> d6 == H(6)
@@ -183,7 +184,7 @@ class H(_MappingT):
 
     ```
 
-    Histograms are maps, so we can test equivalence against other maps:
+    Histograms are maps, so we can test equivalence against other maps.
 
     ``` python
     >>> H(6) == {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
@@ -191,7 +192,7 @@ class H(_MappingT):
 
     ```
 
-    Simple indexes can be used to look up an outcome’s count:
+    Simple indexes can be used to look up an outcome’s count.
 
     ``` python
     >>> H((2, 3, 3, 4, 4, 5))[3]
@@ -200,7 +201,7 @@ class H(_MappingT):
     ```
 
     Most arithmetic operators are supported and do what one would expect. If the operand
-    is a number, the operator applies to the outcomes:
+    is a number, the operator applies to the outcomes.
 
     ``` python
     >>> d6 + 4
@@ -243,7 +244,7 @@ class H(_MappingT):
     ```
 
     To sum ${n}$ identical histograms, the matrix multiplication operator (``@``)
-    provides a shorthand:
+    provides a shorthand.
 
     ``` python
     >>> 3@d6 == d6 + d6 + d6
@@ -251,7 +252,8 @@ class H(_MappingT):
 
     ```
 
-    The ``len`` built-in function can be used to show the number of distinct outcomes:
+    The ``#!python len`` built-in function can be used to show the number of distinct
+    outcomes.
 
     ``` python
     >>> len(2@d6)
@@ -260,7 +262,7 @@ class H(_MappingT):
     ```
 
     The [``total`` property][dyce.h.H.total] can be used to compute the total number of
-    combinations and each outcome’s probability:
+    combinations and each outcome’s probability.
 
     ``` python
     >>> from fractions import Fraction
@@ -301,7 +303,7 @@ class H(_MappingT):
 
     ```
 
-    Or how often at least one ``2`` will show when rolling four six-sided dice:
+    Or how often at least one ``#!python 2`` will show when rolling four six-sided dice:
 
     ``` python
     >>> d6_eq2 = d6.eq(2) ; d6_eq2  # how often a 2 shows on a single six-sided die
@@ -322,11 +324,11 @@ class H(_MappingT):
     !!! tip "Mind your parentheses"
 
         Parentheses are often necessary to enforce the desired order of operations. This
-        is most often an issue with the ``@`` operator, because it behaves differently
-        than the ``d`` operator in most dedicated grammars. More specifically, in
-        Python, ``@`` has a [lower
+        is most often an issue with the ``#!python @`` operator, because it behaves
+        differently than the ``d`` operator in most dedicated grammars. More
+        specifically, in Python, ``#!python @`` has a [lower
         precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence)
-        than ``.`` and ``[…]``:
+        than ``#!python .`` and ``#!python […]``.
 
         ``` python
         >>> 2@d6[7]  # type: ignore
@@ -351,7 +353,7 @@ class H(_MappingT):
         ```
 
     Counts are generally accumulated without reduction. To reduce, call the
-    [``lowest_terms`` method][dyce.h.H.lowest_terms]:
+    [``lowest_terms`` method][dyce.h.H.lowest_terms].
 
     ``` python
     >>> d6.ge(4)
@@ -361,7 +363,7 @@ class H(_MappingT):
 
     ```
 
-    Testing equivalence implicitly performs reductions of operands:
+    Testing equivalence implicitly performs reductions of operands.
 
     ``` python
     >>> d6.ge(4) == d6.ge(4).lowest_terms()
@@ -417,7 +419,6 @@ class H(_MappingT):
             for outcome in sorted_outcomes(tmp)
             if tmp[outcome] != 0
         }
-        self._total = sum(tmp.values())
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -626,22 +627,24 @@ class H(_MappingT):
         r"""
         More descriptive synonym for the [``values`` method][dyce.h.H.values].
         """
-        return self.values()
+        return self._h.values()
 
     def items(self) -> ItemsView[OutcomeT, int]:
-        return cast(ItemsView[OutcomeT, int], self._h.items())
+        # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
+        return self._h.items()  # type: ignore
 
     def keys(self) -> KeysView[OutcomeT]:
-        return cast(KeysView[OutcomeT], self._h.keys())
+        return self.outcomes()
 
     def outcomes(self) -> KeysView[OutcomeT]:
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
-        return self.keys()
+        # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
+        return self._h.keys()  # type: ignore
 
     def values(self) -> ValuesView[int]:
-        return self._h.values()
+        return self.counts()
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -653,13 +656,12 @@ class H(_MappingT):
             This propertyshould be considered experimental and may change or disappear
             in future versions.
 
-        Equivalent to ``sum(self.counts())``, but calculated once in
-        [``H.__init__``][dyce.h.H.__init__].
+        Equivalent to ``#!python sum(self.counts())``.
         """
 
         @experimental
-        def _total():
-            return self._total
+        def _total() -> int:
+            return sum(self.counts())
 
         return _total()
 
@@ -721,7 +723,7 @@ class H(_MappingT):
     ) -> H:
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
-        *left_operand*:
+        *left_operand*.
 
         ``` python
         >>> import operator
@@ -772,7 +774,7 @@ class H(_MappingT):
         op: _UnaryOperatorT,
     ) -> H:
         r"""
-        Applies *op* to each outcome of the histogram:
+        Applies *op* to each outcome of the histogram.
 
         ``` python
         >>> import operator
@@ -805,7 +807,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__lt__, other).umap(bool)``:
+        Shorthand for ``#!python self.map(operator.__lt__, other).umap(bool)``.
 
         ``` python
         >>> H(6).lt(3)
@@ -822,7 +824,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__le__, other).umap(bool)``.
+        Shorthand for ``#!python self.map(operator.__le__, other).umap(bool)``.
 
         ``` python
         >>> H(6).le(3)
@@ -839,7 +841,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__eq__, other).umap(bool)``.
+        Shorthand for ``#!python self.map(operator.__eq__, other).umap(bool)``.
 
         ``` python
         >>> H(6).eq(3)
@@ -856,7 +858,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__ne__, other).umap(bool)``.
+        Shorthand for ``#!python self.map(operator.__ne__, other).umap(bool)``.
 
         ``` python
         >>> H(6).ne(3)
@@ -873,7 +875,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__gt__, other).umap(bool)``.
+        Shorthand for ``#!python self.map(operator.__gt__, other).umap(bool)``.
 
         ``` python
         >>> H(6).gt(3)
@@ -890,7 +892,7 @@ class H(_MappingT):
         other: _OperandT,
     ) -> H:
         r"""
-        Shorthand for ``self.map(operator.__ge__, other).umap(bool)``.
+        Shorthand for ``#!python self.map(operator.__ge__, other).umap(bool)``.
 
         ``` python
         >>> H(6).ge(3)
@@ -904,7 +906,7 @@ class H(_MappingT):
 
     def is_even(self) -> H:
         r"""
-        Equivalent to ``self.umap(lambda outcome: outcome % 2 == 0)``.
+        Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 == 0)``.
 
         ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_even()
@@ -934,7 +936,7 @@ class H(_MappingT):
 
     def is_odd(self) -> H:
         r"""
-        Equivalent to ``self.umap(lambda outcome: outcome % 2 != 0)``.
+        Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 != 0)``.
 
         ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_odd()
@@ -964,7 +966,7 @@ class H(_MappingT):
 
     def accumulate(self, other: _SourceT) -> H:
         r"""
-        Accumulates counts:
+        Accumulates counts.
 
         ``` python
         >>> H(4).accumulate(H(6))
@@ -993,7 +995,7 @@ class H(_MappingT):
             future versions.
 
         Computes and returns the probability distribution where *outcome* appears
-        exactly *k* times among ``n@self``.
+        exactly *k* times among ``#!python n@self``.
 
         ``` python
         >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
@@ -1014,8 +1016,8 @@ class H(_MappingT):
 
     def explode(self, max_depth: IntT = 1) -> H:
         r"""
-        Shorthand for ``self.substitute(lambda h, outcome: h if outcome == max(h) else
-        outcome, operator.__add__, max_depth)``.
+        Shorthand for ``#!python self.substitute(lambda h, outcome: h if outcome == max(h)
+        else outcome, operator.__add__, max_depth)``.
 
         ``` python
         >>> H(6).explode(max_depth=2)
@@ -1061,7 +1063,7 @@ class H(_MappingT):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Shorthand for ``self.order_stat_func_for_n(n)(pos)``.
+        Shorthand for ``#!python self.order_stat_func_for_n(n)(pos)``.
         """
         return self.order_stat_func_for_n(n)(pos)
 
@@ -1075,7 +1077,7 @@ class H(_MappingT):
 
         Returns a function that takes a single argument (*pos*) and computes the
         probability distribution for each outcome appearing in that position among
-        ``n@self``.
+        ``#!python n@self``.
 
         ``` python
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
@@ -1086,10 +1088,10 @@ class H(_MappingT):
         ```
 
         The results show that, when rolling five six-sided “averaging” dice and sorting
-        each roll, there are 26 ways where ``2`` appears at the fourth (index ``3``)
-        position, 1432 ways where ``3`` appears at the fourth position, etc. This can be
-        verified independently using the computationally expensive method of enumerating
-        rolls and counting those that meet the criteria:
+        each roll, there are 26 ways where ``#!python 2`` appears at the fourth (index
+        ``#!python 3``) position, 1432 ways where ``#!python 3`` appears at the fourth
+        position, etc. This can be verified independently using the computationally
+        expensive method of enumerating rolls and counting those that meet the criteria.
 
         ``` python
         >>> from dyce import P
@@ -1105,7 +1107,7 @@ class H(_MappingT):
         different *pos* values are needed for the same *n* (e.g., in a loop) and where
         *n* is large, that overhead can be significant. The returned function caches
         those betas for *n* such that repeated querying or results at *pos* can be
-        computed much faster:
+        computed much faster.
 
         ``` python
         In [2]: %timeit [H(6).order_stat_for_n_at_pos(100, i) for i in range(10)]
@@ -1174,7 +1176,7 @@ class H(_MappingT):
         the substituted outcome’s “scale”. In other words, the sum of the counts of the
         replacement retains the same proportion as the replaced outcome in relation to
         other outcomes. This becomes clearer when there is no overlap between the
-        original histogram and the substitution:
+        original histogram and the substitution.
 
         ``` python
         >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
@@ -1192,7 +1194,7 @@ class H(_MappingT):
             If *coalesce* returns the empty histogram (``H({})``), the corresponding
             outcome and its counts are omitted from the result without substitution or
             scaling. A silly example is modeling a d5 by indefinitely re-rolling a d6
-            until something other than a 6 comes up:
+            until something other than a 6 comes up.
 
             ``` python
             >>> H(6).substitute(lambda h, outcome: H({}) if outcome == 6 else outcome)
@@ -1201,7 +1203,7 @@ class H(_MappingT):
             ```
 
             This technique is more useful when modeling re-rolling certain derived
-            outcomes, like ties in a contest:
+            outcomes, like ties in a contest.
 
             ``` python
             >>> d6_3, d8_2 = 3@H(6), 2@H(8)
@@ -1213,8 +1215,8 @@ class H(_MappingT):
             ```
 
         Because it delegates to a callback for refereeing substitution decisions,
-        ``substitute`` is quite flexible and well suited to modeling (or at least
-        approximating) logical progressions. Consider the following rules:
+        ``#!python substitute`` is quite flexible and well suited to modeling (or at
+        least approximating) logical progressions. Consider the following rules:
 
           1. Start with a total of zero.
           2. Roll a six-sided die. Add the face to the total. If the face was a six, go
@@ -1248,7 +1250,7 @@ class H(_MappingT):
         not).
 
         We can also use this method to model expected damage from a single attack in
-        d20-like role playing games:
+        d20-like role playing games.
 
         ``` python
         >>> bonus = 1
@@ -1340,7 +1342,7 @@ class H(_MappingT):
         Compares the histogram with *other*. -1 represents where *other* is greater. 0
         represents where they are equal. 1 represents where *other* is less.
 
-        Shorthand for ``self.within(0, 0, other)``.
+        Shorthand for ``#!python self.within(0, 0, other)``.
 
         ``` python
         >>> H(6).vs(H(4))
@@ -1424,7 +1426,7 @@ class H(_MappingT):
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
-        outcome/probability pair:
+        outcome/probability pair.
 
         ``` python
         >>> h = H((1, 2, 3, 3, 4, 4, 5, 6))
@@ -1435,7 +1437,7 @@ class H(_MappingT):
 
         ```
 
-        If provided, *fill_items* supplies defaults for any “missing” outcomes:
+        If provided, *fill_items* supplies defaults for any “missing” outcomes.
 
         ``` python
         >>> list(h.distribution())
@@ -1450,9 +1452,9 @@ class H(_MappingT):
             The *rational_t* argument to this method should be considered experimental
             and may change or disappear in future versions.
 
-        If provided, *rational_t* must be a callable that takes two ``int``s (a
+        If provided, *rational_t* must be a callable that takes two ``#!python int``s (a
         numerator and denominator) and returns an instance of a desired (but otherwise
-        arbitrary) type:
+        arbitrary) type.
 
         ``` python
         >>> list(h.distribution(rational_t=lambda n, d: f"{n}/{d}"))
@@ -1479,7 +1481,7 @@ class H(_MappingT):
             The arguments passed to *rational_t* are not reduced to the lowest terms.
 
         The *rational_t* argument is a convenience. Iteration or comprehension can be
-        used to accomplish something similar:
+        used to accomplish something similar.
 
         ``` python
         >>> [(outcome, f"{probability.numerator}/{probability.denominator}") for outcome, probability in (h).distribution()]
@@ -1487,7 +1489,8 @@ class H(_MappingT):
 
         ```
 
-        Many number implementations can convert directly from ``fractions.Fraction``s:
+        Many number implementations can convert directly from ``#!python
+        fractions.Fraction``s.
 
         ``` python
         >>> import sympy.abc  # doctest: +SKIP
@@ -1521,7 +1524,7 @@ class H(_MappingT):
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
         output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
-        values are ``float``s:
+        values are ``#!python float``s.
 
         ``` python
         >>> list(H(6).distribution())
@@ -1531,16 +1534,14 @@ class H(_MappingT):
 
         ```
         """
-        return cast(
-            Tuple[Tuple[int, ...], Tuple[float, ...]],
-            tuple(
-                zip(
-                    *(
-                        (outcome, float(probability))
-                        for outcome, probability in self.distribution(fill_items)
-                    )
+        # TODO(posita): See <https://github.com/python/typing/issues/193>
+        return tuple(  # type: ignore
+            zip(
+                *(
+                    (outcome, float(probability))
+                    for outcome, probability in self.distribution(fill_items)
                 )
-            ),
+            )
         )
 
     def format(
@@ -1591,7 +1592,7 @@ class H(_MappingT):
 
         ```
 
-        If *scaled* is ``True``, horizontal bars are scaled to *width*:
+        If *scaled* is ``#!python True``, horizontal bars are scaled to *width*.
 
         ``` python
         >>> h = (2@H(6)).ge(7)
@@ -1624,7 +1625,7 @@ class H(_MappingT):
 
         if width <= 0:
 
-            def _parts():
+            def _parts() -> Iterator[str]:
                 yield f"avg: {mu:.2f}"
 
                 for (
@@ -1638,7 +1639,7 @@ class H(_MappingT):
         else:
             w = width - 15
 
-            def lines():
+            def lines() -> Iterator[str]:
                 yield f"avg | {mu:7.2f}"
 
                 try:
@@ -1681,7 +1682,7 @@ class H(_MappingT):
 
     def stdev(self, mu: Optional[OutcomeT] = None) -> OutcomeT:
         r"""
-        Shorthand for ``math.sqrt(self.variance(mu))``.
+        Shorthand for ``#!python math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
@@ -1715,7 +1716,7 @@ class H(_MappingT):
         if not self:
             return 0
 
-        return choices(*self.distribution_xy())[0]
+        return choices(tuple(self.outcomes()), tuple(self.counts()))[0]
 
     def _lowest_terms(self) -> Iterable[Tuple[OutcomeT, int]]:
         counts_gcd = gcd(*self.counts())
@@ -1732,7 +1733,7 @@ class HAbleT(
     A protocol whose implementer can be expressed as (or reduced to) an
     [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HAbleT.h]. Currently,
     only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
-    integration point for ``dyce`` users.
+    integration point for ``#!python dyce`` users.
     """
 
     def h(self) -> H:
@@ -1751,218 +1752,218 @@ class HAbleOpsMixin:
 
     def __add__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__add__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__add__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __add__(self.h(), other)
 
     def __radd__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__add__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__add__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __add__(other, self.h())
 
     def __sub__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__sub__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __sub__(self.h(), other)
 
     def __rsub__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__sub__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__sub__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __sub__(other, self.h())
 
     def __mul__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__mul__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __mul__(self.h(), other)
 
     def __rmul__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__mul__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__mul__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __mul__(other, self.h())
 
     def __truediv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__truediv__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __truediv__(self.h(), other)
 
     def __rtruediv__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__truediv__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __truediv__(other, self.h())
 
     def __floordiv__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__floordiv__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __floordiv__(self.h(), other)
 
     def __rfloordiv__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__floordiv__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __floordiv__(other, self.h())
 
     def __mod__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__mod__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __mod__(self.h(), other)
 
     def __rmod__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__mod__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__mod__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __mod__(other, self.h())
 
     def __pow__(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``operator.__pow__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __pow__(self.h(), other)
 
     def __rpow__(self: HAbleT, other: OutcomeT) -> H:
         r"""
-        Shorthand for ``operator.__pow__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__pow__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __pow__(other, self.h())
 
     def __and__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.__and__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __and__(self.h(), other)
 
     def __rand__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.__and__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__and__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __and__(other, self.h())
 
     def __xor__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.__xor__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __xor__(self.h(), other)
 
     def __rxor__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.__xor__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__xor__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __xor__(other, self.h())
 
     def __or__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
         r"""
-        Shorthand for ``operator.__or__(self.h(), other)``. See the
+        Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __or__(self.h(), other)
 
     def __ror__(self: HAbleT, other: IntT) -> H:
         r"""
-        Shorthand for ``operator.__or__(other, self.h())``. See the
+        Shorthand for ``#!python operator.__or__(other, self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __or__(other, self.h())
 
     def __neg__(self: HAbleT) -> H:
         r"""
-        Shorthand for ``operator.__neg__(self.h())``. See the
+        Shorthand for ``#!python operator.__neg__(self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __neg__(self.h())
 
     def __pos__(self: HAbleT) -> H:
         r"""
-        Shorthand for ``operator.__pos__(self.h())``. See the
+        Shorthand for ``#!python operator.__pos__(self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __pos__(self.h())
 
     def __abs__(self: HAbleT) -> H:
         r"""
-        Shorthand for ``operator.__abs__(self.h())``. See the
+        Shorthand for ``#!python operator.__abs__(self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __abs__(self.h())
 
     def __invert__(self: HAbleT) -> H:
         r"""
-        Shorthand for ``operator.__invert__(self.h())``. See the
+        Shorthand for ``#!python operator.__invert__(self.h())``. See the
         [``h`` method][dyce.h.HAbleT.h].
         """
         return __invert__(self.h())
 
     def lt(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().lt(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.lt``][dyce.h.H.lt].
+        Shorthand for ``#!python self.h().lt(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.lt``][dyce.h.H.lt].
         """
         return self.h().lt(other)
 
     def le(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().le(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.le``][dyce.h.H.le].
+        Shorthand for ``#!python self.h().le(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.le``][dyce.h.H.le].
         """
         return self.h().le(other)
 
     def eq(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().eq(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.eq``][dyce.h.H.eq].
+        Shorthand for ``#!python self.h().eq(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.eq``][dyce.h.H.eq].
         """
         return self.h().eq(other)
 
     def ne(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().ne(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.ne``][dyce.h.H.ne].
+        Shorthand for ``#!python self.h().ne(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.ne``][dyce.h.H.ne].
         """
         return self.h().ne(other)
 
     def gt(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().gt(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.gt``][dyce.h.H.gt].
+        Shorthand for ``#!python self.h().gt(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.gt``][dyce.h.H.gt].
         """
         return self.h().gt(other)
 
     def ge(self: HAbleT, other: _OperandT) -> H:
         r"""
-        Shorthand for ``self.h().ge(other)``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.ge``][dyce.h.H.ge].
+        Shorthand for ``#!python self.h().ge(other)``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.ge``][dyce.h.H.ge].
         """
         return self.h().ge(other)
 
     def is_even(self: HAbleT) -> H:
         r"""
-        Shorthand for ``self.h().is_even()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.is_even``][dyce.h.H.is_even].
+        Shorthand for ``#!python self.h().is_even()``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.is_even``][dyce.h.H.is_even].
         """
         return self.h().is_even()
 
@@ -1974,15 +1975,15 @@ class HAbleOpsMixin:
             This method is deprecated and will likely be removed in the next major
             release.
 
-        Shorthand for ``self.h().is_even()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.is_even``][dyce.h.H.is_even].
+        Shorthand for ``#!python self.h().is_even()``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.is_even``][dyce.h.H.is_even].
         """
         return self.h().is_even()
 
     def is_odd(self: HAbleT) -> H:
         r"""
-        Shorthand for ``self.h().is_odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.is_odd``][dyce.h.H.is_odd].
+        Shorthand for ``#!python self.h().is_odd()``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.is_odd``][dyce.h.H.is_odd].
         """
         return self.h().is_odd()
 
@@ -1994,14 +1995,14 @@ class HAbleOpsMixin:
             This method is deprecated and will likely be removed in the next major
             release.
 
-        Shorthand for ``self.h().is_odd()``. See the [``h`` method][dyce.h.HAbleT.h] and
-        [``H.is_odd``][dyce.h.H.is_odd].
+        Shorthand for ``#!python self.h().is_odd()``. See the
+        [``h`` method][dyce.h.HAbleT.h] and [``H.is_odd``][dyce.h.H.is_odd].
         """
         return self.h().is_odd()
 
     def explode(self: HAbleT, max_depth: IntT = 1) -> H:
         r"""
-        Shorthand for ``self.h().explode(max_depth)``. See the
+        Shorthand for ``#!python self.h().explode(max_depth)``. See the
         [``h`` method][dyce.h.HAbleT.h] and [``H.explode``][dyce.h.H.explode].
         """
         return self.h().explode(max_depth)
@@ -2013,14 +2014,14 @@ class HAbleOpsMixin:
         max_depth: IntT = 1,
     ) -> H:
         r"""
-        Shorthand for ``self.h().substitute(expand, coalesce, max_depth)``. See the
+        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the
         [``h`` method][dyce.h.HAbleT.h] and [``H.substitute``][dyce.h.H.substitute].
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
     def within(self: HAbleT, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
         r"""
-        Shorthand for ``self.h().within(lo, hi, other)``. See the
+        Shorthand for ``#!python self.h().within(lo, hi, other)``. See the
         [``h`` method][dyce.h.HAbleT.h] and [``H.within``][dyce.h.H.within].
         """
         return self.h().within(lo, hi, other)

@@ -13,13 +13,13 @@
   Thank you!
 -->
 
-# ``dyce`` package reference
+# ``#!python dyce`` package reference
 
 ::: dyce
     selection:
       members: false
 
-``dyce`` provides several core primitives:
+``#!python dyce`` provides several core primitives:
 
 * [``H``][dyce.h.H] – histograms (outcomes or individual dice)
 * [``P``][dyce.p.P] – collections of histograms (pools)

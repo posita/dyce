@@ -13,11 +13,11 @@
   Thank you!
 -->
 
-``dyce`` provides two core primitives for enumeration[^1]:
+``dyce`` provides two core primitives for enumeration[^1].
 
 [^1]:
 
-    ``dyce`` also provides additional primitives ([``R`` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without costly enumeration.
+    ``dyce`` also provides additional primitives ([``R`` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without the overhead enumeration.
     These are covered [seperately](rollin.md).
 
 
@@ -45,7 +45,7 @@ H(6)
 
 ```
 
-``H(n)`` is shorthand for explicitly enumerating outcomes $[{{1} .. {n}}]$, each with a frequency of 1:
+``#!python H(n)`` is shorthand for explicitly enumerating outcomes $[{{1} .. {n}}]$, each with a frequency of 1.
 
 ``` python
 >>> H(6) == H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
@@ -86,8 +86,8 @@ P(6, 6)
 
 ```
 
-Where ``n`` is an integer, ``P(n, ...)`` is shorthand for ``P(H(n), ...)``.
-The above can be expressed more succinctly:
+Where ``#!python n`` is an integer, ``#!python P(n, ...)`` is shorthand for ``#!python P(H(n), ...)``.
+The above can be expressed more succinctly.
 
 ``` python
 >>> 2@P(6)
@@ -95,7 +95,7 @@ P(6, 6)
 
 ```
 
-Pools (in this case, [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms:
+Pools (in this case, [Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)) can be compared to histograms.
 
 ``` python
 >>> d_sicherman = P(H((1, 2, 2, 3, 3, 4)), H((1, 3, 4, 5, 6, 8)))
@@ -113,8 +113,8 @@ H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 
 ```
 
-The results show there is one way to make ``18``, two ways to make ``21``, three ways to make ``24``, etc.
-Histograms provide rudimentary formatting for convenience:
+The results show there is one way to make ``#!python 18``, two ways to make ``#!python 21``, three ways to make ``#!python 24``, etc.
+Histograms provide rudimentary formatting for convenience.
 
 ``` python
 >>> print((2@H(6)).format(width=65))
@@ -181,7 +181,7 @@ H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 
 ```
 
-Arithmetic operations implicitly “flatten” pools into histograms:
+Arithmetic operations implicitly “flatten” pools into histograms.
 
 ``` python
 >>> 3*(2@P(6)+4)
@@ -195,7 +195,7 @@ Histograms should be sufficient for most calculations.
 However, pools are useful for “taking” (selecting) only some of each roll’s outcomes.
 This is done by providing one or more index arguments to the [``P.h`` method][dyce.p.P.h] or the [``P.rolls_with_counts`` method][dyce.p.P.rolls_with_counts].
 Indexes can be integers, slices, or a mix thereof.
-Outcome indexes are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., ``[0]``, ``[1]``, …, ``[-2]``, ``[-1]``).
+Outcome indexes are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., ``#!python [0]``, ``#!python [1]``, …, ``#!python [-2]``, ``#!python [-1]``).
 Summing the least two faces when rolling three six-sided dice would be:
 
 ``` python
@@ -208,7 +208,7 @@ H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
 
 !!! tip "Mind your parentheses"
 
-    Parentheses are needed in the above example because ``@`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``.`` and ``[…]``.
+    Parentheses are needed in the above example because ``#!python @`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``#!python .`` and ``#!python […]``.
 
     ``` python
     >>> 2@P(6).h(1)  # equivalent to 2@(P(6).h(1))
@@ -308,7 +308,7 @@ var |   19.39
 
 ```
 
-Pools are ordered and iterable:
+Pools are ordered and iterable.
 
 ``` python
 >>> list(2@P(8, 4, 6))
@@ -316,7 +316,7 @@ Pools are ordered and iterable:
 
 ```
 
-Indexing selects particular histograms into a new pool:
+Indexing selects particular histograms into a new pool.
 
 ``` python
 >>> 2@P(8, 4, 6)
@@ -379,7 +379,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Visualization
 
-[``H`` objects][dyce.h.H] provide a [``distribution`` method][dyce.h.H.distribution] and a [``distribution_xy`` method][dyce.h.H.distribution_xy] to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
+[``H`` objects][dyce.h.H] provide a [``distribution`` method][dyce.h.H.distribution] and a [``distribution_xy`` method][dyce.h.H.distribution_xy] to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html).
 
 ``` python
 >>> outcomes, probabilities = (2@H(6)).distribution_xy()
@@ -399,7 +399,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
   ![Plot: Distribution for 2d6](plot_histogram_light.png)
 </picture>
 
-[``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)):
+[``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``#!python matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)).
 
 ``` python
 >>> from dyce.viz import plot_burst
@@ -415,7 +415,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 </picture>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
-Overrides apply counter-clockwise, starting from the 12 o‘clock position:
+Overrides apply counter-clockwise, starting from the 12 o‘clock position.
 
 ``` python
 >>> d20 = H(20)
@@ -438,7 +438,7 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position:
 The outer ring can also be used to compare two histograms directly.
 Ever been curious how your four shiny new fudge dice stack up against your trusty ol’ double six-siders?
 Well wonder no more!
-The ``dyce`` abides:
+The ``dyce`` abides.
 
 ``` python
 >>> df_4 = 4@H((-1, 0, 1))
@@ -457,7 +457,7 @@ The ``dyce`` abides:
 ## Advanced exercise – modeling *Risis*
 
 *[Risus](http://risus.cumberlandgames.com/)* and its many [community-developed alternative rules](http://www.risusiverse.com/home/optional-rules) not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
-We can easily model its opposed combat system for various starting configurations through the first round:
+We can easily model its opposed combat system for various starting configurations through the first round.
 
 ``` python
 >>> for them in range(3, 6):
@@ -481,7 +481,7 @@ We can easily model its opposed combat system for various starting configuration
 
 ```
 
-This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map:
+This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
 
 ``` python
 >>> from typing import List, Tuple
@@ -513,7 +513,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 
 ```
 
-Calling ``matplotlib.pyplot.show`` presents:
+Calling ``#!python matplotlib.pyplot.show`` presents:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -521,7 +521,7 @@ Calling ``matplotlib.pyplot.show`` presents:
   ![Plot: Modeling the Risus combat mechanic after the first roll](plot_risus_first_round_light.png)
 </picture>
 
-With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations):
+With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
 
 ``` python
 >>> from typing import Callable, Dict, Tuple
@@ -575,7 +575,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless g
 
 ```
 
-Using our ``risus_combat_driver`` from above, we can model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule”:
+Using our ``#!python risus_combat_driver`` from above, we can model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule”.
 
 ``` python
 >>> def deadly_combat_vs(us: int, them: int) -> H:
@@ -647,7 +647,7 @@ $$
 
 So what is that? We probably don’t know unless we do math for a living, or at least as an active hobby.
 (The author does neither, which is partially what motivated the creation of this library.)
-Computing the value to the first hundred iterations offers a clue:
+Computing the value to the first hundred iterations offers a clue.
 
 ``` python
 >>> 1/2 * sum(1 / (6 ** i) for i in range(100))
@@ -658,7 +658,7 @@ Computing the value to the first hundred iterations offers a clue:
 It appears convergent around $\frac{3}{5}$.
 Let’s see if we can validate that.
 An [article from MathIsFun.com](https://www.mathsisfun.com/algebra/infinite-series.html) provides useful guidance.
-The section on geometric series is easily adapted to our problem:
+The section on geometric series is easily adapted to our problem.
 
 $$
 \begin{matrix}
@@ -709,7 +709,7 @@ Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
     The Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case.
     It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.
 
-Armed with this knowledge, we can now model “Evens Up” using our ``risus_combat_driver`` from above:
+Armed with this knowledge, we can now model “Evens Up” using our ``#!python risus_combat_driver`` from above.
 
 ``` python
 >>> from functools import partial
@@ -756,7 +756,7 @@ Be aware that performance can be quite slow, however.
 
 ``dyce`` remains opinionated about ordering.
 For non-critical contexts, ``dyce`` will attempt a “natural” ordering based on the string representation of each outcome if relative values are indeterminate.
-This is to accommodate symbolic expressions whose relative values are often unknowable:
+This is to accommodate symbolic expressions whose relative values are often unknowable.
 
 ``` python
 >>> expr = sympy.abc.x < sympy.abc.x * 3 ; expr
@@ -780,7 +780,7 @@ False
 ```
 
 SymPy, for example, does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
-Instead, it relies on the caller to invoke its proprietary solver APIs:
+Instead, it relies on the caller to invoke its proprietary solver APIs.
 
 ``` python
 >>> bool(sympy.abc.x < sympy.abc.x + 1)
@@ -797,7 +797,7 @@ True
 (As it should be.)
 In practice, that means that certain operations won’t work with symbolic expressions where correctness depends on ordering outcomes according to relative value (e.g., dice selection from pools).
 
-Flattening pools works:
+Flattening pools works.
 
 ``` python
 >>> p = P(d3x / 3, (d3x + 1) / 3, (d3x + 2) / 3)
@@ -806,7 +806,7 @@ H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 
 
 ```
 
-Selecting the “lowest” die doesn’t:
+Selecting the “lowest” die doesn’t.
 
 ``` python
 >>> p.h(0)
@@ -816,7 +816,7 @@ TypeError: cannot determine truth value of Relational
 
 ```
 
-Selecting all dice works, since it’s equivalent to flattening (no sorting is required):
+Selecting all dice works, since it’s equivalent to flattening (no sorting is required).
 
 ``` python
 >>> p.h(slice(None))
@@ -824,7 +824,7 @@ H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 
 
 ```
 
-Enumerating rolls doesn’t, even where there is no selection, because each roll’s outcomes must be sorted least-to-greatest:
+Enumerating rolls doesn’t, even where there is no selection, because each roll’s outcomes are sorted least-to-greatest.
 
 ``` python
 >>> list(p.rolls_with_counts())
@@ -834,7 +834,7 @@ TypeError: cannot determine truth value of Relational
 
 ```
 
-[``P.roll``][dyce.p.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience:
+[``P.roll``][dyce.p.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.
 
 ``` python
 >>> p.roll()  # doctest: +SKIP
@@ -842,7 +842,7 @@ TypeError: cannot determine truth value of Relational
 
 ```
 
-[``P.umap``][dyce.p.P.umap] can help pave the way back to concrete outcomes:
+[``P.umap``][dyce.p.P.umap] can help pave the way back to concrete outcomes.
 
 ``` python
 >>> f = lambda o: o.subs({sympy.abc.x: sympy.Rational(1, 3)})
@@ -855,4 +855,4 @@ H({7/9: 9, 8/9: 9, 1: 9})
 
 ## Further exploration
 
-Consider exploring the [applications and translations](translations.md) for more examples, or jump right into the [API][dyce].
+Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API][dyce].

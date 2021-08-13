@@ -9,11 +9,11 @@
 
 from __future__ import annotations
 
+import warnings
 import weakref
 from abc import abstractmethod
-from collections.abc import Iterable as IterableC
 from copy import copy
-from itertools import chain, product
+from itertools import chain
 from operator import (
     __abs__,
     __add__,
@@ -100,7 +100,7 @@ class _RollOutcomeOperatorT(
 # ---- Classes -------------------------------------------------------------------------
 
 
-class R(Sequence["R"]):
+class R:
     r"""
     !!! warning "Experimental"
 
@@ -114,7 +114,7 @@ class R(Sequence["R"]):
     according to those calculations without engaging in computationally expensive
     enumeration (unlike [``H``][dyce.h.H] and [``P``][dyce.p.P] objects). Roller trees
     are typically composed from various ``R`` class methods and operators as well as
-    arithmetic operations:
+    arithmetic operations.
 
     ``` python
     >>> from dyce import H, P, R
@@ -154,15 +154,15 @@ class R(Sequence["R"]):
     !!! info
 
         No optimizations are made when constructing roller trees. They retain their
-        exact structure, even where such structures could be trivially reduced:
+        exact structure, even where such structures could be trivially reduced.
 
         ``` python
         >>> r_6 = R.from_value(6)
         >>> r_6_abs_3 = 3 @ abs(r_6)
-        >>> r_6_3_abs = abs(3 @ r_6)
-        >>> tuple(r_6_abs_3.roll().outcomes()), tuple(r_6_3_abs.roll().outcomes())  # they generate the same rolls
+        >>> r_6_abs_6_abs_6_abs = R.from_rs(abs(r_6), abs(r_6), abs(r_6))
+        >>> tuple(r_6_abs_3.roll().outcomes()), tuple(r_6_abs_6_abs_6_abs.roll().outcomes())  # they generate the same rolls
         ((6, 6, 6), (6, 6, 6))
-        >>> r_6_abs_3 == r_6_3_abs  # and yet, they're different animals
+        >>> r_6_abs_3 == r_6_abs_6_abs_6_abs  # and yet, they're different animals
         False
 
         ```
@@ -172,7 +172,7 @@ class R(Sequence["R"]):
         reduction is desirable, consider using [histograms][dyce.h.H] instead.
 
     Roller trees can can be queried via the [``roll`` method][dyce.r.R.roll], which
-    produces [``Roll`` objects][dyce.r.Roll]:
+    produces [``Roll`` objects][dyce.r.Roll].
 
     ``` python
     >>> roll = r_d6.roll()
@@ -193,7 +193,7 @@ class R(Sequence["R"]):
 
     [``Roll`` objects][dyce.r.Roll] are much richer than mere outcomes. They are also
     tree-like structures that mirror the roller trees used to produce them, capturing
-    references to rollers and the outcomes generated at each one:
+    references to rollers and the outcomes generated at each one.
 
     ``` python
     >>> roll = (r_d6 + 3).roll()
@@ -291,23 +291,6 @@ class R(Sequence["R"]):
             return not __eq__(self, other)
         else:
             return super().__ne__(other)
-
-    def __len__(self) -> int:
-        return len(self.sources)
-
-    @overload
-    def __getitem__(self, key: IndexT) -> R:
-        ...
-
-    @overload
-    def __getitem__(self, key: slice) -> Tuple[R, ...]:
-        ...
-
-    def __getitem__(self, key: _GetItemT) -> Union[R, Tuple[R, ...]]:
-        if isinstance(key, slice):
-            return self.sources[key]
-        else:
-            return self.sources[__index__(key)]
 
     def __add__(self, other: _ROperandT) -> BinaryOperationRoller:
         try:
@@ -511,7 +494,7 @@ class R(Sequence["R"]):
     ) -> PoolRoller:
         r"""
         Creates and returns a roller for “pooling” zero or more *sources*. The returned
-        roller will generate rolls whose items will contain one value for each source:
+        roller will generate rolls whose items will contain one value for each source.
 
         ``` python
         >>> r_pool = R.from_rs_iterable(R.from_value(h) for h in (H((1, 2)), H((3, 4)), H((5, 6))))
@@ -618,6 +601,91 @@ class R(Sequence["R"]):
             annotation=annotation,
         )
 
+    @classmethod
+    def select_from_rs(
+        cls,
+        which: Iterable[_GetItemT],
+        *sources: R,
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``#!python R.select_from_rs_iterable(which, sources,
+        annotation=annotation)``.
+
+        See the [``select_from_rs_iterable`` method][dyce.r.R.select_from_rs_iterable].
+        """
+        return cls.select_from_rs_iterable(which, sources, annotation=annotation)
+
+    @classmethod
+    def select_from_rs_iterable(
+        cls,
+        which: Iterable[_GetItemT],
+        sources: Iterable[R],
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Creates and returns a roller for applying an *n*-ary selection *which* to sorted
+        outcomes from this roller as its source.
+
+        ``` python
+        >>> r_select = R.select_from_values(
+        ...   (0, -1, slice(3, 6), slice(6, 3, -1), -1, 0),
+        ...   5, 4, 6, 3, 7, 2, 8, 1, 9, 0,
+        ... ) ; r_select
+        SelectionRoller(
+          which=(0, -1, slice(3, 6, None), slice(6, 3, -1), -1, 0),
+          sources=(
+            ValueRoller(value=5, annotation=''),
+            ValueRoller(value=4, annotation=''),
+            ...,
+            ValueRoller(value=9, annotation=''),
+            ValueRoller(value=0, annotation=''),
+          ),
+          annotation='',
+        )
+        >>> tuple(r_select.roll().outcomes())
+        (0, 9, 3, 4, 5, 6, 5, 4, 9, 0)
+
+        ```
+        """
+        return SelectionRoller(which, sources, annotation=annotation)
+
+    @classmethod
+    def select_from_values(
+        cls,
+        which: Iterable[_GetItemT],
+        *values: _ValueT,
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``#!python R.select_from_values_iterable(which, sources,
+        annotation=annotation)``.
+
+        See the
+        [``select_from_values_iterable`` method][dyce.r.R.select_from_values_iterable].
+        """
+        return cls.select_from_values_iterable(which, values, annotation=annotation)
+
+    @classmethod
+    def select_from_values_iterable(
+        cls,
+        which: Iterable[_GetItemT],
+        values: Iterable[_ValueT],
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``#!python cls.select_from_rs_iterable((cls.from_value(value) for
+        value in values), annotation=annotation)``.
+
+        See the [``from_value``][dyce.r.R.from_value] and
+        [``select_from_rs_iterable``][dyce.r.R.select_from_rs_iterable] methods.
+        """
+        return cls.select_from_rs_iterable(
+            which,
+            (cls.from_value(value) for value in values),
+            annotation=annotation,
+        )
+
     def select(
         self,
         *which: _GetItemT,
@@ -644,15 +712,17 @@ class R(Sequence["R"]):
         >>> r_select = r_values.select(0, -1, slice(3, 6), slice(6, 3, -1), -1, 0) ; r_select
         SelectionRoller(
           which=(0, -1, slice(3, 6, None), slice(6, 3, -1), -1, 0),
-          source=PoolRoller(
-            sources=(
-              ValueRoller(value=5, annotation=''),
-              ValueRoller(value=4, annotation=''),
-              ...,
-              ValueRoller(value=9, annotation=''),
-              ValueRoller(value=0, annotation=''),
+          sources=(
+            PoolRoller(
+              sources=(
+                ValueRoller(value=5, annotation=''),
+                ValueRoller(value=4, annotation=''),
+                ...,
+                ValueRoller(value=9, annotation=''),
+                ValueRoller(value=0, annotation=''),
+              ),
+              annotation='',
             ),
-            annotation='',
           ),
           annotation='',
         )
@@ -661,7 +731,7 @@ class R(Sequence["R"]):
 
         ```
         """
-        return SelectionRoller(which, self, annotation=annotation)
+        return SelectionRoller(which, (self,), annotation=annotation)
 
     def annotate(self, annotation: Any = "") -> R:
         r"""
@@ -721,7 +791,7 @@ class R(Sequence["R"]):
     ) -> BinaryOperationRoller:
         r"""
         Analogous to the [``map`` method][dyce.r.R.map], but where the caller supplies
-        *left_operand*:
+        *left_operand*.
 
         ``` python
         >>> import operator
@@ -883,6 +953,13 @@ class ValueRoller(R):
     ):
         r"Initializer."
         super().__init__((), annotation)
+
+        if isinstance(value, P) and not value.is_homogeneous:
+            warnings.warn(
+                f"using a heterogeneous pool ({value}) is not recommended where traceability is important",
+                stacklevel=2,
+            )
+
         self._value = value
 
     # ---- Overrides -------------------------------------------------------------------
@@ -953,10 +1030,10 @@ class OperationRollerBase(R):
         return self._op
 
 
-class AccumulationRoller(OperationRollerBase):
+class ChainRoller(OperationRollerBase):
     r"""
     A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
-    applying *op* to the chained outcomes from all *sources*.
+    applying *op* to the chained outcomes from each of *sources*.
     """
 
     # ---- Overrides -------------------------------------------------------------------
@@ -981,10 +1058,10 @@ class AccumulationRoller(OperationRollerBase):
         )
 
 
-class CartesianProductRoller(OperationRollerBase):
+class SumRoller(OperationRollerBase):
     r"""
     A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
-    applying *op* to the Cartesian product of outcomes from all *sources*.
+    applying *op* to the sum of outcomes grouped by each of *sources*.
     """
 
     # ---- Overrides -------------------------------------------------------------------
@@ -993,32 +1070,33 @@ class CartesianProductRoller(OperationRollerBase):
         r""""""
         source_rolls = tuple(source.roll() for source in self.sources)
 
-        def _roll_outcome_gen() -> Iterable[RollOutcome]:
-            for roll_outcomes in product(*source_rolls):
-                if all(
-                    roll_outcome.value is not None for roll_outcome in roll_outcomes
-                ):
-                    res = self.op(*roll_outcomes)
+        def _roll_outcomes() -> Iterator[RollOutcome]:
+            for source_roll in source_rolls:
+                if len(source_roll) == 1:
+                    yield from source_roll
+                elif len(source_roll) > 1:
+                    yield RollOutcome(
+                        sum(roll_outcome.value for roll_outcome in source_roll),
+                        sources=source_roll,
+                    )
 
-                    if isinstance(res, RollOutcome):
-                        yield res
-                    elif isinstance(res, IterableC):
-                        yield from res
-                    else:
-                        assert False, "should never be here"
+        res = self.op(*_roll_outcomes())
+
+        if isinstance(res, RollOutcome):
+            res = (res,)
 
         return Roll(
             self,
-            roll_outcomes=_roll_outcome_gen(),
+            roll_outcomes=res,
             sources=source_rolls,
         )
 
 
-class BinaryOperationRoller(CartesianProductRoller):
+class BinaryOperationRoller(SumRoller):
     r"""
-    A [``CartesianProductRoller`` roller][dyce.r.CartesianProductRoller] for applying a
-    binary operator *op* to the Cartesian product of all outcomes from its *left_source*
-    and all outcomes from its *right_source*.
+    A [``SumRoller``][dyce.r.SumRoller] for applying a binary operator *op* to the sum
+    of all outcomes from its *left_source* and the sum of all outcomes from its
+    *right_source*.
     """
 
     # ---- Constructor -----------------------------------------------------------------
@@ -1051,10 +1129,10 @@ class BinaryOperationRoller(CartesianProductRoller):
 )"""
 
 
-class UnaryOperationRoller(CartesianProductRoller):
+class UnaryOperationRoller(SumRoller):
     r"""
-    A [``CartesianProductRoller`` roller][dyce.r.CartesianProductRoller] for applying a
-    unary operator *op* to each outcome from its sole *source*.
+    A [``SumRoller``][dyce.r.SumRoller] for applying a unary operator *op* to the sum of
+    all outcomes from its sole *source*.
     """
 
     # ---- Constructor -----------------------------------------------------------------
@@ -1080,10 +1158,9 @@ class UnaryOperationRoller(CartesianProductRoller):
 )"""
 
 
-class PoolRoller(AccumulationRoller):
+class PoolRoller(ChainRoller):
     r"""
-    An [``AccumulationRoller`` roller][dyce.r.AccumulationRoller] for “pooling” zero or
-    more *sources* rollers.
+    A [``ChainRoller``][dyce.r.ChainRoller] for “pooling” zero or more roller *sources*.
     """
 
     # ---- Constructor -----------------------------------------------------------------
@@ -1116,10 +1193,10 @@ class PoolRoller(AccumulationRoller):
         return super(OperationRollerBase, self).__eq__(other)
 
 
-class SelectionRoller(AccumulationRoller):
+class SelectionRoller(ChainRoller):
     r"""
-    An [``AccumulationRoller`` roller][dyce.r.AccumulationRoller] for sorting outcomes
-    from its sole *source* and applying a selector *which*.
+    A [``ChainRoller``][dyce.r.ChainRoller] for sorting outcomes from its roller
+    *sources* and applying a selector *which*.
 
     Roll outcomes in created rolls are ordered according to the selections *which*.
     However, those selections reference values in a *sorted* view of the source’s roll
@@ -1132,15 +1209,17 @@ class SelectionRoller(AccumulationRoller):
     >>> r_select = r_values.select(3, 1, 3) ; r_select
     SelectionRoller(
       which=(3, 1, 3),
-      source=PoolRoller(
-        sources=(
-          ValueRoller(value=10000, annotation=''),
-          ValueRoller(value=1, annotation=''),
-          ValueRoller(value=1000, annotation=''),
-          ValueRoller(value=10, annotation=''),
-          ValueRoller(value=100, annotation=''),
+      sources=(
+        PoolRoller(
+          sources=(
+            ValueRoller(value=10000, annotation=''),
+            ValueRoller(value=1, annotation=''),
+            ValueRoller(value=1000, annotation=''),
+            ValueRoller(value=10, annotation=''),
+            ValueRoller(value=100, annotation=''),
+          ),
+          annotation='',
         ),
-        annotation='',
       ),
       annotation='',
     )
@@ -1212,7 +1291,7 @@ class SelectionRoller(AccumulationRoller):
     def __init__(
         self,
         which: Iterable[_GetItemT],
-        source: R,
+        sources: Iterable[R] = (),
         annotation: Any = "",
     ):
         r"Initializer."
@@ -1238,17 +1317,15 @@ class SelectionRoller(AccumulationRoller):
             for excluded_index in set(all_indexes) - unique_selected_indexes:
                 yield roll_outcomes_by_index[excluded_index]
 
-        super().__init__(_select_which, (source,), annotation)
+        super().__init__(_select_which, sources, annotation)
         self._which = tuple(which)
 
     # ---- Overrides -------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        (source,) = self.sources
-
         return f"""{type(self).__name__}(
   which={self.which!r},
-  source={indent(repr(source), "  ").strip()},
+  sources=({_seq_repr(self.sources)}),
   annotation={self.annotation!r},
 )"""
 
@@ -1276,7 +1353,7 @@ class RepeatRoller(R):
     ``` python
     >>> d20 = H(20)
     >>> r_d20 = R.from_value(d20)
-    >>> r_d20_100 = 100 @ r_d20 ; r_d20_100
+    >>> r_d20_100 = 100@r_d20 ; r_d20_100
     RepeatRoller(
       n=100,
       source=ValueRoller(value=H(20), annotation=''),
@@ -1555,6 +1632,84 @@ class RollOutcome:
     def __invert__(self) -> RollOutcome:
         return self.umap(__invert__)
 
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def annotation(self) -> Any:
+        r"""
+        Shorthand for ``#!python self.roll.annotation``.
+
+        See the [``roll``][dyce.r.RollOutcome.roll] and
+        [``Roll.annotation``][dyce.r.Roll.annotation] properties.
+        """
+        return self.roll.annotation
+
+    @property
+    def r(self) -> R:
+        r"""
+        Shorthand for ``#!python self.roll.r``.
+
+        See the [``roll``][dyce.r.RollOutcome.roll] and [``Roll.r``][dyce.r.Roll.r]
+        properties.
+        """
+        return self.roll.r
+
+    @property
+    def roll(self) -> Roll:
+        r"""
+        Returns the roll if one has been associated with this roll outcome. Usually that is
+        done via the [``Roll.__init__`` method][dyce.r.Roll.__init__]. Accessing this
+        property before the roll outcome has been associated with a roll is considered
+        a programming error.
+
+        ``` python
+        >>> from dyce.r import Roll, RollOutcome
+        >>> ro = RollOutcome(4)
+        >>> ro.roll
+        Traceback (most recent call last):
+          ...
+        AssertionError: RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)
+        assert None is not None
+        >>> roll = Roll(R.from_value(4), roll_outcomes=(ro,))
+        >>> ro.roll
+        Roll(
+          r=ValueRoller(value=4, annotation=''),
+          roll_outcomes=(
+            RollOutcome(
+              value=4,
+              sources=(),
+            ),
+          ),
+          sources=(),
+        )
+
+        ```
+        """
+        assert (
+            self._roll is not None
+        ), "RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
+        roll = self._roll()
+        assert (
+            roll is not None
+        ), "RollOutcome.roll accessed after the roll associated the roll outcome was destroyed"
+
+        return roll
+
+    @property
+    def sources(self) -> Tuple[RollOutcome, ...]:
+        r"""
+        The source roll outcomes from which this roll outcome was generated.
+        """
+        return self._sources
+
+    @property
+    def value(self) -> Optional[OutcomeT]:
+        r"""
+        The outcome value. A value of ``#!python None`` is used to signal that a source’s
+        roll outcome was excluded by the roller.
+        """
+        return self._value
+
     # ---- Methods ---------------------------------------------------------------------
 
     def map(
@@ -1605,7 +1760,7 @@ class RollOutcome:
     ) -> RollOutcome:
         r"""
         Analogous to the [``map`` method][dyce.r.RollOutcome.map], but where the caller
-        supplies *left_operand*:
+        supplies *left_operand*.
 
         ``` python
         >>> import operator
@@ -1708,84 +1863,6 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__ge__(self.value, other)), sources=(self,))
 
-    # ---- Properties ------------------------------------------------------------------
-
-    @property
-    def annotation(self) -> Any:
-        r"""
-        Shorthand for ``#!python self.roll.annotation``.
-
-        See the [``roll``][dyce.r.RollOutcome.roll] and
-        [``Roll.annotation``][dyce.r.Roll.annotation] properties.
-        """
-        return self.roll.annotation
-
-    @property
-    def r(self) -> R:
-        r"""
-        Shorthand for ``#!python self.roll.r``.
-
-        See the [``roll``][dyce.r.RollOutcome.roll] and [``Roll.r``][dyce.r.Roll.r]
-        properties.
-        """
-        return self.roll.r
-
-    @property
-    def roll(self) -> Roll:
-        r"""
-        Returns the roll if one has been associated with this roll outcome. Usually that is
-        done via the [``Roll.__init__`` method][dyce.r.Roll.__init__]. Accessing this
-        property before the roll outcome has been associated with a roll is considered
-        a programming error.
-
-        ``` python
-        >>> from dyce.r import Roll, RollOutcome
-        >>> ro = RollOutcome(4)
-        >>> ro.roll
-        Traceback (most recent call last):
-          ...
-        AssertionError: RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)
-        assert None is not None
-        >>> roll = Roll(R.from_value(4), roll_outcomes=(ro,))
-        >>> ro.roll
-        Roll(
-          r=ValueRoller(value=4, annotation=''),
-          roll_outcomes=(
-            RollOutcome(
-              value=4,
-              sources=(),
-            ),
-          ),
-          sources=(),
-        )
-
-        ```
-        """
-        assert (
-            self._roll is not None
-        ), "RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
-        roll = self._roll()
-        assert (
-            roll is not None
-        ), "RollOutcome.roll accessed after the roll associated the roll outcome was destroyed"
-
-        return roll
-
-    @property
-    def sources(self) -> Tuple[RollOutcome, ...]:
-        r"""
-        The source roll outcomes from which this roll outcome was generated.
-        """
-        return self._sources
-
-    @property
-    def value(self) -> Optional[OutcomeT]:
-        r"""
-        The outcome value. An value of ``#!python None`` is used to signal that a source’s
-        roll outcome was excluded by the roller.
-        """
-        return self._value
-
 
 class Roll(Sequence[RollOutcome]):
     r"""
@@ -1812,9 +1889,7 @@ class Roll(Sequence[RollOutcome]):
         super().__init__()
         self._r = r
 
-        def _strip_roll_outcome_sources(
-            roll_outcomes: Iterable[RollOutcome],
-        ) -> Iterator[RollOutcome]:
+        def _strip_roll_outcome_sources() -> Iterator[RollOutcome]:
             for roll_outcome in roll_outcomes:
                 if roll_outcome.value is not None:
                     roll_outcome._sources = ()
@@ -1822,7 +1897,7 @@ class Roll(Sequence[RollOutcome]):
 
         if r.annotation is None:
             self._roll_outcomes: Tuple[RollOutcome, ...] = tuple(
-                _strip_roll_outcome_sources(roll_outcomes)
+                _strip_roll_outcome_sources()
             )
             self._sources: Tuple[Roll, ...] = ()
         else:
@@ -1863,42 +1938,6 @@ class Roll(Sequence[RollOutcome]):
     def __iter__(self) -> Iterator[RollOutcome]:
         return iter(self._roll_outcomes)
 
-    # ---- Methods ---------------------------------------------------------------------
-
-    def outcomes(self) -> Iterator[OutcomeT]:
-        r"""
-        Shorthand for
-        ``#!python (roll_outcome.value for roll_outcome in self if roll_outcome.value is not None)``.
-
-        !!! info
-
-            Unlike [``H.roll``][dyce.h.H.roll] and [``P.roll``][dyce.p.P.roll], these
-            outcomes are *not* sorted. Instead, they retain the ordering from whence
-            they came in the roller tree:
-
-            ``` python
-            >>> r_3d6 = 3 @ R.from_value(H(6))
-            >>> r_3d6_neg = 3 @ -R.from_value(H(6))
-            >>> roll = R.from_rs(r_3d6, r_3d6_neg).roll()
-            >>> tuple(roll.outcomes())  # doctest: +SKIP
-            (1, 4, 1, -5, -2, -3)
-            >>> len(roll)
-            6
-
-            ```
-        """
-        return (
-            roll_outcome.value
-            for roll_outcome in self
-            if roll_outcome.value is not None
-        )
-
-    def total(self) -> OutcomeT:
-        r"""
-        Shorthand for ``#!python sum(self.outcomes())``.
-        """
-        return sum(self.outcomes())
-
     # ---- Properties ------------------------------------------------------------------
 
     @property
@@ -1923,6 +1962,42 @@ class Roll(Sequence[RollOutcome]):
         The source roll from which this roll was generated.
         """
         return self._sources
+
+    # ---- Methods ---------------------------------------------------------------------
+
+    def outcomes(self) -> Iterator[OutcomeT]:
+        r"""
+        Shorthand for
+        ``#!python (roll_outcome.value for roll_outcome in self if roll_outcome.value is not None)``.
+
+        !!! info
+
+            Unlike [``H.roll``][dyce.h.H.roll] and [``P.roll``][dyce.p.P.roll], these
+            outcomes are *not* sorted. Instead, they retain the ordering from whence
+            they came in the roller tree.
+
+            ``` python
+            >>> r_3d6 = 3@R.from_value(H(6))
+            >>> r_3d6_neg = 3@-R.from_value(H(6))
+            >>> roll = R.from_rs(r_3d6, r_3d6_neg).roll()
+            >>> tuple(roll.outcomes())  # doctest: +SKIP
+            (1, 4, 1, -5, -2, -3)
+            >>> len(roll)
+            6
+
+            ```
+        """
+        return (
+            roll_outcome.value
+            for roll_outcome in self
+            if roll_outcome.value is not None
+        )
+
+    def total(self) -> OutcomeT:
+        r"""
+        Shorthand for ``#!python sum(self.outcomes())``.
+        """
+        return sum(self.outcomes())
 
 
 # ---- Functions -----------------------------------------------------------------------

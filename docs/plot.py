@@ -23,7 +23,7 @@ PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="l
 PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))
 
 
-def main() -> None:
+def _main() -> None:
     import matplotlib.pyplot
 
     args = PARSER.parse_args()
@@ -32,6 +32,8 @@ def main() -> None:
 
     if args.style == "dark":
         matplotlib.pyplot.style.use("dark_background")
+    elif args.style == "light":
+        pass
     elif args.style == "gh":
         text_color = "gray"
         matplotlib.rcParams.update(
@@ -43,6 +45,8 @@ def main() -> None:
                 "ytick.color": text_color,
             }
         )
+    else:
+        assert False, f"unrecognized style ({args.style})"
 
     mod_do_it(args.style)
     matplotlib.pyplot.tight_layout()
@@ -51,4 +55,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    _main()

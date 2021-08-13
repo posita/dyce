@@ -143,7 +143,7 @@ def _copy_doctests(
     src_path: pathlib.Path,
     dst_f: TextIO,
     dp: doctest.DocTestParser = doctest.DocTestParser(),
-):
+) -> None:
     with src_path.open() as src_f:
         src_p = str(src_path.resolve())
         dt = dp.get_doctest(src_f.read(), {"__name__": "__main__"}, src_p, src_p, 0)

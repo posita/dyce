@@ -13,7 +13,7 @@
   Thank you!
 -->
 
-# ``dyce.viz`` package reference
+# ``#!python dyce.viz`` package reference
 
 !!! warning "Experimental"
 
@@ -30,3 +30,4 @@
         - "display_burst"
         - "labels_cumulative"
         - "plot_burst"
+        - "walk_r"

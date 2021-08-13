@@ -18,18 +18,18 @@
 ## 0.3.1 (pending)
 
 * Adds these release notes.
-* Boosts ``isinstance`` performance with ``dyce``’s proprietary numeric ``Protocol``s.
+* Boosts ``#!python isinstance`` performance with ``#!python dyce``’s proprietary numeric ``#!python Protocol``s.
 * Reinstates support for Python 3.7 (for now).
 * Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
 * Deprecates synonym methods [``H.even``][dyce.h.H.even] and [``H.odd``][dyce.h.H.odd].
 * Introduces experimental [``H.total``][dyce.h.H.total] property.
-* Removes incorrectly non-flattening unary operation methods ``P.__abs__`` and ``P.__invert__``.
+* Removes incorrectly non-flattening unary operation methods ``#!python P.__abs__`` and ``#!python P.__invert__``.
 * Deprecates non-flattening unary operation methods [``P.__neg__``][dyce.p.P.__neg__] and [``P.__pos__``][dyce.p.P.__pos__].
-* Renames experimental ``P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
+* Renames experimental ``#!python P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
-* Removes ``coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
-* Renames ``dyce.plt`` to [``dyce.viz``][dyce.viz].
-* Deprecates ``dyce.plt``.
+* Removes ``#!python coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
+* Renames ``#!python dyce.plt`` to [``dyce.viz``][dyce.viz].
+* Deprecates synonym package ``#!python dyce.plt``.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

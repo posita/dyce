@@ -12,7 +12,18 @@ from __future__ import annotations
 import re
 from abc import abstractmethod
 from operator import __getitem__, __index__
-from typing import Any, Dict, Iterable, Iterator, List, Sequence, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from .symmetries import Protocol
 from .symmetries import SupportsAbs as _SupportsAbs
@@ -29,13 +40,14 @@ __all__ = ("OutcomeT",)
 
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
+_TT = TypeVar("_TT", bound="type")
 _ProtocolMeta: Any = type(Protocol)
 
 
 class CachingProtocolMeta(_ProtocolMeta):
     """
-    Stand-in for ``Protocol``’s base class that caches results of ``__instancecheck__``,
-    (which is otherwise [really 🤬ing
+    Stand-in for ``#!python Protocol``’s base class that caches results of ``#!python
+    __instancecheck__``, (which is otherwise [really 🤬ing
     expensive](https://github.com/python/mypy/issues/3186#issuecomment-885718629)). (At
     the time this was introduced, it resulted in about a 5× performance increase for
     unit tests.) The downside is that this will yield unpredictable results for objects
@@ -44,8 +56,15 @@ class CachingProtocolMeta(_ProtocolMeta):
     when we come to it.
     """
 
-    def __new__(mcls, name, bases, namespace, **kwargs):
-        cls = super().__new__(mcls, name, bases, namespace, **kwargs)
+    def __new__(
+        mcls: Type[_TT],
+        name: str,
+        bases: Tuple[Type, ...],
+        namespace: Dict[str, Any],
+        **kw: Any,
+    ) -> _TT:
+        # See <https://github.com/python/mypy/issues/9282>
+        cls = super().__new__(mcls, name, bases, namespace, **kw)  # type: ignore
         # Prefixing this class member with "_abc_" is necessary to prevent it from being
         # considered part of the Protocol. (See
         # <https://github.com/python/cpython/blob/main/Lib/typing.py>.)
@@ -54,7 +73,7 @@ class CachingProtocolMeta(_ProtocolMeta):
 
         return cls
 
-    def __instancecheck__(self, inst):
+    def __instancecheck__(self, inst: Any) -> bool:
         inst_t = type(inst)
 
         if (self, inst_t) not in self._abc_inst_check_cache:
@@ -63,7 +82,7 @@ class CachingProtocolMeta(_ProtocolMeta):
         return self._abc_inst_check_cache[self, inst_t]
 
 
-def _assert_isinstance(*num_ts: type, target_t: type):
+def _assert_isinstance(*num_ts: type, target_t: type) -> None:
     for num_t in num_ts:
         assert isinstance(num_t, _SupportsInt)
         assert isinstance(num_t(0), target_t)
@@ -280,7 +299,7 @@ class SupportsOutcome(
 ):
     # Must be able to instantiate it
     @abstractmethod
-    def __init__(self, *args, **kw):
+    def __init__(self, *args: Any, **kw: Any):
         ...
 
     @abstractmethod
@@ -309,8 +328,8 @@ class _RationalConstructorT(
 
 def as_int(val: IntT) -> int:
     r"""
-    Helper function to losslessly coerce *val* into an ``int``. Raises ``TypeError`` if
-    that cannot be done.
+    Helper function to losslessly coerce *val* into an ``#!python int``. Raises
+    ``#!python TypeError`` if that cannot be done.
     """
     int_val = int(val)
 

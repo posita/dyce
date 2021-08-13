@@ -26,7 +26,7 @@ Please try to avoid duplicating issues.
 
 ## Hacking quick-start
 
-A [helper script](https://github.com/posita/dyce/tree/master/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment:
+A [helper script](https://github.com/posita/dyce/tree/master/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
 
 ```sh
 % [PYTHON=…/path/to/python] helpers/venvsetup.sh
@@ -35,7 +35,7 @@ A [helper script](https://github.com/posita/dyce/tree/master/helpers/venvsetup.s
 ```
 
 The helper script is really only there to help folks get their feet wet who don’t already manage their own virtual environments.
-The above is essentially equivalent to the following (with some additional checking):
+The above is essentially equivalent to the following (with some additional checking).
 
 ```sh
 % …/path/to/python -m virtualenv .venv || …/path/to/python -m venv .venv
@@ -48,7 +48,7 @@ The above is essentially equivalent to the following (with some additional check
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
 See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/tree/master/setup.py).
 
-Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed):
+Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed).
 
 ```sh
 % cd …/path/to/dyce
@@ -89,7 +89,7 @@ See [the docs](https://docs.github.com/en/github/collaborating-with-pull-request
 ``dyce`` releases from ``master`` (although not always immediately), so a lot of [these workflows](http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it) are helpful.
 There are only a few additional guidelines:
 
-* If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [``LICENSE``](license.md) file:
+* If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [``LICENSE``](license.md) file.
 
 ```md
 ...

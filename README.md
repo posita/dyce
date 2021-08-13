@@ -25,6 +25,8 @@ If that file is missing or appears to be modified from its original, then please
 
 <img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://github.com/posita/dyce/raw/master/docs/dyce.svg" alt="dyce logo">
 
+Now you’re playing with…
+
 # ``dyce`` – simple Python tools for exploring dice outcomes and other discrete probabilities
 
 ``dyce`` is a pure-Python library for computing discrete probability distributions.
@@ -32,14 +34,17 @@ It is designed to be immediately and broadly useful with minimal additional inve
 While not as compact as a dedicated grammar, ``dyce``’s Python-based primitives are quite sufficient, and often more expressive.
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
 
+That being said, if you’re looking at something on which to build your own grammar, ``dyce`` can serve you well.
+Check out the [``dyce.r`` sub-package](https://posita.github.io/dyce/latest/dyce.r/) and the [rolling tutorial](https://posita.github.io/dyce/latest/rollin/).
+
 ``dyce`` should be able to replicate or replace most other dice probability modeling tools.
 It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
-If you find it lacking in any way, please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) to start a discussion.
+If you find it lacking in any way, please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) to start a discussion.
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying ``LICENSE`` file for details.
 Non-experimental features should be considered stable (but an unquenchable thirst to increase performance remains).
-See the [release notes](https://posita.github.io/dyce/latest/notes) for a summary of version-to-version changes.
+See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
 ## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/master/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
@@ -47,14 +52,43 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 * This could be _you_! 👋
 
 Do you have a project that uses ``dyce``?
-Let me know, and I’ll promote it here!
+[Let me know](https://posita.github.io/dyce/latest/contrib/#filing-issues), and I’ll promote it here!
+
+And don’t forget to do your part in perpetuating gratuitous badge-ification!
+
+``` markdown
+<!-- Markdown -->
+As of version 1.1, HighRollin is
+[![dyce-powered](https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg)][dyce-powered]!
+[dyce-powered]: https://posita.github.io/dyce/ "dyce-powered!"
+```
+
+``` rst
+..
+    reStructuredText - see https://docutils.sourceforge.io/docs/ref/rst/directives.html#image
+
+As of version 1.1, HighRollin is |dyce-powered|!
+
+.. |dyce-powered| image:: https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg
+   :align: top
+   :target: https://posita.github.io/dyce/
+   :alt: dyce-powered
+```
+
+``` html
+<!-- HTML -->
+As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
+  src="https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg"
+  alt="dyce-powered"
+  style="vertical-align: middle;"></a>!
+```
 
 ## A taste
 
 ``dyce`` provides several core primitives.
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
-[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls without costly enumeration.
+[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
 
 ``` python
@@ -114,7 +148,7 @@ var |    1.97
 
 ```
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html):
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html).
 
 ``` python
 >>> import matplotlib  # doctest: +SKIP
@@ -163,66 +197,7 @@ var |    1.97
 
 ```
 
-Where more transparency is required or where enumeration is prohibitive, [``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) can be used to construct arbitrary roller trees.
-Such trees can be used to generate rolls which “show their work”:
-
-``` python
->>> from dyce import R
->>> r_d6 = R.from_value(H(6))
->>> r_1000d6_plus_2 = 1000@(r_d6 + 2)
->>> roll = r_1000d6_plus_2.roll()
->>> tuple(roll.outcomes())  # doctest: +SKIP
-(5, 7, 8, 7, 8, 4, ..., 8, 4, 3, 5, 4, 4)
->>> roll.sources[1]  # doctest: +SKIP
-Roll(
-  r=BinaryOperationRoller(
-    op=<built-in function add>,
-    left_source=ValueRoller(value=H(6), annotation=''),
-    right_source=ValueRoller(value=2, annotation=''),
-    annotation='',
-  ),
-  roll_outcomes=(
-    RollOutcome(
-      value=7,
-      sources=(
-        RollOutcome(
-          value=5,
-          sources=(),
-        ),
-        RollOutcome(
-          value=2,
-          sources=(),
-        ),
-      ),
-    ),
-  ),
-  sources=(
-    Roll(
-      r=ValueRoller(value=H(6), annotation=''),
-      roll_outcomes=(
-        RollOutcome(
-          value=5,
-          sources=(),
-        ),
-      ),
-      sources=(),
-    ),
-    Roll(
-      r=ValueRoller(value=2, annotation=''),
-      roll_outcomes=(
-        RollOutcome(
-          value=2,
-          sources=(),
-        ),
-      ),
-      sources=(),
-    ),
-  ),
-)
-
-```
-
-See the tutorials on [counting](https://posita.github.io/dyce/latest/countin) and [rolling](https://posita.github.io/dyce/latest/rollin), as well as the [API guide](https://posita.github.io/dyce/latest/dyce) for much more thorough treatments, including detailed examples.
+See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) and [rolling](https://posita.github.io/dyce/latest/rollin/), as well as the [API guide](https://posita.github.io/dyce/latest/dyce/) for much more thorough treatments, including detailed examples.
 
 ## Design philosophy
 
@@ -249,7 +224,7 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     You won’t find any lexers, parsers, or tokenizers in ``dyce``’s core, other than straight-up Python.
     That being said, you can always “roll” your own (see what we did there?) and lean on ``dyce`` underneath to perform computations.
     It doesn’t mind.
-    It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin).
+    It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/).
 
 [^2]:
 
@@ -263,11 +238,11 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 ## Comparison to alternatives
 
 The following is a best-effort[^3] summary of the differences between various available tools in this space.
-Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations) for added color.
+Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations/) for added color.
 
 [^3]:
 
-    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib) if you observe discrepancies.
+    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies.
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -310,19 +285,19 @@ Consider exploring the [applications and translations](https://posita.github.io/
 ## License
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the included [``LICENSE``](https://posita.github.io/dyce/latest/license) file for details.
+See the included [``LICENSE``](https://posita.github.io/dyce/latest/license/) file for details.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
 ## Installation
 
-Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/):
+Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 
 ```sh
 % pip install dycelib
 ...
 ```
 
-Alternately, you can download [the source](https://github.com/posita/dyce) and run ``setup.py``:
+Alternately, you can download [the source](https://github.com/posita/dyce) and run ``setup.py``.
 
 ```sh
 % git clone https://github.com/posita/dyce.git
@@ -345,6 +320,7 @@ It has the following runtime dependencies:
 
 ``dyce`` will opportunistically use the following, if available at runtime:
 
-* [``matplotlib``](https://matplotlib.org/) for providing some (hopefully helpful) display conveniences
+* [``graphviz``](https://pypi.org/project/graphviz/) for visualizing [rollers and rolls](https://posita.github.io/dyce/latest/rollin/)
+* [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
 
-See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib#hacking-quick-start) for additional development and testing dependencies.
+See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.

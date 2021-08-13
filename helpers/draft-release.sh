@@ -35,15 +35,48 @@ cd "${_REPO_DIR}"
 twine --version
 mkdocs --version
 mike --version
-tox
 git checkout -b "${VERS_PATCH}-release"
 perl -pi -e 's{^__version__([^#=]*)=\s*\(\s*0\s*,\s*0\s*,\s*0\s*,?\s*\)(\s*#.*)?$}{__version__\1= ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\2}g ;' "${VERS_PY}"
 perl -pi -e 's{\.github\.io/dyce/latest/([^)]*)\)}{\.github\.io/dyce/'"${VERS}"'/\1)}g ; s{/master/}{/'"${TAG}"'/}g ; s{\?version=master\)}{?version='"${TAG}"')}g ; s{!\[master ([^\]]+)\]}{!['"${TAG}"' \1]}g ; s{/pypi/([^/]+/)?'"${PKG}"'(\.svg)?\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'\2)}g' README.md
-grep -E "\b(latest|master)\b" README.md docs/*.md
+
+problem_areas="$(
+    grep -En '\b(latest|master)\b' /dev/null README.md docs/*.md
+    grep -En "^#+\\s+${MAJOR}\\.${MINOR}\\.${PATCH}([^[:alnum:]]|$)" /dev/null docs/notes.md
+)"
+set +x
+
+if [ -n "${problem_areas}" ] ; then
+    echo '- - - - POTENTIAL PROBLEM AREAS - - - -'
+    echo "${problem_areas}"
+    echo '- - - - - - - - - - - - - - - - - - - -'
+fi
+
+sh=$(ps -o comm -p "${$}" | awk 'NR == 2')
+printf "Edit docs/notes.md and anything else as desired. Then type [enter] to continue: "
+
+while true ; do
+    if [ "${sh%/zsh}" != "${sh}" ] ; then
+        read -k 1 -s  # zsh
+    else
+        read -n 1 -s  # everywhere else
+    fi
+
+    case "${REPLY}" in
+        $'\n'|'')
+            echo 'continuing'
+            break
+            ;;
+    esac
+
+    printf '\nType [enter] to continue: '
+done
+
+set -x
+git commit --all --message "Update version and release ${TAG}."
+tox
 python setup.py bdist_wheel sdist
 twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
 mike deploy --rebase --update-aliases "${VERS}" latest
-git commit --all --message "Update version and release ${TAG}."
 git tag --force --message "$( cat <<EOF
 Release ${TAG}.
 

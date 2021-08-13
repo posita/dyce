@@ -13,30 +13,37 @@
   Thank you!
 -->
 
-# ``dyce.r`` package reference
+# ``#!python dyce.r`` package reference
 
 !!! warning "Experimental"
 
-    This package is an attempt to provide primitives for producing weighted randomized rolls without costly enumeration.
+    This package is an attempt to provide primitives for producing weighted randomized rolls without the overhead of enumeration.
     Rolls can be inspected to understand how specific values are derived.
     It should be considered experimental.
     Be warned that future release may introduce incompatibilities or remove this package altogether.
     [Suggestions and contributions](contrib.md) are welcome.
+
+## Roller class hierarchy
+
+<picture>
+  <source srcset="../classes_dyce_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roller class hierarchy](classes_dyce_light.svg)
+</picture>
 
 ::: dyce.r
     rendering:
       show_if_no_docstring: true
     selection:
       members:
-        - "AccumulationRoller"
-        - "BinaryOperationRoller"
-        - "CartesianProductRoller"
-        - "OperationRollerBase"
-        - "PoolRoller"
         - "R"
+        - "ValueRoller"
         - "RepeatRoller"
+        - "OperationRollerBase"
+        - "ChainRoller"
+        - "SumRoller"
+        - "BinaryOperationRoller"
+        - "UnaryOperationRoller"
+        - "PoolRoller"
+        - "SelectionRoller"
         - "Roll"
         - "RollOutcome"
-        - "SelectionRoller"
-        - "UnaryOperationRoller"
-        - "ValueRoller"

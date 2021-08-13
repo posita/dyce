@@ -387,16 +387,26 @@ class TestBinaryOperationRoller:
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
-            h = H(o_type(o) for o in range(-2, 3))
-            h_mul_h = h * h
+            h = H(o_type(i) for i in range(-2, 3))
             r = R.from_value(h, annotation=f"{o_type}")
+            h_mul_h = h * h
             r_mul_r = r * r
 
             for _ in range(100):
                 r_mul_r_roll = r_mul_r.roll()
                 (roll_outcome,) = r_mul_r_roll
                 assert roll_outcome.r == r_mul_r
+                assert roll_outcome.value in h_mul_h
                 assert r_mul_r_roll.total() in h_mul_h, r_mul_r
+
+                for o in h:
+                    h_mul_o = h * o_type(o)
+                    r_mul_o = r * o_type(o)
+                    r_mul_o_roll = r_mul_o.roll()
+                    (roll_outcome,) = r_mul_o_roll
+                    assert roll_outcome.r == r_mul_o
+                    assert roll_outcome.value in h_mul_o
+                    assert r_mul_o_roll.total() in h_mul_o, r_mul_o
 
 
 class TestUnaryOperationRoller:
@@ -550,13 +560,13 @@ class TestPoolRoller:
 
     def test_getitem(self) -> None:
         r_d4_d6_d8 = R.from_values(H(4), H(6), H(8))
-        assert len(r_d4_d6_d8) == 3, r_d4_d6_d8
-        assert isinstance(r_d4_d6_d8[0], ValueRoller)
-        assert r_d4_d6_d8[0].value == H(4)
-        assert isinstance(r_d4_d6_d8[1], ValueRoller)
-        assert r_d4_d6_d8[1].value == H(6)
-        assert isinstance(r_d4_d6_d8[2], ValueRoller)
-        assert r_d4_d6_d8[2].value == H(8)
+        assert len(r_d4_d6_d8.sources) == 3, r_d4_d6_d8
+        assert isinstance(r_d4_d6_d8.sources[0], ValueRoller)
+        assert r_d4_d6_d8.sources[0].value == H(4)
+        assert isinstance(r_d4_d6_d8.sources[1], ValueRoller)
+        assert r_d4_d6_d8.sources[1].value == H(6)
+        assert isinstance(r_d4_d6_d8.sources[2], ValueRoller)
+        assert r_d4_d6_d8.sources[2].value == H(8)
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
@@ -583,16 +593,18 @@ class TestSelectRoller:
             repr(r_squares_select)
             == """SelectionRoller(
   which=(0, -1),
-  source=PoolRoller(
-    sources=(
-      ValueRoller(value=36, annotation=''),
-      ValueRoller(value=25, annotation=''),
-      ValueRoller(value=16, annotation=''),
-      ValueRoller(value=9, annotation=''),
-      ValueRoller(value=4, annotation=''),
-      ValueRoller(value=1, annotation=''),
+  sources=(
+    PoolRoller(
+      sources=(
+        ValueRoller(value=36, annotation=''),
+        ValueRoller(value=25, annotation=''),
+        ValueRoller(value=16, annotation=''),
+        ValueRoller(value=9, annotation=''),
+        ValueRoller(value=4, annotation=''),
+        ValueRoller(value=1, annotation=''),
+      ),
+      annotation='',
     ),
-    annotation='',
   ),
   annotation='',
 )"""

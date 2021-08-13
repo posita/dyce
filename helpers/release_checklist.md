@@ -21,6 +21,7 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``./helpers/draft-release.sh X Y Z``
   * performs in-place version search/replace
+  * provides opportunity to update [release notes](../docs/notes.md)
   * creates branch ``X.Y.Z-release``
   * tags it as ``vX.Y.Z``
   * creates and checks distribution files in ``./dist``

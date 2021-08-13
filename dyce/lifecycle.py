@@ -34,9 +34,9 @@ class ExperimentalWarning(PendingDeprecationWarning):
 
 def deprecated(f: _WrappedT) -> _WrappedT:
     r"""
-    Decorator to mark an interface as deprecated. Warns on *f*'s first use.
+    Decorator to mark an interface as deprecated. Warns on *f*’s first use.
     """
-    return warn_once(
+    return _warn_decr(
         f,
         DeprecationWarning,
         f"{f.__qualname__} is deprecated and will likely be removed in the next major release",
@@ -45,30 +45,26 @@ def deprecated(f: _WrappedT) -> _WrappedT:
 
 def experimental(f: _WrappedT) -> _WrappedT:
     r"""
-    Decorator to mark an interface as experimental. Warns on *f*'s first use.
+    Decorator to mark an interface as experimental. Warns on *f*’s first use.
     """
-    return warn_once(
+    return _warn_decr(
         f,
         ExperimentalWarning,
         f"{f.__qualname__} should be considered experimental and may change or disappear in future versions",
     )
 
 
-def warn_once(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
+def _warn_decr(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
     _wrapped: _WrappedT
-    warned = False
 
     @wraps(f)  # type: ignore
     def _wrapped(*args, **kw):
-        nonlocal warned
 
-        if not warned:
-            warnings.warn(
-                warning_txt,
-                category=category,
-                stacklevel=2,
-            )
-            warned = True
+        warnings.warn(
+            warning_txt,
+            category=category,
+            stacklevel=2,
+        )
 
         return f(*args, **kw)
 

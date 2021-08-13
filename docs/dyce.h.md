@@ -13,7 +13,7 @@
   Thank you!
 -->
 
-# ``dyce.h`` package reference
+# ``#!python dyce.h`` package reference
 
 ::: dyce.h
     rendering:
