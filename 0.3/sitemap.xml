@@ -2,37 +2,57 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://posita.github.io/dyce/0.3/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://posita.github.io/dyce/0.3/contrib/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <lastmod>2021-08-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://posita.github.io/dyce/0.3/countin/</loc>
+         <lastmod>2021-08-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://posita.github.io/dyce/0.3/dyce.h/</loc>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://posita.github.io/dyce/0.3/dyce/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://posita.github.io/dyce/0.3/dyce.plt/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <loc>https://posita.github.io/dyce/0.3/dyce.r/</loc>
+         <lastmod>2021-08-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://posita.github.io/dyce/0.3/dyce.viz/</loc>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://posita.github.io/dyce/0.3/license/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <lastmod>2021-08-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://posita.github.io/dyce/0.3/notes/</loc>
+         <lastmod>2021-08-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://posita.github.io/dyce/0.3/rollin/</loc>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://posita.github.io/dyce/0.3/translations/</loc>
-         <lastmod>2021-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://posita.github.io/dyce/0.3/tutorial/</loc>
-         <lastmod>2021-07-22</lastmod>
+         <lastmod>2021-08-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
