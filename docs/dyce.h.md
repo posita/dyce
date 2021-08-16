@@ -20,7 +20,7 @@
       show_if_no_docstring: true
     selection:
       members:
-        - "HAbleT"
-        - "HAbleOpsMixin"
+        - "HableT"
+        - "HableOpsMixin"
         - "coalesce_replace"
         - "sum_h"

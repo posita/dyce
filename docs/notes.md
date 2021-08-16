@@ -15,19 +15,23 @@
 
 # ``dyce`` release notes
 
-## 0.4.0 (pending)
+## [0.4.0](https://github.com/posita/dyce/releases/tag/v0.4.0)
 
-### Backward incompatible changes
+### Breaking changes
 
+!!! warning
+
+    The following changes are not backward compatible.
+    Please review before upgrading.
+
+* Renames ``HAbleT`` and ``HAbleOpsMixin`` to [``HableT``][dyce.h.HableT] and  [``HableOpsMixin``][dyce.h.HableOpsMixin].
+    Use alternate spellings.
 * Removes deprecated non-flattening unary operation methods ``P.__neg__`` and ``P.__pos__``.
-    Use, e.g., ``#!python P(-h for h in p)`` instead.
-
+    Use, e.g., ``#!python P.umap(operator.__neg__)`` or ``#!python P(-h for h in p)`` instead.
 * Removes deprecated synonym methods ``H.even`` and ``H.odd``.
     Use  [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
-
 * Removes deprecated synonym package ``dyce.plt``.
     Use [``dyce.viz``][dyce.viz] instead.
-
 * Removes special case handling of ``H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.
@@ -64,10 +68,6 @@
     ```
 
 ### Other changes
-
-* TODO(posita)
-
-## 0.3.3 (pending)
 
 * Documentation overhaul including augmented examples and reorganized images and JavaScript.
 * Fixed ``H({}).format()`` bug.

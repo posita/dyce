@@ -88,9 +88,9 @@ _SourceT = Union[
     Iterable[OutcomeT],
     Iterable[Tuple[OutcomeT, IntT]],
     _MappingT,
-    "HAbleT",
+    "HableT",
 ]
-_OperandT = Union[OutcomeT, "H", "HAbleT"]
+_OperandT = Union[OutcomeT, "H", "HableT"]
 _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
@@ -397,7 +397,7 @@ class H(_MappingT):
                     tmp.update({outcome_type(i): 1 for i in outcome_range})
                 else:
                     tmp.update({i: 1 for i in outcome_range})
-        elif isinstance(items, HAbleT):
+        elif isinstance(items, HableT):
             tmp.update(items.h())
         elif isinstance(items, IterableC):
             # Items is either an Iterable[OutcomeT] or an Iterable[Tuple[OutcomeT,
@@ -431,7 +431,7 @@ class H(_MappingT):
         return f"{self.__class__.__name__}({arg})"
 
     def __eq__(self, other) -> bool:
-        if isinstance(other, HAbleT):
+        if isinstance(other, HableT):
             return __eq__(self, other.h())
         elif isinstance(other, H):
             return __eq__(self.lowest_terms()._h, other.lowest_terms()._h)
@@ -439,7 +439,7 @@ class H(_MappingT):
             return super().__eq__(other)
 
     def __ne__(self, other) -> bool:
-        if isinstance(other, HAbleT):
+        if isinstance(other, HableT):
             return __ne__(self, other.h())
         elif isinstance(other, H):
             return not __eq__(self, other)
@@ -556,7 +556,7 @@ class H(_MappingT):
         except NotImplementedError:
             return NotImplemented
 
-    def __and__(self, other: Union[IntT, H, HAbleT]) -> H:
+    def __and__(self, other: Union[IntT, H, HableT]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -571,7 +571,7 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __xor__(self, other: Union[IntT, H, HAbleT]) -> H:
+    def __xor__(self, other: Union[IntT, H, HableT]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -586,7 +586,7 @@ class H(_MappingT):
         except (NotImplementedError, TypeError):
             return NotImplemented
 
-    def __or__(self, other: Union[IntT, H, HAbleT]) -> H:
+    def __or__(self, other: Union[IntT, H, HableT]) -> H:
         try:
             if isinstance(other, _IntCs):
                 other = as_int(other)
@@ -693,7 +693,7 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(right_operand, HAbleT):
+        if isinstance(right_operand, HableT):
             right_operand = right_operand.h()
 
         if isinstance(right_operand, H):
@@ -1664,13 +1664,13 @@ class H(_MappingT):
 
 
 @runtime_checkable
-class HAbleT(
+class HableT(
     Protocol,
     metaclass=CachingProtocolMeta,
 ):
     r"""
     A protocol whose implementer can be expressed as (or reduced to) an
-    [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HAbleT.h]. Currently,
+    [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HableT.h]. Currently,
     only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
     integration point for ``#!python dyce`` users.
     """
@@ -1682,260 +1682,260 @@ class HAbleT(
         ...
 
 
-class HAbleOpsMixin:
+class HableOpsMixin:
     r"""
     A “mix-in” class providing arithmetic operations for implementers of the
-    [``HAbleT`` protocol][dyce.h.HAbleT]. The [``P`` class][dyce.p.P] derives from this
+    [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this
     class.
     """
 
-    def __add__(self: HAbleT, other: _OperandT) -> H:
+    def __add__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__add__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __add__(self.h(), other)
 
-    def __radd__(self: HAbleT, other: OutcomeT) -> H:
+    def __radd__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__add__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __add__(other, self.h())
 
-    def __sub__(self: HAbleT, other: _OperandT) -> H:
+    def __sub__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __sub__(self.h(), other)
 
-    def __rsub__(self: HAbleT, other: OutcomeT) -> H:
+    def __rsub__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__sub__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __sub__(other, self.h())
 
-    def __mul__(self: HAbleT, other: _OperandT) -> H:
+    def __mul__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __mul__(self.h(), other)
 
-    def __rmul__(self: HAbleT, other: OutcomeT) -> H:
+    def __rmul__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__mul__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __mul__(other, self.h())
 
-    def __truediv__(self: HAbleT, other: _OperandT) -> H:
+    def __truediv__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __truediv__(self.h(), other)
 
-    def __rtruediv__(self: HAbleT, other: OutcomeT) -> H:
+    def __rtruediv__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __truediv__(other, self.h())
 
-    def __floordiv__(self: HAbleT, other: _OperandT) -> H:
+    def __floordiv__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __floordiv__(self.h(), other)
 
-    def __rfloordiv__(self: HAbleT, other: OutcomeT) -> H:
+    def __rfloordiv__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __floordiv__(other, self.h())
 
-    def __mod__(self: HAbleT, other: _OperandT) -> H:
+    def __mod__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __mod__(self.h(), other)
 
-    def __rmod__(self: HAbleT, other: OutcomeT) -> H:
+    def __rmod__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__mod__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __mod__(other, self.h())
 
-    def __pow__(self: HAbleT, other: _OperandT) -> H:
+    def __pow__(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __pow__(self.h(), other)
 
-    def __rpow__(self: HAbleT, other: OutcomeT) -> H:
+    def __rpow__(self: HableT, other: OutcomeT) -> H:
         r"""
         Shorthand for ``#!python operator.__pow__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __pow__(other, self.h())
 
-    def __and__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
+    def __and__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __and__(self.h(), other)
 
-    def __rand__(self: HAbleT, other: IntT) -> H:
+    def __rand__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __and__(other, self.h())
 
-    def __xor__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
+    def __xor__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __xor__(self.h(), other)
 
-    def __rxor__(self: HAbleT, other: IntT) -> H:
+    def __rxor__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __xor__(other, self.h())
 
-    def __or__(self: HAbleT, other: Union[IntT, H, HAbleT]) -> H:
+    def __or__(self: HableT, other: Union[IntT, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __or__(self.h(), other)
 
-    def __ror__(self: HAbleT, other: IntT) -> H:
+    def __ror__(self: HableT, other: IntT) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(other, self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __or__(other, self.h())
 
-    def __neg__(self: HAbleT) -> H:
+    def __neg__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__neg__(self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __neg__(self.h())
 
-    def __pos__(self: HAbleT) -> H:
+    def __pos__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__pos__(self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __pos__(self.h())
 
-    def __abs__(self: HAbleT) -> H:
+    def __abs__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__abs__(self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __abs__(self.h())
 
-    def __invert__(self: HAbleT) -> H:
+    def __invert__(self: HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__invert__(self.h())``. See the
-        [``h`` method][dyce.h.HAbleT.h].
+        [``h`` method][dyce.h.HableT.h].
         """
         return __invert__(self.h())
 
-    def lt(self: HAbleT, other: _OperandT) -> H:
+    def lt(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().lt(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.lt``][dyce.h.H.lt].
+        [``h`` method][dyce.h.HableT.h] and [``H.lt``][dyce.h.H.lt].
         """
         return self.h().lt(other)
 
-    def le(self: HAbleT, other: _OperandT) -> H:
+    def le(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().le(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.le``][dyce.h.H.le].
+        [``h`` method][dyce.h.HableT.h] and [``H.le``][dyce.h.H.le].
         """
         return self.h().le(other)
 
-    def eq(self: HAbleT, other: _OperandT) -> H:
+    def eq(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().eq(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.eq``][dyce.h.H.eq].
+        [``h`` method][dyce.h.HableT.h] and [``H.eq``][dyce.h.H.eq].
         """
         return self.h().eq(other)
 
-    def ne(self: HAbleT, other: _OperandT) -> H:
+    def ne(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().ne(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.ne``][dyce.h.H.ne].
+        [``h`` method][dyce.h.HableT.h] and [``H.ne``][dyce.h.H.ne].
         """
         return self.h().ne(other)
 
-    def gt(self: HAbleT, other: _OperandT) -> H:
+    def gt(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().gt(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.gt``][dyce.h.H.gt].
+        [``h`` method][dyce.h.HableT.h] and [``H.gt``][dyce.h.H.gt].
         """
         return self.h().gt(other)
 
-    def ge(self: HAbleT, other: _OperandT) -> H:
+    def ge(self: HableT, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.h().ge(other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.ge``][dyce.h.H.ge].
+        [``h`` method][dyce.h.HableT.h] and [``H.ge``][dyce.h.H.ge].
         """
         return self.h().ge(other)
 
-    def is_even(self: HAbleT) -> H:
+    def is_even(self: HableT) -> H:
         r"""
         Shorthand for ``#!python self.h().is_even()``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.is_even``][dyce.h.H.is_even].
+        [``h`` method][dyce.h.HableT.h] and [``H.is_even``][dyce.h.H.is_even].
         """
         return self.h().is_even()
 
-    def is_odd(self: HAbleT) -> H:
+    def is_odd(self: HableT) -> H:
         r"""
         Shorthand for ``#!python self.h().is_odd()``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.is_odd``][dyce.h.H.is_odd].
+        [``h`` method][dyce.h.HableT.h] and [``H.is_odd``][dyce.h.H.is_odd].
         """
         return self.h().is_odd()
 
-    def explode(self: HAbleT, max_depth: IntT = 1) -> H:
+    def explode(self: HableT, max_depth: IntT = 1) -> H:
         r"""
         Shorthand for ``#!python self.h().explode(max_depth)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.explode``][dyce.h.H.explode].
+        [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].
         """
         return self.h().explode(max_depth)
 
     def substitute(
-        self: HAbleT,
+        self: HableT,
         expand: _ExpandT,
         coalesce: _CoalesceT = coalesce_replace,
         max_depth: IntT = 1,
     ) -> H:
         r"""
         Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.substitute``][dyce.h.H.substitute].
+        [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].
         """
         return self.h().substitute(expand, coalesce, max_depth)
 
-    def within(self: HAbleT, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
+    def within(self: HableT, lo: OutcomeT, hi: OutcomeT, other: _OperandT = 0) -> H:
         r"""
         Shorthand for ``#!python self.h().within(lo, hi, other)``. See the
-        [``h`` method][dyce.h.HAbleT.h] and [``H.within``][dyce.h.H.within].
+        [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].
         """
         return self.h().within(lo, hi, other)
 

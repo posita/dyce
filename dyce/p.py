@@ -30,7 +30,7 @@ from typing import (
     overload,
 )
 
-from .h import H, HAbleOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT, sum_h
+from .h import H, HableOpsMixin, _BinaryOperatorT, _MappingT, _UnaryOperatorT, sum_h
 from .lifecycle import experimental
 from .types import (
     IndexT,
@@ -57,7 +57,7 @@ _RollCountT = Tuple[_RollT, int]
 # ---- Classes -------------------------------------------------------------------------
 
 
-class P(Sequence[H], HAbleOpsMixin):
+class P(Sequence[H], HableOpsMixin):
     r"""
     An immutable pool (ordered sequence) supporting group operations for zero or more
     [``H`` objects][dyce.h.H] (provided or created from the
@@ -88,8 +88,8 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    This class implements the [``HAbleT`` protocol][dyce.h.HAbleT] and derives from the
-    [``HAbleOpsMixin`` class][dyce.h.HAbleOpsMixin], which means it can be
+    This class implements the [``HableT`` protocol][dyce.h.HableT] and derives from the
+    [``HableOpsMixin`` class][dyce.h.HableOpsMixin], which means it can be
     “flattened” into a single histogram, either explicitly via the
     [``h`` method][dyce.p.P.h], or implicitly by using arithmetic operations.
 
@@ -161,7 +161,7 @@ class P(Sequence[H], HAbleOpsMixin):
 
     ```
 
-    In an extension to (departure from) the [``HAbleT`` protocol][dyce.h.HAbleT], the
+    In an extension to (departure from) the [``HableT`` protocol][dyce.h.HableT], the
     [``h`` method][dyce.p.P.h]’s implementation also affords subsets of outcomes to be
     “taken” (selected) by passing in selection criteria. Values are indexed from least
     to greatest. Negative indexes are supported and retain their idiomatic meaning.
@@ -284,7 +284,7 @@ class P(Sequence[H], HAbleOpsMixin):
         self.rolls_with_counts(*which))`` with some short-circuit optimizations.
 
         When provided no arguments, ``#!python h`` combines (or “flattens”) contained
-        histograms in accordance with the [``HAbleT`` protocol][dyce.h.HAbleT].
+        histograms in accordance with the [``HableT`` protocol][dyce.h.HableT].
 
         ``` python
         >>> (2@P(6)).h()
