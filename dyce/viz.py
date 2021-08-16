@@ -250,6 +250,7 @@ def walk_r(
     pretty pictures for docs. But it’s also a vehicle for achieving enlightenment by
     being my own non-traditional customer of rollers and rolls.
     """
+    assert graphviz
     serial = 1
     names: Dict[int, str] = {}
 

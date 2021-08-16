@@ -35,23 +35,25 @@ all : \
 	plot_histogram_dark.png \
 	plot_histogram_light.png \
 	plot_risus_first_round_dark.png \
-	plot_risus_first_round_light.png
+	plot_risus_first_round_light.png \
+	plot_roll_and_keep_dark.png \
+	plot_roll_and_keep_light.png
 
-plot_%_dark.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+plot_%_dark.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=dark $*
 
-plot_%_light.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+plot_%_light.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=light $*
 
 # TODO(posita): This should go away at some point. (See TODO in plot.py.)
-plot_%_gh.png : plot_%.py Makefile plot.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+plot_%_gh.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
-graph_%_dark.svg : graph_%.py Makefile graph.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=dark $*
 	rm -f graph_$*_dark
 
-graph_%_light.svg : graph_%.py Makefile graph.py ../dyce/h.py ../dyce/p.py ../dyce/viz.py
+graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=light $*
 	rm -f graph_$*_light
 
@@ -61,5 +63,5 @@ classes_dyce_dark.svg : classes_dyce.svg Makefile
 classes_dyce_light.svg : classes_dyce.svg Makefile
 	perl >$@ -pe 's{"#000000"}{"DarkSlateGray"}g' $<
 
-dyce-powered.svg : Makefile
+../dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-dyce--powered%21-gold'

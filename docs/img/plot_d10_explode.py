@@ -15,8 +15,14 @@ from dyce import H, P
 def do_it(_: str) -> None:
     import matplotlib.pyplot
 
-    res = (10 @ P(H(10).explode(max_depth=3))).h(slice(-3, None))
+    for depth in range(6):
+        res = (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None))
+        matplotlib.pyplot.plot(
+            *res.distribution_xy(),
+            marker=".",
+            label=f"{depth} rerolls",
+        )
 
-    matplotlib.pyplot.plot(*res.distribution_xy(), marker=".")
+    matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
     matplotlib.pyplot.title(r"Modeling taking the three highest of ten exploding d10s")

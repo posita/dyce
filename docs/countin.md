@@ -17,7 +17,7 @@
 
 [^1]:
 
-    ``dyce`` also provides additional primitives ([``R`` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without the overhead enumeration.
+    ``dyce`` also provides additional primitives ([``R`` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without the overhead of enumeration.
     These are covered [seperately](rollin.md).
 
 
@@ -27,7 +27,7 @@
 ```
 
 [``H`` objects][dyce.h.H] represent histograms for modeling discrete outcomes.
-They encode discrete probability distributions as integer counts without any denominator.
+They encode finite discrete probability distributions as integer counts without any denominator.
 [``P`` objects][dyce.p.P] represent pools (ordered sequences) of histograms.
 If all you need is to aggregate outcomes (sums) from rolling a bunch of dice (or perform calculations on aggregate outcomes), [``H`` objects][dyce.h.H] are probably sufficient.
 If you need to _select_ certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [``P`` objects][dyce.p.P] come in.
@@ -206,7 +206,7 @@ H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
 
 ```
 
-!!! tip "Mind your parentheses"
+!!! bug "Mind your parentheses"
 
     Parentheses are needed in the above example because ``#!python @`` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than ``#!python .`` and ``#!python […]``.
 
@@ -395,8 +395,8 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Distribution for 2d6](plot_histogram_light.png)
+  <source srcset="../img/plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Distribution for 2d6](img/plot_histogram_light.png)
 </picture>
 
 [``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``#!python matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)).
@@ -410,8 +410,8 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Basic plot_burst example](plot_burst_1_light.png)
+  <source srcset="../img/plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Basic plot_burst example](img/plot_burst_1_light.png)
 </picture>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
@@ -431,8 +431,8 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position.
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Advanced plot_burst example](plot_burst_2_light.png)
+  <source srcset="../img/plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Advanced plot_burst example](img/plot_burst_2_light.png)
 </picture>
 
 The outer ring can also be used to compare two histograms directly.
@@ -450,8 +450,8 @@ The ``dyce`` abides.
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: plot_burst example (2d6 vs. d20)](plot_burst_3_light.png)
+  <source srcset="../img/plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: plot_burst example (2d6 vs. d20)](img/plot_burst_3_light.png)
 </picture>
 
 ## Advanced exercise – modeling *Risis*
@@ -517,17 +517,19 @@ Calling ``#!python matplotlib.pyplot.show`` presents:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling the Risus combat mechanic after the first roll](plot_risus_first_round_light.png)
+  <source srcset="../img/plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling the Risus combat mechanic after the first roll](img/plot_risus_first_round_light.png)
 </picture>
+
+### Modeling entire multi-round combats
 
 With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
 
 ``` python
 >>> from typing import Callable, Dict, Tuple
 >>> def risus_combat_driver(
-...     us: int,
-...     them: int,
+...     us: int,  # number of dice we still have
+...     them: int,  # number of dice they still have
 ...     us_vs_them_func: Callable[[int, int], H],
 ... ) -> H:
 ...   if us < 0 or them < 0:
@@ -545,7 +547,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless g
 ...     def _next_round(_: H, outcome) -> H:
 ...       if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
 ...       elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
-...       else: return H({})  # ignore (immediately reroll) all ties
+...       else: return H({})  # ignore (immediately re-roll) all ties
 ...
 ...     already_solved[(us, them)] = this_round.substitute(_next_round)
 ...     return already_solved[(us, them)]
@@ -575,14 +577,133 @@ With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless g
 
 ```
 
-Using our ``#!python risus_combat_driver`` from above, we can model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule”.
+There’s lot going on there.
+Let’s dissect it.
+
+``` python
+def risus_combat_driver(
+    us: int,  # number of dice we still have
+    them: int,  # number of dice they still have
+    us_vs_them_func: Callable[[int, int], H],
+) -> H:
+  ...
+```
+
+Our “driver” takes three arguments:
+
+1. How many dice we have left (``#!python us``);
+1. How many dice the opposition has left (``#!python them``); and
+1. A resolution function (``#!python us_vs_them_func``) that takes counts of each party’s remaining dice and returns a histogram encoding the probability of winning or losing a single round akin to the [``H.vs`` method][dyce.h.H.vs]:
+
+    * An outcome of ``#!python -1`` signals the likelihood of the opposition’s victory
+    * An outcome of ``#!python 1`` signals the likelihood of our victory.
+    * An outcome of ``#!python 0`` signals the likelihood of a tie.
+
+    This is intentional, since we’re going to leverage that very method later.
+
+``` python linenums="6"
+  if us < 0 or them < 0:
+    raise ValueError("cannot have negative numbers (us: {}, them: {})".format(us, them))
+  if us == 0 and them == 0:
+    return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
+  already_solved: Dict[Tuple[int, int], H] = {}
+```
+
+We make some preliminary checks that guard access to our recursive implementation so that it can be a little cleaner.
+We also set up a ``#!python dict`` to keep track of results we‘ve already computed.
+For example, we might compute a case where we lose a die, then our opposition loses a die.
+We arrive at a similar case where our opposition loses a die, then we lose a die.
+Both cases are similar from that point on.
+We’ll keep track of those, so we don’t have to recompute them.
+
+``` python linenums="12"
+  def _resolve(us: int, them: int) -> H:
+    ...
+```
+
+``` python linenums="27"
+  return _resolve(us, them)
+```
+
+Skipping over its implementation for now, we define a our recursive implementation (``#!python _resolve``) and then call it with our initial arguments.
+
+``` python linenums="13"
+  def _resolve(us: int, them: int) -> H:
+    if (us, them) in already_solved: return already_solved[(us, them)]
+    elif us == 0: return H({-1: 1})  # we are out of dice, they win
+    elif them == 0: return H({1: 1})  # they are out of dice, we win
+```
+
+Getting back to that implementation, these are our base cases.
+First we check to see if we’ve already solved for this case (memoization), in which case we can just return it.
+Then we check whether either party has run out of dice, in which case the combat is over.
+If we have none of those cases, we get to work.
+
+!!! note
+
+    In this function, we do not check for the case where *both* parties are at zero.
+    Because only one party can lose a die during each round, the only way both parties can be at zero simultaneously is if they both started at zero.
+    Since we guarded against that case in the enclosing function, we don’t have to worry about that here.
+    Either ``#!python us`` is zero, ``#!python them`` is zero, or neither is zero.
+
+``` python linenums="17"
+    this_round = us_vs_them_func(us, them)
+```
+
+Then, we compute the outcomes for _this round_ using the provided resolution function.
+
+``` python linenums="19"
+    def _next_round(_: H, outcome) -> H:
+      ...
+```
+
+``` python linenums="24"
+    already_solved[(us, them)] = this_round.substitute(_next_round)
+    return already_solved[(us, them)]
+```
+
+Keeping in mind that we’re inside our recursive implementation, we define a substitution function specifically for use with [``H.substitute``][dyce.h.H.substitute].
+This allows us to take our computation for this round, and “fold in” subsequent rounds.
+We keep track of the result in our memoization ``#!python dict`` before returning it.
+
+``` python linenums="19"
+    def _next_round(_: H, outcome) -> H:
+      if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
+      elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
+      else: return H({})  # ignore (immediately re-roll) all ties
+```
+
+Our substitution function is pretty straightforward.
+Where we are asked whether we want to provide a substitution for a round we lost, we lose a die and recurse.
+Where we are asked for a substitution for a round we won, our opposition loses a die and we recurse.
+We ignore ties (simulating that we re-roll them in place until they are no longer ties).
+
+``` python linenums="32"
+    ... risus_combat_driver(
+      u, t,
+      lambda u, t: (u@H(6)).vs(t@H(6))
+    ) ...
+```
+
+At this point, we can define a simple ``#!python lambda`` that wraps [``H.vs``][dyce.h.H.vs] and submit it to our driver to enumerate resolution outcomes from various starting positions.
+
+!!! note
+
+    This is a complicated example that involves some fairly sophisticated programming techniques (recursion, memoization, closures, etc.).
+    The point is not to suggest that such techniques are required to be productive.
+    However, it is useful to show that ``dyce`` is flexible enough to model these types of outcomes in a couple dozen lines of code.
+    It is high-level enough to lean on for nuanced number crunching without a lot of detailed knowledge, while still being low-level enough that authors knowledgeable of advanced programming techniques are not precluded from using them.
+
+### Modeling different combat resolution methods
+
+Using our ``#!python risus_combat_driver`` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule” for resolving ties.
 
 ``` python
 >>> def deadly_combat_vs(us: int, them: int) -> H:
 ...   best_us = (us@P(6)).h(-1)
 ...   best_them = (them@P(6)).h(-1)
 ...   h = best_us.vs(best_them)
-...   # Goliath rule for resolving ties
+...   # Goliath Rule: tie goes to the party with fewer dice in this round
 ...   h = h.substitute(lambda h, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
 ...   return h
 
@@ -602,17 +723,18 @@ Using our ``#!python risus_combat_driver`` from above, we can model the less dea
 
 ```
 
-Modeling the “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic is currently beyond the capabilities of ``dyce`` without additional computation.
+Modeling the “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic is currently beyond the capabilities of ``dyce`` without additional work.
 This is for two reasons.
-First, ``dyce`` only provides mechanisms to approximate outcomes through a fixed number of iterations (not an infinite series).
+First, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to substitute outcomes, not counts.
+This means we can’t arbitrarily *increase* the likelihood of achieving a particular outcome through substitution.
+Second, ``dyce``’s substitution mechanism only resolves outcomes through a fixed number of iterations (not an infinite series).
 Most of the time, this is good enough.
-Second, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to substitute outcomes, not counts.
 
-Both of these limitations can be circumvented where distributions can be computed and encoded as histograms.
+Both of these limitations can be circumvented where infinite series can be computed and encoded as histograms.
 For this mechanic, we can observe that a single six-sided die (``1d6``) has a $\frac{1}{2}$ chance of coming up even, thereby earning a “success”.
 We can also observe that it has a $\frac{1}{6}$ chance of showing a six, earning an additional roll.
 That second roll has a $\frac{1}{2}$ chance of coming up even, as well as a $\frac{1}{6}$ chance of earning another roll, and so on.
-In other words, the number of successes you can expect to roll are:
+In other words, the number of successes one can expect to roll are:
 
 $$
 \frac{1}{2}
@@ -695,11 +817,15 @@ S = \overbrace{ \frac{1}{2} } + \underbrace{ \frac{1}{6}S }
 $$
 
 $$
-S - \frac{1}{6}S = \frac{5}{6}S = \frac{1}{2}
+S - \frac{1}{6}S = \frac{1}{2}
 $$
 
 $$
-S = \frac{6}{10} = \frac{3}{5}
+\frac{5}{6}S = \frac{1}{2}
+$$
+
+$$
+S = \frac{3}{5}
 $$
 
 Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
@@ -710,6 +836,7 @@ Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
     It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.
 
 Armed with this knowledge, we can now model “Evens Up” using our ``#!python risus_combat_driver`` from above.
+We can also deploy a trick using ``#!python partial`` to parameterize use of the Goliath Rule.
 
 ``` python
 >>> from functools import partial
@@ -722,18 +849,19 @@ Armed with this knowledge, we can now model “Evens Up” using our ``#!python 
 ...   return h
 
 >>> for t in range(3, 5):
-...   print("---")
+...   print("- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -")
 ...   for u in range(t, t + 3):
-...     results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=True)).format(width=0)
-...     print(f"{u}d6 vs {t}d6: {results}")
----
-3d6 vs 3d6: {..., -1: 50.00%, 1: 50.00%}
-4d6 vs 3d6: {..., -1: 27.49%, 1: 72.51%}
-5d6 vs 3d6: {..., -1:  9.27%, 1: 90.73%}
----
-4d6 vs 4d6: {..., -1: 50.00%, 1: 50.00%}
-5d6 vs 4d6: {..., -1: 28.50%, 1: 71.50%}
-6d6 vs 4d6: {..., -1: 10.50%, 1: 89.50%}
+...     goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=True)).format(width=0)
+...     no_goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=False)).format(width=0)
+...     print(f"{u}d6 vs {t}d6:   {goliath_results}   {no_goliath_results}")
+- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -
+3d6 vs 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+4d6 vs 3d6:   {..., -1: 27.49%, 1: 72.51%}   {..., -1: 14.38%, 1: 85.62%}
+5d6 vs 3d6:   {..., -1:  9.27%, 1: 90.73%}   {..., -1:  1.99%, 1: 98.01%}
+- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -
+4d6 vs 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+5d6 vs 4d6:   {..., -1: 28.50%, 1: 71.50%}   {..., -1: 16.44%, 1: 83.56%}
+6d6 vs 4d6:   {..., -1: 10.50%, 1: 89.50%}   {..., -1:  2.86%, 1: 97.14%}
 
 ```
 
@@ -750,12 +878,14 @@ H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y
 
 ```
 
-[![Love you, Doris!](doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260)
+[![Love you, Doris!](img/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260)
 
-Be aware that performance can be quite slow, however.
+!!! note
 
-``dyce`` remains opinionated about ordering.
-For non-critical contexts, ``dyce`` will attempt a “natural” ordering based on the string representation of each outcome if relative values are indeterminate.
+    Be aware that, depending on implementation, performance can suffer quite a bit when using symbolic primitives.
+
+For histograms and pools, ``dyce`` remains opinionated about ordering.
+For non-critical contexts where relative values are indeterminate, ``dyce`` will attempt a “natural” ordering based on the string representation of each outcome.
 This is to accommodate symbolic expressions whose relative values are often unknowable.
 
 ``` python
@@ -765,21 +895,10 @@ x < 3*x
 Traceback (most recent call last):
   ...
 TypeError: cannot determine truth value of Relational
->>> s = sympy.abc.x - 1
->>> d3x = H(3) * sympy.abc.x
->>> d3x2 = H(i * sympy.abc.x for i in range(3, 0, -1))
->>> d3x == d3x2  # still results in consistent ordering
-True
->>> P(d3x, d3x2)
-P(H({2*x: 1, 3*x: 1, x: 1}), H({2*x: 1, 3*x: 1, x: 1}))
->>> sympy.abc.x * 3 in d3x
-True
->>> sympy.abc.x - 1 in d3x
-False
 
 ```
 
-SymPy, for example, does not attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
+SymPy does not even attempt simple relative comparisons between symbolic expressions, even where they are unambiguously resolvable.
 Instead, it relies on the caller to invoke its proprietary solver APIs.
 
 ``` python
@@ -800,6 +919,8 @@ In practice, that means that certain operations won’t work with symbolic expre
 Flattening pools works.
 
 ``` python
+>>> d3x = H(3) * sympy.abc.x ; d3x
+H({2*x: 1, 3*x: 1, x: 1})
 >>> p = P(d3x / 3, (d3x + 1) / 3, (d3x + 2) / 3)
 >>> p.h()
 H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 3, x + 1: 1})
@@ -845,7 +966,7 @@ TypeError: cannot determine truth value of Relational
 [``P.umap``][dyce.p.P.umap] can help pave the way back to concrete outcomes.
 
 ``` python
->>> f = lambda o: o.subs({sympy.abc.x: sympy.Rational(1, 3)})
+>>> f = lambda outcome: outcome.subs({sympy.abc.x: sympy.Rational(1, 3)})
 >>> p.umap(f)
 P(H({1/9: 1, 2/9: 1, 1/3: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
 >>> p.umap(f).h(-1)

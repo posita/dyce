@@ -17,29 +17,38 @@ Please see the accompanying ``LICENSE`` file for rights and restrictions governi
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.org/project/dycelib/)
+[![Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.org/project/dycelib/)
 [![License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-
-<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://github.com/posita/dyce/raw/latest/docs/dyce.svg" alt="dyce logo">
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.org/project/dycelib/)
+[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.org/project/dycelib/)
 
 Now you’re playing with…
 
-# ``dyce`` – simple Python tools for exploring dice outcomes and other discrete probabilities
+<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce.svg" alt="dyce logo">
 
-``dyce`` is a pure-Python library for computing discrete probability distributions.
-It is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
+# ``dyce`` – simple Python tools for exploring dice outcomes and other finite discrete probabilities
+
+``dyce`` is a pure-Python library for modeling arbitrarily complex dice mechanics.
+It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
+Its primary applications:
+
+1. Computing finite discrete probability distributions for:
+    * Game designers who want to understand or experiment with various dice mechanics and interactions;
+    * Players (including game masters) who may be curious about in-game probabilities; and
+    * Tool authors who serve those game designers or players.
+1. Generating transparent, weighted random rolls for:
+    * Software developers who want to enable flexible dice mechanic resolution in their gaming environments such as chat servers or virtual tabletops (VTTs).
+
+Beyond those audiences, it may be useful to anyone interested in exploring finite discrete probabilities but not in developing all the low-level math bits from scratch.
+
+``dyce`` is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
 While not as compact as a dedicated grammar, ``dyce``’s Python-based primitives are quite sufficient, and often more expressive.
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
-
-That being said, if you’re looking at something on which to build your own grammar, ``dyce`` can serve you well.
-Check out the [``dyce.r`` sub-package](https://posita.github.io/dyce/latest/dyce.r/) and the [rolling tutorial](https://posita.github.io/dyce/latest/rollin/).
+If you’re looking at something on which to build your own grammar or interface, ``dyce`` can serve you well.
 
 ``dyce`` should be able to replicate or replace most other dice probability modeling tools.
 It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
-If you find it lacking in any way, please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) to start a discussion.
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying ``LICENSE`` file for details.
@@ -47,7 +56,9 @@ Non-experimental features should be considered stable (but an unquenchable thirs
 See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
-## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/latest/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
+If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://posita.github.io/dyce/latest/contrib/).
+
+## Customers [![``dyce``-powered!](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
 
 * This could be _you_! 👋
 
@@ -86,7 +97,7 @@ As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
 ## A taste
 
 ``dyce`` provides several core primitives.
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling discrete outcomes, like individual dice.
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling finite discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
 [``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
@@ -178,7 +189,7 @@ var |    1.97
 ```
 
 <!-- Should match any title of the corresponding plot title -->
-![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/latest/docs/plot_2d6_lo_hi_gh.png)
+![Plot: Taking the lowest or highest die of 2d6](https://raw.githubusercontent.com/posita/dyce/latest/docs/img/plot_2d6_lo_hi_gh.png)
 
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
 
@@ -204,9 +215,8 @@ See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) a
 ``dyce`` is fairly low-level by design, prioritizing ergonomics and composability.
 It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
 That’s a highfalutin way of saying it doesn’t guess.
-It *knows*, even if knowing is harder.
-Which, if we’re honest with ourselves, it often is.
-Or, at least, it *should* be.
+It *knows*, even if knowing is harder or more limiting.
+Which, if we possess a modicum of humility, it often is.
 
 !!! quote
 
@@ -217,12 +227,12 @@ Or, at least, it *should* be.
 Because ``dyce`` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
 It can be installed and run anywhere[^2], and modified as desired.
 On its own, ``dyce`` is completely adequate for casual tinkering.
-However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/).
+However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
 
 [^1]:
 
     You won’t find any lexers, parsers, or tokenizers in ``dyce``’s core, other than straight-up Python.
-    That being said, you can always “roll” your own (see what we did there?) and lean on ``dyce`` underneath to perform computations.
+    That being said, you can always “roll” your own (see what we did there?) and lean on ``dyce`` underneath.
     It doesn’t mind.
     It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/).
 

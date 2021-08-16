@@ -68,7 +68,7 @@ from .types import (
     Protocol,
     _IntCs,
     _OutcomeCs,
-    _RationalConstructorT,
+    _RationalInitializerT,
     as_int,
     runtime_checkable,
     sorted_outcomes,
@@ -127,8 +127,8 @@ class H(_MappingT):
     r"""
     An immutable mapping for use as a histogram which supports arithmetic operations.
     This is useful for modeling discrete outcomes, like individual dice. ``#!python H``
-    objects encode discrete probability distributions as integer counts without any
-    denominator.
+    objects encode finite discrete probability distributions as integer counts without
+    any denominator.
 
     !!! info
 
@@ -321,7 +321,7 @@ class H(_MappingT):
 
     ```
 
-    !!! tip "Mind your parentheses"
+    !!! bug "Mind your parentheses"
 
         Parentheses are often necessary to enforce the desired order of operations. This
         is most often an issue with the ``#!python @`` operator, because it behaves
@@ -1189,7 +1189,7 @@ class H(_MappingT):
 
         ```
 
-        !!! tip "An important exception"
+        !!! note "An important exception"
 
             If *coalesce* returns the empty histogram (``H({})``), the corresponding
             outcome and its counts are omitted from the result without substitution or
@@ -1403,7 +1403,7 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: _MappingT,
-        rational_t: _RationalConstructorT[_T],
+        rational_t: _RationalInitializerT[_T],
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         ...
 
@@ -1411,7 +1411,7 @@ class H(_MappingT):
     def distribution(
         self,
         *,
-        rational_t: _RationalConstructorT[_T],
+        rational_t: _RationalInitializerT[_T],
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         ...
 
@@ -1422,7 +1422,7 @@ class H(_MappingT):
         # TODO(posita): See <https://github.com/python/mypy/issues/10854> for context on
         # all the @overload work-around nonsense above and remove those once that issue
         # is addressed.
-        rational_t: _RationalConstructorT[_T] = Fraction,
+        rational_t: _RationalInitializerT[_T] = Fraction,
     ) -> Iterator[Tuple[OutcomeT, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
@@ -1476,7 +1476,7 @@ class H(_MappingT):
 
         ```
 
-        !!! tip
+        !!! note
 
             The arguments passed to *rational_t* are not reduced to the lowest terms.
 
@@ -1650,19 +1650,20 @@ class H(_MappingT):
                 except TypeError:
                     pass
 
-                outcomes, probabilities = self.distribution_xy(fill_items)
-                tick_scale = max(probabilities) if scaled else 1.0
+                if self:
+                    outcomes, probabilities = self.distribution_xy(fill_items)
+                    tick_scale = max(probabilities) if scaled else 1.0
 
-                for outcome, probability in zip(outcomes, probabilities):
-                    try:
-                        outcome_str = f"{outcome: 3}"
-                    except (TypeError, ValueError):
-                        outcome_str = str(outcome)
-                        outcome_str = f"{outcome_str: >3}"
+                    for outcome, probability in zip(outcomes, probabilities):
+                        try:
+                            outcome_str = f"{outcome: 3}"
+                        except (TypeError, ValueError):
+                            outcome_str = str(outcome)
+                            outcome_str = f"{outcome_str: >3}"
 
-                    ticks = tick * int(w * probability / tick_scale)
-                    probability_f = float(probability)
-                    yield f"{outcome_str} | {probability_f:7.2%} |{ticks}"
+                        ticks = tick * int(w * probability / tick_scale)
+                        probability_f = float(probability)
+                        yield f"{outcome_str} | {probability_f:7.2%} |{ticks}"
 
             return sep.join(lines())
 
@@ -1706,7 +1707,7 @@ class H(_MappingT):
         r"""
         Returns a (weighted) random outcome, sorted.
 
-        !!! tip "On ordering"
+        !!! note "On ordering"
 
             This method “works” (i.e., falls back to a “natural” ordering of string
             representations) for outcomes whose relative values cannot be known (e.g.,

@@ -55,7 +55,7 @@ SETUP_ARGS = {
         "{}.{}".format(*__version__[:2]) if __version__ != (0, 0, 0) else "latest"
     ),
     "license": "MIT License",
-    "description": "Simple Python tools for exploring dice outcomes and other discrete probabilities",
+    "description": "Simple Python tools for exploring dice outcomes and other finite discrete probabilities",
     "long_description": README,
     "long_description_content_type": "text/markdown",
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>

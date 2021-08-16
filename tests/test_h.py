@@ -385,6 +385,17 @@ class TestH:
         )
         assert h.format(width=0) == "{avg: 1.67, 1: 50.00%, 2: 33.33%, 3: 16.67%}"
 
+    def test_format_empty(self) -> None:
+        h = H({})
+        assert h.format(width=115) == os.linesep.join(
+            (
+                "avg |    0.00",
+                "std |    0.00",
+                "var |    0.00",
+            )
+        )
+        assert h.format(width=0) == "{avg: 0.00}"
+
     def test_mean(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H((o_type(i), c_type(i)) for i in range(10))

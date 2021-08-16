@@ -20,13 +20,16 @@ If you have exposure to [another tool](), they may also help with transition.
 
 ``` python
 >>> from dyce import H, P
+>>> res1 = 3 @ H(6)
 >>> p_4d6 = 4@P(6)
->>> res1 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
+>>> res2 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
 >>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: H(6) if outcome == 1 else outcome)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
->>> res2 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
+>>> res3 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
 >>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
->>> res3 = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
+>>> res4 = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
+>>> res5 = 2 @ H(6) + 6
+>>> res6 = 4 @ H(4) + 2
 
 ```
 
@@ -35,19 +38,34 @@ Visualization:
 ``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(
+...   *res4.distribution_xy(),
+...   marker="D",
+...   label="3d6",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
 ...   *res1.distribution_xy(),
-...   marker=".",
-...   label="Discard lowest",
+...   marker="s",
+...   label="4d6 - discard lowest",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(
 ...   *res2.distribution_xy(),
-...   marker=".",
-...   label="Re-roll first 1; discard lowest",
+...   marker="^",
+...   label="4d6 - re-roll first 1, discard lowest",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.plot(
 ...   *res3.distribution_xy(),
-...   marker=".",
-...   label="Re-roll all 1s; discard lowest",
+...   marker="*",
+...   label="4d6 - re-roll all 1s (i.e., 4d5), discard lowest",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   *res5.distribution_xy(),
+...   marker="x",
+...   label="2d6 + 6",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   *res6.distribution_xy(),
+...   marker="o",
+...   label="4d4 + 2",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
 >>> matplotlib.pyplot.title(r"Comparing various take-three-of-4d6 methods")  # doctest: +SKIP
@@ -57,8 +75,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Comparing various take-three-of-4d6 methods](plot_4d6_variants_light.png)
+  <source srcset="../img/plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Comparing various take-three-of-4d6 methods](img/plot_4d6_variants_light.png)
 </picture>
 
 ## Translating one example from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
@@ -100,8 +118,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Expected outcomes for attack with saving throw for half damage](plot_burning_arch_light.png)
+  <source srcset="../img/plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Expected outcomes for attack with saving throw for half damage](img/plot_burning_arch_light.png)
 </picture>
 
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
@@ -240,15 +258,14 @@ Example 1 visualization:
 ...     outer_color="RdYlGn_r",
 ...     alpha=0.9,
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.tight_layout()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Comparing a normal attack to an enhanced one](plot_great_weapon_fighting_light.png)
+  <source srcset="../img/plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Comparing a normal attack to an enhanced one](img/plot_great_weapon_fighting_light.png)
 </picture>
 
 Example 2 source:
@@ -314,11 +331,11 @@ Example 2 visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling an advantage-weighted attack with critical hits](plot_advantage_light.png)
+  <source srcset="../img/plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling an advantage-weighted attack with critical hits](img/plot_advantage_light.png)
 </picture>
 
-## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/questions/166633/roll-and-keep-in-anydice)”
+## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
 
 Source:
 
@@ -337,7 +354,14 @@ Visualization:
 
 ``` python
 >>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.plot(*res.distribution_xy(), marker=".")  # doctest: +SKIP
+>>> for depth in range(6):
+...   res = (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None))
+...   matplotlib.pyplot.plot(
+...     *res.distribution_xy(),
+...     marker=".",
+...     label=f"{depth} rerolls",
+...   )  # doctest: +SKIP
+    matplotlib.pyplot.legend()  # doctest: +SKIP
 >>> matplotlib.pyplot.title(r"Modeling taking the three highest of ten exploding d10s")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
@@ -345,11 +369,11 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling taking the three highest of ten exploding d10s](plot_d10_explode_light.png)
+  <source srcset="../img/plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling taking the three highest of ten exploding d10s](img/plot_d10_explode_light.png)
 </picture>
 
-## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/questions/111414/how-do-i-count-the-number-of-duplicates-in-anydice/111421#111421)”
+## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
 
 Source:
 
@@ -387,18 +411,80 @@ Visualization:
 ...   res,
 ...   desc=r"Chances of rolling $n$ duplicates in 8d10",
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.tight_layout()  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Chances of rolling <i>n</i> duplicates in 8d10](plot_dupes_light.png)
+  <source srcset="../img/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Chances of rolling <i>n</i> duplicates in 8d10](img/plot_dupes_light.png)
 </picture>
 
-## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/questions/112735/modelling-opposed-dice-pools-with-a-swap/112951#112951)”
+## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
+
+Source:
+
+```
+function: N:n of SIZE:n keep K:n extras add {
+    result: [helper NdSIZE SIZE K]
+}
+
+function: helper ROLL:s SIZE:n K:n {
+    COUNT: [count SIZE in ROLL]
+    if COUNT > K { result: K*SIZE - K + COUNT }
+    result: {1..K}@ROLL
+}
+```
+
+Translation:
+
+``` python
+>>> def roll_and_keep(p: P, k: int):
+...   assert p.is_homogeneous
+...   max_d = max(p[-1]) if p else 0
+...   for roll, count in p.rolls_with_counts():
+...     total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
+...     yield total, count
+>>> H(roll_and_keep(6@P(6), 3))
+H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 21: 1})
+
+```
+
+Visualization:
+
+``` python
+>>> import matplotlib  # doctest: +SKIP
+>>> d, k = 6, 3
+>>> for n in range(k + 1, k + 9):
+...   p = n @ P(d)
+...   res_roll_and_keep = H(roll_and_keep(p, k))
+...   matplotlib.pyplot.plot(
+...     *res_roll_and_keep.distribution_xy(),
+...     marker="o",
+...     label=f"{n}d{d} keep {k} add +1",
+...   )  # doctest: +SKIP
+>>> for n in range(k + 1, k + 9):
+...   p = n @ P(d)
+...   res_normal = p.h(slice(-k, None))
+...   matplotlib.pyplot.plot(
+...     *res_normal.distribution_xy(),
+...     marker="s",
+...     label=f"{n}d{d} keep {k}",
+...   )  # doctest: +SKIP
+>>> matplotlib.pyplot.legend()  # doctest: +SKIP
+>>> matplotlib.pyplot.title(r"Roll-and-keep mechanic comparison")  # doctest: +SKIP
+>>> matplotlib.pyplot.show()  # doctest: +SKIP
+
+```
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source srcset="../img/plot_roll_and_keep_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Roll-and-keep mechanic comparison](img/plot_roll_and_keep_light.png)
+</picture>
+
+## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
 
 Source of basic ``brawl``:
 

@@ -24,6 +24,13 @@ You can [file new issues](https://github.com/posita/dyce/issues) as you find the
 Please try to avoid duplicating issues.
 [“Writing Effective Bug Reports” by Elisabeth Hendrickson](http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf) (PDF) may be helpful.
 
+<!--
+## Posting on StackExchange
+
+If you’re so inclined, feel free to post on StackExchange (e.g., in [RPG](https://rpg.stackexchange.com/) or [Math](https://math.stackexchange.com/)), and tag the question with ``dyce``.
+Feel free to at-mention ``@posita`` as well.
+-->
+
 ## Hacking quick-start
 
 A [helper script](https://github.com/posita/dyce/blob/latest/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.

@@ -15,6 +15,11 @@
 
 # ``dyce`` release notes
 
+## 0.3.3 (pending)
+
+* Documentation overhaul including augmented examples and reorganized images and JavaScript.
+* Fixed ``H({}).format()`` bug.
+
 ## [0.3.2](https://github.com/posita/dyce/releases/tag/v0.3.2)
 
 * Emergency release to ~~cover up~~ _address_ [this ~~embarrassment~~ _typo_](https://github.com/borntyping/python-dice/issues/16#issuecomment-900249398). 😬😅

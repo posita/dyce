@@ -15,18 +15,19 @@
 
 The following assumes you are working from the repository root and have a development environment similar to one created by ``pip install install --editable '.[dev]'``. (See, e.g., [``./helpers/venvsetup.sh``](venvsetup.sh).)
 
-* [ ] If necessary, update copyright in [``LICENSE``](../LICENSE) and [``mkdocs.yml``](../mkdocs.yml) and commit
+* [ ] Update docs and commit
+  * Solidify current release start section for next release in [release notes](../docs/notes.md)
+  * If necessary, update copyright in [``LICENSE``](../LICENSE) and [``mkdocs.yml``](../mkdocs.yml)
 
 * [ ] ``git clean -Xdf [-n] [...]``
 
 * [ ] ``./helpers/draft-release.sh X Y Z``
-  * performs in-place version search/replace
-  * provides opportunity to update [release notes](../docs/notes.md)
-  * creates branch ``X.Y.Z-release``
-  * tags it as ``vX.Y.Z``
-  * creates and checks distribution files in ``./dist``
-  * updates ``gh-pages``
-  * see [``./helpers/draft-release.sh``](draft-release.sh) for details
+  * Performs in-place version search/replace
+  * Creates branch ``X.Y.Z-release``
+  * Tags it as ``vX.Y.Z``
+  * Creates and checks distribution files in ``./dist``
+  * Updates ``gh-pages``
+  * See [``./helpers/draft-release.sh``](draft-release.sh) for details
 
 * [ ] ``git tag --force --sign vX.Y.X && git tag --force latest`` and add [release notes](../docs/notes.md)
 

@@ -188,7 +188,7 @@ class P(Sequence[H], HAbleOpsMixin):
     ```
     """
 
-    # ---- Constructor -----------------------------------------------------------------
+    # ---- Initializer -----------------------------------------------------------------
 
     def __init__(self, *args: Union[IntT, P, H]) -> None:
         r"Initializer."

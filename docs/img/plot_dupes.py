@@ -14,8 +14,6 @@ from dyce.viz import plot_burst
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
-
     def dupes(p: P):
         for roll, count in p.rolls_with_counts():
             dupes = 0
@@ -32,4 +30,3 @@ def do_it(style: str) -> None:
         desc=r"Chances of rolling $n$ duplicates in 8d10",
         text_color="white" if style == "dark" else "black",
     )
-    matplotlib.pyplot.tight_layout()

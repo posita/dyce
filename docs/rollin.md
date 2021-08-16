@@ -20,7 +20,7 @@
     [Suggestions and contributions](contrib.md) are welcome.
 
 
-``dyce`` provides additional primitives useful for generating and inspecting rolls of weighted random outcomes without requiring the overhead of enumeration.
+``dyce`` provides additional primitives for generating and inspecting rolls of weighted random outcomes without requiring the overhead of enumeration.
 
 ``` python
 >>> from dyce import R
@@ -41,8 +41,8 @@ Each roll it generates has that value as its sole outcome.
 Let’s see what that looks like (now with tasty entity relationship diagrams).
 
 <picture style="float: right; padding: 0 1.0em 0 1.0em; max-width: 33%;">
-  <source srcset="../graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Rollers, rolls, and outcomes, oh my!](graph_rollin_value_light.svg)
+  <source srcset="../img/graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Rollers, rolls, and outcomes, oh my!](img/graph_rollin_value_light.svg)
 </picture>
 
 ``` python
@@ -72,7 +72,7 @@ Let’s look at some more substantial examples.
 
 ## Emulating a hundred-sided die using two ten-sided dice
 
-<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../1d100-1.png" alt="D00 &amp; D10"></a>
+<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../img/1d100-1.png" alt="D00 &amp; D10"></a>
 
 In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered $[{{0}, {1}, \ldots , {9}}]$) and a “tens” ten-sided die (faces numbered $[{{00}, {10}, \ldots , {90}}]$).
 Let’s try to model that as a roller and use it to generate a roll.
@@ -226,8 +226,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD from emulating a d100](graph_rollin_pool_light.svg)
+  <source srcset="../img/graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD from emulating a d100](img/graph_rollin_pool_light.svg)
 </picture>
 
 Let’s break that down so it doesn’t feel like trying to drink from a fire hose.
@@ -315,8 +315,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD for arithmetic composition](graph_rollin_expr_light.svg)
+  <source srcset="../img/graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD for arithmetic composition](img/graph_rollin_expr_light.svg)
 </picture>
 
 ## Dropping dice from prior rolls – keeping the best three of ``3d6`` and ``1d8``
@@ -463,8 +463,8 @@ Oof.
 Let’s visualize!
 
 <picture>
-  <source srcset="../graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD for dropping outcomes](graph_rollin_select_1_light.svg)
+  <source srcset="../img/graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD for dropping outcomes](img/graph_rollin_select_1_light.svg)
 </picture>
 
 Holy entangled relationship diagrams, Batman!
@@ -487,8 +487,7 @@ True
 
     A roll outcome with a [``value``][dyce.r.RollOutcome.value] of ``#!python None`` is akin to a “tombstone”.
     It conveys one whose sources were present in immediately prior rolls but excluded from the current roll.
-    This implies that such a roll outcome must have at least one source.
-    That constraint is enforced.
+    Such roll outcomes must have at least one source.
 
     ``` python
     >>> from dyce.r import RollOutcome
@@ -537,7 +536,7 @@ H(8)
 
 ```
 
-Alternatively, could have also used our old friend the [``P`` object][dyce.p.P] to eliminate the [``RepeatRoller``][dyce.r.RepeatRoller] for a similar, but slightly simpler result.
+Alternatively, could have also used our old friend the [``P`` object][dyce.p.P] to eliminate the [``RepeatRoller``][dyce.r.RepeatRoller] for a similar, but structurally simpler result.
 
 ``` python
 >>> from dyce import P
@@ -564,8 +563,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Alternate Roll ERD for dropping outcomes](graph_rollin_select_2_light.svg)
+  <source srcset="../img/graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Alternate Roll ERD for dropping outcomes](img/graph_rollin_select_2_light.svg)
 </picture>
 
 In this case, our results are still *mostly* traceable, since our pool is homogeneous.
@@ -637,51 +636,13 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../graph_rollin_select_3_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Alternate Roll ERD for dropping outcomes](graph_rollin_select_3_light.svg)
+  <source srcset="../img/graph_rollin_select_3_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Alternate Roll ERD for dropping outcomes](img/graph_rollin_select_3_light.svg)
 </picture>
 
 This isn’t magic.
-It is merely a way to cleave away any accumulated history at the point a [``Roll`` object][dyce.r.Roll] is constructed by an appropriately annotated roller.
+It is merely a way to cleave away any accumulated history at the point a [``Roll`` object][dyce.r.Roll] is initialized by an appropriately annotated roller.
 To prevent *all* history accumulation for a roller tree, every roller in that tree must be annotated with ``#!python None``.
-
-!!! warning
-
-    Technically, this violates the immutability of roll outcomes.
-
-    ``` python
-    >>> from dyce.r import Roll
-    >>> origin = RollOutcome(value=1)
-    >>> descendant = RollOutcome(value=2, sources=(origin,)) ; descendant
-    RollOutcome(
-      value=2,
-      sources=(
-        RollOutcome(
-          value=1,
-          sources=(),
-        ),
-      ),
-    )
-    >>> roll = Roll(PoolRoller(annotation=None), roll_outcomes=(descendant,))
-    >>> descendant  # sources are wiped out
-    RollOutcome(
-      value=2,
-      sources=(),
-    )
-
-    ```
-
-    ``dyce`` does not generally contemplate creation of rolls or roll outcomes outside the womb of [``R.roll``][dyce.r.R.roll] implementations.
-    [``Roll``][dyce.r.Roll] and [``RollOutcome``][dyce.r.RollOutcome] objects generally mate for life, being created exclusively for (and in close proximity to) one another.
-    A roll manipulating a roll outcome’s internal state post construction may seem unseemly, but that intimacy is a fundamental part of their primordial ritual.
-
-    More practically, it frees each roller from having to do its own cleaving.
-
-    That being said, you’re an adult.
-    Do what you want.
-    Just know that if you’re going to construct your own roll outcomes and pimp them out to different rolls all over town, they might come back with some parts missing.
-
-    (See also the [``RollOutcome.roll`` property][dyce.r.RollOutcome.roll].)
 
 ## Performance
 
@@ -704,64 +665,20 @@ In [4]: %timeit p.roll()[::-2]
 ```
 
 That’s not bad.
-Is a significant improvement possible?
-
-``` python
-In [5]: from itertools import chain
-
-In [6]: from random import choices
-
-In [7]: a20, f20 = list(range(20, 0, -1)), [1] * 20
-
-In [8]: a12, f12 = list(range(12, 0, -1)), [1] * 12
-
-In [9]: %timeit sorted(sum((choices(a20, f20)[0], choices(a12, f12)[0], 4)) for _ in range(5000))[::-2]
-24.1 ms ± 203 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-```
-
-That’s pretty close, even when including the repeated ``#!python sum``.
-What about those frequencies?
-Do we need them?
-As is the case with most traditional dice, ours are all ``#!python 1``s in this example.
-Can we eliminate that redundancy?
-
-``` python
-In [10]: %timeit sorted(sum((choice(a20), choice(a12)), 4) for _ in range(5000))[::-2]
-6.34 ms ± 32.1 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-```
-
-That’s …
-
-![sssmokin’!](https://c.tenor.com/WubaoprHmdEAAAAM/smokin-the-mask.gif)
-
-Pooling histograms clearly adds some overhead over a targeted, native solution.
 What about rollers?
 
 ``` python
-In [11]: r = (5000@(R.select_from_values((slice(None, None, -2),), d20, d12, 4)))
+In [5]: r = (5000@(R.select_from_values((slice(None, None, -2),), d20, d12, 4)))
 
-In [12]: %timeit r.roll()
+In [6]: %timeit r.roll()
 257 ms ± 3.7 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 ```
 
-In this particular case, our roller takes about ten times longer than our histogram pool and about forty times longer than our bespoke one-liner.
-It is unsurprising that a roller is slower, since the math is deferred until [``R.roll``][dyce.r.R.roll] time.
-But there are also likely inefficiencies from generalization and tree creation.
-In other cases, rollers may be more competitive with their histogram pool analogies.
+In this particular case, our roller takes about ten times longer than our histogram pool.
+It is unsurprising that a simple roller is slower than a simple pool, at least in part because the math is deferred until [``R.roll``][dyce.r.R.roll] time.
+In more sophisticated cases, rollers may be more competitive with (or even surpass) their histogram or pool analogies, especially when initialization time is taken into account.
 
-``` python
-In [13]: p = 5000@P(((d20 + 4) * 9) ** d12)
-
-In [14]: %timeit p.roll()[-1]
-68.2 ms ± 188 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-
-In [15]: r = (5000@(((R.from_value(d20) + 4) * 9) ** R.from_value(d12))).select(-1)
-
-In [16]: %timeit r.roll()
-366 ms ± 1.45 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-```
-
-All that being said, for periodic rolls simulating handfuls (not thousands) of dice, such performance disparities probably won’t matter that much.
+All that being said, for periodic rolls simulating handfuls (not thousands) of operations or dice, such performance disparities probably won’t matter that much.
 Just use the primitives whose semantics work best for you.
 If ever performance becomes an issue, [let us know](contrib.md), and we can collaborate on how to improve it.
 

@@ -315,7 +315,7 @@ _GetItemT = Union[IndexT, slice]
 
 
 @runtime_checkable
-class _RationalConstructorT(
+class _RationalInitializerT(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):

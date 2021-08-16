@@ -27,7 +27,7 @@
 
 <picture>
   <source srcset="../classes_dyce_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roller class hierarchy](classes_dyce_light.svg)
+  ![Roller class hierarchy](img/classes_dyce_light.svg)
 </picture>
 
 ::: dyce.r

@@ -37,7 +37,7 @@ mkdocs --version
 mike --version
 git checkout -b "${VERS_PATCH}-release"
 perl -pi -e 's{^__version__([^#=]*)=\s*\(\s*0\s*,\s*0\s*,\s*0\s*,?\s*\)(\s*#.*)?$}{__version__\1= ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\2}g ;' "${VERS_PY}"
-perl -pi -e 's{\.github\.io/dyce/latest/([^)]*)\)}{\.github\.io/dyce/'"${VERS}"'/\1)}g ; s{/dyce/([^/]+)/latest/}{/dyce/\1/'"${TAG}"'/}g ; s{/pypi/([^/]+/)?'"${PKG}"'(\.svg)?\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'\2)}g' README.md docs/contrib.md
+perl -pi -e 's{\.github\.io/dyce/latest/([^)]*)\)}{\.github\.io/dyce/'"${VERS}"'/\1)}g ; s{/dyce/([^/]+)/latest/}{/dyce/\1/'"${TAG}"'/}g ; s{//pypi\.org/([^/]+/)?'"${PKG}"'/} {//pypi.org/\1'"${PKG}"'/'"${VERS_PATCH}"'/}g ; s{/pypi/([^/]+/)?'"${PKG}"'\.svg\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'.svg)}g' README.md docs/contrib.md
 
 problem_areas="$(
     grep -En '/latest\b' /dev/null README.md docs/*.md || [ "${?}" -eq 1 ]
