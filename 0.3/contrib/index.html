@@ -495,7 +495,7 @@ You have only but to try.</p>
 Please try to avoid duplicating issues.
 <a href="http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf">“Writing Effective Bug Reports” by Elisabeth Hendrickson</a> (PDF) may be helpful.</p>
 <h2 id="hacking-quick-start">Hacking quick-start</h2>
-<p>A <a href="https://github.com/posita/dyce/tree/master/helpers/venvsetup.sh">helper script</a> is provided for bootstrapping an isolated development environment.</p>
+<p>A <a href="https://github.com/posita/dyce/blob/v0.3.2/helpers/venvsetup.sh">helper script</a> is provided for bootstrapping an isolated development environment.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% <span class="o">[</span><span class="nv">PYTHON</span><span class="o">=</span>…/path/to/python<span class="o">]</span> helpers/venvsetup.sh
@@ -517,7 +517,7 @@ The above is essentially equivalent to the following (with some additional check
 </code></pre></div>
 </td></tr></table>
 <p>The <code>[dev]</code> variant includes additional dependencies necessary for development and testing.
-See the <code>extras_require</code> parameter in <a href="https://github.com/posita/dyce/tree/master/setup.py"><code>setup.py</code></a>.</p>
+See the <code>extras_require</code> parameter in <a href="https://github.com/posita/dyce/blob/v0.3.2/setup.py"><code>setup.py</code></a>.</p>
 <p>Unit tests are run with <a href="https://tox.readthedocs.org/">Tox</a> (but can also be run with <a href="https://docs.pytest.org/">pytest</a> directly, if installed).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -565,7 +565,7 @@ See the <code>extras_require</code> parameter in <a href="https://github.com/pos
 <h2 id="submission-guidelines">Submission guidelines</h2>
 <p>If you are willing and able, consider <a href="https://github.com/posita/dyce/pulls">submitting a pull request</a> with a fix.
 See <a href="https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">the docs</a> if you’re not already familiar with pull requests.
-<code>dyce</code> releases from <code>master</code> (although not always immediately), so a lot of <a href="http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it">these workflows</a> are helpful.
+<code>dyce</code> releases from <a href="https://github.com/posita/dyce/tree/master"><code>master</code></a> (although not always immediately), so a lot of <a href="http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it">these workflows</a> are helpful.
 There are only a few additional guidelines:</p>
 <ul>
 <li>If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the <a href="../license/"><code>LICENSE</code></a> file.</li>
@@ -589,7 +589,7 @@ There are only a few additional guidelines:</p>
 <p>Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in <a href="https://github.com/posita/dyce/tree/master/tests"><code>tests</code></a>.</p>
+  Unit tests live in <a href="https://github.com/posita/dyce/tree/v0.3.2/tests"><code>tests</code></a>.</p>
 </li>
 <li>
 <p>If you want feedback on a work-in-progress, consider <a href="https://github.blog/2011-03-23-mention-somebody-they-re-notified/">“mentioning” me</a> (<a href="https://github.com/posita"><strong>@posita</strong></a>), and describe specifically how I can help.
