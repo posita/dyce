@@ -15,7 +15,11 @@
 
 # ``dyce`` release notes
 
-## 0.3.1 (pending)
+## [0.3.2](https://github.com/posita/dyce/releases/tag/v0.3.2)
+
+* Emergency release to ~~cover up~~ _address_ [this ~~embarrassment~~ _typo_](https://github.com/borntyping/python-dice/issues/16#issuecomment-900249398). 😬😅
+
+## [0.3.1](https://github.com/posita/dyce/releases/tag/v0.3.1)
 
 * Adds these release notes.
 * Boosts ``#!python isinstance`` performance with ``#!python dyce``’s proprietary numeric ``#!python Protocol``s.

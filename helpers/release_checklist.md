@@ -32,10 +32,10 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``mike serve`` and spot check docs (some images with external references might be missing)
 
-* [ ] ``git push [--force] origin vX.Y.Z gh-pages``
+* [ ] ``git push [--force] origin latest vX.Y.Z gh-pages``
 
 * [ ] ``twine upload dist/*-X.Y.Z[-.]*``
 
 * [ ] ``git checkout master``
 
-* [ ] ``git branch --delete [--force] X.Y.Z-release``
+* [ ] ``git branch --delete [--force] X.Y.Z-release gh-pages``

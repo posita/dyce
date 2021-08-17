@@ -17,13 +17,13 @@ Please see the accompanying ``LICENSE`` file for rights and restrictions governi
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
-[![master Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![master Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
-[![master Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
+[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.python.org/pypi/dycelib)
 
-<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://github.com/posita/dyce/raw/master/docs/dyce.svg" alt="dyce logo">
+<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://github.com/posita/dyce/raw/latest/docs/dyce.svg" alt="dyce logo">
 
 Now you’re playing with…
 
@@ -47,7 +47,7 @@ Non-experimental features should be considered stable (but an unquenchable thirs
 See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
-## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/master/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
+## Customers [![``dyce``-powered!](https://github.com/posita/dyce/raw/latest/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
 
 * This could be _you_! 👋
 
@@ -178,7 +178,7 @@ var |    1.97
 ```
 
 <!-- Should match any title of the corresponding plot title -->
-![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/master/docs/plot_2d6_lo_hi_gh.png)
+![Plot: Taking the lowest or highest die of 2d6](https://github.com/posita/dyce/raw/latest/docs/plot_2d6_lo_hi_gh.png)
 
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
 
@@ -244,7 +244,7 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
     I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies.
 
-| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clemens et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
+| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Latest release                             | 2021	| N/A		| 2021	| Unknown	| 2021		| 2016		| 2021		| 2021		| 2009		|
 | Actively maintained and documented         | ✅	| ⚠️[^4]	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|

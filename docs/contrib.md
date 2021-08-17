@@ -26,7 +26,7 @@ Please try to avoid duplicating issues.
 
 ## Hacking quick-start
 
-A [helper script](https://github.com/posita/dyce/tree/master/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
+A [helper script](https://github.com/posita/dyce/blob/latest/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
 
 ```sh
 % [PYTHON=…/path/to/python] helpers/venvsetup.sh
@@ -46,7 +46,7 @@ The above is essentially equivalent to the following (with some additional check
 ```
 
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
-See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/tree/master/setup.py).
+See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/blob/latest/setup.py).
 
 Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed).
 
@@ -86,7 +86,7 @@ A [``virtualenvwrapper``](https://pypi.org/project/virtualenvwrapper/)-based alt
 
 If you are willing and able, consider [submitting a pull request](https://github.com/posita/dyce/pulls) with a fix.
 See [the docs](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) if you’re not already familiar with pull requests.
-``dyce`` releases from ``master`` (although not always immediately), so a lot of [these workflows](http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it) are helpful.
+``dyce`` releases from [``master``](https://github.com/posita/dyce/tree/master) (although not always immediately), so a lot of [these workflows](http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it) are helpful.
 There are only a few additional guidelines:
 
 * If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [``LICENSE``](license.md) file.
@@ -106,7 +106,7 @@ There are only a few additional guidelines:
 * Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/master/tests).
+  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/latest/tests).
 
 * If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
   Consider prefixing your pull request’s title with something like, “``NEED FEEDBACK – ``”.
