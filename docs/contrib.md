@@ -26,7 +26,7 @@ Please try to avoid duplicating issues.
 
 ## Hacking quick-start
 
-A [helper script](https://github.com/posita/dyce/blob/latest/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
+A [helper script](https://github.com/posita/dyce/blob/v0.3.2/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
 
 ```sh
 % [PYTHON=…/path/to/python] helpers/venvsetup.sh
@@ -46,7 +46,7 @@ The above is essentially equivalent to the following (with some additional check
 ```
 
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
-See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/blob/latest/setup.py).
+See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/blob/v0.3.2/setup.py).
 
 Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed).
 
@@ -106,7 +106,7 @@ There are only a few additional guidelines:
 * Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/latest/tests).
+  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/v0.3.2/tests).
 
 * If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
   Consider prefixing your pull request’s title with something like, “``NEED FEEDBACK – ``”.
