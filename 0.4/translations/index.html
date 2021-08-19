@@ -1,0 +1,1417 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for dice-based probabilities">
+      
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+        <link rel="canonical" href="https://posita.github.io/dyce/0.4/translations/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+    
+    
+      
+        <title>Applications and translations - dyce</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Applications and translations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../countin/" class="md-nav__link">
+        Countin’ with histograms and pools
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rollin/" class="md-nav__link">
+        Rollin’ with rollers and rolls
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Applications and translations
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Applications and translations
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-nav__link">
+    Modeling “The Probability of 4d6, Drop the Lowest, Reroll 1s”
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translating-one-example-from-markbrockettrobsonpython_dice" class="md-nav__link">
+    Translating one example from markbrockettrobson/python_dice
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#more-translations-from-markbrockettrobsonpython_dice" class="md-nav__link">
+    More translations from markbrockettrobson/python_dice
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translations-from-lordsembordndice" class="md-nav__link">
+    Translations from LordSembor/DnDice
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-roll-and-keep-in-anydice" class="md-nav__link">
+    Translation of the accepted answer to “Roll and Keep in Anydice?”
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-how-do-i-count-the-number-of-duplicates-in-anydice" class="md-nav__link">
+    Translation of the accepted answer to “How do I count the number of duplicates in anydice?”
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-how-do-i-implement-this-specialized-roll-and-keep-mechanic-in-anydice" class="md-nav__link">
+    Translation of “How do I implement this specialized roll-and-keep mechanic in AnyDice?”
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-modelling-sic-opposed-dice-pools-with-a-swap" class="md-nav__link">
+    Translation of the accepted answer to “Modelling [sic] opposed dice pools with a swap”
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" data-md-state="indeterminate" type="checkbox" id="__nav_5" checked>
+      
+      <label class="md-nav__link" for="__nav_5">
+        API
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.h/" class="md-nav__link">
+        <tt>dyce.h</tt>
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.r/" class="md-nav__link">
+        <tt>dyce.r</tt>
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        <tt>dyce.viz</tt>
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        Release notes
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/posita/dyce/edit/master/docs/translations.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Applications and translations</h1>
+                
+                <!--- -*- encoding: utf-8 -*-
+  Copyright and other protections apply. Please see the accompanying LICENSE file for
+  rights and restrictions governing use of this software. All rights not expressly
+  waived or licensed are reserved. If that file is missing or appears to be modified
+  from its original, then please contact the author before viewing or using this
+  software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+-->
+
+<p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
+If you have exposure to <a href="">another tool</a>, they may also help with transition.</p>
+<h2 id="modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s">Modeling “<a href="http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/">The Probability of 4d6, Drop the Lowest, Reroll 1s</a>”</h2>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res1</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p_4d6</span> <span class="o">=</span> <span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res2</span> <span class="o">=</span> <span class="n">p_4d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>  <span class="c1"># discard the lowest die (index 0)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_reroll_first_one</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p_4d6_reroll_first_one</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="n">d6_reroll_first_one</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res3</span> <span class="o">=</span> <span class="n">p_4d6_reroll_first_one</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>  <span class="c1"># discard the lowest</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p_4d6_reroll_all_ones</span> <span class="o">=</span> <span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res4</span> <span class="o">=</span> <span class="n">p_4d6_reroll_all_ones</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>  <span class="c1"># discard the lowest</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res5</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">6</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res6</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+</code></pre></div>
+</td></tr></table>
+<p>Visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res4</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;3d6&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res1</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;4d6 - discard lowest&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res2</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;^&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;4d6 - re-roll first 1, discard lowest&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res3</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;4d6 - re-roll all 1s (i.e., 4d5), discard lowest&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res5</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;2d6 + 6&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">res6</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;4d4 + 2&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Comparing various take-three-of-4d6 methods&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../img/plot_4d6_variants_light.png" />
+</picture></p>
+<h2 id="translating-one-example-from-markbrockettrobsonpython_dice">Translating one example from <a href="https://github.com/markbrockettrobson/python_dice#usage"><code>markbrockettrobson/python_dice</code></a></h2>
+<p>Source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1"># …</span>
+<span class="n">program</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">&quot;VAR save_roll = d20&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;VAR burning_arch_damage = 10d6 + 10&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;VAR pass_save = ( save_roll &gt;= 10 ) &quot;</span><span class="p">,</span>
+  <span class="s2">&quot;VAR damage_half_on_save = burning_arch_damage // (pass_save + 1)&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;damage_half_on_save&quot;</span>
+<span class="p">]</span>
+<span class="c1"># …</span>
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">save_roll</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">burning_arch_damage</span> <span class="o">=</span> <span class="mi">10</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pass_save</span> <span class="o">=</span> <span class="n">save_roll</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">damage_half_on_save</span> <span class="o">=</span> <span class="n">burning_arch_damage</span> <span class="o">//</span> <span class="p">(</span><span class="n">pass_save</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="n">damage_half_on_save</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Expected outcomes for attack with saving throw for half damage&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Expected outcomes for attack with saving throw for half damage" src="../img/plot_burning_arch_light.png" />
+</picture></p>
+<p>An alternative using the <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code> method</a>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">save_roll</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span>
+<span class="o">...</span>     <span class="n">burning_arch_damage</span> <span class="o">//</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">&gt;=</span> <span class="mi">10</span>
+<span class="o">...</span>     <span class="k">else</span> <span class="n">burning_arch_damage</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">==</span> <span class="n">damage_half_on_save</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="more-translations-from-markbrockettrobsonpython_dice">More translations from <a href="https://github.com/markbrockettrobson/python_dice#usage"><code>markbrockettrobson/python_dice</code></a></h2>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># VAR name = 1 + 2d3 - 3 * 4d2 // 5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">name</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span><span class="nd">@H</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">//</span> <span class="mi">5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="mf">3.47</span><span class="o">%</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mf">13.89</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">25.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">29.17</span><span class="o">%</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">19.44</span><span class="o">%</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span>  <span class="mf">8.33</span><span class="o">%</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span>  <span class="mf">0.69</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># VAR out = 3 * ( 1 + 1d4 )</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">out</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">18.00</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span>  <span class="mf">6.25</span><span class="o">%</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">12.50</span><span class="o">%</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mf">18.75</span><span class="o">%</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="mf">25.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mf">18.75</span><span class="o">%</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mf">12.50</span><span class="o">%</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span>  <span class="mf">6.25</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># VAR g = (1d4 &gt;= 2) AND !(1d20 == 2)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="mf">28.75</span><span class="o">%</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mf">71.25</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># VAR h = (1d4 &gt;= 2) OR !(1d20 == 2)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span>  <span class="mf">1.25</span><span class="o">%</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mf">98.75</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># VAR abs = ABS( 1d6 - 1d6 )</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">abs_</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">abs_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">1.94</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mf">16.67</span><span class="o">%</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">27.78</span><span class="o">%</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">22.22</span><span class="o">%</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">16.67</span><span class="o">%</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">11.11</span><span class="o">%</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span>  <span class="mf">5.56</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># MAX(4d7, 2d10)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="nd">@H</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">16.60</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span>  <span class="mf">0.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span>  <span class="mf">0.02</span><span class="o">%</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span>  <span class="mf">0.07</span><span class="o">%</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span>  <span class="mf">0.21</span><span class="o">%</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">25</span><span class="p">:</span>  <span class="mf">0.83</span><span class="o">%</span><span class="p">,</span> <span class="mi">26</span><span class="p">:</span>  <span class="mf">0.42</span><span class="o">%</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span>  <span class="mf">0.17</span><span class="o">%</span><span class="p">,</span> <span class="mi">28</span><span class="p">:</span>  <span class="mf">0.04</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># MIN(50, d%)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">((</span><span class="mi">50</span><span class="p">,)),</span> <span class="n">P</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">37.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">47</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">49</span><span class="p">:</span>  <span class="mf">1.00</span><span class="o">%</span><span class="p">,</span> <span class="mi">50</span><span class="p">:</span> <span class="mf">51.00</span><span class="o">%</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="translations-from-lordsembordndice">Translations from <a href="https://github.com/LordSembor/DnDice#examples"><code>LordSembor/DnDice</code></a></h2>
+<p>Example 1 source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">DnDice</span> <span class="kn">import</span> <span class="n">d</span><span class="p">,</span> <span class="n">gwf</span>
+<span class="n">single_attack</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="c1"># …</span>
+<span class="n">great_weapon_fighting</span> <span class="o">=</span> <span class="n">gwf</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="c1"># …</span>
+<span class="c1"># comparison of the probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">single_attack</span><span class="o">.</span><span class="n">expectancies</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">great_weapon_fighting</span><span class="o">.</span><span class="n">expectancies</span><span class="p">())</span>
+<span class="c1"># [ 0.03,  0.06, 0.08, 0.11, 0.14, 0.17, 0.14, ...] (single attack)</span>
+<span class="c1"># [0.003, 0.006, 0.03, 0.05, 0.10, 0.15, 0.17, ...] (gwf attack)</span>
+<span class="c1"># …</span>
+</code></pre></div>
+</td></tr></table>
+<p>Example 1 translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">single_attack</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">gwf</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">great_weapon_fighting</span> <span class="o">=</span> <span class="mi">2</span><span class="o">@</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">gwf</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># reroll either die if it is a one or two</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">single_attack</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span>  <span class="mf">2.78</span><span class="o">%</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span>  <span class="mf">5.56</span><span class="o">%</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span>  <span class="mf">8.33</span><span class="o">%</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">11.11</span><span class="o">%</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mf">13.89</span><span class="o">%</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">16.67</span><span class="o">%</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mf">13.89</span><span class="o">%</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">great_weapon_fighting</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span>  <span class="mf">0.31</span><span class="o">%</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span>  <span class="mf">0.62</span><span class="o">%</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span>  <span class="mf">2.78</span><span class="o">%</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span>  <span class="mf">4.94</span><span class="o">%</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span>  <span class="mf">9.88</span><span class="o">%</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">14.81</span><span class="o">%</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mf">17.28</span><span class="o">%</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Example 1 visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.viz</span> <span class="kn">import</span> <span class="n">display_burst</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_ax</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">burst_ax</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sa_label</span> <span class="o">=</span> <span class="s2">&quot;Normal attack&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>     <span class="o">*</span><span class="n">single_attack</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>     <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:green&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="n">sa_label</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">gwf_label</span> <span class="o">=</span> <span class="s2">&quot;“Great Weapon Fighting”&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>     <span class="o">*</span><span class="n">great_weapon_fighting</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>     <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="n">gwf_label</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Comparing a normal attack to an enhanced one&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">display_burst</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">burst_ax</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">h_inner</span><span class="o">=</span><span class="n">great_weapon_fighting</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">outer</span><span class="o">=</span><span class="n">single_attack</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sa_label</span><span class="si">}</span><span class="s2"> vs. </span><span class="si">{</span><span class="n">gwf_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">inner_color</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">outer_color</span><span class="o">=</span><span class="s2">&quot;RdYlGn_r&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../img/plot_great_weapon_fighting_light.png" />
+</picture></p>
+<p>Example 2 source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">DnDice</span> <span class="kn">import</span> <span class="n">d</span><span class="p">,</span> <span class="n">advantage</span><span class="p">,</span> <span class="n">plot</span>
+
+<span class="n">normal_hit</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">critical_hit</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">d</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">advantage</span><span class="p">():</span>
+  <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">critical_hit</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">value</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">normal_hit</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">d</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">normalizeExpectancies</span><span class="p">()</span>
+<span class="c1"># …</span>
+</code></pre></div>
+</td></tr></table>
+<p>Example 2 translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">normal_hit</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">critical_hit</span> <span class="o">=</span> <span class="mi">3</span><span class="nd">@H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">advantage</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">crit</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span> <span class="k">return</span> <span class="n">critical_hit</span>
+<span class="o">...</span>   <span class="k">elif</span> <span class="n">outcome</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">:</span> <span class="k">return</span> <span class="n">normal_hit</span>
+<span class="o">...</span>   <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">advantage_weighted</span> <span class="o">=</span> <span class="n">advantage</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">crit</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p>Example 2 visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">normal_hit</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Normal hit&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">critical_hit</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Critical hit&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>   <span class="o">*</span><span class="n">advantage_weighted</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Advantage-weighted&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Modeling an advantage-weighted attack with critical hits&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Modeling an advantage-weighted attack with critical hits" src="../img/plot_advantage_light.png" />
+</picture></p>
+<h2 id="translation-of-the-accepted-answer-to-roll-and-keep-in-anydice">Translation of the accepted answer to “<a href="https://rpg.stackexchange.com/a/166637">Roll and Keep in Anydice?</a>”</h2>
+<p>Source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>output [highest 3 of 10d [explode d10]] named &quot;10k3&quot;
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</code></pre></div>
+</td></tr></table>
+<p>Visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="o">...</span>   <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>     <span class="o">*</span><span class="n">res</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">depth</span><span class="si">}</span><span class="s2"> rerolls&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Modeling taking the three highest of ten exploding d10s&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Modeling taking the three highest of ten exploding d10s" src="../img/plot_d10_explode_light.png" />
+</picture></p>
+<h2 id="translation-of-the-accepted-answer-to-how-do-i-count-the-number-of-duplicates-in-anydice">Translation of the accepted answer to “<a href="https://rpg.stackexchange.com/a/111421">How do I count the number of duplicates in anydice?</a>”</h2>
+<p>Source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>function: dupes in DICE:s {
+  D: 0
+  loop X over {2..#DICE} {
+    if ((X-1)@DICE = X@DICE) { D: D + 1}
+  }
+  result: D
+}
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">dupes</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">roll</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">():</span>
+<span class="o">...</span>     <span class="n">dupes</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="o">...</span>     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roll</span><span class="p">)):</span>
+<span class="o">...</span>       <span class="c1"># Outcomes are ordered, so we only have to look at one neighbor</span>
+<span class="o">...</span>       <span class="k">if</span> <span class="n">roll</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">roll</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+<span class="o">...</span>         <span class="n">dupes</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="o">...</span>     <span class="k">yield</span> <span class="n">dupes</span><span class="p">,</span> <span class="n">count</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">dupes</span><span class="p">(</span><span class="mi">8</span><span class="nd">@P</span><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>
+</code></pre></div>
+</td></tr></table>
+<p>Visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.viz</span> <span class="kn">import</span> <span class="n">plot_burst</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plot_burst</span><span class="p">(</span>
+<span class="o">...</span>   <span class="n">res</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">desc</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Chances of rolling $n$ duplicates in 8d10&quot;</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Chances of rolling &lt;i&gt;n&lt;/i&gt; duplicates in 8d10" src="../img/plot_dupes_light.png" />
+</picture></p>
+<h2 id="translation-of-how-do-i-implement-this-specialized-roll-and-keep-mechanic-in-anydice">Translation of “<a href="https://rpg.stackexchange.com/a/190806">How do I implement this specialized roll-and-keep mechanic in AnyDice?</a>”</h2>
+<p>Source:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>function: N:n of SIZE:n keep K:n extras add {
+    result: [helper NdSIZE SIZE K]
+}
+
+function: helper ROLL:s SIZE:n K:n {
+    COUNT: [count SIZE in ROLL]
+    if COUNT &gt; K { result: K*SIZE - K + COUNT }
+    result: {1..K}@ROLL
+}
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">is_homogeneous</span>
+<span class="o">...</span>   <span class="n">max_d</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="n">roll</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">():</span>
+<span class="o">...</span>     <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">roll</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:])</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">roll</span><span class="p">[:</span><span class="o">-</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="n">max_d</span><span class="p">)</span>
+<span class="o">...</span>     <span class="k">yield</span> <span class="n">total</span><span class="p">,</span> <span class="n">count</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="n">roll_and_keep</span><span class="p">(</span><span class="mi">6</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">207</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">5535</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">2500</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">375</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Visualization:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">res_roll_and_keep</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+<span class="o">...</span>   <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>     <span class="o">*</span><span class="n">res_roll_and_keep</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> add +1&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">res_normal</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="o">...</span>   <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<span class="o">...</span>     <span class="o">*</span><span class="n">res_normal</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(),</span>
+<span class="o">...</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="o">...</span>   <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Roll-and-keep mechanic comparison&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
+</td></tr></table>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source srcset="../img/plot_roll_and_keep_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Roll-and-keep mechanic comparison" src="../img/plot_roll_and_keep_light.png" />
+</picture></p>
+<h2 id="translation-of-the-accepted-answer-to-modelling-sic-opposed-dice-pools-with-a-swap">Translation of the accepted answer to “<a href="https://rpg.stackexchange.com/a/112951">Modelling [sic] opposed dice pools with a swap</a>”</h2>
+<p>Source of basic <code>brawl</code>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>function: brawl A:s vs B:s {
+  SA: A &gt;= 1@B
+  SB: B &gt;= 1@A
+  if SA-SB=0 {
+    result:(A &gt; B) - (A &lt; B)
+  }
+  result:SA-SB
+}
+output [brawl 3d6 vs 3d6] named &quot;A vs B Damage&quot;
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">brawl</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="p">(</span><span class="n">roll_a</span><span class="p">,</span> <span class="n">count_a</span><span class="p">),</span> <span class="p">(</span><span class="n">roll_b</span><span class="p">,</span> <span class="n">count_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
+<span class="o">...</span>       <span class="n">a</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">(),</span>
+<span class="o">...</span>       <span class="n">b</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="p">):</span>
+<span class="o">...</span>     <span class="n">a_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_a</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">b_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_b</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>     <span class="k">yield</span> <span class="n">a_successes</span> <span class="o">-</span> <span class="n">b_successes</span><span class="p">,</span> <span class="n">count_a</span> <span class="o">*</span> <span class="n">count_b</span>
+</code></pre></div>
+</td></tr></table>
+<p>Rudimentary visualization using built-in methods:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.00</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.73</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">2.99</span>
+ <span class="o">-</span><span class="mi">3</span> <span class="o">|</span>   <span class="mf">7.86</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="o">-</span><span class="mi">2</span> <span class="o">|</span>  <span class="mf">15.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">0</span> <span class="o">|</span>  <span class="mf">19.96</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">15.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">7.86</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+</code></pre></div>
+</td></tr></table>
+<p>Source of <code>brawl</code> with an optional dice swap:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>function: set element I:n in SEQ:s to N:n {
+  NEW: {}
+  loop J over {1 .. #SEQ} {
+    if I = J { NEW: {NEW, N} }
+    else { NEW: {NEW, J@SEQ} }
+  }
+  result: NEW
+}
+function: brawl A:s vs B:s with optional swap {
+  if #A@A &gt;= 1@B {
+    result: [brawl A vs B]
+  }
+  AX: [sort [set element #A in A to 1@B]]
+  BX: [sort [set element 1 in B to #A@A]]
+  result: [brawl AX vs BX]
+}
+output [brawl 3d6 vs 3d6 with optional swap] named &quot;A vs B Damage&quot;
+</code></pre></div>
+</td></tr></table>
+<p>Translation:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">brawl_w_optional_swap</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">for</span> <span class="p">(</span><span class="n">roll_a</span><span class="p">,</span> <span class="n">count_a</span><span class="p">),</span> <span class="p">(</span><span class="n">roll_b</span><span class="p">,</span> <span class="n">count_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
+<span class="o">...</span>       <span class="n">a</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">(),</span>
+<span class="o">...</span>       <span class="n">b</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">(),</span>
+<span class="o">...</span>   <span class="p">):</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">roll_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+<span class="o">...</span>       <span class="n">roll_a</span><span class="p">,</span> <span class="n">roll_b</span> <span class="o">=</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">roll_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:],</span> <span class="n">roll_a</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">roll_b</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="o">...</span>     <span class="n">roll_a</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">roll_a</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">...</span>     <span class="n">roll_b</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">roll_b</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">...</span>     <span class="n">a_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_a</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">b_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_b</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">a_successes</span> <span class="o">-</span> <span class="n">b_successes</span> <span class="ow">or</span> <span class="p">(</span><span class="n">roll_a</span> <span class="o">&gt;</span> <span class="n">roll_b</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">roll_a</span> <span class="o">&lt;</span> <span class="n">roll_b</span><span class="p">)</span>
+<span class="o">...</span>     <span class="k">yield</span> <span class="n">result</span><span class="p">,</span> <span class="n">count_a</span> <span class="o">*</span> <span class="n">count_b</span>
+</code></pre></div>
+</td></tr></table>
+<p>Rudimentary visualization using built-in methods:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.36</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">0.88</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">0.77</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>   <span class="mf">1.42</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">0</span> <span class="o">|</span>   <span class="mf">0.59</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.65</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">23.19</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">58.15</span><span class="o">%</span> <span class="o">|</span><span class="c1">#############################</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">(</span><span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.64</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.28</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.64</span>
+ <span class="o">-</span><span class="mi">2</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>   <span class="mf">2.94</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">0</span> <span class="o">|</span>   <span class="mf">0.31</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">18.16</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">19.97</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">25.19</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">33.37</span><span class="o">%</span> <span class="o">|</span><span class="c1">################</span>
+</code></pre></div>
+</td></tr></table>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../rollin/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Rollin’ with rollers and rolls" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Rollin’ with rollers and rolls
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../dyce/" class="md-footer__link md-footer__link--next" aria-label="Next: &lt;tt&gt;dyce&lt;/tt&gt;" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <tt>dyce</tt>
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      
+        <script src="../js/site.js"></script>
+      
+        <script src="../js/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
