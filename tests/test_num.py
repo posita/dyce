@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import math
 import operator
-import sys
 from decimal import Decimal
 from fractions import Fraction
 from typing import Tuple
@@ -51,12 +50,8 @@ def test_beartype_validators() -> None:
     roar = pytest.importorskip("beartype.roar", reason="requires beartype")
     from beartype.vale import Is
 
-    from dyce.bt import __version_info__ as bt_version_info
     from dyce.bt import beartype
-    from dyce.symmetries import Annotated
-
-    if sys.version_info < (3, 9) and not bt_version_info >= (0, 8):
-        pytest.skip("requires beartype>=0.8 with python<3.9")
+    from dyce.types import Annotated
 
     NonZero = Annotated[int, Is[lambda x: x != 0]]
 
@@ -156,7 +151,7 @@ def test_numberwang() -> None:
     ):
         assert binop(Numberwang(-273), Numberwang(42)) == binop(
             -273, 42
-        ), "op: {}".format(binop)
+        ), f"op: {binop}"
 
     for unop in (
         complex,
@@ -172,7 +167,7 @@ def test_numberwang() -> None:
         operator.__neg__,
         operator.__pos__,
     ):
-        assert unop(Numberwang(-273)) == unop(-273), "op: {}".format(unop)  # type: ignore
+        assert unop(Numberwang(-273)) == unop(-273), f"op: {unop}"  # type: ignore
 
 
 def test_wangernum() -> None:
@@ -193,7 +188,7 @@ def test_wangernum() -> None:
     ):
         assert binop(Wangernumb(-273.15), Wangernumb(1.618)) == binop(
             -273.15, 1.618
-        ), "op: {}".format(binop)
+        ), f"op: {binop}"
 
     for unop in (
         complex,
@@ -207,4 +202,4 @@ def test_wangernum() -> None:
         operator.__neg__,
         operator.__pos__,
     ):
-        assert unop(Wangernumb(-273.15)) == unop(-273.15), "op: {}".format(unop)  # type: ignore
+        assert unop(Wangernumb(-273.15)) == unop(-273.15), f"op: {unop}"  # type: ignore

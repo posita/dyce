@@ -10,7 +10,8 @@
 from __future__ import annotations
 
 import os
-from typing import Callable, Tuple, TypeVar, cast
+import warnings
+from typing import Callable, TypeVar, cast
 
 __all__ = ("beartype",)
 
@@ -28,32 +29,37 @@ def identity(__: _T) -> _T:
     return __
 
 
+# ---- Initialization ------------------------------------------------------------------
+
+
 beartype: Callable[[_T], _T] = identity
-__version_info__: Tuple[int, ...] = (0,)
+
 _DYCE_BEARTYPE = os.environ.get("DYCE_BEARTYPE", "on")
-_beartype_on: bool
 _truthy = ("on", "t", "true", "yes")
 _falsy = ("off", "f", "false", "no")
+_use_beartype_if_available: bool
 
 try:
-    _beartype_on = bool(int(_DYCE_BEARTYPE))
+    _use_beartype_if_available = bool(int(_DYCE_BEARTYPE))
 except ValueError:
     if _DYCE_BEARTYPE.lower() in _truthy:
-        _beartype_on = True
+        _use_beartype_if_available = True
     elif _DYCE_BEARTYPE.lower() in _falsy:
-        _beartype_on = False
+        _use_beartype_if_available = False
     else:
-        _booleany = _truthy + _falsy
         raise EnvironmentError(
-            f"unrecognized value ({_DYCE_BEARTYPE}) for DYCE_BEARTYPE environment variable (should be one of an integer or {', '.join(_booleany)})"
+            f"""unrecognized value ({_DYCE_BEARTYPE}) for DYCE_BEARTYPE environment variable (should be "{'", "'.join(_truthy + _falsy)}", or an integer)"""
         )
 
-if _beartype_on:
+if _use_beartype_if_available:
     try:
-        from beartype import __version_info__ as _version_info
-        from beartype import beartype as _beartype
+        import beartype as _beartype
 
-        __version_info__ = _version_info
-        beartype = cast(Callable[[_T], _T], _beartype)
+        if _beartype.__version_info__ >= (0, 8):
+            beartype = cast(Callable[[_T], _T], _beartype.beartype)
+        else:
+            warnings.warn(
+                f"beartype>=0.8 required, but beartype=={_beartype.__version__} found; disabled"
+            )
     except ImportError:
         pass

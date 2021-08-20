@@ -15,7 +15,6 @@ import random
 import pytest
 
 from dyce import H, viz
-from dyce.r import ValueRoller
 
 __all__ = ()
 
@@ -122,31 +121,4 @@ def test_labels_cumulative() -> None:
         ("10 8.33%; ≥91.67%; ≤16.67%", fractions.Fraction(1, 12)),
         ("11 5.56%; ≥97.22%; ≤8.33%", fractions.Fraction(1, 18)),
         ("12 2.78%; ≥100.00%; ≤2.78%", fractions.Fraction(1, 36)),
-    )
-
-
-def test_walk_r() -> None:
-    graphviz = pytest.importorskip("graphviz", reason="requires graphviz")
-    g = graphviz.Digraph()
-    viz.walk_r(g, ValueRoller(1).roll())
-    assert (
-        g.source.replace("\t", "  ").strip()
-        == r"""
-digraph {
-  "Roll-1" -> "ValueRoller-2" [label=r]
-  "Roll-1" -> "RollOutcome-3" [label="[0]"]
-  subgraph cluster_rollers {
-    label=<<i>Roller Tree</i>> style=dotted
-    "ValueRoller-2" [label=<<b>ValueRoller</b><br/><font face="Courier New">value=1</font>>]
-  }
-  subgraph cluster_rolls {
-    label=<<i>Roll Tree</i>> style=dotted
-    "Roll-1" [label=<<b>Roll</b>>]
-  }
-  subgraph cluster_roll_outcomes {
-    label=<<i>Roll Outcomes</i>> style=dotted
-    "RollOutcome-3" [label=<<b>RollOutcome</b><br/><font face="Courier New">value=1</font>>]
-  }
-}
-        """.strip()
     )

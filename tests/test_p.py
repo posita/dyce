@@ -19,7 +19,6 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dyce import H, OutcomeT, P
-from dyce.bt import __version_info__ as bt_version_info
 from dyce.bt import beartype
 from dyce.p import (
     _analyze_selection,
@@ -166,7 +165,11 @@ class TestP:
         assert p_3d4n_3d8[2:4] == P(d4n, d8)
 
     def test_getitem_wrong_type(self) -> None:
-        if bt_version_info != (0,):
+        try:
+            import beartype  # noqa: F401
+        except ImportError:
+            pass
+        else:
             pytest.skip("requires beartype not be installed")
 
         p_d6 = P(6)

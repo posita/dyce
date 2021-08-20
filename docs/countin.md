@@ -345,7 +345,7 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
 >>> for n in range(6, 0, -1):
 ...   number_of_evens_in_nd6 = n@d6_even
 ...   all_even = number_of_evens_in_nd6.eq(n)
-...   print("{: >2}d6: {: >6.2%}".format(n, all_even[1] / sum(all_even.counts())))
+...   print(f"{n: >2}d6: {all_even[1] / sum(all_even.counts()): >6.2%}")
  6d6:  1.56%
  5d6:  3.12%
  4d6:  6.25%
@@ -363,7 +363,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 ...   d6e_ge_9 = exploding_d6.ge(9)
 ...   number_of_nines_or_higher_in_nd6e = n@d6e_ge_9
 ...   at_least_one_9 = number_of_nines_or_higher_in_nd6e.ge(1)
-...   print("{: >2}d6-exploding: {: >6.2%}".format(n, at_least_one_9[1] / sum(at_least_one_9.counts())))
+...   print(f"{n: >2}d6-exploding: {at_least_one_9[1] / sum(at_least_one_9.counts()): >6.2%}")
 10d6-exploding: 69.21%
  9d6-exploding: 65.36%
  8d6-exploding: 61.03%
@@ -494,10 +494,10 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...   row_names: List[str] = []
 ...   rows: List[Tuple[float, ...]] = []
 ...   for us in range(them, them + num_rows):
-...     row_names.append("{}d6 …".format(us))
+...     row_names.append(f"{us}d6 …")
 ...     rows.append((us@H(6)).vs(them@H(6)).distribution_xy()[-1])
 ...   _ = ax.imshow(rows)  # doctest: +SKIP
-...   ax.set_title("… vs {}d6".format(them))  # doctest: +SKIP
+...   ax.set_title(f"… vs {them}d6")  # doctest: +SKIP
 ...   ax.set_xticks(col_ticks)  # doctest: +SKIP
 ...   ax.set_xticklabels(col_names, rotation=90)  # doctest: +SKIP
 ...   ax.set_yticks(list(range(len(rows))))  # doctest: +SKIP
@@ -506,7 +506,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...     for x in range(len(col_names)):
 ...       _ = ax.text(
 ...         x, y,
-...         "{:.0%}".format(rows[y][x]),
+...         f"{rows[y][x]:.0%}",
 ...         ha="center", va="center",color="w",
 ...       )  # doctest: +SKIP
 >>> fig.tight_layout()  # doctest: +SKIP
@@ -533,7 +533,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless g
 ...     us_vs_them_func: Callable[[int, int], H],
 ... ) -> H:
 ...   if us < 0 or them < 0:
-...     raise ValueError("cannot have negative numbers (us: {}, them: {})".format(us, them))
+...     raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
 ...   if us == 0 and them == 0:
 ...     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
 ...   already_solved: Dict[Tuple[int, int], H] = {}
@@ -603,7 +603,7 @@ Our “driver” takes three arguments:
 
 ``` python linenums="6"
   if us < 0 or them < 0:
-    raise ValueError("cannot have negative numbers (us: {}, them: {})".format(us, them))
+    raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
   if us == 0 and them == 0:
     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
   already_solved: Dict[Tuple[int, int], H] = {}

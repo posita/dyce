@@ -9,11 +9,10 @@
 
 from __future__ import annotations
 
-from graph import COLORS, digraph
+from graph import COLORS, digraph, graphviz_walk
 
 from dyce import H, P
 from dyce.r import SelectionRoller, ValueRoller
-from dyce.viz import walk_r
 from tests.patches import patch_roll
 
 
@@ -27,13 +26,13 @@ def do_it(style: str):
         3 @ P(d6),
         annotation={
             "node": dict(
-                color=COLORS[style][1],
-                fontcolor=COLORS[style][1],
+                color=COLORS[style]["blue"],
+                fontcolor=COLORS[style]["blue"],
                 style="dashed",
             ),
             "edge": dict(
-                color=COLORS[style][1],
-                fontcolor=COLORS[style][1],
+                color=COLORS[style]["blue"],
+                fontcolor=COLORS[style]["blue"],
                 style="dashed",
             ),
         },
@@ -42,13 +41,13 @@ def do_it(style: str):
         d8,
         annotation={
             "node": dict(
-                color=COLORS[style][2],
-                fontcolor=COLORS[style][2],
+                color=COLORS[style]["red"],
+                fontcolor=COLORS[style]["red"],
                 style="dashed",
             ),
             "edge": dict(
-                color=COLORS[style][2],
-                fontcolor=COLORS[style][2],
+                color=COLORS[style]["red"],
+                fontcolor=COLORS[style]["red"],
                 style="dashed",
             ),
         },
@@ -57,6 +56,6 @@ def do_it(style: str):
         (slice(1, None),),
         (r_3d6, r_d8),
     )
-    walk_r(g, r_best_3_of_3d6_d8.roll())
+    graphviz_walk(g, r_best_3_of_3d6_d8.roll())
 
     return g

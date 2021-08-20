@@ -47,3 +47,4 @@
         - "SelectionRoller"
         - "Roll"
         - "RollOutcome"
+        - "walk"

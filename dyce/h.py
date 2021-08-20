@@ -1235,7 +1235,7 @@ class H(_MappingT):
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.__add__, max_depth=6)
         >>> h_even = h.is_even()
-        >>> print("{:.3%}".format(h_even[1] / h_even.total))
+        >>> print(f"{h_even[1] / h_even.total:.3%}")
         39.131%
 
         ```
@@ -1598,7 +1598,7 @@ class H(_MappingT):
 
         ``` python
         >>> h = (2@H(6)).ge(7)
-        >>> print("{:->65}".format(" 65 chars wide -->|"))
+        >>> print(f"{' 65 chars wide -->|':->65}")
         ---------------------------------------------- 65 chars wide -->|
         >>> print(h.format(width=65, scaled=False))
         avg |    0.58

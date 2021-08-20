@@ -9,15 +9,14 @@
 
 from __future__ import annotations
 
-from graph import digraph
+from graph import digraph, graphviz_walk
 
 from dyce.r import ValueRoller
-from dyce.viz import walk_r
 
 
 def do_it(style: str):
     g = digraph(style)
     r_1 = ValueRoller(1)
-    walk_r(g, r_1.roll())
+    graphviz_walk(g, r_1.roll())
 
     return g

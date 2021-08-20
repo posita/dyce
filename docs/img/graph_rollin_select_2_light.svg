@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 363)">
 <title>%3</title>
 <g id="clust1" class="cluster">
-<title>cluster_rollers</title>
-<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="8,-8 8,-243 295,-243 295,-8 8,-8"/>
-<text text-anchor="start" x="116.5" y="-228.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roller Tree</text>
-</g>
-<g id="clust2" class="cluster">
 <title>cluster_rolls</title>
 <polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="303,-95 303,-351 543,-351 543,-95 303,-95"/>
 <text text-anchor="start" x="394.5" y="-336.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Tree</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_rollers</title>
+<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="8,-8 8,-243 295,-243 295,-8 8,-8"/>
+<text text-anchor="start" x="116.5" y="-228.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roller Tree</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_roll_outcomes</title>
@@ -106,7 +106,7 @@
 <text text-anchor="start" x="437.5" y="-118.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumBlue">Roll</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;Roll&#45;7 -->
-<g id="edge14" class="edge">
+<g id="edge12" class="edge">
 <title>Roll&#45;1&#45;&gt;Roll&#45;7</title>
 <path fill="none" stroke="MediumBlue" stroke-dasharray="5,2" d="M490.05,-283.95C479.97,-273.23 468.21,-258.51 462,-243 449.85,-212.63 448.38,-174.66 449.11,-149.44"/>
 <polygon fill="MediumBlue" stroke="MediumBlue" points="452.62,-149.29 449.56,-139.15 445.63,-148.99 452.62,-149.29"/>
@@ -119,7 +119,7 @@
 <text text-anchor="start" x="324.5" y="-118.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">Roll</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;Roll&#45;12 -->
-<g id="edge15" class="edge">
+<g id="edge13" class="edge">
 <title>Roll&#45;1&#45;&gt;Roll&#45;12</title>
 <path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M480.98,-298.29C447.26,-293.39 390.34,-279.86 360,-243 338.42,-216.77 335.16,-176.42 335.79,-149.62"/>
 <polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="339.3,-149.53 336.24,-139.39 332.31,-149.23 339.3,-149.53"/>
@@ -133,7 +133,7 @@
 <text text-anchor="start" x="143.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="MediumBlue">value=P(6, 6, 6)</text>
 </g>
 <!-- SelectionRoller&#45;2&#45;&gt;ValueRoller&#45;8 -->
-<g id="edge12" class="edge">
+<g id="edge14" class="edge">
 <title>SelectionRoller&#45;2&#45;&gt;ValueRoller&#45;8</title>
 <path fill="none" stroke="MediumBlue" stroke-dasharray="5,2" d="M162.88,-175.79C172.25,-148.37 190.65,-94.53 201.79,-61.96"/>
 <polygon fill="MediumBlue" stroke="MediumBlue" points="205.2,-62.78 205.13,-52.19 198.58,-60.52 205.2,-62.78"/>
@@ -147,7 +147,7 @@
 <text text-anchor="start" x="24.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=H(8)</text>
 </g>
 <!-- SelectionRoller&#45;2&#45;&gt;ValueRoller&#45;13 -->
-<g id="edge13" class="edge">
+<g id="edge15" class="edge">
 <title>SelectionRoller&#45;2&#45;&gt;ValueRoller&#45;13</title>
 <path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M125.47,-175.82C111.58,-166.67 96.33,-154.16 87,-139 72.67,-115.72 68.24,-84.41 67.04,-62.24"/>
 <polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="70.54,-62.04 66.68,-52.17 63.54,-62.28 70.54,-62.04"/>

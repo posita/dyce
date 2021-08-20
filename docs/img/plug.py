@@ -22,7 +22,7 @@ def import_plug(arg: str, pfx: str) -> Tuple[str, Callable[[str], Any]]:
 
     try:
         my_dir = pathlib.Path(__file__).parent
-        mod_path = str(my_dir.joinpath("{}_{}.py".format(pfx, arg)))
+        mod_path = str(my_dir.joinpath(f"{pfx}_{arg}.py"))
         loader = importlib.machinery.SourceFileLoader(arg, mod_path)
         spec = importlib.util.spec_from_loader(arg, loader)
         assert spec
@@ -36,6 +36,6 @@ def import_plug(arg: str, pfx: str) -> Tuple[str, Callable[[str], Any]]:
         ImportError,
         SyntaxError,
     ) as exc:
-        raise argparse.ArgumentTypeError('unable to load "{}" ({})'.format(arg, exc))
+        raise argparse.ArgumentTypeError(f'unable to load "{arg}" ({exc})')
     else:
         return (arg, do_it)

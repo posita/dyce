@@ -29,11 +29,11 @@ def do_it(_: str) -> None:
         num_rows = 3
 
         for us in range(them, them + num_rows):
-            row_names.append("{}d6 …".format(us))
+            row_names.append(f"{us}d6 …")
             rows.append((us @ H(6)).vs(them @ H(6)).distribution_xy()[-1])
         _ = ax.imshow(rows)
 
-        ax.set_title("… vs {}d6".format(them))
+        ax.set_title(f"… vs {them}d6")
         ax.set_xticks(col_ticks)
         ax.set_xticklabels(col_names, rotation=90)
         ax.set_yticks(list(range(len(rows))))
@@ -44,7 +44,7 @@ def do_it(_: str) -> None:
                 _ = ax.text(
                     x,
                     y,
-                    "{:.0%}".format(rows[y][x]),
+                    f"{rows[y][x]:.0%}",
                     ha="center",
                     va="center",
                     color="w",

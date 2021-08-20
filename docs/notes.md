@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
+
+* Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
+
 ## [0.4.0](https://github.com/posita/dyce/releases/tag/v0.4.0)
 
 ### Breaking changes
@@ -70,7 +74,7 @@
 ### Other changes
 
 * Documentation overhaul including augmented examples and reorganized images and JavaScript.
-* Fixed ``H({}).format()`` bug.
+* Fixes ``H({}).format()`` bug.
 * Adds [``beartype``](https://github.com/beartype/beartype) runtime type checking.
 * *Maintains* support for Python 3.7 (for now).
 

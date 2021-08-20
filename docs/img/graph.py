@@ -10,46 +10,257 @@
 from __future__ import annotations
 
 import argparse
+import html
+import sys
+import warnings
+from collections.abc import Mapping as MappingC
 from functools import partial
-from typing import Any, Mapping
+from typing import Any, Dict, Iterator, Mapping, Optional, Union
 
 from plug import import_plug
 
-from dyce.viz import Digraph
+from dyce import R
+from dyce.bt import beartype
+from dyce.r import (
+    ChainRoller,
+    PoolRoller,
+    RepeatRoller,
+    Roll,
+    RollerWalkerVisitor,
+    RollOutcome,
+    RollOutcomeWalkerVisitor,
+    RollWalkerVisitor,
+    SelectionRoller,
+    SumRoller,
+    ValueRoller,
+    walk,
+)
 
-PARSER = argparse.ArgumentParser(description="Generate SVG files for documentation")
+try:
+    import graphviz
+    from graphviz import Digraph
+except ImportError:
+    warnings.warn(f"graphviz not found; {__name__} APIs disabled")
+    graphviz = None  # noqa: F811
+    Digraph = Any
+
+__all__ = ()
+
+
+# ---- Types ---------------------------------------------------------------------------
+
+
+try:
+    if sys.version_info >= (3, 9):
+        from typing import Annotated
+    else:
+        from typing_extensions import Annotated
+
+    from beartype.vale import Is
+
+    _GraphvizAttrTypeVals = ("edge", "graph", "node")
+    _GraphvizAttrTypeT = Annotated[str, Is[lambda text: text in _GraphvizAttrTypeVals]]
+except ImportError:
+    _GraphvizAttrTypeT = str  # type: ignore
+
+
+# ---- Data ----------------------------------------------------------------------------
+
+COLORS = {
+    "light": {"line": "DarkSlateGray", "blue": "MediumBlue", "red": "MediumVioletRed"},
+    "dark": {"line": "Azure", "blue": "LightBlue", "red": "LightPink"},
+}
+
+_PARSER = argparse.ArgumentParser(description="Generate SVG files for documentation")
 # TODO(posita): Get rid of all instances of gh here, below, and with Makefile and
 # *_gh.png once this dumpster fire
 # <https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981>
 # gets resolved
-PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
-PARSER.add_argument("fig", type=partial(import_plug, pfx="graph"))
+_PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
+_PARSER.add_argument("fig", type=partial(import_plug, pfx="graph"))
 
-COLORS = {
-    "dark": ["Azure", "LightBlue", "LightPink"],
-    "light": ["DarkSlateGray", "MediumBlue", "MediumVioletRed"],
-}
+_VALUE_LEN = 24
 
 
+# ---- Classes -------------------------------------------------------------------------
+
+
+class GraphvizObjectResolver:
+    @beartype
+    def __init__(self):
+        self._serial = 1
+        self._names: Dict[int, str] = {}
+
+    @beartype
+    def attrs_for_obj(
+        self,
+        obj: Union[R, Roll, RollOutcome],
+        attr_type: _GraphvizAttrTypeT,
+    ) -> Optional[Mapping[str, str]]:
+        annotation = obj.annotation
+
+        if not isinstance(annotation, MappingC):
+            return None
+
+        attrs = annotation.get(attr_type)
+
+        if not isinstance(attrs, MappingC):
+            return None
+
+        return attrs
+
+    @beartype
+    def name_for_obj(self, obj: Union[R, Roll, RollOutcome]) -> str:
+        if id(obj) not in self._names:
+            self._names[id(obj)] = f"{type(obj).__name__}-{self._serial}"
+            self._serial += 1
+
+        return self._names[id(obj)]
+
+
+class GraphizObjectResolverMixin:
+    @beartype
+    def __init__(self, g: Digraph, resolver: GraphvizObjectResolver):
+        self._g = g
+        self._resolver = resolver
+
+    @property
+    def g(self) -> Digraph:
+        return self._g
+
+    @property
+    def resolver(self) -> Digraph:
+        return self._resolver
+
+
+class InterObjectVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
+    @beartype
+    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
+        edge_attrs = self.resolver.attrs_for_obj(roll, "edge") or {}
+        self.g.edge(
+            self.resolver.name_for_obj(roll),
+            self.resolver.name_for_obj(roll.r),
+            label="r",
+            **edge_attrs,
+        )
+
+        for i, roll_outcome in enumerate(roll):
+            edge_attrs = self.resolver.attrs_for_obj(roll_outcome, "edge") or {}
+            self.g.edge(
+                self.resolver.name_for_obj(roll),
+                self.resolver.name_for_obj(roll_outcome),
+                label=f"[{i}]",
+                **edge_attrs,
+            )
+
+
+class RollClusterVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
+    @beartype
+    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
+        node_attrs = self.resolver.attrs_for_obj(roll, "node") or {}
+        self.g.node(
+            self.resolver.name_for_obj(roll),
+            label=f"<<b>{type(roll).__name__}</b>>",
+            **node_attrs,
+        )
+
+        for i, source_roll in enumerate(roll.sources):
+            edge_attrs = self.resolver.attrs_for_obj(source_roll, "edge") or {}
+            self.g.edge(
+                self.resolver.name_for_obj(roll),
+                self.resolver.name_for_obj(source_roll),
+                label=f"sources[{i}]",
+                **edge_attrs,
+            )
+
+
+class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
+    @beartype
+    def on_roller(self, r: R, parents: Iterator[R]) -> None:
+        node_attrs = self.resolver.attrs_for_obj(r, "node") or {}
+
+        if isinstance(r, PoolRoller):
+            label = f"<<b>{type(r).__name__}</b>>"
+        elif isinstance(r, RepeatRoller):
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">n={r.n!r}</font>>'
+        elif isinstance(r, SelectionRoller):
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">which={r.which!r}</font>>'
+        elif isinstance(r, ValueRoller):
+            value = _truncate(repr(r.value), is_html=True)
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">value={value}</font>>'
+        elif isinstance(r, (ChainRoller, SumRoller)):
+            if hasattr(r.op, "__name__"):
+                op = r.op.__name__  # type: ignore
+            else:
+                op = repr(r.op)
+
+            op = _truncate(op, is_html=True)
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">op={op}</font>>'
+        else:
+            label = f"<<b>{type(r).__name__}</b>>"
+
+        self.g.node(self.resolver.name_for_obj(r), label=label, **node_attrs)
+
+        for i, source_roller in enumerate(r.sources):
+            edge_attrs = self.resolver.attrs_for_obj(source_roller, "edge") or {}
+            self.g.edge(
+                self.resolver.name_for_obj(r),
+                self.resolver.name_for_obj(source_roller),
+                label=f"sources[{i}]",
+                **edge_attrs,
+            )
+
+
+class RollOutcomeClusterVisitor(GraphizObjectResolverMixin, RollOutcomeWalkerVisitor):
+    @beartype
+    def on_roll_outcome(
+        self, roll_outcome: RollOutcome, parents: Iterator[RollOutcome]
+    ) -> None:
+        node_attrs = self.resolver.attrs_for_obj(roll_outcome, "node")
+        node_attrs = (
+            {"style": "dotted"}
+            if roll_outcome.value is None and node_attrs is None
+            else node_attrs or {}
+        )
+        self.g.node(
+            self.resolver.name_for_obj(roll_outcome),
+            label=f'<<b>{type(roll_outcome).__name__}</b><br/><font face="Courier New">value={roll_outcome.value}</font>>',
+            **node_attrs,
+        )
+
+        for i, source_roll_outcome in enumerate(roll_outcome.sources):
+            edge_attrs = self.resolver.attrs_for_obj(source_roll_outcome, "edge") or {}
+            self.g.edge(
+                self.resolver.name_for_obj(roll_outcome),
+                self.resolver.name_for_obj(source_roll_outcome),
+                label=f"sources[{i}]",
+                **edge_attrs,
+            )
+
+
+# ---- Functions -----------------------------------------------------------------------
+
+
+@beartype
 def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, Any]]) -> Digraph:
     g = Digraph()
     g.attr(
         bgcolor="transparent",
-        color=COLORS[style][0],
-        fontcolor=COLORS[style][0],
+        color=COLORS[style]["line"],
+        fontcolor=COLORS[style]["line"],
         fontname="Helvetica",
     )
     g.attr(
         "node",
         shape="box",
-        color=COLORS[style][0],
-        fontcolor=COLORS[style][0],
+        color=COLORS[style]["line"],
+        fontcolor=COLORS[style]["line"],
         fontname="Helvetica",
     )
     g.attr(
         "edge",
-        color=COLORS[style][0],
-        fontcolor=COLORS[style][0],
+        color=COLORS[style]["line"],
+        fontcolor=COLORS[style]["line"],
         fontname="Courier New",
     )
 
@@ -59,15 +270,47 @@ def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, Any]]) -> Digraph:
     return g
 
 
+@beartype
+def graphviz_walk(
+    g: Digraph,
+    obj: Union[R, Roll, RollOutcome],
+) -> None:
+    resolver = GraphvizObjectResolver()
+    walk(obj, InterObjectVisitor(g, resolver))
+
+    with g.subgraph(name="cluster_rolls") as c:
+        c.attr(label="<<i>Roll Tree</i>>", style="dotted")
+        walk(obj, RollClusterVisitor(c, resolver))
+
+    with g.subgraph(name="cluster_rollers") as c:
+        c.attr(label="<<i>Roller Tree</i>>", style="dotted")
+        walk(obj, RollerClusterVisitor(c, resolver))
+
+    with g.subgraph(name="cluster_roll_outcomes") as c:
+        c.attr(label="<<i>Roll Outcomes</i>>", style="dotted")
+        walk(obj, RollOutcomeClusterVisitor(c, resolver))
+
+
+@beartype
+def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) -> str:
+    value = value if len(value) <= value_len else (value[: value_len - 3] + "...")
+
+    return html.escape(value) if is_html else value
+
+
+@beartype
 def _main() -> None:
     import graphviz
 
-    args = PARSER.parse_args()
+    args = _PARSER.parse_args()
     mod_name, mod_do_it = args.fig
-    svg_path = "graph_{}_{}".format(mod_name, args.style)
+    svg_path = f"graph_{mod_name}_{args.style}"
     g: graphviz.Digraph = mod_do_it(args.style)
-    print("saving {}".format(svg_path))
+    print(f"saving {svg_path}")
     g.render(filename=svg_path, format="svg")
+
+
+# ---- Initialization ------------------------------------------------------------------
 
 
 if __name__ == "__main__":

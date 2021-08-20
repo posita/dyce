@@ -49,11 +49,11 @@ plot_%_light.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ..
 plot_%_gh.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=gh $*
 
-graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
+graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=dark $*
 	rm -f graph_$*_dark
 
-graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
+graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=light $*
 	rm -f graph_$*_light
 

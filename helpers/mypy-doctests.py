@@ -21,13 +21,16 @@ import sys
 import tempfile
 from typing import Dict, Iterable, Iterator, Mapping, TextIO
 
+__all__ = ()
+
+
 # ---- Data ----------------------------------------------------------------------------
 
 
-PARSER = argparse.ArgumentParser(
+_PARSER = argparse.ArgumentParser(
     description="Extract doctests from PATH and check them with mypy.",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "-a",
     "--mypyp-arg",
     metavar="ARG",
@@ -36,7 +39,7 @@ PARSER.add_argument(
     default=[],
     dest="mypy_args",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "-A",
     "--clear-mypy-args",
     help="clear any mypy command arguments",
@@ -46,37 +49,35 @@ PARSER.add_argument(
 )
 # Adapted from
 # <https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-exclude>
-PARSER.add_argument(
+_DEFAULT_EXCLUDE_RE = r"\A(\..*|__pycache__|dist|site|.*\.egg-info)\Z"
+_PARSER.add_argument(
     "--exclude-dir-names",
     "--exclude",
     metavar="PATTERN",
-    help='exclude directories matching PATTERN from inspection (default: "{}")'.format(
-        r"\A(\..*|__pycache__|dist|site|.*\.egg-info)\Z"
-    ),
-    default=r"\A(\..*|__pycache__|dist|site|.*\.egg-info)\Z",
+    help=f'exclude directories matching PATTERN from inspection (default: "{_DEFAULT_EXCLUDE_RE}")',
+    default=_DEFAULT_EXCLUDE_RE,
 )
-PARSER.add_argument(
+_DEFAULT_INCLUDE_RE = r"\.(md|py|pyi|rst|txt)\Z"
+_PARSER.add_argument(
     "--include-file-names",
     metavar="PATTERN",
-    help='include files matching PATTERN (default: "{}")'.format(
-        r"\.(md|py|pyi|rst|txt)\Z"
-    ),
-    default=r"\.(md|py|pyi|rst|txt)\Z",
+    help=f'include files matching PATTERN (default: "{_DEFAULT_INCLUDE_RE}")',
+    default=_DEFAULT_INCLUDE_RE,
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "--log-level",
     metavar="LEVEL",
     help="set logging verbosity to LEVEL (default: WARNING)",
     choices=["CRITICAL", "DEBUG", "ERROR", "INFO", "WARNING"],
     default="WARNING",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "--tmp-file-suffix",
     metavar="SUFFIX",
     help='use SUFFIX when creating temporary files (default: ".doctest.py")',
     default=".doctest.py",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "-k",
     "--keep-temp-files",
     help="keep temporary files on exit, e.g., for debugging or inspection (default)",
@@ -84,14 +85,14 @@ PARSER.add_argument(
     default=False,
     dest="keep_temp_files",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "-K",
     "--no-keep-temp-files",
     help="remove temporary files on exit",
     action="store_false",
     dest="keep_temp_files",
 )
-PARSER.add_argument(
+_PARSER.add_argument(
     "paths",
     nargs="+",
     metavar="PATH",
@@ -99,44 +100,6 @@ PARSER.add_argument(
 
 
 # ---- Functions -----------------------------------------------------------------------
-
-
-def main(*args: str) -> int:
-    import mypy.api
-
-    parsed_args = PARSER.parse_args(args) if args else PARSER.parse_args()
-    logging.getLogger().setLevel(parsed_args.log_level)
-    dst_dir = tempfile.mkdtemp()
-    dst_dir_path = pathlib.Path(dst_dir)
-    logging.debug("created temporary directory %s", dst_dir_path)
-    dst_paths_to_orig_paths = _copy_paths(
-        parsed_args, dst_dir_path, _gather_paths(parsed_args)
-    )
-
-    try:
-        results = mypy.api.run(parsed_args.mypy_args + [str(dst_dir)])
-
-        if results[0]:
-            for line in results[0].rstrip("\n").split("\n"):
-                if line.startswith(str(dst_dir)):
-                    p, rest = line.split(":", 1)
-                    path = pathlib.Path(p)
-                    line = "{}:{}".format(
-                        str(dst_paths_to_orig_paths.get(path, path)), rest
-                    )
-
-                print(line)
-
-        if results[1]:
-            sys.stderr.write(results[1])
-
-        return results[2]
-    finally:
-        if parsed_args.keep_temp_files:
-            print("leaving temporary files in {}".format(dst_dir_path), file=sys.stderr)
-        else:
-            logging.debug("removing %s", dst_dir_path)
-            shutil.rmtree(dst_dir)
 
 
 def _copy_doctests(
@@ -156,7 +119,7 @@ def _copy_doctests(
             assert cur_lineno <= example.lineno
 
             while cur_lineno < example.lineno:
-                dst_f.write("# skipped line {}\n".format(cur_lineno))
+                dst_f.write(f"# skipped line {cur_lineno}\n")
                 cur_lineno += 1
 
             dst_f.write(example.source)
@@ -227,8 +190,44 @@ def _gather_paths(
             yield orig_path
 
 
+def _main(*args: str) -> int:
+    import mypy.api
+
+    parsed_args = _PARSER.parse_args(args) if args else _PARSER.parse_args()
+    logging.getLogger().setLevel(parsed_args.log_level)
+    dst_dir = tempfile.mkdtemp()
+    dst_dir_path = pathlib.Path(dst_dir)
+    logging.debug("created temporary directory %s", dst_dir_path)
+    dst_paths_to_orig_paths = _copy_paths(
+        parsed_args, dst_dir_path, _gather_paths(parsed_args)
+    )
+
+    try:
+        results = mypy.api.run(parsed_args.mypy_args + [str(dst_dir)])
+
+        if results[0]:
+            for line in results[0].rstrip("\n").split("\n"):
+                if line.startswith(str(dst_dir)):
+                    p, rest = line.split(":", 1)
+                    path = pathlib.Path(p)
+                    line = f"{str(dst_paths_to_orig_paths.get(path, path))}:{rest}"
+
+                print(line)
+
+        if results[1]:
+            sys.stderr.write(results[1])
+
+        return results[2]
+    finally:
+        if parsed_args.keep_temp_files:
+            print(f"leaving temporary files in {dst_dir_path}", file=sys.stderr)
+        else:
+            logging.debug("removing %s", dst_dir_path)
+            shutil.rmtree(dst_dir)
+
+
 # ---- Initialization ------------------------------------------------------------------
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(_main())

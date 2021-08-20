@@ -12,6 +12,7 @@ from __future__ import annotations
 import warnings
 import weakref
 from abc import abstractmethod
+from collections import defaultdict, deque
 from copy import copy
 from itertools import chain
 from operator import (
@@ -42,10 +43,13 @@ from textwrap import indent
 from typing import (
     Any,
     Callable,
+    DefaultDict,
+    Dict,
     Iterable,
     Iterator,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Union,
     cast,
@@ -1021,7 +1025,7 @@ class ValueRoller(R):
 
     @beartype
     def __repr__(self) -> str:
-        return f"""{type(self).__name__}(value={self.value!r}, annotation={self.annotation!r})"""
+        return f"{type(self).__name__}(value={self.value!r}, annotation={self.annotation!r})"
 
     @beartype
     def roll(self) -> Roll:
@@ -2097,9 +2101,8 @@ class Roll(Sequence[RollOutcome]):
         ...
 
     @beartype
-    # TODO(posita): See:
-    # * <https://github.com/python/mypy/issues/8393>
-    # * <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    # TODO(posita): See: <https://github.com/python/mypy/issues/8393>
+    # TODO(posita): See: <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
     def __getitem__(  # type: ignore
         self,
         key: _GetItemT,
@@ -2175,6 +2178,148 @@ class Roll(Sequence[RollOutcome]):
         Shorthand for ``#!python sum(self.outcomes())``.
         """
         return sum(self.outcomes())
+
+
+class RollWalkerVisitor:
+    r"""
+    !!! warning "Experimental"
+
+        This function should be considered experimental and may change or disappear in
+        future versions.
+
+    Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
+    [``Roll`` object][dyce.r.Roll] found.
+    """
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @abstractmethod
+    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
+        raise NotImplementedError
+
+
+class RollOutcomeWalkerVisitor:
+    r"""
+    !!! warning "Experimental"
+
+        This function should be considered experimental and may change or disappear in
+        future versions.
+
+    Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
+    [``RollOutcome`` object][dyce.r.RollOutcome] found.
+    """
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @abstractmethod
+    def on_roll_outcome(
+        self, roll_outcome: RollOutcome, parents: Iterator[RollOutcome]
+    ) -> None:
+        raise NotImplementedError
+
+
+class RollerWalkerVisitor:
+    r"""
+    !!! warning "Experimental"
+
+        This function should be considered experimental and may change or disappear in
+        future versions.
+
+    Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
+    [``R`` object][dyce.r.R] found.
+    """
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @abstractmethod
+    def on_roller(self, r: R, parents: Iterator[R]) -> None:
+        raise NotImplementedError
+
+
+@experimental
+@beartype
+def walk(
+    root: Union[Roll, R, RollOutcome],
+    visitor: Union[RollWalkerVisitor, RollerWalkerVisitor, RollOutcomeWalkerVisitor],
+) -> None:
+    r"""
+    !!! warning "Experimental"
+
+        This function should be considered experimental and may change or disappear in
+        future versions.
+
+    Walks through *root*, calling *visitor* for each matching object. No ordering
+    guarantees are made.
+
+    !!! info "On the current implementation"
+
+        ``walk`` performs a breadth-first traversal of *root*, assembling a secondary
+        index of referencing objects (parents). Visitors are called back grouped first
+        by type, then by order encountered.
+    """
+    rolls: Dict[int, Roll] = {}
+    rollers: Dict[int, R] = {}
+    roll_outcomes: Dict[int, RollOutcome] = {}
+    roll_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
+    roller_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
+    roll_outcome_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
+    queue = deque((root,))
+    roll: Roll
+    r: R
+    roll_outcome: RollOutcome
+
+    while queue:
+        obj = queue.popleft()
+
+        if isinstance(obj, Roll):
+            roll = obj
+
+            if id(roll) not in rolls:
+                rolls[id(roll)] = roll
+
+                queue.append(roll.r)
+
+                for i, roll_outcome in enumerate(roll):
+                    queue.append(roll_outcome)
+
+                for source_roll in roll.sources:
+                    roll_parent_ids[id(source_roll)].add(id(roll))
+                    queue.append(source_roll)
+        elif isinstance(obj, R):
+            r = obj
+
+            if id(r) not in rollers:
+                rollers[id(r)] = r
+
+                for source_r in r.sources:
+                    roller_parent_ids[id(source_r)].add(id(r))
+                    queue.append(source_r)
+        elif isinstance(obj, RollOutcome):
+            roll_outcome = obj
+
+            if id(roll_outcome) not in roll_outcomes:
+                roll_outcomes[id(roll_outcome)] = roll_outcome
+
+                for source_roll_outcome in roll_outcome.sources:
+                    roll_outcome_parent_ids[id(source_roll_outcome)].add(
+                        id(roll_outcome)
+                    )
+                    queue.append(source_roll_outcome)
+
+    if rolls and isinstance(visitor, RollWalkerVisitor):
+        for roll_id, roll in rolls.items():
+            visitor.on_roll(roll, (rolls[i] for i in roll_parent_ids[roll_id]))
+
+    if rollers and isinstance(visitor, RollerWalkerVisitor):
+        for r_id, r in rollers.items():
+            visitor.on_roller(r, (rollers[i] for i in roller_parent_ids[r_id]))
+
+    if roll_outcomes and isinstance(visitor, RollOutcomeWalkerVisitor):
+        for roll_outcome_id, roll_outcome in roll_outcomes.items():
+            visitor.on_roll_outcome(
+                roll_outcome,
+                (roll_outcomes[i] for i in roll_outcome_parent_ids[roll_outcome_id]),
+            )
 
 
 # ---- Functions -----------------------------------------------------------------------

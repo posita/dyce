@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 203)">
 <title>%3</title>
 <g id="clust1" class="cluster">
-<title>cluster_rollers</title>
-<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-8 8,-83 118,-83 118,-8 8,-8"/>
-<text text-anchor="start" x="28" y="-68.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roller Tree</text>
-</g>
-<g id="clust2" class="cluster">
 <title>cluster_rolls</title>
 <polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="99,-116 99,-191 172,-191 172,-116 99,-116"/>
 <text text-anchor="start" x="107" y="-176.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roll Tree</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_rollers</title>
+<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-8 8,-83 118,-83 118,-8 8,-8"/>
+<text text-anchor="start" x="28" y="-68.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roller Tree</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_roll_outcomes</title>

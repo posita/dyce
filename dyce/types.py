@@ -27,25 +27,69 @@ from typing import (
     Union,
 )
 
-from .bt import __version_info__ as bt_version_info
 from .bt import identity  # noqa: F401
 from .bt import beartype
-from .symmetries import Protocol
-from .symmetries import SupportsAbs as _SupportsAbs
-from .symmetries import SupportsFloat as _SupportsFloat
-from .symmetries import SupportsIndex as _SupportsIndex
-from .symmetries import SupportsInt as _SupportsInt
-from .symmetries import runtime_checkable
 
 __all__ = ("OutcomeT",)
 
 
 # ---- Types ---------------------------------------------------------------------------
 
-
+_S = TypeVar("_S")
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _TT = TypeVar("_TT", bound="type")
+
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated  # noqa: F401
+
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+    from typing import SupportsAbs as _SupportsAbs
+    from typing import SupportsFloat as _SupportsFloat
+    from typing import SupportsIndex as _SupportsIndex
+    from typing import SupportsInt as _SupportsInt
+    from typing import runtime_checkable
+else:
+    from typing_extensions import Protocol, runtime_checkable
+
+    @runtime_checkable
+    class _SupportsAbs(Protocol[_T_co]):
+        __slots__ = ()
+
+        @abstractmethod
+        def __abs__(self) -> _T_co:
+            pass
+
+    @runtime_checkable
+    class _SupportsFloat(Protocol):
+        __slots__ = ()
+
+        @abstractmethod
+        def __float__(self) -> float:
+            pass
+
+    @runtime_checkable
+    class _SupportsIndex(Protocol):
+        __slots__ = ()
+
+        @abstractmethod
+        def __index__(self) -> int:
+            pass
+
+    @runtime_checkable
+    class _SupportsInt(Protocol):
+        __slots__ = ()
+
+        @abstractmethod
+        def __int__(self) -> int:
+            pass
+
+
 _ProtocolMeta: Any = type(Protocol)
 
 
@@ -318,9 +362,7 @@ _OutcomeCs = (int, float, bool, SupportsOutcome)
 
 _GetItemT = Union[IndexT, slice]
 
-if sys.version_info < (3, 8) and bt_version_info < (0, 8):
-    _RationalInitializerT = Callable[[int, int], _T_co]
-else:
+if sys.version_info >= (3, 8):
 
     @runtime_checkable
     class _RationalInitializerT(
@@ -329,6 +371,10 @@ else:
     ):
         def __call__(self, numerator: int, denominator: int) -> _T_co:
             ...
+
+
+else:
+    _RationalInitializerT = Callable[[int, int], _T_co]
 
 
 # ---- Functions -----------------------------------------------------------------------

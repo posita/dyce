@@ -9,42 +9,21 @@
 
 from __future__ import annotations
 
-import html
 import warnings
-from collections import deque
 from fractions import Fraction
 from numbers import Real
-from typing import Any, Dict, Iterable, Iterator, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable, Iterator, Optional, Sequence, Tuple, Union
 
 from .bt import beartype
 from .h import H
 from .lifecycle import experimental
-from .r import (
-    ChainRoller,
-    PoolRoller,
-    R,
-    RepeatRoller,
-    Roll,
-    RollOutcome,
-    SelectionRoller,
-    SumRoller,
-    ValueRoller,
-)
-
-try:
-    import graphviz
-    from graphviz import Digraph
-except ImportError:
-    warnings.warn("graphviz not found; {} APIs disabled".format(__name__))
-    graphviz = None  # noqa: F811
-    Digraph = Any
 
 try:
     import matplotlib.pyplot
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 except ImportError:
-    warnings.warn("matplotlib not found; {} APIs disabled".format(__name__))
+    warnings.warn(f"matplotlib not found; {__name__} APIs disabled")
     matplotlib = None  # noqa: F811
     Axes = Any  # noqa: F811
     Figure = Any  # noqa: F811
@@ -67,7 +46,6 @@ DEFAULT_GRAPH_COLOR = "RdYlGn_r"
 DEFAULT_TEXT_COLOR = "black"
 DEFAULT_GRAPH_ALPHA = 0.5
 _HIDE_LIM = Fraction(1, 2 ** 6)
-_VALUE_LEN = 24
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -118,7 +96,7 @@ def display_burst(
 
     if outer is None:
         outer = (
-            ("{:.2%}".format(float(v)) if v >= _HIDE_LIM else "", v)
+            (f"{float(v):.2%}" if v >= _HIDE_LIM else "", v)
             for _, v in h_inner.distribution()
         )
     elif isinstance(outer, H):
@@ -201,9 +179,7 @@ def labels_cumulative(
     le_total, ge_total = 0.0, 1.0
     for outcome, probability in h.distribution():
         le_total += probability
-        label = "{} {:.2%}; ≥{:.2%}; ≤{:.2%}".format(
-            outcome, float(probability), le_total, ge_total
-        )
+        label = f"{outcome} {float(probability):.2%}; ≥{le_total:.2%}; ≤{ge_total:.2%}"
         ge_total -= probability
         yield (label, probability)
 
@@ -236,171 +212,3 @@ def plot_burst(
     matplotlib.pyplot.tight_layout()
 
     return fig, ax
-
-
-@experimental
-@beartype
-def walk_r(
-    g: Digraph,
-    obj: Union[R, Roll, RollOutcome],
-) -> None:
-    r"""
-    !!! warning "Experimental"
-
-        This method should be considered experimental and is highly likely change or
-        disappear in future versions.
-
-    Whoo boy. What a *mess*. Hasn’t anyone around here ever heard of the visitor
-    pattern? Jeez!
-
-    This is a *study*. It‘s here so I can solve my immediate problem of generating
-    pretty pictures for docs. But it’s also a vehicle for achieving enlightenment by
-    being my own non-traditional customer of rollers and rolls.
-    """
-    assert graphviz
-    serial = 1
-    names: Dict[int, str] = {}
-
-    def _name_for_obj(obj: Union[R, Roll, RollOutcome]) -> str:
-        nonlocal serial, names
-
-        if id(obj) not in names:
-            names[id(obj)] = f"{type(obj).__name__}-{serial}"
-            serial += 1
-
-        return names[id(obj)]
-
-    rollers: Dict[str, R] = {}
-    rolls: Dict[str, Roll] = {}
-    roll_outcomes: Dict[str, RollOutcome] = {}
-    queue = deque((obj,))
-
-    while queue:
-        obj = queue.popleft()
-        obj_name = _name_for_obj(obj)
-
-        if isinstance(obj, R):
-            if obj_name not in rollers:
-                rollers[obj_name] = obj
-                queue.extend(obj.sources)
-        elif isinstance(obj, Roll):
-            if obj_name not in rolls:
-                rolls[obj_name] = obj
-                queue.append(obj.r)
-
-                attrs = obj.annotation if obj.annotation else {}
-                g.edge(
-                    obj_name,
-                    _name_for_obj(obj.r),
-                    label="r",
-                    **attrs.get("edge", {}),
-                )
-                queue.extend(obj.sources)
-
-                for i, roll_outcome in enumerate(obj):
-                    attrs = roll_outcome.annotation if roll_outcome.annotation else {}
-                    g.edge(
-                        obj_name,
-                        _name_for_obj(roll_outcome),
-                        label=f"[{i}]",
-                        **attrs.get("edge", {}),
-                    )
-                    queue.append(roll_outcome)
-        elif isinstance(obj, RollOutcome):
-            if obj_name not in roll_outcomes:
-                roll_outcomes[obj_name] = obj
-                queue.extend(obj.sources)
-
-    if rollers:
-        with g.subgraph(name="cluster_rollers") as c:
-            c.attr(label="<<i>Roller Tree</i>>", style="dotted")
-
-            for r_name, r in rollers.items():
-                attrs = r.annotation if r.annotation else {}
-
-                if isinstance(r, PoolRoller):
-                    label = f"<<b>{type(r).__name__}</b>>"
-                elif isinstance(r, RepeatRoller):
-                    label = f"""<<b>{type(r).__name__}</b><br/><font face="Courier New">n={r.n!r}</font>>"""
-                elif isinstance(r, SelectionRoller):
-                    label = f"""<<b>{type(r).__name__}</b><br/><font face="Courier New">which={r.which!r}</font>>"""
-                elif isinstance(r, ValueRoller):
-                    value = _truncate(repr(r.value), is_html=True)
-                    label = f"""<<b>{type(r).__name__}</b><br/><font face="Courier New">value={value}</font>>"""
-                elif isinstance(r, (ChainRoller, SumRoller)):
-                    if hasattr(r.op, "__name__"):
-                        op = r.op.__name__  # type: ignore
-                    else:
-                        op = repr(r.op)
-
-                    op = _truncate(op, is_html=True)
-                    label = f"""<<b>{type(r).__name__}</b><br/><font face="Courier New">op={op}</font>>"""
-                else:
-                    label = f"<<b>{type(r).__name__}</b>>"
-
-                c.node(r_name, label=label, **attrs.get("node", {}))
-
-                for i, roller_src in enumerate(r.sources):
-                    attrs = roller_src.annotation if roller_src.annotation else {}
-                    c.edge(
-                        r_name,
-                        _name_for_obj(roller_src),
-                        label=f"sources[{i}]",
-                        **attrs.get("edge", {}),
-                    )
-
-    if rolls:
-        with g.subgraph(name="cluster_rolls") as c:
-            c.attr(label="<<i>Roll Tree</i>>", style="dotted")
-
-            for roll_name, roll in rolls.items():
-                attrs = roll.annotation if roll.annotation else {}
-                c.node(
-                    roll_name,
-                    label=f"<<b>{type(roll).__name__}</b>>",
-                    **attrs.get("node", {}),
-                )
-
-                for i, roll_src in enumerate(roll.sources):
-                    attrs = roll_src.annotation if roll_src.annotation else {}
-                    c.edge(
-                        roll_name,
-                        _name_for_obj(roll_src),
-                        label=f"sources[{i}]",
-                        **attrs.get("edge", {}),
-                    )
-
-    if roll_outcomes:
-        with g.subgraph(name="cluster_roll_outcomes") as c:
-            c.attr(label="<<i>Roll Outcomes</i>>", style="dotted")
-
-            for roll_outcome_name, roll_outcome in roll_outcomes.items():
-                attrs = roll_outcome.annotation if roll_outcome.annotation else {}
-                c.node(
-                    roll_outcome_name,
-                    label=f"""<<b>{type(roll_outcome).__name__}</b><br/><font face="Courier New">value={roll_outcome.value}</font>>""",
-                    **attrs.get(
-                        "node",
-                        {"style": "dotted"} if roll_outcome.value is None else {},
-                    ),
-                )
-
-                for i, roll_outcome_src in enumerate(roll_outcome.sources):
-                    attrs = (
-                        roll_outcome_src.annotation
-                        if roll_outcome_src.annotation
-                        else {}
-                    )
-                    c.edge(
-                        roll_outcome_name,
-                        _name_for_obj(roll_outcome_src),
-                        label=f"sources[{i}]",
-                        **attrs.get("edge", {}),
-                    )
-
-
-@beartype
-def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) -> str:
-    value = value if len(value) <= value_len else (value[: value_len - 3] + "...")
-
-    return html.escape(value) if is_html else value

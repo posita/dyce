@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 453)">
 <title>%3</title>
 <g id="clust1" class="cluster">
-<title>cluster_rollers</title>
-<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-8 8,-333 284,-333 284,-8 8,-8"/>
-<text text-anchor="start" x="111" y="-318.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roller Tree</text>
-</g>
-<g id="clust2" class="cluster">
 <title>cluster_rolls</title>
 <polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="376,-366 376,-441 449,-441 449,-366 376,-366"/>
 <text text-anchor="start" x="384" y="-426.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roll Tree</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_rollers</title>
+<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-8 8,-333 284,-333 284,-8 8,-8"/>
+<text text-anchor="start" x="111" y="-318.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roller Tree</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_roll_outcomes</title>
@@ -95,9 +95,9 @@
 <!-- SelectionRoller&#45;2&#45;&gt;RepeatRoller&#45;6 -->
 <g id="edge5" class="edge">
 <title>SelectionRoller&#45;2&#45;&gt;RepeatRoller&#45;6</title>
-<path fill="none" stroke="Azure" d="M113.49,-265.94C99.57,-256.89 84.58,-244.43 76,-229 69.03,-216.46 67.03,-200.65 66.89,-187.32"/>
-<polygon fill="Azure" stroke="Azure" points="70.39,-187.36 67.11,-177.28 63.39,-187.2 70.39,-187.36"/>
-<text text-anchor="middle" x="118.5" y="-217.8" font-family="Courier New" font-size="14.00" fill="Azure">sources[0]</text>
+<path fill="none" stroke="Azure" d="M114.05,-265.79C100.35,-256.7 85.56,-244.26 77,-229 69.97,-216.47 67.75,-200.65 67.39,-187.33"/>
+<polygon fill="Azure" stroke="Azure" points="70.89,-187.3 67.44,-177.29 63.89,-187.27 70.89,-187.3"/>
+<text text-anchor="middle" x="119.5" y="-217.8" font-family="Courier New" font-size="14.00" fill="Azure">sources[0]</text>
 </g>
 <!-- ValueRoller&#45;7 -->
 <g id="node7" class="node">
@@ -111,7 +111,7 @@
 <title>SelectionRoller&#45;2&#45;&gt;ValueRoller&#45;7</title>
 <path fill="none" stroke="Azure" d="M152.12,-265.9C159.43,-245.45 171.76,-210.99 180.36,-186.95"/>
 <polygon fill="Azure" stroke="Azure" points="183.72,-187.95 183.79,-177.35 177.13,-185.59 183.72,-187.95"/>
-<text text-anchor="middle" x="212.5" y="-217.8" font-family="Courier New" font-size="14.00" fill="Azure">sources[1]</text>
+<text text-anchor="middle" x="213.5" y="-217.8" font-family="Courier New" font-size="14.00" fill="Azure">sources[1]</text>
 </g>
 <!-- ValueRoller&#45;8 -->
 <g id="node8" class="node">

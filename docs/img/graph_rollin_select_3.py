@@ -9,11 +9,10 @@
 
 from __future__ import annotations
 
-from graph import digraph
+from graph import digraph, graphviz_walk
 
 from dyce import H, R
 from dyce.r import ValueRoller
-from dyce.viz import walk_r
 from tests.patches import patch_roll
 
 
@@ -31,6 +30,6 @@ def do_it(style: str):
         r_d8,
         annotation=None,
     )
-    walk_r(g, r_forgetful_best_3_of_3d6_d8.roll())
+    graphviz_walk(g, r_forgetful_best_3_of_3d6_d8.roll())
 
     return g

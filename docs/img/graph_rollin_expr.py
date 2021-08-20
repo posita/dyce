@@ -9,11 +9,10 @@
 
 from __future__ import annotations
 
-from graph import COLORS, digraph
+from graph import COLORS, digraph, graphviz_walk
 
 from dyce import H
 from dyce.r import ValueRoller
-from dyce.viz import walk_r
 from tests.patches import patch_roll
 
 
@@ -25,13 +24,13 @@ def do_it(style: str):
         d12,
         annotation={
             "node": {
-                "color": COLORS[style][1],
-                "fontcolor": COLORS[style][1],
+                "color": COLORS[style]["blue"],
+                "fontcolor": COLORS[style]["blue"],
                 "style": "dashed",
             },
             "edge": {
-                "color": COLORS[style][1],
-                "fontcolor": COLORS[style][1],
+                "color": COLORS[style]["blue"],
+                "fontcolor": COLORS[style]["blue"],
                 "style": "dashed",
             },
         },
@@ -40,18 +39,18 @@ def do_it(style: str):
         4,
         annotation={
             "node": {
-                "color": COLORS[style][2],
-                "fontcolor": COLORS[style][2],
+                "color": COLORS[style]["red"],
+                "fontcolor": COLORS[style]["red"],
                 "style": "dashed",
             },
             "edge": {
-                "color": COLORS[style][2],
-                "fontcolor": COLORS[style][2],
+                "color": COLORS[style]["red"],
+                "fontcolor": COLORS[style]["red"],
                 "style": "dashed",
             },
         },
     )
     r_d12_add_4 = r_d12 + r_4
-    walk_r(g, r_d12_add_4.roll())
+    graphviz_walk(g, r_d12_add_4.roll())
 
     return g

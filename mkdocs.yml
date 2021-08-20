@@ -13,14 +13,14 @@ nav:
   - Countin’ with histograms and pools: countin.md
   - Rollin’ with rollers and rolls: rollin.md
   - Applications and translations: translations.md
+  - Release notes: notes.md
+  - Contributing: contrib.md
+  - License: license.md
   - API:
     - <tt>dyce</tt>: dyce.md
     - <tt>dyce.h</tt>: dyce.h.md
     - <tt>dyce.r</tt>: dyce.r.md
     - <tt>dyce.viz</tt>: dyce.viz.md
-  - Release notes: notes.md
-  - Contributing: contrib.md
-  - License: license.md
 
 # See:
 # * <https://squidfunk.github.io/mkdocs-material/reference/admonitions/>, etc.
