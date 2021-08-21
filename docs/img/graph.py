@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import argparse
 import html
+import logging
 import sys
-import warnings
 from collections.abc import Mapping as MappingC
 from functools import partial
 from typing import Any, Dict, Iterator, Mapping, Optional, Union
@@ -37,12 +37,10 @@ from dyce.r import (
 )
 
 try:
-    import graphviz
     from graphviz import Digraph
+    from graphviz.dot import Dot
 except ImportError:
-    warnings.warn(f"graphviz not found; {__name__} APIs disabled")
-    graphviz = None  # noqa: F811
-    Digraph = Any
+    raise
 
 __all__ = ()
 
@@ -72,11 +70,13 @@ COLORS = {
 }
 
 _PARSER = argparse.ArgumentParser(description="Generate SVG files for documentation")
-# TODO(posita): Get rid of all instances of gh here, below, and with Makefile and
-# *_gh.png once this dumpster fire
-# <https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981>
-# gets resolved
-_PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
+_PARSER.add_argument("-s", "--style", choices=("dark", "light"), default="light")
+_PARSER.add_argument(
+    "-l",
+    "--log-level",
+    choices=("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"),
+    default="INFO",
+)
 _PARSER.add_argument("fig", type=partial(import_plug, pfx="graph"))
 
 _VALUE_LEN = 24
@@ -300,14 +300,17 @@ def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) ->
 
 @beartype
 def _main() -> None:
-    import graphviz
-
     args = _PARSER.parse_args()
+    logging.getLogger().setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     svg_path = f"graph_{mod_name}_{args.style}"
-    g: graphviz.Digraph = mod_do_it(args.style)
-    print(f"saving {svg_path}")
-    g.render(filename=svg_path, format="svg")
+    g: Optional[Dot] = mod_do_it(args.style)
+
+    if g is None:
+        logging.warning(f"nothing generated for {svg_path}; skipping")
+    else:
+        print(f"saving {svg_path}")
+        g.render(filename=svg_path, cleanup=True, format="svg")
 
 
 # ---- Initialization ------------------------------------------------------------------

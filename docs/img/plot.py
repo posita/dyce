@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 from functools import partial
 
 from plug import import_plug
@@ -26,6 +27,12 @@ _PARSER = argparse.ArgumentParser(description="Generate PNG files for documentat
 # <https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981>
 # gets resolved
 _PARSER.add_argument("-s", "--style", choices=("dark", "light", "gh"), default="light")
+_PARSER.add_argument(
+    "-l",
+    "--log-level",
+    choices=("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"),
+    default="INFO",
+)
 _PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))
 
 
@@ -36,6 +43,7 @@ def _main() -> None:
     import matplotlib.pyplot
 
     args = _PARSER.parse_args()
+    logging.getLogger().setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     png_path = f"plot_{mod_name}_{args.style}.png"
 

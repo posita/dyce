@@ -9,14 +9,14 @@
 
 from __future__ import annotations
 
-from graph import COLORS, digraph, graphviz_walk
+from graph import COLORS, Dot, digraph, graphviz_walk
 
 from dyce import H
 from dyce.r import ValueRoller
 from tests.patches import patch_roll
 
 
-def do_it(style: str):
+def do_it(style: str) -> Dot:
     g = digraph(style)
     d12 = H(12)
     patch_roll(d12, 7)

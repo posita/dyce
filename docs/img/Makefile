@@ -1,6 +1,6 @@
 all : \
-	classes_dyce_dark.svg \
-	classes_dyce_light.svg \
+	graph_classes_dyce_r_dark.svg \
+	graph_classes_dyce_r_light.svg \
 	graph_rollin_value_dark.svg \
 	graph_rollin_value_light.svg \
 	graph_rollin_expr_dark.svg \
@@ -51,17 +51,9 @@ plot_%_gh.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../..
 
 graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=dark $*
-	rm -f graph_$*_dark
 
 graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=light $*
-	rm -f graph_$*_light
-
-classes_dyce_dark.svg : classes_dyce.svg Makefile
-	perl >$@ -pe 's{"#000000"}{"Azure"}g' $<
-
-classes_dyce_light.svg : classes_dyce.svg Makefile
-	perl >$@ -pe 's{"#000000"}{"DarkSlateGray"}g' $<
 
 ../dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-dyce--powered%21-gold'
