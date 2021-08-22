@@ -40,7 +40,8 @@ try:
     from graphviz import Digraph
     from graphviz.dot import Dot
 except ImportError:
-    raise
+    Digraph = Any
+    Dot = Any
 
 __all__ = ()
 

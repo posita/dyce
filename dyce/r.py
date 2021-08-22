@@ -92,7 +92,7 @@ _RollOutcomeOperandT = Union[OutcomeT, "RollOutcome"]
 
 
 @runtime_checkable
-class _RollOutcomeOperatorT(
+class RollOutcomeOperatorT(
     Protocol,
     metaclass=CachingProtocolMeta,
 ):
@@ -1062,7 +1062,7 @@ class OperationRollerBase(R):
     @beartype
     def __init__(
         self,
-        op: _RollOutcomeOperatorT,
+        op: RollOutcomeOperatorT,
         sources: Iterable[R] = (),
         annotation: Any = "",
     ):
@@ -1087,7 +1087,7 @@ class OperationRollerBase(R):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def op(self) -> _RollOutcomeOperatorT:
+    def op(self) -> RollOutcomeOperatorT:
         r"""
         The operator this roller applies to its sources.
         """
@@ -1177,7 +1177,7 @@ class BinaryOperationRoller(SumRoller):
     ):
         r"Initializer."
         super().__init__(
-            cast(_RollOutcomeOperatorT, op), (left_source, right_source), annotation
+            cast(RollOutcomeOperatorT, op), (left_source, right_source), annotation
         )
 
     # ---- Overrides -------------------------------------------------------------------
@@ -1213,7 +1213,7 @@ class UnaryOperationRoller(SumRoller):
         annotation: Any = "",
     ):
         r"Initializer."
-        super().__init__(cast(_RollOutcomeOperatorT, op), (source,), annotation)
+        super().__init__(cast(RollOutcomeOperatorT, op), (source,), annotation)
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1279,6 +1279,10 @@ class SelectionRoller(ChainRoller):
     >>> r_values = R.from_values(10000, 1, 1000, 10, 100)
     >>> tuple(r_values.roll().outcomes())
     (10000, 1, 1000, 10, 100)
+    >>> tuple(sorted(_))
+    (1, 10, 100, 1000, 10000)
+    >>> _[3], _[1], _[3]
+    (1000, 10, 1000)
     >>> r_select = r_values.select(3, 1, 3) ; r_select
     SelectionRoller(
       which=(3, 1, 3),

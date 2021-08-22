@@ -45,7 +45,7 @@ def do_it(style: str) -> Optional[Dot]:
 
     src_g.remove_node("dyce.r.Roll")
     src_g.remove_node("dyce.r.RollOutcome")
-    src_g.remove_node("dyce.r._RollOutcomeOperatorT")
+    src_g.remove_node("dyce.r.RollOutcomeOperatorT")
 
     for n in src_g.nodes():
         if n.endswith("WalkerVisitor"):

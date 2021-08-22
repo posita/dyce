@@ -47,4 +47,5 @@
         - "SelectionRoller"
         - "Roll"
         - "RollOutcome"
+        - "RollOutcomeOperatorT"
         - "walk"

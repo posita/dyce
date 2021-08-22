@@ -35,16 +35,15 @@ Now you’re playing with…
 
 ``dyce`` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
-Its primary applications:
+Its primary applications are:
 
 1. Computing finite discrete probability distributions for:
-    * Game designers who want to understand or experiment with various dice mechanics and interactions;
-    * Players (including game masters) who may be curious about in-game probabilities; and
-    * Tool authors who serve those game designers or players.
+    * ***Game designers*** who want to understand or experiment with various dice mechanics and interactions; and
+    * ***Design tool developers***.
 1. Generating transparent, weighted random rolls for:
-    * Software developers who want to enable flexible dice mechanic resolution in their gaming environments such as chat servers or virtual tabletops (VTTs).
+    * ***Game environment developers*** who want flexible dice mechanic resolution in, e.g., virtual tabletops (VTTs), chat servers, etc.
 
-Beyond those audiences, it may be useful to anyone interested in exploring finite discrete probabilities but not in developing all the low-level math bits from scratch.
+Beyond those audiences, ``dyce`` may be useful to anyone interested in exploring finite discrete probabilities but not in developing all the low-level math bits from scratch.
 
 ``dyce`` is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
 While not as compact as a dedicated grammar, ``dyce``’s Python-based primitives are quite sufficient, and often more expressive.
