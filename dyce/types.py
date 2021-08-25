@@ -59,35 +59,35 @@ else:
 
     @runtime_checkable
     class _SupportsAbs(Protocol[_T_co]):
-        __slots__ = ()
+        __slots__: Tuple[str, ...] = ()
 
         @abstractmethod
         def __abs__(self) -> _T_co:
-            pass
+            ...
 
     @runtime_checkable
     class _SupportsFloat(Protocol):
-        __slots__ = ()
+        __slots__: Tuple[str, ...] = ()
 
         @abstractmethod
         def __float__(self) -> float:
-            pass
+            ...
 
     @runtime_checkable
     class _SupportsIndex(Protocol):
-        __slots__ = ()
+        __slots__: Tuple[str, ...] = ()
 
         @abstractmethod
         def __index__(self) -> int:
-            pass
+            ...
 
     @runtime_checkable
     class _SupportsInt(Protocol):
-        __slots__ = ()
+        __slots__: Tuple[str, ...] = ()
 
         @abstractmethod
         def __int__(self) -> int:
-            pass
+            ...
 
 
 _ProtocolMeta: Any = type(Protocol)
@@ -143,7 +143,7 @@ class SupportsAbs(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    ...
+    __slots__: Tuple[str, ...] = ()
 
 
 # For each Protocol herein, we also define a type annotation of the form "...T" and a
@@ -168,7 +168,7 @@ class SupportsFloat(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    ...
+    __slots__: Tuple[str, ...] = ()
 
 
 _assert_isinstance(int, float, bool, target_t=SupportsFloat)
@@ -182,7 +182,7 @@ class SupportsInt(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    ...
+    __slots__: Tuple[str, ...] = ()
 
 
 _assert_isinstance(int, float, bool, target_t=SupportsInt)
@@ -196,7 +196,7 @@ class SupportsIndex(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    ...
+    __slots__: Tuple[str, ...] = ()
 
 
 _assert_isinstance(int, bool, target_t=SupportsIndex)
@@ -209,7 +209,7 @@ class SupportsArithmetic(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
     @abstractmethod
     def __lt__(self, other) -> bool:
@@ -302,7 +302,7 @@ class SupportsBitwise(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
     @abstractmethod
     def __and__(self, other: IntT) -> _T_co:
@@ -346,6 +346,8 @@ class SupportsOutcome(
     Protocol[_T_co],
     metaclass=CachingProtocolMeta,
 ):
+    __slots__: Tuple[str, ...] = ()
+
     # Must be able to instantiate it
     @abstractmethod
     def __init__(self, *args: Any, **kw: Any):
@@ -369,6 +371,9 @@ if sys.version_info >= (3, 8):
         Protocol[_T_co],
         metaclass=CachingProtocolMeta,
     ):
+        # TODO(posita): See <https://github.com/python/mypy/issues/11013>
+        # __slots__: Tuple[str, ...] = ()
+
         def __call__(self, numerator: int, denominator: int) -> _T_co:
             ...
 

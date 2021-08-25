@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import warnings
 from functools import wraps
-from typing import Callable, Type, TypeVar
+from typing import Callable, Tuple, Type, TypeVar
 
 __all__ = ()
 
@@ -26,7 +26,7 @@ _WrappedT = TypeVar("_WrappedT", bound=Callable)
 
 
 class ExperimentalWarning(PendingDeprecationWarning):
-    pass
+    __slots__: Tuple[str, ...] = ()
 
 
 # ---- Decorators ----------------------------------------------------------------------

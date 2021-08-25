@@ -36,7 +36,7 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from typing import Optional, Union, overload
+from typing import Optional, Tuple, Union, overload
 
 from dyce.bt import beartype
 
@@ -54,6 +54,8 @@ _RealT = Union[float, Real]
 
 
 class Numberwang(Integral):
+    __slots__: Tuple[str, ...] = ("val",)
+
     @beartype
     def __init__(self, arg: _RealT = 0):
         self.val = int(arg)
@@ -508,6 +510,8 @@ assert isinstance(Numberwang(0), Integral)
 
 
 class Wangernumb(Real):
+    __slots__: Tuple[str, ...] = ("val",)
+
     @beartype
     def __init__(self, arg: _RealT = 0):
         self.val = float(arg)

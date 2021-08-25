@@ -20,10 +20,17 @@ def do_it(style: str) -> Dot:
     g = digraph(style)
     d6 = H(6)
     d8 = H(8)
-    patch_roll(d6, 2, 5, 2)
-    patch_roll(d8, 3)
     r_d6 = ValueRoller(d6)
     r_d8 = ValueRoller(d8)
+
+    # ---- BEGIN MONKEY PATCH ----
+    # For deterministic outcomes
+    d6 = patch_roll(d6, 2, 5, 2)
+    r_d6._value = d6
+    d8 = patch_roll(d8, 3)
+    r_d8._value = d8
+    # ----- END MONKEY PATCH -----
+
     r_forgetful_best_3_of_3d6_d8 = R.select_from_rs(
         (slice(1, None),),
         3 @ r_d6,

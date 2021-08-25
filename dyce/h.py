@@ -372,6 +372,7 @@ class H(_MappingT):
 
     ```
     """
+    __slots__: Tuple[str, ...] = ("_h", "_simple_init")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1743,6 +1744,7 @@ class HableT(
     only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
     integration point for ``#!python dyce`` users.
     """
+    __slots__: Tuple[str, ...] = ()
 
     def h(self) -> H:
         r"""
@@ -1757,6 +1759,7 @@ class HableOpsMixin:
     [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this
     class.
     """
+    __slots__: Tuple[str, ...] = ()
 
     @beartype
     def __add__(self: HableT, other: _OperandT) -> H:

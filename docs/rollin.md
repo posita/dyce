@@ -90,6 +90,20 @@ We start by creating two histograms[^1] representing our two ten-sided dice (``d
 
 ```
 
+<!--
+---- BEGIN MONKEY PATCH ----
+For deterministic outcomes
+
+>>> from tests.patches import patch_roll
+>>> d00 = patch_roll(d00, -1, 60, 40, 20)
+>>> d10 = patch_roll(d10, -1, 9, 2, 1)
+>>> d00.roll(), d10.roll()
+(-1, -1)
+
+----- END MONKEY PATCH -----
+
+-->
+
 Next, we create a roller using the [``R.from_values`` class method][dyce.r.R.from_values].
 
 ``` python
@@ -123,13 +137,6 @@ That durned class method created a whole roller *tree*, which is actually *three
     ```
 
 Let’s use our new roller to create a roll and retrieve its total.
-
-<!--
->>> from tests.patches import patch_roll
->>> patch_roll(d00, 60, 40, 20)
->>> patch_roll(d10, 9, 2, 1)
-
--->
 
 ``` python
 >>> roll = r_d100.roll()
@@ -264,8 +271,14 @@ BinaryOperationRoller(
 ```
 
 <!--
->>> from tests.patches import patch_roll
->>> patch_roll(d12, 7)
+---- BEGIN MONKEY PATCH ----
+For deterministic outcomes
+
+>>> from typing import cast
+>>> d12 = patch_roll(d12, 7)
+>>> cast(ValueRoller, r_d12_add_4.sources[0])._value = d12
+
+----- END MONKEY PATCH -----
 
 -->
 
@@ -346,6 +359,29 @@ ValueRoller(value=H(8), annotation='')
 
 ```
 
+<!--
+---- BEGIN MONKEY PATCH ----
+For deterministic outcomes
+
+>>> d6 = patch_roll(
+...   d6,
+...   6, 1, 1,  # select_1
+...   4, 2, 4,  # select_2
+...   2, 5, 2,  # select_3
+... )
+>>> r_d6._value = d6
+>>> d8 = patch_roll(
+...   d8,
+...   5,  # select_1
+...   1,  # select_2
+...   3,  # select_3
+... )
+>>> r_d8._value = d8
+
+----- END MONKEY PATCH -----
+
+-->
+
 For homogeneous pools, we can use the matrix multiplication operator.
 
 ``` python
@@ -379,22 +415,6 @@ SelectionRoller(
 
 Oh boy!
 Aren’t you super excited to try this thing out?
-
-<!--
->>> patch_roll(
-...   d6,
-...   6, 1, 1,  # select_1
-...   4, 2, 4,  # select_2
-...   2, 5, 2,  # select_3
-... )
->>> patch_roll(
-...   d8,
-...   5,  # select_1
-...   1,  # select_2
-...   3,  # select_3
-... )
-
--->
 
 ``` python
 >>> roll = r_best_3_of_3d6_d8.roll()

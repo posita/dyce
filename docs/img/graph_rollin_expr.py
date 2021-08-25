@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from graph import COLORS, Dot, digraph, graphviz_walk
 
 from dyce import H
@@ -19,7 +21,6 @@ from tests.patches import patch_roll
 def do_it(style: str) -> Dot:
     g = digraph(style)
     d12 = H(12)
-    patch_roll(d12, 7)
     r_d12 = ValueRoller(
         d12,
         annotation={
@@ -51,6 +52,13 @@ def do_it(style: str) -> Dot:
         },
     )
     r_d12_add_4 = r_d12 + r_4
+
+    # ---- BEGIN MONKEY PATCH ----
+    # For deterministic outcomes
+    d12 = patch_roll(d12, 7)
+    cast(ValueRoller, r_d12_add_4.sources[0])._value = d12
+    # ----- END MONKEY PATCH -----
+
     graphviz_walk(g, r_d12_add_4.roll())
 
     return g

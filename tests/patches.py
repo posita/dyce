@@ -20,7 +20,7 @@ __all__ = ()
 # ---- Functions -----------------------------------------------------------------------
 
 
-def patch_roll(h: H, *args: OutcomeT) -> None:
+def patch_roll(h: H, *args: OutcomeT) -> H:
     roll_func = h.roll
 
     def _f() -> Iterator[OutcomeT]:
@@ -29,4 +29,11 @@ def patch_roll(h: H, *args: OutcomeT) -> None:
         while True:
             yield roll_func()
 
-    h.roll = MagicMock(side_effect=_f())  # type: ignore
+    # H is __slots__-ed, so we can't replace its roll method. We have to do this dark
+    # magic instead.
+    doppleganger = type("H", (H,), {})(h)
+    doppleganger._simple_init = h._simple_init
+    assert isinstance(doppleganger, H)
+    doppleganger.roll = MagicMock(side_effect=_f())  # type: ignore
+
+    return doppleganger

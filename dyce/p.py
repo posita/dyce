@@ -191,6 +191,7 @@ class P(Sequence[H], HableOpsMixin):
 
     ```
     """
+    __slots__: Tuple[str, ...] = ("_hs",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -221,7 +222,6 @@ class P(Sequence[H], HableOpsMixin):
             hs.sort(key=lambda h: str(tuple(h.items())))
 
         self._hs = tuple(hs)
-        self._is_homogeneous = len(set(self._hs)) <= 1
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -262,8 +262,8 @@ class P(Sequence[H], HableOpsMixin):
         ...
 
     @beartype
-    # TODO(posita): See: <https://github.com/python/mypy/issues/8393>
-    # TODO(posita): See: <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    # TODO(posita): See <https://github.com/python/mypy/issues/8393>
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
     def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore
         if isinstance(key, slice):
             return P(*self._hs[key])
@@ -407,7 +407,7 @@ class P(Sequence[H], HableOpsMixin):
 
         ```
         """
-        return self._is_homogeneous
+        return len(set(self._hs)) <= 1
 
     # ---- Methods ---------------------------------------------------------------------
 

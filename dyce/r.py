@@ -96,8 +96,12 @@ class RollOutcomeOperatorT(
     Protocol,
     metaclass=CachingProtocolMeta,
 ):
+    # TODO(posita): See <https://github.com/python/mypy/issues/11013>
+    # __slots__: Tuple[str, ...] = ()
+
     def __call__(
-        self, *roll_outcomes: RollOutcome
+        self,
+        *roll_outcomes: RollOutcome,
     ) -> Union[RollOutcome, Iterable[RollOutcome]]:
         ...
 
@@ -259,6 +263,7 @@ class R:
     unary operations, binary operations, pools, etc.). In most cases, details of those
     implementations can be safely ignored.
     """
+    __slots__: Tuple[str, ...] = ("_annotation", "_sources")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -488,7 +493,7 @@ class R:
         Sub-classes should implement this to return a new [``Roll`` object][dyce.r.Roll]
         appropriate for a particular roller (taking into account any sources).
         """
-        raise NotImplementedError
+        ...
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -1001,6 +1006,7 @@ class ValueRoller(R):
     A [roller][dyce.r.R] without any sources for representing a single *value* (i.e., a
     single outcome or a histogram).
     """
+    __slots__: Tuple[str, ...] = ("_value",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1056,6 +1062,7 @@ class OperationRollerBase(R):
     *sources*. (The specific variation is left up to the
     [``R.roll`` method][dyce.r.R.roll] implementation of any subclass.)
     """
+    __slots__: Tuple[str, ...] = ("_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1099,6 +1106,7 @@ class ChainRoller(OperationRollerBase):
     A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
     applying *op* to the chained outcomes from each of *sources*.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1128,6 +1136,7 @@ class SumRoller(OperationRollerBase):
     A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
     applying *op* to the sum of outcomes grouped by each of *sources*.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1164,6 +1173,7 @@ class BinaryOperationRoller(SumRoller):
     of all outcomes from its *left_source* and the sum of all outcomes from its
     *right_source*.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1202,6 +1212,7 @@ class UnaryOperationRoller(SumRoller):
     A [``SumRoller``][dyce.r.SumRoller] for applying a unary operator *op* to the sum of
     all outcomes from its sole *source*.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1232,6 +1243,7 @@ class PoolRoller(ChainRoller):
     r"""
     A [``ChainRoller``][dyce.r.ChainRoller] for “pooling” zero or more roller *sources*.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1275,17 +1287,27 @@ class SelectionRoller(ChainRoller):
     However, those selections reference values in a *sorted* view of the source’s roll
     outcomes.
 
+    <!--
+    ``` python
+    >>> from typing import Tuple, Union
+    >>> which: Tuple[Union[int, slice], ...]
+
+    ```
+
+    -->
+
     ``` python
     >>> r_values = R.from_values(10000, 1, 1000, 10, 100)
-    >>> tuple(r_values.roll().outcomes())
+    >>> outcomes = tuple(r_values.roll().outcomes()) ; outcomes
     (10000, 1, 1000, 10, 100)
-    >>> tuple(sorted(_))
+    >>> sorted_outcomes = tuple(sorted(outcomes)) ; sorted_outcomes
     (1, 10, 100, 1000, 10000)
-    >>> _[3], _[1], _[3]
-    (1000, 10, 1000)
-    >>> r_select = r_values.select(3, 1, 3) ; r_select
+    >>> which = (3, 1, 3, 2)
+    >>> tuple(sorted_outcomes[i] for i in which)
+    (1000, 10, 1000, 100)
+    >>> r_select = r_values.select_iterable(which) ; r_select
     SelectionRoller(
-      which=(3, 1, 3),
+      which=(3, 1, 3, 2),
       sources=(
         PoolRoller(
           sources=(
@@ -1302,7 +1324,7 @@ class SelectionRoller(ChainRoller):
     )
     >>> roll = r_select.roll()
     >>> tuple(roll.outcomes())
-    (1000, 10, 1000)
+    (1000, 10, 1000, 100)
     >>> roll
     Roll(
       r=...,
@@ -1333,11 +1355,10 @@ class SelectionRoller(ChainRoller):
           ),
         ),
         RollOutcome(
-          value=None,
+          value=100,
           sources=(
             RollOutcome(
-              value=1, ...,
-              ),
+              value=100, ...,
             ),
           ),
         ),
@@ -1345,7 +1366,8 @@ class SelectionRoller(ChainRoller):
           value=None,
           sources=(
             RollOutcome(
-              value=100, ...,
+              value=1, ...,
+              ),
             ),
           ),
         ),
@@ -1362,6 +1384,7 @@ class SelectionRoller(ChainRoller):
 
     ```
     """
+    __slots__: Tuple[str, ...] = ("_which",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1444,6 +1467,7 @@ class RepeatRoller(R):
 
     ```
     """
+    __slots__: Tuple[str, ...] = ("_n",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1510,6 +1534,7 @@ class RollOutcome:
 
     A single, ([mostly][dyce.r.Roll.__init__]) immutable outcome generated by a roll.
     """
+    __slots__: Tuple[str, ...] = ("_roll", "_sources", "_value")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1541,7 +1566,7 @@ class RollOutcome:
 )"""
 
     @beartype
-    # TODO(posita): See: <https://github.com/python/mypy/issues/10943>
+    # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __lt__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
             return __lt__(self.value, other.value)
@@ -1549,7 +1574,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    # TODO(posita): See: <https://github.com/python/mypy/issues/10943>
+    # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __le__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
             return __le__(self.value, other.value)
@@ -2001,6 +2026,7 @@ class Roll(Sequence[RollOutcome]):
     calling the [``R.roll`` method][dyce.r.R.roll]. Rolls are sequences of
     [``RollOutcome`` objects][dyce.r.RollOutcome] with additional convenience methods.
     """
+    __slots__: Tuple[str, ...] = ("__weakref__", "_r", "_roll_outcomes", "_sources")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2105,8 +2131,8 @@ class Roll(Sequence[RollOutcome]):
         ...
 
     @beartype
-    # TODO(posita): See: <https://github.com/python/mypy/issues/8393>
-    # TODO(posita): See: <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    # TODO(posita): See <https://github.com/python/mypy/issues/8393>
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
     def __getitem__(  # type: ignore
         self,
         key: _GetItemT,
@@ -2194,12 +2220,13 @@ class RollWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``Roll`` object][dyce.r.Roll] found.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
     @abstractmethod
     def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
-        raise NotImplementedError
+        ...
 
 
 class RollOutcomeWalkerVisitor:
@@ -2212,6 +2239,7 @@ class RollOutcomeWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``RollOutcome`` object][dyce.r.RollOutcome] found.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2219,7 +2247,7 @@ class RollOutcomeWalkerVisitor:
     def on_roll_outcome(
         self, roll_outcome: RollOutcome, parents: Iterator[RollOutcome]
     ) -> None:
-        raise NotImplementedError
+        ...
 
 
 class RollerWalkerVisitor:
@@ -2232,12 +2260,13 @@ class RollerWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``R`` object][dyce.r.R] found.
     """
+    __slots__: Tuple[str, ...] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
     @abstractmethod
     def on_roller(self, r: R, parents: Iterator[R]) -> None:
-        raise NotImplementedError
+        ...
 
 
 @experimental
