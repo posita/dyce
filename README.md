@@ -8,7 +8,7 @@
 
   WARNING: THIS DOCUMENT MUST BE SELF-CONTAINED.
   ALL LINKS MUST BE ABSOLUTE.
-  This file is used on GitHub and PyPi (via setup.py).
+  This file is used on GitHub and PyPi (via setup.cfg).
   There is no guarantee that other docs/resources will be available where this content is displayed.
 -->
 
@@ -310,13 +310,13 @@ Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 ...
 ```
 
-Alternately, you can download [the source](https://github.com/posita/dyce) and run ``setup.py``.
+Alternately, you can download [the source](https://github.com/posita/dyce) and install manually ``setup.cfg``.
 
 ```sh
 % git clone https://github.com/posita/dyce.git
 ...
 % cd dyce
-% python setup.py install
+% python -m pip install .  # -or- python -c 'from setuptools import setup ; setup()' install .
 ...
 ```
 

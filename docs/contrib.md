@@ -53,7 +53,7 @@ The above is essentially equivalent to the following (with some additional check
 ```
 
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
-See the ``extras_require`` parameter in [``setup.py``](https://github.com/posita/dyce/blob/latest/setup.py).
+See the ``[options.extras_require]`` section in [``setup.cfg``](https://github.com/posita/dyce/blob/latest/setup.cfg).
 
 Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed).
 

@@ -1,3 +1,4 @@
+
 #!/usr/bin/env sh
 # -*- encoding: utf-8 -*-
 # ======================================================================================
@@ -21,8 +22,7 @@ if [ "${#}" -ne 3 ] ; then
     exit 1
 fi
 
-PKG="$( python -c 'import setup ; print(setup.SETUP_ARGS["name"])' )"
-VERS_PY="$( python -c 'import setup ; print(setup.vers_info["__path__"])' )"
+PKG="$( python -c 'import configparser, sys ; config = configparser.ConfigParser() ; config.read_file(open(sys.argv[1])) ; print(config.get("metadata", "name"))' "${_REPO_DIR}/setup.cfg" )"
 MAJOR="${1}"
 MINOR="${2}"
 PATCH="${3}"
@@ -36,8 +36,9 @@ twine --version
 mkdocs --version
 mike --version
 git checkout -b "${VERS_PATCH}-release"
-perl -pi -e 's{^__version__([^#=]*)=\s*\(\s*0\s*,\s*0\s*,\s*0\s*,?\s*\)(\s*#.*)?$} {__version__\1= ('"${MAJOR}"', '"${MINOR}"', '"${PATCH}"')\2}g ;' "${VERS_PY}"
-perl -pi -e 's{\.github\.io/dyce/latest/([^)]*)\)} {\.github\.io/dyce/'"${VERS}"'/\1)}g ; s{/dyce/([^/]+/)*latest/} {/dyce/\1'"${TAG}"'/}g ; s{//pypi\.org/([^/]+/)?'"${PKG}"'/} {//pypi.org/\1'"${PKG}"'/'"${VERS_PATCH}"'/}g ; s{/pypi/([^/]+/)?'"${PKG}"'\.svg\)} {/pypi/\1'"${PKG}"'/'"${VERS_PATCH}"'.svg)}g' README.md docs/contrib.md
+perl -pi -e "s{^__version__\\b([^#=]*)=\\s*\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,?\\s*\\)(\\s*#.*)?\$} {__version__\\1= (${MAJOR}, ${MINOR}, ${PATCH})\\2}g" dyce/version.py
+perl -pi -e "s{^version\\s+=\\s+0.0.0\$} {version = ${MAJOR}.${MINOR}.${PATCH}}g" setup.cfg
+perl -pi -e "s{\\.github\\.io/dyce/latest/([^)]*)\\)} {\\.github\\.io/dyce/${VERS}/\\1)}g ; s{/dyce/([^/]+/)*latest/} {/dyce/\\1${TAG}/}g ; s{//pypi\\.org/([^/]+/)?${PKG}/} {//pypi.org/\\1${PKG}/${VERS_PATCH}/}g ; s{/pypi/([^/]+/)?${PKG}\\.svg\\)} {/pypi/\\1${PKG}/${VERS_PATCH}.svg)}g" setup.cfg README.md docs/contrib.md
 
 problem_areas="$(
     grep -En '/latest\b' /dev/null README.md docs/*.md || [ "${?}" -eq 1 ]
@@ -87,7 +88,7 @@ fi
 set -ex
 git commit --all --message "Update version and release ${TAG}."
 tox
-python setup.py bdist_wheel sdist
+python -c 'from setuptools import setup ; setup()' bdist_wheel sdist
 twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
 mike deploy --rebase --update-aliases "${VERS}" latest
 git tag --force --message "$( cat <<EOF
