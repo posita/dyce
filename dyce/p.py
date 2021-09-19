@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -116,7 +115,7 @@ class P(Sequence[H], HableOpsMixin):
     flattening, use the [``map``][dyce.p.P.map], [``rmap``][dyce.p.P.rmap], and
     [``umap``][dyce.p.P.umap] methods.
 
-    ```
+    ``` python
     >>> import operator
     >>> P(4, 6, 8).umap(operator.__neg__)
     P(-8, -6, -4)
@@ -905,7 +904,7 @@ def _analyze_selection(
     elif min_index <= n - max_index:
         return max_index
     else:
-        assert False, "should never be here"
+        assert False, "logically impossible (should never be here)"
 
 
 @beartype

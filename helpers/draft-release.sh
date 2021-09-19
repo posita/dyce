@@ -1,6 +1,5 @@
 
 #!/usr/bin/env sh
-# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -32,13 +31,10 @@ TAG="v${VERS_PATCH}"
 
 set -ex
 cd "${_REPO_DIR}"
-twine --version
-mkdocs --version
-mike --version
 git checkout -b "${VERS_PATCH}-release"
-perl -pi -e "s{^__version__\\b([^#=]*)=\\s*\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,?\\s*\\)(\\s*#.*)?\$} {__version__\\1= (${MAJOR}, ${MINOR}, ${PATCH})\\2}g" dyce/version.py
-perl -pi -e "s{^version\\s+=\\s+0.0.0\$} {version = ${MAJOR}.${MINOR}.${PATCH}}g" setup.cfg
-perl -pi -e "s{\\.github\\.io/dyce/latest/([^)]*)\\)} {\\.github\\.io/dyce/${VERS}/\\1)}g ; s{/dyce/([^/]+/)*latest/} {/dyce/\\1${TAG}/}g ; s{//pypi\\.org/([^/]+/)?${PKG}/} {//pypi.org/\\1${PKG}/${VERS_PATCH}/}g ; s{/pypi/([^/]+/)?${PKG}\\.svg\\)} {/pypi/\\1${PKG}/${VERS_PATCH}.svg)}g" setup.cfg README.md docs/contrib.md
+perl -p -i -e "s{^__version__\\b([^#=]*)=\\s*\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,?\\s*\\)(\\s*#.*)?\$} {__version__\\1= (${MAJOR}, ${MINOR}, ${PATCH})\\2}g" dyce/version.py
+perl -p -i -e "s{^version\\s+=\\s+0.0.0\$} {version = ${MAJOR}.${MINOR}.${PATCH}}g" setup.cfg
+perl -p -i -e "s{\\.github\\.io/dyce/latest/([^)]*)\\)} {\\.github\\.io/dyce/${VERS}/\\1)}g ; s{/dyce/([^/]+/)*latest/} {/dyce/\\1${TAG}/}g ; s{//pypi\\.org/([^/]+/)?${PKG}/} {//pypi.org/\\1${PKG}/${VERS_PATCH}/}g ; s{/pypi/([^/]+/)?${PKG}\\.svg\\)} {/pypi/\\1${PKG}/${VERS_PATCH}.svg)}g" setup.cfg README.md docs/contrib.md
 
 problem_areas="$(
     grep -En '/latest\b' /dev/null README.md docs/*.md || [ "${?}" -eq 1 ]
@@ -88,9 +84,12 @@ fi
 set -ex
 git commit --all --message "Update version and release ${TAG}."
 tox
-python -c 'from setuptools import setup ; setup()' bdist_wheel sdist
-twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
-mike deploy --rebase --update-aliases "${VERS}" latest
+python -c 'from setuptools import setup ; setup()' sdist
+(
+    . "${_REPO_DIR}/.tox/check/bin/activate"
+    twine check "dist/${PKG}-${VERS_PATCH}"[-.]*
+    mike deploy --rebase --update-aliases "${VERS}" latest
+)
 git tag --force --message "$( cat <<EOF
 Release ${TAG}.
 

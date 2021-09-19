@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -1335,6 +1334,9 @@ class H(_MappingT):
         ```
         """
         max_depth = as_int(max_depth)
+
+        if max_depth < 0:
+            raise ValueError("max_depth cannot be negative")
 
         def _substitute(h: H, depth: int = 0) -> H:
             assert coalesce is not None

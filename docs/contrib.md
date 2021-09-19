@@ -1,4 +1,4 @@
-<!--- -*- encoding: utf-8 -*-
+<!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -48,6 +48,8 @@ The above is essentially equivalent to the following (with some additional check
 % …/path/to/python -m virtualenv .venv || …/path/to/python -m venv .venv
 …
 % .venv/bin/pip install --upgrade --editable '.[dev]'
+…
+% .venv/bin/python -m pre_commit install
 …
 % . .venv/bin/activate
 ```

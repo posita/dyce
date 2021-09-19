@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -33,19 +32,18 @@ def do_it(style: str) -> Optional[Dot]:
         "pyreverse",
         "--only-classnames",
         "--output=dot",
-        "--project=dyce_r",
+        f"--project=dyce_r_{style}",
         str(r_path),
     )
     logging.info(" ".join(cmd))
     subprocess.run(cmd)
 
     src_g = AGraph()
-    src_g.read("classes_dyce_r.dot")
-    os.remove("classes_dyce_r.dot")
+    src_g.read(f"classes_dyce_r_{style}.dot")
+    os.remove(f"classes_dyce_r_{style}.dot")
 
     src_g.remove_node("dyce.r.Roll")
     src_g.remove_node("dyce.r.RollOutcome")
-    src_g.remove_node("dyce.r.RollOutcomeOperatorT")
 
     for n in src_g.nodes():
         if n.endswith("WalkerVisitor"):

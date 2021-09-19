@@ -1,4 +1,4 @@
-<!--- -*- encoding: utf-8 -*-
+<!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -18,9 +18,10 @@
 ## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
 
 * Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
-* Use ``pygraphviz`` to automate class diagram generation.
+* Uses ``pygraphviz`` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
-* Use ``numpy`` for RNG, if present.
+* Uses ``numpy`` for RNG, if present.
+* Migrates to using ``pyproject.toml`` and ``setup.cfg``.
 
 ## [0.4.0](https://github.com/posita/dyce/releases/tag/v0.4.0)
 
@@ -32,13 +33,13 @@
     Please review before upgrading.
 
 * Renames ``HAbleT`` and ``HAbleOpsMixin`` to [``HableT``][dyce.h.HableT] and  [``HableOpsMixin``][dyce.h.HableOpsMixin].
-    Use alternate spellings.
+    Uses alternate spellings.
 * Removes deprecated non-flattening unary operation methods ``P.__neg__`` and ``P.__pos__``.
-    Use, e.g., ``#!python P.umap(operator.__neg__)`` or ``#!python P(-h for h in p)`` instead.
+    Uses, e.g., ``#!python P.umap(operator.__neg__)`` or ``#!python P(-h for h in p)`` instead.
 * Removes deprecated synonym methods ``H.even`` and ``H.odd``.
-    Use  [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
+    Uses [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
 * Removes deprecated synonym package ``dyce.plt``.
-    Use [``dyce.viz``][dyce.viz] instead.
+    Uses [``dyce.viz``][dyce.viz] instead.
 * Removes special case handling of ``H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.

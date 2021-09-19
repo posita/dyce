@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# -*- encoding: utf-8 -*-
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
@@ -44,6 +43,7 @@ _venvsetup() {
         (
             cd "${_REPO_DIR}"
             "${_VENVSETUP_DIR}/bin/pip" install --upgrade --editable '.[dev]'
+            "${_VENVSETUP_DIR}/bin/python" -m pre_commit install
         )
     ) \
             || return "${?}"

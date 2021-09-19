@@ -7,11 +7,6 @@
 <svg width="1099pt" height="294pt"
  viewBox="0.00 0.00 1099.00 294.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 290)">
-<g id="clust1" class="cluster">
-<title>cluster_rolls</title>
-<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="589,-95 589,-278 816,-278 816,-95 589,-95"/>
-<text text-anchor="start" x="674" y="-263.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Tree</text>
-</g>
 <g id="clust2" class="cluster">
 <title>cluster_rollers</title>
 <polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="8,-8 8,-170 581,-170 581,-8 8,-8"/>
@@ -21,6 +16,11 @@
 <title>cluster_roll_outcomes</title>
 <polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="824,-8 824,-170 1066,-170 1066,-8 824,-8"/>
 <text text-anchor="start" x="899" y="-155.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Outcomes</text>
+</g>
+<g id="clust1" class="cluster">
+<title>cluster_rolls</title>
+<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="589,-95 589,-278 816,-278 816,-95 589,-95"/>
+<text text-anchor="start" x="674" y="-263.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Tree</text>
 </g>
 <!-- Roll&#45;1 -->
 <g id="node1" class="node">
