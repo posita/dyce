@@ -28,16 +28,16 @@
 <polygon fill="none" stroke="DarkSlateGray" points="364,-247 310,-247 310,-211 364,-211 364,-247"/>
 <text text-anchor="start" x="323.5" y="-226.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">Roll</text>
 </g>
-<!-- BinaryOperationRoller&#45;2 -->
+<!-- BinarySumOpRoller&#45;2 -->
 <g id="node2" class="node">
-<title>BinaryOperationRoller&#45;2</title>
-<polygon fill="none" stroke="DarkSlateGray" points="235,-139 69,-139 69,-103 235,-103 235,-139"/>
-<text text-anchor="start" x="77" y="-124.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">BinaryOperationRoller</text>
-<text text-anchor="start" x="126.5" y="-110.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">op=add</text>
+<title>BinarySumOpRoller&#45;2</title>
+<polygon fill="none" stroke="DarkSlateGray" points="227,-139 77,-139 77,-103 227,-103 227,-139"/>
+<text text-anchor="start" x="85" y="-124.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">BinarySumOpRoller</text>
+<text text-anchor="start" x="109.5" y="-110.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">bin_op=add</text>
 </g>
-<!-- Roll&#45;1&#45;&gt;BinaryOperationRoller&#45;2 -->
+<!-- Roll&#45;1&#45;&gt;BinarySumOpRoller&#45;2 -->
 <g id="edge1" class="edge">
-<title>Roll&#45;1&#45;&gt;BinaryOperationRoller&#45;2</title>
+<title>Roll&#45;1&#45;&gt;BinarySumOpRoller&#45;2</title>
 <path fill="none" stroke="DarkSlateGray" d="M309.87,-216.17C295.69,-209.74 278.17,-201.39 263,-193 236.08,-178.11 206.82,-159.27 185.1,-144.74"/>
 <polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="186.82,-141.68 176.57,-139 182.92,-147.49 186.82,-141.68"/>
 <text text-anchor="middle" x="267.5" y="-181.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">r</text>
@@ -89,9 +89,9 @@
 <text text-anchor="start" x="32.5" y="-37.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumBlue">ValueRoller</text>
 <text text-anchor="start" x="24.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="MediumBlue">value=H(12)</text>
 </g>
-<!-- BinaryOperationRoller&#45;2&#45;&gt;ValueRoller&#45;5 -->
+<!-- BinarySumOpRoller&#45;2&#45;&gt;ValueRoller&#45;5 -->
 <g id="edge9" class="edge">
-<title>BinaryOperationRoller&#45;2&#45;&gt;ValueRoller&#45;5</title>
+<title>BinarySumOpRoller&#45;2&#45;&gt;ValueRoller&#45;5</title>
 <path fill="none" stroke="MediumBlue" stroke-dasharray="5,2" d="M94.13,-102.98C86.27,-98.34 79.15,-92.45 74,-85 69.46,-78.43 67.79,-70.15 67.52,-62.22"/>
 <polygon fill="MediumBlue" stroke="MediumBlue" points="71.02,-62.29 67.84,-52.18 64.02,-62.06 71.02,-62.29"/>
 <text text-anchor="middle" x="116.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="MediumBlue">sources[0]</text>
@@ -103,9 +103,9 @@
 <text text-anchor="start" x="151.5" y="-37.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">ValueRoller</text>
 <text text-anchor="start" x="160.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=4</text>
 </g>
-<!-- BinaryOperationRoller&#45;2&#45;&gt;ValueRoller&#45;8 -->
+<!-- BinarySumOpRoller&#45;2&#45;&gt;ValueRoller&#45;8 -->
 <g id="edge10" class="edge">
-<title>BinaryOperationRoller&#45;2&#45;&gt;ValueRoller&#45;8</title>
+<title>BinarySumOpRoller&#45;2&#45;&gt;ValueRoller&#45;8</title>
 <path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M156.31,-102.93C159.08,-93.08 163.08,-80.58 168,-70 169.39,-67.01 171,-63.96 172.69,-60.97"/>
 <polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="175.74,-62.69 177.91,-52.32 169.75,-59.07 175.74,-62.69"/>
 <text text-anchor="middle" x="210.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[1]</text>

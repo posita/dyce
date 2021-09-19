@@ -24,30 +24,30 @@ def do_it(style: str) -> None:
 
     fig = matplotlib.pyplot.figure()
     fig.set_size_inches(10, 5, forward=True)
-    plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))
-    burst_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
-    sa_label = "Normal attack"
-    plot_ax.plot(
+    ax_plot = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))
+    ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
+    label_sa = "Normal attack"
+    ax_plot.plot(
         *single_attack.distribution_xy(),
         color="lightgreen" if style == "dark" else "tab:green",
-        label=sa_label,
+        label=label_sa,
         marker=".",
     )
-    gwf_label = "“Great Weapon Fighting”"
-    plot_ax.plot(
+    label_gwf = "“Great Weapon Fighting”"
+    ax_plot.plot(
         *great_weapon_fighting.distribution_xy(),
         color="lightblue" if style == "dark" else "tab:blue",
-        label=gwf_label,
+        label=label_gwf,
         marker=".",
     )
-    plot_ax.legend()
+    ax_plot.legend()
     # Should match the corresponding img[alt] text
-    plot_ax.set_title(r"Comparing a normal attack to an enhanced one")
+    ax_plot.set_title("Comparing a normal attack to an enhanced one")
     display_burst(
-        burst_ax,
+        ax_burst,
         h_inner=great_weapon_fighting,
         outer=single_attack,
-        desc=f"{sa_label} vs. {gwf_label}",
+        desc=f"{label_sa} vs. {label_gwf}",
         inner_color="RdYlBu_r",
         outer_color="RdYlGn_r",
         text_color="white" if style == "dark" else "black",

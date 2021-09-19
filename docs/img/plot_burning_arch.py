@@ -23,5 +23,5 @@ def do_it(_: str) -> None:
     matplotlib.pyplot.plot(outcomes, probabilities, marker=".")
     # Should match the corresponding img[alt] text
     matplotlib.pyplot.title(
-        r"Expected outcomes for attack with saving throw for half damage"
+        "Expected outcomes for attack with saving throw for half damage"
     )

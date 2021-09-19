@@ -13,7 +13,8 @@ from typing import Optional
 
 import pytest
 
-from dyce.rng import RNG, _RandSeed
+from dyce import rng
+from dyce.rng import _RandSeed
 
 __all__ = ()
 
@@ -36,7 +37,7 @@ def test_numpy_rng_installed() -> None:
     except ImportError:
         pytest.skip("requires numpy")
 
-    assert isinstance(RNG, PCG64DXSMRandom)
+    assert isinstance(rng.DEFAULT_RNG, PCG64DXSMRandom)
 
 
 def test_numpy_rng() -> None:
@@ -90,7 +91,7 @@ def test_standard_rng_installed() -> None:
     except ImportError:
         pass
 
-    assert isinstance(RNG, Random)
+    assert isinstance(rng.DEFAULT_RNG, Random)
 
 
 def test_standard_rng() -> None:

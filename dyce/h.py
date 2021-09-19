@@ -66,10 +66,14 @@ from .types import (
     IntT,
     OutcomeT,
     Protocol,
+    _BinaryOperatorT,
     _IntCs,
     _OutcomeCs,
     _RationalInitializerT,
+    _UnaryOperatorT,
     as_int,
+    is_even,
+    is_odd,
     runtime_checkable,
     sorted_outcomes,
 )
@@ -91,8 +95,6 @@ _SourceT = Union[
     "HableT",
 ]
 _OperandT = Union[OutcomeT, "H", "HableT"]
-_UnaryOperatorT = Callable[[_T_co], _T_co]
-_BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
 _CoalesceT = Callable[["H", OutcomeT], "H"]
 
@@ -700,11 +702,11 @@ class H(_MappingT):
     @beartype
     def map(
         self,
-        op: _BinaryOperatorT,
+        bin_op: _BinaryOperatorT,
         right_operand: _OperandT,
     ) -> H:
         r"""
-        Applies *op* to each outcome of the histogram as the left operand and
+        Applies *bin_op* to each outcome of the histogram as the left operand and
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
         comparators.
 
@@ -739,19 +741,20 @@ class H(_MappingT):
 
         if isinstance(right_operand, H):
             return type(self)(
-                (op(s, o), self[s] * right_operand[o])
+                (bin_op(s, o), self[s] * right_operand[o])
                 for s, o in product(self, right_operand)
             )
         else:
             return type(self)(
-                (op(outcome, right_operand), count) for outcome, count in self.items()
+                (bin_op(outcome, right_operand), count)
+                for outcome, count in self.items()
             )
 
     @beartype
     def rmap(
         self,
         left_operand: OutcomeT,
-        op: _BinaryOperatorT,
+        bin_op: _BinaryOperatorT,
     ) -> H:
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
@@ -767,21 +770,23 @@ class H(_MappingT):
 
         ```
 
-        Note that the positions of *left_operand* and *op* are different from
-        [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
-        of operand ordering.
+        !!! note
+
+            The positions of *left_operand* and *bin_op* are different from
+            [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
+            of operand ordering.
         """
         return type(self)(
-            (op(left_operand, outcome), count) for outcome, count in self.items()
+            (bin_op(left_operand, outcome), count) for outcome, count in self.items()
         )
 
     @beartype
     def umap(
         self,
-        op: _UnaryOperatorT,
+        un_op: _UnaryOperatorT,
     ) -> H:
         r"""
-        Applies *op* to each outcome of the histogram.
+        Applies *un_op* to each outcome of the histogram.
 
         ``` python
         >>> import operator
@@ -796,10 +801,10 @@ class H(_MappingT):
 
         ```
         """
-        h = type(self)((op(outcome), count) for outcome, count in self.items())
+        h = type(self)((un_op(outcome), count) for outcome, count in self.items())
 
         if self._simple_init is not None:
-            simple_init = op(self._simple_init)
+            simple_init = un_op(self._simple_init)
 
             if isinstance(simple_init, _IntCs):
                 h_simple = type(self)(simple_init)
@@ -920,7 +925,7 @@ class H(_MappingT):
     @beartype
     def is_even(self) -> H:
         r"""
-        Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 == 0)``.
+        Equivalent to ``#!python self.umap(dyce.types.is_even)``.
 
         ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_even()
@@ -930,16 +935,12 @@ class H(_MappingT):
 
         See the [``umap`` method][dyce.h.H.umap].
         """
-
-        def _is_even(outcome: IntT) -> bool:
-            return as_int(outcome) % 2 == 0
-
-        return self.umap(_is_even)
+        return self.umap(is_even)
 
     @beartype
     def is_odd(self) -> H:
         r"""
-        Equivalent to ``#!python self.umap(lambda outcome: outcome % 2 != 0)``.
+        Equivalent to ``#!python self.umap(dyce.types.is_odd)``.
 
         ``` python
         >>> H((-4, -2, 0, 1, 2, 3)).is_odd()
@@ -949,11 +950,7 @@ class H(_MappingT):
 
         See the [``umap`` method][dyce.h.H.umap].
         """
-
-        def _is_odd(outcome: IntT) -> bool:
-            return as_int(outcome) % 2 != 0
-
-        return self.umap(_is_odd)
+        return self.umap(is_odd)
 
     @beartype
     def accumulate(self, other: _SourceT) -> H:
@@ -1745,6 +1742,20 @@ class HableT(
     [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HableT.h]. Currently,
     only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
     integration point for ``#!python dyce`` users.
+
+    !!! info
+
+        The intended pronunciation of ``Hable`` is *AYCH-uh-bul*[^1] (i.e.,
+        [``H``][dyce.h.H]-able). Yes, that is a clumsy attempt at
+        [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25). (You could
+        *totally* [``H``][dyce.h.H] that, dude!) However, if you prefer something else
+        (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you. (Well, they
+        *might*, but they *shouldn’t*.) We all know what you mean.
+
+    [^1]:
+
+        World Book Online (WBO) style [pronunciation
+        respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
     __slots__: Tuple[str, ...] = ()
 
@@ -1760,6 +1771,10 @@ class HableOpsMixin:
     A “mix-in” class providing arithmetic operations for implementers of the
     [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this
     class.
+
+    !!! info
+
+        See [``HableT``][dyce.h.HableT] for notes on pronunciation.
     """
     __slots__: Tuple[str, ...] = ()
 

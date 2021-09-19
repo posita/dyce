@@ -17,6 +17,7 @@ Please see the accompanying ``LICENSE`` file for rights and restrictions governi
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
+[![Tests](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml)
 [![Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.org/project/dycelib/)
 [![Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.org/project/dycelib/)
 [![License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
@@ -310,7 +311,7 @@ Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 ...
 ```
 
-Alternately, you can download [the source](https://github.com/posita/dyce) and install manually ``setup.cfg``.
+Alternately, you can download [the source](https://github.com/posita/dyce) and install manually.
 
 ```sh
 % git clone https://github.com/posita/dyce.git
@@ -336,9 +337,9 @@ It has the following runtime dependencies:
 * [``beartype``](https://pypi.org/project/beartype/) for yummy runtime type-checking goodness (0.8+)
   [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 * [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
-* [``numpy``](https://numpy.org/) for the RNG used by [``H.roll``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.roll)
+* [``numpy``](https://numpy.org/) to supply ``dyce`` with an alternate random number generator implementation
 
-If you install ``beartype`` for type checking your own code, but don’t want ``dyce`` to use it (e.g., for performance reasons), you can set the ``DYCE_BEARTYPE`` environment variable to a falsy[^9] value before ``dyce`` is imported.
+If you use ``beartype`` for type checking your code that interacts with ``dyce``, but don’t want ``dyce`` to use it internally (e.g., for performance reasons), set the ``DYCE_BEARTYPE`` environment variable to a falsy[^9] value before ``dyce`` is loaded.
 
 [^9]:
     I.E., one of: ``0``, ``off``, ``f``, ``false``, and ``no``.

@@ -24,4 +24,4 @@ def do_it(_: str) -> None:
 
     matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Modeling taking the three highest of ten exploding d10s")
+    matplotlib.pyplot.title("Modeling taking the three highest of ten exploding d10s")

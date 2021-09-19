@@ -9,8 +9,9 @@
 from __future__ import annotations
 
 import os
+import sys
 import warnings
-from typing import Callable, TypeVar, cast
+from typing import TypeVar, cast
 
 __all__ = ("beartype",)
 
@@ -19,6 +20,11 @@ __all__ = ("beartype",)
 
 
 _T = TypeVar("_T")
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -31,7 +37,12 @@ def identity(__: _T) -> _T:
 # ---- Initialization ------------------------------------------------------------------
 
 
-beartype: Callable[[_T], _T] = identity
+class _DecoratorT(Protocol):
+    def __call__(self, __: _T) -> _T:
+        ...
+
+
+beartype: _DecoratorT = identity
 
 _DYCE_BEARTYPE = os.environ.get("DYCE_BEARTYPE", "on")
 _truthy = ("on", "t", "true", "yes")
@@ -55,7 +66,7 @@ if _use_beartype_if_available:
         import beartype as _beartype
 
         if _beartype.__version_info__ >= (0, 8):
-            beartype = cast(Callable[[_T], _T], _beartype.beartype)
+            beartype = cast(_DecoratorT, _beartype.beartype)
         else:
             warnings.warn(
                 f"beartype>=0.8 required, but beartype=={_beartype.__version__} found; disabled"

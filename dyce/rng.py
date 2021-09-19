@@ -29,6 +29,7 @@ _RandSeed = Union[None, int, Sequence[int]]
 
 
 RNG: Random
+DEFAULT_RNG: Random
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -67,6 +68,11 @@ try:
                 values as the first argument. For example, it will reject lists of
                 ``#!python int``s as *seed*. This implementation of ``#!python __new__``
                 fixes that.
+
+                See:
+
+                * https://bugs.python.org/issue44260
+                * https://bugs.python.org/issue40346#msg402508
                 """
                 return super(NumPyRandomBase, cls).__new__(cls)
 
@@ -124,6 +130,8 @@ try:
         """
         bit_generator = PCG64DXSM
 
-    RNG = PCG64DXSMRandom()
+    DEFAULT_RNG = PCG64DXSMRandom()
 except ImportError:
-    RNG = Random()
+    DEFAULT_RNG = Random()
+
+RNG = DEFAULT_RNG

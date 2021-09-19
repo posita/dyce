@@ -60,7 +60,7 @@
 <title>RollOutcome&#45;4</title>
 <polygon fill="none" stroke="Azure" points="936,-139 832,-139 832,-103 936,-103 936,-139"/>
 <text text-anchor="start" x="840" y="-124.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="Azure">RollOutcome</text>
-<text text-anchor="start" x="850" y="-110.8" font-family="Courier New" font-size="14.00" fill="Azure">value=&#45;1</text>
+<text text-anchor="start" x="854.5" y="-110.8" font-family="Courier New" font-size="14.00" fill="Azure">value=9</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;RollOutcome&#45;4 -->
 <g id="edge3" class="edge">
@@ -142,7 +142,7 @@
 <title>RollOutcome&#45;10</title>
 <polygon fill="none" stroke="LightPink" stroke-dasharray="5,2" points="936,-52 832,-52 832,-16 936,-16 936,-52"/>
 <text text-anchor="start" x="840" y="-37.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="LightPink">RollOutcome</text>
-<text text-anchor="start" x="850" y="-23.8" font-family="Courier New" font-size="14.00" fill="LightPink">value=&#45;1</text>
+<text text-anchor="start" x="854.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="LightPink">value=9</text>
 </g>
 <!-- RollOutcome&#45;4&#45;&gt;RollOutcome&#45;10 -->
 <g id="edge13" class="edge">

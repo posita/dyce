@@ -388,7 +388,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 ...   [str(v) for v in outcomes],
 ...   probabilities,
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Distribution for 2d6")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Distribution for 2d6")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```

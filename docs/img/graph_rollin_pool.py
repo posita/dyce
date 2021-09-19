@@ -8,24 +8,23 @@
 
 from __future__ import annotations
 
+import random
+
 from graph import COLORS, Dot, digraph, graphviz_walk
 
-from dyce import H
+from dyce import H, rng
 from dyce.r import PoolRoller, ValueRoller
-from tests.patches import patch_roll
 
 
 def do_it(style: str) -> Dot:
+    # ---- BEGIN MONKEY PATCH ----
+    # For deterministic outcomes
+    rng.RNG = random.Random(1633438594)
+    # ----- END MONKEY PATCH -----
+
     g = digraph(style)
     d10 = H(10) - 1
     d00 = 10 * d10
-
-    # ---- BEGIN MONKEY PATCH ----
-    # For deterministic outcomes
-    d00 = patch_roll(d00, -1, 60, 40, 20)
-    d10 = patch_roll(d10, -1, 9, 2, 1)
-    assert d00.roll(), d10.roll() == (-1, -1)
-    # ----- END MONKEY PATCH -----
 
     r_d00 = ValueRoller(
         d00,

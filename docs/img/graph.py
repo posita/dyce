@@ -21,7 +21,8 @@ from plug import import_plug
 from dyce import R
 from dyce.bt import beartype
 from dyce.r import (
-    ChainRoller,
+    BinarySumOpRoller,
+    NarySumOpRoller,
     PoolRoller,
     RepeatRoller,
     Roll,
@@ -30,7 +31,7 @@ from dyce.r import (
     RollOutcomeWalkerVisitor,
     RollWalkerVisitor,
     SelectionRoller,
-    SumRoller,
+    UnarySumOpRoller,
     ValueRoller,
     walk,
 )
@@ -188,9 +189,25 @@ class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
         elif isinstance(r, ValueRoller):
             value = _truncate(repr(r.value), is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">value={value}</font>>'
-        elif isinstance(r, (ChainRoller, SumRoller)):
+        elif isinstance(r, (BinarySumOpRoller)):
+            if hasattr(r.bin_op, "__name__"):
+                bin_op = r.bin_op.__name__
+            else:
+                bin_op = repr(r.bin_op)
+
+            bin_op = _truncate(bin_op, is_html=True)
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">bin_op={bin_op}</font>>'
+        elif isinstance(r, (UnarySumOpRoller)):
+            if hasattr(r.un_op, "__name__"):
+                un_op = r.un_op.__name__
+            else:
+                un_op = repr(r.un_op)
+
+            un_op = _truncate(un_op, is_html=True)
+            label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">un_op={un_op}</font>>'
+        elif isinstance(r, (NarySumOpRoller)):
             if hasattr(r.op, "__name__"):
-                op = r.op.__name__  # type: ignore
+                op = r.op.__name__
             else:
                 op = repr(r.op)
 

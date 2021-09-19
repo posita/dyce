@@ -90,20 +90,6 @@ We start by creating two histograms[^1] representing our two ten-sided dice (``d
 
 ```
 
-<!--
----- BEGIN MONKEY PATCH ----
-For deterministic outcomes
-
->>> from tests.patches import patch_roll
->>> d00 = patch_roll(d00, -1, 60, 40, 20)
->>> d10 = patch_roll(d10, -1, 9, 2, 1)
->>> d00.roll(), d10.roll()
-(-1, -1)
-
------ END MONKEY PATCH -----
-
--->
-
 Next, we create a roller using the [``R.from_values`` class method][dyce.r.R.from_values].
 
 ``` python
@@ -138,6 +124,15 @@ That durned class method created a whole roller *tree*, which is actually *three
 
 Let’s use our new roller to create a roll and retrieve its total.
 
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633438594)
+
+  -- END MONKEY PATCH -->
+
 ``` python
 >>> roll = r_d100.roll()
 >>> roll.total()
@@ -161,6 +156,15 @@ For our roll, the aggregated outcomes are ``#!python 60`` are ``#!python 9``.
 
     You might be wondering to yourself, “Self, one wonders, can one have a pool of pools?”
     Such questions command the response, “Why the heck not? Try it!”
+
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1633440532)
+
+      -- END MONKEY PATCH -->
 
     ``` python
     >>> two_r_d100s = PoolRoller(sources=(r_d100, r_d100))
@@ -258,34 +262,27 @@ Each one has:
 
 Rollers support arithmetic operators.
 
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633438430)
+
+  -- END MONKEY PATCH -->
+
 ``` python
 >>> d12 = H(12)
 >>> r_d12_add_4 = ValueRoller(d12) + 4 ; r_d12_add_4
-BinaryOperationRoller(
-  op=<built-in function add>,
+BinarySumOpRoller(
+  bin_op=<built-in function add>,
   left_source=ValueRoller(value=H(12), annotation=''),
   right_source=ValueRoller(value=4, annotation=''),
   annotation='',
 )
-
-```
-
-<!--
----- BEGIN MONKEY PATCH ----
-For deterministic outcomes
-
->>> from typing import cast
->>> d12 = patch_roll(d12, 7)
->>> cast(ValueRoller, r_d12_add_4.sources[0])._value = d12
-
------ END MONKEY PATCH -----
-
--->
-
-```
 >>> r_d12_add_4.roll()
 Roll(
-  r=BinaryOperationRoller(...),
+  r=BinarySumOpRoller(...),
   roll_outcomes=(
     RollOutcome(
       value=11,
@@ -359,29 +356,6 @@ ValueRoller(value=H(8), annotation='')
 
 ```
 
-<!--
----- BEGIN MONKEY PATCH ----
-For deterministic outcomes
-
->>> d6 = patch_roll(
-...   d6,
-...   6, 1, 1,  # select_1
-...   4, 2, 4,  # select_2
-...   2, 5, 2,  # select_3
-... )
->>> r_d6._value = d6
->>> d8 = patch_roll(
-...   d8,
-...   5,  # select_1
-...   1,  # select_2
-...   3,  # select_3
-... )
->>> r_d8._value = d8
-
------ END MONKEY PATCH -----
-
--->
-
 For homogeneous pools, we can use the matrix multiplication operator.
 
 ``` python
@@ -394,10 +368,10 @@ RepeatRoller(
 
 ```
 
-Finally, we’ll create a [``SelectionRoller``][dyce.r.SelectionRoller] by calling the [``R.select_from_rs``][dyce.r.R.select_from_rs] method on our other rollers.
+Finally, we’ll create a [``SelectionRoller``][dyce.r.SelectionRoller] by calling the [``R.select_from_sources``][dyce.r.R.select_from_sources] method on our other rollers.
 
 ``` python
->>> r_best_3_of_3d6_d8 = R.select_from_rs((slice(1, None),), r_3d6, r_d8) ; r_best_3_of_3d6_d8
+>>> r_best_3_of_3d6_d8 = R.select_from_sources((slice(1, None),), r_3d6, r_d8) ; r_best_3_of_3d6_d8
 SelectionRoller(
   which=(slice(1, None, None),),
   sources=(
@@ -415,6 +389,15 @@ SelectionRoller(
 
 Oh boy!
 Aren’t you super excited to try this thing out?
+
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633438514)
+
+  -- END MONKEY PATCH -->
 
 ``` python
 >>> roll = r_best_3_of_3d6_d8.roll()
@@ -592,13 +575,22 @@ However, results from [``P.roll``][dyce.p.P.roll] are sorted, meaning they lose 
 This risks ambiguity.
 Consider:
 
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633056346)
+
+  -- END MONKEY PATCH -->
+
 ``` python
->>> P(6, 8).roll()  # doctest: +SKIP
-(3, 4)
+>>> P(6, 8).roll()
+(4, 6)
 
 ```
 
-Is the ``#!python 3`` from the ``#!python d6`` or ``#!python d8``? 🤔💭
+Is the ``#!python 4`` from the ``#!python d6`` or ``#!python d8``? 🤔💭
 _No one knows._
 
 ``` python
@@ -619,6 +611,15 @@ Start there.
 If you *really* want to use rollers to generate rolls without histories for some reason, [``Roll.__init__``][dyce.r.Roll.__init__] will surgically remove any source references from its arguments if its roller argument *r* is annotated with ``#!python None``.
 
 This has the effect that rollers annotated with ``#!python None`` will appear to generate “flat” rolls.
+
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633056619)
+
+  -- END MONKEY PATCH -->
 
 ``` python
 >>> r_forgetful_best_3_of_3d6_d8 = r_best_3_of_3d6_d8.annotate(None)

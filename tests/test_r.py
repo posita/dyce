@@ -11,7 +11,7 @@ from __future__ import annotations
 import operator
 
 from dyce import H, P, R
-from dyce.r import PoolRoller, ValueRoller
+from dyce.r import PoolRoller, RollOutcome, ValueRoller
 
 from .test_h import _INTEGRAL_OUTCOME_TYPES, _OUTCOME_TYPES
 
@@ -57,6 +57,7 @@ class TestValueRoller:
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
         assert isinstance(r_42, ValueRoller)
+
         r_42_annotated = R.from_value(42, annotation="42")
         assert r_42 == r_42
         assert r_42 != r_42_annotated
@@ -77,15 +78,77 @@ class TestValueRoller:
                 assert roll_outcome.r == r
                 assert r_roll.total() in h, r
 
+    def test_roll_nested_roll_outcome(self) -> None:
+        for o_type in _OUTCOME_TYPES:
+            for v in range(-2, 3):
+                o = o_type(v)
 
-class TestBinaryOperationRoller:
+                r = R.from_value(o, annotation=f"{o_type}")
+                r_roll = r.roll()
+                (roll_outcome,) = r_roll
+                assert roll_outcome.r == r
+                assert roll_outcome.value == o
+
+                nesting_r = R.from_sources(roll_outcome, annotation=f"{o_type}")
+                nesting_r_roll = nesting_r.roll()
+                (nesting_roll_outcome,) = nesting_r_roll
+                assert nesting_roll_outcome.r == nesting_r
+                assert nesting_roll_outcome.value == o
+                assert nesting_roll_outcome.sources == (roll_outcome,)
+
+
+class TestRepeatRoller:
+    def test_repr(self) -> None:
+        r_42 = R.from_value(42)
+        r_42_3 = r_42 @ 3
+        assert (
+            repr(r_42_3)
+            == """RepeatRoller(
+  n=3,
+  source=ValueRoller(value=42, annotation=''),
+  annotation='',
+)"""
+        )
+
+        r_d6 = R.from_value(H(6), annotation="d6")
+        r_d6_2 = 2 @ r_d6
+        assert (
+            repr(r_d6_2)
+            == """RepeatRoller(
+  n=2,
+  source=ValueRoller(value=H(6), annotation='d6'),
+  annotation='',
+)"""
+        )
+
+    def test_op_eq(self) -> None:
+        r_42 = R.from_value(42)
+        r_42_annotated = r_42.annotate("42")
+        assert 3 @ r_42 == 3 @ r_42
+        assert 3 @ r_42 != 3 @ r_42_annotated
+        assert 3 @ r_42_annotated == 3 @ r_42.annotate("42")
+
+    def test_roll(self) -> None:
+        for o_type in _OUTCOME_TYPES:
+            for i_type in _INTEGRAL_OUTCOME_TYPES:
+                h = H(o_type(o) for o in range(-2, 3))
+                r = R.from_value(h, annotation=f"{o_type}")
+                r_100 = (i_type(100) @ r).annotate(f"{i_type}")
+                r_100_roll = r_100.roll()
+                assert len(r_100_roll) == 100
+
+                for outcome in r_100_roll.outcomes():
+                    assert outcome in h, r_100_roll
+
+
+class TestBinarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_squared = r_42 * r_42
         assert (
             repr(r_42_squared)
-            == """BinaryOperationRoller(
-  op=<built-in function mul>,
+            == """BinarySumOpRoller(
+  bin_op=<built-in function mul>,
   left_source=ValueRoller(value=42, annotation=''),
   right_source=ValueRoller(value=42, annotation=''),
   annotation='',
@@ -96,8 +159,8 @@ class TestBinaryOperationRoller:
         r_d6_2 = r_d6 + r_d6
         assert (
             repr(r_d6_2)
-            == """BinaryOperationRoller(
-  op=<built-in function add>,
+            == """BinarySumOpRoller(
+  bin_op=<built-in function add>,
   left_source=ValueRoller(value=H(6), annotation='d6'),
   right_source=ValueRoller(value=H(6), annotation='d6'),
   annotation='',
@@ -132,14 +195,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 one_add_r = 1 + r
-                assert one_add_r.op == operator.__add__
+                assert one_add_r.bin_op == operator.__add__
                 left, right = one_add_r.sources
                 assert left == ValueRoller(1)
                 assert right == r
                 assert tuple(one_add_r.roll().outcomes()) == (1 + o,), one_add_r
 
                 r_add_one = r + 1
-                assert r_add_one.op == operator.__add__
+                assert r_add_one.bin_op == operator.__add__
                 left, right = r_add_one.sources
                 assert left == r
                 assert right == ValueRoller(1)
@@ -152,14 +215,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 one_sub_r = 1 - r
-                assert one_sub_r.op == operator.__sub__
+                assert one_sub_r.bin_op == operator.__sub__
                 left, right = one_sub_r.sources
                 assert left == ValueRoller(1)
                 assert right == r
                 assert tuple(one_sub_r.roll().outcomes()) == (1 - o,), one_sub_r
 
                 r_sub_one = r - 1
-                assert r_sub_one.op == operator.__sub__
+                assert r_sub_one.bin_op == operator.__sub__
                 left, right = r_sub_one.sources
                 assert left == r
                 assert right == ValueRoller(1)
@@ -172,14 +235,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 two_mul_r = 2 * r
-                assert two_mul_r.op == operator.__mul__
+                assert two_mul_r.bin_op == operator.__mul__
                 left, right = two_mul_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
                 assert tuple(two_mul_r.roll().outcomes()) == (2 * o,), two_mul_r
 
                 r_mul_two = r * 2
-                assert r_mul_two.op == operator.__mul__
+                assert r_mul_two.bin_op == operator.__mul__
                 left, right = r_mul_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
@@ -195,14 +258,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 two_truediv_r = 2 / r
-                assert two_truediv_r.op == operator.__truediv__
+                assert two_truediv_r.bin_op == operator.__truediv__
                 left, right = two_truediv_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
                 assert tuple(two_truediv_r.roll().outcomes()) == (2 / o,), two_truediv_r
 
                 r_truediv_two = r / 2
-                assert r_truediv_two.op == operator.__truediv__
+                assert r_truediv_two.bin_op == operator.__truediv__
                 left, right = r_truediv_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
@@ -218,7 +281,7 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 two_floordiv_r = 2 // r
-                assert two_floordiv_r.op == operator.__floordiv__
+                assert two_floordiv_r.bin_op == operator.__floordiv__
                 left, right = two_floordiv_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
@@ -227,7 +290,7 @@ class TestBinaryOperationRoller:
                 ), two_floordiv_r
 
                 r_floordiv_two = r // 2
-                assert r_floordiv_two.op == operator.__floordiv__
+                assert r_floordiv_two.bin_op == operator.__floordiv__
                 left, right = r_floordiv_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
@@ -245,14 +308,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 two_mod_r = 2 % r
-                assert two_mod_r.op == operator.__mod__
+                assert two_mod_r.bin_op == operator.__mod__
                 left, right = two_mod_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
                 assert tuple(two_mod_r.roll().outcomes()) == (2 % o,), two_mod_r
 
                 r_mod_two = r % 2
-                assert r_mod_two.op == operator.__mod__
+                assert r_mod_two.bin_op == operator.__mod__
                 left, right = r_mod_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
@@ -265,14 +328,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 two_pow_r = 2 ** r
-                assert two_pow_r.op == operator.__pow__
+                assert two_pow_r.bin_op == operator.__pow__
                 left, right = two_pow_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
                 assert tuple(two_pow_r.roll().outcomes()) == (2 ** o,), two_pow_r
 
                 r_pow_two = r ** 2
-                assert r_pow_two.op == operator.__pow__
+                assert r_pow_two.bin_op == operator.__pow__
                 left, right = r_pow_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
@@ -285,14 +348,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 a5_and_r = 0xA5 & r
-                assert a5_and_r.op == operator.__and__
+                assert a5_and_r.bin_op == operator.__and__
                 left, right = a5_and_r.sources
                 assert left == ValueRoller(0xA5)
                 assert right == r
                 assert tuple(a5_and_r.roll().outcomes()) == (0xA5 & o,), a5_and_r
 
                 r_and_a5 = r & 0xA5
-                assert r_and_a5.op == operator.__and__
+                assert r_and_a5.bin_op == operator.__and__
                 left, right = r_and_a5.sources
                 assert left == r
                 assert right == ValueRoller(0xA5)
@@ -305,14 +368,14 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 a5_xor_r = 0xA5 ^ r
-                assert a5_xor_r.op == operator.__xor__
+                assert a5_xor_r.bin_op == operator.__xor__
                 left, right = a5_xor_r.sources
                 assert left == ValueRoller(0xA5)
                 assert right == r
                 assert tuple(a5_xor_r.roll().outcomes()) == (0xA5 ^ o,), a5_xor_r
 
                 r_xor_a5 = r ^ 0xA5
-                assert r_xor_a5.op == operator.__xor__
+                assert r_xor_a5.bin_op == operator.__xor__
                 left, right = r_xor_a5.sources
                 assert left == r
                 assert right == ValueRoller(0xA5)
@@ -325,20 +388,20 @@ class TestBinaryOperationRoller:
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
                 a5_or_r = 0xA5 | r
-                assert a5_or_r.op == operator.__or__
+                assert a5_or_r.bin_op == operator.__or__
                 left, right = a5_or_r.sources
                 assert left == ValueRoller(0xA5)
                 assert right == r
                 assert tuple(a5_or_r.roll().outcomes()) == (0xA5 | o,), a5_or_r
 
                 r_or_a5 = r | 0xA5
-                assert r_or_a5.op == operator.__or__
+                assert r_or_a5.bin_op == operator.__or__
                 left, right = r_or_a5.sources
                 assert left == r
                 assert right == ValueRoller(0xA5)
                 assert tuple(r_or_a5.roll().outcomes()) == (o | 0xA5,), r_or_a5
 
-    def _test_cmp_op(
+    def _test_cmp_op_helper(
         self,
         op_name: str,
     ) -> None:
@@ -367,22 +430,22 @@ class TestBinaryOperationRoller:
                 ), r_op_r_neg
 
     def test_cmp_lt(self) -> None:
-        self._test_cmp_op(op_name="lt")
+        self._test_cmp_op_helper(op_name="lt")
 
     def test_cmp_le(self) -> None:
-        self._test_cmp_op(op_name="le")
+        self._test_cmp_op_helper(op_name="le")
 
     def test_cmp_eq(self) -> None:
-        self._test_cmp_op(op_name="eq")
+        self._test_cmp_op_helper(op_name="eq")
 
     def test_cmp_ne(self) -> None:
-        self._test_cmp_op(op_name="ne")
+        self._test_cmp_op_helper(op_name="ne")
 
     def test_cmp_gt(self) -> None:
-        self._test_cmp_op(op_name="gt")
+        self._test_cmp_op_helper(op_name="gt")
 
     def test_cmp_ge(self) -> None:
-        self._test_cmp_op(op_name="ge")
+        self._test_cmp_op_helper(op_name="ge")
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
@@ -408,14 +471,14 @@ class TestBinaryOperationRoller:
                     assert r_mul_o_roll.total() in h_mul_o, r_mul_o
 
 
-class TestUnaryOperationRoller:
+class TestUnarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_neg = -r_42
         assert (
             repr(r_42_neg)
-            == """UnaryOperationRoller(
-  op=<built-in function neg>,
+            == """UnarySumOpRoller(
+  un_op=<built-in function neg>,
   source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
@@ -425,8 +488,8 @@ class TestUnaryOperationRoller:
         r_d6_neg = -r_d6
         assert (
             repr(r_d6_neg)
-            == """UnaryOperationRoller(
-  op=<built-in function neg>,
+            == """UnarySumOpRoller(
+  un_op=<built-in function neg>,
   source=ValueRoller(value=H(6), annotation='d6'),
   annotation='',
 )"""
@@ -451,6 +514,7 @@ class TestUnaryOperationRoller:
                 o = o_type(v)
                 r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
                 r_neg = -r
+                assert r_neg.un_op == operator.__neg__
                 (source,) = r_neg.sources
                 assert source == r, r_neg
                 assert tuple(r_neg.roll().outcomes()) == (-o,), r_neg
@@ -461,6 +525,7 @@ class TestUnaryOperationRoller:
                 o = o_type(v)
                 r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
                 r_pos = +r
+                assert r_pos.un_op == operator.__pos__
                 (source,) = r_pos.sources
                 assert source == r, r_pos
                 assert tuple(r_pos.roll().outcomes()) == (+o,), r_pos
@@ -471,9 +536,21 @@ class TestUnaryOperationRoller:
                 o = o_type(v)
                 r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
                 r_abs = abs(r)
+                assert r_abs.un_op == operator.__abs__
                 (source,) = r_abs.sources
                 assert source == r, r_abs
                 assert tuple(r_abs.roll().outcomes()) == (abs(o),), r_abs
+
+    def test_op_invert(self) -> None:
+        for o_type in _INTEGRAL_OUTCOME_TYPES:
+            for v in range(-2, 3):
+                o = o_type(v)
+                r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
+                r_inv = ~r
+                assert r_inv.un_op == operator.__invert__
+                (source,) = r_inv.sources
+                assert source == r, r_inv
+                assert tuple(r_inv.roll().outcomes()) == (~o,), r_inv
 
     def test_even(self) -> None:
         for o_type in _INTEGRAL_OUTCOME_TYPES:
@@ -481,6 +558,7 @@ class TestUnaryOperationRoller:
                 o = o_type(v)
                 r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
                 r_even = r.is_even()
+                assert r_even.un_op.__name__ == "_is_even"
                 (source,) = r_even.sources
                 assert source == r, r_even
                 assert tuple(r_even.roll().outcomes()) == (o_type(o) % 2 == 0,), r_even
@@ -491,19 +569,10 @@ class TestUnaryOperationRoller:
                 o = o_type(v)
                 r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
                 r_odd = r.is_odd()
+                assert r_odd.un_op.__name__ == "_is_odd"
                 (source,) = r_odd.sources
                 assert source == r, r_odd
                 assert tuple(r_odd.roll().outcomes()) == (o_type(o) % 2 != 0,), r_odd
-
-    def test_inverse(self) -> None:
-        for o_type in _INTEGRAL_OUTCOME_TYPES:
-            for v in range(-2, 3):
-                o = o_type(v)
-                r = R.from_value(o_type(o), annotation=f"{o_type}({o})")
-                r_inv = ~r
-                (source,) = r_inv.sources
-                assert source == r, r_inv
-                assert tuple(r_inv.roll().outcomes()) == (~o,), r_inv
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
@@ -521,7 +590,7 @@ class TestUnaryOperationRoller:
 
 class TestPoolRoller:
     def test_repr(self) -> None:
-        r_4_6_8 = R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
+        r_4_6_8 = R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
         assert (
             repr(r_4_6_8)
             == """PoolRoller(
@@ -548,12 +617,12 @@ class TestPoolRoller:
         )
 
     def test_op_eq(self) -> None:
-        r_4_6_8 = R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
+        r_4_6_8 = R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
         assert isinstance(r_4_6_8, PoolRoller)
         r_4_6_8_annotated = r_4_6_8.annotate("4-6-8")
-        assert r_4_6_8 == R.from_rs_iterable(R.from_value(i) for i in (4, 6, 8))
+        assert r_4_6_8 == R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
         assert r_4_6_8 != r_4_6_8_annotated
-        assert r_4_6_8_annotated == R.from_rs_iterable(
+        assert r_4_6_8_annotated == R.from_sources_iterable(
             (R.from_value(i) for i in (4, 6, 8)), annotation="4-6-8"
         )
 
@@ -572,7 +641,7 @@ class TestPoolRoller:
             h = H(o_type(o) for o in range(-2, 3))
             h_3 = 3 @ h
             r = R.from_value(h, annotation=f"{o_type}")
-            r_3 = R.from_rs(r, r, r)
+            r_3 = R.from_sources(r, r, r)
 
             for _ in range(10):
                 r_3_roll = r_3.roll()
@@ -582,6 +651,26 @@ class TestPoolRoller:
                     assert roll_outcome.r == r_3
 
                 assert r_3_roll.total() in h_3, r_3_roll
+
+    def test_roll_heterogeneous_source(self) -> None:
+        for o_type in _OUTCOME_TYPES:
+            for v in range(-2, 3):
+                o = o_type(v)
+                r_o = R.from_value(o, annotation=f"{o_type}")
+                roll_o = r_o.roll()
+                (roll_outcome_o,) = roll_o
+
+                r = R.from_sources(roll_outcome_o, r_o, roll_o)
+                r_roll = r.roll()
+
+                assert tuple(r_roll) == (
+                    roll_outcome_o,
+                    roll_outcome_o,
+                    roll_outcome_o,
+                ), f"{o_type}({v})"
+
+                for roll_outcome in r_roll:
+                    assert roll_outcome.r == r
 
 
 class TestSelectRoller:
@@ -630,50 +719,6 @@ class TestSelectRoller:
                 assert source_roll_outcome.r == r_squares
 
 
-class TestRepeatRoller:
-    def test_repr(self) -> None:
-        r_42 = R.from_value(42)
-        r_42_3 = r_42 @ 3
-        assert (
-            repr(r_42_3)
-            == """RepeatRoller(
-  n=3,
-  source=ValueRoller(value=42, annotation=''),
-  annotation='',
-)"""
-        )
-
-        r_d6 = R.from_value(H(6), annotation="d6")
-        r_d6_2 = 2 @ r_d6
-        assert (
-            repr(r_d6_2)
-            == """RepeatRoller(
-  n=2,
-  source=ValueRoller(value=H(6), annotation='d6'),
-  annotation='',
-)"""
-        )
-
-    def test_op_eq(self) -> None:
-        r_42 = R.from_value(42)
-        r_42_annotated = r_42.annotate("42")
-        assert 3 @ r_42 == 3 @ r_42
-        assert 3 @ r_42 != 3 @ r_42_annotated
-        assert 3 @ r_42_annotated == 3 @ r_42.annotate("42")
-
-    def test_roll(self) -> None:
-        for o_type in _OUTCOME_TYPES:
-            for i_type in _INTEGRAL_OUTCOME_TYPES:
-                h = H(o_type(o) for o in range(-2, 3))
-                r = R.from_value(h, annotation=f"{o_type}")
-                r_100 = (i_type(100) @ r).annotate(f"{i_type}")
-                r_100_roll = r_100.roll()
-                assert len(r_100_roll) == 100
-
-                for outcome in r_100_roll.outcomes():
-                    assert outcome in h, r_100_roll
-
-
 class TestRoll:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
@@ -682,8 +727,8 @@ class TestRoll:
         assert (
             repr(r_42_neg_roll)
             == """Roll(
-  r=UnaryOperationRoller(
-    op=<built-in function neg>,
+  r=UnarySumOpRoller(
+    un_op=<built-in function neg>,
     source=ValueRoller(value=42, annotation=''),
     annotation='',
   ),
@@ -758,3 +803,36 @@ class TestRoll:
             (_, r_d6_ro) = r_d6_mul2_ro.sources
             r_d6_ro.value in d6
             assert r_d6_ro.r == r_d6
+
+
+class TestRollOutcome:
+    def test_is_even(self) -> None:
+        six = RollOutcome(6)
+        six_even = six.is_even()
+        assert six_even.value is True
+        assert six_even.sources == (six,)
+
+    def test_is_odd(self) -> None:
+        six = RollOutcome(6)
+        six_odd = six.is_odd()
+        assert six_odd.value is False
+        assert six_odd.sources == (six,)
+
+    def test_euthanize(self) -> None:
+        six = RollOutcome(6)
+        rip_six = six.euthanize()
+        assert rip_six.value is None
+        assert rip_six.sources == (six,)
+
+    def test_cede_outcome(self) -> None:
+        one = RollOutcome(1)
+        six = RollOutcome(6)
+        one_turned_six = one.cede(six)
+        assert one_turned_six.value == 6
+        assert one_turned_six.sources == (one, six)
+
+    def test_cede_value(self) -> None:
+        one = RollOutcome(1)
+        one_turned_six = one.cede(6)
+        assert one_turned_six.value == 6
+        assert one_turned_six.sources == (one,)

@@ -43,4 +43,4 @@ def do_it(_: str) -> None:
 
     matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Roll-and-keep mechanic comparison")
+    matplotlib.pyplot.title("Roll-and-keep mechanic comparison")

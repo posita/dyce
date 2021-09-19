@@ -27,7 +27,7 @@ from typing import (
 )
 
 from .bt import identity  # noqa: F401
-from .bt import beartype
+from .bt import Protocol, beartype
 
 __all__ = ("OutcomeT",)
 
@@ -38,6 +38,8 @@ _S = TypeVar("_S")
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _TT = TypeVar("_TT", bound="type")
+_UnaryOperatorT = Callable[[_T_co], _T_co]
+_BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 
 
 if sys.version_info >= (3, 9):
@@ -47,14 +49,13 @@ else:
 
 
 if sys.version_info >= (3, 8):
-    from typing import Protocol
     from typing import SupportsAbs as _SupportsAbs
     from typing import SupportsFloat as _SupportsFloat
     from typing import SupportsIndex as _SupportsIndex
     from typing import SupportsInt as _SupportsInt
     from typing import runtime_checkable
 else:
-    from typing_extensions import Protocol, runtime_checkable
+    from typing_extensions import runtime_checkable
 
     @runtime_checkable
     class _SupportsAbs(Protocol[_T_co]):
@@ -405,6 +406,16 @@ def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
             yield from __getitem__(seq, key)
         else:
             yield __getitem__(seq, __index__(key))
+
+
+@beartype
+def is_even(outcome: IntT) -> bool:
+    return as_int(outcome) % 2 == 0
+
+
+@beartype
+def is_odd(outcome: IntT) -> bool:
+    return as_int(outcome) % 2 != 0
 
 
 @beartype

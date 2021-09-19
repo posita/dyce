@@ -35,4 +35,4 @@ def do_it(_: str) -> None:
 
     matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Taking the lowest or highest die of 2d6")
+    matplotlib.pyplot.title("Taking the lowest or highest die of 2d6")

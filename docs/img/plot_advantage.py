@@ -45,4 +45,4 @@ def do_it(_: str) -> None:
     )
     matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Modeling an advantage-weighted attack with critical hits")
+    matplotlib.pyplot.title("Modeling an advantage-weighted attack with critical hits")

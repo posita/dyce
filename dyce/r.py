@@ -46,31 +46,32 @@ from typing import (
     Dict,
     Iterable,
     Iterator,
+    List,
     Optional,
     Sequence,
     Set,
     Tuple,
     Union,
-    cast,
     overload,
 )
 
 from .bt import beartype
-from .h import H, _BinaryOperatorT, _UnaryOperatorT
+from .h import H
 from .lifecycle import experimental
 from .p import P
 from .types import (
-    CachingProtocolMeta,
     IndexT,
     IntT,
     OutcomeT,
-    Protocol,
+    _BinaryOperatorT,
     _GetItemT,
     _IntCs,
     _OutcomeCs,
+    _UnaryOperatorT,
     as_int,
     getitems,
-    runtime_checkable,
+    is_even,
+    is_odd,
 )
 
 __all__ = ("R",)
@@ -79,30 +80,16 @@ __all__ = ("R",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_ROperandT = Union[OutcomeT, "R"]
 _ValueT = Union[OutcomeT, H, P]
-_UnaryRollerOperatorT = Callable[
-    ["RollOutcome"], Union["RollOutcome", Iterable["RollOutcome"]]
-]
-_BinaryRollerOperatorT = Callable[
-    ["RollOutcome", "RollOutcome"], Union["RollOutcome", Iterable["RollOutcome"]]
-]
+_SourceT = Union["RollOutcome", "Roll", "R"]
+_ROperandT = Union[OutcomeT, _SourceT]
 _RollOutcomeOperandT = Union[OutcomeT, "RollOutcome"]
-
-
-@runtime_checkable
-class RollOutcomeOperatorT(
-    Protocol,
-    metaclass=CachingProtocolMeta,
-):
-    # TODO(posita): See <https://github.com/python/mypy/issues/11013>
-    # __slots__: Tuple[str, ...] = ()
-
-    def __call__(
-        self,
-        *roll_outcomes: RollOutcome,
-    ) -> Union[RollOutcome, Iterable[RollOutcome]]:
-        ...
+_RollOutcomesReturnT = Union["RollOutcome", Iterable["RollOutcome"]]
+_RollOutcomeUnaryOperatorT = Callable[["RollOutcome"], _RollOutcomesReturnT]
+_RollOutcomeBinaryOperatorT = Callable[
+    ["RollOutcome", "RollOutcome"], _RollOutcomesReturnT
+]
+BasicOperatorT = Callable[["R", Iterable["RollOutcome"]], _RollOutcomesReturnT]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -116,13 +103,13 @@ class R:
         change or disappear in future versions.
 
     Where [``H`` objects][dyce.h.H] and [``P`` objects][dyce.p.P] are used primarily for
-    enumerating all weighted outcomes, ``R`` objects represent rollers. More
+    enumerating all weighted outcomes, ``#!python R`` objects represent rollers. More
     specifically, they are immutable nodes assembled in tree-like structures to
     represent calculations. They generate rolls that conform to outcomes weighted
     according to those calculations without engaging in computationally expensive
     enumeration (unlike [``H``][dyce.h.H] and [``P``][dyce.p.P] objects). Roller trees
-    are typically composed from various ``R`` class methods and operators as well as
-    arithmetic operations.
+    are typically composed from various ``#!python R`` class methods and operators as
+    well as arithmetic operations.
 
     ``` python
     >>> from dyce import H, P, R
@@ -130,16 +117,16 @@ class R:
     >>> r_d6 = R.from_value(d6) ; r_d6
     ValueRoller(value=H(6), annotation='')
     >>> ((4 * r_d6 + 3) ** 2 % 5).gt(2)
-    BinaryOperationRoller(
-      op=<function R.gt...>,
-      left_source=BinaryOperationRoller(
-          op=<built-in function mod>,
-          left_source=BinaryOperationRoller(
-              op=<built-in function pow>,
-              left_source=BinaryOperationRoller(
-                  op=<built-in function add>,
-                  left_source=BinaryOperationRoller(
-                      op=<built-in function mul>,
+    BinarySumOpRoller(
+      bin_op=<function R.gt.<locals>._gt at ...>,
+      left_source=BinarySumOpRoller(
+          bin_op=<built-in function mod>,
+          left_source=BinarySumOpRoller(
+              bin_op=<built-in function pow>,
+              left_source=BinarySumOpRoller(
+                  bin_op=<built-in function add>,
+                  left_source=BinarySumOpRoller(
+                      bin_op=<built-in function mul>,
                       left_source=ValueRoller(value=4, annotation=''),
                       right_source=ValueRoller(value=H(6), annotation=''),
                       annotation='',
@@ -167,7 +154,7 @@ class R:
         ``` python
         >>> r_6 = R.from_value(6)
         >>> r_6_abs_3 = 3 @ abs(r_6)
-        >>> r_6_abs_6_abs_6_abs = R.from_rs(abs(r_6), abs(r_6), abs(r_6))
+        >>> r_6_abs_6_abs_6_abs = R.from_sources(abs(r_6), abs(r_6), abs(r_6))
         >>> tuple(r_6_abs_3.roll().outcomes()), tuple(r_6_abs_6_abs_6_abs.roll().outcomes())  # they generate the same rolls
         ((6, 6, 6), (6, 6, 6))
         >>> r_6_abs_3 == r_6_abs_6_abs_6_abs  # and yet, they're different animals
@@ -182,11 +169,20 @@ class R:
     Roller trees can can be queried via the [``roll`` method][dyce.r.R.roll], which
     produces [``Roll`` objects][dyce.r.Roll].
 
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1633056380)
+
+      -- END MONKEY PATCH -->
+
     ``` python
     >>> roll = r_d6.roll()
-    >>> tuple(roll.outcomes())  # doctest: +SKIP
+    >>> tuple(roll.outcomes())
     (4,)
-    >>> roll.total()  # doctest: +SKIP
+    >>> roll.total()
     4
 
     ```
@@ -205,21 +201,21 @@ class R:
 
     ``` python
     >>> roll = (r_d6 + 3).roll()
-    >>> roll.total()  # doctest: +SKIP
+    >>> roll.total()
     8
-    >>> roll  # doctest: +SKIP
+    >>> roll
     Roll(
-      r=,
+      r=...,
       roll_outcomes=(
         RollOutcome(
           value=8,
           sources=(
             RollOutcome(
-              value=3,
+              value=5,
               sources=(),
             ),
             RollOutcome(
-              value=5,
+              value=3,
               sources=(),
             ),
           ),
@@ -227,18 +223,20 @@ class R:
       ),
       sources=(
         Roll(
+          r=ValueRoller(value=H(6), annotation=''),
           roll_outcomes=(
             RollOutcome(
-              value=3,
+              value=5,
               sources=(),
             ),
           ),
           sources=(),
         ),
         Roll(
+          r=ValueRoller(value=3, annotation=''),
           roll_outcomes=(
             RollOutcome(
-              value=5,
+              value=3,
               sources=(),
             ),
           ),
@@ -257,10 +255,19 @@ class R:
     [``annotate`` method][dyce.r.R.annotate] can be used to apply an annotation to
     existing roller.
 
-    The ``R`` class itself acts as a base from which several computation-specific
-    implementations derive (such as expressing operands like outcomes or histograms,
-    unary operations, binary operations, pools, etc.). In most cases, details of those
-    implementations can be safely ignored.
+    The ``#!python R`` class itself acts as a base from which several
+    computation-specific implementations derive (such as expressing operands like
+    outcomes or histograms, unary operations, binary operations, pools, etc.). In most
+    cases, details of those implementations can be safely ignored.
+
+    <!-- BEGIN MONKEY PATCH --
+    For type-checking docstrings
+
+    >>> from typing import Tuple, Union
+    >>> from dyce.r import PoolRoller, Roll, RollOutcome, ValueRoller
+    >>> which: Tuple[Union[int, slice], ...]
+
+      -- END MONKEY PATCH -->
     """
     __slots__: Tuple[str, ...] = ("_annotation", "_sources")
 
@@ -270,8 +277,9 @@ class R:
     @beartype
     def __init__(
         self,
-        sources: Iterable["R"] = (),
+        sources: Iterable[_SourceT] = (),
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
         super().__init__()
@@ -292,7 +300,7 @@ class R:
         if isinstance(other, R):
             return (
                 (isinstance(self, type(other)) or isinstance(other, type(self)))
-                and __eq__(self.sources, other.sources)
+                and __eq__(self.sources, other.sources)  # order matters
                 and __eq__(self.annotation, other.annotation)
             )
         else:
@@ -306,42 +314,42 @@ class R:
             return super().__ne__(other)
 
     @beartype
-    def __add__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __add__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __radd__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __sub__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __sub__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rsub__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mul__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __mul__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rmul__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
@@ -364,63 +372,63 @@ class R:
         return self.__matmul__(other)
 
     @beartype
-    def __truediv__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __truediv__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rtruediv__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __floordiv__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __floordiv__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rfloordiv__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mod__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __mod__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rmod__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __pow__(self, other: _ROperandT) -> BinaryOperationRoller:
+    def __pow__(self, other: _ROperandT) -> BinarySumOpRoller:
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: OutcomeT) -> BinaryOperationRoller:
+    def __rpow__(self, other: OutcomeT) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
+    def __and__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__and__, other)
@@ -430,14 +438,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: IntT) -> BinaryOperationRoller:
+    def __rand__(self, other: IntT) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __and__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
+    def __xor__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__xor__, other)
@@ -447,14 +455,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: IntT) -> BinaryOperationRoller:
+    def __rxor__(self, other: IntT) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __xor__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union["R", IntT]) -> BinaryOperationRoller:
+    def __or__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__or__, other)
@@ -464,33 +472,157 @@ class R:
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: IntT) -> BinaryOperationRoller:
+    def __ror__(self, other: IntT) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __or__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __neg__(self) -> UnaryOperationRoller:
+    def __neg__(self) -> UnarySumOpRoller:
         return self.umap(__neg__)
 
     @beartype
-    def __pos__(self) -> UnaryOperationRoller:
+    def __pos__(self) -> UnarySumOpRoller:
         return self.umap(__pos__)
 
     @beartype
-    def __abs__(self) -> UnaryOperationRoller:
+    def __abs__(self) -> UnarySumOpRoller:
         return self.umap(__abs__)
 
     @beartype
-    def __invert__(self) -> UnaryOperationRoller:
+    def __invert__(self) -> UnarySumOpRoller:
         return self.umap(__invert__)
 
     @abstractmethod
     def roll(self) -> Roll:
         r"""
-        Sub-classes should implement this to return a new [``Roll`` object][dyce.r.Roll]
-        appropriate for a particular roller (taking into account any sources).
+        Sub-classes should implement this method to return a new
+        [``Roll`` object][dyce.r.Roll] taking into account any
+        [sources][dyce.r.R.sources].
+
+        **Implementors guarantee that all [``RollOutcome``][dyce.r.RollOutcome]s in the
+        returned [``Roll``][dyce.r.Roll] *must* be associated with a roll, *including
+        all roll outcomes’ [``sources``][dyce.r.RollOutcome.sources]*.**
+
+        !!! note
+
+            It is poor practice to pass one’s source rolls through or reuse a source’s
+            roll outcomes. Instead, create new [``RollOutcome``][dyce.r.RollOutcome]s
+            that reference the source ones. Additionally, show that roll outcomes from
+            source rolls are excluded by creating a new roll outcome with a value of
+            ``#!python None`` with the excluded roll outcome as its source. The
+            [``RollOutcome.cede``][dyce.r.RollOutcome.cede] and
+            [``RollOutcome.euthanize``][dyce.r.RollOutcome.euthanize] convenience
+            methods are provided for this purpose.
+
+            See the section on “[Dropping dice from prior rolls
+            …](rollin.md#dropping-dice-from-prior-rolls-keeping-the-best-three-of-3d6-and-1d8)”
+            as well as the note in [``Roll.__init__``][dyce.r.Roll.__init__] for
+            additional color.
+
+            <!-- BEGIN MONKEY PATCH --
+            For deterministic outcomes
+
+            >>> import random
+            >>> from dyce import rng
+            >>> rng.RNG = random.Random(1633403927)
+
+              -- END MONKEY PATCH -->
+
+            ``` python
+            >>> from itertools import chain
+            >>> class AntonChigurhRoller(R):
+            ...   h_coin_toss = H((0, 1))
+            ...   def roll(self) -> Roll:
+            ...     source_rolls = list(self.source_rolls())
+            ...     def _roll_outcomes_gen():
+            ...       for roll_outcome in chain.from_iterable(source_rolls):
+            ...         if roll_outcome.value is None:
+            ...           # Omit those already deceased
+            ...           continue
+            ...         elif self.h_coin_toss.roll():
+            ...           # This one lives; wrap the old outcome in a new one with the same value
+            ...           yield roll_outcome.cede(roll_outcome.value)
+            ...         else:
+            ...           # This one dies here; wrap the old outcome in a new one with a value of None
+            ...           yield roll_outcome.euthanize()
+            ...     return Roll(self, roll_outcomes=_roll_outcomes_gen(), sources=source_rolls)
+            >>> r = AntonChigurhRoller(sources=(R.from_value(1), R.from_value(2), R.from_value(3)))
+            >>> r.roll()
+            Roll(
+              r=AntonChigurhRoller(
+                sources=(
+                  ValueRoller(value=1, annotation=''),
+                  ValueRoller(value=2, annotation=''),
+                  ValueRoller(value=3, annotation=''),
+                ),
+                annotation='',
+              ),
+              roll_outcomes=(
+                RollOutcome(
+                  value=None,
+                  sources=(
+                    RollOutcome(
+                      value=1,
+                      sources=(),
+                    ),
+                  ),
+                ),
+                RollOutcome(
+                  value=2,
+                  sources=(
+                    RollOutcome(
+                      value=2,
+                      sources=(),
+                    ),
+                  ),
+                ),
+                RollOutcome(
+                  value=3,
+                  sources=(
+                    RollOutcome(
+                      value=3,
+                      sources=(),
+                    ),
+                  ),
+                ),
+              ),
+              sources=(
+                Roll(
+                  r=ValueRoller(value=1, annotation=''),
+                  roll_outcomes=(
+                    RollOutcome(
+                      value=1,
+                      sources=(),
+                    ),
+                  ),
+                  sources=(),
+                ),
+                Roll(
+                  r=ValueRoller(value=2, annotation=''),
+                  roll_outcomes=(
+                    RollOutcome(
+                      value=2,
+                      sources=(),
+                    ),
+                  ),
+                  sources=(),
+                ),
+                Roll(
+                  r=ValueRoller(value=3, annotation=''),
+                  roll_outcomes=(
+                    RollOutcome(
+                      value=3,
+                      sources=(),
+                    ),
+                  ),
+                  sources=(),
+                ),
+              ),
+            )
+
+            ```
         """
         ...
 
@@ -504,7 +636,7 @@ class R:
         return self._annotation
 
     @property
-    def sources(self) -> Tuple[R, ...]:
+    def sources(self) -> Tuple[_SourceT, ...]:
         r"""
         The roller’s direct sources (if any).
         """
@@ -514,37 +646,45 @@ class R:
 
     @classmethod
     @beartype
-    def from_rs(
+    def from_sources(
         cls,
-        *sources: R,
+        *sources: _SourceT,
         annotation: Any = "",
     ) -> PoolRoller:
         r"""
-        Shorthand for ``#!python cls.from_rs_iterable(rs, annotation=annotation)``.
+        Shorthand for ``#!python cls.from_sources_iterable(rs, annotation=annotation)``.
 
-        See the [``from_rs_iterable`` method][dyce.r.R.from_rs_iterable].
+        See the [``from_sources_iterable`` method][dyce.r.R.from_sources_iterable].
         """
-        return cls.from_rs_iterable(sources, annotation=annotation)
+        return cls.from_sources_iterable(sources, annotation=annotation)
 
     @classmethod
     @beartype
-    def from_rs_iterable(
+    def from_sources_iterable(
         cls,
-        sources: Iterable["R"],
+        sources: Iterable[_SourceT],
         annotation: Any = "",
     ) -> PoolRoller:
         r"""
-        Creates and returns a roller for “pooling” zero or more *sources*. The returned
-        roller will generate rolls whose items will contain one value for each source.
+        Creates and returns a roller for “pooling” zero or more *sources*.
+
+        <!-- BEGIN MONKEY PATCH --
+        For deterministic outcomes
+
+        >>> import random
+        >>> from dyce import rng
+        >>> rng.RNG = random.Random(1633056341)
+
+          -- END MONKEY PATCH -->
 
         ``` python
-        >>> r_pool = R.from_rs_iterable(R.from_value(h) for h in (H((1, 2)), H((3, 4)), H((5, 6))))
+        >>> r_pool = R.from_sources_iterable(R.from_value(h) for h in (H((1, 2)), H((3, 4)), H((5, 6))))
         >>> roll = r_pool.roll()
-        >>> tuple(roll.outcomes())  # doctest: +SKIP
+        >>> tuple(roll.outcomes())
         (2, 4, 6)
-        >>> roll  # doctest: +SKIP
+        >>> roll
         Roll(
-          r=,
+          r=...,
           roll_outcomes=(
             RollOutcome(
               value=2,
@@ -589,8 +729,7 @@ class R:
         annotation: Any = "",
     ) -> ValueRoller:
         r"""
-        Creates and returns a roller without any sources for representing a single *value*
-        (i.e., scalar or histogram).
+        Creates and returns a [``ValueRoller``][dyce.r.ValueRoller] from *value*.
 
         ``` python
         >>> R.from_value(6)
@@ -634,44 +773,45 @@ class R:
         annotation: Any = "",
     ) -> PoolRoller:
         r"""
-        Shorthand for
-        ``#!python cls.from_rs_iterable((cls.from_value(value) for value in values), annotation=annotation)``.
+        Shorthand for ``#!python cls.from_sources_iterable((cls.from_value(value) for value
+        in values), annotation=annotation)``.
 
         See the [``from_value``][dyce.r.R.from_value] and
-        [``from_rs_iterable``][dyce.r.R.from_rs_iterable] methods.
+        [``from_sources_iterable``][dyce.r.R.from_sources_iterable] methods.
         """
-        return cls.from_rs_iterable(
+        return cls.from_sources_iterable(
             (cls.from_value(value) for value in values),
             annotation=annotation,
         )
 
     @classmethod
     @beartype
-    def select_from_rs(
+    def select_from_sources(
         cls,
         which: Iterable[_GetItemT],
-        *sources: R,
+        *sources: _SourceT,
         annotation: Any = "",
     ) -> SelectionRoller:
         r"""
-        Shorthand for ``#!python R.select_from_rs_iterable(which, sources,
+        Shorthand for ``#!python cls.select_from_sources_iterable(which, sources,
         annotation=annotation)``.
 
-        See the [``select_from_rs_iterable`` method][dyce.r.R.select_from_rs_iterable].
+        See the [``select_from_sources_iterable``
+        method][dyce.r.R.select_from_sources_iterable].
         """
-        return cls.select_from_rs_iterable(which, sources, annotation=annotation)
+        return cls.select_from_sources_iterable(which, sources, annotation=annotation)
 
     @classmethod
     @beartype
-    def select_from_rs_iterable(
+    def select_from_sources_iterable(
         cls,
         which: Iterable[_GetItemT],
-        sources: Iterable["R"],
+        sources: Iterable[_SourceT],
         annotation: Any = "",
     ) -> SelectionRoller:
         r"""
-        Creates and returns a roller for applying an *n*-ary selection *which* to sorted
-        outcomes from this roller as its source.
+        Creates and returns a [``SelectionRoller``][dyce.r.SelectionRoller] for applying
+        selection *which* to sorted outcomes from *sources*.
 
         ``` python
         >>> r_select = R.select_from_values(
@@ -705,7 +845,7 @@ class R:
         annotation: Any = "",
     ) -> SelectionRoller:
         r"""
-        Shorthand for ``#!python R.select_from_values_iterable(which, sources,
+        Shorthand for ``#!python cls.select_from_values_iterable(which, values,
         annotation=annotation)``.
 
         See the
@@ -722,66 +862,33 @@ class R:
         annotation: Any = "",
     ) -> SelectionRoller:
         r"""
-        Shorthand for ``#!python cls.select_from_rs_iterable((cls.from_value(value) for
+        Shorthand for ``#!python cls.select_from_sources_iterable((cls.from_value(value) for
         value in values), annotation=annotation)``.
 
         See the [``from_value``][dyce.r.R.from_value] and
-        [``select_from_rs_iterable``][dyce.r.R.select_from_rs_iterable] methods.
+        [``select_from_sources_iterable``][dyce.r.R.select_from_sources_iterable]
+        methods.
         """
-        return cls.select_from_rs_iterable(
+        return cls.select_from_sources_iterable(
             which,
             (cls.from_value(value) for value in values),
             annotation=annotation,
         )
 
     @beartype
-    def select(
-        self,
-        *which: _GetItemT,
-        annotation: Any = "",
-    ) -> SelectionRoller:
+    def source_rolls(self) -> Iterator["Roll"]:
         r"""
-        Shorthand for ``#!python self.select_iterable(which, annotation=annotation)``.
-
-        See the [``select_iterable`` method][dyce.r.R.select_iterable].
+        Generates new rolls from all [``sources``][dyce.r.R.sources].
         """
-        return self.select_iterable(which, annotation=annotation)
-
-    @beartype
-    def select_iterable(
-        self,
-        which: Iterable[_GetItemT],
-        annotation: Any = "",
-    ) -> SelectionRoller:
-        r"""
-        Creates and returns a roller for applying an *n*-ary selection *which* to sorted
-        outcomes from this roller as its source.
-
-        ``` python
-        >>> r_values = R.from_values(5, 4, 6, 3, 7, 2, 8, 1, 9, 0)
-        >>> r_select = r_values.select(0, -1, slice(3, 6), slice(6, 3, -1), -1, 0) ; r_select
-        SelectionRoller(
-          which=(0, -1, slice(3, 6, None), slice(6, 3, -1), -1, 0),
-          sources=(
-            PoolRoller(
-              sources=(
-                ValueRoller(value=5, annotation=''),
-                ValueRoller(value=4, annotation=''),
-                ...,
-                ValueRoller(value=9, annotation=''),
-                ValueRoller(value=0, annotation=''),
-              ),
-              annotation='',
-            ),
-          ),
-          annotation='',
-        )
-        >>> tuple(r_select.roll().outcomes())
-        (0, 9, 3, 4, 5, 6, 5, 4, 9, 0)
-
-        ```
-        """
-        return SelectionRoller(which, (self,), annotation=annotation)
+        for source in self.sources:
+            if isinstance(source, RollOutcome):
+                yield Roll(self, roll_outcomes=(source.clone(),))
+            elif isinstance(source, Roll):
+                yield source
+            elif isinstance(source, R):
+                yield source.roll()
+            else:
+                assert False, f"unrecognized source type {source!r}"
 
     @beartype
     def annotate(self, annotation: Any = "") -> R:
@@ -804,25 +911,25 @@ class R:
     @beartype
     def map(
         self,
-        op: _BinaryRollerOperatorT,
+        bin_op: _RollOutcomeBinaryOperatorT,
         right_operand: _ROperandT,
         annotation: Any = "",
-    ) -> BinaryOperationRoller:
+    ) -> BinarySumOpRoller:
         r"""
-        Creates and returns a roller for applying binary operator *op* to this roller and
-        *right_operand* as its sources. Shorthands exist for many arithmetic operators
-        and comparators.
+        Creates and returns a [``BinarySumOpRoller``][dyce.r.BinarySumOpRoller] for applying
+        *bin_op* to this roller and *right_operand* as its sources. Shorthands exist for
+        many arithmetic operators and comparators.
 
         ``` python
         >>> import operator
-        >>> r_binop = R.from_value(H(6)).map(operator.__pow__, 2) ; r_binop
-        BinaryOperationRoller(
-          op=<built-in function pow>,
+        >>> r_bin_op = R.from_value(H(6)).map(operator.__pow__, 2) ; r_bin_op
+        BinarySumOpRoller(
+          bin_op=<built-in function pow>,
           left_source=ValueRoller(value=H(6), annotation=''),
           right_source=ValueRoller(value=2, annotation=''),
           annotation='',
         )
-        >>> r_binop == R.from_value(H(6)) ** 2
+        >>> r_bin_op == R.from_value(H(6)) ** 2
         True
 
         ```
@@ -830,73 +937,78 @@ class R:
         if isinstance(right_operand, _OutcomeCs):
             right_operand = ValueRoller(right_operand)
 
-        if isinstance(right_operand, R):
-            return BinaryOperationRoller(op, self, right_operand, annotation=annotation)
+        if isinstance(right_operand, (R, RollOutcome)):
+            return BinarySumOpRoller(bin_op, self, right_operand, annotation=annotation)
         else:
             raise NotImplementedError
 
     @beartype
     def rmap(
         self,
-        left_operand: OutcomeT,
-        op: _BinaryRollerOperatorT,
+        left_operand: Union[OutcomeT, "RollOutcome"],
+        bin_op: _RollOutcomeBinaryOperatorT,
         annotation: Any = "",
-    ) -> BinaryOperationRoller:
+    ) -> BinarySumOpRoller:
         r"""
         Analogous to the [``map`` method][dyce.r.R.map], but where the caller supplies
         *left_operand*.
 
         ``` python
         >>> import operator
-        >>> r_binop = R.from_value(H(6)).rmap(2, operator.__pow__) ; r_binop
-        BinaryOperationRoller(
-          op=<built-in function pow>,
+        >>> r_bin_op = R.from_value(H(6)).rmap(2, operator.__pow__) ; r_bin_op
+        BinarySumOpRoller(
+          bin_op=<built-in function pow>,
           left_source=ValueRoller(value=2, annotation=''),
           right_source=ValueRoller(value=H(6), annotation=''),
           annotation='',
         )
-        >>> r_binop == 2 ** R.from_value(H(6))
+        >>> r_bin_op == 2 ** R.from_value(H(6))
         True
 
         ```
+
+        !!! note
+
+            The positions of *left_operand* and *bin_op* are different from
+            [``map`` method][dyce.r.R.map]. This is intentional and serves as a reminder
+            of operand ordering.
         """
         if isinstance(left_operand, _OutcomeCs):
-            return BinaryOperationRoller(
-                op,
-                ValueRoller(left_operand),
-                self,
-                annotation=annotation,
+            return BinarySumOpRoller(
+                bin_op, ValueRoller(left_operand), self, annotation=annotation
             )
+        elif isinstance(left_operand, RollOutcome):
+            return BinarySumOpRoller(bin_op, left_operand, self, annotation=annotation)
         else:
             raise NotImplementedError
 
     @beartype
     def umap(
         self,
-        op: _UnaryRollerOperatorT,
+        un_op: _RollOutcomeUnaryOperatorT,
         annotation: Any = "",
-    ) -> UnaryOperationRoller:
+    ) -> UnarySumOpRoller:
         r"""
-        Creates and returns a roller for applying unary operator *op* to this roller as its
-        source.
+        Creates and returns a [``UnarySumOpRoller``][dyce.r.UnarySumOpRoller] roller for
+        applying *un_op* to this roller as its source.
 
         ``` python
         >>> import operator
-        >>> r_unop = R.from_value(H(6)).umap(operator.__neg__) ; r_unop
-        UnaryOperationRoller(
-          op=<built-in function neg>,
+        >>> r_un_op = R.from_value(H(6)).umap(operator.__neg__) ; r_un_op
+        UnarySumOpRoller(
+          un_op=<built-in function neg>,
           source=ValueRoller(value=H(6), annotation=''),
           annotation='',
         )
-        >>> r_unop == -R.from_value(H(6))
+        >>> r_un_op == -R.from_value(H(6))
         True
 
         ```
         """
-        return UnaryOperationRoller(op, self, annotation=annotation)
+        return UnarySumOpRoller(un_op, self, annotation=annotation)
 
     @beartype
-    def lt(self, other: _ROperandT) -> BinaryOperationRoller:
+    def lt(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.lt(right), other)``.
 
@@ -909,7 +1021,7 @@ class R:
         return self.map(_lt, other)
 
     @beartype
-    def le(self, other: _ROperandT) -> BinaryOperationRoller:
+    def le(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.le(right), other)``.
 
@@ -922,7 +1034,7 @@ class R:
         return self.map(_le, other)
 
     @beartype
-    def eq(self, other: _ROperandT) -> BinaryOperationRoller:
+    def eq(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.eq(right), other)``.
 
@@ -935,7 +1047,7 @@ class R:
         return self.map(_eq, other)
 
     @beartype
-    def ne(self, other: _ROperandT) -> BinaryOperationRoller:
+    def ne(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ne(right), other)``.
 
@@ -948,7 +1060,7 @@ class R:
         return self.map(_ne, other)
 
     @beartype
-    def gt(self, other: _ROperandT) -> BinaryOperationRoller:
+    def gt(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.gt(right), other)``.
 
@@ -961,7 +1073,7 @@ class R:
         return self.map(_gt, other)
 
     @beartype
-    def ge(self, other: _ROperandT) -> BinaryOperationRoller:
+    def ge(self, other: _ROperandT) -> BinarySumOpRoller:
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ge(right), other)``.
 
@@ -974,36 +1086,83 @@ class R:
         return self.map(_ge, other)
 
     @beartype
-    def is_even(self) -> UnaryOperationRoller:
+    def is_even(self) -> UnarySumOpRoller:
         r"""
-        Shorthand for: ``#!python self.umap(lambda operand: (operand % 2).eq(0))``.
+        Shorthand for: ``#!python self.umap(lambda operand: operand.is_even())``.
 
         See the [``umap`` method][dyce.r.R.umap].
         """
 
         def _is_even(operand: RollOutcome) -> RollOutcome:
-            return __mod__(operand, 2).eq(0)
+            return operand.is_even()
 
         return self.umap(_is_even)
 
     @beartype
-    def is_odd(self) -> UnaryOperationRoller:
+    def is_odd(self) -> UnarySumOpRoller:
         r"""
-        Shorthand for: ``#!python self.umap(lambda operand: (operand % 2).ne(0))``.
+        Shorthand for: ``#!python self.umap(lambda operand: operand.is_odd())``.
 
         See the [``umap`` method][dyce.r.R.umap].
         """
 
         def _is_odd(operand: RollOutcome) -> RollOutcome:
-            return __mod__(operand, 2).ne(0)
+            return operand.is_odd()
 
         return self.umap(_is_odd)
+
+    @beartype
+    def select(
+        self,
+        *which: _GetItemT,
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``#!python self.select_iterable(which, annotation=annotation)``.
+
+        See the [``select_iterable`` method][dyce.r.R.select_iterable].
+        """
+        return self.select_iterable(which, annotation=annotation)
+
+    @beartype
+    def select_iterable(
+        self,
+        which: Iterable[_GetItemT],
+        annotation: Any = "",
+    ) -> SelectionRoller:
+        r"""
+        Shorthand for ``#!python type(self).select_from_sources(which, self,
+        annotation=annotation)``.
+
+        See the [``select_from_sources`` method][dyce.r.R.select_from_sources].
+        """
+        return type(self).select_from_sources(which, self, annotation=annotation)
+
+    @beartype
+    def _prep_for_roll(self, res: _RollOutcomesReturnT) -> Iterator["RollOutcome"]:
+        roll_outcomes: Iterable[RollOutcome]
+
+        if isinstance(res, RollOutcome):
+            roll_outcomes = (res,)
+        else:
+            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
+
+        for roll_outcome in roll_outcomes:
+            if not roll_outcome._has_roll or roll_outcome.r is self:
+                # Roll outcome in need of a roll
+                yield roll_outcome
+            elif roll_outcome.value is None:
+                # Drop euthanized roll outcome from a prior roll
+                pass
+            else:
+                # Wrap active roll outcome from a prior roll
+                yield roll_outcome.cede(roll_outcome.value)
 
 
 class ValueRoller(R):
     r"""
-    A [roller][dyce.r.R] without any sources for representing a single *value* (i.e., a
-    single outcome or a histogram).
+    A [roller][dyce.r.R] whose roll outcomes are derived from scalars,
+    [``H`` objects][dyce.h.H], or [``P`` objects][dyce.p.P] instead of other sources.
     """
     __slots__: Tuple[str, ...] = ("_value",)
 
@@ -1014,9 +1173,10 @@ class ValueRoller(R):
         self,
         value: _ValueT,
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
-        super().__init__((), annotation)
+        super().__init__(sources=(), annotation=annotation, **kw)
 
         if isinstance(value, P) and not value.is_homogeneous:
             warnings.warn(
@@ -1044,6 +1204,8 @@ class ValueRoller(R):
             return Roll(self, roll_outcomes=(RollOutcome(self.value.roll()),))
         elif isinstance(self.value, _OutcomeCs):
             return Roll(self, roll_outcomes=(RollOutcome(self.value),))
+        else:
+            assert False, f"unrecognized value type {self.value!r}"
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -1055,11 +1217,172 @@ class ValueRoller(R):
         return self._value
 
 
-class OperationRollerBase(R):
+class PoolRoller(R):
     r"""
-    An abstract [roller][dyce.r.R] for applying *op* to some variation of outcomes from
-    *sources*. (The specific variation is left up to the
-    [``R.roll`` method][dyce.r.R.roll] implementation of any subclass.)
+    A [roller][dyce.r.R] for rolling flattened “pools” from all *sources*.
+
+    ``` python
+    >>> PoolRoller((
+    ...   PoolRoller((
+    ...     ValueRoller(11),
+    ...     ValueRoller(12),
+    ...   )),
+    ...   PoolRoller((
+    ...     PoolRoller((
+    ...       ValueRoller(211),
+    ...       ValueRoller(212),
+    ...     )),
+    ...     PoolRoller((
+    ...       ValueRoller(221),
+    ...       ValueRoller(222),
+    ...     )),
+    ...   )),
+    ...   ValueRoller(3),
+    ... )).roll()
+    Roll(
+      r=...,
+      roll_outcomes=(
+        RollOutcome(
+          value=11,
+          sources=...,
+        ),
+        RollOutcome(
+          value=12,
+          sources=...,
+        ),
+        RollOutcome(
+          value=211,
+          sources=...,
+        ),
+        RollOutcome(
+          value=212,
+          sources=...,
+        ),
+        RollOutcome(
+          value=221,
+          sources=...,
+        ),
+        RollOutcome(
+          value=222,
+          sources=...,
+        ),
+        RollOutcome(
+          value=3,
+          sources=...,
+        ),
+      ),
+      sources=...,
+    )
+
+    ```
+    """
+    __slots__: Tuple[str, ...] = ()
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls = list(self.source_rolls())
+
+        return Roll(
+            self,
+            roll_outcomes=(
+                roll_outcome.cede(roll_outcome.value)
+                for roll_outcome in chain.from_iterable(source_rolls)
+                if roll_outcome.value is not None
+            ),
+            sources=source_rolls,
+        )
+
+
+class RepeatRoller(R):
+    r"""
+    A [roller][dyce.r.R] to implement the ``#!python __matmul__`` operator. It is akin
+    to a homogeneous [``PoolRoller``][dyce.r.PoolRoller] containing *n* identical
+    *source*s.
+
+    ``` python
+    >>> d20 = H(20)
+    >>> r_d20 = R.from_value(d20)
+    >>> r_d20_100 = 100@r_d20 ; r_d20_100
+    RepeatRoller(
+      n=100,
+      source=ValueRoller(value=H(20), annotation=''),
+      annotation='',
+    )
+    >>> all(outcome in d20 for outcome in r_d20_100.roll().outcomes())
+    True
+
+    ```
+    """
+    __slots__: Tuple[str, ...] = ("_n",)
+
+    # ---- Initializer -----------------------------------------------------------------
+
+    @beartype
+    def __init__(
+        self,
+        n: IntT,
+        source: R,
+        annotation: Any = "",
+        **kw,
+    ):
+        r"Initializer."
+        super().__init__(sources=(source,), annotation=annotation, **kw)
+        self._n = as_int(n)
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @beartype
+    def __repr__(self) -> str:
+        (source,) = self.sources
+
+        return f"""{type(self).__name__}(
+  n={self.n!r},
+  source={indent(repr(source), "  ").strip()},
+  annotation={self.annotation!r},
+)"""
+
+    @beartype
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and self.n == other.n
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls: List[Roll] = []
+
+        for _ in range(self.n):
+            source_rolls.extend(self.source_rolls())
+
+        return Roll(
+            self,
+            roll_outcomes=(
+                roll_outcome.cede(roll_outcome.value)
+                for roll_outcome in chain.from_iterable(source_rolls)
+                if roll_outcome.value is not None
+            ),
+            sources=source_rolls,
+        )
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def n(self) -> int:
+        r"""
+        The number of times to “repeat” the roller’s sole source.
+        """
+        return self._n
+
+
+class BasicOpRoller(R):
+    r"""
+    A [roller][dyce.r.R] for applying *op* to some variation of outcomes from *sources*.
+    Any [``RollOutcome``][dyce.r.RollOutcome]s returned by *op* are used directly in the
+    creation of a new [``Roll``][dyce.r.Roll]. As such, pass-throughs are discouraged,
+    since they will lose their original sources. See [``R.roll``][dyce.r.R.roll] and
+    [``Roll.__init__``][dyce.r.Roll] for details.
     """
     __slots__: Tuple[str, ...] = ("_op",)
 
@@ -1068,12 +1391,13 @@ class OperationRollerBase(R):
     @beartype
     def __init__(
         self,
-        op: RollOutcomeOperatorT,
-        sources: Iterable[R] = (),
+        op: BasicOperatorT,
+        sources: Iterable[R],
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
-        super().__init__(sources, annotation)
+        super().__init__(sources=sources, annotation=annotation, **kw)
         self._op = op
 
     # ---- Overrides -------------------------------------------------------------------
@@ -1088,22 +1412,41 @@ class OperationRollerBase(R):
 
     @beartype
     def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.op == other.op
+        return super().__eq__(other) and (_callable_cmp(self.op, other.op))
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls = list(self.source_rolls())
+        res = self.op(
+            self,
+            (
+                roll_outcome
+                for roll_outcome in chain.from_iterable(source_rolls)
+                if roll_outcome.value is not None
+            ),
+        )
+
+        return Roll(
+            self,
+            roll_outcomes=self._prep_for_roll(res),
+            sources=source_rolls,
+        )
 
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def op(self) -> RollOutcomeOperatorT:
+    def op(self) -> BasicOperatorT:
         r"""
         The operator this roller applies to its sources.
         """
         return self._op
 
 
-class ChainRoller(OperationRollerBase):
+class NarySumOpRoller(BasicOpRoller):
     r"""
-    A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
-    applying *op* to the chained outcomes from each of *sources*.
+    A [``BasicOpRoller``][dyce.r.BasicOpRoller] for applying *op* to the sum of outcomes
+    grouped by each of *sources*.
     """
     __slots__: Tuple[str, ...] = ()
 
@@ -1112,118 +1455,117 @@ class ChainRoller(OperationRollerBase):
     @beartype
     def roll(self) -> Roll:
         r""""""
-        source_rolls = tuple(source.roll() for source in self.sources)
-        roll_outcomes = tuple(
-            roll_outcome
-            for roll_outcome in chain.from_iterable(source_rolls)
-            if roll_outcome.value is not None
-        )
-        res = self.op(*roll_outcomes)
+        source_rolls = list(self.source_rolls())
 
-        if isinstance(res, RollOutcome):
-            res = (res,)
-
-        return Roll(
-            self,
-            roll_outcomes=res,
-            sources=source_rolls,
-        )
-
-
-class SumRoller(OperationRollerBase):
-    r"""
-    A roller deriving from [``OperationRollerBase``][dyce.r.OperationRollerBase] for
-    applying *op* to the sum of outcomes grouped by each of *sources*.
-    """
-    __slots__: Tuple[str, ...] = ()
-
-    # ---- Overrides -------------------------------------------------------------------
-
-    @beartype
-    def roll(self) -> Roll:
-        r""""""
-        source_rolls = tuple(source.roll() for source in self.sources)
-
-        def _roll_outcomes() -> Iterator[RollOutcome]:
+        def _sum_roll_outcomes_by_rolls() -> Iterator[RollOutcome]:
             for source_roll in source_rolls:
-                if len(source_roll) == 1:
+                if len(source_roll) == 1 and source_roll[0].value is not None:
                     yield from source_roll
-                elif len(source_roll) > 1:
-                    yield RollOutcome(
-                        sum(roll_outcome.value for roll_outcome in source_roll),
-                        sources=source_roll,
-                    )
+                else:
+                    yield RollOutcome(sum(source_roll.outcomes()), sources=source_roll)
 
-        res = self.op(*_roll_outcomes())
-
-        if isinstance(res, RollOutcome):
-            res = (res,)
+        res = self.op(self, _sum_roll_outcomes_by_rolls())
 
         return Roll(
             self,
-            roll_outcomes=res,
+            roll_outcomes=self._prep_for_roll(res),
             sources=source_rolls,
         )
 
 
-class BinaryOperationRoller(SumRoller):
+class BinarySumOpRoller(NarySumOpRoller):
     r"""
-    A [``SumRoller``][dyce.r.SumRoller] for applying a binary operator *op* to the sum
-    of all outcomes from its *left_source* and the sum of all outcomes from its
-    *right_source*.
+    An [``NarySumOpRoller``][dyce.r.NarySumOpRoller] for applying a binary operator
+    *bin_op* to the sum of all outcomes from its *left_source* and the sum of all
+    outcomes from its *right_source*.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Tuple[str, ...] = ("_bin_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
     def __init__(
         self,
-        op: _BinaryRollerOperatorT,
+        bin_op: _RollOutcomeBinaryOperatorT,
         left_source: R,
         right_source: R,
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
+
+        def _op(
+            r: R,
+            roll_outcomes: Iterable[RollOutcome],
+        ) -> Union[RollOutcome, Iterable[RollOutcome]]:
+            left_operand, right_operand = roll_outcomes
+
+            return bin_op(left_operand, right_operand)
+
         super().__init__(
-            cast(RollOutcomeOperatorT, op), (left_source, right_source), annotation
+            op=_op, sources=(left_source, right_source), annotation=annotation, **kw
         )
+        self._bin_op = bin_op
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def bin_op(self) -> _RollOutcomeBinaryOperatorT:
+        r"""
+        The operator this roller applies to its sources.
+        """
+        return self._bin_op
 
     # ---- Overrides -------------------------------------------------------------------
 
     @beartype
     def __repr__(self) -> str:
-        def _source_repr(source: R) -> str:
+        def _source_repr(source: _SourceT) -> str:
             return indent(repr(source), "    ").strip()
 
         left_source, right_source = self.sources
 
         return f"""{type(self).__name__}(
-  op={self.op!r},
+  bin_op={self.bin_op!r},
   left_source={_source_repr(left_source)},
   right_source={_source_repr(right_source)},
   annotation={self.annotation!r},
 )"""
 
+    @beartype
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and (_callable_cmp(self.bin_op, other.bin_op))
 
-class UnaryOperationRoller(SumRoller):
+
+class UnarySumOpRoller(NarySumOpRoller):
     r"""
-    A [``SumRoller``][dyce.r.SumRoller] for applying a unary operator *op* to the sum of
-    all outcomes from its sole *source*.
+    An [``NarySumOpRoller``][dyce.r.NarySumOpRoller] for applying a unary operator
+    *un_op* to the sum of all outcomes from its sole *source*.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Tuple[str, ...] = ("_un_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
     def __init__(
         self,
-        op: _UnaryRollerOperatorT,
+        un_op: _RollOutcomeUnaryOperatorT,
         source: R,
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
-        super().__init__(cast(RollOutcomeOperatorT, op), (source,), annotation)
+
+        def _op(
+            r: R,
+            roll_outcomes: Iterable[RollOutcome],
+        ) -> Union[RollOutcome, Iterable[RollOutcome]]:
+            (operand,) = roll_outcomes
+
+            return un_op(operand)
+
+        super().__init__(op=_op, sources=(source,), annotation=annotation, **kw)
+        self._un_op = un_op
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1232,68 +1574,33 @@ class UnaryOperationRoller(SumRoller):
         (source,) = self.sources
 
         return f"""{type(self).__name__}(
-  op={self.op!r},
+  un_op={self.un_op!r},
   source={indent(repr(source), "  ").strip()},
-  annotation={self.annotation!r},
-)"""
-
-
-class PoolRoller(ChainRoller):
-    r"""
-    A [``ChainRoller``][dyce.r.ChainRoller] for “pooling” zero or more roller *sources*.
-    """
-    __slots__: Tuple[str, ...] = ()
-
-    # ---- Initializer -----------------------------------------------------------------
-
-    @beartype
-    def __init__(
-        self,
-        sources: Iterable[R] = (),
-        annotation: Any = "",
-    ):
-        r"Initializer."
-
-        def _pool(*source_outcomes: RollOutcome) -> Iterable[RollOutcome]:
-            for source_outcome in source_outcomes:
-                yield RollOutcome(
-                    source_outcome.value,
-                    sources=(source_outcome,),
-                )
-
-        super().__init__(_pool, sources, annotation)
-
-    # ---- Overrides -------------------------------------------------------------------
-
-    @beartype
-    def __repr__(self) -> str:
-        return f"""{type(self).__name__}(
-  sources=({_seq_repr(self.sources)}),
   annotation={self.annotation!r},
 )"""
 
     @beartype
     def __eq__(self, other) -> bool:
-        return super(OperationRollerBase, self).__eq__(other)
+        return super().__eq__(other) and (_callable_cmp(self.un_op, other.un_op))
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def un_op(self) -> _RollOutcomeUnaryOperatorT:
+        r"""
+        The operator this roller applies to its sources.
+        """
+        return self._un_op
 
 
-class SelectionRoller(ChainRoller):
+class SelectionRoller(R):
     r"""
-    A [``ChainRoller``][dyce.r.ChainRoller] for sorting outcomes from its roller
-    *sources* and applying a selector *which*.
+    A [roller][dyce.r.R] for sorting outcomes from its *sources* and applying a selector
+    *which*.
 
     Roll outcomes in created rolls are ordered according to the selections *which*.
-    However, those selections reference values in a *sorted* view of the source’s roll
-    outcomes.
-
-    <!--
-    ``` python
-    >>> from typing import Tuple, Union
-    >>> which: Tuple[Union[int, slice], ...]
-
-    ```
-
-    -->
+    However, those selections are interpreted as indexes in a *sorted* view of the
+    source’s roll outcomes.
 
     ``` python
     >>> r_values = R.from_values(10000, 1, 1000, 10, 100)
@@ -1391,33 +1698,12 @@ class SelectionRoller(ChainRoller):
     def __init__(
         self,
         which: Iterable[_GetItemT],
-        sources: Iterable[R] = (),
+        sources: Iterable[R],
         annotation: Any = "",
+        **kw,
     ):
         r"Initializer."
-
-        def _select_which(*source_outcomes: RollOutcome) -> Iterable[RollOutcome]:
-            all_indexes = tuple(range(len(source_outcomes)))
-            selected_indexes = tuple(getitems(all_indexes, self.which))
-            unique_selected_indexes = set(selected_indexes)
-            source_outcomes_sorted = sorted(source_outcomes, key=attrgetter("value"))
-            roll_outcomes_by_index = {
-                index: RollOutcome(
-                    value=source_outcomes_sorted[index].value
-                    if index in unique_selected_indexes
-                    else None,
-                    sources=(source_outcomes_sorted[index],),
-                )
-                for index in all_indexes
-            }
-
-            for selected_index in selected_indexes:
-                yield roll_outcomes_by_index[selected_index]
-
-            for excluded_index in set(all_indexes) - unique_selected_indexes:
-                yield roll_outcomes_by_index[excluded_index]
-
-        super().__init__(_select_which, sources, annotation)
+        super().__init__(sources=sources, annotation=annotation, **kw)
         self._which = tuple(which)
 
     # ---- Overrides -------------------------------------------------------------------
@@ -1432,8 +1718,35 @@ class SelectionRoller(ChainRoller):
 
     @beartype
     def __eq__(self, other) -> bool:
-        return (
-            super(OperationRollerBase, self).__eq__(other) and self.which == other.which
+        return super().__eq__(other) and self.which == other.which
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls = list(self.source_rolls())
+        roll_outcomes = list(
+            roll_outcome
+            for roll_outcome in chain.from_iterable(source_rolls)
+            if roll_outcome.value is not None
+        )
+        roll_outcomes.sort(key=attrgetter("value"))
+        all_indexes = tuple(range(len(roll_outcomes)))
+        selected_indexes = tuple(getitems(all_indexes, self.which))
+
+        def _selected_roll_outcomes():
+            for selected_index in selected_indexes:
+                selected_roll_outcome = roll_outcomes[selected_index]
+                value = selected_roll_outcome.value
+                assert value is not None
+                yield selected_roll_outcome.cede(value)
+
+            for excluded_index in set(all_indexes) - set(selected_indexes):
+                yield roll_outcomes[excluded_index].euthanize()
+
+        return Roll(
+            self,
+            roll_outcomes=_selected_roll_outcomes(),
+            sources=source_rolls,
         )
 
     # ---- Properties ------------------------------------------------------------------
@@ -1444,84 +1757,6 @@ class SelectionRoller(ChainRoller):
         The selector this roller applies to the sorted outcomes of its sole source.
         """
         return self._which
-
-
-class RepeatRoller(R):
-    r"""
-    A [roller][dyce.r.R] to implement the ``#!python __matmul__`` operator. It is akin
-    to a homogeneous [``PoolRoller``][dyce.r.PoolRoller] containing *n* copies of its
-    sole *source*.
-
-    ``` python
-    >>> d20 = H(20)
-    >>> r_d20 = R.from_value(d20)
-    >>> r_d20_100 = 100@r_d20 ; r_d20_100
-    RepeatRoller(
-      n=100,
-      source=ValueRoller(value=H(20), annotation=''),
-      annotation='',
-    )
-    >>> all(outcome in d20 for outcome in r_d20_100.roll().outcomes())
-    True
-
-    ```
-    """
-    __slots__: Tuple[str, ...] = ("_n",)
-
-    # ---- Initializer -----------------------------------------------------------------
-
-    @beartype
-    def __init__(
-        self,
-        n: IntT,
-        source: R,
-        annotation: Any = "",
-    ):
-        r"Initializer."
-        super().__init__((source,), annotation)
-        self._n = as_int(n)
-
-    # ---- Overrides -------------------------------------------------------------------
-
-    @beartype
-    def __repr__(self) -> str:
-        (source,) = self.sources
-
-        return f"""{type(self).__name__}(
-  n={self.n!r},
-  source={indent(repr(source), "  ").strip()},
-  annotation={self.annotation!r},
-)"""
-
-    @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.n == other.n
-
-    @beartype
-    def roll(self) -> Roll:
-        r""""""
-        (source,) = self.sources
-        source_rolls = tuple(source.roll() for _ in range(self.n))
-
-        def _roll_outcome_gen() -> Iterable[RollOutcome]:
-            for source_roll in source_rolls:
-                for source_outcome in source_roll:
-                    if source_outcome.value is not None:
-                        yield RollOutcome(
-                            source_outcome.value,
-                            sources=(source_outcome,),
-                        )
-
-        return Roll(self, roll_outcomes=_roll_outcome_gen(), sources=source_rolls)
-
-    # ---- Properties ------------------------------------------------------------------
-
-    @property
-    def n(self) -> int:
-        r"""
-        The number of times to “repeat” the roller’s sole source.
-        """
-        return self._n
 
 
 class RollOutcome:
@@ -1568,7 +1803,7 @@ class RollOutcome:
     # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __lt__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
-            return __lt__(self.value, other.value)
+            return bool(__lt__(self.value, other.value))
         else:
             return NotImplemented
 
@@ -1576,35 +1811,35 @@ class RollOutcome:
     # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __le__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
         if isinstance(other, RollOutcome):
-            return __le__(self.value, other.value)
+            return bool(__le__(self.value, other.value))
         else:
             return NotImplemented
 
     @beartype
     def __eq__(self, other) -> bool:
         if isinstance(other, RollOutcome):
-            return __eq__(self.value, other.value)
+            return bool(__eq__(self.value, other.value))
         else:
             return super().__eq__(other)
 
     @beartype
     def __ne__(self, other) -> bool:
         if isinstance(other, RollOutcome):
-            return __ne__(self.value, other.value)
+            return bool(__ne__(self.value, other.value))
         else:
             return super().__ne__(other)
 
     @beartype
     def __gt__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
-            return __gt__(self.value, other.value)
+            return bool(__gt__(self.value, other.value))
         else:
             return NotImplemented
 
     @beartype
     def __ge__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
-            return __ge__(self.value, other.value)
+            return bool(__ge__(self.value, other.value))
         else:
             return NotImplemented
 
@@ -1804,7 +2039,6 @@ class RollOutcome:
         a programming error.
 
         ``` python
-        >>> from dyce.r import Roll, RollOutcome
         >>> ro = RollOutcome(4)
         >>> ro.roll
         Traceback (most recent call last):
@@ -1851,22 +2085,30 @@ class RollOutcome:
         """
         return self._value
 
+    @property
+    def _has_roll(self) -> bool:
+        r"""
+        ``#!python True`` if this roll outcome has been associated with a
+        [``Roll``][dyce.r.Roll], ``#!python False`` if not. Accessing this property
+        should not be necessary outside of roll creation (hence its underscore prefix).
+        """
+        return self._roll is not None
+
     # ---- Methods ---------------------------------------------------------------------
 
     @beartype
     def map(
         self,
-        op: _BinaryOperatorT,
+        bin_op: _BinaryOperatorT,
         right_operand: _RollOutcomeOperandT,
     ) -> RollOutcome:
         r"""
-        Applies *op* to the value of this roll outcome as the left operand and
+        Applies *bin_op* to the value of this roll outcome as the left operand and
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
         comparators.
 
         ``` python
         >>> import operator
-        >>> from dyce.r import RollOutcome
         >>> two = RollOutcome(2)
         >>> two.map(operator.__pow__, 10)
         RollOutcome(
@@ -1891,7 +2133,7 @@ class RollOutcome:
             right_operand_value = right_operand
 
         if isinstance(right_operand_value, _OutcomeCs):
-            return RollOutcome(op(self.value, right_operand_value), sources)
+            return RollOutcome(bin_op(self.value, right_operand_value), sources)
         else:
             raise NotImplementedError
 
@@ -1899,7 +2141,7 @@ class RollOutcome:
     def rmap(
         self,
         left_operand: OutcomeT,
-        op: _BinaryOperatorT,
+        bin_op: _BinaryOperatorT,
     ) -> RollOutcome:
         r"""
         Analogous to the [``map`` method][dyce.r.RollOutcome.map], but where the caller
@@ -1907,7 +2149,6 @@ class RollOutcome:
 
         ``` python
         >>> import operator
-        >>> from dyce.r import RollOutcome
         >>> two = RollOutcome(2)
         >>> two.rmap(10, operator.__pow__)
         RollOutcome(
@@ -1923,26 +2164,31 @@ class RollOutcome:
         True
 
         ```
+
+        !!! note
+
+            The positions of *left_operand* and *bin_op* are different from
+            [``map`` method][dyce.r.RollOutcome.map]. This is intentional and serves as
+            a reminder of operand ordering.
         """
         if isinstance(left_operand, _OutcomeCs):
-            return RollOutcome(op(left_operand, self.value), sources=(self,))
+            return RollOutcome(bin_op(left_operand, self.value), sources=(self,))
         else:
             raise NotImplementedError
 
     @beartype
     def umap(
         self,
-        op: _UnaryOperatorT,
+        un_op: _UnaryOperatorT,
     ) -> RollOutcome:
         r"""
-        Applies *op* to the value of this roll outcome. Shorthands exist for many arithmetic
-        operators and comparators.
+        Applies *un_op* to the value of this roll outcome. Shorthands exist for many
+        arithmetic operators and comparators.
 
         ``` python
         >>> import operator
-        >>> from dyce.r import RollOutcome
-        >>> two = RollOutcome(-2)
-        >>> two.umap(operator.__neg__)
+        >>> two_neg = RollOutcome(-2)
+        >>> two_neg.umap(operator.__neg__)
         RollOutcome(
           value=2,
           sources=(
@@ -1952,12 +2198,12 @@ class RollOutcome:
             ),
           ),
         )
-        >>> two.umap(operator.__neg__) == -two
+        >>> two_neg.umap(operator.__neg__) == -two_neg
         True
 
         ```
         """
-        return RollOutcome(op(self.value), sources=(self,))
+        return RollOutcome(un_op(self.value), sources=(self,))
 
     @beartype
     def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
@@ -2013,6 +2259,89 @@ class RollOutcome:
         else:
             return RollOutcome(bool(__ge__(self.value, other)), sources=(self,))
 
+    @beartype
+    def cede(self, other: _RollOutcomeOperandT) -> RollOutcome:
+        r"""
+        Shorthand for ``#!python self.map(lambda left, right: right, other)``.
+
+        ``` python
+        >>> two = RollOutcome(2)
+        >>> two.cede(-3)
+        RollOutcome(
+          value=-3,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+          ),
+        )
+
+        ```
+
+        See the [``map`` method][dyce.r.RollOutcome.map].
+        """
+
+        def _cede(left_operand: OutcomeT, right_operand: OutcomeT) -> OutcomeT:
+            return right_operand
+
+        return self.map(_cede, other)
+
+    @beartype
+    def is_even(self) -> RollOutcome:
+        r"""
+        Shorthand for: ``#!python self.umap(dyce.types.is_even)``.
+
+        See the [``umap`` method][dyce.r.RollOutcome.umap].
+        """
+        return self.umap(is_even)
+
+    @beartype
+    def is_odd(self) -> RollOutcome:
+        r"""
+        Shorthand for: ``#!python self.umap(dyce.types.is_even)``.
+
+        See the [``umap`` method][dyce.r.RollOutcome.umap].
+        """
+        return self.umap(is_odd)
+
+    @beartype
+    def euthanize(self) -> RollOutcome:
+        r"""
+        Shorthand for ``#!python self.umap(lambda operand: None)``.
+
+        ``` python
+        >>> two = RollOutcome(2)
+        >>> two.euthanize()
+        RollOutcome(
+          value=None,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+          ),
+        )
+
+        ```
+
+        See the [``umap`` method][dyce.r.RollOutcome.umap].
+        """
+
+        def _euthanize(operand: Optional[OutcomeT]) -> Optional[OutcomeT]:
+            return None
+
+        return self.umap(_euthanize)
+
+    @beartype
+    def clone(self) -> RollOutcome:
+        r"""
+        Clones this roll outcome, keeping its [``value``][dyce.r.RollOutcome.value] and
+        [``sources``][dyce.r.RollOutcome.sources], but not any associated
+        [``roll``][dyce.r.RollOutcome.roll].
+        """
+        return type(self)(self.value, self.sources)
+
 
 class Roll(Sequence[RollOutcome]):
     r"""
@@ -2049,7 +2378,6 @@ class Roll(Sequence[RollOutcome]):
             Technically, this violates the immutability of roll outcomes.
 
             ``` python
-            >>> from dyce.r import PoolRoller, Roll, RollOutcome
             >>> origin = RollOutcome(value=1)
             >>> descendant = RollOutcome(value=2, sources=(origin,)) ; descendant
             RollOutcome(
@@ -2084,7 +2412,7 @@ class Roll(Sequence[RollOutcome]):
             going to create your own roll outcomes and pimp them out to different rolls
             all over town, they might come back with some parts missing.
 
-            (See also the [``RollOutcome.roll`` property][dyce.r.RollOutcome.roll].)
+            See also the [``RollOutcome.roll`` property][dyce.r.RollOutcome.roll].
         """
         super().__init__()
         self._r = r
@@ -2175,8 +2503,8 @@ class Roll(Sequence[RollOutcome]):
     @beartype
     def outcomes(self) -> Iterator[OutcomeT]:
         r"""
-        Shorthand for
-        ``#!python (roll_outcome.value for roll_outcome in self if roll_outcome.value is not None)``.
+        Shorthand for ``#!python (roll_outcome.value for roll_outcome in self if
+        roll_outcome.value is not None)``.
 
         !!! info
 
@@ -2184,12 +2512,21 @@ class Roll(Sequence[RollOutcome]):
             outcomes are *not* sorted. Instead, they retain the ordering from whence
             they came in the roller tree.
 
+            <!-- BEGIN MONKEY PATCH --
+            For deterministic outcomes
+
+            >>> import random
+            >>> from dyce import rng
+            >>> rng.RNG = random.Random(1633056410)
+
+              -- END MONKEY PATCH -->
+
             ``` python
             >>> r_3d6 = 3@R.from_value(H(6))
             >>> r_3d6_neg = 3@-R.from_value(H(6))
-            >>> roll = R.from_rs(r_3d6, r_3d6_neg).roll()
-            >>> tuple(roll.outcomes())  # doctest: +SKIP
-            (1, 4, 1, -5, -2, -3)
+            >>> roll = R.from_sources(r_3d6, r_3d6_neg).roll()
+            >>> tuple(roll.outcomes())
+            (1, 3, 1, -4, -6, -1)
             >>> len(roll)
             6
 
@@ -2285,9 +2622,9 @@ def walk(
 
     !!! info "On the current implementation"
 
-        ``walk`` performs a breadth-first traversal of *root*, assembling a secondary
-        index of referencing objects (parents). Visitors are called back grouped first
-        by type, then by order encountered.
+        ``#!python walk`` performs a breadth-first traversal of *root*, assembling a
+        secondary index of referencing objects (parents). Visitors are called back
+        grouped first by type, then by order encountered.
     """
     rolls: Dict[int, Roll] = {}
     rollers: Dict[int, R] = {}
@@ -2355,6 +2692,15 @@ def walk(
 
 
 # ---- Functions -----------------------------------------------------------------------
+
+
+@beartype
+def _callable_cmp(op1: Callable, op2: Callable) -> bool:
+    return op1 == op2 or (
+        hasattr(op1, "__code__")
+        and hasattr(op2, "__code__")
+        and op1.__code__ == op2.__code__
+    )
 
 
 @beartype

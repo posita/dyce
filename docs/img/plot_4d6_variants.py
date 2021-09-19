@@ -59,4 +59,4 @@ def do_it(_: str) -> None:
     )
     matplotlib.pyplot.legend()
     # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title(r"Comparing various take-three-of-4d6 methods")
+    matplotlib.pyplot.title("Comparing various take-three-of-4d6 methods")

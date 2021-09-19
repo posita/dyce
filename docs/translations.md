@@ -68,7 +68,7 @@ Visualization:
 ...   label="4d4 + 2",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Comparing various take-three-of-4d6 methods")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Comparing various take-three-of-4d6 methods")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -111,7 +111,7 @@ Visualization:
 >>> import matplotlib  # doctest: +SKIP
 >>> outcomes, probabilities = damage_half_on_save.distribution_xy()
 >>> matplotlib.pyplot.plot(outcomes, probabilities, marker=".")  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Expected outcomes for attack with saving throw for half damage")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Expected outcomes for attack with saving throw for half damage")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -231,29 +231,29 @@ Example 1 visualization:
 ``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> from dyce.viz import display_burst
->>> plot_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
->>> burst_ax = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))  # doctest: +SKIP
->>> sa_label = "Normal attack"
->>> plot_ax.plot(
+>>> ax_plot = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
+>>> ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))  # doctest: +SKIP
+>>> label_sa = "Normal attack"
+>>> ax_plot.plot(
 ...     *single_attack.distribution_xy(),
 ...     color="tab:green",
-...     label=sa_label,
+...     label=label_sa,
 ...     marker=".",
 ... )  # doctest: +SKIP
->>> gwf_label = "“Great Weapon Fighting”"
->>> plot_ax.plot(
+>>> label_gwf = "“Great Weapon Fighting”"
+>>> ax_plot.plot(
 ...     *great_weapon_fighting.distribution_xy(),
 ...     color="tab:blue",
-...     label=gwf_label,
+...     label=label_gwf,
 ...     marker=".",
 ... )  # doctest: +SKIP
->>> plot_ax.legend()  # doctest: +SKIP
->>> plot_ax.set_title(r"Comparing a normal attack to an enhanced one")  # doctest: +SKIP
+>>> ax_plot.legend()  # doctest: +SKIP
+>>> ax_plot.set_title("Comparing a normal attack to an enhanced one")  # doctest: +SKIP
 >>> display_burst(
-...     burst_ax,
+...     ax_burst,
 ...     h_inner=great_weapon_fighting,
 ...     outer=single_attack,
-...     desc=f"{sa_label} vs. {gwf_label}",
+...     desc=f"{label_sa} vs. {label_gwf}",
 ...     inner_color="RdYlBu_r",
 ...     outer_color="RdYlGn_r",
 ...     alpha=0.9,
@@ -324,7 +324,7 @@ Example 2 visualization:
 ...   label="Advantage-weighted",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Modeling an advantage-weighted attack with critical hits")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Modeling an advantage-weighted attack with critical hits")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -362,7 +362,7 @@ Visualization:
 ...     label=f"{depth} rerolls",
 ...   )  # doctest: +SKIP
     matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Modeling taking the three highest of ten exploding d10s")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Modeling taking the three highest of ten exploding d10s")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -399,26 +399,34 @@ Translation:
 ...         dupes += 1
 ...     yield dupes, count
 
->>> res = H(dupes(8@P(10)))
+>>> res_15d6 = H(dupes(15@P(6)))
+>>> res_8d10 = H(dupes(8@P(10)))
 
 ```
 
 Visualization:
 
 ``` python
->>> from dyce.viz import plot_burst
->>> plot_burst(
-...   res,
-...   desc=r"Chances of rolling $n$ duplicates in 8d10",
+>>> import matplotlib  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   *res_15d6.distribution_xy(),
+...   marker="o",
+...   label="15d6",
 ... )  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
+>>> matplotlib.pyplot.plot(
+...   *res_8d10.distribution_xy(),
+...   marker="o",
+...   label="8d10",
+... )  # doctest: +SKIP
+>>> matplotlib.pyplot.legend()  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Chances of rolling $n$ duplicates")  # doctest: +SKIP
 
 ```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../img/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Chances of rolling <i>n</i> duplicates in 8d10](img/plot_dupes_light.png)
+  ![Plot: Chances of rolling <i>n</i> duplicates](img/plot_dupes_light.png)
 </picture>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
@@ -473,7 +481,7 @@ Visualization:
 ...     label=f"{n}d{d} keep {k}",
 ...   )  # doctest: +SKIP
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Roll-and-keep mechanic comparison")  # doctest: +SKIP
+>>> matplotlib.pyplot.title("Roll-and-keep mechanic comparison")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```

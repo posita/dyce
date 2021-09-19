@@ -9,10 +9,11 @@
 from __future__ import annotations
 
 from dyce import H, P
-from dyce.viz import plot_burst
 
 
 def do_it(style: str) -> None:
+    import matplotlib.pyplot
+
     def dupes(p: P):
         for roll, count in p.rolls_with_counts():
             dupes = 0
@@ -21,11 +22,19 @@ def do_it(style: str) -> None:
                     dupes += 1
             yield dupes, count
 
-    res = H(dupes(8 @ P(10)))
+    res_15d6 = H(dupes(15 @ P(6)))
+    res_8d10 = H(dupes(8 @ P(10)))
 
-    plot_burst(
-        res,
-        # Should match the corresponding img[alt] text
-        desc=r"Chances of rolling $n$ duplicates in 8d10",
-        text_color="white" if style == "dark" else "black",
+    matplotlib.pyplot.plot(
+        *res_15d6.distribution_xy(),
+        marker="o",
+        label="15d6",
     )
+    matplotlib.pyplot.plot(
+        *res_8d10.distribution_xy(),
+        marker="o",
+        label="8d10",
+    )
+    matplotlib.pyplot.legend()
+    # Should match the corresponding img[alt] text
+    matplotlib.pyplot.title("Chances of rolling $n$ duplicates")
