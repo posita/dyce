@@ -62,7 +62,7 @@ class Numberwang(Integral):
 
     @beartype
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.val})"
+        return f"{type(self).__name__}({self.val})"
 
     @beartype
     def __lt__(self, other) -> bool:
@@ -90,7 +90,7 @@ class Numberwang(Integral):
 
     @beartype
     def __hash__(self) -> int:
-        return hash((self.__class__.__name__, self.val))
+        return hash((type(self).__name__, self.val))
 
     @overload
     def __add__(self, other: _IntegralT) -> Integral:
@@ -518,7 +518,7 @@ class Wangernumb(Real):
 
     @beartype
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.val})"
+        return f"{type(self).__name__}({self.val})"
 
     @beartype
     def __lt__(self, other) -> bool:

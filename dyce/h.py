@@ -39,7 +39,6 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from random import choices
 from typing import (
     Callable,
     Counter,
@@ -96,6 +95,7 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
 _CoalesceT = Callable[["H", OutcomeT], "H"]
+_ChoiceT = Callable[["H"], OutcomeT]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -119,6 +119,47 @@ def coalesce_replace(h: H, outcome: OutcomeT) -> H:
     (*outcome* is ignored).
     """
     return h
+
+
+_choice_impl: _ChoiceT
+
+
+try:
+    from numpy.random import Generator
+
+    try:
+        from numpy.random import PCG64DXSM as _BitGenImpl
+    except ImportError:
+        from numpy.random import PCG64 as _BitGenImpl
+
+    _NUMPY_RNG = Generator(_BitGenImpl())
+
+    def _numpy_choice_impl(h: H) -> OutcomeT:
+        return (
+            _NUMPY_RNG.choice(
+                tuple(h.outcomes()),
+                p=tuple(Fraction(count, h.total) for count in h.counts()),
+            )
+            if h
+            else 0
+        )
+
+    _choice_impl = _numpy_choice_impl
+except ImportError:
+    from random import choices
+
+    def _default_choice_impl(h: H) -> OutcomeT:
+        return (
+            choices(
+                population=tuple(h.outcomes()),
+                weights=tuple(h.counts()),
+                k=1,
+            )[0]
+            if h
+            else 0
+        )
+
+    _choice_impl = _default_choice_impl
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -432,7 +473,7 @@ class H(_MappingT):
         else:
             arg = dict.__repr__(self._h)
 
-        return f"{self.__class__.__name__}({arg})"
+        return f"{type(self).__name__}({arg})"
 
     @beartype
     def __eq__(self, other) -> bool:
@@ -739,12 +780,12 @@ class H(_MappingT):
             right_operand = right_operand.h()
 
         if isinstance(right_operand, H):
-            return H(
+            return type(self)(
                 (op(s, o), self[s] * right_operand[o])
                 for s, o in product(self, right_operand)
             )
         else:
-            return H(
+            return type(self)(
                 (op(outcome, right_operand), count) for outcome, count in self.items()
             )
 
@@ -772,7 +813,9 @@ class H(_MappingT):
         [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
         of operand ordering.
         """
-        return H((op(left_operand, outcome), count) for outcome, count in self.items())
+        return type(self)(
+            (op(left_operand, outcome), count) for outcome, count in self.items()
+        )
 
     @beartype
     def umap(
@@ -795,13 +838,13 @@ class H(_MappingT):
 
         ```
         """
-        h = H((op(outcome), count) for outcome, count in self.items())
+        h = type(self)((op(outcome), count) for outcome, count in self.items())
 
         if self._simple_init is not None:
             simple_init = op(self._simple_init)
 
             if isinstance(simple_init, _IntCs):
-                h_simple = H(simple_init)
+                h_simple = type(self)(simple_init)
 
                 if h_simple == h:
                     return h_simple
@@ -970,7 +1013,7 @@ class H(_MappingT):
         elif not isinstance(other, IterableC):
             other = cast(Iterable[OutcomeT], (other,))
 
-        return H(chain(self.items(), cast(Iterable, other)))
+        return type(self)(chain(self.items(), cast(Iterable, other)))
 
     @experimental
     @beartype
@@ -1047,7 +1090,7 @@ class H(_MappingT):
 
         ```
         """
-        return H(self._lowest_terms())
+        return type(self)(self._lowest_terms())
 
     @experimental
     @beartype
@@ -1132,7 +1175,7 @@ class H(_MappingT):
 
         @beartype
         def order_stat_for_n_at_pos(pos: IntT) -> H:
-            return H(_gen_h_items_at_pos(as_int(pos)))
+            return type(self)(_gen_h_items_at_pos(as_int(pos)))
 
         return order_stat_for_n_at_pos
 
@@ -1325,7 +1368,7 @@ class H(_MappingT):
                 else:
                     items_for_reassembly.append((expanded, count, 1))
 
-            return H(
+            return type(self)(
                 (
                     # Apply the total_scalar, but factor out this item's contribution
                     (outcome, count * total_scalar // s)
@@ -1714,18 +1757,8 @@ class H(_MappingT):
     def roll(self) -> OutcomeT:
         r"""
         Returns a (weighted) random outcome, sorted.
-
-        !!! note "On ordering"
-
-            This method “works” (i.e., falls back to a “natural” ordering of string
-            representations) for outcomes whose relative values cannot be known (e.g.,
-            symbolic expressions). This is deliberate to allow random roll functionality
-            where symbolic resolution is not needed or will happen later.
         """
-        if not self:
-            return 0
-
-        return choices(tuple(self.outcomes()), tuple(self.counts()))[0]
+        return _choice_impl(self)
 
     def _lowest_terms(self) -> Iterable[Tuple[OutcomeT, int]]:
         counts_gcd = gcd(*self.counts())

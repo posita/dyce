@@ -233,7 +233,7 @@ class P(Sequence[H], HableOpsMixin):
 
         args = ", ".join(_parts())
 
-        return f"{self.__class__.__name__}({args})"
+        return f"{type(self).__name__}({args})"
 
     @beartype
     def __eq__(self, other) -> bool:
@@ -511,6 +511,13 @@ class P(Sequence[H], HableOpsMixin):
     def roll(self) -> _RollT:
         r"""
         Returns (weighted) random outcomes from contained histograms.
+
+        !!! note "On ordering"
+
+            This method “works” (i.e., falls back to a “natural” ordering of string
+            representations) for outcomes whose relative values cannot be known (e.g.,
+            symbolic expressions). This is deliberate to allow random roll functionality
+            where symbolic resolution is not needed or will happen later.
         """
         return tuple(sorted_outcomes(h.roll() for h in self))
 
@@ -1027,7 +1034,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
             else:
                 this_outcome = min(h)
 
-            next_h = H(
+            next_h = type(h)(
                 (outcome, count)
                 for outcome, count in h.items()
                 if outcome != this_outcome

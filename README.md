@@ -336,6 +336,7 @@ It has the following runtime dependencies:
 * [``beartype``](https://pypi.org/project/beartype/) for yummy runtime type-checking goodness (0.8+)
   [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 * [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
+* [``numpy``](https://numpy.org/) for the RNG used by [``H.roll``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.roll)
 
 If you install ``beartype`` for type checking your own code, but don’t want ``dyce`` to use it (e.g., for performance reasons), you can set the ``DYCE_BEARTYPE`` environment variable to a falsy[^9] value before ``dyce`` is imported.
 

@@ -72,7 +72,7 @@ class TestValueRoller:
             h = H(o_type(o) for o in range(-2, 3))
             r = R.from_value(h, annotation=f"{o_type}")
 
-            for _ in range(100):
+            for _ in range(10):
                 r_roll = r.roll()
                 (roll_outcome,) = r_roll
                 assert roll_outcome.r == r
@@ -392,7 +392,7 @@ class TestBinaryOperationRoller:
             h_mul_h = h * h
             r_mul_r = r * r
 
-            for _ in range(100):
+            for _ in range(10):
                 r_mul_r_roll = r_mul_r.roll()
                 (roll_outcome,) = r_mul_r_roll
                 assert roll_outcome.r == r_mul_r
@@ -513,7 +513,7 @@ class TestUnaryOperationRoller:
             r = R.from_value(h, annotation=f"{o_type}")
             r_neg = -r
 
-            for _ in range(100):
+            for _ in range(10):
                 r_neg_roll = r_neg.roll()
                 (roll_outcome,) = r_neg_roll
                 assert roll_outcome.r == r_neg
@@ -575,7 +575,7 @@ class TestPoolRoller:
             r = R.from_value(h, annotation=f"{o_type}")
             r_3 = R.from_rs(r, r, r)
 
-            for _ in range(100):
+            for _ in range(10):
                 r_3_roll = r_3.roll()
                 assert len(r_3_roll) == 3, r_3_roll
 

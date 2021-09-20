@@ -568,7 +568,7 @@ class TestP:
         d10 = H(10)
         p_6d10 = 6 @ P(d10)
 
-        for _ in range(1000):
+        for _ in range(100):
             roll = p_6d10.roll()
             assert len(roll) == len(p_6d10)
             assert all(v in d10 for v in roll)
