@@ -59,6 +59,7 @@ from typing import (
 
 from .bt import beartype
 from .lifecycle import experimental
+from .rng import RNG
 from .symmetries import comb, gcd
 from .types import (
     CachingProtocolMeta,
@@ -94,7 +95,6 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _ExpandT = Callable[["H", OutcomeT], Union[OutcomeT, "H"]]
 _CoalesceT = Callable[["H", OutcomeT], "H"]
-_ChoiceT = Callable[["H"], OutcomeT]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -118,47 +118,6 @@ def coalesce_replace(h: H, outcome: OutcomeT) -> H:
     (*outcome* is ignored).
     """
     return h
-
-
-_choice_impl: _ChoiceT
-
-
-try:
-    from numpy.random import Generator
-
-    try:
-        from numpy.random import PCG64DXSM as _BitGenImpl
-    except ImportError:
-        from numpy.random import PCG64 as _BitGenImpl
-
-    _NUMPY_RNG = Generator(_BitGenImpl())
-
-    def _numpy_choice_impl(h: H) -> OutcomeT:
-        return (
-            _NUMPY_RNG.choice(
-                tuple(h.outcomes()),
-                p=tuple(Fraction(count, h.total) for count in h.counts()),
-            )
-            if h
-            else 0
-        )
-
-    _choice_impl = _numpy_choice_impl
-except ImportError:
-    from random import choices
-
-    def _default_choice_impl(h: H) -> OutcomeT:
-        return (
-            choices(
-                population=tuple(h.outcomes()),
-                weights=tuple(h.counts()),
-                k=1,
-            )[0]
-            if h
-            else 0
-        )
-
-    _choice_impl = _default_choice_impl
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -1760,7 +1719,15 @@ class H(_MappingT):
         r"""
         Returns a (weighted) random outcome, sorted.
         """
-        return _choice_impl(self)
+        return (
+            RNG.choices(
+                population=tuple(self.outcomes()),
+                weights=tuple(self.counts()),
+                k=1,
+            )[0]
+            if self
+            else 0
+        )
 
     def _lowest_terms(self) -> Iterable[Tuple[OutcomeT, int]]:
         counts_gcd = gcd(*self.counts())
