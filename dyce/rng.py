@@ -8,8 +8,12 @@
 
 from __future__ import annotations
 
+from abc import ABC
 from random import Random
-from typing import Any, NewType, Optional, Union
+from sys import version_info
+from typing import NewType, Sequence, Type, Union
+
+from .bt import beartype
 
 __all__ = ("RNG",)
 
@@ -17,67 +21,109 @@ __all__ = ("RNG",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_RandSeed = Union[int, float, str, bytes, bytearray]
-_RandState = NewType("_RandState", Any)
+_RandState = NewType("_RandState", object)
+_RandSeed = Union[None, int, Sequence[int]]
 
 
 # ---- Data ----------------------------------------------------------------------------
 
 
-RNG: Random = Random()
+RNG: Random
+
+
+# ---- Classes -------------------------------------------------------------------------
 
 
 try:
-    import numpy.random
-    from numpy.random import BitGenerator, Generator
+    from numpy.random import PCG64DXSM, BitGenerator, Generator, default_rng
 
-    class NumpyRandom(Random):
+    _BitGeneratorT = Type[BitGenerator]
+
+    class NumPyRandomBase(Random, ABC):
         r"""
-        Defines a [``!#python
+        Base class for a [``#!python
         random.Random``](https://docs.python.org/3/library/random.html#random.Random)
-        implementation that accepts and uses a [``!#python
+        implementation that uses a [``#!python
         numpy.random.BitGenerator``](https://numpy.org/doc/stable/reference/random/bit_generators/index.html)
         under the covers. Motivated by
         [avrae/d20#7](https://github.com/avrae/d20/issues/7).
+
+        The [initializer][rng.NumPyRandomBase.__init__] takes an optional *seed*, which is
+        passed to
+        [``NumPyRandomBase.bit_generator``][dyce.rng.NumPyRandomBase.bit_generator] via
+        [``NumPyRandomBase.seed``][dyce.rng.NumPyRandomBase.seed] during construction.
         """
 
-        def __init__(self, bit_generator: BitGenerator):
-            self._g = Generator(bit_generator)
+        bit_generator: _BitGeneratorT
+        _generator: Generator
 
+        if version_info < (3, 11):
+
+            @beartype
+            def __new__(cls, seed: _RandSeed = None):
+                r"""
+                Because ``#!python random.Random`` is broken in versions <3.11, ``#!python
+                random.Random``’s vanilla implementation cannot accept non-hashable
+                values as the first argument. For example, it will reject lists of
+                ``#!python int``s as *seed*. This implementation of ``#!python __new__``
+                fixes that.
+                """
+                return super(NumPyRandomBase, cls).__new__(cls)
+
+        @beartype
+        def __init__(self, seed: _RandSeed = None):
+            # Parent calls self.seed(seed)
+            super().__init__(seed)
+
+        # ---- Overrides ---------------------------------------------------------------
+
+        @beartype
+        def getrandbits(self, k: int) -> int:
+            # Adapted from the implementation for random.SystemRandom.getrandbits
+            if k < 0:
+                raise ValueError("number of bits must be non-negative")
+
+            numbytes = (k + 7) // 8  # bits / 8 and rounded up
+            x = int.from_bytes(self.randbytes(numbytes), "big")
+
+            return x >> (numbytes * 8 - k)  # trim excess bits
+
+        @beartype
+        # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
+        def getstate(self) -> _RandState:  # type: ignore
+            return _RandState(self._generator.bit_generator.state)
+
+        @beartype
+        def randbytes(self, n: int) -> bytes:
+            return self._generator.bytes(n)
+
+        @beartype
         def random(self) -> float:
-            return self._g.random()
+            return self._generator.random()
 
-        def seed(self, a: Optional[_RandSeed], version: int = 2) -> None:
-            if a is not None and not isinstance(a, (int, float, str, bytes, bytearray)):
-                raise ValueError(f"unrecognized seed type ({type(a)})")
+        @beartype
+        def seed(  # type: ignore
+            self,
+            a: _RandSeed,
+            version: int = 2,
+        ) -> None:
+            self._generator = default_rng(self.bit_generator(a))
 
-            bg_type = type(self._g.bit_generator)
+        @beartype
+        def setstate(  # type: ignore
+            self,
+            # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
+            state: _RandState,
+        ) -> None:
+            self._generator.bit_generator.state = state
 
-            if a is None:
-                self._g = Generator(bg_type())
-            else:
-                # This is somewhat fragile and may not be the best approach. It uses
-                # `random.Random` to generate its own state from the seed in order to
-                # maintain compatibility with accepted seed types. (NumPy only accepts
-                # ints whereas the standard library accepts ints, floats, bytes, etc.).
-                # That state consists of a 3-tuple: (version: int, internal_state:
-                # tuple[int], gauss_next: float) at least for for versions through 3 (as
-                # of this writing). We feed internal_state as the seed for the NumPy
-                # BitGenerator.
-                version, internal_state, _ = Random(a).getstate()
-                self._g = Generator(bg_type(internal_state))
+    class PCG64DXSMRandom(NumPyRandomBase):
+        r"""
+        A [``NumPyRandomBase``][dyce.rng.NumPyRandomBase] based on
+        [``numpy.random.PCG64DXSM``](https://numpy.org/doc/stable/reference/random/bit_generators/pcg64dxsm.html#numpy.random.PCG64DXSM).
+        """
+        bit_generator = PCG64DXSM
 
-        def getstate(self) -> _RandState:
-            return _RandState(self._g.bit_generator.state)
-
-        def setstate(self, state: _RandState) -> None:
-            self._g.bit_generator.state = state
-
-    if hasattr(numpy.random, "PCG64DXSM"):
-        RNG = NumpyRandom(numpy.random.PCG64DXSM())
-    elif hasattr(numpy.random, "PCG64"):
-        RNG = NumpyRandom(numpy.random.PCG64())
-    elif hasattr(numpy.random, "default_rng"):
-        RNG = NumpyRandom(numpy.random.default_rng().bit_generator)
+    RNG = PCG64DXSMRandom()
 except ImportError:
-    pass
+    RNG = Random()

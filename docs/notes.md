@@ -20,7 +20,7 @@
 * Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
 * Uses ``pygraphviz`` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
-* Uses ``numpy`` for RNG, if present.
+* Introduces experimental use of ``numpy`` for RNG, if present.
 * Migrates to using ``pyproject.toml`` and ``setup.cfg``.
 
 ## [0.4.0](https://github.com/posita/dyce/releases/tag/v0.4.0)

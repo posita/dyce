@@ -8,14 +8,12 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
 from random import Random
 from typing import Optional
 
 import pytest
 
-import dyce.rng
-from dyce.rng import _RandSeed
+from dyce.rng import RNG, _RandSeed
 
 __all__ = ()
 
@@ -23,78 +21,120 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-SEED_INT_128 = 0x6265656663616665
-SEED_FLOAT = float(
-    Decimal(
-        "9856940084378475016744131457734599215371411366662962480265638551381775059468656635085733393811201634227995293393551923733235754825282073085472925752147516616452603904"
-    ),
-)
-SEED_BYTES_128 = b"beefcafe"[::-1]
-SEED_INT_192 = 0x646561646265656663616665
-SEED_BYTES_192 = b"deadbeefcafe"[::-1]
+SEED_INT_64: int = 0x64656164
+SEED_INT_128: int = 0x6465616462656566
+SEED_INT_192: int = 0x646561646265656663616665
+SEED_INTS: _RandSeed = (SEED_INT_64, SEED_INT_128, SEED_INT_192)
 
 
 # ---- Tests ---------------------------------------------------------------------------
 
 
+def test_numpy_rng_installed() -> None:
+    try:
+        from dyce.rng import PCG64DXSMRandom
+    except ImportError:
+        pytest.skip("requires numpy")
+
+    assert isinstance(RNG, PCG64DXSMRandom)
+
+
 def test_numpy_rng() -> None:
-    pytest.importorskip("numpy.random", reason="requires numpy")
-    assert hasattr(dyce.rng, "NumpyRandom")
-    assert isinstance(dyce.rng.RNG, dyce.rng.NumpyRandom)
+    try:
+        from dyce.rng import PCG64DXSMRandom
+    except ImportError:
+        pytest.skip("requires numpy")
+
+    rng = PCG64DXSMRandom()
+    seed: _RandSeed
+    random: float
+    getrandbits: int
+    randbytes: bytes
+
+    for seed, random, getrandbits, randbytes in (
+        (
+            SEED_INT_64,
+            0.5066807340643421,
+            0x6CCCD2511ED4B58,
+            bytes.fromhex("6cccd2511ed4b581"),
+        ),
+        (
+            SEED_INT_128,
+            0.16159916444553268,
+            0x32CDBF5A16905E2,
+            bytes.fromhex("32cdbf5a16905e29"),
+        ),
+        (
+            SEED_INT_192,
+            0.09272816060986888,
+            0xE0D0D43C6108BD1,
+            bytes.fromhex("e0d0d43c6108bd17"),
+        ),
+        (
+            SEED_INTS,
+            0.32331170065667836,
+            0x6F230DBC3C8EC45,
+            bytes.fromhex("6f230dbc3c8ec452"),
+        ),
+    ):
+        _test_random_w_seed_helper(rng, seed, random)
+        _test_getrandbits_w_seed_helper(rng, seed, 60, getrandbits)
+        _test_randbytes_w_seed_helper(rng, seed, randbytes)
 
 
-def test_numpy_rng_pcg64dxsm() -> None:
-    numpy_random = pytest.importorskip("numpy.random", reason="requires numpy")
+def test_standard_rng_installed() -> None:
+    try:
+        from dyce.rng import PCG64DXSMRandom  # noqa: F401
 
-    if not hasattr(numpy_random, "PCG64DXSM"):
-        pytest.skip("requires numpy.random.PCG64DXSM")
+        pytest.skip("requires numpy not be installed")
+    except ImportError:
+        pass
 
-    rng = dyce.rng.NumpyRandom(numpy_random.PCG64DXSM())
-    _test_w_seed_helper(rng, SEED_INT_128, 0.7903327469601987)
-    _test_w_seed_helper(rng, SEED_FLOAT, 0.6018795857570297)
-    _test_w_seed_helper(rng, SEED_BYTES_128, 0.5339952033746491)
-    _test_w_seed_helper(rng, SEED_INT_192, 0.9912715409588355)
-    _test_w_seed_helper(rng, SEED_BYTES_192, 0.13818265573158406)
-
-    with pytest.raises(ValueError):
-        _test_w_seed_helper(rng, object())  # type: ignore
+    assert isinstance(RNG, Random)
 
 
-def test_numpy_rng_pcg64() -> None:
-    numpy_random = pytest.importorskip("numpy.random", reason="requires numpy")
+def test_standard_rng() -> None:
+    rng = Random()
 
-    if not hasattr(numpy_random, "PCG64"):
-        pytest.skip("requires numpy.random.PCG64")
-
-    rng = dyce.rng.NumpyRandom(numpy_random.PCG64())
-    _test_w_seed_helper(rng, SEED_INT_128, 0.9794491381144006)
-    _test_w_seed_helper(rng, SEED_FLOAT, 0.8347478482621317)
-    _test_w_seed_helper(rng, SEED_BYTES_128, 0.7800090883745199)
-    _test_w_seed_helper(rng, SEED_INT_192, 0.28018439479392754)
-    _test_w_seed_helper(rng, SEED_BYTES_192, 0.4814859325412144)
-
-    with pytest.raises(ValueError):
-        _test_w_seed_helper(rng, object())  # type: ignore
+    for seed in (
+        SEED_INT_64,
+        SEED_INT_128,
+        SEED_INT_192,
+        SEED_INTS,
+    ):
+        _test_random_w_seed_helper(rng, seed)
 
 
-def test_numpy_rng_default() -> None:
-    numpy_random = pytest.importorskip("numpy.random", reason="requires numpy")
-
-    if not hasattr(numpy_random, "default_rng"):
-        pytest.skip("requires numpy.random.default_rng")
-
-    rng = dyce.rng.NumpyRandom(numpy_random.default_rng().bit_generator)
-    _test_w_seed_helper(rng, SEED_INT_128)
-    _test_w_seed_helper(rng, SEED_FLOAT)
-    _test_w_seed_helper(rng, SEED_BYTES_128)
-    _test_w_seed_helper(rng, SEED_INT_192)
-    _test_w_seed_helper(rng, SEED_BYTES_192)
-
-    with pytest.raises(ValueError):
-        _test_w_seed_helper(rng, object())  # type: ignore
+def _test_getrandbits_w_seed_helper(
+    rng: Random,
+    seed: _RandSeed,
+    bits: int,
+    expected: int,
+) -> None:
+    rng.seed(seed)
+    state = rng.getstate()
+    val = rng.getrandbits(bits)
+    assert val == expected
+    rng.setstate(state)
+    assert rng.getrandbits(bits) == val
 
 
-def _test_w_seed_helper(
+def _test_randbytes_w_seed_helper(
+    rng: Random,
+    seed: _RandSeed,
+    expected: bytes,
+) -> None:
+    rng.seed(seed)
+    state = rng.getstate()
+    val = rng.randbytes(len(expected))
+    assert val == expected
+    rng.setstate(state)
+    assert rng.randbytes(len(expected)) == val
+    rng.setstate(state)
+    assert rng.randbytes(len(expected)) == val
+
+
+def _test_random_w_seed_helper(
     rng: Random,
     seed: _RandSeed,
     expected: Optional[float] = None,
@@ -105,7 +145,12 @@ def _test_w_seed_helper(
     assert val >= 0.0 and val < 1.0
 
     if expected is not None:
-        assert expected == val
+        assert val == expected
+
+    assert type(rng)(seed).random() == val
 
     rng.setstate(state)
+    assert rng.random() == val
+
+    rng.seed(seed)
     assert rng.random() == val

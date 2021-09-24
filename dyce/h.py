@@ -57,9 +57,9 @@ from typing import (
     overload,
 )
 
+from . import rng
 from .bt import beartype
 from .lifecycle import experimental
-from .rng import RNG
 from .symmetries import comb, gcd
 from .types import (
     CachingProtocolMeta,
@@ -1720,7 +1720,7 @@ class H(_MappingT):
         Returns a (weighted) random outcome, sorted.
         """
         return (
-            RNG.choices(
+            rng.RNG.choices(
                 population=tuple(self.outcomes()),
                 weights=tuple(self.counts()),
                 k=1,
