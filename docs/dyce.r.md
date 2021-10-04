@@ -47,6 +47,7 @@
         - "UnarySumOpRoller"
         - "FilterRoller"
         - "SelectionRoller"
+        - "BranchOperationRoller"
         - "Roll"
         - "RollOutcome"
         - "RollOutcomeOperatorT"

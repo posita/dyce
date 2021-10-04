@@ -88,6 +88,10 @@ _RollOutcomeBinaryOperatorT = Callable[
 ]
 BasicOperatorT = Callable[["R", Iterable["RollOutcome"]], _RollOutcomesReturnT]
 PredicateT = Callable[["RollOutcome"], bool]
+BranchOperatorT = Callable[
+    ["BranchOperationRoller", Iterable["RollOutcome"]],
+    Iterable[Union["RollOutcome", "R"]],
+]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -1956,6 +1960,112 @@ class SelectionRoller(R):
         return self._which
 
 
+class BranchOperationRoller(R):
+    r"""
+    A [roller][dyce.r.R] for applying *branch_op* recursively up to *max_depth* to roll
+    outcomes starting with those from *sources*.
+    """
+    __slots__: Tuple[str, ...] = ("_branch_op", "_max_depth")
+
+    # ---- Initializer -----------------------------------------------------------------
+
+    @beartype
+    def __init__(
+        self,
+        branch_op: BranchOperatorT,
+        sources: Iterable[R],
+        max_depth: IntT = 1,
+        annotation: Any = "",
+        **kw,
+    ):
+        r"Initializer."
+        max_depth = as_int(max_depth)
+
+        if max_depth < 0:
+            raise ValueError("max_depth cannot be negative")
+
+        super().__init__(sources=sources, annotation=annotation, **kw)
+        self._branch_op = branch_op
+        self._max_depth = max_depth
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @beartype
+    def __repr__(self) -> str:
+        return f"""{type(self).__name__}(
+  branch_op={self.branch_op!r},
+  sources=({_seq_repr(self.sources)}),
+  max_depth={self.max_depth!r},
+  annotation={self.annotation!r},
+)"""
+
+    @beartype
+    def __eq__(self, other) -> bool:
+        return (
+            super().__eq__(other)
+            and _callable_cmp(self.branch_op, other.branch_op)
+            and self.max_depth == other.max_depth
+        )
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls = list(self.source_rolls())
+
+        def _branch(
+            rolls: Iterable[Roll],
+            depth: int = 0,
+        ) -> Iterable["RollOutcome"]:
+            source_roll_outcomes = list(
+                roll_outcome
+                for roll_outcome in chain.from_iterable(rolls)
+                if roll_outcome.value is not None
+            )
+
+            if depth == self.max_depth:
+                yield from source_roll_outcomes
+            else:
+                res = self.branch_op(self, source_roll_outcomes)
+                new_rolls: List[Roll] = []
+
+                for roll_outcome_or_r in res:
+                    if isinstance(roll_outcome_or_r, RollOutcome):
+                        yield roll_outcome_or_r
+                    elif isinstance(roll_outcome_or_r, R):
+                        new_rolls.append(roll_outcome_or_r.roll())
+                    else:
+                        assert False, f"unrecognized value type {roll_outcome_or_r!r}"
+
+                source_rolls.extend(new_rolls)
+                yield from _branch(new_rolls, depth + 1)
+
+        roll_outcomes = list(_branch(source_rolls))
+
+        return Roll(
+            self,
+            roll_outcomes=roll_outcomes,
+            source_rolls=source_rolls,
+        )
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def branch_op(self) -> BranchOperatorT:
+        r"""
+        The branch operator this roller applies to its sources.
+        """
+        return self._branch_op
+
+    @property
+    def max_depth(self) -> int:
+        r"""
+        The maximum number of times to recursively apply
+        [``branch_op``][dyce.r.BranchOperationRoller.branch_op] inside
+        [``roll``][dyce.r.BranchOperationRoller.roll].
+        """
+        return self._max_depth
+
+
 class RollOutcome:
     r"""
     !!! warning "Experimental"
@@ -2800,7 +2910,6 @@ def walk(
 
             if id(roll) not in rolls:
                 rolls[id(roll)] = roll
-
                 queue.append(roll.r)
 
                 for i, roll_outcome in enumerate(roll):

@@ -105,7 +105,7 @@ PoolRoller(
 ```
 
 Well, wouldya look at that?
-That durned class method created a whole roller *tree*, which is actually *three* rollers.
+That durned class method created a whole roller *tree*, which is actually *three* roller *nodes*.
 
 1. One [``ValueRoller``][dyce.r.ValueRoller] for the ``d00`` histogram;
 1. Another for the ``d10`` histogram; and
@@ -209,7 +209,7 @@ Let’s break that down so it doesn’t feel like trying to drink from a fire ho
 
 Calling the [``R.roll`` method][dyce.r.R.roll] on our [``PoolRoller``][dyce.r.PoolRoller] resulted in a [``Roll`` object][dyce.r.Roll].
 Actually, it resulted in a roll *tree* (analogous to our roller tree).
-Each [``Roll`` object][dyce.r.Roll] in that tree has:
+Each [``Roll`` object *node*][dyce.r.Roll] in that tree has:
 
 * A reference to the [``R`` object][dyce.r.R] in the roller tree that generated it, retrieved via its [``r`` property][dyce.r.Roll.r];
 * Zero or more [``RollOutcome`` objects][dyce.r.RollOutcome], retrieved by accessing the roll as a sequence (i.e., via ``#!python __getitem__``, ``#!python __len__``); and
