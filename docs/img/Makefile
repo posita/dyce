@@ -11,8 +11,6 @@ all : \
 	graph_rollin_select_1_light.svg \
 	graph_rollin_select_2_dark.svg \
 	graph_rollin_select_2_light.svg \
-	graph_rollin_select_3_dark.svg \
-	graph_rollin_select_3_light.svg \
 	plot_2d6_lo_hi_gh.png \
 	plot_4d6_variants_dark.png \
 	plot_4d6_variants_light.png \

@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import warnings
-import weakref
 from abc import abstractmethod
 from collections import defaultdict, deque
 from copy import copy
@@ -80,8 +79,8 @@ __all__ = ("R",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_ValueT = Union[OutcomeT, H, P]
-_SourceT = Union["RollOutcome", "Roll", "R"]
+_ValueT = Union[OutcomeT, H, P, "RollOutcome", "Roll"]
+_SourceT = Union["R"]
 _ROperandT = Union[OutcomeT, _SourceT]
 _RollOutcomeOperandT = Union[OutcomeT, "RollOutcome"]
 _RollOutcomesReturnT = Union["RollOutcome", Iterable["RollOutcome"]]
@@ -221,7 +220,7 @@ class R:
           ),
         ),
       ),
-      sources=(
+      source_rolls=(
         Roll(
           r=ValueRoller(value=H(6), annotation=''),
           roll_outcomes=(
@@ -230,7 +229,7 @@ class R:
               sources=(),
             ),
           ),
-          sources=(),
+          source_rolls=(),
         ),
         Roll(
           r=ValueRoller(value=3, annotation=''),
@@ -240,7 +239,7 @@ class R:
               sources=(),
             ),
           ),
-          sources=(),
+          source_rolls=(),
         ),
       ),
     )
@@ -428,7 +427,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
+    def __and__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__and__, other)
@@ -445,7 +444,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
+    def __xor__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__xor__, other)
@@ -462,7 +461,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union["R", IntT]) -> BinarySumOpRoller:
+    def __or__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__or__, other)
@@ -547,9 +546,9 @@ class R:
             ...         else:
             ...           # This one dies here; wrap the old outcome in a new one with a value of None
             ...           yield roll_outcome.euthanize()
-            ...     return Roll(self, roll_outcomes=_roll_outcomes_gen(), sources=source_rolls)
-            >>> r = AntonChigurhRoller(sources=(R.from_value(1), R.from_value(2), R.from_value(3)))
-            >>> r.roll()
+            ...     return Roll(self, roll_outcomes=_roll_outcomes_gen(), source_rolls=source_rolls)
+            >>> ac_r = AntonChigurhRoller(sources=(R.from_value(1), R.from_value(2), R.from_value(3)))
+            >>> ac_r.roll()
             Roll(
               r=AntonChigurhRoller(
                 sources=(
@@ -588,7 +587,7 @@ class R:
                   ),
                 ),
               ),
-              sources=(
+              source_rolls=(
                 Roll(
                   r=ValueRoller(value=1, annotation=''),
                   roll_outcomes=(
@@ -597,7 +596,7 @@ class R:
                       sources=(),
                     ),
                   ),
-                  sources=(),
+                  source_rolls=(),
                 ),
                 Roll(
                   r=ValueRoller(value=2, annotation=''),
@@ -607,7 +606,7 @@ class R:
                       sources=(),
                     ),
                   ),
-                  sources=(),
+                  source_rolls=(),
                 ),
                 Roll(
                   r=ValueRoller(value=3, annotation=''),
@@ -617,7 +616,7 @@ class R:
                       sources=(),
                     ),
                   ),
-                  sources=(),
+                  source_rolls=(),
                 ),
               ),
             )
@@ -714,7 +713,7 @@ class R:
               ),
             ),
           ),
-          sources=...,
+          source_rolls=...,
         )
 
         ```
@@ -881,14 +880,7 @@ class R:
         Generates new rolls from all [``sources``][dyce.r.R.sources].
         """
         for source in self.sources:
-            if isinstance(source, RollOutcome):
-                yield Roll(self, roll_outcomes=(source.clone(),))
-            elif isinstance(source, Roll):
-                yield source
-            elif isinstance(source, R):
-                yield source.roll()
-            else:
-                assert False, f"unrecognized source type {source!r}"
+            yield source.roll()
 
     @beartype
     def annotate(self, annotation: Any = "") -> R:
@@ -1149,13 +1141,13 @@ class R:
 
         for roll_outcome in roll_outcomes:
             if not roll_outcome._has_roll or roll_outcome.r is self:
-                # Roll outcome in need of a roll
+                # New roll outcomes in need of rolls
                 yield roll_outcome
             elif roll_outcome.value is None:
-                # Drop euthanized roll outcome from a prior roll
+                # Drop euthanized roll outcomes from prior rolls
                 pass
             else:
-                # Wrap active roll outcome from a prior roll
+                # Wrap active roll outcomes from prior rolls
                 yield roll_outcome.cede(roll_outcome.value)
 
 
@@ -1195,7 +1187,11 @@ class ValueRoller(R):
     @beartype
     def roll(self) -> Roll:
         r""""""
-        if isinstance(self.value, P):
+        if isinstance(self.value, Roll):
+            return self.value
+        elif isinstance(self.value, RollOutcome):
+            return Roll(self, roll_outcomes=(self.value.clone(),))
+        elif isinstance(self.value, P):
             return Roll(
                 self,
                 roll_outcomes=(RollOutcome(outcome) for outcome in self.value.roll()),
@@ -1271,7 +1267,7 @@ class PoolRoller(R):
           sources=...,
         ),
       ),
-      sources=...,
+      source_rolls=...,
     )
 
     ```
@@ -1292,7 +1288,7 @@ class PoolRoller(R):
                 for roll_outcome in chain.from_iterable(source_rolls)
                 if roll_outcome.value is not None
             ),
-            sources=source_rolls,
+            source_rolls=source_rolls,
         )
 
 
@@ -1324,7 +1320,7 @@ class RepeatRoller(R):
     def __init__(
         self,
         n: IntT,
-        source: R,
+        source: _SourceT,
         annotation: Any = "",
         **kw,
     ):
@@ -1363,7 +1359,7 @@ class RepeatRoller(R):
                 for roll_outcome in chain.from_iterable(source_rolls)
                 if roll_outcome.value is not None
             ),
-            sources=source_rolls,
+            source_rolls=source_rolls,
         )
 
     # ---- Properties ------------------------------------------------------------------
@@ -1380,9 +1376,7 @@ class BasicOpRoller(R):
     r"""
     A [roller][dyce.r.R] for applying *op* to some variation of outcomes from *sources*.
     Any [``RollOutcome``][dyce.r.RollOutcome]s returned by *op* are used directly in the
-    creation of a new [``Roll``][dyce.r.Roll]. As such, pass-throughs are discouraged,
-    since they will lose their original sources. See [``R.roll``][dyce.r.R.roll] and
-    [``Roll.__init__``][dyce.r.Roll] for details.
+    creation of a new [``Roll``][dyce.r.Roll].
     """
     __slots__: Tuple[str, ...] = ("_op",)
 
@@ -1392,7 +1386,7 @@ class BasicOpRoller(R):
     def __init__(
         self,
         op: BasicOperatorT,
-        sources: Iterable[R],
+        sources: Iterable[_SourceT],
         annotation: Any = "",
         **kw,
     ):
@@ -1430,7 +1424,7 @@ class BasicOpRoller(R):
         return Roll(
             self,
             roll_outcomes=self._prep_for_roll(res),
-            sources=source_rolls,
+            source_rolls=source_rolls,
         )
 
     # ---- Properties ------------------------------------------------------------------
@@ -1469,7 +1463,7 @@ class NarySumOpRoller(BasicOpRoller):
         return Roll(
             self,
             roll_outcomes=self._prep_for_roll(res),
-            sources=source_rolls,
+            source_rolls=source_rolls,
         )
 
 
@@ -1487,8 +1481,8 @@ class BinarySumOpRoller(NarySumOpRoller):
     def __init__(
         self,
         bin_op: _RollOutcomeBinaryOperatorT,
-        left_source: R,
-        right_source: R,
+        left_source: _SourceT,
+        right_source: _SourceT,
         annotation: Any = "",
         **kw,
     ):
@@ -1550,7 +1544,7 @@ class UnarySumOpRoller(NarySumOpRoller):
     def __init__(
         self,
         un_op: _RollOutcomeUnaryOperatorT,
-        source: R,
+        source: _SourceT,
         annotation: Any = "",
         **kw,
     ):
@@ -1698,7 +1692,7 @@ class SelectionRoller(R):
     def __init__(
         self,
         which: Iterable[_GetItemT],
-        sources: Iterable[R],
+        sources: Iterable[_SourceT],
         annotation: Any = "",
         **kw,
     ):
@@ -1736,9 +1730,8 @@ class SelectionRoller(R):
         def _selected_roll_outcomes():
             for selected_index in selected_indexes:
                 selected_roll_outcome = roll_outcomes[selected_index]
-                value = selected_roll_outcome.value
-                assert value is not None
-                yield selected_roll_outcome.cede(value)
+                assert selected_roll_outcome.value is not None
+                yield selected_roll_outcome.cede(selected_roll_outcome.value)
 
             for excluded_index in set(all_indexes) - set(selected_indexes):
                 yield roll_outcomes[excluded_index].euthanize()
@@ -1746,7 +1739,7 @@ class SelectionRoller(R):
         return Roll(
             self,
             roll_outcomes=_selected_roll_outcomes(),
-            sources=source_rolls,
+            source_rolls=source_rolls,
         )
 
     # ---- Properties ------------------------------------------------------------------
@@ -1782,10 +1775,7 @@ class RollOutcome:
         super().__init__()
         self._value = value
         self._sources = tuple(sources)
-        # These are back-references to rolls used to aggregate roll outcomes. We use a
-        # weakref here to avoid circular references that might frustrate or delay
-        # garbage collection efforts
-        self._roll: Optional[weakref.ref[Roll]] = None
+        self._roll: Optional[Roll] = None
 
         if self._value is None and not self._sources:
             raise ValueError("value can only be None if sources is non-empty")
@@ -2013,25 +2003,25 @@ class RollOutcome:
     @property
     def annotation(self) -> Any:
         r"""
-        Shorthand for ``#!python self.roll.annotation``.
+        Shorthand for ``#!python self.source_roll.annotation``.
 
-        See the [``roll``][dyce.r.RollOutcome.roll] and
+        See the [``source_roll``][dyce.r.RollOutcome.source_roll] and
         [``Roll.annotation``][dyce.r.Roll.annotation] properties.
         """
-        return self.roll.annotation
+        return self.source_roll.annotation
 
     @property
     def r(self) -> R:
         r"""
-        Shorthand for ``#!python self.roll.r``.
+        Shorthand for ``#!python self.source_roll.r``.
 
-        See the [``roll``][dyce.r.RollOutcome.roll] and [``Roll.r``][dyce.r.Roll.r]
-        properties.
+        See the [``source_roll``][dyce.r.RollOutcome.source_roll] and
+        [``Roll.r``][dyce.r.Roll.r] properties.
         """
-        return self.roll.r
+        return self.source_roll.r
 
     @property
-    def roll(self) -> Roll:
+    def source_roll(self) -> Roll:
         r"""
         Returns the roll if one has been associated with this roll outcome. Usually that is
         done via the [``Roll.__init__`` method][dyce.r.Roll.__init__]. Accessing this
@@ -2040,13 +2030,13 @@ class RollOutcome:
 
         ``` python
         >>> ro = RollOutcome(4)
-        >>> ro.roll
+        >>> ro.source_roll
         Traceback (most recent call last):
           ...
-        AssertionError: RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)
+        AssertionError: RollOutcome.source_roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)
         assert None is not None
         >>> roll = Roll(R.from_value(4), roll_outcomes=(ro,))
-        >>> ro.roll
+        >>> ro.source_roll
         Roll(
           r=ValueRoller(value=4, annotation=''),
           roll_outcomes=(
@@ -2055,20 +2045,16 @@ class RollOutcome:
               sources=(),
             ),
           ),
-          sources=(),
+          source_rolls=(),
         )
 
         ```
         """
         assert (
             self._roll is not None
-        ), "RollOutcome.roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
-        roll = self._roll()
-        assert (
-            roll is not None
-        ), "RollOutcome.roll accessed after the roll associated the roll outcome was destroyed"
+        ), "RollOutcome.source_roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
 
-        return roll
+        return self._roll
 
     @property
     def sources(self) -> Tuple[RollOutcome, ...]:
@@ -2338,7 +2324,7 @@ class RollOutcome:
         r"""
         Clones this roll outcome, keeping its [``value``][dyce.r.RollOutcome.value] and
         [``sources``][dyce.r.RollOutcome.sources], but not any associated
-        [``roll``][dyce.r.RollOutcome.roll].
+        [``source_roll``][dyce.r.RollOutcome.source_roll].
         """
         return type(self)(self.value, self.sources)
 
@@ -2354,7 +2340,7 @@ class Roll(Sequence[RollOutcome]):
     calling the [``R.roll`` method][dyce.r.R.roll]. Rolls are sequences of
     [``RollOutcome`` objects][dyce.r.RollOutcome] with additional convenience methods.
     """
-    __slots__: Tuple[str, ...] = ("__weakref__", "_r", "_roll_outcomes", "_sources")
+    __slots__: Tuple[str, ...] = ("_r", "_roll_outcomes", "_source_rolls")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2364,39 +2350,28 @@ class Roll(Sequence[RollOutcome]):
         self,
         r: R,
         roll_outcomes: Iterable[RollOutcome],
-        sources: Iterable["Roll"] = (),
+        source_rolls: Iterable["Roll"] = (),
     ):
         r"""
         Initializer.
 
-        If the [``R.annotation`` property][dyce.r.R.annotation] of the *r* argument is
-        ``#!python None``, all history will be removed from any *roll_outcomes* and
-        *sources* during initialization.
+        This initializer will associate each of *roll_outcomes* with the newly
+        constructed roll. As such it is an error if any is already associated with
+        another.
+
+        ``` python
+        >>> r_4 = ValueRoller(4)
+        >>> roll = r_4.roll()
+        >>> Roll(r_4, roll)
+        Traceback (most recent call last):
+          ...
+        AssertionError: RollOutcome submitted to Roll.__init__ already has roll
+
+        ```
 
         !!! note
 
             Technically, this violates the immutability of roll outcomes.
-
-            ``` python
-            >>> origin = RollOutcome(value=1)
-            >>> descendant = RollOutcome(value=2, sources=(origin,)) ; descendant
-            RollOutcome(
-              value=2,
-              sources=(
-                RollOutcome(
-                  value=1,
-                  sources=(),
-                ),
-              ),
-            )
-            >>> roll = Roll(PoolRoller(annotation=None), roll_outcomes=(descendant,))
-            >>> descendant  # sources are wiped out
-            RollOutcome(
-              value=2,
-              sources=(),
-            )
-
-            ```
 
             ``dyce`` does not generally contemplate creation of rolls or roll outcomes
             outside the womb of [``R.roll``][dyce.r.R.roll] implementations.
@@ -2412,28 +2387,21 @@ class Roll(Sequence[RollOutcome]):
             going to create your own roll outcomes and pimp them out to different rolls
             all over town, they might come back with some parts missing.
 
-            See also the [``RollOutcome.roll`` property][dyce.r.RollOutcome.roll].
+            See also the
+            [``RollOutcome.source_roll`` property][dyce.r.RollOutcome.source_roll].
         """
         super().__init__()
         self._r = r
-
-        def _strip_roll_outcome_sources() -> Iterator[RollOutcome]:
-            for roll_outcome in roll_outcomes:
-                if roll_outcome.value is not None:
-                    roll_outcome._sources = ()
-                    yield roll_outcome
-
-        if r.annotation is None:
-            self._roll_outcomes: Tuple[RollOutcome, ...] = tuple(
-                _strip_roll_outcome_sources()
-            )
-            self._sources: Tuple[Roll, ...] = ()
-        else:
-            self._roll_outcomes = tuple(roll_outcomes)
-            self._sources = tuple(sources)
+        self._roll_outcomes = tuple(roll_outcomes)
+        self._source_rolls = tuple(source_rolls)
 
         for roll_outcome in self._roll_outcomes:
-            roll_outcome._roll = weakref.ref(self)
+            assert (
+                not roll_outcome._has_roll
+            ), "RollOutcome submitted to Roll.__init__ already has roll"
+
+        for roll_outcome in self._roll_outcomes:
+            roll_outcome._roll = self
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2442,7 +2410,7 @@ class Roll(Sequence[RollOutcome]):
         return f"""{type(self).__name__}(
   r={indent(repr(self.r), "  ").strip()},
   roll_outcomes=({_seq_repr(self)}),
-  sources=({_seq_repr(self.sources)}),
+  source_rolls=({_seq_repr(self.source_rolls)}),
 )"""
 
     @beartype
@@ -2492,11 +2460,11 @@ class Roll(Sequence[RollOutcome]):
         return self._r
 
     @property
-    def sources(self) -> Tuple[Roll, ...]:
+    def source_rolls(self) -> Tuple[Roll, ...]:
         r"""
-        The source roll from which this roll was generated.
+        The source rolls from which this roll was generated.
         """
-        return self._sources
+        return self._source_rolls
 
     # ---- Methods ---------------------------------------------------------------------
 
@@ -2651,7 +2619,7 @@ def walk(
                 for i, roll_outcome in enumerate(roll):
                     queue.append(roll_outcome)
 
-                for source_roll in roll.sources:
+                for source_roll in roll.source_rolls:
                     roll_parent_ids[id(source_roll)].add(id(roll))
                     queue.append(source_roll)
         elif isinstance(obj, R):

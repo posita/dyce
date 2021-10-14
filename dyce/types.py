@@ -41,12 +41,10 @@ _TT = TypeVar("_TT", bound="type")
 _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 
-
 if sys.version_info >= (3, 9):
     from typing import Annotated
 else:
     from typing_extensions import Annotated  # noqa: F401
-
 
 if sys.version_info >= (3, 8):
     from typing import SupportsAbs as _SupportsAbs

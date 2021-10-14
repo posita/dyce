@@ -165,7 +165,7 @@ class RollClusterVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
             **node_attrs,
         )
 
-        for i, source_roll in enumerate(roll.sources):
+        for i, source_roll in enumerate(roll.source_rolls):
             edge_attrs = self.resolver.attrs_for_obj(source_roll, "edge") or {}
             self.g.edge(
                 self.resolver.name_for_obj(roll),

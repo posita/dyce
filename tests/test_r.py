@@ -69,7 +69,7 @@ class TestValueRoller:
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
-            h = H(o_type(o) for o in range(-2, 3))
+            h = H(o_type(v) for v in range(-2, 3))
             r = R.from_value(h, annotation=f"{o_type}")
 
             for _ in range(10):
@@ -78,7 +78,7 @@ class TestValueRoller:
                 assert roll_outcome.r == r
                 assert r_roll.total() in h, r
 
-    def test_roll_nested_roll_outcome(self) -> None:
+    def test_roll_cloned_roll_outcome(self) -> None:
         for o_type in _OUTCOME_TYPES:
             for v in range(-2, 3):
                 o = o_type(v)
@@ -88,13 +88,32 @@ class TestValueRoller:
                 (roll_outcome,) = r_roll
                 assert roll_outcome.r == r
                 assert roll_outcome.value == o
+                assert roll_outcome.sources == ()
 
-                nesting_r = R.from_sources(roll_outcome, annotation=f"{o_type}")
-                nesting_r_roll = nesting_r.roll()
-                (nesting_roll_outcome,) = nesting_r_roll
-                assert nesting_roll_outcome.r == nesting_r
-                assert nesting_roll_outcome.value == o
-                assert nesting_roll_outcome.sources == (roll_outcome,)
+                cloning_r = R.from_value(roll_outcome, annotation=f"{o_type}")
+                cloned_r_roll = cloning_r.roll()
+                (cloned_roll_outcome,) = cloned_r_roll
+                assert cloned_roll_outcome.r == cloning_r
+                assert cloned_roll_outcome.value == o
+                assert cloned_roll_outcome.sources == roll_outcome.sources
+
+    def test_roll_heterogeneous_source(self) -> None:
+        for o_type in _OUTCOME_TYPES:
+            for v in range(-2, 3):
+                o = o_type(v)
+                r_o = R.from_value(o, annotation=f"{o_type}")
+                roll_o = r_o.roll()
+                (roll_outcome_o,) = roll_o
+                r = R.from_values(o, roll_outcome_o, roll_o)
+                r_roll = r.roll()
+                assert tuple(r_roll) == (
+                    roll_outcome_o,
+                    roll_outcome_o,
+                    roll_outcome_o,
+                ), f"{o_type}({v})"
+
+                for roll_outcome in r_roll:
+                    assert roll_outcome.r == r
 
 
 class TestRepeatRoller:
@@ -131,7 +150,7 @@ class TestRepeatRoller:
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
             for i_type in _INTEGRAL_OUTCOME_TYPES:
-                h = H(o_type(o) for o in range(-2, 3))
+                h = H(o_type(v) for v in range(-2, 3))
                 r = R.from_value(h, annotation=f"{o_type}")
                 r_100 = (i_type(100) @ r).annotate(f"{i_type}")
                 r_100_roll = r_100.roll()
@@ -449,7 +468,7 @@ class TestBinarySumOpRoller:
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
-            h = H(o_type(i) for i in range(-2, 3))
+            h = H(o_type(v) for v in range(-2, 3))
             r = R.from_value(h, annotation=f"{o_type}")
             h_mul_h = h * h
             r_mul_r = r * r
@@ -576,7 +595,7 @@ class TestUnarySumOpRoller:
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
-            h = H(o_type(o) for o in range(-2, 3))
+            h = H(o_type(v) for v in range(-2, 3))
             h_neg = -h
             r = R.from_value(h, annotation=f"{o_type}")
             r_neg = -r
@@ -590,7 +609,7 @@ class TestUnarySumOpRoller:
 
 class TestPoolRoller:
     def test_repr(self) -> None:
-        r_4_6_8 = R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
+        r_4_6_8 = R.from_values(4, 6, 8)
         assert (
             repr(r_4_6_8)
             == """PoolRoller(
@@ -617,14 +636,12 @@ class TestPoolRoller:
         )
 
     def test_op_eq(self) -> None:
-        r_4_6_8 = R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
+        r_4_6_8 = R.from_values(4, 6, 8)
         assert isinstance(r_4_6_8, PoolRoller)
         r_4_6_8_annotated = r_4_6_8.annotate("4-6-8")
-        assert r_4_6_8 == R.from_sources_iterable(R.from_value(i) for i in (4, 6, 8))
+        assert r_4_6_8 == R.from_values(4, 6, 8)
         assert r_4_6_8 != r_4_6_8_annotated
-        assert r_4_6_8_annotated == R.from_sources_iterable(
-            (R.from_value(i) for i in (4, 6, 8)), annotation="4-6-8"
-        )
+        assert r_4_6_8_annotated == R.from_values(4, 6, 8, annotation="4-6-8")
 
     def test_getitem(self) -> None:
         r_d4_d6_d8 = R.from_values(H(4), H(6), H(8))
@@ -638,7 +655,7 @@ class TestPoolRoller:
 
     def test_roll(self) -> None:
         for o_type in _OUTCOME_TYPES:
-            h = H(o_type(o) for o in range(-2, 3))
+            h = H(o_type(v) for v in range(-2, 3))
             h_3 = 3 @ h
             r = R.from_value(h, annotation=f"{o_type}")
             r_3 = R.from_sources(r, r, r)
@@ -652,30 +669,10 @@ class TestPoolRoller:
 
                 assert r_3_roll.total() in h_3, r_3_roll
 
-    def test_roll_heterogeneous_source(self) -> None:
-        for o_type in _OUTCOME_TYPES:
-            for v in range(-2, 3):
-                o = o_type(v)
-                r_o = R.from_value(o, annotation=f"{o_type}")
-                roll_o = r_o.roll()
-                (roll_outcome_o,) = roll_o
-
-                r = R.from_sources(roll_outcome_o, r_o, roll_o)
-                r_roll = r.roll()
-
-                assert tuple(r_roll) == (
-                    roll_outcome_o,
-                    roll_outcome_o,
-                    roll_outcome_o,
-                ), f"{o_type}({v})"
-
-                for roll_outcome in r_roll:
-                    assert roll_outcome.r == r
-
 
 class TestSelectRoller:
     def test_repr(self) -> None:
-        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1)
         assert (
             repr(r_squares_select)
@@ -699,7 +696,7 @@ class TestSelectRoller:
         )
 
     def test_op_eq(self) -> None:
-        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1, 1, -2)
         r_squares_select_annotated = r_squares_select.annotate("0, -1, 1, 2")
         assert r_squares_select == r_squares.select(0, -1, 1, -2)
@@ -707,7 +704,7 @@ class TestSelectRoller:
         assert r_squares_select_annotated == r_squares_select.annotate("0, -1, 1, 2")
 
     def test_roll(self) -> None:
-        r_squares = R.from_values_iterable(i ** 2 for i in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1, 1, -2)
         r_squares_select_roll = r_squares_select.roll()
         assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
@@ -743,7 +740,7 @@ class TestRoll:
       ),
     ),
   ),
-  sources=(
+  source_rolls=(
     Roll(
       r=ValueRoller(value=42, annotation=''),
       roll_outcomes=(
@@ -752,7 +749,7 @@ class TestRoll:
           sources=(),
         ),
       ),
-      sources=(),
+      source_rolls=(),
     ),
   ),
 )"""

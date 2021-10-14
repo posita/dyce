@@ -62,7 +62,7 @@ Roll(
       sources=(),
     ),
   ),
-  sources=(),
+  source_rolls=(),
 )
 
 ```
@@ -152,32 +152,6 @@ Let’s dig a little deeper and ask for the roll’s outcome values.
 As we mentioned before, the top level of our roller tree is a [``PoolRoller``][dyce.r.PoolRoller], which aggregates (or “pools”) rolls from its sources.
 For our roll, the aggregated outcomes are ``#!python 60`` are ``#!python 9``.
 
-!!! tip
-
-    You might be wondering to yourself, “Self, one wonders, can one have a pool of pools?”
-    Such questions command the response, “Why the heck not? Try it!”
-
-    <!-- BEGIN MONKEY PATCH --
-    For deterministic outcomes
-
-    >>> import random
-    >>> from dyce import rng
-    >>> rng.RNG = random.Random(1633440532)
-
-      -- END MONKEY PATCH -->
-
-    ``` python
-    >>> two_r_d100s = PoolRoller(sources=(r_d100, r_d100))
-    >>> roll_two = two_r_d100s.roll()
-    >>> roll_two.total()
-    63
-    >>> tuple(roll_two.outcomes())
-    (40, 2, 20, 1)
-
-    ```
-
-    So the answer is a resounding, ~~“Of course. What devious entity would *prohibit* such a thing? Please identify that creature so we may flog it until it achieves enlightenment,”~~ *“Yes.”*
-
 What does our pooled roll look like?
 
 ``` python
@@ -210,7 +184,7 @@ Roll(
       ),
     ),
   ),
-  sources=(
+  source_rolls=(
     Roll(
       r=ValueRoller(value=H({0: 1, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1}), annotation=''),
       roll_outcomes=(
@@ -219,7 +193,7 @@ Roll(
           sources=(),
         ),
       ),
-      sources=(),
+      source_rolls=(),
     ),
     Roll(
       r=ValueRoller(value=H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), annotation=''),
@@ -229,7 +203,7 @@ Roll(
           sources=(),
         ),
       ),
-      sources=(),
+      source_rolls=(),
     ),
   ),
 )
@@ -249,14 +223,40 @@ Each [``Roll`` object][dyce.r.Roll] in that tree has:
 
 * A reference to the [``R`` object][dyce.r.R] in the roller tree that generated it, retrieved via its [``r`` property][dyce.r.Roll.r];
 * Zero or more [``RollOutcome`` objects][dyce.r.RollOutcome], retrieved by accessing the roll as a sequence (i.e., via ``#!python __getitem__``, ``#!python __len__``); and
-* Zero or more source rolls, retrieved via its [``sources`` property][dyce.r.Roll.sources].
+* Zero or more source rolls, retrieved via its [``source_rolls`` property][dyce.r.Roll.source_rolls].
 
 The [``RollOutcome`` objects][dyce.r.RollOutcome] *also* form trees (in our case, simple ones).
 Each one has:
 
 * A single value, retrieved via its [``value`` property][dyce.r.RollOutcome.value];
 * Zero or more source outcomes from which the value was derived, retrieved via its [``sources`` property][dyce.r.RollOutcome.sources]; and
-* A [weak reference](https://docs.python.org/3/library/weakref.html) back to the roll that generated it, retrieved via its [``roll`` property][dyce.r.RollOutcome.roll] (omitted from the diagram for the sake of readability).
+* A reference back to the roll that generated it, retrieved via its [``source_roll`` property][dyce.r.RollOutcome.source_roll] (omitted from the diagram for the sake of readability).
+
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1633440532)
+
+  -- END MONKEY PATCH -->
+
+!!! tip
+
+    You might be wondering to yourself, “Self, one wonders, can one have a pool of pools?”
+    Such questions command the response, “Why the heck not? Try it!”
+
+    ``` python
+    >>> two_r_d100s = PoolRoller(sources=(r_d100, r_d100))
+    >>> roll_two = two_r_d100s.roll()
+    >>> roll_two.total()
+    63
+    >>> tuple(roll_two.outcomes())
+    (40, 2, 20, 1)
+
+    ```
+
+    So the answer is a resounding, ~~“Of course. What devious entity would *prohibit* such a thing? Please identify that creature so we may flog it until it achieves enlightenment,”~~ *“Yes.”*
 
 ## Composing rollers with arithmetic
 
@@ -298,7 +298,7 @@ Roll(
       ),
     ),
   ),
-  sources=(
+  source_rolls=(
     Roll(
       r=ValueRoller(value=H(12), annotation=''),
       roll_outcomes=(
@@ -307,7 +307,7 @@ Roll(
           sources=(),
         ),
       ),
-      sources=(),
+      source_rolls=(),
     ),
     Roll(
       r=ValueRoller(value=4, annotation=''),
@@ -317,7 +317,7 @@ Roll(
           sources=(),
         ),
       ),
-      sources=(),
+      source_rolls=(),
     ),
   ),
 )
@@ -414,13 +414,13 @@ But, we all know what happens when one assumes.
   [![xkcd: When You Assume](https://imgs.xkcd.com/comics/when_you_assume.png)](https://xkcd.com/1339/)
 </picture>
 
-Recall that in roll trees, a roll may have references to other rolls (its “sources”) from which it derives.
+Recall that in roll trees, a roll may have references to other rolls (its “source rolls”) from which it derives.
 We should be able to get information about the dropped die by traversing that tree.
 Let’s see if we can validate our assumption by looking at the outcomes from our roll’s direct source.
 
 ``` python
 >>> from itertools import chain
->>> tuple(chain.from_iterable(source.outcomes() for source in roll.sources))
+>>> tuple(chain.from_iterable(source_roll.outcomes() for source_roll in roll.source_rolls))
 (6, 1, 1, 5)
 
 ```
@@ -511,15 +511,8 @@ We can programmatically verify that the excluded outcome originated from one of 
 True
 >>> excluded.sources[0].value
 1
->>> excluded.sources[0].roll.r is r_3d6
+>>> excluded.sources[0].source_roll.r is r_3d6
 True
->>> excluded.sources[0].sources[0].value
-1
->>> excluded.sources[0].sources[0].roll.r is r_d6
-True
->>> assert isinstance(excluded.sources[0].sources[0].roll.r, ValueRoller)
->>> excluded.sources[0].sources[0].roll.r.value
-H(6)
 
 ```
 
@@ -529,13 +522,8 @@ We can also verify that the ``#!python 5`` came from the eight-sided die.
 >>> five = roll[1]
 >>> five.value
 5
->>> five.sources[0].roll.r is r_d8
+>>> five.sources[0].source_roll.r is r_d8
 True
->>> five.sources[0].value
-5
->>> assert isinstance(five.sources[0].roll.r, ValueRoller)
->>> five.sources[0].roll.r.value
-H(8)
 
 ```
 
@@ -600,70 +588,6 @@ _No one knows._
 ValueRoller(value=P(6, 8), annotation='')
 
 ```
-
-## Lean(er) rolls — what if we don’t care about all this transparency?
-
-What if all we wanted to do was generate some rolls, but we’re not interested in their detailed origin stories or that ridiculous entanglement of cross-references all the way down?
-In almost all cases, [``P``][dyce.p.P] and [``H``][dyce.h.H] objects will get you were you need to go.
-Start there.
-(See also the [section on performance](#performance) below.)
-
-If you *really* want to use rollers to generate rolls without histories for some reason, [``Roll.__init__``][dyce.r.Roll.__init__] will surgically remove any source references from its arguments if its roller argument *r* is annotated with ``#!python None``.
-
-This has the effect that rollers annotated with ``#!python None`` will appear to generate “flat” rolls.
-
-<!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
-
->>> import random
->>> from dyce import rng
->>> rng.RNG = random.Random(1633056619)
-
-  -- END MONKEY PATCH -->
-
-``` python
->>> r_forgetful_best_3_of_3d6_d8 = r_best_3_of_3d6_d8.annotate(None)
->>> roll = r_forgetful_best_3_of_3d6_d8.roll() ; roll
-Roll(
-  r=SelectionRoller(
-    which=(slice(1, None, None),),
-    sources=(
-      RepeatRoller(
-        n=3,
-        source=ValueRoller(value=H(6), annotation=''),
-        annotation='',
-      ),
-      ValueRoller(value=H(8), annotation=''),
-    ),
-    annotation=None,
-  ),
-  roll_outcomes=(
-    RollOutcome(
-      value=2,
-      sources=(),
-    ),
-    RollOutcome(
-      value=3,
-      sources=(),
-    ),
-    RollOutcome(
-      value=5,
-      sources=(),
-    ),
-  ),
-  sources=(),
-)
-
-```
-
-<picture>
-  <source srcset="../img/graph_rollin_select_3_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Alternate Roll ERD for dropping outcomes](img/graph_rollin_select_3_light.svg)
-</picture>
-
-This isn’t magic.
-It is merely a way to cleave away any accumulated history at the point a [``Roll`` object][dyce.r.Roll] is initialized by an appropriately annotated roller.
-To prevent *all* history accumulation for a roller tree, every roller in that tree must be annotated with ``#!python None``.
 
 ## Performance
 
