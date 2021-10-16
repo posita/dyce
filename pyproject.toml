@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 [tool.mypy]  # -------------------------------------------------------------------------
 
 check_untyped_defs = true
-# See <https://github.com/python/mypy/issues/10250#issuecomment-899187636>
+# See <https://github.com/python/mypy/issues/10250#issuecomment-899187636> and
+# <https://github.com/python/mypy/issues/10310>
 exclude = """(?x)(
   (^|/)build/
 )"""
@@ -14,3 +15,13 @@ ignore_missing_imports = true
 strict_optional = true
 warn_redundant_casts = true
 warn_unused_configs = true
+
+[tool.pytest.ini_options]  # -----------------------------------------------------------
+
+addopts = "--doctest-continue-on-failure --doctest-glob='*.md' --doctest-modules --pythonwarnings=ignore"
+doctest_optionflags = [
+  "ELLIPSIS",
+  "IGNORE_EXCEPTION_DETAIL",
+  "NORMALIZE_WHITESPACE",
+  "NUMBER",
+]

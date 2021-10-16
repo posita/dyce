@@ -106,14 +106,12 @@ class TestValueRoller:
                 (roll_outcome_o,) = roll_o
                 r = R.from_values(o, roll_outcome_o, roll_o)
                 r_roll = r.roll()
+                assert r_roll.r == r
                 assert tuple(r_roll) == (
                     roll_outcome_o,
                     roll_outcome_o,
                     roll_outcome_o,
                 ), f"{o_type}({v})"
-
-                for roll_outcome in r_roll:
-                    assert roll_outcome.r == r
 
 
 class TestRepeatRoller:
@@ -665,7 +663,7 @@ class TestPoolRoller:
                 assert len(r_3_roll) == 3, r_3_roll
 
                 for roll_outcome in r_3_roll:
-                    assert roll_outcome.r == r_3
+                    assert roll_outcome.r == r
 
                 assert r_3_roll.total() in h_3, r_3_roll
 
@@ -710,10 +708,10 @@ class TestSelectRoller:
         assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
 
         for roll_outcome in r_squares_select_roll:
-            assert roll_outcome.r == r_squares_select
-
-            for source_roll_outcome in roll_outcome.sources:
-                assert source_roll_outcome.r == r_squares
+            if roll_outcome.value is None:
+                assert roll_outcome.r is r_squares_select
+            else:
+                assert roll_outcome.r in r_squares.sources
 
 
 class TestRoll:
@@ -781,24 +779,32 @@ class TestRoll:
         assert r_d6_mul2_neg_add4_3_roll.total() in d6_mul2_neg_add4_3
         assert len(r_d6_mul2_neg_add4_3_roll) == 3, r_d6_mul2_neg_add4_3_roll
 
+        for r_d6_mul2_neg_add4_roll in r_d6_mul2_neg_add4_3_roll.source_rolls:
+            (r_d6_mul2_neg_add4_ro,) = r_d6_mul2_neg_add4_roll
+            assert r_d6_mul2_neg_add4_ro.value in d6_mul2_neg_add4
+
+            (r_d6_mul2_neg_roll, _) = r_d6_mul2_neg_add4_roll.source_rolls
+            (r_d6_mul2_neg_ro,) = r_d6_mul2_neg_roll
+            assert r_d6_mul2_neg_ro.value in d6_mul2_neg
+
+            (r_d6_mul2_roll,) = r_d6_mul2_neg_roll.source_rolls
+            (r_d6_mul2_ro,) = r_d6_mul2_roll
+            assert r_d6_mul2_ro.value in d6_mul2
+
+            (r_d6_roll, _) = r_d6_mul2_roll.source_rolls
+            (r_d6_ro,) = r_d6_roll
+            assert r_d6_ro.value in d6
+
         for r_d6_mul2_neg_add4_3_ro in r_d6_mul2_neg_add4_3_roll:
-            r_d6_mul2_neg_add4_3_ro.value in d6_mul2_neg_add4
-            assert r_d6_mul2_neg_add4_3_ro.r == r_d6_mul2_neg_add4_3
+            assert r_d6_mul2_neg_add4_3_ro.r == r_d6_mul2_neg_add4
 
-            (r_d6_mul2_neg_add4_ro,) = r_d6_mul2_neg_add4_3_ro.sources
-            r_d6_mul2_neg_add4_ro.value in d6_mul2_neg_add4
-            assert r_d6_mul2_neg_add4_ro.r == r_d6_mul2_neg_add4
-
-            (r_d6_mul2_neg_ro, _) = r_d6_mul2_neg_add4_ro.sources
-            r_d6_mul2_neg_ro.value in d6_mul2_neg
+            (r_d6_mul2_neg_ro, _) = r_d6_mul2_neg_add4_3_ro.sources
             assert r_d6_mul2_neg_ro.r == r_d6_mul2_neg
 
             (r_d6_mul2_ro,) = r_d6_mul2_neg_ro.sources
-            r_d6_mul2_ro.value in d6_mul2
             assert r_d6_mul2_ro.r == r_d6_mul2
 
             (_, r_d6_ro) = r_d6_mul2_ro.sources
-            r_d6_ro.value in d6
             assert r_d6_ro.r == r_d6
 
 
@@ -820,16 +826,3 @@ class TestRollOutcome:
         rip_six = six.euthanize()
         assert rip_six.value is None
         assert rip_six.sources == (six,)
-
-    def test_cede_outcome(self) -> None:
-        one = RollOutcome(1)
-        six = RollOutcome(6)
-        one_turned_six = one.cede(six)
-        assert one_turned_six.value == 6
-        assert one_turned_six.sources == (one, six)
-
-    def test_cede_value(self) -> None:
-        one = RollOutcome(1)
-        one_turned_six = one.cede(6)
-        assert one_turned_six.value == 6
-        assert one_turned_six.sources == (one,)

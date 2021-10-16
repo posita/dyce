@@ -1495,8 +1495,8 @@ class H(_MappingT):
         fractions.Fraction``s.
 
         ``` python
-        >>> import sympy.abc  # doctest: +SKIP
-        >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]  # doctest: +SKIP
+        >>> import sympy.abc
+        >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]
         [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
 
         ```

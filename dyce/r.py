@@ -102,13 +102,12 @@ class R:
         change or disappear in future versions.
 
     Where [``H`` objects][dyce.h.H] and [``P`` objects][dyce.p.P] are used primarily for
-    enumerating all weighted outcomes, ``#!python R`` objects represent rollers. More
+    enumerating weighted outcomes, ``#!python R`` objects represent rollers. More
     specifically, they are immutable nodes assembled in tree-like structures to
-    represent calculations. They generate rolls that conform to outcomes weighted
-    according to those calculations without engaging in computationally expensive
-    enumeration (unlike [``H``][dyce.h.H] and [``P``][dyce.p.P] objects). Roller trees
-    are typically composed from various ``#!python R`` class methods and operators as
-    well as arithmetic operations.
+    represent calculations. Unlike [``H``][dyce.h.H] or [``P``][dyce.p.P] objects,
+    rollers generate rolls that conform to weighted outcomes without engaging in
+    computationally expensive enumeration. Roller trees are typically composed from
+    various ``#!python R`` class methods and operators as well as arithmetic operations.
 
     ``` python
     >>> from dyce import H, P, R
@@ -194,9 +193,9 @@ class R:
 
     ```
 
-    [``Roll`` objects][dyce.r.Roll] are much richer than mere outcomes. They are also
-    tree-like structures that mirror the roller trees used to produce them, capturing
-    references to rollers and the outcomes generated at each one.
+    [``Roll`` objects][dyce.r.Roll] are much richer than mere sequences of outcomes.
+    They are also tree-like structures that mirror the roller trees used to produce
+    them, capturing references to rollers and the outcomes generated at each node.
 
     ``` python
     >>> roll = (r_d6 + 3).roll()
@@ -246,18 +245,17 @@ class R:
 
     ```
 
-    Rollers provide optional arbitrary annotations as a convenience to callers. They are
-    taken into account when comparing roller trees, but otherwise ignored internally.
-    One use is to capture references to corresponding rollers in an abstract syntax tree
-    generated from parsing a proprietary grammar. Any provided *annotation* can be
-    retrieved using the [``annotation`` property][dyce.r.R.annotation]. The
+    Rollers afford optional annotations as a convenience to callers. They are taken into
+    account when comparing roller trees, but otherwise ignored, internally. One use is
+    to capture references to nodes in an abstract syntax tree generated from parsing a
+    proprietary grammar. Any provided *annotation* can be retrieved using the
+    [``annotation`` property][dyce.r.R.annotation]. The
     [``annotate`` method][dyce.r.R.annotate] can be used to apply an annotation to
     existing roller.
 
     The ``#!python R`` class itself acts as a base from which several
     computation-specific implementations derive (such as expressing operands like
-    outcomes or histograms, unary operations, binary operations, pools, etc.). In most
-    cases, details of those implementations can be safely ignored.
+    outcomes or histograms, unary operations, binary operations, pools, etc.).
 
     <!-- BEGIN MONKEY PATCH --
     For type-checking docstrings
@@ -500,34 +498,33 @@ class R:
         [``Roll`` object][dyce.r.Roll] taking into account any
         [sources][dyce.r.R.sources].
 
-        **Implementors guarantee that all [``RollOutcome``][dyce.r.RollOutcome]s in the
-        returned [``Roll``][dyce.r.Roll] *must* be associated with a roll, *including
-        all roll outcomes’ [``sources``][dyce.r.RollOutcome.sources]*.**
-
         !!! note
 
-            It is poor practice to pass one’s source rolls through or reuse a source’s
-            roll outcomes. Instead, create new [``RollOutcome``][dyce.r.RollOutcome]s
-            that reference the source ones. Additionally, show that roll outcomes from
-            source rolls are excluded by creating a new roll outcome with a value of
-            ``#!python None`` with the excluded roll outcome as its source. The
-            [``RollOutcome.cede``][dyce.r.RollOutcome.cede] and
-            [``RollOutcome.euthanize``][dyce.r.RollOutcome.euthanize] convenience
-            methods are provided for this purpose.
+            Implementors guarantee that all [``RollOutcome``][dyce.r.RollOutcome]s in
+            the returned [``Roll``][dyce.r.Roll] *must* be associated with a roll,
+            *including all roll outcomes’ [``sources``][dyce.r.RollOutcome.sources]*.
+
+        <!-- BEGIN MONKEY PATCH --
+        For deterministic outcomes
+
+        >>> import random
+        >>> from dyce import rng
+        >>> rng.RNG = random.Random(1633403927)
+
+          -- END MONKEY PATCH -->
+
+        !!! tip
+
+            Show that roll outcomes from source rolls are excluded by creating a new
+            roll outcome with a value of ``#!python None`` with the excluded roll
+            outcome as its source. The
+            [``RollOutcome.euthanize``][dyce.r.RollOutcome.euthanize] convenience method
+            is provided for this purpose.
 
             See the section on “[Dropping dice from prior rolls
             …](rollin.md#dropping-dice-from-prior-rolls-keeping-the-best-three-of-3d6-and-1d8)”
             as well as the note in [``Roll.__init__``][dyce.r.Roll.__init__] for
             additional color.
-
-            <!-- BEGIN MONKEY PATCH --
-            For deterministic outcomes
-
-            >>> import random
-            >>> from dyce import rng
-            >>> rng.RNG = random.Random(1633403927)
-
-              -- END MONKEY PATCH -->
 
             ``` python
             >>> from itertools import chain
@@ -541,10 +538,10 @@ class R:
             ...           # Omit those already deceased
             ...           continue
             ...         elif self.h_coin_toss.roll():
-            ...           # This one lives; wrap the old outcome in a new one with the same value
-            ...           yield roll_outcome.cede(roll_outcome.value)
+            ...           # This one lives. Wrap the old outcome in a new one with the same value.
+            ...           yield roll_outcome
             ...         else:
-            ...           # This one dies here; wrap the old outcome in a new one with a value of None
+            ...           # This one dies here. Wrap the old outcome in a new one with a value of None.
             ...           yield roll_outcome.euthanize()
             ...     return Roll(self, roll_outcomes=_roll_outcomes_gen(), source_rolls=source_rolls)
             >>> ac_r = AntonChigurhRoller(sources=(R.from_value(1), R.from_value(2), R.from_value(3)))
@@ -570,21 +567,11 @@ class R:
                 ),
                 RollOutcome(
                   value=2,
-                  sources=(
-                    RollOutcome(
-                      value=2,
-                      sources=(),
-                    ),
-                  ),
+                  sources=(),
                 ),
                 RollOutcome(
                   value=3,
-                  sources=(
-                    RollOutcome(
-                      value=3,
-                      sources=(),
-                    ),
-                  ),
+                  sources=(),
                 ),
               ),
               source_rolls=(
@@ -687,30 +674,15 @@ class R:
           roll_outcomes=(
             RollOutcome(
               value=2,
-              sources=(
-                RollOutcome(
-                  value=2,
-                  sources=(),
-                ),
-              ),
+              sources=(),
             ),
             RollOutcome(
               value=4,
-              sources=(
-                RollOutcome(
-                  value=4,
-                  sources=(),
-                ),
-              ),
+              sources=(),
             ),
             RollOutcome(
               value=6,
-              sources=(
-                RollOutcome(
-                  value=6,
-                  sources=(),
-                ),
-              ),
+              sources=(),
             ),
           ),
           source_rolls=...,
@@ -1130,31 +1102,13 @@ class R:
         """
         return type(self).select_from_sources(which, self, annotation=annotation)
 
-    @beartype
-    def _prep_for_roll(self, res: _RollOutcomesReturnT) -> Iterator["RollOutcome"]:
-        roll_outcomes: Iterable[RollOutcome]
-
-        if isinstance(res, RollOutcome):
-            roll_outcomes = (res,)
-        else:
-            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
-
-        for roll_outcome in roll_outcomes:
-            if not roll_outcome._has_roll or roll_outcome.r is self:
-                # New roll outcomes in need of rolls
-                yield roll_outcome
-            elif roll_outcome.value is None:
-                # Drop euthanized roll outcomes from prior rolls
-                pass
-            else:
-                # Wrap active roll outcomes from prior rolls
-                yield roll_outcome.cede(roll_outcome.value)
-
 
 class ValueRoller(R):
     r"""
     A [roller][dyce.r.R] whose roll outcomes are derived from scalars,
-    [``H`` objects][dyce.h.H], or [``P`` objects][dyce.p.P] instead of other sources.
+    [``H`` objects][dyce.h.H], [``P`` objects][dyce.p.P],
+    [``RollOutcome`` objects][dyce.r.RollOutcome], or even
+    [``Roll`` objects][dyce.r.Roll], instead of other source rollers.
     """
     __slots__: Tuple[str, ...] = ("_value",)
 
@@ -1190,7 +1144,7 @@ class ValueRoller(R):
         if isinstance(self.value, Roll):
             return self.value
         elif isinstance(self.value, RollOutcome):
-            return Roll(self, roll_outcomes=(self.value.clone(),))
+            return Roll(self, roll_outcomes=(self.value,))
         elif isinstance(self.value, P):
             return Roll(
                 self,
@@ -1208,7 +1162,8 @@ class ValueRoller(R):
     @property
     def value(self) -> _ValueT:
         r"""
-        The single value for this leaf node roller.
+        The value to be emitted by this roller via its
+        [``ValueRoller.roll`` method][dyce.r.ValueRoller.roll].
         """
         return self._value
 
@@ -1284,7 +1239,7 @@ class PoolRoller(R):
         return Roll(
             self,
             roll_outcomes=(
-                roll_outcome.cede(roll_outcome.value)
+                roll_outcome
                 for roll_outcome in chain.from_iterable(source_rolls)
                 if roll_outcome.value is not None
             ),
@@ -1355,7 +1310,7 @@ class RepeatRoller(R):
         return Roll(
             self,
             roll_outcomes=(
-                roll_outcome.cede(roll_outcome.value)
+                roll_outcome
                 for roll_outcome in chain.from_iterable(source_rolls)
                 if roll_outcome.value is not None
             ),
@@ -1421,9 +1376,14 @@ class BasicOpRoller(R):
             ),
         )
 
+        if isinstance(res, RollOutcome):
+            roll_outcomes = (res,)
+        else:
+            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
+
         return Roll(
             self,
-            roll_outcomes=self._prep_for_roll(res),
+            roll_outcomes=roll_outcomes,
             source_rolls=source_rolls,
         )
 
@@ -1460,9 +1420,14 @@ class NarySumOpRoller(BasicOpRoller):
 
         res = self.op(self, _sum_roll_outcomes_by_rolls())
 
+        if isinstance(res, RollOutcome):
+            roll_outcomes = (res,)
+        else:
+            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
+
         return Roll(
             self,
-            roll_outcomes=self._prep_for_roll(res),
+            roll_outcomes=roll_outcomes,
             source_rolls=source_rolls,
         )
 
@@ -1631,34 +1596,26 @@ class SelectionRoller(R):
       roll_outcomes=(
         RollOutcome(
           value=1000,
-          sources=(
-            RollOutcome(
-              value=1000, ...,
-            ),
-          ),
+          sources=(),
         ),
         RollOutcome(
           value=10,
-          sources=(
-            RollOutcome(
-              value=10, ...,
-            ),
-          ),
+          sources=(),
         ),
         RollOutcome(
           value=1000,
-          sources=(
-            RollOutcome(
-              value=1000, ...,
-              ),
-            ),
-          ),
+          sources=(),
         ),
         RollOutcome(
           value=100,
+          sources=(),
+        ),
+        RollOutcome(
+          value=None,
           sources=(
             RollOutcome(
-              value=100, ...,
+              value=1,
+              sources=(),
             ),
           ),
         ),
@@ -1666,20 +1623,13 @@ class SelectionRoller(R):
           value=None,
           sources=(
             RollOutcome(
-              value=1, ...,
-              ),
-            ),
-          ),
-        ),
-        RollOutcome(
-          value=None,
-          sources=(
-            RollOutcome(
-              value=10000, ...,
+              value=10000,
+              sources=(),
             ),
           ),
         ),
       ),
+      source_rolls=...,
     )
 
     ```
@@ -1731,7 +1681,7 @@ class SelectionRoller(R):
             for selected_index in selected_indexes:
                 selected_roll_outcome = roll_outcomes[selected_index]
                 assert selected_roll_outcome.value is not None
-                yield selected_roll_outcome.cede(selected_roll_outcome.value)
+                yield selected_roll_outcome
 
             for excluded_index in set(all_indexes) - set(selected_indexes):
                 yield roll_outcomes[excluded_index].euthanize()
@@ -2023,10 +1973,12 @@ class RollOutcome:
     @property
     def source_roll(self) -> Roll:
         r"""
-        Returns the roll if one has been associated with this roll outcome. Usually that is
-        done via the [``Roll.__init__`` method][dyce.r.Roll.__init__]. Accessing this
-        property before the roll outcome has been associated with a roll is considered
-        a programming error.
+        Returns the roll if one has been associated with this roll outcome. Usually that
+        happens by submitting the roll outcome to the
+        [``Roll.__init__`` method][dyce.r.Roll.__init__] inside a
+        [``R.roll`` method][dyce.r.R.roll] implementation. Accessing this property
+        before the roll outcome has been associated with a roll is considered a
+        programming error.
 
         ``` python
         >>> ro = RollOutcome(4)
@@ -2246,34 +2198,6 @@ class RollOutcome:
             return RollOutcome(bool(__ge__(self.value, other)), sources=(self,))
 
     @beartype
-    def cede(self, other: _RollOutcomeOperandT) -> RollOutcome:
-        r"""
-        Shorthand for ``#!python self.map(lambda left, right: right, other)``.
-
-        ``` python
-        >>> two = RollOutcome(2)
-        >>> two.cede(-3)
-        RollOutcome(
-          value=-3,
-          sources=(
-            RollOutcome(
-              value=2,
-              sources=(),
-            ),
-          ),
-        )
-
-        ```
-
-        See the [``map`` method][dyce.r.RollOutcome.map].
-        """
-
-        def _cede(left_operand: OutcomeT, right_operand: OutcomeT) -> OutcomeT:
-            return right_operand
-
-        return self.map(_cede, other)
-
-    @beartype
     def is_even(self) -> RollOutcome:
         r"""
         Shorthand for: ``#!python self.umap(dyce.types.is_even)``.
@@ -2319,15 +2243,6 @@ class RollOutcome:
 
         return self.umap(_euthanize)
 
-    @beartype
-    def clone(self) -> RollOutcome:
-        r"""
-        Clones this roll outcome, keeping its [``value``][dyce.r.RollOutcome.value] and
-        [``sources``][dyce.r.RollOutcome.sources], but not any associated
-        [``source_roll``][dyce.r.RollOutcome.source_roll].
-        """
-        return type(self)(self.value, self.sources)
-
 
 class Roll(Sequence[RollOutcome]):
     r"""
@@ -2338,7 +2253,7 @@ class Roll(Sequence[RollOutcome]):
 
     An immutable roll result (or “roll” for short). More specifically, the result of
     calling the [``R.roll`` method][dyce.r.R.roll]. Rolls are sequences of
-    [``RollOutcome`` objects][dyce.r.RollOutcome] with additional convenience methods.
+    [``RollOutcome`` objects][dyce.r.RollOutcome] that can be assembled into trees.
     """
     __slots__: Tuple[str, ...] = ("_r", "_roll_outcomes", "_source_rolls")
 
@@ -2356,16 +2271,27 @@ class Roll(Sequence[RollOutcome]):
         Initializer.
 
         This initializer will associate each of *roll_outcomes* with the newly
-        constructed roll. As such it is an error if any is already associated with
-        another.
+        constructed roll if they do not already have a
+        [``source_roll``][dyce.r.RollOutcome.source_roll].
 
         ``` python
         >>> r_4 = ValueRoller(4)
         >>> roll = r_4.roll()
-        >>> Roll(r_4, roll)
-        Traceback (most recent call last):
-          ...
-        AssertionError: RollOutcome submitted to Roll.__init__ already has roll
+        >>> new_roll = Roll(r_4, roll) ; new_roll
+        Roll(
+          r=ValueRoller(value=4, annotation=''),
+          roll_outcomes=(
+            RollOutcome(
+              value=4,
+              sources=(),
+            ),
+          ),
+          source_rolls=(),
+        )
+        >>> roll[0].source_roll == roll
+        True
+        >>> roll[0].r == r_4
+        True
 
         ```
 
@@ -2381,11 +2307,9 @@ class Roll(Sequence[RollOutcome]):
             state post initialization may seem unseemly, but that intimacy is a
             fundamental part of their primordial ritual.
 
-            More practically, it frees each roller from having to do its own cleaving.
-
             That being said, you’re an adult. Do what you want. Just know that if you’re
-            going to create your own roll outcomes and pimp them out to different rolls
-            all over town, they might come back with some parts missing.
+            going to create your own roll outcomes and pimp them out all over town, they
+            might pick something up along the way.
 
             See also the
             [``RollOutcome.source_roll`` property][dyce.r.RollOutcome.source_roll].
@@ -2396,12 +2320,8 @@ class Roll(Sequence[RollOutcome]):
         self._source_rolls = tuple(source_rolls)
 
         for roll_outcome in self._roll_outcomes:
-            assert (
-                not roll_outcome._has_roll
-            ), "RollOutcome submitted to Roll.__init__ already has roll"
-
-        for roll_outcome in self._roll_outcomes:
-            roll_outcome._roll = self
+            if not roll_outcome._has_roll:
+                roll_outcome._roll = self
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2474,20 +2394,20 @@ class Roll(Sequence[RollOutcome]):
         Shorthand for ``#!python (roll_outcome.value for roll_outcome in self if
         roll_outcome.value is not None)``.
 
+        <!-- BEGIN MONKEY PATCH --
+        For deterministic outcomes
+
+        >>> import random
+        >>> from dyce import rng
+        >>> rng.RNG = random.Random(1633056410)
+
+          -- END MONKEY PATCH -->
+
         !!! info
 
             Unlike [``H.roll``][dyce.h.H.roll] and [``P.roll``][dyce.p.P.roll], these
             outcomes are *not* sorted. Instead, they retain the ordering from whence
             they came in the roller tree.
-
-            <!-- BEGIN MONKEY PATCH --
-            For deterministic outcomes
-
-            >>> import random
-            >>> from dyce import rng
-            >>> rng.RNG = random.Random(1633056410)
-
-              -- END MONKEY PATCH -->
 
             ``` python
             >>> r_3d6 = 3@R.from_value(H(6))

@@ -167,21 +167,11 @@ Roll(
   roll_outcomes=(
     RollOutcome(
       value=60,
-      sources=(
-        RollOutcome(
-          value=60,
-          sources=(),
-        ),
-      ),
+      sources=(),
     ),
     RollOutcome(
       value=9,
-      sources=(
-        RollOutcome(
-          value=9,
-          sources=(),
-        ),
-      ),
+      sources=(),
     ),
   ),
   source_rolls=(
@@ -511,7 +501,7 @@ We can programmatically verify that the excluded outcome originated from one of 
 True
 >>> excluded.sources[0].value
 1
->>> excluded.sources[0].source_roll.r is r_3d6
+>>> excluded.sources[0].r is r_d6
 True
 
 ```
@@ -522,7 +512,7 @@ We can also verify that the ``#!python 5`` came from the eight-sided die.
 >>> five = roll[1]
 >>> five.value
 5
->>> five.sources[0].source_roll.r is r_d8
+>>> five.r is r_d8
 True
 
 ```
