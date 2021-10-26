@@ -1,4 +1,3 @@
-
 #!/usr/bin/env sh
 # ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for

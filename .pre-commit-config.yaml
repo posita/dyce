@@ -6,12 +6,23 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
-    - id: trailing-whitespace
-      exclude: ^docs/dyce-powered\.svg$
     - id: end-of-file-fixer
       exclude: ^docs/dyce-powered\.svg$
-    - id: check-yaml
+    - id: mixed-line-ending
+    - id: trailing-whitespace
+      exclude: ^docs/dyce-powered\.svg$
     - id: check-added-large-files
+    - id: check-case-conflict
+    - id: check-executables-have-shebangs
+    - id: check-merge-conflict
+    - id: check-shebang-scripts-are-executable
+    - id: check-symlinks
+    - id: check-vcs-permalinks
+    - id: destroyed-symlinks
+    - id: detect-private-key
+    - id: check-toml
+    - id: check-xml
+    - id: check-yaml
   - repo: https://github.com/psf/black
     rev: 21.9b0
     hooks:
@@ -21,6 +32,6 @@ repos:
     hooks:
     - id: isort
   - repo: https://github.com/pycqa/flake8
-    rev: 3.9.2
+    rev: 4.0.1
     hooks:
     - id: flake8
