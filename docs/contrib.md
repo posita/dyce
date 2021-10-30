@@ -33,38 +33,31 @@ Feel free to at-mention ``@posita`` as well.
 
 ## Hacking quick-start
 
-A [helper script](https://github.com/posita/dyce/blob/latest/helpers/venvsetup.sh) is provided for bootstrapping an isolated development environment.
+An easy way to bootstrap an isolated development environment is:
 
-```sh
-% [PYTHON=…/path/to/python] helpers/venvsetup.sh
+``` sh
+% git clone --recurse-submodules https://github.com/posita/dyce.git
+…
+% cd dyce
+% /path/to/python -m venv .venv
 …
 % . .venv/bin/activate
+% pip install --upgrade --editable '.[dev]'
+…
+% python -m pre_commit install
+…
 ```
 
-The helper script is really only there to help folks get their feet wet who don’t already manage their own virtual environments.
-The above is essentially equivalent to the following (with some additional checking).
-
-```sh
-% …/path/to/python -m virtualenv .venv || …/path/to/python -m venv .venv
-…
-% .venv/bin/pip install --upgrade --editable '.[dev]'
-…
-% .venv/bin/python -m pre_commit install
-…
-% . .venv/bin/activate
-```
-
+Substitute your preferred virtual environment process for [``venv``](https://docs.python.org/3/library/venv.html).
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
 See the ``[options.extras_require]`` section in [``setup.cfg``](https://github.com/posita/dyce/blob/latest/setup.cfg).
 
-Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run with [pytest](https://docs.pytest.org/) directly, if installed).
+Unit tests are run with [pytest](https://docs.pytest.org/) via [Tox](https://tox.readthedocs.org/).
 
-```sh
+``` sh
 % cd …/path/to/dyce
 % . .venv/bin/activate
 % tox [TOX_ARGS... [-- PYTEST_ARGS...]]
-…
-% pytest [PYTEST_ARGS...]
 …
 ```
 
@@ -76,8 +69,7 @@ Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run
     This is because the pure-Python alternative we use elsewhere [does not support editing](https://github.com/xflr6/graphviz/issues/141).
     PyGraphviz has some [special needs](https://pygraphviz.github.io/documentation/stable/install.html#advanced) when it comes to installation.
 
-    Because this dumpster fire is complicated and fragile[^1], it is not part of the default workflow.
-    To regenerate class diagrams, run ``tox -e check-classdiagrams``.
+    This dumpster fire is complicated and fragile.[^1]
     Depending on your configuration, PyGraphviz may not be able to find the native Graphviz library it needs.
     This can often be remedied by setting the appropriate [``gcc`` environment variables](https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html).
 
@@ -85,34 +77,9 @@ Unit tests are run with [Tox](https://tox.readthedocs.org/) (but can also be run
     CPATH=/opt/local/include LIBRARY_PATH=/optlocal/lib tox -e check-classdiagrams
     ```
 
-    If anyone has a way out of this mess, please [get in touch](https://github.com/posita/dyce/issues).
-
 [^1]:
 
     It is uncanny how often those two properties are found together.
-
-A bare bones example:
-
-```sh
-% git clone https://github.com/posita/dyce.git  # or your fork
-% cd dyce
-% helpers/venvsetup.sh && . .venv/bin/activate
-…
-% tox
-…
-```
-
-A [``virtualenvwrapper``](https://pypi.org/project/virtualenvwrapper/)-based alternative:
-
-```sh
-% git clone https://github.com/posita/dyce.git  # or your fork
-% mkvirtualenv [--python=…/path/to/python] -a "${PWD}/dyce" dycelib
-…
-% pip install --upgrade --editable '.[dev]'
-…
-% tox
-…
-```
 
 ## Submission guidelines
 

@@ -306,14 +306,14 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 
 Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 
-```sh
+``` sh
 % pip install dycelib
 ...
 ```
 
 Alternately, you can download [the source](https://github.com/posita/dyce) and install manually.
 
-```sh
+``` sh
 % git clone https://github.com/posita/dyce.git
 ...
 % cd dyce

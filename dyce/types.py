@@ -34,6 +34,7 @@ __all__ = ("OutcomeT",)
 
 # ---- Types ---------------------------------------------------------------------------
 
+
 _S = TypeVar("_S")
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)

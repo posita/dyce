@@ -8,7 +8,6 @@
 
 include \
   .isort.cfg \
-  .mypy.ini \
   .pre-commit-config.yaml \
   mkdocs.yaml
 graft docs
