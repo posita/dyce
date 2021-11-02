@@ -54,4 +54,4 @@ graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py
 	"$${PYTHON:-python}" graph.py --style=light $*
 
 ../dyce-powered.svg : Makefile
-	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-dyce--powered%21-gold'
+	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'

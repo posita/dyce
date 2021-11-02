@@ -16,10 +16,10 @@ from collections.abc import Mapping as MappingC
 from functools import partial
 from typing import Any, Dict, Iterator, Mapping, Optional, Union
 
+from numerary.bt import beartype
 from plug import import_plug
 
 from dyce import R
-from dyce.bt import beartype
 from dyce.r import (
     BinarySumOpRoller,
     NarySumOpRoller,

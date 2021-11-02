@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import warnings
 from functools import wraps
-from typing import Callable, Tuple, Type, TypeVar
+from typing import Callable, Iterable, Type, TypeVar, Union
 
 __all__ = ()
 
@@ -25,7 +25,7 @@ _WrappedT = TypeVar("_WrappedT", bound=Callable)
 
 
 class ExperimentalWarning(PendingDeprecationWarning):
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
 
 # ---- Decorators ----------------------------------------------------------------------

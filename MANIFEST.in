@@ -7,11 +7,9 @@
 # ======================================================================================
 
 include \
-  .isort.cfg \
-  .pre-commit-config.yaml \
-  mkdocs.yaml
-graft docs
-graft helpers
-graft tests
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+  mkdocs.yml
+global-include py.typed *.pyi
+global-exclude *.py[co]
+global-exclude __pycache__
+prune .github
+prune .tox

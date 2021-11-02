@@ -20,7 +20,7 @@
     This package is an attempt to explore conveniences for integration with [Matplotlib](https://matplotlib.org/).
     It is an explicit departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2) and should be considered experimental.
     Be warned that future release may introduce incompatibilities or remove this package altogether.
-    [Suggestions and contributions](contrib.md) are welcome.
+    [Feedback, suggestions, and contributions](contrib.md) are welcome and appreciated.
 
 ::: dyce.viz
     rendering:

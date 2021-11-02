@@ -17,11 +17,15 @@
 
 ## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
 
+* Splits out protocol checking into its own fancy library: [``numerary``](https://github.com/posita/numerary/)!
+* Is now [available on PyPI as ``dyce``_](https://pypi.org/project/dyce/), thanks to the generosity of [David Eyk](https://eykd.net/about/)!
 * Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
 * Uses ``pygraphviz`` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
 * Introduces experimental use of ``numpy`` for RNG, if present.
 * Migrates to using ``pyproject.toml`` and ``setup.cfg``.
+* Adds missing [``py.typed`` to ensure clients get type checking](https://www.python.org/dev/peps/pep-0561/).
+  (Whoops.)
 
 ## [0.4.0](https://github.com/posita/dyce/releases/tag/v0.4.0)
 

@@ -13,7 +13,7 @@ from random import Random
 from sys import version_info
 from typing import NewType, Sequence, Type, Union
 
-from .bt import beartype
+from numerary.bt import beartype
 
 __all__ = ("RNG",)
 

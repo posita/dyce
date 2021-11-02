@@ -13,7 +13,8 @@ from fractions import Fraction
 from numbers import Real
 from typing import Any, Iterable, Iterator, Optional, Sequence, Tuple, Union
 
-from .bt import beartype
+from numerary.bt import beartype
+
 from .h import H
 from .lifecycle import experimental
 

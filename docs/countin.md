@@ -523,7 +523,7 @@ Calling ``#!python matplotlib.pyplot.show`` presents:
 
 ### Modeling entire multi-round combats
 
-With a little ~~elbow~~ *finger* grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
+With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
 
 ``` python
 >>> from typing import Callable, Dict, Tuple
@@ -833,7 +833,7 @@ Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
 !!! info
 
     The Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case.
-    It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.
+    It involves no algebra and is left as an exercise to the reader … at least one with nothing more pressing to do.
 
 Armed with this knowledge, we can now model “Evens Up” using our ``#!python risus_combat_driver`` from above.
 We can also deploy a trick using ``#!python partial`` to parameterize use of the Goliath Rule.
@@ -867,7 +867,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 
 ## Time to get meta-evil on those outcomes!
 
-``dyce`` offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as [SymPy](https://www.sympy.org/).
+Thanks to [``#!python numerary``](https://pypi.org/project/numerary/), ``dyce`` offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as [SymPy](https://www.sympy.org/).
 
 ``` python
 >>> import sympy.abc
@@ -878,7 +878,7 @@ H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y
 
 ```
 
-[![Love you, Doris!](img/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260)
+[![Miss you, Doris!](img/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186)
 
 !!! note
 

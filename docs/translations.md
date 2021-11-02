@@ -125,9 +125,10 @@ Visualization:
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
 
 ``` python
+>>> import operator
 >>> save_roll.substitute(
 ...   lambda h, outcome:
-...     burning_arch_damage // 2 if outcome >= 10
+...     burning_arch_damage // 2 if operator.__ge__(outcome, 10)
 ...     else burning_arch_damage
 ... ) == damage_half_on_save
 True

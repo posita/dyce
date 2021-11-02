@@ -18,11 +18,10 @@ from fractions import Fraction
 from typing import Tuple, Type, Union
 
 import pytest
+from numerary import RealLikeSCU
 
-from dyce import H, OutcomeT
+from dyce import H
 from dyce.h import _within
-
-from .numberwang import Numberwang, Wangernumb
 
 __all__ = ()
 
@@ -30,15 +29,11 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-_INTEGRAL_OUTCOME_TYPES: Tuple[Type, ...] = (
-    int,
-    Numberwang,
-)
+_INTEGRAL_OUTCOME_TYPES: Tuple[Type, ...] = (int,)
 _OUTCOME_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
     float,
     Decimal,
     Fraction,
-    Wangernumb,
 )
 _COUNT_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
 
@@ -67,10 +62,7 @@ else:
         sympy.Rational,
         sympy.RealNumber,
     )
-    _INTEGRAL_OUTCOME_TYPES += (
-        # TODO(posita): See <https://github.com/sympy/sympy/issues/19311>
-        # sympy.Integer,
-    )
+    _INTEGRAL_OUTCOME_TYPES += (sympy.Integer,)
     _COUNT_TYPES += (sympy.Integer,)
 
 
@@ -338,7 +330,7 @@ class TestH:
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(h: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
+        def double_odd_values(h: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -350,7 +342,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(d: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
+        def never_expand(d: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
             return outcome
 
         d20 = H(20)
@@ -358,7 +350,7 @@ class TestH:
         assert d20.substitute(never_expand, operator.__add__, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, outcome: OutcomeT) -> Union[H, OutcomeT]:
+        def reroll_d4_threes(h: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
             return h if max(h) == 4 and outcome == 3 else outcome
 
         h = H(4)

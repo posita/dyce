@@ -54,18 +54,16 @@ from typing import (
     overload,
 )
 
-from .bt import beartype
+from numerary import RealLikeSCT, RealLikeSCU
+from numerary.bt import beartype
+from numerary.types import SupportsIndex, SupportsIntSCT, SupportsIntSCU
+
 from .h import H
 from .lifecycle import experimental
 from .p import P
 from .types import (
-    IndexT,
-    IntT,
-    OutcomeT,
     _BinaryOperatorT,
     _GetItemT,
-    _IntCs,
-    _OutcomeCs,
     _UnaryOperatorT,
     as_int,
     getitems,
@@ -79,10 +77,10 @@ __all__ = ("R",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_ValueT = Union[OutcomeT, H, P, "RollOutcome", "Roll"]
+_ValueT = Union[RealLikeSCU, H, P, "RollOutcome", "Roll"]
 _SourceT = Union["R"]
-_ROperandT = Union[OutcomeT, _SourceT]
-_RollOutcomeOperandT = Union[OutcomeT, "RollOutcome"]
+_ROperandT = Union[RealLikeSCU, _SourceT]
+_RollOutcomeOperandT = Union[RealLikeSCU, "RollOutcome"]
 _RollOutcomesReturnT = Union["RollOutcome", Iterable["RollOutcome"]]
 _RollOutcomeUnaryOperatorT = Callable[["RollOutcome"], _RollOutcomesReturnT]
 _RollOutcomeBinaryOperatorT = Callable[
@@ -266,7 +264,7 @@ class R:
 
       -- END MONKEY PATCH -->
     """
-    __slots__: Tuple[str, ...] = ("_annotation", "_sources")
+    __slots__: Union[str, Iterable[str]] = ("_annotation", "_sources")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -318,7 +316,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __radd__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
@@ -332,7 +330,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rsub__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
@@ -346,14 +344,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rmul__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __matmul__(self, other: IntT) -> R:
+    def __matmul__(self, other: SupportsIntSCU) -> R:
         try:
             other = as_int(other)
         except TypeError:
@@ -365,7 +363,7 @@ class R:
             return RepeatRoller(other, self)
 
     @beartype
-    def __rmatmul__(self, other: IntT) -> R:
+    def __rmatmul__(self, other: SupportsIntSCU) -> R:
         return self.__matmul__(other)
 
     @beartype
@@ -376,7 +374,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rtruediv__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
@@ -390,7 +388,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rfloordiv__(self, other: RealLikeSCU) -> BinarySumOpRoller:  # type: ignore
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -404,7 +402,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rmod__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
@@ -418,14 +416,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: OutcomeT) -> BinarySumOpRoller:
+    def __rpow__(self, other: RealLikeSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
+    def __and__(self, other: Union[_SourceT, SupportsIntSCU]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__and__, other)
@@ -435,14 +433,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: IntT) -> BinarySumOpRoller:
+    def __rand__(self, other: SupportsIntSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __and__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
+    def __xor__(self, other: Union[_SourceT, SupportsIntSCU]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__xor__, other)
@@ -452,14 +450,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: IntT) -> BinarySumOpRoller:
+    def __rxor__(self, other: SupportsIntSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __xor__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union[_SourceT, IntT]) -> BinarySumOpRoller:
+    def __or__(self, other: Union[_SourceT, SupportsIntSCU]) -> BinarySumOpRoller:
         try:
             if isinstance(other, R):
                 return self.map(__or__, other)
@@ -469,7 +467,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: IntT) -> BinarySumOpRoller:
+    def __ror__(self, other: SupportsIntSCU) -> BinarySumOpRoller:
         try:
             return self.rmap(as_int(other), __or__)
         except NotImplementedError:
@@ -898,7 +896,7 @@ class R:
 
         ```
         """
-        if isinstance(right_operand, _OutcomeCs):
+        if isinstance(right_operand, RealLikeSCT):
             right_operand = ValueRoller(right_operand)
 
         if isinstance(right_operand, (R, RollOutcome)):
@@ -909,7 +907,7 @@ class R:
     @beartype
     def rmap(
         self,
-        left_operand: Union[OutcomeT, "RollOutcome"],
+        left_operand: Union[RealLikeSCU, "RollOutcome"],
         bin_op: _RollOutcomeBinaryOperatorT,
         annotation: Any = "",
     ) -> BinarySumOpRoller:
@@ -937,7 +935,7 @@ class R:
             [``map`` method][dyce.r.R.map]. This is intentional and serves as a reminder
             of operand ordering.
         """
-        if isinstance(left_operand, _OutcomeCs):
+        if isinstance(left_operand, RealLikeSCT):
             return BinarySumOpRoller(
                 bin_op, ValueRoller(left_operand), self, annotation=annotation
             )
@@ -1110,7 +1108,7 @@ class ValueRoller(R):
     [``RollOutcome`` objects][dyce.r.RollOutcome], or even
     [``Roll`` objects][dyce.r.Roll], instead of other source rollers.
     """
-    __slots__: Tuple[str, ...] = ("_value",)
+    __slots__: Union[str, Iterable[str]] = ("_value",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1152,7 +1150,7 @@ class ValueRoller(R):
             )
         elif isinstance(self.value, H):
             return Roll(self, roll_outcomes=(RollOutcome(self.value.roll()),))
-        elif isinstance(self.value, _OutcomeCs):
+        elif isinstance(self.value, RealLikeSCT):
             return Roll(self, roll_outcomes=(RollOutcome(self.value),))
         else:
             assert False, f"unrecognized value type {self.value!r}"
@@ -1227,7 +1225,7 @@ class PoolRoller(R):
 
     ```
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1267,14 +1265,14 @@ class RepeatRoller(R):
 
     ```
     """
-    __slots__: Tuple[str, ...] = ("_n",)
+    __slots__: Union[str, Iterable[str]] = ("_n",)
 
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
     def __init__(
         self,
-        n: IntT,
+        n: SupportsIntSCU,
         source: _SourceT,
         annotation: Any = "",
         **kw,
@@ -1333,7 +1331,7 @@ class BasicOpRoller(R):
     Any [``RollOutcome``][dyce.r.RollOutcome]s returned by *op* are used directly in the
     creation of a new [``Roll``][dyce.r.Roll].
     """
-    __slots__: Tuple[str, ...] = ("_op",)
+    __slots__: Union[str, Iterable[str]] = ("_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1402,7 +1400,7 @@ class NarySumOpRoller(BasicOpRoller):
     A [``BasicOpRoller``][dyce.r.BasicOpRoller] for applying *op* to the sum of outcomes
     grouped by each of *sources*.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1438,7 +1436,7 @@ class BinarySumOpRoller(NarySumOpRoller):
     *bin_op* to the sum of all outcomes from its *left_source* and the sum of all
     outcomes from its *right_source*.
     """
-    __slots__: Tuple[str, ...] = ("_bin_op",)
+    __slots__: Union[str, Iterable[str]] = ("_bin_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1501,7 +1499,7 @@ class UnarySumOpRoller(NarySumOpRoller):
     An [``NarySumOpRoller``][dyce.r.NarySumOpRoller] for applying a unary operator
     *un_op* to the sum of all outcomes from its sole *source*.
     """
-    __slots__: Tuple[str, ...] = ("_un_op",)
+    __slots__: Union[str, Iterable[str]] = ("_un_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1634,7 +1632,7 @@ class SelectionRoller(R):
 
     ```
     """
-    __slots__: Tuple[str, ...] = ("_which",)
+    __slots__: Union[str, Iterable[str]] = ("_which",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1711,14 +1709,14 @@ class RollOutcome:
 
     A single, ([mostly][dyce.r.Roll.__init__]) immutable outcome generated by a roll.
     """
-    __slots__: Tuple[str, ...] = ("_roll", "_sources", "_value")
+    __slots__: Union[str, Iterable[str]] = ("_roll", "_sources", "_value")
 
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
     def __init__(
         self,
-        value: Optional[OutcomeT],
+        value: Optional[RealLikeSCU],
         sources: Iterable["RollOutcome"] = (),
     ):
         r"Initializer."
@@ -1740,16 +1738,14 @@ class RollOutcome:
 )"""
 
     @beartype
-    # TODO(posita): See <https://github.com/python/mypy/issues/10943>
-    def __lt__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
+    def __lt__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
             return bool(__lt__(self.value, other.value))
         else:
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/python/mypy/issues/10943>
-    def __le__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore
+    def __le__(self, other: _RollOutcomeOperandT) -> bool:
         if isinstance(other, RollOutcome):
             return bool(__le__(self.value, other.value))
         else:
@@ -1791,7 +1787,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: OutcomeT) -> RollOutcome:
+    def __radd__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
@@ -1805,7 +1801,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: OutcomeT) -> RollOutcome:
+    def __rsub__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
@@ -1819,7 +1815,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: OutcomeT) -> RollOutcome:
+    def __rmul__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
@@ -1833,7 +1829,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: OutcomeT) -> RollOutcome:
+    def __rtruediv__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
@@ -1847,7 +1843,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: OutcomeT) -> RollOutcome:
+    def __rfloordiv__(self, other: RealLikeSCU) -> RollOutcome:  # type: ignore
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -1861,7 +1857,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: OutcomeT) -> RollOutcome:
+    def __rmod__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
@@ -1875,16 +1871,16 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: OutcomeT) -> RollOutcome:
+    def __rpow__(self, other: RealLikeSCU) -> RollOutcome:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
+    def __and__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, _IntCs):
+            if isinstance(other, SupportsIntSCT):
                 other = as_int(other)
 
             return self.map(__and__, other)
@@ -1892,16 +1888,16 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: IntT) -> RollOutcome:
+    def __rand__(self, other: SupportsIntSCU) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
+    def __xor__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, _IntCs):
+            if isinstance(other, SupportsIntSCT):
                 other = as_int(other)
 
             return self.map(__xor__, other)
@@ -1909,16 +1905,16 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: IntT) -> RollOutcome:
+    def __rxor__(self, other: SupportsIntSCU) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union["RollOutcome", IntT]) -> RollOutcome:
+    def __or__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, _IntCs):
+            if isinstance(other, SupportsIntSCT):
                 other = as_int(other)
 
             return self.map(__or__, other)
@@ -1926,7 +1922,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: IntT) -> RollOutcome:
+    def __ror__(self, other: SupportsIntSCU) -> RollOutcome:
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
@@ -2016,7 +2012,7 @@ class RollOutcome:
         return self._sources
 
     @property
-    def value(self) -> Optional[OutcomeT]:
+    def value(self) -> Optional[RealLikeSCU]:
         r"""
         The outcome value. A value of ``#!python None`` is used to signal that a source’s
         roll outcome was excluded by the roller.
@@ -2065,12 +2061,12 @@ class RollOutcome:
         """
         if isinstance(right_operand, RollOutcome):
             sources: Tuple[RollOutcome, ...] = (self, right_operand)
-            right_operand_value: Optional[OutcomeT] = right_operand.value
+            right_operand_value: Optional[RealLikeSCU] = right_operand.value
         else:
             sources = (self,)
             right_operand_value = right_operand
 
-        if isinstance(right_operand_value, _OutcomeCs):
+        if isinstance(right_operand_value, RealLikeSCT):
             return RollOutcome(bin_op(self.value, right_operand_value), sources)
         else:
             raise NotImplementedError
@@ -2078,7 +2074,7 @@ class RollOutcome:
     @beartype
     def rmap(
         self,
-        left_operand: OutcomeT,
+        left_operand: RealLikeSCU,
         bin_op: _BinaryOperatorT,
     ) -> RollOutcome:
         r"""
@@ -2109,7 +2105,7 @@ class RollOutcome:
             [``map`` method][dyce.r.RollOutcome.map]. This is intentional and serves as
             a reminder of operand ordering.
         """
-        if isinstance(left_operand, _OutcomeCs):
+        if isinstance(left_operand, RealLikeSCT):
             return RollOutcome(bin_op(left_operand, self.value), sources=(self,))
         else:
             raise NotImplementedError
@@ -2238,7 +2234,7 @@ class RollOutcome:
         See the [``umap`` method][dyce.r.RollOutcome.umap].
         """
 
-        def _euthanize(operand: Optional[OutcomeT]) -> Optional[OutcomeT]:
+        def _euthanize(operand: Optional[RealLikeSCU]) -> Optional[RealLikeSCU]:
             return None
 
         return self.umap(_euthanize)
@@ -2255,7 +2251,7 @@ class Roll(Sequence[RollOutcome]):
     calling the [``R.roll`` method][dyce.r.R.roll]. Rolls are sequences of
     [``RollOutcome`` objects][dyce.r.RollOutcome] that can be assembled into trees.
     """
-    __slots__: Tuple[str, ...] = ("_r", "_roll_outcomes", "_source_rolls")
+    __slots__: Union[str, Iterable[str]] = ("_r", "_roll_outcomes", "_source_rolls")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2338,7 +2334,7 @@ class Roll(Sequence[RollOutcome]):
         return len(self._roll_outcomes)
 
     @overload
-    def __getitem__(self, key: IndexT) -> RollOutcome:
+    def __getitem__(self, key: SupportsIndex) -> RollOutcome:
         ...
 
     @overload
@@ -2389,7 +2385,7 @@ class Roll(Sequence[RollOutcome]):
     # ---- Methods ---------------------------------------------------------------------
 
     @beartype
-    def outcomes(self) -> Iterator[OutcomeT]:
+    def outcomes(self) -> Iterator[RealLikeSCU]:
         r"""
         Shorthand for ``#!python (roll_outcome.value for roll_outcome in self if
         roll_outcome.value is not None)``.
@@ -2427,7 +2423,7 @@ class Roll(Sequence[RollOutcome]):
         )
 
     @beartype
-    def total(self) -> OutcomeT:
+    def total(self) -> RealLikeSCU:
         r"""
         Shorthand for ``#!python sum(self.outcomes())``.
         """
@@ -2444,7 +2440,7 @@ class RollWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``Roll`` object][dyce.r.Roll] found.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2463,7 +2459,7 @@ class RollOutcomeWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``RollOutcome`` object][dyce.r.RollOutcome] found.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2484,7 +2480,7 @@ class RollerWalkerVisitor:
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``R`` object][dyce.r.R] found.
     """
-    __slots__: Tuple[str, ...] = ()
+    __slots__: Union[str, Iterable[str]] = ()
 
     # ---- Overrides -------------------------------------------------------------------
 

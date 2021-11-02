@@ -23,5 +23,6 @@ jobs:
         if [ '${{ matrix.python-version }}' = '3.9' ] ; then \
           sudo apt-get install graphviz libgraphviz-dev ; \
         fi
+        git submodule update --init --recursive
     - name: Test with Tox
       run: tox

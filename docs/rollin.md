@@ -17,7 +17,7 @@
 
     This functionality should be considered experimental.
     Be warned that future release may introduce incompatibilities or remove it altogether.
-    [Suggestions and contributions](contrib.md) are welcome.
+    [Feedback, suggestions, and contributions](contrib.md) are welcome and appreciated.
 
 
 ``dyce`` provides additional primitives for generating and inspecting rolls of weighted random outcomes without requiring the overhead of enumeration.

@@ -21,7 +21,7 @@
     Rolls can be inspected to understand how specific values are derived.
     It should be considered experimental.
     Be warned that future release may introduce incompatibilities or remove this package altogether.
-    [Suggestions and contributions](contrib.md) are welcome.
+    [Feedback, suggestions, and contributions](contrib.md) are welcome and appreciated.
 
 ## Roller class hierarchy
 

@@ -18,14 +18,16 @@ All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml)
-[![Version](https://img.shields.io/pypi/v/dycelib.svg)](https://pypi.org/project/dycelib/)
-[![Development Stage](https://img.shields.io/pypi/status/dycelib.svg)](https://pypi.org/project/dycelib/)
-[![License](https://img.shields.io/pypi/l/dycelib.svg)](http://opensource.org/licenses/MIT)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dycelib.svg)](https://pypi.org/project/dycelib/)
-[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dycelib.svg)](https://pypi.org/project/dycelib/)
+[![Version](https://img.shields.io/pypi/v/dyce.svg)](https://pypi.org/project/dyce/)
+[![Development Stage](https://img.shields.io/pypi/status/dyce.svg)](https://pypi.org/project/dyce/)
+[![License](https://img.shields.io/pypi/l/dyce.svg)](http://opensource.org/licenses/MIT)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce.svg)](https://pypi.org/project/dyce/)
+[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce.svg)](https://pypi.org/project/dyce/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![``numerary``-encumbered!](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
-Now you’re playing with…
+Now you’re playing with …
 
 <img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce.svg" alt="dyce logo">
 
@@ -33,6 +35,7 @@ Now you’re playing with…
 
 **💥 _Now 100% [Bear-ified™](https://beartype.rtfd.io/)!_ 👌🏾🐻**
 ([Details](#requirements) below.)
+
 
 ``dyce`` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
@@ -98,12 +101,21 @@ As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
   style="vertical-align: middle;"></a>!
 ```
 
+## Donors
+
+When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.
+
+* [David Eyk](https://eykd.net/about/) not only [inspires others to explore creative writing](https://eykd.net/blog/), but has graciously ceded his PyPI project dedicated to [his own prior work under a similar name](https://code.google.com/archive/p/dyce/).
+  As such, ``dyce`` is now [available as ~~``dycelib``~~ _``dyce``_](https://pypi.org/project/dyce/)!
+  Thanks to his generosity, —~~millions~~ *dozens* of future ``dyce`` users will be spared from typing superfluous characters.
+  On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🙇‍♂️
+
 ## A taste
 
 ``dyce`` provides several core primitives.
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling finite discrete outcomes, like individual dice.
 [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
-[``R`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
+[``R`` objects](https://posita.github.io/dyce/latest/dyce.r/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
 
 ``` python
@@ -258,18 +270,18 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
     I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies.
 
-| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* | [dyce](https://pypi.org/project/dyce/)<br>*Eyk* |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Latest release                             | 2021	| N/A		| 2021	| Unknown	| 2021		| 2016		| 2021		| 2021		| 2009		|
-| Actively maintained and documented         | ✅	| ⚠️[^4]	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
-| Suitable as a dependency in other projects | ✅	| ⚠️[^5]	| ✅		| ❌		| ✅		| ⚠️[^5]	| ✅		| ❌		| ❌		|
-| Discrete outcome enumeration               | ✅	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		| ❌		|
-| Arbitrary expressions                      | ✅	| ⚠️[^6]	| ✅		| ✅		| ✅		| ⚠️[^7]	| ❌		| ❌		| ❌		|
-| Arbitrary dice definitions                 | ✅	| ✅		| ✅		| ✅		| ❌		| ❌		| ❌		| ❌		| ❌		|
-| Integrates with other tools                | ✅	| ✅		| ⚠️[^8]	| ❌		| ⚠️[^8]	| ✅		| ⚠️[^8]	| ⚠️[^8]	| ⚠️[^8]	|
-| Open source (can inspect)                  | ✅	| ✅		| ✅		| ❌		| ✅		| ✅		| ✅		| ✅		| ✅		|
-| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅		| N/A		| ✅		| ✅		| ✅		| ✅		| ✅		|
-<!--                                         	🔺 dycelib			🔺 python-dice		🔺 d20					🔺 dice				🔺 dyce
+| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Latest release                             | 2021	| N/A		| 2021		| Unknown	| 2021		| 2016		| 2021		| 2021		|
+| Actively maintained and documented         | ✅	| ⚠️[^4]	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		|
+| Suitable as a dependency in other projects | ✅	| ⚠️[^5]	| ✅		| ❌		| ✅		| ⚠️[^5]	| ✅		| ❌		|
+| Discrete outcome enumeration               | ✅	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
+| Arbitrary expressions                      | ✅	| ⚠️[^6]	| ✅		| ✅		| ✅		| ⚠️[^7]	| ❌		| ❌		|
+| Arbitrary dice definitions                 | ✅	| ✅		| ✅		| ✅		| ❌		| ❌		| ❌		| ❌		|
+| Integrates with other tools                | ✅	| ✅		| ⚠️[^8]	| ❌		| ⚠️[^8]	| ✅		| ⚠️[^8]	| ⚠️[^8]	|
+| Open source (can inspect)                  | ✅	| ✅		| ✅		| ❌		| ✅		| ✅		| ✅		| ✅		|
+| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅		| N/A		| ✅		| ✅		| ✅		| ✅		|
+<!--                                         	🔺 dyce			🔺 python-dice		🔺 d20					🔺 dice
                                              			🔺 dyce_roll.py		🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
 
 [^4]:
@@ -307,7 +319,7 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 
 ``` sh
-% pip install dycelib
+% pip install dyce
 ...
 ```
 
@@ -330,7 +342,7 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 
 It has the following runtime dependencies:
 
-* [``typing-extensions``](https://pypi.org/project/typing-extensions/) (with Python <3.9)
+* [``numerary``](https://pypi.org/project/numerary/)
 
 ``dyce`` will opportunistically use the following, if available at runtime:
 
@@ -339,9 +351,6 @@ It has the following runtime dependencies:
 * [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
 * [``numpy``](https://numpy.org/) to supply ``dyce`` with an alternate random number generator implementation
 
-If you use ``beartype`` for type checking your code that interacts with ``dyce``, but don’t want ``dyce`` to use it internally (e.g., for performance reasons), set the ``DYCE_BEARTYPE`` environment variable to a falsy[^9] value before ``dyce`` is loaded.
-
-[^9]:
-    I.E., one of: ``0``, ``off``, ``f``, ``false``, and ``no``.
+``dyce`` leverages ``numerary`` for its opportunistic use of ``beartype``. If you use ``beartype`` for type checking your code that interacts with ``dyce``, but don’t want ``dyce`` or ``numerary`` to use it internally (e.g., for performance reasons), disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://posita.github.io/numerary/latest/#requirements).
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
