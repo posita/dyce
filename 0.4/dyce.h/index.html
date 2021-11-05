@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/dyce.h/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -82,7 +82,9 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
@@ -170,11 +172,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -282,6 +287,51 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        Release notes
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -291,20 +341,25 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
       
-      <label class="md-nav__link" for="__nav_5">
-        API
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
           API
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -315,8 +370,10 @@
     </li>
   
 
+            
           
             
+              
   
   
     
@@ -340,6 +397,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -367,6 +426,13 @@
   
     <nav class="md-nav" aria-label="HableOpsMixin">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__slots__" class="md-nav__link">
+    __slots__
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#dyce.h.HableOpsMixin.__abs__" class="md-nav__link">
@@ -627,6 +693,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#dyce.h.HableT.__slots__" class="md-nav__link">
+    __slots__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dyce.h.HableT.__init__" class="md-nav__link">
     __init__()
   </a>
@@ -673,8 +746,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -685,8 +760,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -697,54 +774,10 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../notes/" class="md-nav__link">
-        Release notes
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../contrib/" class="md-nav__link">
-        Contributing
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../license/" class="md-nav__link">
-        License
-      </a>
     </li>
   
 
@@ -766,7 +799,7 @@
                   </a>
                 
                 
-                <!--- -*- encoding: utf-8 -*-
+                <!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -805,7 +838,8 @@
 
 
 <h2 id="dyce.h.HableOpsMixin" class="doc doc-heading">
-        <code>HableOpsMixin</code>
+        <code>
+HableOpsMixin        </code>
 
 
 
@@ -816,6 +850,10 @@
       <p>A “mix-in” class providing arithmetic operations for implementers of the
 <a href="#dyce.h.HableT"><code>HableT</code> protocol</a>. The <a href="../dyce/#dyce.p.P"><code>P</code> class</a> derives from this
 class.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>See <a href="#dyce.h.HableT"><code>HableT</code></a> for notes on pronunciation.</p>
+</div>
 
 
 
@@ -824,6 +862,27 @@ class.</p>
 
 
 
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__slots__" class="doc doc-heading">
+<code class="highlight language-python"><span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
 
 
 
@@ -870,7 +929,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -905,7 +964,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__and__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -921,7 +980,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">IntT</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__and__(self.h(), other)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -940,7 +999,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__floordiv__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1010,7 +1069,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__mod__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1045,7 +1104,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__mul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1115,7 +1174,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__or__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1131,7 +1190,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">IntT</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__or__(self.h(), other)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1185,7 +1244,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__pow__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1220,7 +1279,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__radd__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1236,7 +1295,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__add__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1255,7 +1314,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rand__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1271,7 +1330,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">IntT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__and__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1290,7 +1349,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rfloordiv__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1306,7 +1365,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1325,7 +1384,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rmod__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1341,7 +1400,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__mod__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1360,7 +1419,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1376,7 +1435,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__mul__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1395,7 +1454,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__ror__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1411,7 +1470,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">IntT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__or__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1430,7 +1489,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rpow__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1446,7 +1505,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__pow__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1465,7 +1524,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rsub__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1481,7 +1540,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__sub__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1500,7 +1559,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rtruediv__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1516,7 +1575,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1535,7 +1594,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__rxor__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1551,7 +1610,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">IntT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsIntSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__xor__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1570,7 +1629,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__sub__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1605,7 +1664,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__truediv__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1640,7 +1699,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.__xor__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1656,7 +1715,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">IntT</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -1675,7 +1734,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.eq" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1707,7 +1766,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.explode" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1720,7 +1779,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">IntT</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python self.h().explode(max_depth)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].</span>
@@ -1739,7 +1798,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.ge" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1771,7 +1830,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.gt" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1867,7 +1926,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.le" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1899,7 +1958,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.lt" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1931,7 +1990,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.ne" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1963,7 +2022,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">H</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">]],</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">H</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">]],</span> <span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10ea9aaf0</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsInt</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10697bf70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -1980,7 +2039,7 @@ class.</p>
     <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span>
     <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
     <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
-    <span class="n">max_depth</span><span class="p">:</span> <span class="n">IntT</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the</span>
@@ -2000,7 +2059,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.within" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">],</span> <span class="n">hi</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">],</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">dyce</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">SupportsOutcome</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -2013,7 +2072,9 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">within</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python self.h().within(lo, hi, other)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].</span>
@@ -2042,7 +2103,9 @@ class.</p>
 
 
 <h2 id="dyce.h.HableT" class="doc doc-heading">
-        <code>HableT</code>
+        <code>
+HableT            (<span title="typing.Protocol">Protocol</span>)
+        </code>
 
 
 
@@ -2054,6 +2117,24 @@ class.</p>
 <a href="../dyce/#dyce.h.H"><code>H</code> object</a> by calling its <a href="#dyce.h.HableT.h"><code>h</code> method</a>. Currently,
 only the <a href="../dyce/#dyce.p.P"><code>P</code> class</a> implements this protocol, but this affords an
 integration point for <code class="highlight"><span class="n">dyce</span></code> users.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The intended pronunciation of <code>Hable</code> is <em>AYCH-uh-bul</em><sup id="dyce.h.HableT--fnref:1"><a class="footnote-ref" href="#dyce.h.HableT--fn:1">1</a></sup> (i.e.,
+<a href="../dyce/#dyce.h.H"><code>H</code></a>-able). Yes, that is a clumsy attempt at
+<a href="https://www.gocomics.com/calvinandhobbes/1993/01/25">verbing</a>. (You could
+<em>totally</em> <a href="../dyce/#dyce.h.H"><code>H</code></a> that, dude!) However, if you prefer something else
+(e.g. <em>HAY-bul</em> or <em>AYCH-AY-bul</em>), no one is going to judge you. (Well, they
+<em>might</em>, but they <em>shouldn’t</em>.) We all know what you mean.</p>
+</div>
+<div class="footnote">
+<hr />
+<ol>
+<li id="dyce.h.HableT--fn:1">
+<p>World Book Online (WBO) style <a href="https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems">pronunciation
+respelling</a>.&#160;<a class="footnote-backref" href="#dyce.h.HableT--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
 
 
@@ -2062,6 +2143,27 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
 
 
 
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="dyce.h.HableT.__slots__" class="doc doc-heading">
+<code class="highlight language-python"><span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
 
 
 
@@ -2087,8 +2189,7 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_no_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_is_protocol</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Protocols cannot be instantiated&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Protocols cannot be instantiated&#39;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -2205,7 +2306,7 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
 
 
 <h2 id="dyce.h.coalesce_replace" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h2>
@@ -2217,7 +2318,7 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
 
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">OutcomeT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified</span>
 <span class="sd">    (*outcome* is ignored).</span>
@@ -2236,7 +2337,7 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
 
 
 <h2 id="dyce.h.sum_h" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">sum_h</span><span class="p">(</span><span class="n">hs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="p">])</span></code>
+<code class="highlight language-python"><span class="n">sum_h</span><span class="p">(</span><span class="n">hs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">])</span></code>
 
 
 </h2>
@@ -2333,10 +2434,12 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
             <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
           </div>
         
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
         
       </div>
       
@@ -2348,10 +2451,10 @@ integration point for <code class="highlight"><span class="n">dyce</span></code>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
       
         <script src="../js/site.js"></script>
       

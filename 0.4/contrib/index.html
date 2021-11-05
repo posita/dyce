@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/contrib/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -82,7 +82,9 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
@@ -170,11 +172,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -283,86 +288,6 @@
   
   
   
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" data-md-state="indeterminate" type="checkbox" id="__nav_5" checked>
-      
-      <label class="md-nav__link" for="__nav_5">
-        API
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-      <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
-          <span class="md-nav__icon md-icon"></span>
-          API
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce/" class="md-nav__link">
-        <tt>dyce</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.h/" class="md-nav__link">
-        <tt>dyce.h</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.r/" class="md-nav__link">
-        <tt>dyce.r</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.viz/" class="md-nav__link">
-        <tt>dyce.viz</tt>
-      </a>
-    </li>
-  
-
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
     <li class="md-nav__item">
       <a href="../notes/" class="md-nav__link">
         Release notes
@@ -398,6 +323,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -455,6 +382,98 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" data-md-state="indeterminate" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.h/" class="md-nav__link">
+        <tt>dyce.h</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.r/" class="md-nav__link">
+        <tt>dyce.r</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        <tt>dyce.viz</tt>
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -472,7 +491,7 @@
                   </a>
                 
                 
-                <!--- -*- encoding: utf-8 -*-
+                <!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -502,73 +521,55 @@ Feel free to at-mention ``@posita`` as well.
 -->
 
 <h2 id="hacking-quick-start">Hacking quick-start</h2>
-<p>A <a href="https://github.com/posita/dyce/blob/v0.4.0/helpers/venvsetup.sh">helper script</a> is provided for bootstrapping an isolated development environment.</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% <span class="o">[</span><span class="nv">PYTHON</span><span class="o">=</span>…/path/to/python<span class="o">]</span> helpers/venvsetup.sh
+<p>An easy way to bootstrap an isolated development environment is:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% git clone --recurse-submodules https://github.com/posita/dyce.git
+…
+% <span class="nb">cd</span> dyce
+% /path/to/python -m venv .venv
 …
 % . .venv/bin/activate
+% pip install --upgrade --editable <span class="s1">&#39;.[dev]&#39;</span>
+…
+% python -m pre_commit install
+…
 </code></pre></div>
 </td></tr></table>
-<p>The helper script is really only there to help folks get their feet wet who don’t already manage their own virtual environments.
-The above is essentially equivalent to the following (with some additional checking).</p>
+<p>Substitute your preferred virtual environment process for <a href="https://docs.python.org/3/library/venv.html"><code>venv</code></a>.
+The <code>[dev]</code> variant includes additional dependencies necessary for development and testing.
+See the <code>[options.extras_require]</code> section in <a href="https://github.com/posita/dyce/blob/v0.4.1/setup.cfg"><code>setup.cfg</code></a>.</p>
+<p>Unit tests are run with <a href="https://docs.pytest.org/">pytest</a> via <a href="https://tox.readthedocs.org/">Tox</a>.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% …/path/to/python -m virtualenv .venv <span class="o">||</span> …/path/to/python -m venv .venv
-…
-% .venv/bin/pip install --upgrade --editable <span class="s1">&#39;.[dev]&#39;</span>
-…
-% . .venv/bin/activate
-</code></pre></div>
-</td></tr></table>
-<p>The <code>[dev]</code> variant includes additional dependencies necessary for development and testing.
-See the <code>extras_require</code> parameter in <a href="https://github.com/posita/dyce/blob/v0.4.0/setup.py"><code>setup.py</code></a>.</p>
-<p>Unit tests are run with <a href="https://tox.readthedocs.org/">Tox</a> (but can also be run with <a href="https://docs.pytest.org/">pytest</a> directly, if installed).</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% <span class="nb">cd</span> …/path/to/dyce
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% <span class="nb">cd</span> …/path/to/dyce
 % . .venv/bin/activate
 % tox <span class="o">[</span>TOX_ARGS... <span class="o">[</span>-- PYTEST_ARGS...<span class="o">]]</span>
 …
-% pytest <span class="o">[</span>PYTEST_ARGS...<span class="o">]</span>
-…
 </code></pre></div>
 </td></tr></table>
-<p>A bare bones example:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% git clone https://github.com/posita/dyce.git  <span class="c1"># or your fork</span>
-% <span class="nb">cd</span> dyce
-% helpers/venvsetup.sh <span class="o">&amp;&amp;</span> . .venv/bin/activate
-…
-% tox
-…
+<div class="admonition fail">
+<p class="admonition-title">Special considerations for regenerating class diagrams</p>
+<p>We use <a href="https://www.logilab.org/blogentry/6883">Pyreverse</a> to generate class diagrams.
+Pyreverse is <a href="https://github.com/PyCQA/pylint/issues/568#issuecomment-897755586">not very flexible</a> with respect to what it includes.
+We use <a href="https://pygraphviz.github.io/">PyGraphviz</a> to get rid of unwanted entries from the <code>.dot</code> file generated by Pyreverse.
+This is because the pure-Python alternative we use elsewhere <a href="https://github.com/xflr6/graphviz/issues/141">does not support editing</a>.
+PyGraphviz has some <a href="https://pygraphviz.github.io/documentation/stable/install.html#advanced">special needs</a> when it comes to installation.</p>
+<p>This dumpster fire is complicated and fragile.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>
+Depending on your configuration, PyGraphviz may not be able to find the native Graphviz library it needs.
+This can often be remedied by setting the appropriate <a href="https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html"><code>gcc</code> environment variables</a>.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="nv">CPATH</span><span class="o">=</span>/opt/local/include <span class="nv">LIBRARY_PATH</span><span class="o">=</span>/optlocal/lib tox -e check-classdiagrams
 </code></pre></div>
 </td></tr></table>
-<p>A <a href="https://pypi.org/project/virtualenvwrapper/"><code>virtualenvwrapper</code></a>-based alternative:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>% git clone https://github.com/posita/dyce.git  <span class="c1"># or your fork</span>
-% mkvirtualenv <span class="o">[</span>--python<span class="o">=</span>…/path/to/python<span class="o">]</span> -a <span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/dyce&quot;</span> dycelib
-…
-% pip install --upgrade --editable <span class="s1">&#39;.[dev]&#39;</span>
-…
-% tox
-…
-</code></pre></div>
-</td></tr></table>
+</div>
 <h2 id="submission-guidelines">Submission guidelines</h2>
 <p>If you are willing and able, consider <a href="https://github.com/posita/dyce/pulls">submitting a pull request</a> with a fix.
 See <a href="https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">the docs</a> if you’re not already familiar with pull requests.
@@ -596,7 +597,7 @@ There are only a few additional guidelines:</p>
 <p>Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in <a href="https://github.com/posita/dyce/tree/v0.4.0/tests"><code>tests</code></a>.</p>
+  Unit tests live in <a href="https://github.com/posita/dyce/tree/v0.4.1/tests"><code>tests</code></a>.</p>
 </li>
 <li>
 <p>If you want feedback on a work-in-progress, consider <a href="https://github.blog/2011-03-23-mention-somebody-they-re-notified/">“mentioning” me</a> (<a href="https://github.com/posita"><strong>@posita</strong></a>), and describe specifically how I can help.
@@ -613,6 +614,14 @@ There are only a few additional guidelines:</p>
   I will try to get to it as soon as I can.</p>
 </li>
 </ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>It is uncanny how often those two properties are found together.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
                 
               
               
@@ -672,10 +681,12 @@ There are only a few additional guidelines:</p>
             <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
           </div>
         
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
         
       </div>
       
@@ -687,10 +698,10 @@ There are only a few additional guidelines:</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
       
         <script src="../js/site.js"></script>
       

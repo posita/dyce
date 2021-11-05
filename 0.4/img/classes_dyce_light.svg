@@ -14,7 +14,7 @@
 <g id="node1" class="node">
 <title>0</title>
 <polygon fill="none" stroke="DarkSlateGray" points="0,-.5 0,-36.5 146,-36.5 146,-.5 0,-.5"/>
-<text text-anchor="middle" x="73" y="-14.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">BinaryOperationRoller</text>
+<text text-anchor="middle" x="73" y="-14.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">BinarySumOpRoller</text>
 </g>
 <!-- 9 -->
 <g id="node10" class="node">
@@ -38,7 +38,7 @@
 <g id="node3" class="node">
 <title>2</title>
 <polygon fill="none" stroke="DarkSlateGray" points="231.5,-146.5 231.5,-182.5 366.5,-182.5 366.5,-146.5 231.5,-146.5"/>
-<text text-anchor="middle" x="299" y="-160.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">OperationRollerBase</text>
+<text text-anchor="middle" x="299" y="-160.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">OpRollerBase</text>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge2" class="edge">
@@ -104,7 +104,7 @@
 <g id="node11" class="node">
 <title>10</title>
 <polygon fill="none" stroke="DarkSlateGray" points="164,-.5 164,-36.5 306,-36.5 306,-.5 164,-.5"/>
-<text text-anchor="middle" x="235" y="-14.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">UnaryOperationRoller</text>
+<text text-anchor="middle" x="235" y="-14.8" font-family="Times,serif" font-size="14.00" fill="DarkSlateGray">UnarySumOpRoller</text>
 </g>
 <!-- 10&#45;&gt;9 -->
 <g id="edge8" class="edge">

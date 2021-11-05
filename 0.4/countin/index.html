@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/countin/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -82,7 +82,9 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
@@ -170,11 +172,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -256,6 +261,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -367,86 +374,6 @@
   
   
   
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" data-md-state="indeterminate" type="checkbox" id="__nav_5" checked>
-      
-      <label class="md-nav__link" for="__nav_5">
-        API
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-      <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
-          <span class="md-nav__icon md-icon"></span>
-          API
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce/" class="md-nav__link">
-        <tt>dyce</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.h/" class="md-nav__link">
-        <tt>dyce.h</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.r/" class="md-nav__link">
-        <tt>dyce.r</tt>
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dyce.viz/" class="md-nav__link">
-        <tt>dyce.viz</tt>
-      </a>
-    </li>
-  
-
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
     <li class="md-nav__item">
       <a href="../notes/" class="md-nav__link">
         Release notes
@@ -485,6 +412,98 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" data-md-state="indeterminate" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.h/" class="md-nav__link">
+        <tt>dyce.h</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.r/" class="md-nav__link">
+        <tt>dyce.r</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        <tt>dyce.viz</tt>
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -504,7 +523,7 @@
                 
                   <h1>Countin’ with histograms and pools</h1>
                 
-                <!--- -*- encoding: utf-8 -*-
+                <!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -923,7 +942,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 <span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
 <span class="o">...</span>   <span class="n">number_of_evens_in_nd6</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@d6_even</span>
 <span class="o">...</span>   <span class="n">all_even</span> <span class="o">=</span> <span class="n">number_of_evens_in_nd6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;2}</span><span class="s2">d6: </span><span class="si">{: &gt;6.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">all_even</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">all_even</span><span class="o">.</span><span class="n">counts</span><span class="p">())))</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">all_even</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">all_even</span><span class="o">.</span><span class="n">counts</span><span class="p">())</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
  <span class="mi">6</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">1.56</span><span class="o">%</span>
  <span class="mi">5</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">3.12</span><span class="o">%</span>
  <span class="mi">4</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">6.25</span><span class="o">%</span>
@@ -953,7 +972,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 <span class="o">...</span>   <span class="n">d6e_ge_9</span> <span class="o">=</span> <span class="n">exploding_d6</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
 <span class="o">...</span>   <span class="n">number_of_nines_or_higher_in_nd6e</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@d6e_ge_9</span>
 <span class="o">...</span>   <span class="n">at_least_one_9</span> <span class="o">=</span> <span class="n">number_of_nines_or_higher_in_nd6e</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;2}</span><span class="s2">d6-exploding: </span><span class="si">{: &gt;6.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">at_least_one_9</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">at_least_one_9</span><span class="o">.</span><span class="n">counts</span><span class="p">())))</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6-exploding: </span><span class="si">{</span><span class="n">at_least_one_9</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">at_least_one_9</span><span class="o">.</span><span class="n">counts</span><span class="p">())</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="mi">10</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">69.21</span><span class="o">%</span>
  <span class="mi">9</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">65.36</span><span class="o">%</span>
  <span class="mi">8</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">61.03</span><span class="o">%</span>
@@ -981,7 +1000,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 <span class="o">...</span>   <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outcomes</span><span class="p">],</span>
 <span class="o">...</span>   <span class="n">probabilities</span><span class="p">,</span>
 <span class="o">...</span> <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Distribution for 2d6&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution for 2d6&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
 </code></pre></div>
 </td></tr></table>
@@ -1121,10 +1140,10 @@ We can easily model its opposed combat system for various starting configuration
 <span class="o">...</span>   <span class="n">row_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="o">...</span>   <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="o">...</span>   <span class="k">for</span> <span class="n">us</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">them</span><span class="p">,</span> <span class="n">them</span> <span class="o">+</span> <span class="n">num_rows</span><span class="p">):</span>
-<span class="o">...</span>     <span class="n">row_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">d6 …&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">))</span>
+<span class="o">...</span>     <span class="n">row_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">us</span><span class="si">}</span><span class="s2">d6 …&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">us</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">them</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="o">...</span>   <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
-<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;… vs </span><span class="si">{}</span><span class="s2">d6&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">them</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;… vs </span><span class="si">{</span><span class="n">them</span><span class="si">}</span><span class="s2">d6&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">col_ticks</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">...</span>   <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))))</span>  <span class="c1"># doctest: +SKIP</span>
@@ -1133,7 +1152,7 @@ We can easily model its opposed combat system for various starting configuration
 <span class="o">...</span>     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)):</span>
 <span class="o">...</span>       <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
 <span class="o">...</span>         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
-<span class="o">...</span>         <span class="s2">&quot;</span><span class="si">{:.0%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]),</span>
+<span class="o">...</span>         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rows</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <span class="o">...</span>         <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
 <span class="o">...</span>       <span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>  <span class="c1"># doctest: +SKIP</span>
@@ -1146,7 +1165,7 @@ We can easily model its opposed combat system for various starting configuration
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../img/plot_risus_first_round_light.png" />
 </picture></p>
 <h3 id="modeling-entire-multi-round-combats">Modeling entire multi-round combats</h3>
-<p>With a little <del>elbow</del> <em>finger</em> grease, we can roll up our…erm…fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).</p>
+<p>With a little <del>elbow</del> <em>finger</em> grease, we can roll up our … erm … fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1201,7 +1220,7 @@ We can easily model its opposed combat system for various starting configuration
 <span class="o">...</span>     <span class="n">us_vs_them_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">],</span>
 <span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
 <span class="o">...</span>   <span class="k">if</span> <span class="n">us</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">them</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-<span class="o">...</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot have negative numbers (us: </span><span class="si">{}</span><span class="s2">, them: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">))</span>
+<span class="o">...</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cannot have negative numbers (us: </span><span class="si">{</span><span class="n">us</span><span class="si">}</span><span class="s2">, them: </span><span class="si">{</span><span class="n">them</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 <span class="o">...</span>   <span class="k">if</span> <span class="n">us</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">them</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
 <span class="o">...</span>     <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># should not happen unless combat(0, 0) is called from the start</span>
 <span class="o">...</span>   <span class="n">already_solved</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1278,7 +1297,7 @@ Let’s dissect it.</p>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>  <span class="k">if</span> <span class="n">us</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">them</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot have negative numbers (us: </span><span class="si">{}</span><span class="s2">, them: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">them</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cannot have negative numbers (us: </span><span class="si">{</span><span class="n">us</span><span class="si">}</span><span class="s2">, them: </span><span class="si">{</span><span class="n">them</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">us</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">them</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># should not happen unless combat(0, 0) is called from the start</span>
   <span class="n">already_solved</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1504,7 +1523,7 @@ S = \frac{3}{5}
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>The Archimedean visualization technique mentioned in the <a href="https://www.mathsisfun.com/algebra/infinite-series.html">aforementioned article</a> also adapts well to this case.
-It involves no algebra and is left as an exercise to the reader…at least one with nothing more pressing to do.</p>
+It involves no algebra and is left as an exercise to the reader … at least one with nothing more pressing to do.</p>
 </div>
 <p>Armed with this knowledge, we can now model “Evens Up” using our <code class="highlight"><span class="n">risus_combat_driver</span></code> from above.
 We can also deploy a trick using <code class="highlight"><span class="n">partial</span></code> to parameterize use of the Goliath Rule.</p>
@@ -1556,7 +1575,7 @@ We can also deploy a trick using <code class="highlight"><span class="n">partial
 </code></pre></div>
 </td></tr></table>
 <h2 id="time-to-get-meta-evil-on-those-outcomes">Time to get meta-evil on those outcomes!</h2>
-<p><code>dyce</code> offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
+<p>Thanks to <a href="https://pypi.org/project/numerary/"><code class="highlight"><span class="n">numerary</span></code></a>, <code>dyce</code> offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1568,7 +1587,7 @@ We can also deploy a trick using <code class="highlight"><span class="n">partial
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div>
 </td></tr></table>
-<p><a href="https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22068260"><img alt="Love you, Doris!" src="../img/doris.png" /></a></p>
+<p><a href="https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186"><img alt="Miss you, Doris!" src="../img/doris.png" /></a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Be aware that, depending on implementation, performance can suffer quite a bit when using symbolic primitives.</p>
@@ -1735,10 +1754,12 @@ These are covered <a href="../rollin/">seperately</a>.&#160;<a class="footnote-b
             <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
           </div>
         
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
         
       </div>
       
@@ -1750,10 +1771,10 @@ These are covered <a href="../rollin/">seperately</a>.&#160;<a class="footnote-b
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
       
         <script src="../js/site.js"></script>
       
