@@ -1237,7 +1237,7 @@ output [brawl 3d6 vs 3d6] named &quot;A vs B Damage&quot;
 <span class="normal">10</span>
 <span class="normal">11</span>
 <span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.73</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">2.99</span>
@@ -1338,7 +1338,7 @@ output [brawl 3d6 vs 3d6 with optional swap] named &quot;A vs B Damage&quot;
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.36</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.88</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.77</span>
@@ -1349,7 +1349,7 @@ output [brawl 3d6 vs 3d6 with optional swap] named &quot;A vs B Damage&quot;
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">58.15</span><span class="o">%</span> <span class="o">|</span><span class="c1">#############################</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">(</span><span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">4</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.64</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.28</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">1.64</span>

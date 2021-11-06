@@ -1258,7 +1258,7 @@ two six-sided dice (<code>2d6</code>) can be expressed as:</p>
 <span class="normal">16</span>
 <span class="normal">17</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">2.42</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">5.83</span>
@@ -1314,7 +1314,7 @@ shows a different face than a second is:</p>
 <span class="normal">7</span>
 <span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">30</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.83</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.37</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.14</span>
@@ -1332,7 +1332,7 @@ shows a different face than a second is:</p>
 <span class="normal">7</span>
 <span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">15</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.42</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
@@ -1358,7 +1358,7 @@ shows a different face than a second is:</p>
 <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">625</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">4</span><span class="nd">@d6_eq2</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># how often that count is at least one</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">625</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">671</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">4</span><span class="nd">@d6_eq2</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">4</span><span class="nd">@d6_eq2</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.52</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.50</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.25</span>
@@ -3124,7 +3124,7 @@ exactly <em>k</em> times among <code class="highlight"><span class="n">n</span><
 
 
 <h3 id="dyce.h.H.format" class="doc doc-heading">
-<code class="highlight language-python"><span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_items</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_MappingT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">88</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tick</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+<code class="highlight language-python"><span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_items</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_MappingT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tick</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
 
 
 </h3>
@@ -3163,7 +3163,7 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
-<span class="normal">24</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fill_items</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)},</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">tick</span><span class="o">=</span><span class="s2">&quot;@&quot;</span><span class="p">))</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fill_items</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)},</span> <span class="n">tick</span><span class="o">=</span><span class="s2">&quot;@&quot;</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">2.42</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">5.83</span>
@@ -3207,13 +3207,13 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
 <span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39; 65 chars wide --&gt;|&#39;</span><span class="si">:</span><span class="s2">-&gt;65</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="o">----------------------------------------------</span> <span class="mi">65</span> <span class="n">chars</span> <span class="n">wide</span> <span class="o">--&gt;|</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.58</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
   <span class="mi">0</span> <span class="o">|</span>  <span class="mf">41.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################</span>
   <span class="mi">1</span> <span class="o">|</span>  <span class="mf">58.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">#############################</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.58</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
@@ -3246,7 +3246,7 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
 <span class="sd">    ```</span>
 
 <span class="sd">    ``` python</span>
-<span class="sd">    &gt;&gt;&gt; print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick=&quot;@&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, tick=&quot;@&quot;))</span>
 <span class="sd">    avg |    7.00</span>
 <span class="sd">    std |    2.42</span>
 <span class="sd">    var |    5.83</span>
@@ -3279,13 +3279,13 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
 <span class="sd">    &gt;&gt;&gt; h = (2@H(6)).ge(7)</span>
 <span class="sd">    &gt;&gt;&gt; print(f&quot;{&#39; 65 chars wide --&gt;|&#39;:-&gt;65}&quot;)</span>
 <span class="sd">    ---------------------------------------------- 65 chars wide --&gt;|</span>
-<span class="sd">    &gt;&gt;&gt; print(h.format(width=65, scaled=False))</span>
+<span class="sd">    &gt;&gt;&gt; print(h.format(scaled=False))</span>
 <span class="sd">    avg |    0.58</span>
 <span class="sd">    std |    0.49</span>
 <span class="sd">    var |    0.24</span>
 <span class="sd">      0 |  41.67% |####################</span>
 <span class="sd">      1 |  58.33% |#############################</span>
-<span class="sd">    &gt;&gt;&gt; print(h.format(width=65, scaled=True))</span>
+<span class="sd">    &gt;&gt;&gt; print(h.format(scaled=True))</span>
 <span class="sd">    avg |    0.58</span>
 <span class="sd">    std |    0.49</span>
 <span class="sd">    var |    0.24</span>
@@ -4312,7 +4312,7 @@ of operand ordering.</p>
 
 
 <h3 id="dyce.h.H.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10697bf70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10defff70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -4485,7 +4485,7 @@ d20-like role playing games.</p>
 <span class="o">...</span>     <span class="k">return</span> <span class="mi">0</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">d20</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">dmg_from_attack_roll</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.15</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">3.40</span>
 <span class="n">var</span> <span class="o">|</span>   <span class="mf">11.55</span>
@@ -4642,7 +4642,7 @@ d20-like role playing games.</p>
 <span class="sd">    ...     return 0</span>
 
 <span class="sd">    &gt;&gt;&gt; h = d20.substitute(dmg_from_attack_roll)</span>
-<span class="sd">    &gt;&gt;&gt; print(h.format(width=65, scaled=True))</span>
+<span class="sd">    &gt;&gt;&gt; print(h.format(scaled=True))</span>
 <span class="sd">    avg |    2.15</span>
 <span class="sd">    std |    3.40</span>
 <span class="sd">    var |   11.55</span>
@@ -4939,7 +4939,7 @@ and <em>hi</em> (inclusive). 1 represents where that difference is greater than 
 <span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_2</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">d6_2</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6_2</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6_2</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>   <span class="o">-</span><span class="mf">0.25</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.72</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.52</span>
@@ -4960,7 +4960,7 @@ and <em>hi</em> (inclusive). 1 represents where that difference is greater than 
 <span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="p">,</span> <span class="n">d8_2</span> <span class="o">=</span> <span class="mi">3</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d8_2</span><span class="p">)</span>  <span class="c1"># 3d6 w/in 1 of 2d8</span>
 <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">3500</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">3412</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6912</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6_3</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d8_2</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6_3</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d8_2</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.25</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.83</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.69</span>
@@ -4983,7 +4983,7 @@ and <em>hi</em> (inclusive). 1 represents where that difference is greater than 
 <span class="sd">    &gt;&gt;&gt; d6_2 = 2@H(6)</span>
 <span class="sd">    &gt;&gt;&gt; d6_2.within(7, 9)</span>
 <span class="sd">    H({-1: 15, 0: 15, 1: 6})</span>
-<span class="sd">    &gt;&gt;&gt; print(d6_2.within(7, 9).format(width=65))</span>
+<span class="sd">    &gt;&gt;&gt; print(d6_2.within(7, 9).format())</span>
 <span class="sd">    avg |   -0.25</span>
 <span class="sd">    std |    0.72</span>
 <span class="sd">    var |    0.52</span>
@@ -4997,7 +4997,7 @@ and <em>hi</em> (inclusive). 1 represents where that difference is greater than 
 <span class="sd">    &gt;&gt;&gt; d6_3, d8_2 = 3@H(6), 2@H(8)</span>
 <span class="sd">    &gt;&gt;&gt; d6_3.within(-1, 1, d8_2)  # 3d6 w/in 1 of 2d8</span>
 <span class="sd">    H({-1: 3500, 0: 3412, 1: 6912})</span>
-<span class="sd">    &gt;&gt;&gt; print(d6_3.within(-1, 1, d8_2).format(width=65))</span>
+<span class="sd">    &gt;&gt;&gt; print(d6_3.within(-1, 1, d8_2).format())</span>
 <span class="sd">    avg |    0.25</span>
 <span class="sd">    std |    0.83</span>
 <span class="sd">    var |    0.69</span>
@@ -5162,7 +5162,7 @@ expressed as:</p>
 <span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span> <span class="o">=</span> <span class="mi">3</span><span class="nd">@p_d6</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">8.46</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">2.21</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">4.91</span>
@@ -5821,7 +5821,7 @@ mixed.</p>
 <span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_2d6</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p_2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.47</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">1.97</span>
@@ -5857,7 +5857,7 @@ can be modeled as:</p>
 <span class="normal">20</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_10d4</span> <span class="o">=</span> <span class="mi">10</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p_10d4</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1012</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">5030</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">51973</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">168760</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">595004</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">168760</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">51973</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mi">5030</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="mi">1012</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_10d4</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_10d4</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>   <span class="mf">10.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.91</span>
 <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.84</span>
@@ -5919,7 +5919,7 @@ pool.</p>
 <span class="sd">    &gt;&gt;&gt; p_2d6 = 2@P(6)</span>
 <span class="sd">    &gt;&gt;&gt; p_2d6.h(-1)</span>
 <span class="sd">    H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})</span>
-<span class="sd">    &gt;&gt;&gt; print(p_2d6.h(-1).format(width=65))</span>
+<span class="sd">    &gt;&gt;&gt; print(p_2d6.h(-1).format())</span>
 <span class="sd">    avg |    4.47</span>
 <span class="sd">    std |    1.40</span>
 <span class="sd">    var |    1.97</span>
@@ -5939,7 +5939,7 @@ pool.</p>
 <span class="sd">    &gt;&gt;&gt; p_10d4 = 10@P(4)</span>
 <span class="sd">    &gt;&gt;&gt; p_10d4.h(slice(2), slice(-2, None))</span>
 <span class="sd">    H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})</span>
-<span class="sd">    &gt;&gt;&gt; print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))</span>
+<span class="sd">    &gt;&gt;&gt; print(p_10d4.h(slice(2), slice(-2, None)).format(scaled=True))</span>
 <span class="sd">    avg |   10.00</span>
 <span class="sd">    std |    0.91</span>
 <span class="sd">    var |    0.84</span>
