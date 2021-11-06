@@ -117,7 +117,7 @@ The results show there is one way to make ``#!python 18``, two ways to make ``#!
 Histograms provide rudimentary formatting for convenience.
 
 ``` python
->>> print((2@H(6)).format(width=65))
+>>> print((2@H(6)).format())
 avg |    7.00
 std |    2.42
 var |    5.83
@@ -143,7 +143,7 @@ The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative
 >>> miwin_v = H((2, 3, 4, 6, 7, 8))
 >>> miwin_iii + miwin_iv + miwin_v
 H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
->>> print((miwin_iii + miwin_iv + miwin_v).format(scaled=True, width=65))
+>>> print((miwin_iii + miwin_iv + miwin_v).format(scaled=True))
 avg |   15.00
 std |    4.47
 var |   20.00
@@ -226,7 +226,7 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
 >>> p_3d6 = 3@P(6)
 >>> p_3d6.h(0)
 H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
->>> print(p_3d6.h(0).format(width=65))
+>>> print(p_3d6.h(0).format())
 avg |    2.04
 std |    1.14
 var |    1.31
@@ -242,7 +242,7 @@ var |    1.31
 ``` python
 >>> p_3d6.h(1)
 H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
->>> print(p_3d6.h(1).format(width=65))
+>>> print(p_3d6.h(1).format())
 avg |    3.50
 std |    1.37
 var |    1.88
@@ -258,7 +258,7 @@ var |    1.88
 ``` python
 >>> p_3d6.h(2)
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
->>> print(p_3d6.h(-1).format(width=65))
+>>> print(p_3d6.h(-1).format())
 avg |    4.96
 std |    1.14
 var |    1.31
@@ -277,7 +277,7 @@ Summing the greatest and the least faces when rolling a typical six-die polygona
 >>> d10 = H(10)-1 ; d10  # a common “d10” with faces [0 .. 9]
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
 >>> h = P(4, 6, 8, d10, 12, 20).h(0, -1)
->>> print(h.format(width=65, scaled=True))
+>>> print(h.format(scaled=True))
 avg |   13.48
 std |    4.40
 var |   19.39

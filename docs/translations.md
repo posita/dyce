@@ -529,7 +529,7 @@ Rudimentary visualization using built-in methods:
 
 ``` python
 >>> res = H(brawl(3@P(6), 3@P(6))).lowest_terms()
->>> print(res.format(width=65))
+>>> print(res.format())
 avg |    0.00
 std |    1.73
 var |    2.99
@@ -588,7 +588,7 @@ Rudimentary visualization using built-in methods:
 
 ``` python
 >>> res = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
->>> print(res.format(width=65))
+>>> print(res.format())
 avg |    2.36
 std |    0.88
 var |    0.77
@@ -599,7 +599,7 @@ var |    0.77
   3 |  58.15% |#############################
 
 >>> res = H(brawl_w_optional_swap(4@P(6), 4@P(6))).lowest_terms()
->>> print(res.format(width=65))
+>>> print(res.format())
 avg |    2.64
 std |    1.28
 var |    1.64
