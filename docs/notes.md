@@ -17,7 +17,9 @@
 
 ## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
 
-* Removes calls to ``os.get_terminal_size`` to retain utility in environments without terminals. (Fixes [#5](https://github.com/posita/dyce/issues/5).)
+* Removes calls to ``os.get_terminal_size`` to retain utility in environments without terminals.
+  Fixes [#5](https://github.com/posita/dyce/issues/5).
+  Thanks [@sudo-simon!](https://github.com/sudo-simon)!
 
 ## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
 
