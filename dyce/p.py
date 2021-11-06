@@ -173,7 +173,7 @@ class P(Sequence[H], HableOpsMixin):
     >>> p_3d6 = 3@p_d6
     >>> p_3d6.h(-2, -1)
     H({2: 1, 3: 3, 4: 7, 5: 12, 6: 19, 7: 27, 8: 34, 9: 36, 10: 34, 11: 27, 12: 16})
-    >>> print(p_3d6.h(-2, -1).format(width=65))
+    >>> print(p_3d6.h(-2, -1).format())
     avg |    8.46
     std |    2.21
     var |    4.91
@@ -317,7 +317,7 @@ class P(Sequence[H], HableOpsMixin):
         >>> p_2d6 = 2@P(6)
         >>> p_2d6.h(-1)
         H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
-        >>> print(p_2d6.h(-1).format(width=65))
+        >>> print(p_2d6.h(-1).format())
         avg |    4.47
         std |    1.40
         var |    1.97
@@ -337,7 +337,7 @@ class P(Sequence[H], HableOpsMixin):
         >>> p_10d4 = 10@P(4)
         >>> p_10d4.h(slice(2), slice(-2, None))
         H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
-        >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))
+        >>> print(p_10d4.h(slice(2), slice(-2, None)).format(scaled=True))
         avg |   10.00
         std |    0.91
         var |    0.84

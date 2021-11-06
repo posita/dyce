@@ -104,12 +104,9 @@ _CoalesceT = Callable[["H", RealLikeSCU], "H"]
 
 
 try:
-    _ROW_WIDTH = os.get_terminal_size().columns
-except OSError:
-    try:
-        _ROW_WIDTH = int(os.environ["COLUMNS"])
-    except (KeyError, ValueError):
-        _ROW_WIDTH = 88
+    _ROW_WIDTH = int(os.environ["COLUMNS"])
+except (KeyError, ValueError):
+    _ROW_WIDTH = 65
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -228,7 +225,7 @@ class H(_MappingT):
     ``` python
     >>> d6 + d6
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-    >>> print((d6 + d6).format(width=65))
+    >>> print((d6 + d6).format())
     avg |    7.00
     std |    2.42
     var |    5.83
@@ -283,7 +280,7 @@ class H(_MappingT):
     ``` python
     >>> d6.ne(d6)
     H({False: 6, True: 30})
-    >>> print(d6.ne(d6).format(width=65))
+    >>> print(d6.ne(d6).format())
     avg |    0.83
     std |    0.37
     var |    0.14
@@ -297,7 +294,7 @@ class H(_MappingT):
     ``` python
     >>> d6.lt(d6)
     H({False: 21, True: 15})
-    >>> print(d6.lt(d6).format(width=65))
+    >>> print(d6.lt(d6).format())
     avg |    0.42
     std |    0.49
     var |    0.24
@@ -315,7 +312,7 @@ class H(_MappingT):
     H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
     >>> (4@d6_eq2).ge(1)  # how often that count is at least one
     H({False: 625, True: 671})
-    >>> print((4@d6_eq2).ge(1).format(width=65))
+    >>> print((4@d6_eq2).ge(1).format())
     avg |    0.52
     std |    0.50
     var |    0.25
@@ -1268,7 +1265,7 @@ class H(_MappingT):
         ...     return 0
 
         >>> h = d20.substitute(dmg_from_attack_roll)
-        >>> print(h.format(width=65, scaled=True))
+        >>> print(h.format(scaled=True))
         avg |    2.15
         std |    3.40
         var |   11.55
@@ -1370,7 +1367,7 @@ class H(_MappingT):
         >>> d6_2 = 2@H(6)
         >>> d6_2.within(7, 9)
         H({-1: 15, 0: 15, 1: 6})
-        >>> print(d6_2.within(7, 9).format(width=65))
+        >>> print(d6_2.within(7, 9).format())
         avg |   -0.25
         std |    0.72
         var |    0.52
@@ -1384,7 +1381,7 @@ class H(_MappingT):
         >>> d6_3, d8_2 = 3@H(6), 2@H(8)
         >>> d6_3.within(-1, 1, d8_2)  # 3d6 w/in 1 of 2d8
         H({-1: 3500, 0: 3412, 1: 6912})
-        >>> print(d6_3.within(-1, 1, d8_2).format(width=65))
+        >>> print(d6_3.within(-1, 1, d8_2).format())
         avg |    0.25
         std |    0.83
         var |    0.69
@@ -1572,7 +1569,7 @@ class H(_MappingT):
         ```
 
         ``` python
-        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, width=65, tick="@"))
+        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, tick="@"))
         avg |    7.00
         std |    2.42
         var |    5.83
@@ -1605,13 +1602,13 @@ class H(_MappingT):
         >>> h = (2@H(6)).ge(7)
         >>> print(f"{' 65 chars wide -->|':->65}")
         ---------------------------------------------- 65 chars wide -->|
-        >>> print(h.format(width=65, scaled=False))
+        >>> print(h.format(scaled=False))
         avg |    0.58
         std |    0.49
         var |    0.24
           0 |  41.67% |####################
           1 |  58.33% |#############################
-        >>> print(h.format(width=65, scaled=True))
+        >>> print(h.format(scaled=True))
         avg |    0.58
         std |    0.49
         var |    0.24

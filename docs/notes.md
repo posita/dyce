@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
+
+* Removes calls to ``os.get_terminal_size`` to retain utility in environments without terminals. (Fixes [#5](https://github.com/posita/dyce/issues/5).)
+
 ## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
 
 * Splits out protocol checking into its own fancy library: [``numerary``](https://github.com/posita/numerary/)!

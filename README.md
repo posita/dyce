@@ -110,7 +110,7 @@ By providing an optional argument to the [``P.h`` method](https://posita.github.
 ``` python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
->>> print(p_2d6.h(0).format(width=65))
+>>> print(p_2d6.h(0).format())
 avg |    2.53
 std |    1.40
 var |    1.97
@@ -126,7 +126,7 @@ var |    1.97
 ``` python
 >>> p_2d6.h(-1)  # take the highest die of 2d6
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
->>> print(p_2d6.h(-1).format(width=65))
+>>> print(p_2d6.h(-1).format())
 avg |    4.47
 std |    1.40
 var |    1.97
