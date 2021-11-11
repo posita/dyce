@@ -18,6 +18,8 @@
 ::: dyce.h
     rendering:
       show_if_no_docstring: true
+      show_root_heading: false
+      show_root_toc_entry: false
     selection:
       members:
         - "HableT"

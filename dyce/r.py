@@ -54,9 +54,9 @@ from typing import (
     overload,
 )
 
-from numerary import RealLikeSCT, RealLikeSCU
+from numerary import RealLike, RealLikeSCU
 from numerary.bt import beartype
-from numerary.types import SupportsIndex, SupportsIntSCT, SupportsIntSCU
+from numerary.types import SupportsIndex, SupportsInt, SupportsIntSCU
 
 from .h import H
 from .lifecycle import experimental
@@ -388,7 +388,7 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLikeSCU) -> BinarySumOpRoller:  # type: ignore
+    def __rfloordiv__(self, other: RealLikeSCU) -> BinarySumOpRoller:  # type: ignore [misc]
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -896,7 +896,7 @@ class R:
 
         ```
         """
-        if isinstance(right_operand, RealLikeSCT):
+        if isinstance(right_operand, RealLike):
             right_operand = ValueRoller(right_operand)
 
         if isinstance(right_operand, (R, RollOutcome)):
@@ -935,7 +935,7 @@ class R:
             [``map`` method][dyce.r.R.map]. This is intentional and serves as a reminder
             of operand ordering.
         """
-        if isinstance(left_operand, RealLikeSCT):
+        if isinstance(left_operand, RealLike):
             return BinarySumOpRoller(
                 bin_op, ValueRoller(left_operand), self, annotation=annotation
             )
@@ -1150,7 +1150,7 @@ class ValueRoller(R):
             )
         elif isinstance(self.value, H):
             return Roll(self, roll_outcomes=(RollOutcome(self.value.roll()),))
-        elif isinstance(self.value, RealLikeSCT):
+        elif isinstance(self.value, RealLike):
             return Roll(self, roll_outcomes=(RollOutcome(self.value),))
         else:
             assert False, f"unrecognized value type {self.value!r}"
@@ -1377,7 +1377,7 @@ class BasicOpRoller(R):
         if isinstance(res, RollOutcome):
             roll_outcomes = (res,)
         else:
-            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
+            roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
 
         return Roll(
             self,
@@ -1421,7 +1421,7 @@ class NarySumOpRoller(BasicOpRoller):
         if isinstance(res, RollOutcome):
             roll_outcomes = (res,)
         else:
-            roll_outcomes = res  # type: ignore  # TODO(posita): WTF?
+            roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
 
         return Roll(
             self,
@@ -1843,7 +1843,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLikeSCU) -> RollOutcome:  # type: ignore
+    def __rfloordiv__(self, other: RealLikeSCU) -> RollOutcome:  # type: ignore [misc]
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -1880,7 +1880,7 @@ class RollOutcome:
     @beartype
     def __and__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__and__, other)
@@ -1897,7 +1897,7 @@ class RollOutcome:
     @beartype
     def __xor__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__xor__, other)
@@ -1914,7 +1914,7 @@ class RollOutcome:
     @beartype
     def __or__(self, other: Union["RollOutcome", SupportsIntSCU]) -> RollOutcome:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__or__, other)
@@ -2066,7 +2066,7 @@ class RollOutcome:
             sources = (self,)
             right_operand_value = right_operand
 
-        if isinstance(right_operand_value, RealLikeSCT):
+        if isinstance(right_operand_value, RealLike):
             return RollOutcome(bin_op(self.value, right_operand_value), sources)
         else:
             raise NotImplementedError
@@ -2105,7 +2105,7 @@ class RollOutcome:
             [``map`` method][dyce.r.RollOutcome.map]. This is intentional and serves as
             a reminder of operand ordering.
         """
-        if isinstance(left_operand, RealLikeSCT):
+        if isinstance(left_operand, RealLike):
             return RollOutcome(bin_op(left_operand, self.value), sources=(self,))
         else:
             raise NotImplementedError
@@ -2344,7 +2344,7 @@ class Roll(Sequence[RollOutcome]):
     @beartype
     # TODO(posita): See <https://github.com/python/mypy/issues/8393>
     # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
-    def __getitem__(  # type: ignore
+    def __getitem__(  # type: ignore [override]
         self,
         key: _GetItemT,
     ) -> Union[RollOutcome, Tuple[RollOutcome, ...]]:

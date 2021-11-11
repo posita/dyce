@@ -27,7 +27,7 @@ def import_plug(arg: str, pfx: str) -> Tuple[str, Callable[[str], Any]]:
         assert spec
         mod = importlib.util.module_from_spec(spec)
         loader.exec_module(mod)
-        do_it = mod.do_it  # type: ignore
+        do_it = mod.do_it  # type: ignore [attr-defined]
     except (
         AssertionError,
         AttributeError,

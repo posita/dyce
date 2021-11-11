@@ -15,10 +15,6 @@
 
 # ``#!python dyce`` package reference
 
-::: dyce
-    selection:
-      members: false
-
 ``#!python dyce`` provides several core primitives:
 
 * [``H``][dyce.h.H] – histograms (outcomes or individual dice)

@@ -23,7 +23,7 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-_EXEC_GLOBALS = {}  # type: ignore
+_EXEC_GLOBALS = {}  # type: ignore [var-annotated]
 
 
 def _positive_int(val: str) -> int:

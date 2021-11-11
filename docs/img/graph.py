@@ -60,7 +60,7 @@ try:
     _GraphvizAttrTypeVals = ("edge", "graph", "node")
     _GraphvizAttrTypeT = Annotated[str, Is[lambda text: text in _GraphvizAttrTypeVals]]
 except ImportError:
-    _GraphvizAttrTypeT = str  # type: ignore
+    _GraphvizAttrTypeT = str  # type: ignore [misc]
 
 
 # ---- Data ----------------------------------------------------------------------------

@@ -175,14 +175,14 @@ class TestP:
         p_d6 = P(6)
 
         with pytest.raises(TypeError):
-            _ = p_d6[""]  # type: ignore
+            _ = p_d6[""]  # type: ignore [call-overload]
 
     def test_getitem_wrong_type_beartype(self) -> None:
         roar = pytest.importorskip("beartype.roar", reason="requires beartype")
         p_d6 = P(6)
 
         with pytest.raises(roar.BeartypeException):
-            _ = p_d6[""]  # type: ignore
+            _ = p_d6[""]  # type: ignore [call-overload]
 
     def test_op_add_h(self) -> None:
         d2 = H(2)

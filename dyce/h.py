@@ -57,12 +57,12 @@ from typing import (
     overload,
 )
 
-from numerary import RealLikeSCT, RealLikeSCU
+from numerary import RealLike, RealLikeSCU
 from numerary.bt import beartype
 from numerary.types import (
     CachingProtocolMeta,
     Protocol,
-    SupportsIntSCT,
+    SupportsInt,
     SupportsIntSCU,
     runtime_checkable,
 )
@@ -331,7 +331,7 @@ class H(_MappingT):
         than ``#!python .`` and ``#!python […]``.
 
         ``` python
-        >>> 2@d6[7]  # type: ignore
+        >>> 2@d6[7]  # type: ignore [operator]
         Traceback (most recent call last):
           ...
         KeyError: 7
@@ -385,7 +385,7 @@ class H(_MappingT):
         if isinstance(items, MappingC):
             items = items.items()
 
-        if isinstance(items, SupportsIntSCT):
+        if isinstance(items, SupportsInt):
             if items != 0:
                 self._simple_init = as_int(items)
                 outcome_range = range(
@@ -394,9 +394,9 @@ class H(_MappingT):
                     1 if self._simple_init < 0 else -1,  # count toward zero
                 )
 
-                if isinstance(items, RealLikeSCT):
+                if isinstance(items, RealLike):
                     outcome_type = type(items)
-                    tmp.update({outcome_type(i): 1 for i in outcome_range})  # type: ignore
+                    tmp.update({outcome_type(i): 1 for i in outcome_range})
                 else:
                     tmp.update({i: 1 for i in outcome_range})
         elif isinstance(items, HableT):
@@ -547,7 +547,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLikeSCU) -> H:  # type: ignore
+    def __rfloordiv__(self, other: RealLikeSCU) -> H:  # type: ignore [misc]
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -584,7 +584,7 @@ class H(_MappingT):
     @beartype
     def __and__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__and__, other)
@@ -601,7 +601,7 @@ class H(_MappingT):
     @beartype
     def __xor__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__xor__, other)
@@ -618,7 +618,7 @@ class H(_MappingT):
     @beartype
     def __or__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
         try:
-            if isinstance(other, SupportsIntSCT):
+            if isinstance(other, SupportsInt):
                 other = as_int(other)
 
             return self.map(__or__, other)
@@ -658,7 +658,7 @@ class H(_MappingT):
     @beartype
     def items(self) -> ItemsView[RealLikeSCU, int]:
         # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
-        return self._h.items()  # type: ignore
+        return self._h.items()  # type: ignore [return-value]
 
     @beartype
     def keys(self) -> KeysView[RealLikeSCU]:
@@ -670,7 +670,7 @@ class H(_MappingT):
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
         # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
-        return self._h.keys()  # type: ignore
+        return self._h.keys()  # type: ignore [return-value]
 
     @beartype
     def values(self) -> ValuesView[int]:
@@ -804,7 +804,7 @@ class H(_MappingT):
         if self._simple_init is not None:
             simple_init = un_op(self._simple_init)
 
-            if isinstance(simple_init, SupportsIntSCT):
+            if isinstance(simple_init, SupportsInt):
                 h_simple = type(self)(simple_init)
 
                 if h_simple == h:
@@ -1538,7 +1538,7 @@ class H(_MappingT):
         ```
         """
         # TODO(posita): See <https://github.com/python/typing/issues/193>
-        return tuple(  # type: ignore
+        return tuple(  # type: ignore [return-value]
             zip(
                 *(
                     (outcome, float(probability))
@@ -1851,7 +1851,7 @@ class HableOpsMixin:
         return __floordiv__(self.h(), other)
 
     @beartype
-    def __rfloordiv__(self: HableT, other: RealLikeSCU) -> H:  # type: ignore
+    def __rfloordiv__(self: HableT, other: RealLikeSCU) -> H:  # type: ignore [misc]
         r"""
         Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].

@@ -31,7 +31,7 @@ from typing import (
 
 from numerary import RealLikeSCU
 from numerary.bt import beartype
-from numerary.types import SupportsIndexSCU, SupportsIntSCT, SupportsIntSCU
+from numerary.types import SupportsIndexSCU, SupportsInt, SupportsIntSCU
 
 from .h import H, HableOpsMixin, _MappingT, sum_h
 from .lifecycle import experimental
@@ -207,7 +207,7 @@ class P(Sequence[H], HableOpsMixin):
                 elif isinstance(a, P):
                     for h in a._hs:
                         yield h
-                elif isinstance(a, SupportsIntSCT):
+                elif isinstance(a, SupportsInt):
                     yield H(a)
                 else:
                     raise ValueError(f"unrecognized initializer {args}")
@@ -264,7 +264,7 @@ class P(Sequence[H], HableOpsMixin):
     @beartype
     # TODO(posita): See <https://github.com/python/mypy/issues/8393>
     # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
-    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore
+    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore [override]
         if isinstance(key, slice):
             return P(*self._hs[key])
         else:

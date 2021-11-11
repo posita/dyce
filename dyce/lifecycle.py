@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import warnings
 from functools import wraps
-from typing import Callable, Iterable, Type, TypeVar, Union
+from typing import Callable, Iterable, Type, TypeVar, Union, cast
 
 __all__ = ()
 
@@ -54,9 +54,7 @@ def experimental(f: _WrappedT) -> _WrappedT:
 
 
 def _warn_decr(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
-    _wrapped: _WrappedT
-
-    @wraps(f)  # type: ignore
+    @wraps(f)
     def _wrapped(*args, **kw):
 
         warnings.warn(
@@ -67,4 +65,4 @@ def _warn_decr(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _Wrap
 
         return f(*args, **kw)
 
-    return _wrapped
+    return cast(_WrappedT, _wrapped)

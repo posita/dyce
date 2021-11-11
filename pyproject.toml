@@ -15,6 +15,7 @@ exclude = """(?x)(
 )"""
 ignore_missing_imports = true
 strict_optional = true
+show_error_codes = true
 warn_redundant_casts = true
 warn_unused_configs = true
 

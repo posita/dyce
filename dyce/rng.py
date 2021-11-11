@@ -96,7 +96,7 @@ try:
 
         @beartype
         # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
-        def getstate(self) -> _RandState:  # type: ignore
+        def getstate(self) -> _RandState:  # type: ignore [override]
             return _RandState(self._generator.bit_generator.state)
 
         @beartype
@@ -108,7 +108,7 @@ try:
             return self._generator.random()
 
         @beartype
-        def seed(  # type: ignore
+        def seed(  # type: ignore [override]
             self,
             a: _RandSeed,
             version: int = 2,
@@ -116,7 +116,7 @@ try:
             self._generator = default_rng(self.bit_generator(a))
 
         @beartype
-        def setstate(  # type: ignore
+        def setstate(  # type: ignore [override]
             self,
             # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
             state: _RandState,
