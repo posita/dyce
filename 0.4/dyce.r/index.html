@@ -434,13 +434,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dyce.r" class="md-nav__link">
-    dyce.r
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#dyce.r.BasicOpRoller" class="md-nav__link">
     BasicOpRoller
   </a>
@@ -1815,7 +1808,7 @@ Be warned that future release may introduce incompatibilities or remove this pac
 
   <div class="doc doc-object doc-module">
 
-<a id="dyce.r"></a>
+
     <div class="doc doc-contents first">
 
 
@@ -2035,7 +2028,7 @@ creation of a new <a href="#dyce.r.Roll"><code>Roll</code></a>.</p>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">RollOutcome</span><span class="p">):</span>
         <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="p">,)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="n">res</span>  <span class="c1"># type: ignore  # TODO(posita): WTF?</span>
+        <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="n">res</span>  <span class="c1"># type: ignore [assignment]  # TODO(posita): WTF?</span>
 
     <span class="k">return</span> <span class="n">Roll</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2347,7 +2340,7 @@ grouped by each of <em>sources</em>.</p>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">RollOutcome</span><span class="p">):</span>
         <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="p">,)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="n">res</span>  <span class="c1"># type: ignore  # TODO(posita): WTF?</span>
+        <span class="n">roll_outcomes</span> <span class="o">=</span> <span class="n">res</span>  <span class="c1"># type: ignore [assignment]  # TODO(posita): WTF?</span>
 
     <span class="k">return</span> <span class="n">Roll</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -3512,7 +3505,7 @@ For type-checking docstrings
         <details class="quote">
           <summary>Source code in <code>dyce/r.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinarySumOpRoller</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinarySumOpRoller</span><span class="p">:</span>  <span class="c1"># type: ignore [misc]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmap</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="fm">__floordiv__</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
@@ -4581,7 +4574,7 @@ many arithmetic operators and comparators.</p>
 
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_operand</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_operand</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
         <span class="n">right_operand</span> <span class="o">=</span> <span class="n">ValueRoller</span><span class="p">(</span><span class="n">right_operand</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_operand</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">RollOutcome</span><span class="p">)):</span>
@@ -4708,7 +4701,7 @@ of operand ordering.</p>
 <span class="sd">        [``map`` method][dyce.r.R.map]. This is intentional and serves as a reminder</span>
 <span class="sd">        of operand ordering.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_operand</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_operand</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BinarySumOpRoller</span><span class="p">(</span>
             <span class="n">bin_op</span><span class="p">,</span> <span class="n">ValueRoller</span><span class="p">(</span><span class="n">left_operand</span><span class="p">),</span> <span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span>
         <span class="p">)</span>
@@ -5877,7 +5870,7 @@ calling the <a href="#dyce.r.R.roll"><code>R.roll</code> method</a>. Rolls are s
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="c1"># TODO(posita): See &lt;https://github.com/python/mypy/issues/8393&gt;</span>
 <span class="c1"># TODO(posita): See &lt;https://github.com/beartype/beartype/issues/39#issuecomment-871914114&gt; et seq.</span>
-<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>  <span class="c1"># type: ignore [override]</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">key</span><span class="p">:</span> <span class="n">_GetItemT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">RollOutcome</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RollOutcome</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
@@ -6558,7 +6551,7 @@ roll outcome was excluded by the roller.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;RollOutcome&quot;</span><span class="p">,</span> <span class="n">SupportsIntSCU</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RollOutcome</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__and__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -6980,7 +6973,7 @@ roll outcome was excluded by the roller.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;RollOutcome&quot;</span><span class="p">,</span> <span class="n">SupportsIntSCU</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RollOutcome</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__or__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -7170,7 +7163,7 @@ roll outcome was excluded by the roller.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/r.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollOutcome</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollOutcome</span><span class="p">:</span>  <span class="c1"># type: ignore [misc]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmap</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="fm">__floordiv__</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
@@ -7492,7 +7485,7 @@ roll outcome was excluded by the roller.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;RollOutcome&quot;</span><span class="p">,</span> <span class="n">SupportsIntSCU</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RollOutcome</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__xor__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -7885,7 +7878,7 @@ comparators.</p>
         <span class="n">sources</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span>
         <span class="n">right_operand_value</span> <span class="o">=</span> <span class="n">right_operand</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_operand_value</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_operand_value</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RollOutcome</span><span class="p">(</span><span class="n">bin_op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">right_operand_value</span><span class="p">),</span> <span class="n">sources</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
@@ -8014,7 +8007,7 @@ a reminder of operand ordering.</p>
 <span class="sd">        [``map`` method][dyce.r.RollOutcome.map]. This is intentional and serves as</span>
 <span class="sd">        a reminder of operand ordering.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_operand</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_operand</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RollOutcome</span><span class="p">(</span><span class="n">bin_op</span><span class="p">(</span><span class="n">left_operand</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">sources</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
@@ -9052,7 +9045,7 @@ ValueRoller            (<a title="dyce.r.R" href="#dyce.r.R">R</a>)
         <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Roll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roll_outcomes</span><span class="o">=</span><span class="p">(</span><span class="n">RollOutcome</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">roll</span><span class="p">()),))</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Roll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roll_outcomes</span><span class="o">=</span><span class="p">(</span><span class="n">RollOutcome</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">),))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;unrecognized value type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">&quot;</span>

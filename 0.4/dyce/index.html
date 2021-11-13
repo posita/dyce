@@ -399,13 +399,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dyce" class="md-nav__link">
-    dyce
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#dyce.h.H" class="md-nav__link">
     H
   </a>
@@ -1123,19 +1116,6 @@
 -->
 
 <h1 id="dyce-package-reference"><code class="highlight"><span class="n">dyce</span></code> package reference</h1>
-
-
-  <div class="doc doc-object doc-module">
-
-<a id="dyce"></a>
-    <div class="doc doc-contents first">
-
-
-
-    </div>
-
-  </div>
-
 <p><code class="highlight"><span class="n">dyce</span></code> provides several core primitives:</p>
 <ul>
 <li><a href="#dyce.h.H"><code>H</code></a> – histograms (outcomes or individual dice)</li>
@@ -1381,7 +1361,7 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
 <span class="normal">5</span>
 <span class="normal">6</span>
 <span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@d6</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="nd">@d6</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore [operator]</span>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
   <span class="o">...</span>
 <span class="ne">KeyError</span><span class="p">:</span> <span class="mi">7</span>
@@ -1567,7 +1547,7 @@ in future versions.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;HableT&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__and__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -1735,7 +1715,7 @@ in future versions.</p>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">MappingC</span><span class="p">):</span>
         <span class="n">items</span> <span class="o">=</span> <span class="n">items</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">items</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
             <span class="n">outcome_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span>
@@ -1744,9 +1724,9 @@ in future versions.</p>
                 <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># count toward zero</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">RealLikeSCT</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">):</span>
                 <span class="n">outcome_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
-                <span class="n">tmp</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">outcome_type</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">outcome_range</span><span class="p">})</span>  <span class="c1"># type: ignore</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">outcome_type</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">outcome_range</span><span class="p">})</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmp</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">i</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">outcome_range</span><span class="p">})</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">HableT</span><span class="p">):</span>
@@ -2051,7 +2031,7 @@ in future versions.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;HableT&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__or__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -2243,7 +2223,7 @@ in future versions.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>  <span class="c1"># type: ignore [misc]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmap</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="fm">__floordiv__</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
@@ -2594,7 +2574,7 @@ in future versions.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsIntSCU</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;HableT&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="fm">__xor__</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -2931,7 +2911,7 @@ values are <code class="highlight"><span class="nb">float</span></code>s.</p>
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO(posita): See &lt;https://github.com/python/typing/issues/193&gt;</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>  <span class="c1"># type: ignore [return-value]</span>
         <span class="nb">zip</span><span class="p">(</span>
             <span class="o">*</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">probability</span><span class="p">))</span>
@@ -3557,7 +3537,7 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ItemsView</span><span class="p">[</span><span class="n">RealLikeSCU</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="c1"># TODO(posita): See &lt;https://github.com/python/typeshed/issues/5808&gt;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>  <span class="c1"># type: ignore [return-value]</span>
 </code></pre></div>
         </details>
     </div>
@@ -4157,7 +4137,7 @@ computed much faster.</p>
 <span class="sd">    More descriptive synonym for the [``keys`` method][dyce.h.H.keys].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO(posita): See &lt;https://github.com/python/typeshed/issues/5808&gt;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># type: ignore [return-value]</span>
 </code></pre></div>
         </details>
     </div>
@@ -4312,7 +4292,7 @@ of operand ordering.</p>
 
 
 <h3 id="dyce.h.H.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10defff70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x101340f70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -4774,7 +4754,7 @@ d20-like role playing games.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">simple_init</span> <span class="o">=</span> <span class="n">un_op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simple_init</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simple_init</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
             <span class="n">h_simple</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">simple_init</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">h_simple</span> <span class="o">==</span> <span class="n">h</span><span class="p">:</span>
@@ -5304,7 +5284,7 @@ in future versions.</p>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
 <span class="c1"># TODO(posita): See &lt;https://github.com/python/mypy/issues/8393&gt;</span>
 <span class="c1"># TODO(posita): See &lt;https://github.com/beartype/beartype/issues/39#issuecomment-871914114&gt; et seq.</span>
-<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">_GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">_GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">]:</span>  <span class="c1"># type: ignore [override]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_hs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
@@ -5348,7 +5328,7 @@ in future versions.</p>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">_hs</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">h</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SupportsIntSCT</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">):</span>
                 <span class="k">yield</span> <span class="n">H</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unrecognized initializer </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

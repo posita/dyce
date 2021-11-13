@@ -324,6 +324,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#043" class="md-nav__link">
+    0.4.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#042" class="md-nav__link">
     0.4.2
   </a>
@@ -548,6 +555,11 @@
 -->
 
 <h1 id="dyce-release-notes"><code>dyce</code> release notes</h1>
+<h2 id="043"><a href="https://github.com/posita/dyce/releases/tag/v0.4.3">0.4.3</a></h2>
+<ul>
+<li>Removes dependencies on deprecated <code>numerary.types.…SCT</code> tuples</li>
+<li>Adds <a href="https://theangrygm.com/definitive-tension-pool/">Angry GM Tension Pool mechanic</a> translation</li>
+</ul>
 <h2 id="042"><a href="https://github.com/posita/dyce/releases/tag/v0.4.2">0.4.2</a></h2>
 <ul>
 <li>Removes calls to <code>os.get_terminal_size</code> to retain utility in environments without terminals.
@@ -581,7 +593,7 @@ Please review before upgrading.</p>
 <li>Removes deprecated synonym methods <code>H.even</code> and <code>H.odd</code>.
     Uses <a href="../dyce/#dyce.h.H.is_even"><code>H.is_even</code></a> and <a href="../dyce/#dyce.h.H.is_odd"><code>H.is_odd</code></a> instead.</li>
 <li>Removes deprecated synonym package <code>dyce.plt</code>.
-    Uses <a href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> instead.</li>
+    Uses <a href="../dyce.viz/"><code>dyce.viz</code></a> instead.</li>
 <li>
 <p>Removes special case handling of <code>H({})</code> for addition and subtraction.
     Check for code that relied on, e.g., <code class="highlight"><span class="n">h</span> <span class="o">+</span> <span class="n">H</span><span class="p">({})</span></code> resolving to <code class="highlight"><span class="n">h</span></code>.
@@ -642,7 +654,7 @@ Please review before upgrading.</p>
 <li>Renames experimental <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">homogeneous</span></code> property to <a href="../dyce/#dyce.p.P.is_homogeneous"><code>P.is_homogeneous</code></a>.</li>
 <li>Introduces experimental <a href="../dyce.r/#dyce.r.R"><code>R</code></a> and <a href="../dyce.r/#dyce.r.Roll"><code>Roll</code></a> primitives.</li>
 <li>Removes <code class="highlight"><span class="n">coerce</span></code> parameter from <a href="../dyce/#dyce.h.H.map"><code>H.map</code></a>, <a href="../dyce/#dyce.h.H.rmap"><code>H.rmap</code></a>, and <a href="../dyce/#dyce.h.H.umap"><code>H.umap</code></a>.</li>
-<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code> to <a href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a>.</li>
+<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code> to <a href="../dyce.viz/"><code>dyce.viz</code></a>.</li>
 <li>Deprecates synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.</li>
 </ul>
 <h2 id="030"><a href="https://github.com/posita/dyce/releases/tag/v0.3.0">0.3.0</a></h2>

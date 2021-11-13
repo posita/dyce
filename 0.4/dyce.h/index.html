@@ -413,13 +413,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dyce.h" class="md-nav__link">
-    dyce.h
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#dyce.h.HableOpsMixin" class="md-nav__link">
     HableOpsMixin
   </a>
@@ -819,7 +812,7 @@
 
   <div class="doc doc-object doc-module">
 
-<a id="dyce.h"></a>
+
     <div class="doc doc-contents first">
 
 
@@ -1365,7 +1358,7 @@ class.</p>
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLikeSCU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>  <span class="c1"># type: ignore [misc]</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
@@ -2022,7 +2015,7 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10defff70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x101340f70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>

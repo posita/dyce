@@ -73,7 +73,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-skip">
+        <a href="#checking-angrys-math-on-the-tension-pool" class="md-skip">
           Skip to content
         </a>
       
@@ -303,6 +303,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#checking-angrys-math-on-the-tension-pool" class="md-nav__link">
+    Checking Angry’s math on the Tension Pool
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-nav__link">
@@ -541,6 +548,317 @@
 
 <p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
 If you have exposure to <a href="">another tool</a>, they may also help with transition.</p>
+<h2 id="checking-angrys-math-on-the-tension-pool">Checking Angry’s math on the <a href="https://theangrygm.com/definitive-tension-pool/">Tension Pool</a></h2>
+<p>In the <a href="https://theangrygm.com/">Angry GM</a>’s publication of the <a href="https://theangrygm.com/wp-content/uploads/The-Tension-Pool.pdf">PDF version of his Tension Pool mechanic</a>, he includes some probabilities.
+Can <code>dyce</code> check his work?</p>
+<p>You bet!</p>
+<p>Let’s reproduce his tables (with slightly different names to provide context).</p>
+<table>
+<thead>
+<tr>
+<th align="center">d6s in Pool</th>
+<th align="center">Angry’s Probability of At Least One <code>1</code> Showing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">16.7%</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">30.6%</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">42.1%</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">51.8%</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">59.8%</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">66.5%</td>
+</tr>
+</tbody>
+</table>
+<p>How do we do translate this to <code>dyce</code>?</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">one_in_d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">ones_in_nd6</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@one_in_d6</span>
+<span class="o">...</span>   <span class="n">at_least_one_one_in_nd6</span> <span class="o">=</span> <span class="n">ones_in_nd6</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">at_least_one_one_in_nd6</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">at_least_one_one_in_nd6</span><span class="o">.</span><span class="n">total</span><span class="si">:</span><span class="s2">7.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="mi">1</span><span class="p">:</span>  <span class="mf">16.67</span><span class="o">%</span>
+<span class="mi">2</span><span class="p">:</span>  <span class="mf">30.56</span><span class="o">%</span>
+<span class="mi">3</span><span class="p">:</span>  <span class="mf">42.13</span><span class="o">%</span>
+<span class="mi">4</span><span class="p">:</span>  <span class="mf">51.77</span><span class="o">%</span>
+<span class="mi">5</span><span class="p">:</span>  <span class="mf">59.81</span><span class="o">%</span>
+<span class="mi">6</span><span class="p">:</span>  <span class="mf">66.51</span><span class="o">%</span>
+</code></pre></div>
+</td></tr></table>
+<p>So far so good.
+Let’s try the next one.</p>
+<table>
+<thead>
+<tr>
+<th align="center">1d8 + 1d12</th>
+<th align="center">Rarity or Severity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">2-4</td>
+<td align="center">Very Rare or Extreme</td>
+</tr>
+<tr>
+<td align="center">5-6</td>
+<td align="center">Rare or Major</td>
+</tr>
+<tr>
+<td align="center">7-8</td>
+<td align="center">Uncommon or Moderate</td>
+</tr>
+<tr>
+<td align="center">9-13</td>
+<td align="center">Common or Minor</td>
+</tr>
+<tr>
+<td align="center">14-15</td>
+<td align="center">Uncommon or Moderate</td>
+</tr>
+<tr>
+<td align="center">16-17</td>
+<td align="center">Rare or Major</td>
+</tr>
+<tr>
+<td align="center">18-20</td>
+<td align="center">Very Rare or Extreme</td>
+</tr>
+</tbody>
+</table>
+<p>We need to map semantic outcomes to numbers (and back again).
+How can we represent this in <code>dyce</code>?
+One way we can do this is <a href="https://docs.python.org/3/library/enum.html"><code>Enum</code></a>s.
+More particularly, <code>IntEnum</code>s have a property that allows them to substitute directly for <code>int</code>s, which is very convenient for <code>dyce</code>.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Complication</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">COMMON</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">...</span>   <span class="n">UNCOMMON</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="o">...</span>   <span class="n">RARE</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="o">...</span>   <span class="n">VERY_RARE</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="o">...</span>   <span class="n">NONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># this will come in handy later</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">map</span> <span class="o">=</span> <span class="p">{</span>
+<span class="o">...</span>   <span class="mi">2</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">3</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">4</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">5</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">6</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">7</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">UNCOMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">8</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">UNCOMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">9</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">10</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">11</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">12</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">13</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">14</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">UNCOMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">15</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">UNCOMMON</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">16</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">17</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">18</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">19</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span>   <span class="mi">20</span><span class="p">:</span> <span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Now let’s use our map to validate the probabilities of a particular outcome.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Rarity or Impact</th>
+<th align="center">Angry’s Probability of a Complication Arising</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Common or Minor</td>
+<td align="center">41.7%</td>
+</tr>
+<tr>
+<td align="center">Uncommon or Moderate</td>
+<td align="center">27.1%</td>
+</tr>
+<tr>
+<td align="center">Rare or Major</td>
+<td align="center">18.8%</td>
+</tr>
+<tr>
+<td align="center">Very Rare or Extreme</td>
+<td align="center">12.5%</td>
+</tr>
+</tbody>
+</table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">outcome_to_rarity</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="nb">map</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">prob_of_complication</span> <span class="o">=</span> <span class="p">((</span><span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">))</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">outcome_to_rarity</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="n">outcome</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="si">:</span><span class="s2">7.2%</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">prob_of_complication</span><span class="o">.</span><span class="n">distribution</span><span class="p">()}</span>
+<span class="p">{</span><span class="o">&lt;</span><span class="n">Complication</span><span class="o">.</span><span class="n">COMMON</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span> <span class="s1">&#39; 41.67%&#39;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">Complication</span><span class="o">.</span><span class="n">UNCOMMON</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">:</span> <span class="s1">&#39; 27.08%&#39;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">Complication</span><span class="o">.</span><span class="n">RARE</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">:</span> <span class="s1">&#39; 18.75%&#39;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">Complication</span><span class="o">.</span><span class="n">VERY_RARE</span><span class="p">:</span> <span class="mi">4</span><span class="o">&gt;</span><span class="p">:</span> <span class="s1">&#39; 12.50%&#39;</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Lookin’ good.
+Lookin’ good.
+Now let’s put both together, just like Angry!</p>
+<table>
+<thead>
+<tr>
+<th align="center">d6s in Pool</th>
+<th align="center">No Complication</th>
+<th align="center">Common Complication</th>
+<th align="center">Uncommon Complication</th>
+<th align="center">Rare Complication</th>
+<th align="center">Very Rare Complication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">83.3%</td>
+<td align="center">7.0%</td>
+<td align="center">4.5%</td>
+<td align="center">3.1%</td>
+<td align="center">2.1%</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">69.4%</td>
+<td align="center">12.7%</td>
+<td align="center">8.3%</td>
+<td align="center">5.7%</td>
+<td align="center">3.8%</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">57.9%</td>
+<td align="center">17.6%</td>
+<td align="center">11.4%</td>
+<td align="center">7.9%</td>
+<td align="center">5.3%</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">48.2%</td>
+<td align="center">21.6%</td>
+<td align="center">14.0%</td>
+<td align="center">9.7%</td>
+<td align="center">6.5%</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">40.2%</td>
+<td align="center">24.9%</td>
+<td align="center">16.2%</td>
+<td align="center">11.2%</td>
+<td align="center">7.5%</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">33.5%</td>
+<td align="center">27.7%</td>
+<td align="center">18.0%</td>
+<td align="center">12.5%</td>
+<td align="center">8.3%</td>
+</tr>
+</tbody>
+</table>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">ones_in_nd6</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@one_in_d6</span>
+<span class="o">...</span>   <span class="n">at_least_one_one_in_nd6</span> <span class="o">=</span> <span class="n">ones_in_nd6</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>   <span class="n">prob_complication_in_nd6</span> <span class="o">=</span> <span class="n">at_least_one_one_in_nd6</span> <span class="o">*</span> <span class="n">prob_of_complication</span>
+<span class="o">...</span>   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">{</span><span class="n">Complication</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">outcome</span><span class="p">))</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="si">:</span><span class="s2">7.2%</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="p">(</span><span class="n">prob_complication_in_nd6</span><span class="p">)</span><span class="o">.</span><span class="n">distribution</span><span class="p">()}))</span>
+<span class="mi">1</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 83.33%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39;  6.94%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39;  4.51%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  3.12%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  2.08%&#39;</span><span class="p">}</span>
+<span class="mi">2</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 69.44%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 12.73%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39;  8.28%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  5.73%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  3.82%&#39;</span><span class="p">}</span>
+<span class="mi">3</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 57.87%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 17.55%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 11.41%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  7.90%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  5.27%&#39;</span><span class="p">}</span>
+<span class="mi">4</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 48.23%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 21.57%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 14.02%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  9.71%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  6.47%&#39;</span><span class="p">}</span>
+<span class="mi">5</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 40.19%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 24.92%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 16.20%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39; 11.21%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  7.48%&#39;</span><span class="p">}</span>
+<span class="mi">6</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;NONE&#39;</span><span class="p">:</span> <span class="s1">&#39; 33.49%&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 27.71%&#39;</span><span class="p">,</span> <span class="s1">&#39;UNCOMMON&#39;</span><span class="p">:</span> <span class="s1">&#39; 18.01%&#39;</span><span class="p">,</span> <span class="s1">&#39;RARE&#39;</span><span class="p">:</span> <span class="s1">&#39; 12.47%&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY_RARE&#39;</span><span class="p">:</span> <span class="s1">&#39;  8.31%&#39;</span><span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>Neat!
+That Angry guy sure knows his math!
+And, thanks to <code>dyce</code>, we didn’t even have to get out of our chair to come to that conclusion.</p>
 <h2 id="modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s">Modeling “<a href="http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/">The Probability of 4d6, Drop the Lowest, Reroll 1s</a>”</h2>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -665,7 +983,9 @@ If you have exposure to <a href="">another tool</a>, they may also help with tra
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">save_roll</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">save_roll</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">burning_arch_damage</span> <span class="o">=</span> <span class="mi">10</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">pass_save</span> <span class="o">=</span> <span class="n">save_roll</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">damage_half_on_save</span> <span class="o">=</span> <span class="n">burning_arch_damage</span> <span class="o">//</span> <span class="p">(</span><span class="n">pass_save</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -803,7 +1123,9 @@ If you have exposure to <a href="">another tool</a>, they may also help with tra
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">single_attack</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">single_attack</span> <span class="o">=</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">gwf</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
 <span class="o">...</span>   <span class="k">return</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span>
@@ -987,7 +1309,9 @@ If you have exposure to <a href="">another tool</a>, they may also help with tra
 </code></pre></div>
 </td></tr></table>
 <p>Translation:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 </code></pre></div>
 </td></tr></table>
 <p>Visualization:</p>
@@ -1047,7 +1371,11 @@ If you have exposure to <a href="">another tool</a>, they may also help with tra
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">dupes</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">dupes</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
 <span class="o">...</span>   <span class="k">for</span> <span class="n">roll</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">():</span>
 <span class="o">...</span>     <span class="n">dupes</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="o">...</span>     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roll</span><span class="p">)):</span>
@@ -1115,19 +1443,25 @@ function: helper ROLL:s SIZE:n K:n {
 </code></pre></div>
 </td></tr></table>
 <p>Translation:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="o">...</span>   <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">is_homogeneous</span>
 <span class="o">...</span>   <span class="n">max_d</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="mi">0</span>
 <span class="o">...</span>   <span class="k">for</span> <span class="n">roll</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">():</span>
 <span class="o">...</span>     <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">roll</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:])</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">roll</span><span class="p">[:</span><span class="o">-</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="n">max_d</span><span class="p">)</span>
 <span class="o">...</span>     <span class="k">yield</span> <span class="n">total</span><span class="p">,</span> <span class="n">count</span>
+
 <span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="n">roll_and_keep</span><span class="p">(</span><span class="mi">6</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">207</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">5535</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">2500</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">375</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div>
@@ -1212,7 +1546,9 @@ output [brawl 3d6 vs 3d6] named &quot;A vs B Damage&quot;
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">P</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">brawl</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">P</span><span class="p">):</span>
 <span class="o">...</span>   <span class="k">for</span> <span class="p">(</span><span class="n">roll_a</span><span class="p">,</span> <span class="n">count_a</span><span class="p">),</span> <span class="p">(</span><span class="n">roll_b</span><span class="p">,</span> <span class="n">count_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
@@ -1236,7 +1572,9 @@ output [brawl 3d6 vs 3d6] named &quot;A vs B Damage&quot;
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">brawl</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.73</span>
