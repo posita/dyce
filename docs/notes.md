@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
+
+* TODO
+
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 
 * Removes dependencies on deprecated ``numerary.types.…SCT`` tuples

@@ -14,13 +14,12 @@
 -->
 
 The following examples and translations are intended to showcase ``dyce``’s flexibility.
-If you have exposure to [another tool](), they may also help with transition.
+If you have exposure to another tool, they may also help with transition.
 
 ## Checking Angry’s math on the [Tension Pool](https://theangrygm.com/definitive-tension-pool/)
 
 In the [Angry GM](https://theangrygm.com/)’s publication of the [PDF version of his Tension Pool mechanic](https://theangrygm.com/wp-content/uploads/The-Tension-Pool.pdf), he includes some probabilities.
 Can ``dyce`` check his work?
-
 You bet!
 
 Let’s reproduce his tables (with slightly different names to provide context).
@@ -34,7 +33,7 @@ Let’s reproduce his tables (with slightly different names to provide context).
 | 5           | 59.8%                                             |
 | 6           | 66.5%                                             |
 
-How do we do translate this to ``dyce``?
+How do we do compute these results using ``dyce``?
 
 ``` python
 >>> from dyce import H
@@ -53,7 +52,7 @@ How do we do translate this to ``dyce``?
 ```
 
 So far so good.
-Let’s try the next one.
+Let’s keep going.
 
 | 1d8 + 1d12 | Rarity or Severity   |
 |:----------:|:--------------------:|
@@ -66,9 +65,9 @@ Let’s try the next one.
 | 18-20      | Very Rare or Extreme |
 
 We need to map semantic outcomes to numbers (and back again).
-How can we represent this in ``dyce``?
-One way we can do this is [``Enum``](https://docs.python.org/3/library/enum.html)s.
-More particularly, ``IntEnum``s have a property that allows them to substitute directly for ``int``s, which is very convenient for ``dyce``.
+How can we represent those in ``dyce``?
+One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
+``IntEnum``s have a property that allows them to substitute directly for ``int``s, which is very convenient.
 
 ``` python
 >>> from enum import IntEnum
@@ -129,7 +128,7 @@ Now let’s use our map to validate the probabilities of a particular outcome.
 
 Lookin’ good.
 Lookin’ good.
-Now let’s put both together, just like Angry!
+Now let’s put everything together.
 
 | d6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
 |:-----------:|:---------------:|:-------------------:|:---------------------:|:-----------------:|:----------------------:|
