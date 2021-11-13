@@ -619,7 +619,7 @@ If ever performance becomes an issue, [let us know](contrib.md), and we can coll
 
 ## Further exploration
 
-Consider reviewing the [roller API][dyce.r].
+Consider reviewing the [roller API](dyce.r.md).
 
 <!-- TODO(posita): In addition to generating random rolls, roller trees can be useful for translating from proprietary grammars. -->
 <!--

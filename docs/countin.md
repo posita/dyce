@@ -976,4 +976,4 @@ H({7/9: 9, 8/9: 9, 1: 9})
 
 ## Further exploration
 
-Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API][dyce].
+Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API](dyce.md).

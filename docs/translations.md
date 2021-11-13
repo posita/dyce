@@ -16,6 +16,150 @@
 The following examples and translations are intended to showcase ``dyce``’s flexibility.
 If you have exposure to [another tool](), they may also help with transition.
 
+## Checking Angry’s math on the [Tension Pool](https://theangrygm.com/definitive-tension-pool/)
+
+In the [Angry GM](https://theangrygm.com/)’s publication of the [PDF version of his Tension Pool mechanic](https://theangrygm.com/wp-content/uploads/The-Tension-Pool.pdf), he includes some probabilities.
+Can ``dyce`` check his work?
+
+You bet!
+
+Let’s reproduce his tables (with slightly different names to provide context).
+
+| d6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
+|:-----------:|:-------------------------------------------------:|
+| 1           | 16.7%                                             |
+| 2           | 30.6%                                             |
+| 3           | 42.1%                                             |
+| 4           | 51.8%                                             |
+| 5           | 59.8%                                             |
+| 6           | 66.5%                                             |
+
+How do we do translate this to ``dyce``?
+
+``` python
+>>> from dyce import H
+>>> one_in_d6 = H(6).eq(1)
+>>> for n in range(1, 7):
+...   ones_in_nd6 = n@one_in_d6
+...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
+...   print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:7.2%}")
+1:  16.67%
+2:  30.56%
+3:  42.13%
+4:  51.77%
+5:  59.81%
+6:  66.51%
+
+```
+
+So far so good.
+Let’s try the next one.
+
+| 1d8 + 1d12 | Rarity or Severity   |
+|:----------:|:--------------------:|
+| 2-4        | Very Rare or Extreme |
+| 5-6        | Rare or Major        |
+| 7-8        | Uncommon or Moderate |
+| 9-13       | Common or Minor      |
+| 14-15      | Uncommon or Moderate |
+| 16-17      | Rare or Major        |
+| 18-20      | Very Rare or Extreme |
+
+We need to map semantic outcomes to numbers (and back again).
+How can we represent this in ``dyce``?
+One way we can do this is [``Enum``](https://docs.python.org/3/library/enum.html)s.
+More particularly, ``IntEnum``s have a property that allows them to substitute directly for ``int``s, which is very convenient for ``dyce``.
+
+``` python
+>>> from enum import IntEnum
+
+>>> class Complication(IntEnum):
+...   COMMON = 1
+...   UNCOMMON = 2
+...   RARE = 3
+...   VERY_RARE = 4
+...   NONE = 0  # this will come in handy later
+
+>>> map = {
+...   2: Complication.VERY_RARE,
+...   3: Complication.VERY_RARE,
+...   4: Complication.VERY_RARE,
+...   5: Complication.RARE,
+...   6: Complication.RARE,
+...   7: Complication.UNCOMMON,
+...   8: Complication.UNCOMMON,
+...   9: Complication.COMMON,
+...   10: Complication.COMMON,
+...   11: Complication.COMMON,
+...   12: Complication.COMMON,
+...   13: Complication.COMMON,
+...   14: Complication.UNCOMMON,
+...   15: Complication.UNCOMMON,
+...   16: Complication.RARE,
+...   17: Complication.RARE,
+...   18: Complication.VERY_RARE,
+...   19: Complication.VERY_RARE,
+...   20: Complication.VERY_RARE,
+... }
+
+```
+
+Now let’s use our map to validate the probabilities of a particular outcome.
+
+| Rarity or Impact     | Angry’s Probability of a Complication Arising |
+|:--------------------:|:---------------------------------------------:|
+| Common or Minor      | 41.7%                                         |
+| Uncommon or Moderate | 27.1%                                         |
+| Rare or Major        | 18.8%                                         |
+| Very Rare or Extreme | 12.5%                                         |
+
+``` python
+>>> def outcome_to_rarity(h, outcome):
+...   return map[outcome]
+
+>>> prob_of_complication = ((H(8) + H(12)).substitute(outcome_to_rarity))
+>>> from pprint import pprint
+>>> {outcome: f"{float(prob):7.2%}" for outcome, prob in prob_of_complication.distribution()}
+{<Complication.COMMON: 1>: ' 41.67%',
+ <Complication.UNCOMMON: 2>: ' 27.08%',
+ <Complication.RARE: 3>: ' 18.75%',
+ <Complication.VERY_RARE: 4>: ' 12.50%'}
+
+```
+
+Lookin’ good.
+Lookin’ good.
+Now let’s put both together, just like Angry!
+
+| d6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
+|:-----------:|:---------------:|:-------------------:|:---------------------:|:-----------------:|:----------------------:|
+| 1           | 83.3%           | 7.0%                | 4.5%                  | 3.1%              | 2.1%                   |
+| 2           | 69.4%           | 12.7%               | 8.3%                  | 5.7%              | 3.8%                   |
+| 3           | 57.9%           | 17.6%               | 11.4%                 | 7.9%              | 5.3%                   |
+| 4           | 48.2%           | 21.6%               | 14.0%                 | 9.7%              | 6.5%                   |
+| 5           | 40.2%           | 24.9%               | 16.2%                 | 11.2%             | 7.5%                   |
+| 6           | 33.5%           | 27.7%               | 18.0%                 | 12.5%             | 8.3%                   |
+
+``` python
+>>> from typing import cast
+>>> for n in range(1, 7):
+...   ones_in_nd6 = n@one_in_d6
+...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
+...   prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
+...   print("{} -> {}".format(n, {Complication(cast(int, outcome)).name: f"{float(prob):7.2%}" for outcome, prob in (prob_complication_in_nd6).distribution()}))
+1 -> {'NONE': ' 83.33%', 'COMMON': '  6.94%', 'UNCOMMON': '  4.51%', 'RARE': '  3.12%', 'VERY_RARE': '  2.08%'}
+2 -> {'NONE': ' 69.44%', 'COMMON': ' 12.73%', 'UNCOMMON': '  8.28%', 'RARE': '  5.73%', 'VERY_RARE': '  3.82%'}
+3 -> {'NONE': ' 57.87%', 'COMMON': ' 17.55%', 'UNCOMMON': ' 11.41%', 'RARE': '  7.90%', 'VERY_RARE': '  5.27%'}
+4 -> {'NONE': ' 48.23%', 'COMMON': ' 21.57%', 'UNCOMMON': ' 14.02%', 'RARE': '  9.71%', 'VERY_RARE': '  6.47%'}
+5 -> {'NONE': ' 40.19%', 'COMMON': ' 24.92%', 'UNCOMMON': ' 16.20%', 'RARE': ' 11.21%', 'VERY_RARE': '  7.48%'}
+6 -> {'NONE': ' 33.49%', 'COMMON': ' 27.71%', 'UNCOMMON': ' 18.01%', 'RARE': ' 12.47%', 'VERY_RARE': '  8.31%'}
+
+```
+
+Neat!
+That Angry guy sure knows his math!
+And, thanks to ``dyce``, we didn’t even have to get out of our chair to come to that conclusion.
+
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
 ``` python
@@ -98,6 +242,7 @@ program = [
 Translation:
 
 ``` python
+>>> from dyce import H
 >>> save_roll = H(20)
 >>> burning_arch_damage = 10@H(6) + 10
 >>> pass_save = save_roll.ge(10)
@@ -214,6 +359,7 @@ print(great_weapon_fighting.expectancies())
 Example 1 translation:
 
 ``` python
+>>> from dyce import H
 >>> single_attack = 2@H(6) + 5
 
 >>> def gwf(h: H, outcome):
@@ -347,6 +493,7 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 Translation:
 
 ``` python
+>>> from dyce import H, P
 >>> res = (10@P(H(10).explode(max_depth=3))).h(slice(-3, None))
 
 ```
@@ -391,6 +538,8 @@ function: dupes in DICE:s {
 Translation:
 
 ``` python
+>>> from dyce import H, P
+
 >>> def dupes(p: P):
 ...   for roll, count in p.rolls_with_counts():
 ...     dupes = 0
@@ -449,12 +598,15 @@ function: helper ROLL:s SIZE:n K:n {
 Translation:
 
 ``` python
+>>> from dyce import H, P
+
 >>> def roll_and_keep(p: P, k: int):
 ...   assert p.is_homogeneous
 ...   max_d = max(p[-1]) if p else 0
 ...   for roll, count in p.rolls_with_counts():
 ...     total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
 ...     yield total, count
+
 >>> H(roll_and_keep(6@P(6), 3))
 H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 21: 1})
 
@@ -513,6 +665,7 @@ Translation:
 
 ``` python
 >>> from itertools import product
+>>> from dyce import P
 
 >>> def brawl(a: P, b: P):
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
@@ -528,6 +681,7 @@ Translation:
 Rudimentary visualization using built-in methods:
 
 ``` python
+>>> from dyce import H
 >>> res = H(brawl(3@P(6), 3@P(6))).lowest_terms()
 >>> print(res.format())
 avg |    0.00

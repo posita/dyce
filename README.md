@@ -324,7 +324,7 @@ See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hack
 * This could be _you_! 👋
 
 Do you have a project that uses ``dyce``?
-[Let me know](https://posita.github.io/dyce/latest/contrib/#filing-issues), and I’ll promote it here!
+[Let me know](https://posita.github.io/dyce/latest/contrib/#starting-discussions-and-filing-issues), and I’ll promote it here!
 
 And don’t forget to do your part in perpetuating gratuitous badge-ification!
 

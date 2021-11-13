@@ -15,6 +15,11 @@
 
 # ``dyce`` release notes
 
+## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
+
+* Removes dependencies on deprecated ``numerary.types.…SCT`` tuples
+* Adds [Angry GM Tension Pool mechanic](https://theangrygm.com/definitive-tension-pool/) translation
+
 ## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
 
 * Removes calls to ``os.get_terminal_size`` to retain utility in environments without terminals.
@@ -49,7 +54,7 @@
 * Removes deprecated synonym methods ``H.even`` and ``H.odd``.
     Uses [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
 * Removes deprecated synonym package ``dyce.plt``.
-    Uses [``dyce.viz``][dyce.viz] instead.
+    Uses [``dyce.viz``](dyce.viz.md) instead.
 * Removes special case handling of ``H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.
@@ -109,7 +114,7 @@
 * Renames experimental ``#!python P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
 * Removes ``#!python coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
-* Renames ``#!python dyce.plt`` to [``dyce.viz``][dyce.viz].
+* Renames ``#!python dyce.plt`` to [``dyce.viz``](dyce.viz.md).
 * Deprecates synonym package ``#!python dyce.plt``.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
