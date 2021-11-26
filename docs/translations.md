@@ -41,13 +41,13 @@ How do we do compute these results using ``dyce``?
 >>> for n in range(1, 7):
 ...   ones_in_nd6 = n@one_in_d6
 ...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-...   print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:7.2%}")
-1:  16.67%
-2:  30.56%
-3:  42.13%
-4:  51.77%
-5:  59.81%
-6:  66.51%
+...   print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
+1: 16.67%
+2: 30.56%
+3: 42.13%
+4: 51.77%
+5: 59.81%
+6: 66.51%
 
 ```
 
@@ -73,11 +73,11 @@ One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
 >>> from enum import IntEnum
 
 >>> class Complication(IntEnum):
+...   NONE = 0  # this will come in handy later
 ...   COMMON = 1
 ...   UNCOMMON = 2
 ...   RARE = 3
 ...   VERY_RARE = 4
-...   NONE = 0  # this will come in handy later
 
 >>> map = {
 ...   2: Complication.VERY_RARE,
@@ -103,7 +103,7 @@ One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
 
 ```
 
-Now let’s use our map to validate the probabilities of a particular outcome.
+Now let’s use our map to validate the probabilities of a particular outcome using that D8 and D12.
 
 | Rarity or Impact     | Angry’s Probability of a Complication Arising |
 |:--------------------:|:---------------------------------------------:|
@@ -118,11 +118,11 @@ Now let’s use our map to validate the probabilities of a particular outcome.
 
 >>> prob_of_complication = ((H(8) + H(12)).substitute(outcome_to_rarity))
 >>> from pprint import pprint
->>> {outcome: f"{float(prob):7.2%}" for outcome, prob in prob_of_complication.distribution()}
-{<Complication.COMMON: 1>: ' 41.67%',
- <Complication.UNCOMMON: 2>: ' 27.08%',
- <Complication.RARE: 3>: ' 18.75%',
- <Complication.VERY_RARE: 4>: ' 12.50%'}
+>>> {outcome: f"{float(prob):6.2%}" for outcome, prob in prob_of_complication.distribution()}
+{<Complication.COMMON: 1>: '41.67%',
+ <Complication.UNCOMMON: 2>: '27.08%',
+ <Complication.RARE: 3>: '18.75%',
+ <Complication.VERY_RARE: 4>: '12.50%'}
 
 ```
 
@@ -145,19 +145,18 @@ Now let’s put everything together.
 ...   ones_in_nd6 = n@one_in_d6
 ...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
 ...   prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
-...   print("{} -> {}".format(n, {Complication(cast(int, outcome)).name: f"{float(prob):7.2%}" for outcome, prob in (prob_complication_in_nd6).distribution()}))
-1 -> {'NONE': ' 83.33%', 'COMMON': '  6.94%', 'UNCOMMON': '  4.51%', 'RARE': '  3.12%', 'VERY_RARE': '  2.08%'}
-2 -> {'NONE': ' 69.44%', 'COMMON': ' 12.73%', 'UNCOMMON': '  8.28%', 'RARE': '  5.73%', 'VERY_RARE': '  3.82%'}
-3 -> {'NONE': ' 57.87%', 'COMMON': ' 17.55%', 'UNCOMMON': ' 11.41%', 'RARE': '  7.90%', 'VERY_RARE': '  5.27%'}
-4 -> {'NONE': ' 48.23%', 'COMMON': ' 21.57%', 'UNCOMMON': ' 14.02%', 'RARE': '  9.71%', 'VERY_RARE': '  6.47%'}
-5 -> {'NONE': ' 40.19%', 'COMMON': ' 24.92%', 'UNCOMMON': ' 16.20%', 'RARE': ' 11.21%', 'VERY_RARE': '  7.48%'}
-6 -> {'NONE': ' 33.49%', 'COMMON': ' 27.71%', 'UNCOMMON': ' 18.01%', 'RARE': ' 12.47%', 'VERY_RARE': '  8.31%'}
+...   print("{} -> {}".format(n, {Complication(cast(int, outcome)).name: f"{float(prob):6.2%}" for outcome, prob in (prob_complication_in_nd6).distribution()}))
+1 -> {'NONE': '83.33%', 'COMMON': ' 6.94%', 'UNCOMMON': ' 4.51%', 'RARE': ' 3.12%', 'VERY_RARE': ' 2.08%'}
+2 -> {'NONE': '69.44%', 'COMMON': '12.73%', 'UNCOMMON': ' 8.28%', 'RARE': ' 5.73%', 'VERY_RARE': ' 3.82%'}
+3 -> {'NONE': '57.87%', 'COMMON': '17.55%', 'UNCOMMON': '11.41%', 'RARE': ' 7.90%', 'VERY_RARE': ' 5.27%'}
+4 -> {'NONE': '48.23%', 'COMMON': '21.57%', 'UNCOMMON': '14.02%', 'RARE': ' 9.71%', 'VERY_RARE': ' 6.47%'}
+5 -> {'NONE': '40.19%', 'COMMON': '24.92%', 'UNCOMMON': '16.20%', 'RARE': '11.21%', 'VERY_RARE': ' 7.48%'}
+6 -> {'NONE': '33.49%', 'COMMON': '27.71%', 'UNCOMMON': '18.01%', 'RARE': '12.47%', 'VERY_RARE': ' 8.31%'}
 
 ```
 
 Neat!
-That Angry guy sure knows his math!
-And, thanks to ``dyce``, we didn’t even have to get out of our chair to come to that conclusion.
+Thanks to ``dyce``, we can confidently verify that Angry guy sure knows his math!
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 

@@ -17,7 +17,8 @@
 
 ## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
 
-* TODO
+* Remove ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved
+* Refine Tension Pool example
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 

@@ -40,7 +40,7 @@ def test_display_burst() -> None:
     d6_2 = 2 @ H(6)
     viz.display_burst(ax, d6_2)
     wedge_labels = [
-        w.get_label() for w in ax.get_children()[:22] if isinstance(w, patches.Wedge)
+        w.get_label() for w in ax.get_children() if isinstance(w, patches.Wedge)
     ]
     assert len(wedge_labels) == 22
     assert wedge_labels == [
@@ -77,7 +77,7 @@ def test_display_burst_outer() -> None:
     d6_2 = 2 @ H(6)
     viz.display_burst(ax, d6_2, viz.labels_cumulative(d6_2))
     wedge_labels = [
-        w.get_label() for w in ax.get_children()[:22] if isinstance(w, patches.Wedge)
+        w.get_label() for w in ax.get_children() if isinstance(w, patches.Wedge)
     ]
     assert len(wedge_labels) == 22
     assert wedge_labels == [

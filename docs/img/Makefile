@@ -11,7 +11,8 @@ all : \
 	graph_rollin_select_1_light.svg \
 	graph_rollin_select_2_dark.svg \
 	graph_rollin_select_2_light.svg \
-	plot_2d6_lo_hi_gh.png \
+	plot_2d6_lo_hi_dark.png \
+	plot_2d6_lo_hi_light.png \
 	plot_4d6_variants_dark.png \
 	plot_4d6_variants_light.png \
 	plot_advantage_dark.png \
@@ -42,10 +43,6 @@ plot_%_dark.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../
 
 plot_%_light.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=light $*
-
-# TODO(posita): This should go away at some point. (See TODO in plot.py.)
-plot_%_gh.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
-	"$${PYTHON:-python}" plot.py --style=gh $*
 
 graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=dark $*
