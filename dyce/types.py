@@ -28,8 +28,8 @@ from numerary.bt import beartype
 from numerary.types import (
     CachingProtocolMeta,
     Protocol,
-    SupportsIndexSCU,
-    SupportsIntSCU,
+    SupportsIndex,
+    SupportsInt,
     runtime_checkable,
 )
 
@@ -47,7 +47,7 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
-_GetItemT = Union[SupportsIndexSCU, slice]
+_GetItemT = Union[SupportsIndex, slice]
 
 if sys.version_info >= (3, 8):
 
@@ -72,7 +72,7 @@ else:
 
 
 @beartype
-def as_int(val: SupportsIntSCU) -> int:
+def as_int(val: SupportsInt) -> int:
     r"""
     Helper function to losslessly coerce *val* into an ``#!python int``. Raises
     ``#!python TypeError`` if that cannot be done.
@@ -95,12 +95,12 @@ def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
 
 
 @beartype
-def is_even(outcome: SupportsIntSCU) -> bool:
+def is_even(outcome: SupportsInt) -> bool:
     return as_int(outcome) % 2 == 0
 
 
 @beartype
-def is_odd(outcome: SupportsIntSCU) -> bool:
+def is_odd(outcome: SupportsInt) -> bool:
     return as_int(outcome) % 2 != 0
 
 

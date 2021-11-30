@@ -67,7 +67,7 @@ Let’s keep going.
 We need to map semantic outcomes to numbers (and back again).
 How can we represent those in ``dyce``?
 One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
-``IntEnum``s have a property that allows them to substitute directly for ``int``s, which is very convenient.
+``IntEnum``s have a property that allows them to substitute directly for ``int``s, which, with a little nudging, is very convenient.
 
 ``` python
 >>> from enum import IntEnum
@@ -143,7 +143,11 @@ Now let’s put everything together.
 ...   ones_in_nd6 = n@one_in_d6
 ...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
 ...   prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
-...   print("{} -> {}".format(n, {Complication(cast(int, outcome)).name: f"{float(prob):6.2%}" for outcome, prob in (prob_complication_in_nd6).distribution()}))
+...   complications_for_nd6 = {
+...     Complication(cast(int, outcome)).name: f"{float(prob):6.2%}"
+...     for outcome, prob in (prob_complication_in_nd6).distribution()
+...   }
+...   print("{} -> {}".format(n, complications_for_nd6))
 1 -> {'NONE': '83.33%', 'COMMON': ' 6.94%', 'UNCOMMON': ' 4.51%', 'RARE': ' 3.12%', 'VERY_RARE': ' 2.08%'}
 2 -> {'NONE': '69.44%', 'COMMON': '12.73%', 'UNCOMMON': ' 8.28%', 'RARE': ' 5.73%', 'VERY_RARE': ' 3.82%'}
 3 -> {'NONE': '57.87%', 'COMMON': '17.55%', 'UNCOMMON': '11.41%', 'RARE': ' 7.90%', 'VERY_RARE': ' 5.27%'}
@@ -170,7 +174,7 @@ We can also deploy a counting trick with the two d10s.
 
 ``` python
 >>> from dyce import H, as_int
->>> from numerary.types import RealLikeSCU
+>>> from numerary.types import RealLike
 >>> from enum import IntEnum, auto
 >>> from typing import Iterator, Tuple, cast
 >>> d6 = H(6)
@@ -249,11 +253,11 @@ The key to mapping that to ``dyce`` internals is recognizing that we have a depe
 
 ``` python
 >>> class IronSoloResult(IntEnum):
-...   SPECTACULAR_FAILURE = -1
-...   FAILURE = auto()
+...   FAILURE = 0
 ...   WEAK_SUCCESS = auto()
 ...   STRONG_SUCCESS = auto()
 ...   SPECTACULAR_SUCCESS = auto()
+...   SPECTACULAR_FAILURE = -1
 
 >>> def iron_solo_dependent_term(action, first_challenge, second_challenge, mod=0):
 ...   modded_action = action + mod

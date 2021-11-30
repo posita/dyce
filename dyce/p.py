@@ -29,9 +29,9 @@ from typing import (
     overload,
 )
 
-from numerary import RealLikeSCU
+from numerary import RealLike
 from numerary.bt import beartype
-from numerary.types import SupportsIndexSCU, SupportsInt, SupportsIntSCU
+from numerary.types import SupportsIndex, SupportsInt
 
 from .h import H, HableOpsMixin, _MappingT, sum_h
 from .lifecycle import experimental
@@ -50,8 +50,8 @@ __all__ = ("P",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_OperandT = Union["P", RealLikeSCU]
-_RollT = Tuple[RealLikeSCU, ...]
+_OperandT = Union["P", RealLike]
+_RollT = Tuple[RealLike, ...]
 _RollCountT = Tuple[_RollT, int]
 
 
@@ -196,7 +196,7 @@ class P(Sequence[H], HableOpsMixin):
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
-    def __init__(self, *args: Union[SupportsIntSCU, "P", H]) -> None:
+    def __init__(self, *args: Union[SupportsInt, "P", H]) -> None:
         r"Initializer."
         super().__init__()
 
@@ -254,7 +254,7 @@ class P(Sequence[H], HableOpsMixin):
         return len(self._hs)
 
     @overload
-    def __getitem__(self, key: SupportsIndexSCU) -> H:
+    def __getitem__(self, key: SupportsIndex) -> H:
         ...
 
     @overload
@@ -275,7 +275,7 @@ class P(Sequence[H], HableOpsMixin):
         return iter(self._hs)
 
     @beartype
-    def __matmul__(self, other: SupportsIntSCU) -> P:
+    def __matmul__(self, other: SupportsInt) -> P:
         try:
             other = as_int(other)
         except TypeError:
@@ -287,7 +287,7 @@ class P(Sequence[H], HableOpsMixin):
             return P(*chain.from_iterable(repeat(self, other)))
 
     @beartype
-    def __rmatmul__(self, other: SupportsIntSCU) -> P:
+    def __rmatmul__(self, other: SupportsInt) -> P:
         return self.__matmul__(other)
 
     @beartype
@@ -413,7 +413,7 @@ class P(Sequence[H], HableOpsMixin):
 
     @experimental
     @beartype
-    def appearances_in_rolls(self, outcome: RealLikeSCU) -> H:
+    def appearances_in_rolls(self, outcome: RealLike) -> H:
         r"""
         !!! warning "Experimental"
 
@@ -477,10 +477,10 @@ class P(Sequence[H], HableOpsMixin):
         ```
         </details>
         """
-        group_counters: List[Counter[RealLikeSCU]] = []
+        group_counters: List[Counter[RealLike]] = []
 
         for h, hs in groupby(self):
-            group_counter: Counter[RealLikeSCU] = counter()
+            group_counter: Counter[RealLike] = counter()
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
@@ -747,7 +747,7 @@ class P(Sequence[H], HableOpsMixin):
         return P(*(h.map(op, right_operand) for h in self))
 
     @beartype
-    def rmap(self, left_operand: RealLikeSCU, op: _BinaryOperatorT) -> P:
+    def rmap(self, left_operand: RealLike, op: _BinaryOperatorT) -> P:
         r"""
         Shorthand for ``#!python P(*(h.rmap(left_operand, op) for h in self))``. See the
         [``H.rmap`` method][dyce.h.H.rmap].
@@ -855,7 +855,7 @@ def _rwc_heterogeneous_h_groups(
         # It's possible v is () if h_groups is empty; see
         # https://stackoverflow.com/questions/3154301/ for a detailed discussion
         if v:
-            rolls_by_group: Iterable[Iterable[RealLikeSCU]]
+            rolls_by_group: Iterable[Iterable[RealLike]]
             counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
@@ -869,7 +869,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     h: H,
     n: int,
     k: int,
-    fill: Optional[RealLikeSCU] = None,
+    fill: Optional[RealLike] = None,
 ) -> Iterator[_RollCountT]:
     r"""
     A memoized adaptation of [Ilmari Karonen’s

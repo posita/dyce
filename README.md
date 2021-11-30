@@ -321,7 +321,8 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 
 It has the following runtime dependencies:
 
-* [``numerary``](https://pypi.org/project/numerary/) for ~~proper~~ *best-effort hacking around deficiencies in* static and runtime numeric type-checking [![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
+* [``numerary``](https://pypi.org/project/numerary/) for ~~proper~~ *best-effort hacking around deficiencies in* static and runtime numeric type-checking
+  [![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
 
 ``dyce`` will opportunistically use the following, if available at runtime:
 
@@ -330,7 +331,7 @@ It has the following runtime dependencies:
 * [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
 * [``numpy``](https://numpy.org/) to supply ``dyce`` with an alternate random number generator implementation
 
-``dyce`` leverages ``numerary`` for its opportunistic use of ``beartype``. If you use ``beartype`` for type checking your code that interacts with ``dyce``, but don’t want ``dyce`` or ``numerary`` to use it internally (e.g., for performance reasons), disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://posita.github.io/numerary/latest/#requirements).
+``dyce`` leverages ``numerary`` for its opportunistic use of ``beartype``. If you use ``beartype`` for type checking your code, but don’t want ``dyce`` or ``numerary`` to use it internally, disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://posita.github.io/numerary/latest/#requirements).
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
 

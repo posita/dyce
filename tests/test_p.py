@@ -16,7 +16,7 @@ from typing import DefaultDict, Iterator, Sequence, Tuple
 from unittest.mock import Mock, patch
 
 import pytest
-from numerary import RealLikeSCU
+from numerary import RealLike
 from numerary.bt import beartype
 
 from dyce import H, P
@@ -540,7 +540,7 @@ class TestP:
         assert not P(2, -3).is_homogeneous
 
     def test_appearances_in_rolls(self) -> None:
-        def _sum_method(p: P, outcome: RealLikeSCU) -> H:
+        def _sum_method(p: P, outcome: RealLike) -> H:
             return H(
                 (sum(1 for v in roll if v == outcome), count)
                 for roll, count in p.rolls_with_counts()

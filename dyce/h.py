@@ -59,15 +59,9 @@ from typing import (
     overload,
 )
 
-from numerary import RealLike, RealLikeSCU
+from numerary import RealLike
 from numerary.bt import beartype
-from numerary.types import (
-    CachingProtocolMeta,
-    Protocol,
-    SupportsInt,
-    SupportsIntSCU,
-    runtime_checkable,
-)
+from numerary.types import CachingProtocolMeta, Protocol, SupportsInt, runtime_checkable
 
 from . import rng
 from .lifecycle import experimental
@@ -89,17 +83,17 @@ __all__ = ("H",)
 
 
 _T = TypeVar("_T")
-_MappingT = Mapping[RealLikeSCU, int]
+_MappingT = Mapping[RealLike, int]
 _SourceT = Union[
-    SupportsIntSCU,
-    Iterable[RealLikeSCU],
-    Iterable[Tuple[RealLikeSCU, SupportsIntSCU]],
+    SupportsInt,
+    Iterable[RealLike],
+    Iterable[Tuple[RealLike, SupportsInt]],
     _MappingT,
     "HableT",
 ]
-_OperandT = Union[RealLikeSCU, "H", "HableT"]
-_ExpandT = Callable[["H", RealLikeSCU], Union[RealLikeSCU, "H"]]
-_CoalesceT = Callable[["H", RealLikeSCU], "H"]
+_OperandT = Union[RealLike, "H", "HableT"]
+_ExpandT = Callable[["H", RealLike], Union[RealLike, "H"]]
+_CoalesceT = Callable[["H", RealLike], "H"]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -114,7 +108,7 @@ except (KeyError, ValueError):
 # ---- Functions -----------------------------------------------------------------------
 
 
-def coalesce_replace(h: H, outcome: RealLikeSCU) -> H:
+def coalesce_replace(h: H, outcome: RealLike) -> H:
     r"""
     Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified
     (*outcome* is ignored).
@@ -382,7 +376,7 @@ class H(_MappingT):
         r"Initializer."
         super().__init__()
         self._simple_init: Optional[int] = None
-        tmp: Counter[RealLikeSCU] = counter()
+        tmp: Counter[RealLike] = counter()
 
         if isinstance(items, MappingC):
             items = items.items()
@@ -404,9 +398,9 @@ class H(_MappingT):
         elif isinstance(items, HableT):
             tmp.update(items.h())
         elif isinstance(items, IterableC):
-            # items is either an Iterable[RealLikeSCU] or an Iterable[Tuple[RealLikeSCU,
-            # SupportsIntSCU]] (although this technically supports
-            # Iterable[Union[RealLikeSCU, Tuple[RealLikeSCU, SupportsIntSCU]]])
+            # items is either an Iterable[RealLike] or an Iterable[Tuple[RealLike,
+            # SupportsInt]] (although this technically supports Iterable[Union[RealLike,
+            # Tuple[RealLike, SupportsInt]]])
             for item in items:
                 if isinstance(item, tuple):
                     outcome, count = item
@@ -464,11 +458,11 @@ class H(_MappingT):
         return len(self._h)
 
     @beartype
-    def __getitem__(self, key: RealLikeSCU) -> int:
+    def __getitem__(self, key: RealLike) -> int:
         return __getitem__(self._h, key)
 
     @beartype
-    def __iter__(self) -> Iterator[RealLikeSCU]:
+    def __iter__(self) -> Iterator[RealLike]:
         return iter(self._h)
 
     @beartype
@@ -479,7 +473,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: RealLikeSCU) -> H:
+    def __radd__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
@@ -493,7 +487,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: RealLikeSCU) -> H:
+    def __rsub__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
@@ -507,14 +501,14 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: RealLikeSCU) -> H:
+    def __rmul__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __matmul__(self, other: SupportsIntSCU) -> H:
+    def __matmul__(self, other: SupportsInt) -> H:
         try:
             other = as_int(other)
         except TypeError:
@@ -526,7 +520,7 @@ class H(_MappingT):
             return sum_h(repeat(self, other))
 
     @beartype
-    def __rmatmul__(self, other: SupportsIntSCU) -> H:
+    def __rmatmul__(self, other: SupportsInt) -> H:
         return self.__matmul__(other)
 
     @beartype
@@ -537,7 +531,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: RealLikeSCU) -> H:
+    def __rtruediv__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
@@ -551,7 +545,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLikeSCU) -> H:  # type: ignore [misc]
+    def __rfloordiv__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
@@ -565,7 +559,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: RealLikeSCU) -> H:
+    def __rmod__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
@@ -579,14 +573,14 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: RealLikeSCU) -> H:
+    def __rpow__(self, other: RealLike) -> H:
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
+    def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -596,14 +590,14 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: SupportsIntSCU) -> H:
+    def __rand__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
+    def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -613,14 +607,14 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: SupportsIntSCU) -> H:
+    def __rxor__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union[SupportsIntSCU, "H", "HableT"]) -> H:
+    def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -630,7 +624,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: SupportsIntSCU) -> H:
+    def __ror__(self, other: SupportsInt) -> H:
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
@@ -660,15 +654,15 @@ class H(_MappingT):
         return self._h.values()
 
     @beartype
-    def items(self) -> ItemsView[RealLikeSCU, int]:
+    def items(self) -> ItemsView[RealLike, int]:
         return self._h.items()
 
     @beartype
-    def keys(self) -> KeysView[RealLikeSCU]:
+    def keys(self) -> KeysView[RealLike]:
         return self.outcomes()
 
     @beartype
-    def outcomes(self) -> KeysView[RealLikeSCU]:
+    def outcomes(self) -> KeysView[RealLike]:
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
@@ -747,7 +741,7 @@ class H(_MappingT):
             )
 
     @beartype
-    def rmap(self, left_operand: RealLikeSCU, bin_op: _BinaryOperatorT) -> H:
+    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> H:
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
         *left_operand*.
@@ -937,7 +931,7 @@ class H(_MappingT):
         if isinstance(other, MappingC):
             other = other.items()
         elif not isinstance(other, IterableC):
-            other = cast(Iterable[RealLikeSCU], (other,))
+            other = cast(Iterable[RealLike], (other,))
 
         return type(self)(chain(self.items(), cast(Iterable, other)))
 
@@ -945,9 +939,9 @@ class H(_MappingT):
     @beartype
     def exactly_k_times_in_n(
         self,
-        outcome: RealLikeSCU,
-        n: SupportsIntSCU,
-        k: SupportsIntSCU,
+        outcome: RealLike,
+        n: SupportsInt,
+        k: SupportsInt,
     ) -> int:
         r"""
         !!! warning "Experimental"
@@ -976,7 +970,7 @@ class H(_MappingT):
         return comb(n, k) * c_outcome ** k * (self.total - c_outcome) ** (n - k)
 
     @beartype
-    def explode(self, max_depth: SupportsIntSCU = 1) -> H:
+    def explode(self, max_depth: SupportsInt = 1) -> H:
         r"""
         Shorthand for ``#!python self.substitute(lambda h, outcome: h if outcome == max(h)
         else outcome, operator.__add__, max_depth)``.
@@ -1020,7 +1014,7 @@ class H(_MappingT):
 
     @experimental
     @beartype
-    def order_stat_for_n_at_pos(self, n: SupportsIntSCU, pos: SupportsIntSCU) -> H:
+    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> H:
         r"""
         !!! warning "Experimental"
 
@@ -1033,9 +1027,7 @@ class H(_MappingT):
 
     @experimental
     @beartype
-    def order_stat_func_for_n(
-        self, n: SupportsIntSCU
-    ) -> Callable[[SupportsIntSCU], "H"]:
+    def order_stat_func_for_n(self, n: SupportsInt) -> Callable[[SupportsInt], "H"]:
         r"""
         !!! warning "Experimental"
 
@@ -1088,7 +1080,7 @@ class H(_MappingT):
         ```
         </details>
         """
-        betas_by_outcome: Dict[RealLikeSCU, Tuple[H, H]] = {}
+        betas_by_outcome: Dict[RealLike, Tuple[H, H]] = {}
 
         for outcome in self.outcomes():
             betas_by_outcome[outcome] = (
@@ -1096,7 +1088,7 @@ class H(_MappingT):
                 n @ self.lt(outcome),
             )
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[RealLikeSCU, int]]:
+        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[RealLike, int]]:
             for outcome, (h_le, h_lt) in betas_by_outcome.items():
                 yield (
                     outcome,
@@ -1104,7 +1096,7 @@ class H(_MappingT):
                 )
 
         @beartype
-        def order_stat_for_n_at_pos(pos: SupportsIntSCU) -> H:
+        def order_stat_for_n_at_pos(pos: SupportsInt) -> H:
             return type(self)(_gen_h_items_at_pos(as_int(pos)))
 
         return order_stat_for_n_at_pos
@@ -1114,7 +1106,7 @@ class H(_MappingT):
         self,
         expand: _ExpandT,
         coalesce: _CoalesceT = coalesce_replace,
-        max_depth: SupportsIntSCU = 1,
+        max_depth: SupportsInt = 1,
     ) -> H:
         r"""
         Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*
@@ -1277,7 +1269,7 @@ class H(_MappingT):
                 return h
 
             total_scalar = 1
-            items_for_reassembly: List[Tuple[RealLikeSCU, int, int]] = []
+            items_for_reassembly: List[Tuple[RealLike, int, int]] = []
 
             for outcome, count in h.items():
                 expanded = expand(h, outcome)
@@ -1333,7 +1325,7 @@ class H(_MappingT):
         return self.within(0, 0, other)
 
     @beartype
-    def within(self, lo: RealLikeSCU, hi: RealLikeSCU, other: _OperandT = 0) -> H:
+    def within(self, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> H:
         r"""
         Computes the difference between the histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
@@ -1373,7 +1365,7 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: Optional[_MappingT] = None,
-    ) -> Iterator[Tuple[RealLikeSCU, Fraction]]:
+    ) -> Iterator[Tuple[RealLike, Fraction]]:
         ...
 
     @overload
@@ -1381,7 +1373,7 @@ class H(_MappingT):
         self,
         fill_items: _MappingT,
         rational_t: _RationalInitializerT[_T],
-    ) -> Iterator[Tuple[RealLikeSCU, _T]]:
+    ) -> Iterator[Tuple[RealLike, _T]]:
         ...
 
     @overload
@@ -1389,7 +1381,7 @@ class H(_MappingT):
         self,
         *,
         rational_t: _RationalInitializerT[_T],
-    ) -> Iterator[Tuple[RealLikeSCU, _T]]:
+    ) -> Iterator[Tuple[RealLike, _T]]:
         ...
 
     @experimental
@@ -1401,7 +1393,7 @@ class H(_MappingT):
         # all the @overload work-around nonsense above and remove those once that issue
         # is addressed.
         rational_t: _RationalInitializerT[_T] = cast(_RationalInitializerT, Fraction),
-    ) -> Iterator[Tuple[RealLikeSCU, _T]]:
+    ) -> Iterator[Tuple[RealLike, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair.
@@ -1499,7 +1491,7 @@ class H(_MappingT):
     def distribution_xy(
         self,
         fill_items: Optional[_MappingT] = None,
-    ) -> Tuple[Tuple[RealLikeSCU, ...], Tuple[float, ...]]:
+    ) -> Tuple[Tuple[RealLike, ...], Tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
         output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
@@ -1527,7 +1519,7 @@ class H(_MappingT):
     def format(
         self,
         fill_items: Optional[_MappingT] = None,
-        width: SupportsIntSCU = _ROW_WIDTH,
+        width: SupportsInt = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
         sep: str = os.linesep,
@@ -1599,7 +1591,7 @@ class H(_MappingT):
         # tower implementations sometimes neglect to implement __format__ properly (or
         # at all). (I'm looking at you, sage.rings.…!)
         try:
-            mu: RealLikeSCU = float(self.mean())
+            mu: RealLike = float(self.mean())
         except TypeError:
             mu = self.mean()
 
@@ -1649,7 +1641,7 @@ class H(_MappingT):
             return sep.join(lines())
 
     @beartype
-    def mean(self) -> RealLikeSCU:
+    def mean(self) -> RealLike:
         r"""
         Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
         """
@@ -1664,14 +1656,14 @@ class H(_MappingT):
         return numerator / (denominator or 1)
 
     @beartype
-    def stdev(self, mu: Optional[RealLikeSCU] = None) -> RealLikeSCU:
+    def stdev(self, mu: Optional[RealLike] = None) -> RealLike:
         r"""
         Shorthand for ``#!python math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
     @beartype
-    def variance(self, mu: Optional[RealLikeSCU] = None) -> RealLikeSCU:
+    def variance(self, mu: Optional[RealLike] = None) -> RealLike:
         r"""
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
@@ -1688,7 +1680,7 @@ class H(_MappingT):
         return numerator / (denominator or 1)
 
     @beartype
-    def roll(self) -> RealLikeSCU:
+    def roll(self) -> RealLike:
         r"""
         Returns a (weighted) random outcome, sorted.
         """
@@ -1702,7 +1694,7 @@ class H(_MappingT):
             else 0
         )
 
-    def _lowest_terms(self) -> Iterable[Tuple[RealLikeSCU, int]]:
+    def _lowest_terms(self) -> Iterable[Tuple[RealLike, int]]:
         counts_gcd = gcd(*self.counts())
 
         return ((k, v // counts_gcd) for k, v in self.items())
@@ -1763,7 +1755,7 @@ class HableOpsMixin:
         return __add__(self.h(), other)
 
     @beartype
-    def __radd__(self: HableT, other: RealLikeSCU) -> H:
+    def __radd__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__add__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1779,7 +1771,7 @@ class HableOpsMixin:
         return __sub__(self.h(), other)
 
     @beartype
-    def __rsub__(self: HableT, other: RealLikeSCU) -> H:
+    def __rsub__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__sub__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1795,7 +1787,7 @@ class HableOpsMixin:
         return __mul__(self.h(), other)
 
     @beartype
-    def __rmul__(self: HableT, other: RealLikeSCU) -> H:
+    def __rmul__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__mul__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1811,7 +1803,7 @@ class HableOpsMixin:
         return __truediv__(self.h(), other)
 
     @beartype
-    def __rtruediv__(self: HableT, other: RealLikeSCU) -> H:
+    def __rtruediv__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1827,7 +1819,7 @@ class HableOpsMixin:
         return __floordiv__(self.h(), other)
 
     @beartype
-    def __rfloordiv__(self: HableT, other: RealLikeSCU) -> H:  # type: ignore [misc]
+    def __rfloordiv__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1843,7 +1835,7 @@ class HableOpsMixin:
         return __mod__(self.h(), other)
 
     @beartype
-    def __rmod__(self: HableT, other: RealLikeSCU) -> H:
+    def __rmod__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__mod__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1859,7 +1851,7 @@ class HableOpsMixin:
         return __pow__(self.h(), other)
 
     @beartype
-    def __rpow__(self: HableT, other: RealLikeSCU) -> H:
+    def __rpow__(self: HableT, other: RealLike) -> H:
         r"""
         Shorthand for ``#!python operator.__pow__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1867,7 +1859,7 @@ class HableOpsMixin:
         return __pow__(other, self.h())
 
     @beartype
-    def __and__(self: HableT, other: Union[SupportsIntSCU, H, HableT]) -> H:
+    def __and__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1875,7 +1867,7 @@ class HableOpsMixin:
         return __and__(self.h(), other)
 
     @beartype
-    def __rand__(self: HableT, other: SupportsIntSCU) -> H:
+    def __rand__(self: HableT, other: SupportsInt) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1883,7 +1875,7 @@ class HableOpsMixin:
         return __and__(other, self.h())
 
     @beartype
-    def __xor__(self: HableT, other: Union[SupportsIntSCU, H, HableT]) -> H:
+    def __xor__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1891,7 +1883,7 @@ class HableOpsMixin:
         return __xor__(self.h(), other)
 
     @beartype
-    def __rxor__(self: HableT, other: SupportsIntSCU) -> H:
+    def __rxor__(self: HableT, other: SupportsInt) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1899,7 +1891,7 @@ class HableOpsMixin:
         return __xor__(other, self.h())
 
     @beartype
-    def __or__(self: HableT, other: Union[SupportsIntSCU, H, HableT]) -> H:
+    def __or__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -1907,7 +1899,7 @@ class HableOpsMixin:
         return __or__(self.h(), other)
 
     @beartype
-    def __ror__(self: HableT, other: SupportsIntSCU) -> H:
+    def __ror__(self: HableT, other: SupportsInt) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(other, self.h())``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -2011,7 +2003,7 @@ class HableOpsMixin:
         return self.h().is_odd()
 
     @beartype
-    def explode(self: HableT, max_depth: SupportsIntSCU = 1) -> H:
+    def explode(self: HableT, max_depth: SupportsInt = 1) -> H:
         r"""
         Shorthand for ``#!python self.h().explode(max_depth)``. See the
         [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].
@@ -2023,7 +2015,7 @@ class HableOpsMixin:
         self: HableT,
         expand: _ExpandT,
         coalesce: _CoalesceT = coalesce_replace,
-        max_depth: SupportsIntSCU = 1,
+        max_depth: SupportsInt = 1,
     ) -> H:
         r"""
         Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the
@@ -2032,9 +2024,7 @@ class HableOpsMixin:
         return self.h().substitute(expand, coalesce, max_depth)
 
     @beartype
-    def within(
-        self: HableT, lo: RealLikeSCU, hi: RealLikeSCU, other: _OperandT = 0
-    ) -> H:
+    def within(self: HableT, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> H:
         r"""
         Shorthand for ``#!python self.h().within(lo, hi, other)``. See the
         [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].
@@ -2142,14 +2132,12 @@ def resolve_dependent_probability(
         else:
             independent_variables_by_name[key] = H(value)
 
-    captured_values_by_name: Dict[str, RealLikeSCU] = {}
+    captured_values_by_name: Dict[str, RealLike] = {}
     uncaptured_value_names = set(independent_variables_by_name)
 
-    def _resolve() -> Union[H, RealLikeSCU]:
-        def _capture_dependent_value(
-            h: H, outcome: RealLikeSCU
-        ) -> Union[RealLikeSCU, H]:
-            expanded: Union[RealLikeSCU, H]
+    def _resolve() -> Union[H, RealLike]:
+        def _capture_dependent_value(h: H, outcome: RealLike) -> Union[RealLike, H]:
+            expanded: Union[RealLike, H]
             captured_values_by_name[name_to_be_captured] = outcome
             expanded = _resolve()
             del captured_values_by_name[name_to_be_captured]
@@ -2189,11 +2177,11 @@ def sum_h(hs: Iterable[H]):
 
 
 @beartype
-def _within(lo: RealLikeSCU, hi: RealLikeSCU) -> _BinaryOperatorT:
+def _within(lo: RealLike, hi: RealLike) -> _BinaryOperatorT:
     if __gt__(lo, hi):
         raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")
 
-    def _cmp(a: RealLikeSCU, b: RealLikeSCU) -> int:
+    def _cmp(a: RealLike, b: RealLike) -> int:
         # This approach will probably not work with most symbolic outcomes
         diff = a - b
 

@@ -18,7 +18,7 @@ from fractions import Fraction
 from typing import Tuple, Type, Union
 
 import pytest
-from numerary import RealLikeSCU
+from numerary import RealLike
 
 from dyce import H
 from dyce.h import _within
@@ -330,7 +330,7 @@ class TestH:
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(h: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
+        def double_odd_values(h: H, outcome: RealLike) -> Union[H, RealLike]:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -342,7 +342,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(d: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
+        def never_expand(d: H, outcome: RealLike) -> Union[H, RealLike]:
             return outcome
 
         d20 = H(20)
@@ -350,7 +350,7 @@ class TestH:
         assert d20.substitute(never_expand, operator.__add__, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, outcome: RealLikeSCU) -> Union[H, RealLikeSCU]:
+        def reroll_d4_threes(h: H, outcome: RealLike) -> Union[H, RealLike]:
             return h if max(h) == 4 and outcome == 3 else outcome
 
         h = H(4)

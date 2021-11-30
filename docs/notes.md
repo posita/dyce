@@ -18,6 +18,7 @@
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
 * Breaks ``dyce.viz`` out into [``anydyce``](https://github.com/posita/anydyce/).
+* Removes use of ``#!python numerary.types.…SCU`` types
 
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
