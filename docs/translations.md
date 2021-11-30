@@ -24,7 +24,7 @@ You bet!
 
 Let’s reproduce his tables (with slightly different names to provide context).
 
-| d6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
+| D6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
 |:-----------:|:-------------------------------------------------:|
 | 1           | 16.7%                                             |
 | 2           | 30.6%                                             |
@@ -130,7 +130,7 @@ Lookin’ good.
 Lookin’ good.
 Now let’s put everything together.
 
-| d6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
+| D6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
 |:-----------:|:---------------:|:-------------------:|:---------------------:|:-----------------:|:----------------------:|
 | 1           | 83.3%           | 7.0%                | 4.5%                  | 3.1%              | 2.1%                   |
 | 2           | 69.4%           | 12.7%               | 8.3%                  | 5.7%              | 3.8%                   |
@@ -158,11 +158,173 @@ Now let’s put everything together.
 Neat!
 Thanks to ``dyce``, we can confidently verify that Angry guy sure knows his math!
 
+## Modeling *Ironsworn*’s core mechanic
+
+Shawn Tomlin’s [*Ironsworn*](https://www.ironswornrpg.com/) melds a number of different influences in a fresh way.
+Its core mechanic involves rolling a D6, adding a modifier (up to four), and comparing the resulting value to two D10s.
+If the modified value from the D6 is strictly greater than both D10s, the result is a strong success.
+If it is strictly greater than only one D10, the result is a weak success.
+If it is equal to or less than both D10s, it’s a failure.
+
+A brute force way to model this is to enumerate the product of the three dice and then perform logical comparisons.
+
+``` python
+>>> from dyce import H
+>>> from numerary.types import RealLikeSCU
+>>> from enum import IntEnum, auto
+>>> from typing import Iterator, Tuple, cast
+>>> d6 = H(6)
+>>> d10 = H(10)
+
+>>> class IronResult(IntEnum):
+...   FAILURE = 0
+...   WEAK_SUCCESS = auto()
+...   STRONG_SUCCESS = auto()
+
+>>> def iron_results_brute_force(mod: int = 0) -> Iterator[Tuple[RealLikeSCU, int]]:
+...   modded_d6 = d6 + mod
+...   d6_outcome: int
+...   first_d10_outcome: int
+...   second_d10_outcome: int
+...   for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], d6.items()):
+...     for first_d10_outcome, first_d10_count in cast(Iterator[Tuple[int, int]], d10.items()):
+...       for second_d10_outcome, second_d10_count in cast(Iterator[Tuple[int, int]], d10.items()):
+...         if d6_outcome > first_d10_outcome and d6_outcome > second_d10_outcome:
+...           outcome = IronResult.STRONG_SUCCESS
+...         elif d6_outcome > first_d10_outcome or d6_outcome > second_d10_outcome:
+...           outcome = IronResult.WEAK_SUCCESS
+...         else:
+...           outcome = IronResult.FAILURE
+...         yield outcome, d6_count * first_d10_count * second_d10_count
+
+>>> # By choosing our function's return type with care, we can lean on H.__init__ for
+>>> # the accounting. (That's what it's there for!)
+>>> print(H(iron_results_brute_force()).format())
+avg |    0.50
+std |    0.66
+var |    0.43
+  0 |  59.17% |#############################
+  1 |  31.67% |###############
+  2 |   9.17% |####
+
+```
+
+The above is probably fine for a few number of dice without many sides, but ``dyce`` offers some optimizations.
+In this case, we can leverage [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] to enumerate the possible values of the two D10s.
+
+``` python
+>>> from dyce import P
+>>> d10_2 = 2@P(d10)
+
+>>> def iron_results(mod: int = 0):
+...   modded_d6 = d6 + mod
+...   for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], modded_d6.items()):
+...     for (d10_2_roll, d10_2_count) in cast(Iterator[Tuple[Tuple[int, int], int]], d10_2.rolls_with_counts()):
+...       lower_d10, higher_d10 = d10_2_roll  # roll outcomes are sorted
+...       if d6_outcome > higher_d10:
+...         outcome = IronResult.STRONG_SUCCESS
+...       elif d6_outcome > lower_d10:
+...         outcome = IronResult.WEAK_SUCCESS
+...       else:
+...         outcome = IronResult.FAILURE
+...       yield outcome, d6_count * d10_2_count
+
+>>> for mod in range(-2, 5):
+...   iron_distribution = H(iron_results(mod))
+...   print("{:+} -> {}".format(mod, {cast(IronResult, outcome).name: f"{float(prob):6.2%}" for outcome, prob in iron_distribution.distribution()}))
+-2 -> {'FAILURE': '82.33%', 'WEAK_SUCCESS': '15.33%', 'STRONG_SUCCESS': ' 2.33%'}
+-1 -> {'FAILURE': '71.67%', 'WEAK_SUCCESS': '23.33%', 'STRONG_SUCCESS': ' 5.00%'}
++0 -> {'FAILURE': '59.17%', 'WEAK_SUCCESS': '31.67%', 'STRONG_SUCCESS': ' 9.17%'}
++1 -> {'FAILURE': '45.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '15.17%'}
++2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
++3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
++4 -> {'FAILURE': '15.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '45.17%'}
+
+```
+
+Simple enough.
+
+!!! info "Why *not* use ``#!python P(d6, d10, d10).rolls_with_counts``?"
+
+    First, it would provide no performance benefit.
+    ``dyce``’s optimizations are generally limited to homogeneous pools (or the homogeneous subsets of heterogeneous pools).
+
+    Second, we would have a correctness issue.
+    [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] guarantees that outcomes in each roll that it produces are sorted according to value, *irrespective of source*.
+
+    In this case, let’s say we were considering a roll of ``#!python (1, 1, 2)``.
+    Did the ``#!python 2`` come from the ``#!python d6`` or one of the ``#!python d10``s?
+    We don’t know.
+
+    Pools are great for enumeration, but not where ordering needs to be preserved.
+
+Ah, but there’s a _twist_.
+In cooperative or solo play, a failure or success is particularly spectacular when the D10s come up doubles.
+We can tweak our prior function slightly to reflect this.
+
+``` python
+>>> class IronSoloResult(IntEnum):
+...   SPECTACULAR_FAILURE = -1
+...   FAILURE = auto()
+...   WEAK_SUCCESS = auto()
+...   STRONG_SUCCESS = auto()
+...   SPECTACULAR_SUCCESS = auto()
+
+>>> def iron_solo_results(mod: int = 0):
+...   modded_d6 = d6 + mod
+...   for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], modded_d6.items()):
+...     for (d10_2_roll, d10_2_count) in cast(Iterator[Tuple[Tuple[int, int], int]], d10_2.rolls_with_counts()):
+...       lower_d10, higher_d10 = d10_2_roll
+...       if d6_outcome > higher_d10:
+...         outcome = IronSoloResult.SPECTACULAR_SUCCESS if higher_d10 == lower_d10 else IronSoloResult.STRONG_SUCCESS
+...       elif d6_outcome > lower_d10:
+...         outcome = IronSoloResult.WEAK_SUCCESS
+...       else:
+...         outcome = IronSoloResult.SPECTACULAR_FAILURE if higher_d10 == lower_d10 else IronSoloResult.FAILURE
+...       yield outcome, d6_count * d10_2_count
+
+```
+
+Visualization:
+
+``` python
+>>> from collections import defaultdict
+>>> import matplotlib  # doctest: +SKIP
+>>> fig, axes = matplotlib.pyplot.subplots()  # doctest: +SKIP
+>>> by_result = defaultdict(list)
+>>> mods = list(range(-2, 5))
+>>> for mod in mods:
+...   results_for_mod = dict(H(iron_solo_results(mod)).distribution())
+...   for result in IronSoloResult:
+...     result_val = float(results_for_mod.get(result, 0))
+...     by_result[result].append(result_val)
+>>> labels = [str(mod) for mod in mods]
+>>> bottoms = [0.0 for _ in mods]
+>>> for result in IronSoloResult:
+...   result_vals = by_result[result]
+...   assert len(result_vals) == len(mods)
+...   axes.bar(labels, result_vals, bottom=bottoms, label=result.name)  # doctest: +SKIP
+...   bottoms = [
+...     bottom + result_val
+...     for bottom, result_val in zip(bottoms, result_vals)
+...   ]
+>>> axes.legend()  # doctest: +SKIP
+>>> axes.set_xlabel("modifier")  # doctest: +SKIP
+>>> fig.title("Ironsworn distributions")  # doctest: +SKIP
+
+```
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source srcset="../img/plot_ironsworn_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Ironsworn distributions](img/plot_ironsworn_light.png)
+</picture>
+
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
 ``` python
 >>> from dyce import H, P
->>> res1 = 3 @ H(6)
+>>> res1 = 3@H(6)
 >>> p_4d6 = 4@P(6)
 >>> res2 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
 >>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: H(6) if outcome == 1 else outcome)
@@ -170,8 +332,8 @@ Thanks to ``dyce``, we can confidently verify that Angry guy sure knows his math
 >>> res3 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
 >>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
 >>> res4 = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
->>> res5 = 2 @ H(6) + 6
->>> res6 = 4 @ H(4) + 2
+>>> res5 = 2@H(6) + 6
+>>> res6 = 4@H(4) + 2
 
 ```
 
@@ -210,7 +372,6 @@ Visualization:
 ...   label="4d4 + 2",
 ... )  # doctest: +SKIP
 >>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title("Comparing various take-three-of-4d6 methods")  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
 
 ```
@@ -501,7 +662,7 @@ Visualization:
 ``` python
 >>> import matplotlib  # doctest: +SKIP
 >>> for depth in range(6):
-...   res = (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None))
+...   res = (10@P(H(10).explode(max_depth=depth))).h(slice(-3, None))
 ...   matplotlib.pyplot.plot(
 ...     *res.distribution_xy(),
 ...     marker=".",
@@ -616,7 +777,7 @@ Visualization:
 >>> import matplotlib  # doctest: +SKIP
 >>> d, k = 6, 3
 >>> for n in range(k + 1, k + 9):
-...   p = n @ P(d)
+...   p = n@P(d)
 ...   res_roll_and_keep = H(roll_and_keep(p, k))
 ...   matplotlib.pyplot.plot(
 ...     *res_roll_and_keep.distribution_xy(),
@@ -624,7 +785,7 @@ Visualization:
 ...     label=f"{n}d{d} keep {k} add +1",
 ...   )  # doctest: +SKIP
 >>> for n in range(k + 1, k + 9):
-...   p = n @ P(d)
+...   p = n@P(d)
 ...   res_normal = p.h(slice(-k, None))
 ...   matplotlib.pyplot.plot(
 ...     *res_normal.distribution_xy(),

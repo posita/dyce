@@ -13,7 +13,7 @@ from typing import List, Tuple
 from dyce import H
 
 
-def do_it(_: str) -> None:
+def do_it(__: str) -> None:
     import matplotlib.pyplot
 
     col_names = ["Loss", "Tie", "Win"]

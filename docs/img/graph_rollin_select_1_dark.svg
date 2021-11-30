@@ -7,15 +7,15 @@
 <svg width="1044pt" height="489pt"
  viewBox="0.00 0.00 1044.00 489.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 485)">
-<g id="clust1" class="cluster">
-<title>cluster_rolls</title>
-<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-203 8,-473 343,-473 343,-203 8,-203"/>
-<text text-anchor="start" x="147" y="-458.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roll Tree</text>
-</g>
 <g id="clust2" class="cluster">
 <title>cluster_rollers</title>
 <polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="752,-95 752,-365 1028,-365 1028,-95 752,-95"/>
 <text text-anchor="start" x="855.5" y="-350.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roller Tree</text>
+</g>
+<g id="clust1" class="cluster">
+<title>cluster_rolls</title>
+<polygon fill="transparent" stroke="Azure" stroke-dasharray="1,5" points="8,-203 8,-473 343,-473 343,-203 8,-203"/>
+<text text-anchor="start" x="147" y="-458.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="Azure">Roll Tree</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_roll_outcomes</title>

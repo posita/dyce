@@ -17,17 +17,18 @@
 
 ## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
 
-* Remove ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved
-* Refine Tension Pool example
+* Removes ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved
+* Refines Tension Pool example
+* Adds *Ironsworn* example
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 
-* Removes dependencies on deprecated ``numerary.types.…SCT`` tuples
+* Removes dependencies on deprecated ``#!python numerary.types.…SCT`` tuples
 * Adds [Angry GM Tension Pool mechanic](https://theangrygm.com/definitive-tension-pool/) translation
 
 ## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
 
-* Removes calls to ``os.get_terminal_size`` to retain utility in environments without terminals.
+* Removes calls to ``#!python os.get_terminal_size`` to retain utility in environments without terminals.
   Fixes [#5](https://github.com/posita/dyce/issues/5).
   Thanks [@sudo-simon!](https://github.com/sudo-simon)!
 
@@ -36,9 +37,9 @@
 * Splits out protocol checking into its own fancy library: [``numerary``](https://github.com/posita/numerary/)!
 * Is now [available on PyPI as ``dyce``_](https://pypi.org/project/dyce/), thanks to the generosity of [David Eyk](https://eykd.net/about/)!
 * Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
-* Uses ``pygraphviz`` to automate class diagram generation.
+* Uses ``#!python pygraphviz`` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
-* Introduces experimental use of ``numpy`` for RNG, if present.
+* Introduces experimental use of ``#!python numpy`` for RNG, if present.
 * Migrates to using ``pyproject.toml`` and ``setup.cfg``.
 * Adds missing [``py.typed`` to ensure clients get type checking](https://www.python.org/dev/peps/pep-0561/).
   (Whoops.)
@@ -52,15 +53,15 @@
     The following changes are not backward compatible.
     Please review before upgrading.
 
-* Renames ``HAbleT`` and ``HAbleOpsMixin`` to [``HableT``][dyce.h.HableT] and  [``HableOpsMixin``][dyce.h.HableOpsMixin].
+* Renames ``#!python HAbleT`` and ``#!python HAbleOpsMixin`` to [``HableT``][dyce.h.HableT] and  [``HableOpsMixin``][dyce.h.HableOpsMixin].
     Uses alternate spellings.
-* Removes deprecated non-flattening unary operation methods ``P.__neg__`` and ``P.__pos__``.
+* Removes deprecated non-flattening unary operation methods ``#!python P.__neg__`` and ``#!python P.__pos__``.
     Uses, e.g., ``#!python P.umap(operator.__neg__)`` or ``#!python P(-h for h in p)`` instead.
-* Removes deprecated synonym methods ``H.even`` and ``H.odd``.
+* Removes deprecated synonym methods ``#!python H.even`` and ``#!python H.odd``.
     Uses [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
-* Removes deprecated synonym package ``dyce.plt``.
+* Removes deprecated synonym package ``#!python dyce.plt``.
     Uses [``dyce.viz``](dyce.viz.md) instead.
-* Removes special case handling of ``H({})`` for addition and subtraction.
+* Removes special case handling of ``#!python H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.
     If the behavior is desired, consider eliminating empty histograms before performing calculations.
@@ -98,7 +99,7 @@
 ### Other changes
 
 * Documentation overhaul including augmented examples and reorganized images and JavaScript.
-* Fixes ``H({}).format()`` bug.
+* Fixes ``#!python H({}).format()`` bug.
 * Adds [``beartype``](https://github.com/beartype/beartype) runtime type checking.
 * *Maintains* support for Python 3.7 (for now).
 
@@ -112,7 +113,7 @@
 * Boosts ``#!python isinstance`` performance with ``#!python dyce``’s proprietary numeric ``#!python Protocol``s.
 * Reinstates support for Python 3.7 ~~(for now)~~.
 * Adds [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd].
-* Deprecates synonym methods ``H.even`` and ``H.odd``.
+* Deprecates synonym methods ``#!python H.even`` and ``#!python H.odd``.
 * Introduces experimental [``H.total``][dyce.h.H.total] property.
 * Removes incorrectly non-flattening unary operation methods ``#!python P.__abs__`` and ``#!python P.__invert__``.
 * Deprecates non-flattening unary operation methods ``#!python P.__neg__`` and ``#!python P.__pos__``.

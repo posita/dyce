@@ -33,6 +33,8 @@ all : \
 	plot_great_weapon_fighting_light.png \
 	plot_histogram_dark.png \
 	plot_histogram_light.png \
+	plot_ironsworn_dark.png \
+	plot_ironsworn_light.png \
 	plot_risus_first_round_dark.png \
 	plot_risus_first_round_light.png \
 	plot_roll_and_keep_dark.png \

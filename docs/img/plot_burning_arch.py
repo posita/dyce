@@ -11,7 +11,7 @@ from __future__ import annotations
 from dyce import H
 
 
-def do_it(_: str) -> None:
+def do_it(__: str) -> None:
     import matplotlib.pyplot
 
     save_roll = H(20)

@@ -11,7 +11,7 @@ from __future__ import annotations
 from dyce import H, P
 
 
-def do_it(_: str) -> None:
+def do_it(__: str) -> None:
     import matplotlib.pyplot
 
     def roll_and_keep(p: P, k: int):

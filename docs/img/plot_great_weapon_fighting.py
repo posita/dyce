@@ -41,8 +41,6 @@ def do_it(style: str) -> None:
         marker=".",
     )
     ax_plot.legend()
-    # Should match the corresponding img[alt] text
-    ax_plot.set_title("Comparing a normal attack to an enhanced one")
     display_burst(
         ax_burst,
         h_inner=great_weapon_fighting,
