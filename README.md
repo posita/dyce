@@ -71,7 +71,7 @@ When one worries that the flickering light of humanity may be snuffed out at any
 
 * [David Eyk](https://eykd.net/about/) not only [inspires others to explore creative writing](https://eykd.net/blog/), but has graciously ceded his PyPI project dedicated to [his own prior work under a similar name](https://code.google.com/archive/p/dyce/).
   As such, ``dyce`` is now [available as ~~``dycelib``~~ _``dyce``_](https://pypi.org/project/dyce/)!
-  Thanks to his generosity, —~~millions~~ *dozens* of future ``dyce`` users will be spared from typing superfluous characters.
+  Thanks to his generosity, ~~millions~~ *dozens* of future ``dyce`` users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🙇‍♂️
 
 ## A taste

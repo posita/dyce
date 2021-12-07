@@ -158,15 +158,15 @@ Now let’s put everything together.
 Neat!
 Thanks to ``dyce``, we can confidently verify that Angry guy sure knows his math!
 
-## Modeling *Ironsworn*’s core mechanic
+## Dependent variables in ``dyce`` – modeling *Ironsworn*’s core mechanic
 
 Shawn Tomlin’s [*Ironsworn*](https://www.ironswornrpg.com/) melds a number of different influences in a fresh way.
-Its core mechanic involves rolling a D6, adding a modifier (up to four), and comparing the resulting value to two D10s.
+Its core mechanic involves rolling a D6, adding a modifier, and comparing the resulting value to two D10s.
 If the modified value from the D6 is strictly greater than both D10s, the result is a strong success.
 If it is strictly greater than only one D10, the result is a weak success.
 If it is equal to or less than both D10s, it’s a failure.
 
-A brute force way to model this is to enumerate the product of the three dice and then perform logical comparisons.
+A brute force (and verbose) way to model this is to enumerate the product of the three dice and then perform logical comparisons.
 
 ``` python
 >>> from dyce import H
@@ -183,9 +183,6 @@ A brute force way to model this is to enumerate the product of the three dice an
 
 >>> def iron_results_brute_force(mod: int = 0) -> Iterator[Tuple[RealLikeSCU, int]]:
 ...   modded_d6 = d6 + mod
-...   d6_outcome: int
-...   first_d10_outcome: int
-...   second_d10_outcome: int
 ...   for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], d6.items()):
 ...     for first_d10_outcome, first_d10_count in cast(Iterator[Tuple[int, int]], d10.items()):
 ...       for second_d10_outcome, second_d10_count in cast(Iterator[Tuple[int, int]], d10.items()):
@@ -229,11 +226,11 @@ In this case, we can leverage [``P.rolls_with_counts``][dyce.p.P.rolls_with_coun
 ...         outcome = IronResult.FAILURE
 ...       yield outcome, d6_count * d10_2_count
 
->>> for mod in range(-2, 5):
-...   iron_distribution = H(iron_results(mod))
+>>> iron_distributions_by_mod = {
+...   mod: H(iron_results(mod)) for mod in range(5)
+... }
+>>> for mod, iron_distribution in iron_distributions_by_mod.items():
 ...   print("{:+} -> {}".format(mod, {cast(IronResult, outcome).name: f"{float(prob):6.2%}" for outcome, prob in iron_distribution.distribution()}))
--2 -> {'FAILURE': '82.33%', 'WEAK_SUCCESS': '15.33%', 'STRONG_SUCCESS': ' 2.33%'}
--1 -> {'FAILURE': '71.67%', 'WEAK_SUCCESS': '23.33%', 'STRONG_SUCCESS': ' 5.00%'}
 +0 -> {'FAILURE': '59.17%', 'WEAK_SUCCESS': '31.67%', 'STRONG_SUCCESS': ' 9.17%'}
 +1 -> {'FAILURE': '45.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '15.17%'}
 +2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
@@ -242,25 +239,56 @@ In this case, we can leverage [``P.rolls_with_counts``][dyce.p.P.rolls_with_coun
 
 ```
 
-Simple enough.
+This can be expressed more compactly by leaning on ``dyce`` to handle the enumeration of the D10s as well as the comparison to the value from the D6.
 
-!!! info "Why *not* use ``#!python P(d6, d10, d10).rolls_with_counts``?"
+``` python
+
+>>> def iron_results_compact(mod: int = 0):
+...   modded_d6 = d6 + mod
+...   for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], modded_d6.items()):
+...     for num_successes, success_count in (2@(d10.lt(d6_outcome))).items():
+...       yield num_successes, success_count * d6_count
+
+>>> {
+...   mod: H(iron_results_compact(mod))
+...   for mod in range(5)
+... } == iron_distributions_by_mod
+True
+
+```
+
+[``H.substitute``][dyce.h.H.substitute] affords an even more terse expression.
+
+``` python
+>>> {
+...   mod: d6.substitute(lambda _, d6_outcome: 2@(d10.lt(d6_outcome + mod)))
+...   for mod in range(5)
+... } == iron_distributions_by_mod
+True
+
+```
+
+!!! info "Why doesn’t ``#!python 2@(H(6).gt(H(10))`` work?"
+
+    ``#!python H(6).gt(H(10))`` will compute how often a six-sided die is strictly greater than a ten-sided die.
+    ``#!python 2@(H(6).gt(H(10)))`` will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
+    This isn’t quite what we want, since the mechanic calls for rolling a single six-sided and comparing that result to each of two ten-sided dice.
+    Other than [``H.substitute``][dyce.h.H.substitute], ``dyce`` does not provide an internal mechanism for handling dependent variables, so we either have to use that or find another way to express the dependency.
+
+!!! info "Why not use ``#!python P(d6, d10, d10).rolls_with_counts``?"
 
     First, it would provide no performance benefit.
     ``dyce``’s optimizations are generally limited to homogeneous pools (or the homogeneous subsets of heterogeneous pools).
-
     Second, we would have a correctness issue.
     [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] guarantees that outcomes in each roll that it produces are sorted according to value, *irrespective of source*.
-
     In this case, let’s say we were considering a roll of ``#!python (1, 1, 2)``.
     Did the ``#!python 2`` come from the ``#!python d6`` or one of the ``#!python d10``s?
     We don’t know.
-
     Pools are great for enumeration, but not where ordering needs to be preserved.
 
-Ah, but there’s a _twist_.
+Now for the _twist_.
 In cooperative or solo play, a failure or success is particularly spectacular when the D10s come up doubles.
-We can tweak our prior function slightly to reflect this.
+We can tweak our prior enumeration function slightly to reflect this.
 
 ``` python
 >>> class IronSoloResult(IntEnum):
