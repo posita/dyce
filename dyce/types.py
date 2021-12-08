@@ -33,7 +33,11 @@ from numerary.types import (
     runtime_checkable,
 )
 
-__all__ = ()
+__all__ = (
+    "as_int",
+    "is_even",
+    "is_odd",
+)
 
 
 # ---- Types ---------------------------------------------------------------------------

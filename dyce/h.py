@@ -1212,7 +1212,8 @@ class H(_MappingT):
 
         Because it delegates to a callback for refereeing substitution decisions,
         ``#!python substitute`` is quite flexible and well suited to modeling (or at
-        least approximating) logical progressions. Consider the following rules:
+        least approximating) logical progressions with dependent variables. Consider the
+        following rules:
 
           1. Start with a total of zero.
           2. Roll a six-sided die. Add the face to the total. If the face was a six, go

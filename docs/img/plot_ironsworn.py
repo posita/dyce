@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 from enum import IntEnum, auto
-from typing import Iterator, Tuple, cast
+from functools import partial
 
-from dyce import H, P
+from dyce import H
 
 
 class IronSoloResult(IntEnum):
@@ -23,31 +23,35 @@ class IronSoloResult(IntEnum):
     SPECTACULAR_SUCCESS = auto()
 
 
-def iron_solo_results(mod: int = 0):
-    d6 = H(6)
-    d10_2 = 2 @ P(10)
-    modded_d6 = d6 + mod
+d6 = H(6)
+d10 = H(10)
 
-    for d6_outcome, d6_count in cast(Iterator[Tuple[int, int]], modded_d6.items()):
-        for (d10_2_roll, d10_2_count) in cast(
-            Iterator[Tuple[Tuple[int, int], int]], d10_2.rolls_with_counts()
-        ):
-            lower_d10, higher_d10 = d10_2_roll
-            if d6_outcome > higher_d10:
-                outcome = (
+
+def sub_d6(__, d6_outcome, mod=0):
+    def sub_first_d10(__, first_challenge):
+        def sub_second_d10(__, second_challenge):
+            action = d6_outcome + mod
+            action_beats_first = action > first_challenge
+            action_beats_second = action > second_challenge
+            doubles = first_challenge == second_challenge
+            if action_beats_first and action_beats_second:
+                return (
                     IronSoloResult.SPECTACULAR_SUCCESS
-                    if higher_d10 == lower_d10
+                    if doubles
                     else IronSoloResult.STRONG_SUCCESS
                 )
-            elif d6_outcome > lower_d10:
-                outcome = IronSoloResult.WEAK_SUCCESS
+            elif action_beats_first or action_beats_second:
+                return IronSoloResult.WEAK_SUCCESS
             else:
-                outcome = (
+                return (
                     IronSoloResult.SPECTACULAR_FAILURE
-                    if higher_d10 == lower_d10
+                    if doubles
                     else IronSoloResult.FAILURE
                 )
-            yield outcome, d6_count * d10_2_count
+
+        return d10.substitute(sub_second_d10)
+
+    return d10.substitute(sub_first_d10)
 
 
 def do_it(__: str) -> None:
@@ -58,10 +62,11 @@ def do_it(__: str) -> None:
     mods = list(range(-2, 5))
 
     for mod in mods:
-        results_for_mod = dict(H(iron_solo_results(mod)).distribution())
+        results_for_mod = d6.substitute(partial(sub_d6, mod=mod))
+        distribution_for_mod = dict(results_for_mod.distribution())
 
         for result in IronSoloResult:
-            result_val = float(results_for_mod.get(result, 0))
+            result_val = float(distribution_for_mod.get(result, 0))
             by_result[result].append(result_val)
 
     labels = [str(mod) for mod in mods]

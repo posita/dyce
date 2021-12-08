@@ -615,7 +615,7 @@ In more sophisticated cases, rollers may be more competitive with (or even surpa
 
 All that being said, for periodic rolls simulating handfuls (not thousands) of operations or dice, such performance disparities probably won’t matter that much.
 Just use the primitives whose semantics work best for you.
-If ever performance becomes an issue, [let us know](contrib.md), and we can collaborate on how to improve it.
+If ever performance becomes an issue, [let me know](contrib.md), and we can collaborate on how to improve it.
 
 ## Further exploration
 
