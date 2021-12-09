@@ -24,7 +24,7 @@ You bet!
 
 Let’s reproduce his tables (with slightly different names to provide context).
 
-| D6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
+| d6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
 |:-----------:|:-------------------------------------------------:|
 | 1           | 16.7%                                             |
 | 2           | 30.6%                                             |
@@ -103,7 +103,7 @@ One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
 
 ```
 
-Now let’s use our map to validate the probabilities of a particular outcome using that D8 and D12.
+Now let’s use our map to validate the probabilities of a particular outcome using that d8 and d12.
 
 | Rarity or Impact     | Angry’s Probability of a Complication Arising |
 |:--------------------:|:---------------------------------------------:|
@@ -128,7 +128,7 @@ Now let’s use our map to validate the probabilities of a particular outcome us
 Lookin’ good!
 Now let’s put everything together.
 
-| D6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
+| d6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
 |:-----------:|:---------------:|:-------------------:|:---------------------:|:-----------------:|:----------------------:|
 | 1           | 83.3%           | 7.0%                | 4.5%                  | 3.1%              | 2.1%                   |
 | 2           | 69.4%           | 12.7%               | 8.3%                  | 5.7%              | 3.8%                   |
@@ -153,13 +153,13 @@ Now let’s put everything together.
 
 ```
 
-Neat!
-Thanks to ``dyce``, we can confidently verify that Angry guy sure knows his math!
+Well butter my butt, and call me a biscuit!
+That Angry guy sure knows his math!
 
 ## Modeling *Ironsworn*’s core mechanic
 
 Shawn Tomlin’s [*Ironsworn*](https://www.ironswornrpg.com/) melds a number of different influences in a fresh way.
-Its core mechanic involves rolling an *action die* (a D6), adding a modifier, and comparing the resulting value to two *challenge dice* (D10s).
+Its core mechanic involves rolling an *action die* (a d6), adding a modifier, and comparing the resulting value to two *challenge dice* (d10s).
 If the modified value from the action die is strictly greater than both challenge dice, the result is a strong success.
 If it is strictly greater than only one challenge die, the result is a weak success.
 If it is equal to or less than both challenge dice, it’s a failure.
@@ -212,14 +212,14 @@ A brute force way to model this is to enumerate the product of the three dice an
 
 ```
 
-While relatively straightforward, this approach is very verbose.
+While relatively straightforward, this approach is a little verbose.
 If we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can re-characterize our solution in terms of [``H.substitute``][dyce.h.H.substitute].
-We can also deploy a counting trick on the two D10s.
+We can also deploy a counting trick with the two d10s.
 
 ``` python
 >>> {
 ...   mod: (d6 + mod).substitute(
-...     lambda _, action: 2@(d10.lt(action))
+...     lambda __, action: 2@(d10.lt(action))
 ...   ) for mod in range(5)
 ... } == iron_distributions_by_mod
 True
@@ -229,15 +229,15 @@ True
 !!! question "What’s with that ``#!python 2@(d10.lt(action))``?"
 
     Let’s break it down.
-    ``#!python H(10).lt(value)`` will tell us how often a single D10 is less than ``#!python value``.
+    ``#!python H(10).lt(value)`` will tell us how often a single d10 is less than ``#!python value``.
 
     ``` python
-    >>> H(10).lt(5)  # how often a D10 is strictly less than 5
+    >>> H(10).lt(5)  # how often a d10 is strictly less than 5
     H({False: 6, True: 4})
 
     ```
 
-    By summing those results (and taking advantage of the fact that, in Python, ``#!python bool``s act like ``#!python int``s when it comes to arithmetic operators), we can count how often that happens with more than one interchangeable D10s.
+    By summing those results (and taking advantage of the fact that, in Python, ``#!python bool``s act like ``#!python int``s when it comes to arithmetic operators), we can count how often that happens with more than one interchangeable d10s.
 
     ``` python
     >>> h = H(10).lt(5) + H(10).lt(5) ; h
@@ -248,9 +248,9 @@ True
     ```
 
     How do we interpret those results?
-    36 times out of a hundred, neither D10 will be strictly less than five.
-    48 times out of a hundred, exactly one of the D10s will be strictly less than five.
-    16 times out of a hundred, both D10s will be strictly less than five.
+    36 times out of a hundred, neither d10 will be strictly less than five.
+    48 times out of a hundred, exactly one of the d10s will be strictly less than five.
+    16 times out of a hundred, both d10s will be strictly less than five.
 
     [``H``][dyce.h.H]’s ``#!python @`` operator provides a shorthand.
 
@@ -269,9 +269,10 @@ True
     Other than [``H.substitute``][dyce.h.H.substitute], ``dyce`` does not provide an internal mechanism for handling dependent probabilities, so we either have to use that or find another way to express the dependency.
 
 Now for a _twist_.
-In cooperative or solo play, a failure or success is particularly spectacular when the D10s come up doubles.
-The trick to mapping that to ``dyce`` is recognizing that we now have a dependent probability that involves *three* independent variables: the (modded) D6, a first D10, and a second D10.
-We also deploy a technique involving ``#!python partial`` to parameterize our ``#!python mod`` value.
+In cooperative or solo play, a failure or success is particularly spectacular when the d10s come up doubles.
+The trick to mapping that to ``dyce`` is recognizing that we now have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
+We even deploy a technique involving ``#!python partial`` to parameterize our ``#!python mod`` value.
+This ends up looking similar to our brute force solution of the simpler mechanic, above, but without requiring the low-level accounting.
 
 ``` python
 >>> class IronSoloResult(IntEnum):
@@ -339,7 +340,7 @@ Visualization:
 ## Advanced topic – modeling *Risis*
 
 *[Risus](http://risus.cumberlandgames.com/)* and its many [community-developed alternative rules](http://www.risusiverse.com/home/optional-rules) not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
-We can easily model its opposed combat system for various starting configurations through the first round.
+We can easily model the first round of its opposed combat system for various starting configurations.
 
 ``` python
 >>> for them in range(3, 6):
@@ -427,7 +428,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...     elif them == 0: return H({1: 1})  # they are out of dice, we win
 ...     this_round = us_vs_them_func(us, them)
 ...
-...     def _next_round(_: H, outcome) -> H:
+...     def _next_round(__: H, outcome) -> H:
 ...       if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
 ...       elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
 ...       else: return H({})  # ignore (immediately re-roll) all ties
@@ -482,8 +483,6 @@ Our “driver” takes three arguments:
     * An outcome of ``#!python 1`` signals the likelihood of our victory.
     * An outcome of ``#!python 0`` signals the likelihood of a tie.
 
-    This is intentional, since we’re going to leverage that very method later.
-
 ``` python linenums="7"
   if us < 0 or them < 0:
     raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
@@ -493,11 +492,11 @@ Our “driver” takes three arguments:
 ```
 
 We make some preliminary checks that guard access to our recursive implementation so that it can be a little cleaner.
-We also set up a ``#!python dict`` to keep track of results we‘ve already computed.
+We also set up a ``#!python dict`` to cache results we‘ve already computed.
 For example, we might compute a case where we lose a die, then our opposition loses a die.
 We arrive at a similar case where our opposition loses a die, then we lose a die.
-Both cases are similar from that point on.
-We’ll keep track of those, so we don’t have to recompute them.
+Both cases would be identical from that point on.
+We’ll detect this redundancy and avoid recomputing identical sub-trees.
 
 ``` python linenums="13"
   def _resolve(us: int, them: int) -> H:
@@ -526,7 +525,7 @@ If we have none of those cases, we get to work.
 
     In this function, we do not check for the case where *both* parties are at zero.
     Because only one party can lose a die during each round, the only way both parties can be at zero simultaneously is if they both started at zero.
-    Since we guarded against that case in the enclosing function, we don’t have to worry about that here.
+    Since we guard against that case in the enclosing function, we don’t have to worry about it here.
     Either ``#!python us`` is zero, ``#!python them`` is zero, or neither is zero.
 
 ``` python linenums="17"
@@ -536,7 +535,7 @@ If we have none of those cases, we get to work.
 Then, we compute the outcomes for _this round_ using the provided resolution function.
 
 ``` python linenums="19"
-    def _next_round(_: H, outcome) -> H:
+    def _next_round(__: H, outcome) -> H:
       ...
 ```
 
@@ -550,7 +549,7 @@ This allows us to take our computation for this round, and “fold in” subsequ
 We keep track of the result in our memoization ``#!python dict`` before returning it.
 
 ``` python linenums="19"
-    def _next_round(_: H, outcome) -> H:
+    def _next_round(__: H, outcome) -> H:
       if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
       elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
       else: return H({})  # ignore (immediately re-roll) all ties
@@ -587,7 +586,7 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 ...   best_them = (them@P(6)).h(-1)
 ...   h = best_us.vs(best_them)
 ...   # Goliath Rule: tie goes to the party with fewer dice in this round
-...   h = h.substitute(lambda h, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
+...   h = h.substitute(lambda __, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
 ...   return h
 
 >>> for t in range(3, 5):
@@ -606,145 +605,88 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 
 ```
 
-Modeling the “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic is currently beyond the capabilities of ``dyce`` without additional work.
-This is for two reasons.
-First, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to substitute outcomes, not counts.
-This means we can’t arbitrarily *increase* the likelihood of achieving a particular outcome through substitution.
-Second, ``dyce``’s substitution mechanism only resolves outcomes through a fixed number of iterations (not an infinite series).
-Most of the time, this is good enough.
+The “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
 
-Both of these limitations can be circumvented where infinite series can be computed and encoded as histograms.
-For this mechanic, we can observe that a single six-sided die (``1d6``) has a $\frac{1}{2}$ chance of coming up even, thereby earning a “success”.
-We can also observe that it has a $\frac{1}{6}$ chance of showing a six, earning an additional roll.
-That second roll has a $\frac{1}{2}$ chance of coming up even, as well as a $\frac{1}{6}$ chance of earning another roll, and so on.
-In other words, the number of successes one can expect to roll are:
+First, ``dyce``’s substitution mechanism only resolves outcomes through a fixed number of iterations, so it can only approximate probabilities for infinite series.
+Most of the time, the implications are largely theoretical with a sufficient number of iterations.
+This is no exception.
 
-$$
-\frac{1}{2}
-+ \frac{1}{6} \left( \frac{1}{2}
-  + \frac{1}{6} \left( \frac{1}{2}
-    + \frac{1}{6} \left( \frac{1}{2}
-      + \ldots
-    \right)
-  \right)
-\right)
-$$
+Second, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to directly substitute outcomes, not counts.
+This means we can’t arbitrarily *increase* the likelihood of achieving a particular outcome through replacement.
+With some creativity, we can work around that, too.
 
-Or, in the alternative:
+In the case of “Evens Up”, we need to keep track of whether an even number was rolled, but we also need to keep rolling (and accumulating) as long as sixes are rolled.
+This behaves a lot like an exploding die with three values (miss, hit, and hit-and-explode).
+Further, we can observe that every “run” will be zero or more exploding hits terminated by either a miss or a non-exploding hit.
 
-$$
-\frac{1}{2}
-+ \frac{1}{2}\frac{1}{6}
-+ \frac{1}{2}\frac{1}{6}\frac{1}{6}
-+ \frac{1}{2}\frac{1}{6}\frac{1}{6}\frac{1}{6}
-+ \ldots
-$$
-
-Or simply:
-
-$$
-\frac{1}{{2} \times {6}^{0}}
-+ \frac{1}{{2} \times {6}^{1}}
-+ \frac{1}{{2} \times {6}^{2}}
-+ \frac{1}{{2} \times {6}^{3}}
-+ \ldots
-$$
-
-So what is that? We probably don’t know unless we do math for a living, or at least as an active hobby.
-(The author does neither, which is partially what motivated the creation of this library.)
-Computing the value to the first hundred iterations offers a clue.
+If we choose our values carefully, we can encode how many times we’ve encountered relevant events as we explode.
 
 ``` python
->>> 1/2 * sum(1 / (6 ** i) for i in range(100))
-0.59999999999999975575093458246556110680103302001953125
+>>> import operator
+>>> MISS = 0
+>>> HIT = 1
+>>> HIT_EXPLODE = 2
+>>> d_evens_up_raw = H((
+...   MISS,  # 1
+...   HIT,  # 2
+...   MISS,  # 3
+...   HIT,  # 4
+...   MISS,  # 5
+...   HIT_EXPLODE,  # 6
+... ))
+
+>>> d_evens_up_exploded = d_evens_up_raw.explode(max_depth=3) ; d_evens_up_exploded
+H({0: 648, 1: 432, 2: 108, 3: 72, 4: 18, 5: 12, 6: 3, 7: 2, 8: 1})
 
 ```
 
-It appears convergent around $\frac{3}{5}$.
-Let’s see if we can validate that.
-An [article from MathIsFun.com](https://www.mathsisfun.com/algebra/infinite-series.html) provides useful guidance.
-The section on geometric series is easily adapted to our problem.
+For every value that is even, we ended in a miss.
+For every value that is odd, we ended in a hit that will need to be tallied.
+Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
-$$
-\begin{matrix}
-S
-& = &
-\frac{1}{{2} \times {6}^{0}}
-+ \frac{1}{{2} \times {6}^{1}}
-+ \frac{1}{{2} \times {6}^{2}}
-+ \frac{1}{{2} \times {6}^{3}}
-+ \frac{1}{{2} \times {6}^{4}}
-+ \ldots \\
-& = &
-\overbrace{ \frac{1}{2} }
-+ \underbrace{ \frac{1}{12} + \frac{1}{72} + \frac{1}{432} + \frac{1}{2\,592} + \ldots } \\
-\end{matrix}
-$$
+``` python
+>>> def decode_hits(__, outcome):
+...   return (outcome + 1) // 2  # equivalent to outcome // 2 + outcome % 2
 
-$$
-\begin{matrix}
-\frac{1}{6}S
-& = &
-\frac{1}{6}\frac{1}{{2} \times {6}^{0}}
-+ \frac{1}{6}\frac{1}{{2} \times {6}^{1}}
-+ \frac{1}{6}\frac{1}{{2} \times {6}^{2}}
-+ \frac{1}{6}\frac{1}{{2} \times {6}^{3}}
-+ \ldots \\
-& = &
-\underbrace{ \frac{1}{12} + \frac{1}{72} + \frac{1}{432} + \frac{1}{2\,592} + \ldots } \\
-\end{matrix}
-$$
+>>> d_evens_up = d_evens_up_exploded.substitute(decode_hits)
+>>> print(d_evens_up.format())
+avg |    0.60
+std |    0.69
+var |    0.48
+  0 |  50.00% |#########################
+  1 |  41.67% |####################
+  2 |   6.94% |###
+  3 |   1.16% |
+  4 |   0.23% |
 
-$$
-S = \overbrace{ \frac{1}{2} } + \underbrace{ \frac{1}{6}S }
-$$
+```
 
-$$
-S - \frac{1}{6}S = \frac{1}{2}
-$$
-
-$$
-\frac{5}{6}S = \frac{1}{2}
-$$
-
-$$
-S = \frac{3}{5}
-$$
-
-Well, butter my butt and call me a biscuit! Math really _is_ fun! 🧈 🤠 🧮
-
-!!! info
-
-    The Archimedean visualization technique mentioned in the [aforementioned article](https://www.mathsisfun.com/algebra/infinite-series.html) also adapts well to this case.
-    It involves no algebra and is left as an exercise to the reader … at least one with nothing more pressing to do.
-
-Armed with this knowledge, we can now model “Evens Up” using our ``#!python risus_combat_driver`` from above.
+We can now approximate a complete “Evens Up” combat using our ``#!python risus_combat_driver`` from above.
 We can also deploy a trick using ``#!python partial`` to parameterize use of the Goliath Rule.
 
 ``` python
 >>> from functools import partial
->>> d6_evens_exploding_on_six = H({1: 3, 0: 2})  # 3 dubyas, 2 doughnuts
 
 >>> def evens_up_vs(us: int, them: int, goliath: bool = False) -> H:
-...   h = (us@d6_evens_exploding_on_six).vs(them@d6_evens_exploding_on_six)
+...   h = (us@d_evens_up).vs(them@d_evens_up)
 ...   if goliath:
-...     h = h.substitute(lambda h, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
+...     h = h.substitute(lambda __, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
 ...   return h
 
 >>> for t in range(3, 5):
-...   print("- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -")
+...   print("-----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---")
 ...   for u in range(t, t + 3):
 ...     goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=True)).format(width=0)
 ...     no_goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=False)).format(width=0)
 ...     print(f"{u}d6 vs {t}d6:   {goliath_results}   {no_goliath_results}")
-- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -
+-----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
 3d6 vs 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-4d6 vs 3d6:   {..., -1: 27.49%, 1: 72.51%}   {..., -1: 14.38%, 1: 85.62%}
-5d6 vs 3d6:   {..., -1:  9.27%, 1: 90.73%}   {..., -1:  1.99%, 1: 98.01%}
-- - - - - - - With Goliath Rule - - - - - -  Without Goliath Rule - - - -
+4d6 vs 3d6:   {..., -1: 29.51%, 1: 70.49%}   {..., -1: 19.08%, 1: 80.92%}
+5d6 vs 3d6:   {..., -1: 12.32%, 1: 87.68%}   {..., -1:  4.57%, 1: 95.43%}
+-----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
 4d6 vs 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-5d6 vs 4d6:   {..., -1: 28.50%, 1: 71.50%}   {..., -1: 16.44%, 1: 83.56%}
-6d6 vs 4d6:   {..., -1: 10.50%, 1: 89.50%}   {..., -1:  2.86%, 1: 97.14%}
+5d6 vs 4d6:   {..., -1: 30.52%, 1: 69.48%}   {..., -1: 21.04%, 1: 78.96%}
+6d6 vs 4d6:   {..., -1: 13.68%, 1: 86.32%}   {..., -1:  5.88%, 1: 94.12%}
 
 ```
 
@@ -755,7 +697,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 >>> res1 = 3@H(6)
 >>> p_4d6 = 4@P(6)
 >>> res2 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
->>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: H(6) if outcome == 1 else outcome)
+>>> d6_reroll_first_one = H(6).substitute(lambda __, outcome: H(6) if outcome == 1 else outcome)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> res3 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
 >>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
@@ -859,7 +801,7 @@ An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
 ``` python
 >>> import operator
 >>> save_roll.substitute(
-...   lambda h, outcome:
+...   lambda __, outcome:
 ...     burning_arch_damage // 2 if operator.__ge__(outcome, 10)
 ...     else burning_arch_damage
 ... ) == damage_half_on_save
@@ -1029,7 +971,7 @@ Example 2 translation:
 >>> critical_hit = 3@H(12) + 5
 >>> advantage = (2@P(20)).h(-1)
 
->>> def crit(_: H, outcome):
+>>> def crit(__: H, outcome):
 ...   if outcome == 20: return critical_hit
 ...   elif outcome + 5 >= 14: return normal_hit
 ...   else: return 0

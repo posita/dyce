@@ -114,6 +114,7 @@ H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 ```
 
 The results show there is one way to make ``#!python 18``, two ways to make ``#!python 21``, three ways to make ``#!python 24``, etc.
+
 Histograms provide rudimentary formatting for convenience.
 
 ``` python
@@ -141,9 +142,9 @@ The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative
 >>> miwin_iii = H((1, 2, 5, 6, 7, 9))
 >>> miwin_iv = H((1, 3, 4, 5, 8, 9))
 >>> miwin_v = H((2, 3, 4, 6, 7, 8))
->>> miwin_iii + miwin_iv + miwin_v
+>>> miwin_dist = miwin_iii + miwin_iv + miwin_v ; miwin_dist
 H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
->>> print((miwin_iii + miwin_iv + miwin_v).format(scaled=True))
+>>> print((miwin_dist).format(scaled=True))
 avg |   15.00
 std |    4.47
 var |   20.00
@@ -379,14 +380,14 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Dependent probabilities
 
-In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute], although it takes some practice to adjust to those semantics.
+In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute], although it takes some practice to adjust to the semantics.
 
 Where we can identify independent terms and reduce dependent terms to calculations solely involving independent terms, there is a fairly straightforward translation.
 First, we express independent terms as histograms.
 Second, we express dependent terms as substitution functions.
 Finally, we pass the dependent substitution functions to the independent histograms via [``H.substitute``][dyce.h.H.substitute].
 
-Say we want to roll a D6 and compare whether the result is strictly greater than its distance from some constant.
+Say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
 
 ``` python
 >>> d6 = H(6)  # independent term
@@ -399,7 +400,7 @@ H({False: 1, True: 2})
 ```
 
 Now, instead of a constant, let’s use another die as a second independent variable.
-We’ll roll a D4 and a D6 and compare whether the D6 is strictly greater than the absolute difference between dice.
+We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
 
 ``` python
 >>> d4 = H(4)  # first independent term

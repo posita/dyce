@@ -20,6 +20,8 @@
 * Removes ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved
 * Refines Tension Pool example
 * Adds *Ironsworn* example
+* Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example
+* Adds detail around dependent probabilities
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 

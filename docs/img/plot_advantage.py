@@ -18,7 +18,7 @@ def do_it(__: str) -> None:
     critical_hit = 3 @ H(12) + 5
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(_: H, outcome):
+    def crit(__: H, outcome):
         if outcome == 20:
             return critical_hit
         elif outcome + 5 >= 14:

@@ -1152,8 +1152,8 @@ class H(_MappingT):
         See [``coalesce_replace``][dyce.h.coalesce_replace] and the
         [``lowest_terms`` method][dyce.h.H.lowest_terms].
 
-        This method can be used to model complex rules. The following models re-rolling
-        a face of 1 on the first roll:
+        This method can be used to model complex mechanics. The following models
+        re-rolling a face of 1 on the first roll:
 
         ``` python
         >>> def reroll_one(h: H, outcome):
@@ -1193,7 +1193,7 @@ class H(_MappingT):
             until something other than a 6 comes up.
 
             ``` python
-            >>> H(6).substitute(lambda h, outcome: H({}) if outcome == 6 else outcome)
+            >>> H(6).substitute(lambda __, outcome: H({}) if outcome == 6 else outcome)
             H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
             ```
@@ -1205,7 +1205,7 @@ class H(_MappingT):
             >>> d6_3, d8_2 = 3@H(6), 2@H(8)
             >>> d6_3.vs(d8_2)
             H({-1: 4553, 0: 1153, 1: 8118})
-            >>> d6_3.vs(d8_2).substitute(lambda h, outcome: H({}) if outcome == 0 else outcome)
+            >>> d6_3.vs(d8_2).substitute(lambda __, outcome: H({}) if outcome == 0 else outcome)
             H({-1: 4553, 1: 8118})
 
             ```
@@ -1213,7 +1213,7 @@ class H(_MappingT):
         Because it delegates to a callback for refereeing substitution decisions,
         ``#!python substitute`` is quite flexible and well suited to modeling (or at
         least approximating) logical progressions with dependent variables. Consider the
-        following rules:
+        following mechanic:
 
           1. Start with a total of zero.
           2. Roll a six-sided die. Add the face to the total. If the face was a six, go

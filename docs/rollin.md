@@ -72,7 +72,7 @@ Let’s look at some more substantial examples.
 
 ## Emulating a hundred-sided die using two ten-sided dice
 
-<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../img/1d100-1.png" alt="D00 &amp; D10"></a>
+<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../img/1d100-1.png" alt="d00 &amp; d10"></a>
 
 In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered $[{{0}, {1}, \ldots , {9}}]$) and a “tens” ten-sided die (faces numbered $[{{00}, {10}, \ldots , {90}}]$).
 Let’s try to model that as a roller and use it to generate a roll.
