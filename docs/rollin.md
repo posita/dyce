@@ -41,8 +41,8 @@ Each roll it generates has that value as its sole outcome.
 Let’s see what that looks like (now with tasty entity relationship diagrams).
 
 <picture style="float: right; padding: 0 1.0em 0 1.0em; max-width: 33%;">
-  <source srcset="../img/graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Rollers, rolls, and outcomes, oh my!](img/graph_rollin_value_light.svg)
+  <source srcset="../assets/graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Rollers, rolls, and outcomes, oh my!](assets/graph_rollin_value_light.svg)
 </picture>
 
 ``` python
@@ -72,7 +72,7 @@ Let’s look at some more substantial examples.
 
 ## Emulating a hundred-sided die using two ten-sided dice
 
-<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../img/1d100-1.png" alt="d00 &amp; d10"></a>
+<a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../assets/1d100-1.png" alt="d00 &amp; d10"></a>
 
 In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered $[{{0}, {1}, \ldots , {9}}]$) and a “tens” ten-sided die (faces numbered $[{{00}, {10}, \ldots , {90}}]$).
 Let’s try to model that as a roller and use it to generate a roll.
@@ -201,8 +201,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../img/graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD from emulating a d100](img/graph_rollin_pool_light.svg)
+  <source srcset="../assets/graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD from emulating a d100](assets/graph_rollin_pool_light.svg)
 </picture>
 
 Let’s break that down so it doesn’t feel like trying to drink from a fire hose.
@@ -315,8 +315,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../img/graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD for arithmetic composition](img/graph_rollin_expr_light.svg)
+  <source srcset="../assets/graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD for arithmetic composition](assets/graph_rollin_expr_light.svg)
 </picture>
 
 ## Dropping dice from prior rolls – keeping the best three of ``3d6`` and ``1d8``
@@ -456,8 +456,8 @@ Oof.
 Let’s visualize!
 
 <picture>
-  <source srcset="../img/graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roll ERD for dropping outcomes](img/graph_rollin_select_1_light.svg)
+  <source srcset="../assets/graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roll ERD for dropping outcomes](assets/graph_rollin_select_1_light.svg)
 </picture>
 
 Holy entangled relationship diagrams, Batman!
@@ -544,8 +544,8 @@ Roll(
 ```
 
 <picture>
-  <source srcset="../img/graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Alternate Roll ERD for dropping outcomes](img/graph_rollin_select_2_light.svg)
+  <source srcset="../assets/graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Alternate Roll ERD for dropping outcomes](assets/graph_rollin_select_2_light.svg)
 </picture>
 
 In this case, our results are still *mostly* traceable, since our pool is homogeneous.
@@ -585,31 +585,22 @@ How much overhead do all these data structures contribute?
 It obviously depends on the complexity of the structure.
 Consider a simple example ``d20 + d12 + 4``.
 Let’s do that 5,000 times, sort the results, and take every other one starting with the highest.
-
 We might use a pool, if we didn’t care about traceability.
+Let’s compare that to our roller.
 
 ``` python
-In [1]: from dyce import H, P, R
-
-In [2]: d20, d12 = H(20), H(12)
-
-In [3]: p = 5000@P(d20 + d12 + 4)
-
-In [4]: %timeit p.roll()[::-2]
-26.3 ms ± 520 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+--8<-- "docs/assets/perf_pools_vs_rollers.txt"
 ```
 
-That’s not bad.
-What about rollers?
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_resolve_dependent_probability.ipy"><code>perf_resolve_dependent_probability.ipy</code></a></summary>
 
 ``` python
-In [5]: r = (5000@(R.select_from_values((slice(None, None, -2),), d20, d12, 4)))
-
-In [6]: %timeit r.roll()
-257 ms ± 3.7 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+--8<-- "docs/assets/perf_pools_vs_rollers.ipy"
 ```
+</details>
 
-In this particular case, our roller takes about ten times longer than our histogram pool.
+In this particular case, our roller takes over ten times longer than our histogram pool.
 It is unsurprising that a simple roller is slower than a simple pool, at least in part because the math is deferred until [``R.roll``][dyce.r.R.roll] time.
 In more sophisticated cases, rollers may be more competitive with (or even surpass) their histogram or pool analogies, especially when initialization time is taken into account.
 

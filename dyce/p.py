@@ -463,34 +463,19 @@ class P(Sequence[H], HableOpsMixin):
         ```
 
         Based on some rudimentary testing, this method appears to converge on being
-        almost twice (about $\frac{7}{4}$) as efficient as the boolean accumulation
-        technique for larger sets.
+        about twice as fast as the boolean accumulation technique for larger sets.
 
         ``` python
-        In [3]: %timeit 3@d4_eq3 + 2@d6_eq3
-        287 µs ± 6.96 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-
-        In [4]: %timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)
-        402 µs ± 5.59 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-
-        In [5]: %timeit 9@d4_eq3 + 6@d6_eq3
-        845 µs ± 7.89 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-
-        In [6]: %timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)
-        597 µs ± 9.46 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-
-        In [7]: %timeit 90@d4_eq3 + 60@d6_eq3
-        24.7 ms ± 380 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-
-        In [8]: %timeit P(90@P(4), 60@P(6)).appearances_in_rolls(3)
-        7.5 ms ± 84.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-
-        In [9]: %timeit 900@d4_eq3 + 600@d6_eq3
-        3.34 s ± 19.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-
-        In [10]: %timeit P(900@P(4), 600@P(6)).appearances_in_rolls(3)
-        1.93 s ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+        --8<-- "docs/assets/perf_appearances_in_rolls.txt"
         ```
+
+        <details>
+        <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_appearances_in_rolls.ipy"><code>perf_appearances_in_rolls.ipy</code></a></summary>
+
+        ``` python
+        --8<-- "docs/assets/perf_appearances_in_rolls.ipy"
+        ```
+        </details>
         """
         group_counters: List[Counter[RealLikeSCU]] = []
 
@@ -690,75 +675,17 @@ class P(Sequence[H], HableOpsMixin):
             heterogeneous ones. Note, however, that all three appear to scale
             geometrically in some way.
 
-            ```ipython
-            In [1]: from dyce import H, P
-
-            In [2]: for n in (6, 8):
-               ...:   p = n@P(6)
-               ...:   for i in range(len(p) - 4, len(p)):
-               ...:     print(f"({p}).h(slice({i})):")
-               ...:     %timeit p.h(slice(i))
-            (P(6, 6, 6, 6, 6, 6)).h(slice(2)):
-            1.35 ms ± 23.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-            (P(6, 6, 6, 6, 6, 6)).h(slice(3)):
-            3.15 ms ± 516 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(6, 6, 6, 6, 6, 6)).h(slice(4)):
-            5.37 ms ± 182 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(6, 6, 6, 6, 6, 6)).h(slice(5)):
-            10.5 ms ± 1.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(4)):
-            5.58 ms ± 25.3 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(5)):
-            9.81 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(6)):
-            14.7 ms ± 430 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(7)):
-            20.4 ms ± 328 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-
-            In [3]: for n in (3, 4):
-               ...:   p = P(n@P(6), *[H(6) - m for m in range(n, 0, -1)])
-               ...:   for i in range(len(p) - 4, len(p)):
-               ...:     print(f"({p}).h(slice({i})):")
-               ...:     %timeit p.h(slice(i))
-            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(2)):
-            16.1 ms ± 1.09 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
-            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(3)):
-            39 ms ± 602 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(4)):
-            40.3 ms ± 3.49 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(5)):
-            46.2 ms ± 7.43 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(4)):
-            538 ms ± 9.46 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(5)):
-            534 ms ± 30.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(6)):
-            536 ms ± 13.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(7)):
-            604 ms ± 52.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-
-            In [4]: for n in (6, 8):
-               ...:   p = P(*[H(6) - m for m in range(n, 0, -1)])
-               ...:   for i in range(len(p) - 4, len(p)):
-               ...:     print(f"({p}).h(slice({i})):")
-               ...:     %timeit p.h(slice(i))
-            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(2)):
-            145 ms ± 4.59 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(3)):
-            147 ms ± 3.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
-            158 ms ± 1.38 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
-            147 ms ± 691 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
-            6.09 s ± 14.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
-            6.11 s ± 36.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(6)):
-            6.25 s ± 47.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(7)):
-            6.31 s ± 42.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+            ``` python
+            --8<-- "docs/assets/perf_rolls_with_counts.txt"
             ```
+
+            <details>
+            <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_rolls_with_counts.ipy"><code>perf_rolls_with_counts.ipy</code></a></summary>
+
+            ``` python
+            --8<-- "docs/assets/perf_rolls_with_counts.ipy"
+            ```
+            </details>
         """
         n = len(self)
 

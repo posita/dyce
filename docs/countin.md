@@ -81,12 +81,13 @@ H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 A pool of two six-sided dice is:
 
 ``` python
->>> 2@P(H(6))
+>>> P(H(6), H(6))
 P(6, 6)
 
 ```
 
 Where ``#!python n`` is an integer, ``#!python P(n, ...)`` is shorthand for ``#!python P(H(n), ...)``.
+Python’s matrix multiplication operator (``@``) can also be used with pools.
 The above can be expressed more succinctly.
 
 ``` python
@@ -324,12 +325,12 @@ Indexing selects particular histograms into a new pool.
 P(4, 4, 6, 6, 8, 8)
 >>> (2@P(8, 4, 6))[:2]
 P(4, 4)
->>> (2@P(8, 4, 6))[::2]
-P(4, 6, 8)
+>>> (2@P(8, 4, 6))[::3]
+P(4, 6)
 
 ```
 
-A brute-force way to enumerate all possible rolls is:
+An inefficient way to enumerate all possible rolls is:
 
 ``` python
 >>> import itertools
@@ -359,6 +360,7 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
 The odds of scoring at least one nine or higher on any single die when rolling $n$ “[exploding][dyce.h.H.explode]” six-sided dice, for $n$ in $[1..10]$ is:
 
 ``` python
+>>> # By the time we're rolling a third die, we're guaranteed a nine or higher, so we only need to look that far
 >>> exploding_d6 = H(6).explode(max_depth=2)
 >>> for n in range(10, 0, -1):
 ...   d6e_ge_9 = exploding_d6.ge(9)
@@ -380,12 +382,12 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Dependent probabilities
 
-In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute], although it takes some practice to adjust to the semantics.
+In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute] or [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability], although it takes some practice to adjust to the semantics.
 
 Where we can identify independent terms and reduce dependent terms to calculations solely involving independent terms, there is a fairly straightforward translation.
 First, we express independent terms as histograms.
 Second, we express dependent terms as substitution functions.
-Finally, we pass the dependent substitution functions to the independent histograms via [``H.substitute``][dyce.h.H.substitute].
+Finally, we pass the dependent substitution functions to the independent histograms via [``H.substitute``][dyce.h.H.substitute] or [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability].
 
 Say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
 
@@ -415,13 +417,23 @@ One way to express the dependent terms is to nest substitution functions, where 
 ...   def sub_d6(__, d6_outcome):
 ...     return d6_outcome > abs(d4_outcome - d6_outcome)
 ...   return d6.substitute(sub_d6)
->>> d4.substitute(sub_d4)
+>>> h = d4.substitute(sub_d4) ; h
 H({False: 1, True: 5})
 
 ```
 
-This isn’t the most intuitive thing in the world, so ``dyce`` may introduce a more friendly mechanism in the future.
-If you have ideas, please [let me know](contrib.md)!
+This isn’t the most intuitive thing in the world, so ``dyce`` provides the [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] function as a semantically equivalent shorthand.
+
+``` python
+>>> from dyce.h import resolve_dependent_probability
+
+>>> def dependent_term(d4_outcome, d6_outcome):
+...   return d6_outcome > abs(d4_outcome - d6_outcome)
+
+>>> resolve_dependent_probability(dependent_term, d4_outcome = d4, d6_outcome = d6) == h
+True
+
+```
 
 ## Visualization
 
@@ -441,8 +453,8 @@ If you have ideas, please [let me know](contrib.md)!
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Distribution for 2d6](img/plot_histogram_light.png)
+  <source srcset="../assets/plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Distribution for 2d6](assets/plot_histogram_light.png)
 </picture>
 
 [``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``#!python matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)).
@@ -456,12 +468,12 @@ If you have ideas, please [let me know](contrib.md)!
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Basic plot_burst example](img/plot_burst_1_light.png)
+  <source srcset="../assets/plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Basic plot_burst example](assets/plot_burst_1_light.png)
 </picture>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
-Overrides apply counter-clockwise, starting from the 12 o‘clock position.
+Overrides apply counter-clockwise, starting from the 12 o’clock position.
 
 ``` python
 >>> d20 = H(20)
@@ -477,8 +489,8 @@ Overrides apply counter-clockwise, starting from the 12 o‘clock position.
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Advanced plot_burst example](img/plot_burst_2_light.png)
+  <source srcset="../assets/plot_burst_2_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Advanced plot_burst example](assets/plot_burst_2_light.png)
 </picture>
 
 The outer ring can also be used to compare two histograms directly.
@@ -496,8 +508,8 @@ The ``dyce`` abides.
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: plot_burst example (2d6 vs. d20)](img/plot_burst_3_light.png)
+  <source srcset="../assets/plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: plot_burst example (2d6 vs. d20)](assets/plot_burst_3_light.png)
 </picture>
 
 ## Time to get meta-evil on those outcomes!
@@ -513,7 +525,7 @@ H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y
 
 ```
 
-[![Miss you, Doris!](img/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186)
+[![Miss you, Doris!](assets/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186)
 
 !!! note
 

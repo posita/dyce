@@ -7,10 +7,24 @@ repos:
     rev: v4.0.1
     hooks:
     - id: end-of-file-fixer
-      exclude: ^docs/dyce-powered\.svg$
+      # See <https://docs.python.org/3/library/re.html#re.X>
+      exclude: |
+        (?x)^(
+            docs/(
+                dyce-powered\.svg|
+                assets/perf_.*\.txt
+            )
+        )$
     - id: mixed-line-ending
     - id: trailing-whitespace
-      exclude: ^docs/dyce-powered\.svg$
+      # See <https://docs.python.org/3/library/re.html#re.X>
+      exclude: |
+        (?x)^(
+            docs/(
+                dyce-powered\.svg|
+                assets/perf_.*\.txt
+            )
+        )$
     - id: check-added-large-files
     - id: check-case-conflict
     - id: check-executables-have-shebangs

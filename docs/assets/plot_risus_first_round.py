@@ -30,7 +30,7 @@ def do_it(__: str) -> None:
         for us in range(them, them + num_rows):
             row_names.append(f"{us}d6 …")
             rows.append((us @ H(6)).vs(them @ H(6)).distribution_xy()[-1])
-        _ = ax.imshow(rows)
+        ax.imshow(rows)
 
         ax.set_title(f"… vs {them}d6")
         ax.set_xticks(col_ticks)
@@ -40,7 +40,7 @@ def do_it(__: str) -> None:
 
         for y in range(len(row_names)):
             for x in range(len(col_names)):
-                _ = ax.text(
+                ax.text(
                     x,
                     y,
                     f"{rows[y][x]:.0%}",

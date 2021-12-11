@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from collections import Counter as counter
 from collections.abc import Iterable as IterableC
 from collections.abc import Mapping as MappingC
@@ -38,6 +39,7 @@ from operator import (
     __truediv__,
     __xor__,
 )
+from pprint import pformat
 from typing import (
     Callable,
     Counter,
@@ -428,6 +430,8 @@ class H(_MappingT):
     def __repr__(self) -> str:
         if self._simple_init is not None:
             arg = str(self._simple_init)
+        elif sys.version_info >= (3, 8):
+            arg = pformat(self._h, sort_dicts=False)
         else:
             arg = dict.__repr__(self._h)
 
@@ -1104,14 +1108,16 @@ class H(_MappingT):
         computed much faster.
 
         ``` python
-        In [2]: %timeit [H(6).order_stat_for_n_at_pos(100, i) for i in range(10)]
-        1.61 s ± 31.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-
-        In [3]: %%timeit
-           ...: order_stat_for_100d6_at_pos = H(6).order_stat_func_for_n(100)
-           ...: [order_stat_for_100d6_at_pos(i) for i in range(10)]
-        170 ms ± 3.41 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        --8<-- "docs/assets/perf_order_stat_for_n.txt"
         ```
+
+        <details>
+        <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_order_stat_for_n.ipy"><code>perf_order_stat_for_n.ipy</code></a></summary>
+
+        ``` python
+        --8<-- "docs/assets/perf_order_stat_for_n.ipy"
+        ```
+        </details>
         """
         betas_by_outcome: Dict[RealLikeSCU, Tuple[H, H]] = {}
 
@@ -2068,6 +2074,137 @@ class HableOpsMixin:
 
 
 # ---- Functions -----------------------------------------------------------------------
+
+
+@beartype
+def resolve_dependent_probability(
+    dependent_term: Callable[..., H],
+    **independent_sources: _SourceT,
+) -> H:
+    r"""
+    !!! warning "Experimental"
+
+        This method should be considered experimental and may change or disappear in
+        future versions.
+
+    Calls ``#!python dependent_term`` for each set of outcomes from the product of
+    ``independent_sources`` and accumulates the results. This is useful for resolving
+    dependent probabilities and is semantically equivalent to nesting substitution
+    functions.
+
+    ``` python
+    >>> def dependent_term(
+    ...   outcome_1,
+    ...   outcome_2,
+    ...   outcome_3,
+    ...   # ...
+    ...   outcome_n,
+    ... ):
+    ...   return (
+    ...     (outcome_1 == outcome_2) +
+    ...     (outcome_2 == outcome_3) +
+    ...     (outcome_1 == outcome_3) +
+    ...     (
+    ...       outcome_n > outcome_1
+    ...       and outcome_n > outcome_2
+    ...       and outcome_n > outcome_3
+    ...       # ...
+    ...     )
+    ...   )
+
+    >>> source_1 = H(6)
+    >>> source_2 = H(8)
+    >>> source_3 = H(10)
+    >>> # ...
+    >>> source_n = H(20)
+
+    >>> def sub_source_1(__, outcome_1):
+    ...   def sub_source_2(__, outcome_2):
+    ...     def sub_source_3(__, outcome_3):
+    ...       # ...
+    ...       def sub_source_n(__, outcome_n):
+    ...         return dependent_term(
+    ...           outcome_1,
+    ...           outcome_2,
+    ...           outcome_3,
+    ...           # ...
+    ...           outcome_n,
+    ...       )
+    ...       return source_n.substitute(sub_source_n)
+    ...       # ...
+    ...     return source_3.substitute(sub_source_3)
+    ...   return source_2.substitute(sub_source_2)
+
+    >>> from dyce.h import resolve_dependent_probability
+    >>> h = resolve_dependent_probability(
+    ...   dependent_term,
+    ...   outcome_1=source_1,
+    ...   outcome_2=source_2,
+    ...   outcome_3=source_3,
+    ...   # ...
+    ...   outcome_n=source_n,
+    ... ) ; h
+    H({0: 808, 1: 1700, 2: 652, 3: 7, 4: 33})
+    >>> source_1.substitute(sub_source_1) == h
+    True
+
+    ```
+
+    This function imposes a modest overhead when compared to the nesting approach. In
+    most cases, the improved readability is worth it.
+
+    ``` python
+    --8<-- "docs/assets/perf_resolve_dependent_probability.txt"
+    ```
+
+    <details>
+    <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_resolve_dependent_probability.ipy"><code>perf_resolve_dependent_probability.ipy</code></a></summary>
+
+    ``` python
+    --8<-- "docs/assets/perf_resolve_dependent_probability.ipy"
+    ```
+    </details>
+    """
+    independent_variables_by_name: Dict[str, H] = {}
+
+    for key, value in independent_sources.items():
+        if isinstance(value, H):
+            independent_variables_by_name[key] = value
+        else:
+            independent_variables_by_name[key] = H(value)
+
+    captured_values_by_name: Dict[str, RealLikeSCU] = {}
+    uncaptured_value_names = set(independent_variables_by_name)
+
+    def _resolve() -> Union[H, RealLikeSCU]:
+        def _capture_dependent_value(
+            h: H, outcome: RealLikeSCU
+        ) -> Union[RealLikeSCU, H]:
+            expanded: Union[RealLikeSCU, H]
+            captured_values_by_name[name_to_be_captured] = outcome
+            expanded = _resolve()
+            del captured_values_by_name[name_to_be_captured]
+
+            return expanded
+
+        if uncaptured_value_names:
+            # Used in _capture_dependent_value
+            name_to_be_captured = uncaptured_value_names.pop()
+            expanded = independent_variables_by_name[name_to_be_captured].substitute(
+                _capture_dependent_value
+            )
+            uncaptured_value_names.add(name_to_be_captured)
+        else:
+            return dependent_term(**captured_values_by_name)
+
+        return expanded
+
+    resolved = _resolve()
+
+    if not isinstance(resolved, H):
+        resolved = H({resolved: 1})
+
+    return resolved
 
 
 @beartype

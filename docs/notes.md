@@ -22,6 +22,7 @@
 * Adds *Ironsworn* example
 * Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example
 * Adds detail around dependent probabilities
+* Adds experimental [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] function
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 

@@ -26,8 +26,8 @@
 ## Roller class hierarchy
 
 <picture>
-  <source srcset="../img/graph_classes_dyce_r_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Roller class hierarchy](img/graph_classes_dyce_r_light.svg)
+  <source srcset="../assets/graph_classes_dyce_r_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Roller class hierarchy](assets/graph_classes_dyce_r_light.svg)
 </picture>
 
 ::: dyce.r

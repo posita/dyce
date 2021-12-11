@@ -40,6 +40,13 @@ all : \
 	plot_roll_and_keep_dark.png \
 	plot_roll_and_keep_light.png
 
+perf : \
+	perf_appearances_in_rolls.txt \
+	perf_order_stat_for_n.txt \
+	perf_pools_vs_rollers.txt \
+	perf_resolve_dependent_probability.txt \
+	perf_rolls_with_counts.txt
+
 plot_%_dark.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
 	"$${PYTHON:-python}" plot.py --style=dark $*
 
@@ -51,6 +58,10 @@ graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py 
 
 graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=light $*
+
+perf_%.txt : perf_%.ipy Makefile ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
+	ipython --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy \
+		| cut >perf_$*.txt -f 2 -d $$'\a'
 
 ../dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'

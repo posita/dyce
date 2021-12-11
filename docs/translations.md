@@ -24,7 +24,7 @@ You bet!
 
 Let’s reproduce his tables (with slightly different names to provide context).
 
-| d6s in Pool | Angry’s Probability of At Least One ``1`` Showing |
+| d6s in pool | Angry’s probability of at least one ``1`` showing |
 |:-----------:|:-------------------------------------------------:|
 | 1           | 16.7%                                             |
 | 2           | 30.6%                                             |
@@ -105,7 +105,7 @@ One way is [``IntEnum``](https://docs.python.org/3/library/enum.html#intenum)s.
 
 Now let’s use our map to validate the probabilities of a particular outcome using that d8 and d12.
 
-| Rarity or Impact     | Angry’s Probability of a Complication Arising |
+| Rarity or impact     | Angry’s probability of a Complication arising |
 |:--------------------:|:---------------------------------------------:|
 | Common or Minor      | 41.7%                                         |
 | Uncommon or Moderate | 27.1%                                         |
@@ -128,14 +128,14 @@ Now let’s use our map to validate the probabilities of a particular outcome us
 Lookin’ good!
 Now let’s put everything together.
 
-| d6s in Pool | No Complication | Common Complication | Uncommon Complication | Rare Complication | Very Rare Complication |
-|:-----------:|:---------------:|:-------------------:|:---------------------:|:-----------------:|:----------------------:|
-| 1           | 83.3%           | 7.0%                | 4.5%                  | 3.1%              | 2.1%                   |
-| 2           | 69.4%           | 12.7%               | 8.3%                  | 5.7%              | 3.8%                   |
-| 3           | 57.9%           | 17.6%               | 11.4%                 | 7.9%              | 5.3%                   |
-| 4           | 48.2%           | 21.6%               | 14.0%                 | 9.7%              | 6.5%                   |
-| 5           | 40.2%           | 24.9%               | 16.2%                 | 11.2%             | 7.5%                   |
-| 6           | 33.5%           | 27.7%               | 18.0%                 | 12.5%             | 8.3%                   |
+| d6s in pool | None  | Common | Uncommon | Rare  | Very Rare |
+|:-----------:|:-----:|:------:|:--------:|:-----:|:---------:|
+| 1           | 83.3% | 7.0%   | 4.5%     | 3.1%  | 2.1%      |
+| 2           | 69.4% | 12.7%  | 8.3%     | 5.7%  | 3.8%      |
+| 3           | 57.9% | 17.6%  | 11.4%    | 7.9%  | 5.3%      |
+| 4           | 48.2% | 21.6%  | 14.0%    | 9.7%  | 6.5%      |
+| 5           | 40.2% | 24.9%  | 16.2%    | 11.2% | 7.5%      |
+| 6           | 33.5% | 27.7%  | 18.0%    | 12.5% | 8.3%      |
 
 ``` python
 >>> from typing import cast
@@ -266,13 +266,14 @@ True
     ``#!python H(6).gt(H(10))`` will compute how often a six-sided die is strictly greater than a ten-sided die.
     ``#!python 2@(H(6).gt(H(10)))`` will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
     This isn’t quite what we want, since the mechanic calls for rolling a single six-sided die and comparing that result to each of two ten-sided dice.
-    Other than [``H.substitute``][dyce.h.H.substitute], ``dyce`` does not provide an internal mechanism for handling dependent probabilities, so we either have to use that or find another way to express the dependency.
+    Other than [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] and [``H.substitute``][dyce.h.H.substitute], ``dyce`` does not provide an internal mechanism for handling dependent probabilities, so we either have to use that or find another way to express the dependency.
 
 Now for a _twist_.
 In cooperative or solo play, a failure or success is particularly spectacular when the d10s come up doubles.
-The trick to mapping that to ``dyce`` is recognizing that we now have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
-We even deploy a technique involving ``#!python partial`` to parameterize our ``#!python mod`` value.
-This ends up looking similar to our brute force solution of the simpler mechanic, above, but without requiring the low-level accounting.
+The trick to mapping that to ``dyce`` internals (beyond the brute force approach) is recognizing that we have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
+
+[``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] is especially useful where there are multiple independent terms.
+The interior of our dependent term ends up looking similar to our brute force solution of the simpler mechanic above, but without the low-level accounting.
 
 ``` python
 >>> class IronSoloResult(IntEnum):
@@ -282,25 +283,34 @@ This ends up looking similar to our brute force solution of the simpler mechanic
 ...   STRONG_SUCCESS = auto()
 ...   SPECTACULAR_SUCCESS = auto()
 
->>> def sub_d6(__, d6_outcome, mod = 0):
-...   def sub_first_d10(__, first_challenge):
-...     def sub_second_d10(__, second_challenge):
-...       action = d6_outcome + mod
-...       action_beats_first_challenge = action > first_challenge
-...       action_beats_second_challenge = action > second_challenge
-...       doubles = first_challenge == second_challenge
-...       if action_beats_first_challenge and action_beats_second_challenge:
-...         return IronSoloResult.SPECTACULAR_SUCCESS if doubles else IronSoloResult.STRONG_SUCCESS
-...       elif action_beats_first_challenge or action_beats_second_challenge:
-...         return IronSoloResult.WEAK_SUCCESS
-...       else:
-...         return IronSoloResult.SPECTACULAR_FAILURE if doubles else IronSoloResult.FAILURE
-...     return d10.substitute(sub_second_d10)
-...   return d10.substitute(sub_first_d10)
+>>> def iron_solo_dependent_term(action, first_challenge, second_challenge, mod=0):
+...   modded_action = action + mod
+...   beats_first_challenge = modded_action > first_challenge
+...   beats_second_challenge = modded_action > second_challenge
+...   doubles = first_challenge == second_challenge
+...   if beats_first_challenge and beats_second_challenge:
+...     return IronSoloResult.SPECTACULAR_SUCCESS if doubles else IronSoloResult.STRONG_SUCCESS
+...   elif beats_first_challenge or beats_second_challenge:
+...     return IronSoloResult.WEAK_SUCCESS
+...   else:
+...     return IronSoloResult.SPECTACULAR_FAILURE if doubles else IronSoloResult.FAILURE
+
+>>> from dyce.h import resolve_dependent_probability
+>>> resolve_dependent_probability(
+...   iron_solo_dependent_term,  # mod defaults to 0
+...   action=d6,
+...   first_challenge=d10,
+...   second_challenge=d10,
+... )
+H({<IronSoloResult.SPECTACULAR_FAILURE: -1>: 9,
+ <IronSoloResult.FAILURE: 0>: 62,
+ <IronSoloResult.WEAK_SUCCESS: 1>: 38,
+ <IronSoloResult.STRONG_SUCCESS: 2>: 8,
+ <IronSoloResult.SPECTACULAR_SUCCESS: 3>: 3})
 
 ```
 
-Visualization:
+We can deploy a technique involving ``#!python partial`` to parameterize our ``#!python mod`` value, which is helpful for visualization.
 
 ``` python
 >>> from collections import defaultdict
@@ -308,9 +318,14 @@ Visualization:
 >>> import matplotlib  # doctest: +SKIP
 >>> fig, axes = matplotlib.pyplot.subplots()  # doctest: +SKIP
 >>> by_result = defaultdict(list)
->>> mods = list(range(-2, 5))
+>>> mods = list(range(0, 5))
 >>> for mod in mods:
-...   results_for_mod = d6.substitute(partial(sub_d6, mod=mod))
+...   results_for_mod = resolve_dependent_probability(
+...     partial(iron_solo_dependent_term, mod=mod),
+...     action=d6,
+...     first_challenge=d10,
+...     second_challenge=d10,
+...   )
 ...   distribution_for_mod = dict(results_for_mod.distribution())
 ...   for result in IronSoloResult:
 ...     result_val = float(distribution_for_mod.get(result, 0))
@@ -331,10 +346,12 @@ Visualization:
 
 ```
 
+Calling ``#!python matplotlib.pyplot.show`` presents:
+
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_ironsworn_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Ironsworn distributions](img/plot_ironsworn_light.png)
+  <source srcset="../assets/plot_ironsworn_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Ironsworn distributions](assets/plot_ironsworn_light.png)
 </picture>
 
 ## Advanced topic – modeling *Risis*
@@ -379,7 +396,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...   for us in range(them, them + num_rows):
 ...     row_names.append(f"{us}d6 …")
 ...     rows.append((us@H(6)).vs(them@H(6)).distribution_xy()[-1])
-...   _ = ax.imshow(rows)  # doctest: +SKIP
+...   ax.imshow(rows)  # doctest: +SKIP
 ...   ax.set_title(f"… vs {them}d6")  # doctest: +SKIP
 ...   ax.set_xticks(col_ticks)  # doctest: +SKIP
 ...   ax.set_xticklabels(col_names, rotation=90)  # doctest: +SKIP
@@ -387,7 +404,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 ...   ax.set_yticklabels(row_names)  # doctest: +SKIP
 ...   for y in range(len(row_names)):
 ...     for x in range(len(col_names)):
-...       _ = ax.text(
+...       ax.text(
 ...         x, y,
 ...         f"{rows[y][x]:.0%}",
 ...         ha="center", va="center",color="w",
@@ -400,8 +417,8 @@ Calling ``#!python matplotlib.pyplot.show`` presents:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling the Risus combat mechanic after the first roll](img/plot_risus_first_round_light.png)
+  <source srcset="../assets/plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling the Risus combat mechanic after the first roll](assets/plot_risus_first_round_light.png)
 </picture>
 
 ### Modeling entire multi-round combats
@@ -409,8 +426,9 @@ Calling ``#!python matplotlib.pyplot.show`` presents:
 With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
 
 ``` python
->>> from typing import Callable, Dict, Tuple
 >>> from dyce import H, P
+>>> from typing import Callable, Dict, Tuple
+
 >>> def risus_combat_driver(
 ...     us: int,  # number of dice we still have
 ...     them: int,  # number of dice they still have
@@ -435,7 +453,6 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...
 ...     already_solved[(us, them)] = this_round.substitute(_next_round)
 ...     return already_solved[(us, them)]
-...
 ...   return _resolve(us, them)
 
 >>> for t in range(3, 6):
@@ -748,8 +765,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Comparing various take-three-of-4d6 methods](img/plot_4d6_variants_light.png)
+  <source srcset="../assets/plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Comparing various take-three-of-4d6 methods](assets/plot_4d6_variants_light.png)
 </picture>
 
 ## Translating one example from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
@@ -792,8 +809,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Expected outcomes for attack with saving throw for half damage](img/plot_burning_arch_light.png)
+  <source srcset="../assets/plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Expected outcomes for attack with saving throw for half damage](assets/plot_burning_arch_light.png)
 </picture>
 
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
@@ -845,24 +862,24 @@ True
 
 ``` python
 >>> # VAR abs = ABS( 1d6 - 1d6 )
->>> abs_ = abs(H(6) - H(6))
->>> print(abs_.format(width=0))
+>>> abs_h = abs(H(6) - H(6))
+>>> print(abs_h.format(width=0))
 {avg: 1.94, 0: 16.67%, 1: 27.78%, 2: 22.22%, 3: 16.67%, 4: 11.11%, 5:  5.56%}
 
 ```
 
 ``` python
 >>> # MAX(4d7, 2d10)
->>> _ = P(4@H(7), 2@H(10)).h(-1)
->>> print(_.format(width=0))
+>>> max_h = P(4@H(7), 2@H(10)).h(-1)
+>>> print(max_h.format(width=0))
 {avg: 16.60, 4:  0.00%, 5:  0.02%, 6:  0.07%, 7:  0.21%, ..., 25:  0.83%, 26:  0.42%, 27:  0.17%, 28:  0.04%}
 
 ```
 
 ``` python
 >>> # MIN(50, d%)
->>> _ = P(H((50,)), P(100)).h(0)
->>> print(_.format(width=0))
+>>> min_h = P(H((50,)), P(100)).h(0)
+>>> print(min_h.format(width=0))
 {avg: 37.75, 1:  1.00%, 2:  1.00%, 3:  1.00%, ..., 47:  1.00%, 48:  1.00%, 49:  1.00%, 50: 51.00%}
 
 ```
@@ -940,8 +957,8 @@ Example 1 visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Comparing a normal attack to an enhanced one](img/plot_great_weapon_fighting_light.png)
+  <source srcset="../assets/plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Comparing a normal attack to an enhanced one](assets/plot_great_weapon_fighting_light.png)
 </picture>
 
 Example 2 source:
@@ -1007,8 +1024,8 @@ Example 2 visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling an advantage-weighted attack with critical hits](img/plot_advantage_light.png)
+  <source srcset="../assets/plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling an advantage-weighted attack with critical hits](assets/plot_advantage_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
@@ -1046,8 +1063,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling taking the three highest of ten exploding d10s](img/plot_d10_explode_light.png)
+  <source srcset="../assets/plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Modeling taking the three highest of ten exploding d10s](assets/plot_d10_explode_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
@@ -1104,8 +1121,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Chances of rolling <i>n</i> duplicates](img/plot_dupes_light.png)
+  <source srcset="../assets/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Chances of rolling <i>n</i> duplicates](assets/plot_dupes_light.png)
 </picture>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
@@ -1170,8 +1187,8 @@ Visualization:
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="../img/plot_roll_and_keep_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Roll-and-keep mechanic comparison](img/plot_roll_and_keep_light.png)
+  <source srcset="../assets/plot_roll_and_keep_dark.png" media="(prefers-color-scheme: dark)">
+  ![Plot: Roll-and-keep mechanic comparison](assets/plot_roll_and_keep_light.png)
 </picture>
 
 ## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
@@ -1193,8 +1210,8 @@ output [brawl 3d6 vs 3d6] named "A vs B Damage"
 Translation:
 
 ``` python
->>> from itertools import product
 >>> from dyce import P
+>>> from itertools import product
 
 >>> def brawl(a: P, b: P):
 ...   for (roll_a, count_a), (roll_b, count_b) in product(
