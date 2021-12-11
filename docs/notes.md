@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
+
+* Fixes [this bullshit](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87) (no, really, I’m serious this time)
+
 ## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
 
 * Removes ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved

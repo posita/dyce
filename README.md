@@ -169,7 +169,14 @@ var |    1.97
 ```
 
 <!-- Should match any title of the corresponding plot title -->
-![Plot: Taking the lowest or highest die of 2d6](https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only)![Plot: Taking the lowest or highest die of 2d6](https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only)
+<picture>
+  <source srcset="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only"><span style="display: none"><img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only"></span>
+</picture>
+<!-- The above is a ridiculous work-around for GitHub's braindead, proprietary
+light/dark image rendering dumpster fire. See
+[https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87].
+-->
 
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
 
