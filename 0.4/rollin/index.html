@@ -9,14 +9,13 @@
         <meta name="description" content="Simple Python tools for dice-based probabilities">
       
       
-      
         <meta name="author" content="Matt Bogosian">
       
       
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/rollin/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.0">
     
     
       
@@ -24,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.82f3c0b9.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
         
       
     
@@ -37,16 +36,15 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
-    
     
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-
 
     
     
@@ -63,9 +61,8 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
   
     
-    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
-      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -81,6 +78,13 @@
     <div data-md-component="announce">
       
     </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
     
       
 
@@ -126,8 +130,7 @@
       <label class="md-header__button md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -159,8 +162,7 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -207,8 +209,7 @@
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -276,7 +277,6 @@
       </a>
       
         
-
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -496,14 +496,14 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/posita/dyce/edit/master/docs/rollin.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                  <h1>Rollin’ with rollers and rolls</h1>
-                
-                <!---
+<a href="https://github.com/posita/dyce/edit/master/docs/rollin.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+  <h1>Rollin’ with rollers and rolls</h1>
+
+<!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -539,8 +539,8 @@ Similarly, roll outcomes can derive from other roll outcomes.</p>
 Each roll it generates has that value as its sole outcome.
 Let’s see what that looks like (now with tasty entity relationship diagrams).</p>
 <p><picture style="float: right; padding: 0 1.0em 0 1.0em; max-width: 33%;">
-  <source srcset="../img/graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
-  <img alt="Rollers, rolls, and outcomes, oh my!" src="../img/graph_rollin_value_light.svg" />
+  <source srcset="../assets/graph_rollin_value_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Rollers, rolls, and outcomes, oh my!" src="../assets/graph_rollin_value_light.svg" />
 </picture></p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -582,7 +582,7 @@ Let’s see what that looks like (now with tasty entity relationship diagrams).<
 <p>Hopefully, that’s relatively straightforward.
 Let’s look at some more substantial examples.</p>
 <h2 id="emulating-a-hundred-sided-die-using-two-ten-sided-dice">Emulating a hundred-sided die using two ten-sided dice</h2>
-<p><a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../img/1d100-1.png" alt="D00 &amp; D10"></a></p>
+<p><a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../assets/1d100-1.png" alt="d00 &amp; d10"></a></p>
 <p>In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered <span class="arithmatex">\([{{0}, {1}, \ldots , {9}}]\)</span>) and a “tens” ten-sided die (faces numbered <span class="arithmatex">\([{{00}, {10}, \ldots , {90}}]\)</span>).
 Let’s try to model that as a roller and use it to generate a roll.</p>
 <p>We start by creating two histograms<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> representing our two ten-sided dice (<code>d00</code> for our “tens” die and <code>d10</code> for our “ones“ die).</p>
@@ -742,8 +742,8 @@ For our roll, the aggregated outcomes are <code class="highlight"><span class="m
 </code></pre></div>
 </td></tr></table>
 <p><picture>
-  <source srcset="../img/graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
-  <img alt="Roll ERD from emulating a d100" src="../img/graph_rollin_pool_light.svg" />
+  <source srcset="../assets/graph_rollin_pool_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Roll ERD from emulating a d100" src="../assets/graph_rollin_pool_light.svg" />
 </picture></p>
 <p>Let’s break that down so it doesn’t feel like trying to drink from a fire hose.</p>
 <p>Calling the <a href="../dyce.r/#dyce.r.R.roll"><code>R.roll</code> method</a> on our <a href="../dyce.r/#dyce.r.PoolRoller"><code>PoolRoller</code></a> resulted in a <a href="../dyce.r/#dyce.r.Roll"><code>Roll</code> object</a>.
@@ -900,8 +900,8 @@ For deterministic outcomes
 </code></pre></div>
 </td></tr></table>
 <p><picture>
-  <source srcset="../img/graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
-  <img alt="Roll ERD for arithmetic composition" src="../img/graph_rollin_expr_light.svg" />
+  <source srcset="../assets/graph_rollin_expr_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Roll ERD for arithmetic composition" src="../assets/graph_rollin_expr_light.svg" />
 </picture></p>
 <h2 id="dropping-dice-from-prior-rolls-keeping-the-best-three-of-3d6-and-1d8">Dropping dice from prior rolls – keeping the best three of <code>3d6</code> and <code>1d8</code></h2>
 <p>The trifecta of roller trees, roll trees, and outcome trees might appear complicated or redundant.
@@ -1049,8 +1049,8 @@ We can see that, too!</p>
 ☝️ That was … a <em>lot</em>.
 Let’s visualize!</p>
 <p><picture>
-  <source srcset="../img/graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
-  <img alt="Roll ERD for dropping outcomes" src="../img/graph_rollin_select_1_light.svg" />
+  <source srcset="../assets/graph_rollin_select_1_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Roll ERD for dropping outcomes" src="../assets/graph_rollin_select_1_light.svg" />
 </picture></p>
 <p>Holy entangled relationship diagrams, Batman!
 One thing you may notice about our top-level roll is that it has <em>four</em> outcomes.
@@ -1151,8 +1151,8 @@ Such roll outcomes must have at least one source.</p>
 </code></pre></div>
 </td></tr></table>
 <p><picture>
-  <source srcset="../img/graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
-  <img alt="Alternate Roll ERD for dropping outcomes" src="../img/graph_rollin_select_2_light.svg" />
+  <source srcset="../assets/graph_rollin_select_2_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Alternate Roll ERD for dropping outcomes" src="../assets/graph_rollin_select_2_light.svg" />
 </picture></p>
 <p>In this case, our results are still <em>mostly</em> traceable, since our pool is homogeneous.
 However, results from <a href="../dyce/#dyce.p.P.roll"><code>P.roll</code></a> are sorted, meaning they lose association with their source histograms.
@@ -1187,42 +1187,58 @@ For deterministic outcomes
 <p>How much overhead do all these data structures contribute?
 It obviously depends on the complexity of the structure.
 Consider a simple example <code>d20 + d12 + 4</code>.
-Let’s do that 5,000 times, sort the results, and take every other one starting with the highest.</p>
-<p>We might use a pool, if we didn’t care about traceability.</p>
+Let’s do that 5,000 times, sort the results, and take every other one starting with the highest.
+We might use a pool, if we didn’t care about traceability.
+Let’s compare that to our roller.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">R</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">%</span><span class="n">timeit</span> <span class="p">(</span><span class="mi">5000</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">roll</span><span class="p">()[::</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="mf">58.7</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">14.8</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">d20</span><span class="p">,</span> <span class="n">d12</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">5000</span><span class="nd">@P</span><span class="p">(</span><span class="n">d20</span> <span class="o">+</span> <span class="n">d12</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">p</span><span class="o">.</span><span class="n">roll</span><span class="p">()[::</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-<span class="mf">26.3</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">520</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="p">(</span><span class="mi">5000</span><span class="o">@</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">select_from_values</span><span class="p">((</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),),</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="mi">4</span><span class="p">)))</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+<span class="mi">662</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">23.4</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
-<p>That’s not bad.
-What about rollers?</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5000</span><span class="o">@</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">select_from_values</span><span class="p">((</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),),</span> <span class="n">d20</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_resolve_dependent_probability.ipy"><code>perf_resolve_dependent_probability.ipy</code></a></summary>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">r</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
-<span class="mi">257</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">3.7</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">R</span>
+
+<span class="n">d20</span><span class="p">,</span> <span class="n">d12</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit (5000@P(</span><span class="si">{</span><span class="n">d20</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="n">d12</span><span class="si">}</span><span class="s2"> + 4)).roll()[::-2]&quot;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mi">5000</span><span class="nd">@P</span><span class="p">(</span><span class="n">d20</span> <span class="o">+</span> <span class="n">d12</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">p</span><span class="o">.</span><span class="n">roll</span><span class="p">()[::</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit (5000@(R.select_from_values((slice(None, None, -2),), </span><span class="si">{</span><span class="n">d20</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">d12</span><span class="si">}</span><span class="s2">, 4))).roll()&quot;</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mi">5000</span><span class="o">@</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">select_from_values</span><span class="p">((</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),),</span> <span class="n">d20</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">r</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">()</span>
 </code></pre></div>
 </td></tr></table>
-<p>In this particular case, our roller takes about ten times longer than our histogram pool.
+</details>
+
+<p>In this particular case, our roller takes over ten times longer than our histogram pool.
 It is unsurprising that a simple roller is slower than a simple pool, at least in part because the math is deferred until <a href="../dyce.r/#dyce.r.R.roll"><code>R.roll</code></a> time.
 In more sophisticated cases, rollers may be more competitive with (or even surpass) their histogram or pool analogies, especially when initialization time is taken into account.</p>
 <p>All that being said, for periodic rolls simulating handfuls (not thousands) of operations or dice, such performance disparities probably won’t matter that much.
 Just use the primitives whose semantics work best for you.
-If ever performance becomes an issue, <a href="../contrib/">let us know</a>, and we can collaborate on how to improve it.</p>
+If ever performance becomes an issue, <a href="../contrib/">let me know</a>, and we can collaborate on how to improve it.</p>
 <h2 id="further-exploration">Further exploration</h2>
 <p>Consider reviewing the <a href="../dyce.r/">roller API</a>.</p>
 <!-- TODO(posita): In addition to generating random rolls, roller trees can be useful for translating from proprietary grammars. -->
@@ -1256,11 +1272,6 @@ If you discover one, consider <a href="../contrib/">contributing</a> an example.
 </li>
 </ol>
 </div>
-                
-              
-              
-                
-
 
               
             </article>
@@ -1269,8 +1280,7 @@ If you discover one, consider <a href="../contrib/">contributing</a> an example.
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
@@ -1309,20 +1319,19 @@ If you discover one, consider <a href="../contrib/">contributing</a> an example.
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
-          </div>
-        
-        
-          Made with
-          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-            Material for MkDocs
-          </a>
-        
-        
-      </div>
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
@@ -1332,10 +1341,10 @@ If you discover one, consider <a href="../contrib/">contributing</a> an example.
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      <script src="../assets/javascripts/bundle.17f42bbf.min.js"></script>
       
         <script src="../js/site.js"></script>
       

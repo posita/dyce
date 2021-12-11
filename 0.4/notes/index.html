@@ -9,14 +9,13 @@
         <meta name="description" content="Simple Python tools for dice-based probabilities">
       
       
-      
         <meta name="author" content="Matt Bogosian">
       
       
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/notes/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.0">
     
     
       
@@ -24,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.82f3c0b9.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
         
       
     
@@ -37,16 +36,15 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
-    
     
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-
 
     
     
@@ -63,9 +61,8 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
   
     
-    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
-      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -81,6 +78,13 @@
     <div data-md-component="announce">
       
     </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
     
       
 
@@ -126,8 +130,7 @@
       <label class="md-header__button md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -159,8 +162,7 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -207,8 +209,7 @@
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -309,7 +310,6 @@
       
         
 
-
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -322,6 +322,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#044" class="md-nav__link">
+    0.4.4
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#043" class="md-nav__link">
@@ -534,12 +541,12 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/posita/dyce/edit/master/docs/notes.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                <!---
+<a href="https://github.com/posita/dyce/edit/master/docs/notes.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -555,14 +562,23 @@
 -->
 
 <h1 id="dyce-release-notes"><code>dyce</code> release notes</h1>
+<h2 id="044"><a href="https://github.com/posita/dyce/releases/tag/v0.4.4">0.4.4</a></h2>
+<ul>
+<li>Removes <code>…_gh.png</code> hack now that <a href="https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981">this dumpster fire</a> is at least partially resolved</li>
+<li>Refines Tension Pool example</li>
+<li>Adds <em>Ironsworn</em> example</li>
+<li>Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example</li>
+<li>Adds detail around dependent probabilities</li>
+<li>Adds experimental <a href="../dyce.h/#dyce.h.resolve_dependent_probability"><code>resolve_dependent_probability</code></a> function</li>
+</ul>
 <h2 id="043"><a href="https://github.com/posita/dyce/releases/tag/v0.4.3">0.4.3</a></h2>
 <ul>
-<li>Removes dependencies on deprecated <code>numerary.types.…SCT</code> tuples</li>
+<li>Removes dependencies on deprecated <code class="highlight"><span class="n">numerary</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="err">…</span><span class="n">SCT</span></code> tuples</li>
 <li>Adds <a href="https://theangrygm.com/definitive-tension-pool/">Angry GM Tension Pool mechanic</a> translation</li>
 </ul>
 <h2 id="042"><a href="https://github.com/posita/dyce/releases/tag/v0.4.2">0.4.2</a></h2>
 <ul>
-<li>Removes calls to <code>os.get_terminal_size</code> to retain utility in environments without terminals.
+<li>Removes calls to <code class="highlight"><span class="n">os</span><span class="o">.</span><span class="n">get_terminal_size</span></code> to retain utility in environments without terminals.
   Fixes <a href="https://github.com/posita/dyce/issues/5">#5</a>.
   Thanks <a href="https://github.com/sudo-simon">@sudo-simon!</a>!</li>
 </ul>
@@ -571,9 +587,9 @@
 <li>Splits out protocol checking into its own fancy library: <a href="https://github.com/posita/numerary/"><code>numerary</code></a>!</li>
 <li>Is now <a href="https://pypi.org/project/dyce/">available on PyPI as <code>dyce</code>_</a>, thanks to the generosity of <a href="https://eykd.net/about/">David Eyk</a>!</li>
 <li>Introduces experimental generic <a href="../dyce.r/#dyce.r.walk"><code>walk</code></a> function and supporting visitor data structures.</li>
-<li>Uses <code>pygraphviz</code> to automate class diagram generation.
+<li>Uses <code class="highlight"><span class="n">pygraphviz</span></code> to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the <a href="../contrib/#hacking-quick-start">hacking quick start</a>.)</li>
-<li>Introduces experimental use of <code>numpy</code> for RNG, if present.</li>
+<li>Introduces experimental use of <code class="highlight"><span class="n">numpy</span></code> for RNG, if present.</li>
 <li>Migrates to using <code>pyproject.toml</code> and <code>setup.cfg</code>.</li>
 <li>Adds missing <a href="https://www.python.org/dev/peps/pep-0561/"><code>py.typed</code> to ensure clients get type checking</a>.
   (Whoops.)</li>
@@ -586,16 +602,16 @@
 Please review before upgrading.</p>
 </div>
 <ul>
-<li>Renames <code>HAbleT</code> and <code>HAbleOpsMixin</code> to <a href="../dyce.h/#dyce.h.HableT"><code>HableT</code></a> and  <a href="../dyce.h/#dyce.h.HableOpsMixin"><code>HableOpsMixin</code></a>.
+<li>Renames <code class="highlight"><span class="n">HAbleT</span></code> and <code class="highlight"><span class="n">HAbleOpsMixin</span></code> to <a href="../dyce.h/#dyce.h.HableT"><code>HableT</code></a> and  <a href="../dyce.h/#dyce.h.HableOpsMixin"><code>HableOpsMixin</code></a>.
     Uses alternate spellings.</li>
-<li>Removes deprecated non-flattening unary operation methods <code>P.__neg__</code> and <code>P.__pos__</code>.
+<li>Removes deprecated non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.
     Uses, e.g., <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="fm">__neg__</span><span class="p">)</span></code> or <code class="highlight"><span class="n">P</span><span class="p">(</span><span class="o">-</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)</span></code> instead.</li>
-<li>Removes deprecated synonym methods <code>H.even</code> and <code>H.odd</code>.
+<li>Removes deprecated synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.
     Uses <a href="../dyce/#dyce.h.H.is_even"><code>H.is_even</code></a> and <a href="../dyce/#dyce.h.H.is_odd"><code>H.is_odd</code></a> instead.</li>
-<li>Removes deprecated synonym package <code>dyce.plt</code>.
+<li>Removes deprecated synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.
     Uses <a href="../dyce.viz/"><code>dyce.viz</code></a> instead.</li>
 <li>
-<p>Removes special case handling of <code>H({})</code> for addition and subtraction.
+<p>Removes special case handling of <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for addition and subtraction.
     Check for code that relied on, e.g., <code class="highlight"><span class="n">h</span> <span class="o">+</span> <span class="n">H</span><span class="p">({})</span></code> resolving to <code class="highlight"><span class="n">h</span></code>.
     It is probably not correct.
     If the behavior is desired, consider eliminating empty histograms before performing calculations.
@@ -633,7 +649,7 @@ Please review before upgrading.</p>
 <h3 id="other-changes">Other changes</h3>
 <ul>
 <li>Documentation overhaul including augmented examples and reorganized images and JavaScript.</li>
-<li>Fixes <code>H({}).format()</code> bug.</li>
+<li>Fixes <code class="highlight"><span class="n">H</span><span class="p">({})</span><span class="o">.</span><span class="n">format</span><span class="p">()</span></code> bug.</li>
 <li>Adds <a href="https://github.com/beartype/beartype"><code>beartype</code></a> runtime type checking.</li>
 <li><em>Maintains</em> support for Python 3.7 (for now).</li>
 </ul>
@@ -647,7 +663,7 @@ Please review before upgrading.</p>
 <li>Boosts <code class="highlight"><span class="nb">isinstance</span></code> performance with <code class="highlight"><span class="n">dyce</span></code>’s proprietary numeric <code class="highlight"><span class="n">Protocol</span></code>s.</li>
 <li>Reinstates support for Python 3.7 <del>(for now)</del>.</li>
 <li>Adds <a href="../dyce/#dyce.h.H.is_even"><code>H.is_even</code></a> and <a href="../dyce/#dyce.h.H.is_odd"><code>H.is_odd</code></a>.</li>
-<li>Deprecates synonym methods <code>H.even</code> and <code>H.odd</code>.</li>
+<li>Deprecates synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.</li>
 <li>Introduces experimental <a href="../dyce/#dyce.h.H.total"><code>H.total</code></a> property.</li>
 <li>Removes incorrectly non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__abs__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__invert__</span></code>.</li>
 <li>Deprecates non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.</li>
@@ -660,11 +676,6 @@ Please review before upgrading.</p>
 <h2 id="030"><a href="https://github.com/posita/dyce/releases/tag/v0.3.0">0.3.0</a></h2>
 <p><code>dyce</code> goes beta!
 Non-experimental features should be considered stable.</p>
-                
-              
-              
-                
-
 
               
             </article>
@@ -673,8 +684,7 @@ Non-experimental features should be considered stable.</p>
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
@@ -713,20 +723,19 @@ Non-experimental features should be considered stable.</p>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
-          </div>
-        
-        
-          Made with
-          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-            Material for MkDocs
-          </a>
-        
-        
-      </div>
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
@@ -736,10 +745,10 @@ Non-experimental features should be considered stable.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      <script src="../assets/javascripts/bundle.17f42bbf.min.js"></script>
       
         <script src="../js/site.js"></script>
       

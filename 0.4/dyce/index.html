@@ -9,14 +9,13 @@
         <meta name="description" content="Simple Python tools for dice-based probabilities">
       
       
-      
         <meta name="author" content="Matt Bogosian">
       
       
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/dyce/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.0">
     
     
       
@@ -24,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.82f3c0b9.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
         
       
     
@@ -37,16 +36,15 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
-    
     
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-
 
     
     
@@ -63,9 +61,8 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
   
     
-    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
-      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -81,6 +78,13 @@
     <div data-md-component="announce">
       
     </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
     
       
 
@@ -126,8 +130,7 @@
       <label class="md-header__button md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -159,8 +162,7 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -207,8 +209,7 @@
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -383,7 +384,6 @@
       </a>
       
         
-
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -1095,12 +1095,12 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/posita/dyce/edit/master/docs/dyce.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                <!---
+<a href="https://github.com/posita/dyce/edit/master/docs/dyce.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<!---
   Copyright and other protections apply. Please see the accompanying LICENSE file for
   rights and restrictions governing use of this software. All rights not expressly
   waived or licensed are reserved. If that file is missing or appears to be modified
@@ -2192,6 +2192,8 @@ in future versions.</p>
 <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">arg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_simple_init</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="p">,</span> <span class="n">sort_dicts</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">arg</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="p">)</span>
 
@@ -4018,17 +4020,36 @@ computed much faster.</p>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_for_n_at_pos</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
-<span class="mf">1.61</span> <span class="n">s</span> <span class="err">±</span> <span class="mf">31.3</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">%</span><span class="n">timeit</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_for_n_at_pos</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="mi">462</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">16.9</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="o">%%</span><span class="n">timeit</span>
-   <span class="o">...</span><span class="p">:</span> <span class="n">order_stat_for_100d6_at_pos</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_func_for_n</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-   <span class="o">...</span><span class="p">:</span> <span class="p">[</span><span class="n">order_stat_for_100d6_at_pos</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
-<span class="mi">170</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">3.41</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">order_stat_for_30d6_at_pos</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_func_for_n</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span> <span class="p">;</span> <span class="p">[</span><span class="n">order_stat_for_30d6_at_pos</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="mf">54.4</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">1.47</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_order_stat_for_n.ipy"><code>perf_order_stat_for_n.ipy</code></a></summary>
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit [H(6).order_stat_for_n_at_pos(30, i) for i in range(10)]&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_for_n_at_pos</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit order_stat_for_30d6_at_pos = H(6).order_stat_func_for_n(30) ; [order_stat_for_30d6_at_pos(i) for i in range(10)]&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">order_stat_for_30d6_at_pos</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">order_stat_func_for_n</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span> <span class="p">;</span> <span class="p">[</span><span class="n">order_stat_for_30d6_at_pos</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">()</span>
+</code></pre></div>
+</td></tr></table>
+</details>
 
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
@@ -4078,14 +4099,16 @@ computed much faster.</p>
 <span class="sd">    computed much faster.</span>
 
 <span class="sd">    ``` python</span>
-<span class="sd">    In [2]: %timeit [H(6).order_stat_for_n_at_pos(100, i) for i in range(10)]</span>
-<span class="sd">    1.61 s ± 31.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-
-<span class="sd">    In [3]: %%timeit</span>
-<span class="sd">       ...: order_stat_for_100d6_at_pos = H(6).order_stat_func_for_n(100)</span>
-<span class="sd">       ...: [order_stat_for_100d6_at_pos(i) for i in range(10)]</span>
-<span class="sd">    170 ms ± 3.41 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+<span class="sd">    --8&lt;-- &quot;docs/assets/perf_order_stat_for_n.txt&quot;</span>
 <span class="sd">    ```</span>
+
+<span class="sd">    &lt;details&gt;</span>
+<span class="sd">    &lt;summary&gt;Source: &lt;a href=&quot;https://github.com/posita/dyce/blob/latest/docs/assets/perf_order_stat_for_n.ipy&quot;&gt;&lt;code&gt;perf_order_stat_for_n.ipy&lt;/code&gt;&lt;/a&gt;&lt;/summary&gt;</span>
+
+<span class="sd">    ``` python</span>
+<span class="sd">    --8&lt;-- &quot;docs/assets/perf_order_stat_for_n.ipy&quot;</span>
+<span class="sd">    ```</span>
+<span class="sd">    &lt;/details&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">betas_by_outcome</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">RealLikeSCU</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">H</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -4292,7 +4315,7 @@ of operand ordering.</p>
 
 
 <h3 id="dyce.h.H.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x101340f70</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x106b65040</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsIntSCU</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
@@ -4307,8 +4330,8 @@ behavior for <em>coalesce</em> is to replace the outcome with the expanded histo
 Returned histograms are always reduced to their lowest terms.</p>
 <p>See <a href="../dyce.h/#dyce.h.coalesce_replace"><code>coalesce_replace</code></a> and the
 <a href="#dyce.h.H.lowest_terms"><code>lowest_terms</code> method</a>.</p>
-<p>This method can be used to model complex rules. The following models re-rolling
-a face of 1 on the first roll:</p>
+<p>This method can be used to model complex mechanics. The following models
+re-rolling a face of 1 on the first roll:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -4350,7 +4373,7 @@ outcome and its counts are omitted from the result without substitution or
 scaling. A silly example is modeling a d5 by indefinitely re-rolling a d6
 until something other than a 6 comes up.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">6</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">__</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">6</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div>
 </td></tr></table>
@@ -4363,14 +4386,15 @@ outcomes, like ties in a contest.</p>
 <span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="p">,</span> <span class="n">d8_2</span> <span class="o">=</span> <span class="mi">3</span><span class="nd">@H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">d8_2</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">4553</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1153</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">8118</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">d8_2</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_3</span><span class="o">.</span><span class="n">vs</span><span class="p">(</span><span class="n">d8_2</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">__</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">4553</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">8118</span><span class="p">})</span>
 </code></pre></div>
 </td></tr></table>
 </div>
 <p>Because it delegates to a callback for refereeing substitution decisions,
 <code class="highlight"><span class="n">substitute</span></code> is quite flexible and well suited to modeling (or at
-least approximating) logical progressions. Consider the following rules:</p>
+least approximating) logical progressions with dependent variables. Consider the
+following mechanic:</p>
 <ol>
 <li>Start with a total of zero.</li>
 <li>Roll a six-sided die. Add the face to the total. If the face was a six, go
@@ -4509,8 +4533,8 @@ d20-like role playing games.</p>
 <span class="sd">    See [``coalesce_replace``][dyce.h.coalesce_replace] and the</span>
 <span class="sd">    [``lowest_terms`` method][dyce.h.H.lowest_terms].</span>
 
-<span class="sd">    This method can be used to model complex rules. The following models re-rolling</span>
-<span class="sd">    a face of 1 on the first roll:</span>
+<span class="sd">    This method can be used to model complex mechanics. The following models</span>
+<span class="sd">    re-rolling a face of 1 on the first roll:</span>
 
 <span class="sd">    ``` python</span>
 <span class="sd">    &gt;&gt;&gt; def reroll_one(h: H, outcome):</span>
@@ -4550,7 +4574,7 @@ d20-like role playing games.</p>
 <span class="sd">        until something other than a 6 comes up.</span>
 
 <span class="sd">        ``` python</span>
-<span class="sd">        &gt;&gt;&gt; H(6).substitute(lambda h, outcome: H({}) if outcome == 6 else outcome)</span>
+<span class="sd">        &gt;&gt;&gt; H(6).substitute(lambda __, outcome: H({}) if outcome == 6 else outcome)</span>
 <span class="sd">        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})</span>
 
 <span class="sd">        ```</span>
@@ -4562,14 +4586,15 @@ d20-like role playing games.</p>
 <span class="sd">        &gt;&gt;&gt; d6_3, d8_2 = 3@H(6), 2@H(8)</span>
 <span class="sd">        &gt;&gt;&gt; d6_3.vs(d8_2)</span>
 <span class="sd">        H({-1: 4553, 0: 1153, 1: 8118})</span>
-<span class="sd">        &gt;&gt;&gt; d6_3.vs(d8_2).substitute(lambda h, outcome: H({}) if outcome == 0 else outcome)</span>
+<span class="sd">        &gt;&gt;&gt; d6_3.vs(d8_2).substitute(lambda __, outcome: H({}) if outcome == 0 else outcome)</span>
 <span class="sd">        H({-1: 4553, 1: 8118})</span>
 
 <span class="sd">        ```</span>
 
 <span class="sd">    Because it delegates to a callback for refereeing substitution decisions,</span>
 <span class="sd">    ``#!python substitute`` is quite flexible and well suited to modeling (or at</span>
-<span class="sd">    least approximating) logical progressions. Consider the following rules:</span>
+<span class="sd">    least approximating) logical progressions with dependent variables. Consider the</span>
+<span class="sd">    following mechanic:</span>
 
 <span class="sd">      1. Start with a total of zero.</span>
 <span class="sd">      2. Roll a six-sided die. Add the face to the total. If the face was a six, go</span>
@@ -5606,8 +5631,7 @@ much more efficient.</p>
 </code></pre></div>
 </td></tr></table>
 <p>Based on some rudimentary testing, this method appears to converge on being
-almost twice (about <span class="arithmatex">\(\frac{7}{4}\)</span>) as efficient as the boolean accumulation
-technique for larger sets.</p>
+about twice as fast as the boolean accumulation technique for larger sets.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -5630,31 +5654,112 @@ technique for larger sets.</p>
 <span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
-<span class="normal">23</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="mi">3</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">2</span><span class="nd">@d6_eq3</span>
-<span class="mi">287</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">6.96</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="normal">23</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">%</span><span class="n">timeit</span> <span class="mi">3</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">2</span><span class="nd">@d6_eq3</span>
+<span class="mi">397</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">17.5</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="mi">402</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">5.59</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="mi">653</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">23.9</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="mi">9</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">6</span><span class="nd">@d6_eq3</span>
-<span class="mi">845</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">7.89</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">9</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">6</span><span class="nd">@d6_eq3</span>
+<span class="mf">1.39</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">53.9</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">9</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">6</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="mi">597</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">9.46</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">9</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">6</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="mf">1.12</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">35.3</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="mi">90</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">60</span><span class="nd">@d6_eq3</span>
-<span class="mf">24.7</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">380</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">27</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">18</span><span class="nd">@d6_eq3</span>
+<span class="mf">7.14</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">223</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">90</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">60</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="mf">7.5</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">84.6</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">27</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">18</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="mf">3.32</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">109</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="mi">900</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">600</span><span class="nd">@d6_eq3</span>
-<span class="mf">3.34</span> <span class="n">s</span> <span class="err">±</span> <span class="mf">19.3</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">81</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">54</span><span class="nd">@d6_eq3</span>
+<span class="mf">46.7</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">1.01</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">900</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">600</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="mf">1.93</span> <span class="n">s</span> <span class="err">±</span> <span class="mf">14.3</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">81</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">54</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="mf">17.1</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">416</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_appearances_in_rolls.ipy"><code>perf_appearances_in_rolls.ipy</code></a></summary>
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+
+<span class="n">p_2d6</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">d4</span><span class="p">,</span> <span class="n">d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">p_3d4_2d6</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">d4</span><span class="p">,</span> <span class="n">d4</span><span class="p">,</span> <span class="n">d4</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">d6</span><span class="p">)</span>
+<span class="n">d4_eq3</span><span class="p">,</span> <span class="n">d6_eq3</span> <span class="o">=</span> <span class="n">d4</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">d6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit 3@d4_eq3 + 2@d6_eq3&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">3</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">2</span><span class="nd">@d6_eq3</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit 9@d4_eq3 + 6@d6_eq3&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">9</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">6</span><span class="nd">@d6_eq3</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">9</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">6</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit 27@d4_eq3 + 18@d6_eq3&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">27</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">18</span><span class="nd">@d6_eq3</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit P(27@P(4), 18@P(6)).appearances_in_rolls(3)&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">27</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">18</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit 81@d4_eq3 + 54@d6_eq3&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="mi">81</span><span class="nd">@d4_eq3</span> <span class="o">+</span> <span class="mi">54</span><span class="nd">@d6_eq3</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%timeit P(81@P(4), 54@P(6)).appearances_in_rolls(3)&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">P</span><span class="p">(</span><span class="mi">81</span><span class="nd">@P</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">54</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">appearances_in_rolls</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+</code></pre></div>
+</td></tr></table>
+</details>
 
         <details class="quote">
           <summary>Source code in <code>dyce/p.py</code></summary>
@@ -5710,34 +5815,19 @@ technique for larger sets.</p>
 <span class="sd">    ```</span>
 
 <span class="sd">    Based on some rudimentary testing, this method appears to converge on being</span>
-<span class="sd">    almost twice (about $\frac{7}{4}$) as efficient as the boolean accumulation</span>
-<span class="sd">    technique for larger sets.</span>
+<span class="sd">    about twice as fast as the boolean accumulation technique for larger sets.</span>
 
 <span class="sd">    ``` python</span>
-<span class="sd">    In [3]: %timeit 3@d4_eq3 + 2@d6_eq3</span>
-<span class="sd">    287 µs ± 6.96 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span>
-
-<span class="sd">    In [4]: %timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)</span>
-<span class="sd">    402 µs ± 5.59 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span>
-
-<span class="sd">    In [5]: %timeit 9@d4_eq3 + 6@d6_eq3</span>
-<span class="sd">    845 µs ± 7.89 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span>
-
-<span class="sd">    In [6]: %timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)</span>
-<span class="sd">    597 µs ± 9.46 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span>
-
-<span class="sd">    In [7]: %timeit 90@d4_eq3 + 60@d6_eq3</span>
-<span class="sd">    24.7 ms ± 380 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-
-<span class="sd">    In [8]: %timeit P(90@P(4), 60@P(6)).appearances_in_rolls(3)</span>
-<span class="sd">    7.5 ms ± 84.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-
-<span class="sd">    In [9]: %timeit 900@d4_eq3 + 600@d6_eq3</span>
-<span class="sd">    3.34 s ± 19.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-
-<span class="sd">    In [10]: %timeit P(900@P(4), 600@P(6)).appearances_in_rolls(3)</span>
-<span class="sd">    1.93 s ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
+<span class="sd">    --8&lt;-- &quot;docs/assets/perf_appearances_in_rolls.txt&quot;</span>
 <span class="sd">    ```</span>
+
+<span class="sd">    &lt;details&gt;</span>
+<span class="sd">    &lt;summary&gt;Source: &lt;a href=&quot;https://github.com/posita/dyce/blob/latest/docs/assets/perf_appearances_in_rolls.ipy&quot;&gt;&lt;code&gt;perf_appearances_in_rolls.ipy&lt;/code&gt;&lt;/a&gt;&lt;/summary&gt;</span>
+
+<span class="sd">    ``` python</span>
+<span class="sd">    --8&lt;-- &quot;docs/assets/perf_appearances_in_rolls.ipy&quot;</span>
+<span class="sd">    ```</span>
+<span class="sd">    &lt;/details&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">group_counters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Counter</span><span class="p">[</span><span class="n">RealLikeSCU</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -6355,92 +6445,112 @@ geometrically in some way.</p>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>In [1]: from dyce import H, P
+<span class="normal">50</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+<span class="mf">22.7</span> <span class="n">µs</span> <span class="err">±</span> <span class="mi">463</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)):</span>
+<span class="mi">740</span> <span class="n">µs</span> <span class="err">±</span> <span class="mf">16.4</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mf">2.25</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">97.7</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mf">4.44</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">219</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mf">2.12</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">26</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mf">4.46</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">75.5</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">4</span><span class="p">)):</span>
+<span class="mf">7.89</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">186</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">5</span><span class="p">)):</span>
+<span class="mf">12.7</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">287</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-In [2]: for n in (6, 8):
-   ...:   p = n@P(6)
-   ...:   for i in range(len(p) - 4, len(p)):
-   ...:     print(f&quot;({p}).h(slice({i})):&quot;)
-   ...:     %timeit p.h(slice(i))
-(P(6, 6, 6, 6, 6, 6)).h(slice(2)):
-1.35 ms ± 23.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-(P(6, 6, 6, 6, 6, 6)).h(slice(3)):
-3.15 ms ± 516 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(6, 6, 6, 6, 6, 6)).h(slice(4)):
-5.37 ms ± 182 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(6, 6, 6, 6, 6, 6)).h(slice(5)):
-10.5 ms ± 1.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(4)):
-5.58 ms ± 25.3 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(5)):
-9.81 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(6)):
-14.7 ms ± 430 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(7)):
-20.4 ms ± 328 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+<span class="mf">22.6</span> <span class="n">µs</span> <span class="err">±</span> <span class="mi">820</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)):</span>
+<span class="mf">2.51</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">102</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mf">5.31</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">63</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mf">5.37</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">98.5</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mf">32.4</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">1.36</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mf">78.6</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">918</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">4</span><span class="p">)):</span>
+<span class="mf">80.8</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">2.18</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">5</span><span class="p">)):</span>
+<span class="mf">79.9</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">2.81</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
 
-In [3]: for n in (3, 4):
-   ...:   p = P(n@P(6), *[H(6) - m for m in range(n, 0, -1)])
-   ...:   for i in range(len(p) - 4, len(p)):
-   ...:     print(f&quot;({p}).h(slice({i})):&quot;)
-   ...:     %timeit p.h(slice(i))
-(P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(2)):
-16.1 ms ± 1.09 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
-(P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(3)):
-39 ms ± 602 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(4)):
-40.3 ms ± 3.49 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(5)):
-46.2 ms ± 7.43 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(4)):
-538 ms ± 9.46 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(5)):
-534 ms ± 30.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(6)):
-536 ms ± 13.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(7)):
-604 ms ± 52.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-
-In [4]: for n in (6, 8):
-   ...:   p = P(*[H(6) - m for m in range(n, 0, -1)])
-   ...:   for i in range(len(p) - 4, len(p)):
-   ...:     print(f&quot;({p}).h(slice({i})):&quot;)
-   ...:     %timeit p.h(slice(i))
-(P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(2)):
-145 ms ± 4.59 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(3)):
-147 ms ± 3.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
-158 ms ± 1.38 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
-147 ms ± 691 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-(P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):
-6.09 s ± 14.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):
-6.11 s ± 36.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(6)):
-6.25 s ± 47.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-(P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(7)):
-6.31 s ± 42.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+<span class="mf">22.6</span> <span class="n">µs</span> <span class="err">±</span> <span class="mi">438</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)):</span>
+<span class="mf">8.98</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">169</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mf">9.09</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">205</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mf">9.09</span> <span class="n">ms</span> <span class="err">±</span> <span class="mi">350</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">100</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="mi">312</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">9.72</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+<span class="mi">314</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">2.45</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">4</span><span class="p">)):</span>
+<span class="mi">334</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">10.2</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
+<span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">})))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">5</span><span class="p">)):</span>
+<span class="mi">324</span> <span class="n">ms</span> <span class="err">±</span> <span class="mf">5.48</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">loop</span> <span class="n">each</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
+<p><details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_rolls_with_counts.ipy"><code>perf_rolls_with_counts.ipy</code></a></summary></p>
+<p><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">dyce</span> <span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+  <span class="n">p</span> <span class="o">=</span> <span class="n">n</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">).h(slice(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)):&quot;</span><span class="p">)</span>
+    <span class="o">%</span><span class="n">timeit</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+  <span class="n">p</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">n</span><span class="nd">@P</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">).h(slice(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)):&quot;</span><span class="p">)</span>
+    <span class="o">%</span><span class="n">timeit</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+  <span class="n">p</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">).h(slice(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)):&quot;</span><span class="p">)</span>
+    <span class="o">%</span><span class="n">timeit</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">()</span>
+</code></pre></div>
+</td></tr></table>
+</details></p>
 </div>
 
         <details class="quote">
@@ -6614,75 +6724,17 @@ In [4]: for n in (6, 8):
 <span class="sd">        heterogeneous ones. Note, however, that all three appear to scale</span>
 <span class="sd">        geometrically in some way.</span>
 
-<span class="sd">        ```ipython</span>
-<span class="sd">        In [1]: from dyce import H, P</span>
-
-<span class="sd">        In [2]: for n in (6, 8):</span>
-<span class="sd">           ...:   p = n@P(6)</span>
-<span class="sd">           ...:   for i in range(len(p) - 4, len(p)):</span>
-<span class="sd">           ...:     print(f&quot;({p}).h(slice({i})):&quot;)</span>
-<span class="sd">           ...:     %timeit p.h(slice(i))</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6)).h(slice(2)):</span>
-<span class="sd">        1.35 ms ± 23.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6)).h(slice(3)):</span>
-<span class="sd">        3.15 ms ± 516 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6)).h(slice(4)):</span>
-<span class="sd">        5.37 ms ± 182 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6)).h(slice(5)):</span>
-<span class="sd">        10.5 ms ± 1.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(4)):</span>
-<span class="sd">        5.58 ms ± 25.3 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(5)):</span>
-<span class="sd">        9.81 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(6)):</span>
-<span class="sd">        14.7 ms ± 430 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(6, 6, 6, 6, 6, 6, 6, 6)).h(slice(7)):</span>
-<span class="sd">        20.4 ms ± 328 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-
-<span class="sd">        In [3]: for n in (3, 4):</span>
-<span class="sd">           ...:   p = P(n@P(6), *[H(6) - m for m in range(n, 0, -1)])</span>
-<span class="sd">           ...:   for i in range(len(p) - 4, len(p)):</span>
-<span class="sd">           ...:     print(f&quot;({p}).h(slice({i})):&quot;)</span>
-<span class="sd">           ...:     %timeit p.h(slice(i))</span>
-<span class="sd">        (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(2)):</span>
-<span class="sd">        16.1 ms ± 1.09 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
-<span class="sd">        (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(3)):</span>
-<span class="sd">        39 ms ± 602 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(4)):</span>
-<span class="sd">        40.3 ms ± 3.49 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-2: 1, ..., 3: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6)).h(slice(5)):</span>
-<span class="sd">        46.2 ms ± 7.43 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(4)):</span>
-<span class="sd">        538 ms ± 9.46 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(5)):</span>
-<span class="sd">        534 ms ± 30.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(6)):</span>
-<span class="sd">        536 ms ± 13.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-3: 1, ..., 2: 1}), ..., H({0: 1, ..., 5: 1}), 6, 6, 6, 6)).h(slice(7)):</span>
-<span class="sd">        604 ms ± 52.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-
-<span class="sd">        In [4]: for n in (6, 8):</span>
-<span class="sd">           ...:   p = P(*[H(6) - m for m in range(n, 0, -1)])</span>
-<span class="sd">           ...:   for i in range(len(p) - 4, len(p)):</span>
-<span class="sd">           ...:     print(f&quot;({p}).h(slice({i})):&quot;)</span>
-<span class="sd">           ...:     %timeit p.h(slice(i))</span>
-<span class="sd">        (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(2)):</span>
-<span class="sd">        145 ms ± 4.59 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(3)):</span>
-<span class="sd">        147 ms ± 3.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):</span>
-<span class="sd">        158 ms ± 1.38 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-5: 1, ..., 0: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):</span>
-<span class="sd">        147 ms ± 691 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
-<span class="sd">        (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(4)):</span>
-<span class="sd">        6.09 s ± 14.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(5)):</span>
-<span class="sd">        6.11 s ± 36.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(6)):</span>
-<span class="sd">        6.25 s ± 47.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
-<span class="sd">        (P(H({-7: 1, ..., -2: 1}), ..., H({0: 1, ..., 5: 1}))).h(slice(7)):</span>
-<span class="sd">        6.31 s ± 42.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
+<span class="sd">        ``` python</span>
+<span class="sd">        --8&lt;-- &quot;docs/assets/perf_rolls_with_counts.txt&quot;</span>
 <span class="sd">        ```</span>
+
+<span class="sd">        &lt;details&gt;</span>
+<span class="sd">        &lt;summary&gt;Source: &lt;a href=&quot;https://github.com/posita/dyce/blob/latest/docs/assets/perf_rolls_with_counts.ipy&quot;&gt;&lt;code&gt;perf_rolls_with_counts.ipy&lt;/code&gt;&lt;/a&gt;&lt;/summary&gt;</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        --8&lt;-- &quot;docs/assets/perf_rolls_with_counts.ipy&quot;</span>
+<span class="sd">        ```</span>
+<span class="sd">        &lt;/details&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -6796,11 +6848,6 @@ In [4]: for n in (6, 8):
     </div>
 
   </div>
-                
-              
-              
-                
-
 
               
             </article>
@@ -6809,8 +6856,7 @@ In [4]: for n in (6, 8):
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
@@ -6849,20 +6895,19 @@ In [4]: for n in (6, 8):
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
-          </div>
-        
-        
-          Made with
-          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-            Material for MkDocs
-          </a>
-        
-        
-      </div>
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
@@ -6872,10 +6917,10 @@ In [4]: for n in (6, 8):
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      <script src="../assets/javascripts/bundle.17f42bbf.min.js"></script>
       
         <script src="../js/site.js"></script>
       

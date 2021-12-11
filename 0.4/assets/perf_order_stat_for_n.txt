@@ -1,0 +1,6 @@
+%timeit [H(6).order_stat_for_n_at_pos(30, i) for i in range(10)]
+462 ms ± 16.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+%timeit order_stat_for_30d6_at_pos = H(6).order_stat_func_for_n(30) ; [order_stat_for_30d6_at_pos(i) for i in range(10)]
+54.4 ms ± 1.47 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
