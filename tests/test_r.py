@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import operator
+import re
 
 from dyce import H, P, R
 from dyce.r import PoolRoller, RollOutcome, ValueRoller
@@ -668,7 +669,71 @@ class TestPoolRoller:
                 assert r_3_roll.total() in h_3, r_3_roll
 
 
-class TestSelectRoller:
+class TestFilterRoller:
+    def test_repr(self) -> None:
+        def evens_filter(outcome: RollOutcome) -> bool:
+            return bool(outcome.is_even().value)
+
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares_filter = r_squares.filter(evens_filter)
+        pattern = (
+            re.escape(
+                """FilterRoller(
+  predicate=<function TestFilterRoller.test_repr.<locals>.evens_filter at """
+            )
+            + r"(?:0x)?([0-9A-Fa-f]+)"
+            + re.escape(
+                """>,
+  sources=(
+    PoolRoller(
+      sources=(
+        ValueRoller(value=36, annotation=''),
+        ValueRoller(value=25, annotation=''),
+        ValueRoller(value=16, annotation=''),
+        ValueRoller(value=9, annotation=''),
+        ValueRoller(value=4, annotation=''),
+        ValueRoller(value=1, annotation=''),
+      ),
+      annotation='',
+    ),
+  ),
+  annotation='',
+)"""
+            )
+        )
+        assert re.search(
+            pattern,
+            repr(r_squares_filter),
+        )
+
+    def test_op_eq(self) -> None:
+        def evens_filter(outcome: RollOutcome) -> bool:
+            return bool(outcome.is_even().value)
+
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares_filter = r_squares.filter(evens_filter)
+        r_squares_filter_annotated = r_squares_filter.annotate("even squares")
+        assert r_squares_filter == r_squares.filter(evens_filter)
+        assert r_squares_filter != r_squares_filter_annotated
+        assert r_squares_filter_annotated == r_squares_filter.annotate("even squares")
+
+    def test_roll(self) -> None:
+        def evens_filter(outcome: RollOutcome) -> bool:
+            return bool(outcome.is_even().value)
+
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares_filter = r_squares.filter(evens_filter)
+        r_squares_filter_roll = r_squares_filter.roll()
+        assert tuple(r_squares_filter_roll.outcomes()) == (36, 16, 4)
+
+        for roll_outcome in r_squares_filter_roll:
+            if roll_outcome.value is None:
+                assert roll_outcome.r is r_squares_filter
+            else:
+                assert roll_outcome.r in r_squares.sources
+
+
+class TestSelectionRoller:
     def test_repr(self) -> None:
         r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1)

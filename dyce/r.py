@@ -87,6 +87,7 @@ _RollOutcomeBinaryOperatorT = Callable[
     ["RollOutcome", "RollOutcome"], _RollOutcomesReturnT
 ]
 BasicOperatorT = Callable[["R", Iterable["RollOutcome"]], _RollOutcomesReturnT]
+PredicateT = Callable[["RollOutcome"], bool]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -755,6 +756,99 @@ class R:
 
     @classmethod
     @beartype
+    def filter_from_sources(
+        cls,
+        predicate: PredicateT,
+        *sources: _SourceT,
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Shorthand for ``#!python cls.filter_from_sources_iterable(predicate, sources,
+        annotation=annotation)``.
+
+        See the [``filter_from_sources_iterable``
+        method][dyce.r.R.filter_from_sources_iterable].
+        """
+        return cls.filter_from_sources_iterable(
+            predicate, sources, annotation=annotation
+        )
+
+    @classmethod
+    @beartype
+    def filter_from_sources_iterable(
+        cls,
+        predicate: PredicateT,
+        sources: Iterable[_SourceT],
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Creates and returns a [``FilterRoller``][dyce.r.FilterRoller] for applying filterion
+        *predicate* to sorted outcomes from *sources*.
+
+        ``` python
+        >>> r_filter = R.filter_from_sources_iterable(
+        ...   lambda outcome: bool(outcome.is_even().value),
+        ...   (R.from_value(i) for i in (5, 4, 6, 3, 7, 2, 8, 1, 9, 0)),
+        ... ) ; r_filter
+        FilterRoller(
+          predicate=<function <lambda> at ...>,
+          sources=(
+            ValueRoller(value=5, annotation=''),
+            ValueRoller(value=4, annotation=''),
+            ...,
+            ValueRoller(value=9, annotation=''),
+            ValueRoller(value=0, annotation=''),
+          ),
+          annotation='',
+        )
+        >>> tuple(r_filter.roll().outcomes())
+        (4, 6, 2, 8, 0)
+
+        ```
+        """
+        return FilterRoller(predicate, sources, annotation=annotation)
+
+    @classmethod
+    @beartype
+    def filter_from_values(
+        cls,
+        predicate: PredicateT,
+        *values: _ValueT,
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Shorthand for ``#!python cls.filter_from_values_iterable(predicate, values,
+        annotation=annotation)``.
+
+        See the
+        [``filter_from_values_iterable`` method][dyce.r.R.filter_from_values_iterable].
+        """
+        return cls.filter_from_values_iterable(predicate, values, annotation=annotation)
+
+    @classmethod
+    @beartype
+    def filter_from_values_iterable(
+        cls,
+        predicate: PredicateT,
+        values: Iterable[_ValueT],
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Shorthand for ``#!python cls.filter_from_sources_iterable((cls.from_value(value) for
+        value in values), annotation=annotation)``.
+
+        See the [``from_value``][dyce.r.R.from_value] and
+        [``filter_from_sources_iterable``][dyce.r.R.filter_from_sources_iterable]
+        methods.
+        """
+        return cls.filter_from_sources_iterable(
+            predicate,
+            (cls.from_value(value) for value in values),
+            annotation=annotation,
+        )
+
+    @classmethod
+    @beartype
     def select_from_sources(
         cls,
         which: Iterable[_GetItemT],
@@ -783,9 +877,9 @@ class R:
         selection *which* to sorted outcomes from *sources*.
 
         ``` python
-        >>> r_select = R.select_from_values(
+        >>> r_select = R.select_from_sources_iterable(
         ...   (0, -1, slice(3, 6), slice(6, 3, -1), -1, 0),
-        ...   5, 4, 6, 3, 7, 2, 8, 1, 9, 0,
+        ...   (R.from_value(i) for i in (5, 4, 6, 3, 7, 2, 8, 1, 9, 0)),
         ... ) ; r_select
         SelectionRoller(
           which=(0, -1, slice(3, 6, None), slice(6, 3, -1), -1, 0),
@@ -1072,6 +1166,33 @@ class R:
             return operand.is_odd()
 
         return self.umap(_is_odd)
+
+    @beartype
+    def filter(
+        self,
+        predicate: PredicateT,
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Shorthand for ``#!python self.filter_iterable(predicate, annotation=annotation)``.
+
+        See the [``filter_iterable`` method][dyce.r.R.filter_iterable].
+        """
+        return self.filter_iterable(predicate, annotation=annotation)
+
+    @beartype
+    def filter_iterable(
+        self,
+        predicate: PredicateT,
+        annotation: Any = "",
+    ) -> FilterRoller:
+        r"""
+        Shorthand for ``#!python type(self).filter_from_sources(predicate, self,
+        annotation=annotation)``.
+
+        See the [``filter_from_sources`` method][dyce.r.R.filter_from_sources].
+        """
+        return type(self).filter_from_sources(predicate, self, annotation=annotation)
 
     @beartype
     def select(
@@ -1548,6 +1669,141 @@ class UnarySumOpRoller(NarySumOpRoller):
         The operator this roller applies to its sources.
         """
         return self._un_op
+
+
+class FilterRoller(R):
+    r"""
+    A [roller][dyce.r.R] for applying *predicate* to filter outcomes its *sources*.
+
+    ``` python
+    >>> r_values = R.from_values_iterable(range(6))
+    >>> r_filter = r_values.filter_iterable(lambda outcome: bool(outcome.is_odd().value)) ; r_filter
+    FilterRoller(
+      predicate=<function <lambda> at ...>,
+      sources=(
+        PoolRoller(
+          sources=(
+            ValueRoller(value=0, annotation=''),
+            ValueRoller(value=1, annotation=''),
+            ValueRoller(value=2, annotation=''),
+            ValueRoller(value=3, annotation=''),
+            ValueRoller(value=4, annotation=''),
+            ValueRoller(value=5, annotation=''),
+          ),
+          annotation='',
+        ),
+      ),
+      annotation='',
+    )
+    >>> roll = r_filter.roll()
+    >>> tuple(roll.outcomes())
+    (1, 3, 5)
+    >>> roll
+    Roll(
+      r=...,
+      roll_outcomes=(
+        RollOutcome(
+          value=None,
+          sources=(
+            RollOutcome(
+              value=0,
+              sources=(),
+            ),
+          ),
+        ),
+        RollOutcome(
+          value=1,
+          sources=(),
+        ),
+        RollOutcome(
+          value=None,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+          ),
+        ),
+        RollOutcome(
+          value=3,
+          sources=(),
+        ),
+        RollOutcome(
+          value=None,
+          sources=(
+            RollOutcome(
+              value=4,
+              sources=(),
+            ),
+          ),
+        ),
+        RollOutcome(
+          value=5,
+          sources=(),
+        ),
+      ),
+      source_rolls=...,
+    )
+
+    ```
+    """
+    __slots__: Tuple[str, ...] = ("_predicate",)
+
+    # ---- Initializer -----------------------------------------------------------------
+
+    @beartype
+    def __init__(
+        self,
+        predicate: PredicateT,
+        sources: Iterable[R],
+        annotation: Any = "",
+        **kw,
+    ):
+        r"Initializer."
+        super().__init__(sources=sources, annotation=annotation, **kw)
+        self._predicate = predicate
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @beartype
+    def __repr__(self) -> str:
+        return f"""{type(self).__name__}(
+  predicate={self.predicate!r},
+  sources=({_seq_repr(self.sources)}),
+  annotation={self.annotation!r},
+)"""
+
+    @beartype
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and _callable_cmp(self.predicate, other.predicate)
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+        source_rolls = list(self.source_rolls())
+
+        def _filtered_roll_outcomes() -> Iterator[RollOutcome]:
+            for roll_outcome in chain.from_iterable(source_rolls):
+                if roll_outcome.value is not None:
+                    if self.predicate(roll_outcome):
+                        yield roll_outcome
+                    else:
+                        yield roll_outcome.euthanize()
+
+        return Roll(
+            self,
+            roll_outcomes=_filtered_roll_outcomes(),
+            source_rolls=source_rolls,
+        )
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def predicate(self) -> PredicateT:
+        r"""
+        The predicate this roller applies to filter its sources.
+        """
+        return self._predicate
 
 
 class SelectionRoller(R):
@@ -2067,7 +2323,7 @@ class RollOutcome:
             right_operand_value = right_operand
 
         if isinstance(right_operand_value, RealLike):
-            return RollOutcome(bin_op(self.value, right_operand_value), sources)
+            return self.__class__(bin_op(self.value, right_operand_value), sources)
         else:
             raise NotImplementedError
 
@@ -2106,7 +2362,7 @@ class RollOutcome:
             a reminder of operand ordering.
         """
         if isinstance(left_operand, RealLike):
-            return RollOutcome(bin_op(left_operand, self.value), sources=(self,))
+            return self.__class__(bin_op(left_operand, self.value), sources=(self,))
         else:
             raise NotImplementedError
 
@@ -2137,61 +2393,61 @@ class RollOutcome:
 
         ```
         """
-        return RollOutcome(un_op(self.value), sources=(self,))
+        return self.__class__(un_op(self.value), sources=(self,))
 
     @beartype
     def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__lt__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__lt__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__lt__(self.value, other)), sources=(self,))
 
     @beartype
     def le(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__le__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__le__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__le__(self.value, other)), sources=(self,))
 
     @beartype
     def eq(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__eq__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__eq__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__eq__(self.value, other)), sources=(self,))
 
     @beartype
     def ne(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__ne__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__ne__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__ne__(self.value, other)), sources=(self,))
 
     @beartype
     def gt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__gt__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__gt__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__gt__(self.value, other)), sources=(self,))
 
     @beartype
     def ge(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return RollOutcome(
+            return self.__class__(
                 bool(__ge__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return RollOutcome(bool(__ge__(self.value, other)), sources=(self,))
+            return self.__class__(bool(__ge__(self.value, other)), sources=(self,))
 
     @beartype
     def is_even(self) -> RollOutcome:
@@ -2238,6 +2494,21 @@ class RollOutcome:
             return None
 
         return self.umap(_euthanize)
+
+    @beartype
+    def adopt(
+        self, sources: Iterable["RollOutcome"] = (), force: bool = False
+    ) -> RollOutcome:
+        r"""
+        TODO
+        """
+        if self.sources and not force:
+            raise ValueError("TODO")
+        else:
+            adopted_roll_outcome = self.__class__(self.value, sources)
+            adopted_roll_outcome._roll = self._roll
+
+            return adopted_roll_outcome
 
 
 class Roll(Sequence[RollOutcome]):
@@ -2402,8 +2673,8 @@ class Roll(Sequence[RollOutcome]):
         !!! info
 
             Unlike [``H.roll``][dyce.h.H.roll] and [``P.roll``][dyce.p.P.roll], these
-            outcomes are *not* sorted. Instead, they retain the ordering from whence
-            they came in the roller tree.
+            outcomes are *not* sorted. Instead, they retain the ordering as passed to
+            [``__init__``][dyce.r.Roll.__init__].
 
             ``` python
             >>> r_3d6 = 3@R.from_value(H(6))

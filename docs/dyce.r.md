@@ -45,6 +45,7 @@
         - "NarySumOpRoller"
         - "BinarySumOpRoller"
         - "UnarySumOpRoller"
+        - "FilterRoller"
         - "SelectionRoller"
         - "Roll"
         - "RollOutcome"
