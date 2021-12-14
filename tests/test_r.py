@@ -10,9 +10,17 @@ from __future__ import annotations
 
 import operator
 import re
+from typing import Union
 
 from dyce import H, P, R
-from dyce.r import PoolRoller, RollOutcome, ValueRoller
+from dyce.r import (
+    CoalesceMode,
+    PoolRoller,
+    RollOutcome,
+    SubstitutionRoller,
+    ValueRoller,
+    _ValueT,
+)
 
 from .test_h import _INTEGRAL_OUTCOME_TYPES, _OUTCOME_TYPES
 
@@ -78,41 +86,6 @@ class TestValueRoller:
                 (roll_outcome,) = r_roll
                 assert roll_outcome.r == r
                 assert r_roll.total() in h, r
-
-    def test_roll_cloned_roll_outcome(self) -> None:
-        for o_type in _OUTCOME_TYPES:
-            for v in range(-2, 3):
-                o = o_type(v)
-
-                r = R.from_value(o, annotation=f"{o_type}")
-                r_roll = r.roll()
-                (roll_outcome,) = r_roll
-                assert roll_outcome.r == r
-                assert roll_outcome.value == o
-                assert roll_outcome.sources == ()
-
-                cloning_r = R.from_value(roll_outcome, annotation=f"{o_type}")
-                cloned_r_roll = cloning_r.roll()
-                (cloned_roll_outcome,) = cloned_r_roll
-                assert cloned_roll_outcome.r == cloning_r
-                assert cloned_roll_outcome.value == o
-                assert cloned_roll_outcome.sources == roll_outcome.sources
-
-    def test_roll_heterogeneous_source(self) -> None:
-        for o_type in _OUTCOME_TYPES:
-            for v in range(-2, 3):
-                o = o_type(v)
-                r_o = R.from_value(o, annotation=f"{o_type}")
-                roll_o = r_o.roll()
-                (roll_outcome_o,) = roll_o
-                r = R.from_values(o, roll_outcome_o, roll_o)
-                r_roll = r.roll()
-                assert r_roll.r == r
-                assert tuple(r_roll) == (
-                    roll_outcome_o,
-                    roll_outcome_o,
-                    roll_outcome_o,
-                ), f"{o_type}({v})"
 
 
 class TestRepeatRoller:
@@ -779,6 +752,56 @@ class TestSelectionRoller:
                 assert roll_outcome.r in r_squares.sources
 
 
+class TestSubstitutionRoller:
+    def test_repr(self) -> None:
+        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
+            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+
+        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
+        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
+        pattern = (
+            re.escape(
+                """SubstitutionRoller(
+  initial_value=P(H({1: 1}), H({4: 1}), H({9: 1}), H({16: 1}), H({25: 1}), H({36: 1})),
+  expansion_op=<function TestSubstitutionRoller.test_repr.<locals>.odd_doubler at """
+            )
+            + r"(?:0x)?([0-9A-Fa-f]+)"
+            + re.escape(
+                """>,
+  coalesce_mode=<CoalesceMode.REPLACE: 1>,
+  max_depth=1,
+  annotation='',
+)"""
+            )
+        )
+        assert re.search(
+            pattern,
+            repr(r_double_odd_squares),
+        )
+
+    def test_op_eq(self) -> None:
+        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
+            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+
+        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
+        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
+        r_double_odd_squares_annotated = r_double_odd_squares.annotate("doubled odd squares")
+        assert r_double_odd_squares == SubstitutionRoller(p_squares, odd_doubler)
+        assert r_double_odd_squares != r_double_odd_squares_annotated
+        assert r_double_odd_squares_annotated == r_double_odd_squares.annotate(
+            "doubled odd squares"
+        )
+
+    def test_roll(self) -> None:
+        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
+            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+
+        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
+        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
+        r_double_odd_squares_roll = r_double_odd_squares.roll()
+        assert tuple(r_double_odd_squares_roll.outcomes()) == (2, 4, 18, 16, 50, 36)
+
+
 class TestRoll:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
@@ -827,6 +850,30 @@ class TestRoll:
             == tuple(r_123_roll[i] for i in range(len(r_123_roll)))
             == tuple(r_123_roll)
         )
+
+    def test_adopt_append(self) -> None:
+        r_567 = R.from_values(1, 2, 3) + 4
+        roll = r_567.roll()
+        one = RollOutcome(1)
+        assert not any(one in roll_outcome.sources for roll_outcome in roll)
+
+        adopted_roll = roll.adopt((one,), CoalesceMode.APPEND)
+
+        for roll_outcome in adopted_roll:
+            assert len(roll_outcome.sources) > 1
+            assert one in roll_outcome.sources
+
+    def test_adopt_replace(self) -> None:
+        r_567 = R.from_values(1, 2, 3) + 4
+        roll = r_567.roll()
+        one = RollOutcome(1)
+        assert not any(one in roll_outcome.sources for roll_outcome in roll)
+
+        adopted_roll = roll.adopt((one,), CoalesceMode.REPLACE)
+
+        for roll_outcome in adopted_roll:
+            assert len(roll_outcome.sources) == 1
+            assert one in roll_outcome.sources
 
     def test_hierarchy(self) -> None:
         d6 = H(6)
@@ -885,6 +932,28 @@ class TestRollOutcome:
         six_odd = six.is_odd()
         assert six_odd.value is False
         assert six_odd.sources == (six,)
+
+    def test_adopt_append(self) -> None:
+        six = RollOutcome(6)
+        four_from_six = RollOutcome(4, sources=(six,))
+        five = RollOutcome(5)
+        four_from_six_five = four_from_six.adopt(
+            sources=(five,),
+            coalesce_mode=CoalesceMode.APPEND,
+        )
+        assert four_from_six_five.value == four_from_six.value
+        assert four_from_six_five.sources == (six, five)
+
+    def test_adopt_replace(self) -> None:
+        six = RollOutcome(6)
+        four_from_six = RollOutcome(4, sources=(six,))
+        five = RollOutcome(5)
+        four_from_five = four_from_six.adopt(
+            sources=(five,),
+            coalesce_mode=CoalesceMode.REPLACE,
+        )
+        assert four_from_five.value == four_from_six.value
+        assert four_from_five.sources == (five,)
 
     def test_euthanize(self) -> None:
         six = RollOutcome(6)

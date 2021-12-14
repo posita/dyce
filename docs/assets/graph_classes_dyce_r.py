@@ -42,6 +42,7 @@ def do_it(style: str) -> Optional[Dot]:
     src_g.read(f"classes_dyce_r_{style}.dot")
     os.remove(f"classes_dyce_r_{style}.dot")
 
+    src_g.remove_node("dyce.r.CoalesceMode")
     src_g.remove_node("dyce.r.Roll")
     src_g.remove_node("dyce.r.RollOutcome")
 

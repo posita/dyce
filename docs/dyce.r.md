@@ -45,6 +45,8 @@
         - "NarySumOpRoller"
         - "BinarySumOpRoller"
         - "UnarySumOpRoller"
+        - "SubstitutionRoller"
+        - "SubstitutionMode"
         - "FilterRoller"
         - "SelectionRoller"
         - "Roll"

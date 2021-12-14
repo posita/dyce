@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import enum
 import warnings
 from abc import abstractmethod
 from collections import defaultdict, deque
@@ -77,7 +78,7 @@ __all__ = ("R",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_ValueT = Union[RealLikeSCU, H, P, "RollOutcome", "Roll"]
+_ValueT = Union[RealLikeSCU, H, P]
 _SourceT = Union["R"]
 _ROperandT = Union[RealLikeSCU, _SourceT]
 _RollOutcomeOperandT = Union[RealLikeSCU, "RollOutcome"]
@@ -87,7 +88,13 @@ _RollOutcomeBinaryOperatorT = Callable[
     ["RollOutcome", "RollOutcome"], _RollOutcomesReturnT
 ]
 BasicOperatorT = Callable[["R", Iterable["RollOutcome"]], _RollOutcomesReturnT]
-PredicateT = Callable[["RollOutcome"], bool]
+_ExpansionOperatorT = Callable[["RollOutcome"], Union["RollOutcome", _ValueT]]
+_PredicateT = Callable[["RollOutcome"], bool]
+
+
+class CoalesceMode(enum.Enum):
+    REPLACE = enum.auto()
+    APPEND = enum.auto()
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -150,7 +157,7 @@ class R:
 
         ``` python
         >>> r_6 = R.from_value(6)
-        >>> r_6_abs_3 = 3 @ abs(r_6)
+        >>> r_6_abs_3 = 3@abs(r_6)
         >>> r_6_abs_6_abs_6_abs = R.from_sources(abs(r_6), abs(r_6), abs(r_6))
         >>> tuple(r_6_abs_3.roll().outcomes()), tuple(r_6_abs_6_abs_6_abs.roll().outcomes())  # they generate the same rolls
         ((6, 6, 6), (6, 6, 6))
@@ -167,7 +174,7 @@ class R:
     produces [``Roll`` objects][dyce.r.Roll].
 
     <!-- BEGIN MONKEY PATCH --
-    For deterministic outcomes
+    For deterministic outcomes.
 
     >>> import random
     >>> from dyce import rng
@@ -504,7 +511,7 @@ class R:
             *including all roll outcomes’ [``sources``][dyce.r.RollOutcome.sources]*.
 
         <!-- BEGIN MONKEY PATCH --
-        For deterministic outcomes
+        For deterministic outcomes.
 
         >>> import random
         >>> from dyce import rng
@@ -654,7 +661,7 @@ class R:
         Creates and returns a roller for “pooling” zero or more *sources*.
 
         <!-- BEGIN MONKEY PATCH --
-        For deterministic outcomes
+        For deterministic outcomes.
 
         >>> import random
         >>> from dyce import rng
@@ -758,7 +765,7 @@ class R:
     @beartype
     def filter_from_sources(
         cls,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         *sources: _SourceT,
         annotation: Any = "",
     ) -> FilterRoller:
@@ -777,7 +784,7 @@ class R:
     @beartype
     def filter_from_sources_iterable(
         cls,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         sources: Iterable[_SourceT],
         annotation: Any = "",
     ) -> FilterRoller:
@@ -812,7 +819,7 @@ class R:
     @beartype
     def filter_from_values(
         cls,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         *values: _ValueT,
         annotation: Any = "",
     ) -> FilterRoller:
@@ -829,7 +836,7 @@ class R:
     @beartype
     def filter_from_values_iterable(
         cls,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         values: Iterable[_ValueT],
         annotation: Any = "",
     ) -> FilterRoller:
@@ -1170,20 +1177,7 @@ class R:
     @beartype
     def filter(
         self,
-        predicate: PredicateT,
-        annotation: Any = "",
-    ) -> FilterRoller:
-        r"""
-        Shorthand for ``#!python self.filter_iterable(predicate, annotation=annotation)``.
-
-        See the [``filter_iterable`` method][dyce.r.R.filter_iterable].
-        """
-        return self.filter_iterable(predicate, annotation=annotation)
-
-    @beartype
-    def filter_iterable(
-        self,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         annotation: Any = "",
     ) -> FilterRoller:
         r"""
@@ -1260,11 +1254,7 @@ class ValueRoller(R):
     @beartype
     def roll(self) -> Roll:
         r""""""
-        if isinstance(self.value, Roll):
-            return self.value
-        elif isinstance(self.value, RollOutcome):
-            return Roll(self, roll_outcomes=(self.value,))
-        elif isinstance(self.value, P):
+        if isinstance(self.value, P):
             return Roll(
                 self,
                 roll_outcomes=(RollOutcome(outcome) for outcome in self.value.roll()),
@@ -1599,7 +1589,7 @@ class BinarySumOpRoller(NarySumOpRoller):
     @beartype
     def __repr__(self) -> str:
         def _source_repr(source: _SourceT) -> str:
-            return indent(repr(source), "    ").strip()
+            return indent(repr(source), "  ").strip()
 
         left_source, right_source = self.sources
 
@@ -1675,46 +1665,34 @@ class FilterRoller(R):
     r"""
     A [roller][dyce.r.R] for applying *predicate* to filter outcomes its *sources*.
 
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes.
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1639580307)
+
+      -- END MONKEY PATCH -->
+
     ``` python
-    >>> r_values = R.from_values_iterable(range(6))
-    >>> r_filter = r_values.filter_iterable(lambda outcome: bool(outcome.is_odd().value)) ; r_filter
-    FilterRoller(
-      predicate=<function <lambda> at ...>,
-      sources=(
-        PoolRoller(
-          sources=(
-            ValueRoller(value=0, annotation=''),
-            ValueRoller(value=1, annotation=''),
-            ValueRoller(value=2, annotation=''),
-            ValueRoller(value=3, annotation=''),
-            ValueRoller(value=4, annotation=''),
-            ValueRoller(value=5, annotation=''),
-          ),
-          annotation='',
-        ),
-      ),
-      annotation='',
-    )
-    >>> roll = r_filter.roll()
-    >>> tuple(roll.outcomes())
-    (1, 3, 5)
-    >>> roll
+    >>> r_d6 = R.from_value(H(6))
+    >>> filter_r = (2@r_d6).filter(
+    ...   lambda outcome: outcome.value is not None and outcome.value > 3,  # type: ignore
+    ... )
+    >>> (filter_r).roll()
     Roll(
-      r=...,
-      roll_outcomes=(
-        RollOutcome(
-          value=None,
-          sources=(
-            RollOutcome(
-              value=0,
-              sources=(),
-            ),
+      r=FilterRoller(
+        predicate=<function <lambda> at ...>,
+        sources=(
+          RepeatRoller(
+            n=2,
+            source=ValueRoller(value=H(6), annotation=''),
+            annotation='',
           ),
         ),
-        RollOutcome(
-          value=1,
-          sources=(),
-        ),
+        annotation='',
+      ),
+      roll_outcomes=(
         RollOutcome(
           value=None,
           sources=(
@@ -1725,27 +1703,57 @@ class FilterRoller(R):
           ),
         ),
         RollOutcome(
-          value=3,
-          sources=(),
-        ),
-        RollOutcome(
-          value=None,
-          sources=(
-            RollOutcome(
-              value=4,
-              sources=(),
-            ),
-          ),
-        ),
-        RollOutcome(
           value=5,
           sources=(),
         ),
       ),
-      source_rolls=...,
+      source_rolls=(
+        Roll(
+          r=RepeatRoller(
+            n=2,
+            source=ValueRoller(value=H(6), annotation=''),
+            annotation='',
+          ),
+          roll_outcomes=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+            RollOutcome(
+              value=5,
+              sources=(),
+            ),
+          ),
+          source_rolls=(
+            Roll(
+              r=ValueRoller(value=H(6), annotation=''),
+              roll_outcomes=(
+                RollOutcome(
+                  value=2,
+                  sources=(),
+                ),
+              ),
+              source_rolls=(),
+            ),
+            Roll(
+              r=ValueRoller(value=H(6), annotation=''),
+              roll_outcomes=(
+                RollOutcome(
+                  value=5,
+                  sources=(),
+                ),
+              ),
+              source_rolls=(),
+            ),
+          ),
+        ),
+      ),
     )
 
     ```
+
+    See the section on “[Filtering and
+    substitution](rollin.md#filtering-and-substitution)” more examples.
     """
     __slots__: Tuple[str, ...] = ("_predicate",)
 
@@ -1754,7 +1762,7 @@ class FilterRoller(R):
     @beartype
     def __init__(
         self,
-        predicate: PredicateT,
+        predicate: _PredicateT,
         sources: Iterable[R],
         annotation: Any = "",
         **kw,
@@ -1799,7 +1807,7 @@ class FilterRoller(R):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def predicate(self) -> PredicateT:
+    def predicate(self) -> _PredicateT:
         r"""
         The predicate this roller applies to filter its sources.
         """
@@ -1956,6 +1964,206 @@ class SelectionRoller(R):
         return self._which
 
 
+class SubstitutionRoller(ValueRoller):
+    r"""
+    A [roller][dyce.r.R] for applying *expansion_op* to determine when to roll new
+    values up to *max_depth* times for incorporation via *coalesce_mode*.
+
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes.
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1639580307)
+
+      -- END MONKEY PATCH -->
+
+    ``` python
+    >>> from dyce.r import SubstitutionRoller
+    >>> replace_r = SubstitutionRoller(
+    ...   H(6),
+    ...   lambda outcome: H(6) if outcome.value is not None and outcome.value <= 3 else outcome,
+    ...   max_depth=2,
+    ... )
+    >>> (2@replace_r).roll()
+    Roll(
+      r=RepeatRoller(
+        n=2,
+        source=SubstitutionRoller(
+          initial_value=H(6),
+          expansion_op=<function <lambda> at ...>,
+          coalesce_mode=<CoalesceMode.REPLACE: 1>,
+          max_depth=2,
+          annotation='',
+        ),
+        annotation='',
+      ),
+      roll_outcomes=(
+        RollOutcome(
+          value=5,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+          ),
+        ),
+        RollOutcome(
+          value=4,
+          sources=(
+            RollOutcome(
+              value=3,
+              sources=(),
+            ),
+          ),
+        ),
+      ),
+      source_rolls=(...),
+    )
+
+    ```
+
+    See the section on “[Filtering and
+    substitution](rollin.md#filtering-and-substitution)” more examples.
+    """
+    __slots__: Tuple[str, ...] = ("_coalesce_mode", "_expansion_op", "_max_depth")
+
+    # ---- Initializer -----------------------------------------------------------------
+
+    @beartype
+    def __init__(
+        self,
+        initial_value: _ValueT,
+        expansion_op: _ExpansionOperatorT,
+        coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
+        max_depth: SupportsIntSCU = 1,
+        annotation: Any = "",
+        **kw,
+    ):
+        r"Initializer."
+        super().__init__(value=initial_value, annotation=annotation, **kw)
+        self._expansion_op = expansion_op
+        self._coalesce_mode = coalesce_mode
+        self._max_depth = as_int(max_depth)
+
+    # ---- Overrides -------------------------------------------------------------------
+
+    @beartype
+    def __repr__(self) -> str:
+        return f"""{type(self).__name__}(
+  initial_value={indent(repr(self.value), "  ").strip()},
+  expansion_op={self.expansion_op!r},
+  coalesce_mode={self.coalesce_mode!r},
+  max_depth={self.max_depth!r},
+  annotation={self.annotation!r},
+)"""
+
+    @beartype
+    def __eq__(self, other) -> bool:
+        return (
+            super().__eq__(other)
+            and _callable_cmp(self.expansion_op, other.expansion_op)
+            and self.coalesce_mode == other.coalesce_mode
+            and self.max_depth == other.max_depth
+        )
+
+    @beartype
+    def roll(self) -> Roll:
+        r""""""
+
+        def _expanded_roll_outcomes(
+            roll_outcomes: Iterable[RollOutcome],
+            depth: int = 0,
+        ) -> Iterator[RollOutcome]:
+            if depth >= self.max_depth:
+                yield from roll_outcomes
+
+                return
+
+            for roll_outcome in roll_outcomes:
+                expanded = self.expansion_op(roll_outcome)
+
+                if isinstance(expanded, P):
+                    expanded_roll_outcomes = tuple(
+                        RollOutcome(outcome, sources=(roll_outcome,))
+                        for outcome in expanded.roll()
+                    )
+                elif isinstance(expanded, H):
+                    expanded_roll_outcomes = (
+                        RollOutcome(expanded.roll(), sources=(roll_outcome,)),
+                    )
+                elif isinstance(expanded, RollOutcome):
+                    if expanded is roll_outcome:
+                        yield expanded
+                        continue
+                    else:
+                        raise ValueError(
+                            f"expansion_op cannot return a RollOutcome other than its argument; return {expanded.value} instead of {expanded}"
+                        )
+                else:
+                    expanded_roll_outcomes = (
+                        RollOutcome(expanded, sources=(roll_outcome,)),
+                    )
+
+                if self.coalesce_mode == CoalesceMode.REPLACE:
+                    yield from _expanded_roll_outcomes(
+                        expanded_roll_outcomes, depth + 1
+                    )
+                elif self.coalesce_mode == CoalesceMode.APPEND:
+                    yield roll_outcome
+                    yield from _expanded_roll_outcomes(
+                        expanded_roll_outcomes, depth + 1
+                    )
+                else:
+                    assert (
+                        False
+                    ), f"unrecognized substitution mode {self.coalesce_mode!r}"
+
+        base_roll_outcomes = (
+            RollOutcome(roll_outcome.value, roll_outcome.sources)
+            for roll_outcome in super().roll()
+        )
+        roll = Roll(
+            self,
+            roll_outcomes=_expanded_roll_outcomes(base_roll_outcomes),
+        )
+
+        def associate(roll: Roll, roll_outcomes: Iterable[RollOutcome]):
+            for roll_outcome in roll_outcomes:
+                if roll_outcome._roll is None:
+                    roll_outcome._roll = roll
+
+                associate(roll, roll_outcome.sources)
+
+        associate(roll, roll)
+
+        return roll
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def max_depth(self) -> int:
+        r"""
+        The max number of times this roller will attempt to substitute an outcome satisfying
+        its [``expansion_op``][dyce.r.SubstitutionRoller.expansion_op].
+        """
+        return self._max_depth
+
+    @property
+    def expansion_op(self) -> _ExpansionOperatorT:
+        r"""
+        The expansion operator this roller applies to decide whether to substitute outcomes.
+        """
+        return self._expansion_op
+
+    @property
+    def coalesce_mode(self) -> CoalesceMode:
+        r"""
+        The coalesce mode this roller uses to incorporate substituted outcomes.
+        """
+        return self._coalesce_mode
+
+
 class RollOutcome:
     r"""
     !!! warning "Experimental"
@@ -1969,6 +2177,7 @@ class RollOutcome:
 
     # ---- Initializer -----------------------------------------------------------------
 
+    @experimental
     @beartype
     def __init__(
         self,
@@ -2275,15 +2484,6 @@ class RollOutcome:
         """
         return self._value
 
-    @property
-    def _has_roll(self) -> bool:
-        r"""
-        ``#!python True`` if this roll outcome has been associated with a
-        [``Roll``][dyce.r.Roll], ``#!python False`` if not. Accessing this property
-        should not be necessary outside of roll creation (hence its underscore prefix).
-        """
-        return self._roll is not None
-
     # ---- Methods ---------------------------------------------------------------------
 
     @beartype
@@ -2323,7 +2523,7 @@ class RollOutcome:
             right_operand_value = right_operand
 
         if isinstance(right_operand_value, RealLike):
-            return self.__class__(bin_op(self.value, right_operand_value), sources)
+            return type(self)(bin_op(self.value, right_operand_value), sources)
         else:
             raise NotImplementedError
 
@@ -2362,7 +2562,7 @@ class RollOutcome:
             a reminder of operand ordering.
         """
         if isinstance(left_operand, RealLike):
-            return self.__class__(bin_op(left_operand, self.value), sources=(self,))
+            return type(self)(bin_op(left_operand, self.value), sources=(self,))
         else:
             raise NotImplementedError
 
@@ -2393,61 +2593,61 @@ class RollOutcome:
 
         ```
         """
-        return self.__class__(un_op(self.value), sources=(self,))
+        return type(self)(un_op(self.value), sources=(self,))
 
     @beartype
     def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__lt__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__lt__(self.value, other)), sources=(self,))
+            return type(self)(bool(__lt__(self.value, other)), sources=(self,))
 
     @beartype
     def le(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__le__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__le__(self.value, other)), sources=(self,))
+            return type(self)(bool(__le__(self.value, other)), sources=(self,))
 
     @beartype
     def eq(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__eq__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__eq__(self.value, other)), sources=(self,))
+            return type(self)(bool(__eq__(self.value, other)), sources=(self,))
 
     @beartype
     def ne(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__ne__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__ne__(self.value, other)), sources=(self,))
+            return type(self)(bool(__ne__(self.value, other)), sources=(self,))
 
     @beartype
     def gt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__gt__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__gt__(self.value, other)), sources=(self,))
+            return type(self)(bool(__gt__(self.value, other)), sources=(self,))
 
     @beartype
     def ge(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return self.__class__(
+            return type(self)(
                 bool(__ge__(self.value, other.value)), sources=(self, other)
             )
         else:
-            return self.__class__(bool(__ge__(self.value, other)), sources=(self,))
+            return type(self)(bool(__ge__(self.value, other)), sources=(self,))
 
     @beartype
     def is_even(self) -> RollOutcome:
@@ -2466,6 +2666,68 @@ class RollOutcome:
         See the [``umap`` method][dyce.r.RollOutcome.umap].
         """
         return self.umap(is_odd)
+
+    @beartype
+    def adopt(
+        self,
+        sources: Iterable["RollOutcome"] = (),
+        coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
+    ) -> RollOutcome:
+        r"""
+        Creates and returns a new roll outcome identical to this roll outcome, but with
+        *sources* replacing or appended to this roll outcome’s sources in accordance
+        with *coalesce_mode*.
+
+        ``` python
+        >>> from dyce.r import CoalesceMode
+        >>> orig = RollOutcome(1, sources=(RollOutcome(2),)) ; orig
+        RollOutcome(
+          value=1,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+          ),
+        )
+        >>> orig.adopt((RollOutcome(3),), coalesce_mode=CoalesceMode.REPLACE)
+        RollOutcome(
+          value=1,
+          sources=(
+            RollOutcome(
+              value=3,
+              sources=(),
+            ),
+          ),
+        )
+        >>> orig.adopt((RollOutcome(3),), coalesce_mode=CoalesceMode.APPEND)
+        RollOutcome(
+          value=1,
+          sources=(
+            RollOutcome(
+              value=2,
+              sources=(),
+            ),
+            RollOutcome(
+              value=3,
+              sources=(),
+            ),
+          ),
+        )
+
+        ```
+        """
+        if coalesce_mode is CoalesceMode.REPLACE:
+            adopted_sources = sources
+        elif coalesce_mode is CoalesceMode.APPEND:
+            adopted_sources = chain(self.sources, sources)
+        else:
+            assert False, f"unrecognized substitution mode {self.coalesce_mode!r}"
+
+        adopted_roll_outcome = type(self)(self.value, adopted_sources)
+        adopted_roll_outcome._roll = self._roll
+
+        return adopted_roll_outcome
 
     @beartype
     def euthanize(self) -> RollOutcome:
@@ -2494,21 +2756,6 @@ class RollOutcome:
             return None
 
         return self.umap(_euthanize)
-
-    @beartype
-    def adopt(
-        self, sources: Iterable["RollOutcome"] = (), force: bool = False
-    ) -> RollOutcome:
-        r"""
-        TODO
-        """
-        if self.sources and not force:
-            raise ValueError("TODO")
-        else:
-            adopted_roll_outcome = self.__class__(self.value, sources)
-            adopted_roll_outcome._roll = self._roll
-
-            return adopted_roll_outcome
 
 
 class Roll(Sequence[RollOutcome]):
@@ -2587,7 +2834,7 @@ class Roll(Sequence[RollOutcome]):
         self._source_rolls = tuple(source_rolls)
 
         for roll_outcome in self._roll_outcomes:
-            if not roll_outcome._has_roll:
+            if roll_outcome._roll is None:
                 roll_outcome._roll = self
 
     # ---- Overrides -------------------------------------------------------------------
@@ -2656,13 +2903,29 @@ class Roll(Sequence[RollOutcome]):
     # ---- Methods ---------------------------------------------------------------------
 
     @beartype
+    def adopt(
+        self,
+        sources: Iterable["RollOutcome"] = (),
+        coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
+    ) -> Roll:
+        r"""
+        Shorthand for ``#!python Roll(self.r, (roll_outcome.adopt(sources,
+        coalesce_mode) for roll_outcome in self), self.source_rolls)``.
+        """
+        return type(self)(
+            self.r,
+            (roll_outcome.adopt(sources, coalesce_mode) for roll_outcome in self),
+            self.source_rolls,
+        )
+
+    @beartype
     def outcomes(self) -> Iterator[RealLikeSCU]:
         r"""
         Shorthand for ``#!python (roll_outcome.value for roll_outcome in self if
         roll_outcome.value is not None)``.
 
         <!-- BEGIN MONKEY PATCH --
-        For deterministic outcomes
+        For deterministic outcomes.
 
         >>> import random
         >>> from dyce import rng
@@ -2705,8 +2968,8 @@ class RollWalkerVisitor:
     r"""
     !!! warning "Experimental"
 
-        This function should be considered experimental and may change or disappear in
-        future versions.
+        This class (and its descendants) should be considered experimental and may
+        change or disappear in future versions.
 
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``Roll`` object][dyce.r.Roll] found.
@@ -2724,8 +2987,8 @@ class RollOutcomeWalkerVisitor:
     r"""
     !!! warning "Experimental"
 
-        This function should be considered experimental and may change or disappear in
-        future versions.
+        This class (and its descendants) should be considered experimental and may
+        change or disappear in future versions.
 
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``RollOutcome`` object][dyce.r.RollOutcome] found.
@@ -2745,8 +3008,8 @@ class RollerWalkerVisitor:
     r"""
     !!! warning "Experimental"
 
-        This function should be considered experimental and may change or disappear in
-        future versions.
+        This class (and its descendants) should be considered experimental and may
+        change or disappear in future versions.
 
     Abstract visitor interface for use with [``walk``][dyce.r.walk] called for each
     [``R`` object][dyce.r.R] found.

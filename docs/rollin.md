@@ -125,7 +125,7 @@ That durned class method created a whole roller *tree*, which is actually *three
 Let’s use our new roller to create a roll and retrieve its total.
 
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -223,7 +223,7 @@ Each one has:
 * A reference back to the roll that generated it, retrieved via its [``source_roll`` property][dyce.r.RollOutcome.source_roll] (omitted from the diagram for the sake of readability).
 
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -253,7 +253,7 @@ For deterministic outcomes
 Rollers support arithmetic operators.
 
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -326,8 +326,8 @@ Everything serves a purpose.[^2]
 
 [^2]:
 
-    We may still be discovering what those are.
-    We have the utmost faith such purposes exist, even if they have yet to reveal themselves.
+    We may still be discovering what those purposes are.
+    We have the utmost faith they exist, even if they have yet to reveal themselves.
     If you discover one, consider [contributing](contrib.md) an example.
 
 Consider excluding (or “dropping”) dice from a roll.
@@ -381,7 +381,7 @@ Oh boy!
 Aren’t you super excited to try this thing out?
 
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -554,7 +554,7 @@ This risks ambiguity.
 Consider:
 
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -578,6 +578,202 @@ _No one knows._
 ValueRoller(value=P(6, 8), annotation='')
 
 ```
+
+## Filtering and substitution
+
+``dyce`` provides two additional rollers for outcome manipulation.
+
+[``FilterRoller``][dyce.r.FilterRoller]s [``euthanize``][dyce.r.RollOutcome.euthanize] outcomes that don’t meet provided criteria.
+
+``` python
+>>> r_values = R.from_values_iterable(range(6))
+>>> r_filter = r_values.filter(lambda outcome: bool(outcome.is_odd().value)) ; r_filter
+FilterRoller(
+  predicate=<function <lambda> at ...>,
+  sources=(
+    PoolRoller(
+      sources=(
+        ValueRoller(value=0, annotation=''),
+        ValueRoller(value=1, annotation=''),
+        ValueRoller(value=2, annotation=''),
+        ValueRoller(value=3, annotation=''),
+        ValueRoller(value=4, annotation=''),
+        ValueRoller(value=5, annotation=''),
+      ),
+      annotation='',
+    ),
+  ),
+  annotation='',
+)
+>>> roll = r_filter.roll()
+>>> tuple(roll.outcomes())
+(1, 3, 5)
+>>> roll
+Roll(
+  r=...,
+  roll_outcomes=(
+    RollOutcome(
+      value=None,
+      sources=(
+        RollOutcome(
+          value=0,
+          sources=(),
+        ),
+      ),
+    ),
+    RollOutcome(
+      value=1,
+      sources=(),
+    ),
+    RollOutcome(
+      value=None,
+      sources=(
+        RollOutcome(
+          value=2,
+          sources=(),
+        ),
+      ),
+    ),
+    RollOutcome(
+      value=3,
+      sources=(),
+    ),
+    RollOutcome(
+      value=None,
+      sources=(
+        RollOutcome(
+          value=4,
+          sources=(),
+        ),
+      ),
+    ),
+    RollOutcome(
+      value=5,
+      sources=(),
+    ),
+  ),
+  source_rolls=...,
+)
+
+```
+
+[``SubstitutionRoller``][dyce.r.SubstitutionRoller]s replace or append outcomes based on existing ones.
+
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes.
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1639492287)
+
+  -- END MONKEY PATCH -->
+
+``` python
+>>> from dyce.r import CoalesceMode, SubstitutionRoller
+
+>>> replace_r = SubstitutionRoller(
+...   H(6),
+...   lambda outcome: H(6) if outcome.value == 1 else outcome,
+...   max_depth=2,
+... )
+>>> replace_r.roll()
+    Roll(
+      r=SubstitutionRoller(
+        initial_value=H(6),
+        expansion_op=<function <lambda> at ...>,
+        coalesce_mode=<CoalesceMode.REPLACE: 1>,
+        max_depth=2,
+        annotation='',
+      ),
+      roll_outcomes=(
+        RollOutcome(
+          value=2,
+          sources=(
+            RollOutcome(
+              value=1,
+              sources=(
+                RollOutcome(
+                  value=1,
+                  sources=(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      source_rolls=(),
+    )
+
+```
+
+<picture>
+  <source srcset="../assets/graph_substitute_replace_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Replacement substitution ERD](assets/graph_substitute_replace_light.svg)
+</picture>
+
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes.
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1639492287)
+
+  -- END MONKEY PATCH -->
+
+``` python
+>>> append_r = SubstitutionRoller(
+...   H(6),
+...   lambda outcome: H(6) if outcome.value == 1 else outcome,
+...   coalesce_mode=CoalesceMode.APPEND,
+...   max_depth=2,
+... )
+>>> append_r.roll()
+    Roll(
+      r=SubstitutionRoller(
+        initial_value=H(6),
+        expansion_op=<function <lambda> at ...>,
+        coalesce_mode=<CoalesceMode.APPEND: 2>,
+        max_depth=2,
+        annotation='',
+      ),
+      roll_outcomes=(
+        RollOutcome(
+          value=1,
+          sources=(),
+        ),
+        RollOutcome(
+          value=1,
+          sources=(
+            RollOutcome(
+              value=1,
+              sources=(),
+            ),
+          ),
+        ),
+        RollOutcome(
+          value=2,
+          sources=(
+            RollOutcome(
+              value=1,
+              sources=(
+                RollOutcome(
+                  value=1,
+                  sources=(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      source_rolls=(),
+    )
+
+```
+
+<picture>
+  <source srcset="../assets/graph_substitute_append_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Appendment substitution ERD](assets/graph_substitute_append_light.svg)
+</picture>
 
 ## Performance
 
