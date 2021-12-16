@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.4.6](https://github.com/posita/dyce/releases/tag/v0.4.6)
+
+* TODO
+
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
 * Fixes [this bullshit](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87) (no, really, I’m serious this time)

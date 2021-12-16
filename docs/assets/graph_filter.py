@@ -16,26 +16,27 @@ from dyce.r import R
 def do_it(style: str) -> Dot:
     g = digraph(style)
     colors_by_index = tuple(name for name in COLORS[style].keys() if name != "line")
-    r_values = R.from_sources_iterable(
-        R.from_value(
-            i,
-            annotation={
-                "node": {
-                    "color": COLORS[style][colors_by_index[i]],
-                    "fontcolor": COLORS[style][colors_by_index[i]],
-                    "style": "dashed",
+    r_filter = R.filter_from_sources_iterable(
+        lambda outcome: bool(outcome.is_odd().value),
+        sources=(
+            R.from_value(
+                i,
+                annotation={
+                    "node": {
+                        "color": COLORS[style][colors_by_index[i]],
+                        "fontcolor": COLORS[style][colors_by_index[i]],
+                        "style": "dashed",
+                    },
+                    "edge": {
+                        "color": COLORS[style][colors_by_index[i]],
+                        "fontcolor": COLORS[style][colors_by_index[i]],
+                        "style": "dashed",
+                    },
                 },
-                "edge": {
-                    "color": COLORS[style][colors_by_index[i]],
-                    "fontcolor": COLORS[style][colors_by_index[i]],
-                    "style": "dashed",
-                },
-            },
-        )
-        for i in range(6)
+            )
+            for i in range(6)
+        ),
     )
-    r_filter = r_values.filter(lambda outcome: bool(outcome.is_odd().value))
-    r_filter
     graphviz_walk(g, r_filter.roll())
 
     return g

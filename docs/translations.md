@@ -164,7 +164,9 @@ If the modified value from the action die is strictly greater than both challeng
 If it is strictly greater than only one challenge die, the result is a weak success.
 If it is equal to or less than both challenge dice, it’s a failure.
 
-A brute force way to model this is to enumerate the product of the three dice and then perform logical comparisons.
+A verbose way to model this is to enumerate the product of the three dice and then perform logical comparisons.
+However, if we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can craft a solution in terms of [``H.substitute``][dyce.h.H.substitute].
+We can also deploy a counting trick with the two d10s.
 
 ``` python
 >>> from dyce import H, as_int
@@ -179,25 +181,10 @@ A brute force way to model this is to enumerate the product of the three dice an
 ...   WEAK_SUCCESS = auto()
 ...   STRONG_SUCCESS = auto()
 
->>> def iron_results_brute_force(mod: int = 0) -> Iterator[Tuple[RealLikeSCU, int]]:
-...   action_die = d6 + mod
-...   for action, action_count in cast(Iterator[Tuple[int, int]], action_die.items()):
-...     for first_challenge, first_challenge_count in cast(Iterator[Tuple[int, int]], d10.items()):
-...       for second_challenge, second_challenge_count in cast(Iterator[Tuple[int, int]], d10.items()):
-...         action_beats_first_challenge = action > first_challenge
-...         action_beats_second_challenge = action > second_challenge
-...         if action_beats_first_challenge and action_beats_second_challenge:
-...           outcome = IronResult.STRONG_SUCCESS
-...         elif action_beats_first_challenge or action_beats_second_challenge:
-...           outcome = IronResult.WEAK_SUCCESS
-...         else:
-...           outcome = IronResult.FAILURE
-...         yield outcome, action_count * first_challenge_count * second_challenge_count
-
->>> # By choosing our function's return type with care, we can lean on H.__init__ for
->>> # the accounting. (That's what it's there for!)
 >>> iron_distributions_by_mod = {
-...   mod: H(iron_results_brute_force(mod)) for mod in range(5)
+...   mod: (d6 + mod).substitute(
+...     lambda __, action: 2@(d10.lt(action))
+...   ) for mod in range(5)
 ... }
 >>> for mod, iron_distribution in iron_distributions_by_mod.items():
 ...   print("{:+} -> {}".format(mod, {
@@ -209,20 +196,6 @@ A brute force way to model this is to enumerate the product of the three dice an
 +2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
 +3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
 +4 -> {'FAILURE': '15.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '45.17%'}
-
-```
-
-While relatively straightforward, this approach is a little verbose.
-If we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can re-characterize our solution in terms of [``H.substitute``][dyce.h.H.substitute].
-We can also deploy a counting trick with the two d10s.
-
-``` python
->>> {
-...   mod: (d6 + mod).substitute(
-...     lambda __, action: 2@(d10.lt(action))
-...   ) for mod in range(5)
-... } == iron_distributions_by_mod
-True
 
 ```
 
@@ -270,10 +243,9 @@ True
 
 Now for a _twist_.
 In cooperative or solo play, a failure or success is particularly spectacular when the d10s come up doubles.
-The trick to mapping that to ``dyce`` internals (beyond the brute force approach) is recognizing that we have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
+The key to mapping that to ``dyce`` internals is recognizing that we have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
 
 [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] is especially useful where there are multiple independent terms.
-The interior of our dependent term ends up looking similar to our brute force solution of the simpler mechanic above, but without the low-level accounting.
 
 ``` python
 >>> class IronSoloResult(IntEnum):
@@ -310,7 +282,7 @@ H({<IronSoloResult.SPECTACULAR_FAILURE: -1>: 9,
 
 ```
 
-We can deploy a technique involving ``#!python partial`` to parameterize our ``#!python mod`` value, which is helpful for visualization.
+By defining our dependent term function to include ``#!python mod`` as a parameter with a default argument, we can use ``#!python partial`` to manipulate it, which is helpful for visualization.
 
 ``` python
 >>> from collections import defaultdict

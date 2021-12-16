@@ -491,6 +491,22 @@ True
 
     ```
 
+    The [``RollOutcome.euthanize``][dyce.r.RollOutcome.euthanize] method provides a convenient shorthand.
+
+    ``` python
+    >>> RollOutcome(42).euthanize()
+    RollOutcome(
+      value=None,
+      sources=(
+        RollOutcome(
+          value=42,
+          sources=(),
+        ),
+      ),
+    )
+
+    ```
+
     However, because such a roll signals its *absence* from the current roll, its value is *not* included by the [``Roll.outcomes`` method][dyce.r.Roll.outcomes].
 
 We can programmatically verify that the excluded outcome originated from one of the six-sided dice.
@@ -586,22 +602,19 @@ ValueRoller(value=P(6, 8), annotation='')
 [``FilterRoller``][dyce.r.FilterRoller]s [``euthanize``][dyce.r.RollOutcome.euthanize] outcomes that don’t meet provided criteria.
 
 ``` python
->>> r_values = R.from_values_iterable(range(6))
->>> r_filter = r_values.filter(lambda outcome: bool(outcome.is_odd().value)) ; r_filter
+>>> r_filter = R.filter_from_values_iterable(
+...   lambda outcome: bool(outcome.is_odd().value),
+...   range(6),
+... ) ; r_filter
 FilterRoller(
   predicate=<function <lambda> at ...>,
   sources=(
-    PoolRoller(
-      sources=(
-        ValueRoller(value=0, annotation=''),
-        ValueRoller(value=1, annotation=''),
-        ValueRoller(value=2, annotation=''),
-        ValueRoller(value=3, annotation=''),
-        ValueRoller(value=4, annotation=''),
-        ValueRoller(value=5, annotation=''),
-      ),
-      annotation='',
-    ),
+    ValueRoller(value=0, annotation=''),
+    ValueRoller(value=1, annotation=''),
+    ValueRoller(value=2, annotation=''),
+    ValueRoller(value=3, annotation=''),
+    ValueRoller(value=4, annotation=''),
+    ValueRoller(value=5, annotation=''),
   ),
   annotation='',
 )
@@ -652,7 +665,7 @@ Roll(
       sources=(),
     ),
   ),
-  source_rolls=...,
+  source_rolls=(...),
 )
 
 ```
