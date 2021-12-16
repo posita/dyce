@@ -72,153 +72,153 @@
 <!-- RollOutcome&#45;5 -->
 <g id="node5" class="node">
 <title>RollOutcome&#45;5</title>
-<polygon fill="none" stroke="DarkSlateGray" points="496,-226 392,-226 392,-190 496,-190 496,-226"/>
-<text text-anchor="start" x="400" y="-211.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">RollOutcome</text>
-<text text-anchor="start" x="414.5" y="-197.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">value=2</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="496,-226 392,-226 392,-190 496,-190 496,-226"/>
+<text text-anchor="start" x="400" y="-211.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">RollOutcome</text>
+<text text-anchor="start" x="414.5" y="-197.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=2</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;RollOutcome&#45;5 -->
 <g id="edge4" class="edge">
 <title>Roll&#45;1&#45;&gt;RollOutcome&#45;5</title>
-<path fill="none" stroke="DarkSlateGray" d="M439.09,-417.8C455.72,-413.06 475.74,-404.21 486,-388 516.54,-339.77 483.91,-271.57 461.47,-234.83"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="464.32,-232.8 456.03,-226.21 458.4,-236.53 464.32,-232.8"/>
-<text text-anchor="middle" x="511" y="-312.3" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">[2]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M439.09,-417.8C455.72,-413.06 475.74,-404.21 486,-388 516.54,-339.77 483.91,-271.57 461.47,-234.83"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="464.32,-232.8 456.03,-226.21 458.4,-236.53 464.32,-232.8"/>
+<text text-anchor="middle" x="511" y="-312.3" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">[2]</text>
 </g>
 <!-- Roll&#45;6 -->
 <g id="node6" class="node">
 <title>Roll&#45;6</title>
-<polygon fill="none" stroke="DarkSlateGray" points="232,-334 178,-334 178,-298 232,-298 232,-334"/>
-<text text-anchor="start" x="191.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">Roll</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="232,-334 178,-334 178,-298 232,-298 232,-334"/>
+<text text-anchor="start" x="191.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">Roll</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;Roll&#45;6 -->
 <g id="edge11" class="edge">
 <title>Roll&#45;1&#45;&gt;Roll&#45;6</title>
-<path fill="none" stroke="DarkSlateGray" d="M384.69,-422.64C333.26,-421.32 225.11,-415.29 202,-388 191.93,-376.11 192.52,-358.66 195.72,-344.04"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="199.2,-344.57 198.38,-334.01 192.43,-342.78 199.2,-344.57"/>
-<text text-anchor="middle" x="244.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M384.69,-422.64C333.26,-421.32 225.11,-415.29 202,-388 191.93,-376.11 192.52,-358.66 195.72,-344.04"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="199.2,-344.57 198.38,-334.01 192.43,-342.78 199.2,-344.57"/>
+<text text-anchor="middle" x="244.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- Roll&#45;9 -->
 <g id="node9" class="node">
 <title>Roll&#45;9</title>
-<polygon fill="none" stroke="DarkSlateGray" points="376,-334 322,-334 322,-298 376,-298 376,-334"/>
-<text text-anchor="start" x="335.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">Roll</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="376,-334 322,-334 322,-298 376,-298 376,-334"/>
+<text text-anchor="start" x="335.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">Roll</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;Roll&#45;9 -->
 <g id="edge12" class="edge">
 <title>Roll&#45;1&#45;&gt;Roll&#45;9</title>
-<path fill="none" stroke="DarkSlateGray" d="M405.55,-405.89C401.57,-396.01 396.07,-383.51 390,-373 384.01,-362.61 376.48,-351.84 369.51,-342.54"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="372.19,-340.29 363.33,-334.48 366.64,-344.55 372.19,-340.29"/>
-<text text-anchor="middle" x="439.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[1]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M405.55,-405.89C401.57,-396.01 396.07,-383.51 390,-373 384.01,-362.61 376.48,-351.84 369.51,-342.54"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="372.19,-340.29 363.33,-334.48 366.64,-344.55 372.19,-340.29"/>
+<text text-anchor="middle" x="439.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[1]</text>
 </g>
 <!-- Roll&#45;11 -->
 <g id="node11" class="node">
 <title>Roll&#45;11</title>
-<polygon fill="none" stroke="DarkSlateGray" points="304,-334 250,-334 250,-298 304,-298 304,-334"/>
-<text text-anchor="start" x="263.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">Roll</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="304,-334 250,-334 250,-298 304,-298 304,-334"/>
+<text text-anchor="start" x="263.5" y="-313.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">Roll</text>
 </g>
 <!-- Roll&#45;1&#45;&gt;Roll&#45;11 -->
 <g id="edge13" class="edge">
 <title>Roll&#45;1&#45;&gt;Roll&#45;11</title>
-<path fill="none" stroke="DarkSlateGray" d="M384.73,-421.25C359.81,-418.23 323.52,-410.06 301,-388 289.26,-376.5 283.26,-359.06 280.2,-344.34"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="283.6,-343.48 278.44,-334.23 276.7,-344.68 283.6,-343.48"/>
-<text text-anchor="middle" x="343.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[2]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M384.73,-421.25C359.81,-418.23 323.52,-410.06 301,-388 289.26,-376.5 283.26,-359.06 280.2,-344.34"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="283.6,-343.48 278.44,-334.23 276.7,-344.68 283.6,-343.48"/>
+<text text-anchor="middle" x="343.5" y="-376.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[2]</text>
 </g>
 <!-- ValueRoller&#45;7 -->
 <g id="node7" class="node">
 <title>ValueRoller&#45;7</title>
-<polygon fill="none" stroke="DarkSlateGray" points="153.5,-226 52.5,-226 52.5,-190 153.5,-190 153.5,-226"/>
-<text text-anchor="start" x="64.5" y="-211.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">ValueRoller</text>
-<text text-anchor="start" x="60.5" y="-197.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">value=H(6)</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="153.5,-226 52.5,-226 52.5,-190 153.5,-190 153.5,-226"/>
+<text text-anchor="start" x="64.5" y="-211.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">ValueRoller</text>
+<text text-anchor="start" x="60.5" y="-197.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=H(6)</text>
 </g>
 <!-- SubstitutionRoller&#45;2&#45;&gt;ValueRoller&#45;7 -->
 <g id="edge14" class="edge">
 <title>SubstitutionRoller&#45;2&#45;&gt;ValueRoller&#45;7</title>
-<path fill="none" stroke="DarkSlateGray" d="M76.16,-297.88C72.28,-288.23 69.17,-275.94 72,-265 74.71,-254.51 79.85,-243.89 85.18,-234.75"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="88.2,-236.52 90.49,-226.18 82.25,-232.84 88.2,-236.52"/>
-<text text-anchor="middle" x="114.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M76.16,-297.88C72.28,-288.23 69.17,-275.94 72,-265 74.71,-254.51 79.85,-243.89 85.18,-234.75"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="88.2,-236.52 90.49,-226.18 82.25,-232.84 88.2,-236.52"/>
+<text text-anchor="middle" x="114.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- RollOutcome&#45;8 -->
 <g id="node8" class="node">
 <title>RollOutcome&#45;8</title>
-<polygon fill="none" stroke="DarkSlateGray" points="496,-52 392,-52 392,-16 496,-16 496,-52"/>
-<text text-anchor="start" x="400" y="-37.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">RollOutcome</text>
-<text text-anchor="start" x="414.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">value=1</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="496,-52 392,-52 392,-16 496,-16 496,-52"/>
+<text text-anchor="start" x="400" y="-37.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">RollOutcome</text>
+<text text-anchor="start" x="414.5" y="-23.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=1</text>
 </g>
 <!-- RollOutcome&#45;3&#45;&gt;RollOutcome&#45;8 -->
 <g id="edge15" class="edge">
 <title>RollOutcome&#45;3&#45;&gt;RollOutcome&#45;8</title>
-<path fill="none" stroke="DarkSlateGray" d="M549.14,-102.57C538.72,-92.35 524.75,-79.6 511,-70 504.42,-65.4 497.16,-61.01 489.92,-56.97"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="491.27,-53.73 480.81,-52.07 487.96,-59.89 491.27,-53.73"/>
-<text text-anchor="middle" x="570.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M549.14,-102.57C538.72,-92.35 524.75,-79.6 511,-70 504.42,-65.4 497.16,-61.01 489.92,-56.97"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="491.27,-53.73 480.81,-52.07 487.96,-59.89 491.27,-53.73"/>
+<text text-anchor="middle" x="570.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- RollOutcome&#45;10 -->
 <g id="node10" class="node">
 <title>RollOutcome&#45;10</title>
-<polygon fill="none" stroke="DarkSlateGray" points="496,-139 392,-139 392,-103 496,-103 496,-139"/>
-<text text-anchor="start" x="400" y="-124.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="DarkSlateGray">RollOutcome</text>
-<text text-anchor="start" x="414.5" y="-110.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">value=1</text>
+<polygon fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" points="496,-139 392,-139 392,-103 496,-103 496,-139"/>
+<text text-anchor="start" x="400" y="-124.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00" fill="MediumVioletRed">RollOutcome</text>
+<text text-anchor="start" x="414.5" y="-110.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">value=1</text>
 </g>
 <!-- RollOutcome&#45;4&#45;&gt;RollOutcome&#45;10 -->
 <g id="edge16" class="edge">
 <title>RollOutcome&#45;4&#45;&gt;RollOutcome&#45;10</title>
-<path fill="none" stroke="DarkSlateGray" d="M549.14,-189.57C538.72,-179.35 524.75,-166.6 511,-157 504.42,-152.4 497.16,-148.01 489.92,-143.97"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="491.27,-140.73 480.81,-139.07 487.96,-146.89 491.27,-140.73"/>
-<text text-anchor="middle" x="570.5" y="-160.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M549.14,-189.57C538.72,-179.35 524.75,-166.6 511,-157 504.42,-152.4 497.16,-148.01 489.92,-143.97"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="491.27,-140.73 480.81,-139.07 487.96,-146.89 491.27,-140.73"/>
+<text text-anchor="middle" x="570.5" y="-160.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- RollOutcome&#45;5&#45;&gt;RollOutcome&#45;10 -->
 <g id="edge17" class="edge">
 <title>RollOutcome&#45;5&#45;&gt;RollOutcome&#45;10</title>
-<path fill="none" stroke="DarkSlateGray" d="M433.12,-189.83C430.22,-184.35 427.48,-178.11 426,-172 424.13,-164.27 425.56,-156.07 428.28,-148.6"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="431.55,-149.86 432.43,-139.3 425.16,-147.01 431.55,-149.86"/>
-<text text-anchor="middle" x="468.5" y="-160.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M433.12,-189.83C430.22,-184.35 427.48,-178.11 426,-172 424.13,-164.27 425.56,-156.07 428.28,-148.6"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="431.55,-149.86 432.43,-139.3 425.16,-147.01 431.55,-149.86"/>
+<text text-anchor="middle" x="468.5" y="-160.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- Roll&#45;6&#45;&gt;ValueRoller&#45;7 -->
 <g id="edge5" class="edge">
 <title>Roll&#45;6&#45;&gt;ValueRoller&#45;7</title>
-<path fill="none" stroke="DarkSlateGray" d="M188.57,-297.87C179.3,-288.21 167.51,-275.93 157,-265 147.1,-254.71 136.16,-243.37 126.74,-233.6"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="129.02,-230.91 119.55,-226.15 123.98,-235.77 129.02,-230.91"/>
-<text text-anchor="middle" x="175.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">r</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M188.57,-297.87C179.3,-288.21 167.51,-275.93 157,-265 147.1,-254.71 136.16,-243.37 126.74,-233.6"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="129.02,-230.91 119.55,-226.15 123.98,-235.77 129.02,-230.91"/>
+<text text-anchor="middle" x="175.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">r</text>
 </g>
 <!-- Roll&#45;6&#45;&gt;RollOutcome&#45;8 -->
 <g id="edge6" class="edge">
 <title>Roll&#45;6&#45;&gt;RollOutcome&#45;8</title>
-<path fill="none" stroke="DarkSlateGray" d="M207.98,-297.97C210.25,-287.89 214.03,-275.15 220,-265 271.97,-176.67 364.84,-96.58 413.04,-58.45"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="415.23,-61.19 420.95,-52.27 410.92,-55.68 415.23,-61.19"/>
-<text text-anchor="middle" x="316" y="-160.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M207.98,-297.97C210.25,-287.89 214.03,-275.15 220,-265 271.97,-176.67 364.84,-96.58 413.04,-58.45"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="415.23,-61.19 420.95,-52.27 410.92,-55.68 415.23,-61.19"/>
+<text text-anchor="middle" x="316" y="-160.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">[0]</text>
 </g>
 <!-- Roll&#45;9&#45;&gt;ValueRoller&#45;7 -->
 <g id="edge7" class="edge">
 <title>Roll&#45;9&#45;&gt;ValueRoller&#45;7</title>
-<path fill="none" stroke="DarkSlateGray" d="M336.83,-297.88C328.25,-286.99 315.85,-273.4 302,-265 259.62,-239.29 205.05,-225.02 163.77,-217.33"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="164.31,-213.87 153.85,-215.56 163.08,-220.76 164.31,-213.87"/>
-<text text-anchor="middle" x="324.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">r</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M336.83,-297.88C328.25,-286.99 315.85,-273.4 302,-265 259.62,-239.29 205.05,-225.02 163.77,-217.33"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="164.31,-213.87 153.85,-215.56 163.08,-220.76 164.31,-213.87"/>
+<text text-anchor="middle" x="324.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">r</text>
 </g>
 <!-- Roll&#45;9&#45;&gt;RollOutcome&#45;10 -->
 <g id="edge8" class="edge">
 <title>Roll&#45;9&#45;&gt;RollOutcome&#45;10</title>
-<path fill="none" stroke="DarkSlateGray" d="M345.51,-297.72C341.05,-270.99 336.2,-218.87 357,-182 365.89,-166.24 380.85,-153.71 395.87,-144.27"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="397.85,-147.17 404.69,-139.07 394.29,-141.14 397.85,-147.17"/>
-<text text-anchor="middle" x="370" y="-204.3" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M345.51,-297.72C341.05,-270.99 336.2,-218.87 357,-182 365.89,-166.24 380.85,-153.71 395.87,-144.27"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="397.85,-147.17 404.69,-139.07 394.29,-141.14 397.85,-147.17"/>
+<text text-anchor="middle" x="370" y="-204.3" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">[0]</text>
 </g>
 <!-- RollOutcome&#45;10&#45;&gt;RollOutcome&#45;8 -->
 <g id="edge18" class="edge">
 <title>RollOutcome&#45;10&#45;&gt;RollOutcome&#45;8</title>
-<path fill="none" stroke="DarkSlateGray" d="M433.12,-102.83C430.22,-97.35 427.48,-91.11 426,-85 424.13,-77.27 425.56,-69.07 428.28,-61.6"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="431.55,-62.86 432.43,-52.3 425.16,-60.01 431.55,-62.86"/>
-<text text-anchor="middle" x="468.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">sources[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M433.12,-102.83C430.22,-97.35 427.48,-91.11 426,-85 424.13,-77.27 425.56,-69.07 428.28,-61.6"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="431.55,-62.86 432.43,-52.3 425.16,-60.01 431.55,-62.86"/>
+<text text-anchor="middle" x="468.5" y="-73.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">sources[0]</text>
 </g>
 <!-- Roll&#45;11&#45;&gt;RollOutcome&#45;5 -->
 <g id="edge10" class="edge">
 <title>Roll&#45;11&#45;&gt;RollOutcome&#45;5</title>
-<path fill="none" stroke="DarkSlateGray" d="M271.15,-297.58C268.75,-286.84 268.1,-273.54 276,-265 291.44,-248.31 356.67,-264.87 378,-257 392.65,-251.59 406.93,-241.94 418.43,-232.7"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="420.87,-235.23 426.28,-226.12 416.37,-229.86 420.87,-235.23"/>
-<text text-anchor="middle" x="289" y="-268.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">[0]</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M271.15,-297.58C268.75,-286.84 268.1,-273.54 276,-265 291.44,-248.31 356.67,-264.87 378,-257 392.65,-251.59 406.93,-241.94 418.43,-232.7"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="420.87,-235.23 426.28,-226.12 416.37,-229.86 420.87,-235.23"/>
+<text text-anchor="middle" x="289" y="-268.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">[0]</text>
 </g>
 <!-- Roll&#45;11&#45;&gt;ValueRoller&#45;7 -->
 <g id="edge9" class="edge">
 <title>Roll&#45;11&#45;&gt;ValueRoller&#45;7</title>
-<path fill="none" stroke="DarkSlateGray" d="M252.77,-297.8C248.87,-295.14 244.85,-292.46 241,-290 208.41,-269.16 170.44,-247.02 142.59,-231.17"/>
-<polygon fill="DarkSlateGray" stroke="DarkSlateGray" points="143.98,-227.93 133.55,-226.04 140.52,-234.02 143.98,-227.93"/>
-<text text-anchor="middle" x="227.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="DarkSlateGray">r</text>
+<path fill="none" stroke="MediumVioletRed" stroke-dasharray="5,2" d="M252.77,-297.8C248.87,-295.14 244.85,-292.46 241,-290 208.41,-269.16 170.44,-247.02 142.59,-231.17"/>
+<polygon fill="MediumVioletRed" stroke="MediumVioletRed" points="143.98,-227.93 133.55,-226.04 140.52,-234.02 143.98,-227.93"/>
+<text text-anchor="middle" x="227.5" y="-268.8" font-family="Courier New" font-size="14.00" fill="MediumVioletRed">r</text>
 </g>
 </g>
 </svg>

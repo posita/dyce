@@ -66,8 +66,24 @@ except ImportError:
 # ---- Data ----------------------------------------------------------------------------
 
 COLORS = {
-    "light": {"line": "DarkSlateGray", "blue": "MediumBlue", "red": "MediumVioletRed"},
-    "dark": {"line": "Azure", "blue": "LightBlue", "red": "LightPink"},
+    "light": {
+        "line": "DarkSlateGray",
+        "purple": "Indigo",
+        "blue": "MediumBlue",
+        "green": "MediumSeaGreen",
+        "yellow": "Goldenrod",
+        "orange": "DarkSalmon",
+        "red": "MediumVioletRed",
+    },
+    "dark": {
+        "line": "Azure",
+        "purple": "Lavender",
+        "blue": "LightBlue",
+        "green": "LightGreen",
+        "yellow": "LightGoldenRodYellow",
+        "orange": "LightSalmon",
+        "red": "LightPink",
+    },
 }
 
 _PARSER = argparse.ArgumentParser(description="Generate SVG files for documentation")

@@ -1,6 +1,8 @@
 all : \
 	graph_classes_dyce_r_dark.svg \
 	graph_classes_dyce_r_light.svg \
+	graph_filter_dark.svg \
+	graph_filter_light.svg \
 	graph_rollin_value_dark.svg \
 	graph_rollin_value_light.svg \
 	graph_rollin_expr_dark.svg \

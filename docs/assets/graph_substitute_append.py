@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import random
 
-from graph import Dot, digraph, graphviz_walk
+from graph import COLORS, Dot, digraph, graphviz_walk
 
 from dyce import H, rng
 from dyce.r import CoalesceMode, R, SubstitutionRoller
@@ -23,13 +23,27 @@ def do_it(style: str) -> Dot:
     # ----- END MONKEY PATCH -----
 
     g = digraph(style)
-    r_d6 = R.from_value(H(6))
-    append_r = SubstitutionRoller(
+    r_d6 = R.from_value(
+        H(6),
+        annotation={
+            "node": {
+                "color": COLORS[style]["blue"],
+                "fontcolor": COLORS[style]["blue"],
+                "style": "dashed",
+            },
+            "edge": {
+                "color": COLORS[style]["blue"],
+                "fontcolor": COLORS[style]["blue"],
+                "style": "dashed",
+            },
+        },
+    )
+    r_append = SubstitutionRoller(
         lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
         r_d6,
         CoalesceMode.APPEND,
         max_depth=2,
     )
-    graphviz_walk(g, append_r.roll())
+    graphviz_walk(g, r_append.roll())
 
     return g

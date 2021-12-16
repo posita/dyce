@@ -661,8 +661,7 @@ class H(_MappingT):
 
     @beartype
     def items(self) -> ItemsView[RealLikeSCU, int]:
-        # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
-        return self._h.items()  # type: ignore [return-value]
+        return self._h.items()
 
     @beartype
     def keys(self) -> KeysView[RealLikeSCU]:
@@ -673,8 +672,7 @@ class H(_MappingT):
         r"""
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
-        # TODO(posita): See <https://github.com/python/typeshed/issues/5808>
-        return self._h.keys()  # type: ignore [return-value]
+        return self._h.keys()
 
     @beartype
     def values(self) -> ValuesView[int]:
@@ -1327,8 +1325,8 @@ class H(_MappingT):
                         # keep track of the impact on peers so we can factor it out for
                         # these items later
                         items_for_reassembly.extend(
-                            (exp_f, exp_c * count, expanded_scalar)
-                            for exp_f, exp_c in expanded.items()
+                            (expanded_outcome, expanded_count * count, expanded_scalar)
+                            for expanded_outcome, expanded_count in expanded.items()
                         )
                 else:
                     items_for_reassembly.append((expanded, count, 1))
@@ -1336,8 +1334,8 @@ class H(_MappingT):
             return type(self)(
                 (
                     # Apply the total_scalar, but factor out this item's contribution
-                    (outcome, count * total_scalar // s)
-                    for outcome, count, s in items_for_reassembly
+                    (outcome, count * total_scalar // scalar)
+                    for outcome, count, scalar in items_for_reassembly
                 )
             ).lowest_terms()
 

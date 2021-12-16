@@ -1981,11 +1981,11 @@ class SubstitutionRoller(R):
     ``` python
     >>> from dyce.r import SubstitutionRoller
     >>> r_d6 = R.from_value(H(6))
-    >>> replace_r = SubstitutionRoller(
+    >>> r_replace = SubstitutionRoller(
     ...   lambda outcome: RollOutcome(0) if outcome.value is not None and outcome.value <= 3 else outcome,
     ...   r_d6,
     ... )
-    >>> (2@replace_r).roll()
+    >>> (2@r_replace).roll()
     Roll(
       r=RepeatRoller(
         n=2,

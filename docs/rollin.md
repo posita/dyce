@@ -657,6 +657,11 @@ Roll(
 
 ```
 
+<picture>
+  <source srcset="../assets/graph_filter_dark.svg" media="(prefers-color-scheme: dark)">
+  ![Filtered ERD](assets/graph_filter_light.svg)
+</picture>
+
 [``SubstitutionRoller``][dyce.r.SubstitutionRoller]s replace or append outcomes based on existing ones.
 
 <!-- BEGIN MONKEY PATCH --
@@ -672,12 +677,12 @@ For deterministic outcomes.
 >>> from dyce.r import CoalesceMode, SubstitutionRoller
 >>> r_d6 = R.from_value(H(6))
 
->>> replace_r = SubstitutionRoller(
+>>> r_replace = SubstitutionRoller(
 ...   lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
 ...   r_d6,
 ...   max_depth=2,
 ... )
->>> replace_r.roll()
+>>> r_replace.roll()
 Roll(
   r=SubstitutionRoller(
     expansion_op=<function <lambda> at ...>,
@@ -745,13 +750,13 @@ For deterministic outcomes.
   -- END MONKEY PATCH -->
 
 ``` python
->>> append_r = SubstitutionRoller(
+>>> r_append = SubstitutionRoller(
 ...   lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
 ...   r_d6,
 ...   coalesce_mode=CoalesceMode.APPEND,
 ...   max_depth=2,
 ... )
->>> append_r.roll()
+>>> r_append.roll()
 Roll(
   r=SubstitutionRoller(
     expansion_op=<function <lambda> at ...>,
@@ -796,7 +801,7 @@ Roll(
 
 <picture>
   <source srcset="../assets/graph_substitute_append_dark.svg" media="(prefers-color-scheme: dark)">
-  ![Appendment substitution ERD](assets/graph_substitute_append_light.svg)
+  ![Appending substitution ERD](assets/graph_substitute_append_light.svg)
 </picture>
 
 ## Performance
