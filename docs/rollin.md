@@ -670,39 +670,63 @@ For deterministic outcomes.
 
 ``` python
 >>> from dyce.r import CoalesceMode, SubstitutionRoller
+>>> r_d6 = R.from_value(H(6))
 
 >>> replace_r = SubstitutionRoller(
-...   H(6),
-...   lambda outcome: H(6) if outcome.value == 1 else outcome,
+...   lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
+...   r_d6,
 ...   max_depth=2,
 ... )
 >>> replace_r.roll()
-    Roll(
-      r=SubstitutionRoller(
-        initial_value=H(6),
-        expansion_op=<function <lambda> at ...>,
-        coalesce_mode=<CoalesceMode.REPLACE: 1>,
-        max_depth=2,
-        annotation='',
-      ),
-      roll_outcomes=(
+Roll(
+  r=SubstitutionRoller(
+    expansion_op=<function <lambda> at ...>,
+    source=ValueRoller(value=H(6), annotation=''),
+    coalesce_mode=<CoalesceMode.REPLACE: 1>,
+    max_depth=2,
+    annotation='',
+  ),
+  roll_outcomes=(
+    RollOutcome(
+      value=None,
+      sources=(
         RollOutcome(
-          value=2,
+          value=1,
+          sources=(),
+        ),
+      ),
+    ),
+    RollOutcome(
+      value=None,
+      sources=(
+        RollOutcome(
+          value=1,
           sources=(
             RollOutcome(
               value=1,
-              sources=(
-                RollOutcome(
-                  value=1,
-                  sources=(),
-                ),
-              ),
+              sources=(),
             ),
           ),
         ),
       ),
-      source_rolls=(),
-    )
+    ),
+    RollOutcome(
+      value=2,
+      sources=(
+        RollOutcome(
+          value=1,
+          sources=(
+            RollOutcome(
+              value=1,
+              sources=(),
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+  source_rolls=(...),
+)
 
 ```
 
@@ -722,25 +746,37 @@ For deterministic outcomes.
 
 ``` python
 >>> append_r = SubstitutionRoller(
-...   H(6),
-...   lambda outcome: H(6) if outcome.value == 1 else outcome,
+...   lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
+...   r_d6,
 ...   coalesce_mode=CoalesceMode.APPEND,
 ...   max_depth=2,
 ... )
 >>> append_r.roll()
-    Roll(
-      r=SubstitutionRoller(
-        initial_value=H(6),
-        expansion_op=<function <lambda> at ...>,
-        coalesce_mode=<CoalesceMode.APPEND: 2>,
-        max_depth=2,
-        annotation='',
-      ),
-      roll_outcomes=(
+Roll(
+  r=SubstitutionRoller(
+    expansion_op=<function <lambda> at ...>,
+    source=ValueRoller(value=H(6), annotation=''),
+    coalesce_mode=<CoalesceMode.APPEND: 2>,
+    max_depth=2,
+    annotation='',
+  ),
+  roll_outcomes=(
+    RollOutcome(
+      value=1,
+      sources=(),
+    ),
+    RollOutcome(
+      value=1,
+      sources=(
         RollOutcome(
           value=1,
           sources=(),
         ),
+      ),
+    ),
+    RollOutcome(
+      value=2,
+      sources=(
         RollOutcome(
           value=1,
           sources=(
@@ -750,23 +786,11 @@ For deterministic outcomes.
             ),
           ),
         ),
-        RollOutcome(
-          value=2,
-          sources=(
-            RollOutcome(
-              value=1,
-              sources=(
-                RollOutcome(
-                  value=1,
-                  sources=(),
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
-      source_rolls=(),
-    )
+    ),
+  ),
+  source_rolls=(...),
+)
 
 ```
 

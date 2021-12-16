@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import operator
 import re
-from typing import Union
 
 from dyce import H, P, R
 from dyce.r import (
@@ -19,7 +18,6 @@ from dyce.r import (
     RollOutcome,
     SubstitutionRoller,
     ValueRoller,
-    _ValueT,
 )
 
 from .test_h import _INTEGRAL_OUTCOME_TYPES, _OUTCOME_TYPES
@@ -754,20 +752,30 @@ class TestSelectionRoller:
 
 class TestSubstitutionRoller:
     def test_repr(self) -> None:
-        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
-            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+        def odd_doubler(outcome: RollOutcome) -> RollOutcome:
+            return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
-        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         pattern = (
             re.escape(
                 """SubstitutionRoller(
-  initial_value=P(H({1: 1}), H({4: 1}), H({9: 1}), H({16: 1}), H({25: 1}), H({36: 1})),
   expansion_op=<function TestSubstitutionRoller.test_repr.<locals>.odd_doubler at """
             )
             + r"(?:0x)?([0-9A-Fa-f]+)"
             + re.escape(
                 """>,
+  source=PoolRoller(
+    sources=(
+      ValueRoller(value=36, annotation=''),
+      ValueRoller(value=25, annotation=''),
+      ValueRoller(value=16, annotation=''),
+      ValueRoller(value=9, annotation=''),
+      ValueRoller(value=4, annotation=''),
+      ValueRoller(value=1, annotation=''),
+    ),
+    annotation='',
+  ),
   coalesce_mode=<CoalesceMode.REPLACE: 1>,
   max_depth=1,
   annotation='',
@@ -780,26 +788,28 @@ class TestSubstitutionRoller:
         )
 
     def test_op_eq(self) -> None:
-        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
-            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+        def odd_doubler(outcome: RollOutcome) -> RollOutcome:
+            return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
-        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
-        r_double_odd_squares_annotated = r_double_odd_squares.annotate("doubled odd squares")
-        assert r_double_odd_squares == SubstitutionRoller(p_squares, odd_doubler)
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
+        r_double_odd_squares_annotated = r_double_odd_squares.annotate(
+            "doubled odd squares"
+        )
+        assert r_double_odd_squares == SubstitutionRoller(odd_doubler, r_squares)
         assert r_double_odd_squares != r_double_odd_squares_annotated
         assert r_double_odd_squares_annotated == r_double_odd_squares.annotate(
             "doubled odd squares"
         )
 
     def test_roll(self) -> None:
-        def odd_doubler(outcome: RollOutcome) -> Union[RollOutcome, _ValueT]:
-            return outcome.value * 2 if bool(outcome.is_odd().value) else outcome  # type: ignore
+        def odd_doubler(outcome: RollOutcome) -> RollOutcome:
+            return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        p_squares = P(*(H({v ** 2: 1}) for v in range(6, 0, -1)))
-        r_double_odd_squares = SubstitutionRoller(p_squares, odd_doubler)
+        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         r_double_odd_squares_roll = r_double_odd_squares.roll()
-        assert tuple(r_double_odd_squares_roll.outcomes()) == (2, 4, 18, 16, 50, 36)
+        assert tuple(r_double_odd_squares_roll.outcomes()) == (36, 50, 16, 18, 4, 2)
 
 
 class TestRoll:

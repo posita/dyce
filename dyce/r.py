@@ -88,7 +88,7 @@ _RollOutcomeBinaryOperatorT = Callable[
     ["RollOutcome", "RollOutcome"], _RollOutcomesReturnT
 ]
 BasicOperatorT = Callable[["R", Iterable["RollOutcome"]], _RollOutcomesReturnT]
-_ExpansionOperatorT = Callable[["RollOutcome"], Union["RollOutcome", _ValueT]]
+_ExpansionOperatorT = Callable[["RollOutcome"], Union["RollOutcome", "Roll"]]
 _PredicateT = Callable[["RollOutcome"], bool]
 
 
@@ -1964,7 +1964,7 @@ class SelectionRoller(R):
         return self._which
 
 
-class SubstitutionRoller(ValueRoller):
+class SubstitutionRoller(R):
     r"""
     A [roller][dyce.r.R] for applying *expansion_op* to determine when to roll new
     values up to *max_depth* times for incorporation via *coalesce_mode*.
@@ -1980,27 +1980,27 @@ class SubstitutionRoller(ValueRoller):
 
     ``` python
     >>> from dyce.r import SubstitutionRoller
+    >>> r_d6 = R.from_value(H(6))
     >>> replace_r = SubstitutionRoller(
-    ...   H(6),
-    ...   lambda outcome: H(6) if outcome.value is not None and outcome.value <= 3 else outcome,
-    ...   max_depth=2,
+    ...   lambda outcome: RollOutcome(0) if outcome.value is not None and outcome.value <= 3 else outcome,
+    ...   r_d6,
     ... )
     >>> (2@replace_r).roll()
     Roll(
       r=RepeatRoller(
         n=2,
         source=SubstitutionRoller(
-          initial_value=H(6),
           expansion_op=<function <lambda> at ...>,
+          source=ValueRoller(value=H(6), annotation=''),
           coalesce_mode=<CoalesceMode.REPLACE: 1>,
-          max_depth=2,
+          max_depth=1,
           annotation='',
         ),
         annotation='',
       ),
       roll_outcomes=(
         RollOutcome(
-          value=5,
+          value=0,
           sources=(
             RollOutcome(
               value=2,
@@ -2009,13 +2009,8 @@ class SubstitutionRoller(ValueRoller):
           ),
         ),
         RollOutcome(
-          value=4,
-          sources=(
-            RollOutcome(
-              value=3,
-              sources=(),
-            ),
-          ),
+          value=5,
+          sources=(),
         ),
       ),
       source_rolls=(...),
@@ -2033,15 +2028,15 @@ class SubstitutionRoller(ValueRoller):
     @beartype
     def __init__(
         self,
-        initial_value: _ValueT,
         expansion_op: _ExpansionOperatorT,
+        source: _SourceT,
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
         max_depth: SupportsIntSCU = 1,
         annotation: Any = "",
         **kw,
     ):
         r"Initializer."
-        super().__init__(value=initial_value, annotation=annotation, **kw)
+        super().__init__(sources=(source,), annotation=annotation, **kw)
         self._expansion_op = expansion_op
         self._coalesce_mode = coalesce_mode
         self._max_depth = as_int(max_depth)
@@ -2050,9 +2045,11 @@ class SubstitutionRoller(ValueRoller):
 
     @beartype
     def __repr__(self) -> str:
+        (source,) = self.sources
+
         return f"""{type(self).__name__}(
-  initial_value={indent(repr(self.value), "  ").strip()},
   expansion_op={self.expansion_op!r},
+  source={indent(repr(source), "  ").strip()},
   coalesce_mode={self.coalesce_mode!r},
   max_depth={self.max_depth!r},
   annotation={self.annotation!r},
@@ -2070,11 +2067,18 @@ class SubstitutionRoller(ValueRoller):
     @beartype
     def roll(self) -> Roll:
         r""""""
+        (source_roll,) = self.source_rolls()
+        source_rolls: List[Roll] = []
 
         def _expanded_roll_outcomes(
-            roll_outcomes: Iterable[RollOutcome],
+            roll: Roll,
             depth: int = 0,
         ) -> Iterator[RollOutcome]:
+            source_rolls.append(roll)
+            roll_outcomes = (
+                roll_outcome for roll_outcome in roll if roll_outcome.value is not None
+            )
+
             if depth >= self.max_depth:
                 yield from roll_outcomes
 
@@ -2083,61 +2087,31 @@ class SubstitutionRoller(ValueRoller):
             for roll_outcome in roll_outcomes:
                 expanded = self.expansion_op(roll_outcome)
 
-                if isinstance(expanded, P):
-                    expanded_roll_outcomes = tuple(
-                        RollOutcome(outcome, sources=(roll_outcome,))
-                        for outcome in expanded.roll()
-                    )
-                elif isinstance(expanded, H):
-                    expanded_roll_outcomes = (
-                        RollOutcome(expanded.roll(), sources=(roll_outcome,)),
-                    )
-                elif isinstance(expanded, RollOutcome):
-                    if expanded is roll_outcome:
-                        yield expanded
-                        continue
+                if isinstance(expanded, RollOutcome):
+                    if expanded is not roll_outcome:
+                        expanded = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
+
+                    yield expanded
+                elif isinstance(expanded, Roll):
+                    if self.coalesce_mode == CoalesceMode.REPLACE:
+                        yield roll_outcome.euthanize()
+                    elif self.coalesce_mode == CoalesceMode.APPEND:
+                        yield roll_outcome
                     else:
-                        raise ValueError(
-                            f"expansion_op cannot return a RollOutcome other than its argument; return {expanded.value} instead of {expanded}"
-                        )
-                else:
-                    expanded_roll_outcomes = (
-                        RollOutcome(expanded, sources=(roll_outcome,)),
-                    )
+                        assert (
+                            False
+                        ), f"unrecognized substitution mode {self.coalesce_mode!r}"
 
-                if self.coalesce_mode == CoalesceMode.REPLACE:
-                    yield from _expanded_roll_outcomes(
-                        expanded_roll_outcomes, depth + 1
-                    )
-                elif self.coalesce_mode == CoalesceMode.APPEND:
-                    yield roll_outcome
-                    yield from _expanded_roll_outcomes(
-                        expanded_roll_outcomes, depth + 1
-                    )
+                    expanded_roll = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
+                    yield from _expanded_roll_outcomes(expanded_roll, depth + 1)
                 else:
-                    assert (
-                        False
-                    ), f"unrecognized substitution mode {self.coalesce_mode!r}"
+                    assert False, f"unrecognized type for expanded value {expanded!r}"
 
-        base_roll_outcomes = (
-            RollOutcome(roll_outcome.value, roll_outcome.sources)
-            for roll_outcome in super().roll()
-        )
-        roll = Roll(
+        return Roll(
             self,
-            roll_outcomes=_expanded_roll_outcomes(base_roll_outcomes),
+            roll_outcomes=_expanded_roll_outcomes(source_roll),
+            source_rolls=source_rolls,
         )
-
-        def associate(roll: Roll, roll_outcomes: Iterable[RollOutcome]):
-            for roll_outcome in roll_outcomes:
-                if roll_outcome._roll is None:
-                    roll_outcome._roll = roll
-
-                associate(roll, roll_outcome.sources)
-
-        associate(roll, roll)
-
-        return roll
 
     # ---- Properties ------------------------------------------------------------------
 

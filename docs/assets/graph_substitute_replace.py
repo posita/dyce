@@ -13,7 +13,7 @@ import random
 from graph import Dot, digraph, graphviz_walk
 
 from dyce import H, rng
-from dyce.r import SubstitutionRoller
+from dyce.r import R, SubstitutionRoller
 
 
 def do_it(style: str) -> Dot:
@@ -23,9 +23,10 @@ def do_it(style: str) -> Dot:
     # ----- END MONKEY PATCH -----
 
     g = digraph(style)
+    r_d6 = R.from_value(H(6))
     replace_r = SubstitutionRoller(
-        H(6),
-        lambda outcome: H(6) if outcome.value == 1 else outcome,
+        lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
+        r_d6,
         max_depth=2,
     )
     graphviz_walk(g, replace_r.roll())

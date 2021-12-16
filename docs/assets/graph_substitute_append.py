@@ -13,7 +13,7 @@ import random
 from graph import Dot, digraph, graphviz_walk
 
 from dyce import H, rng
-from dyce.r import CoalesceMode, SubstitutionRoller
+from dyce.r import CoalesceMode, R, SubstitutionRoller
 
 
 def do_it(style: str) -> Dot:
@@ -23,12 +23,13 @@ def do_it(style: str) -> Dot:
     # ----- END MONKEY PATCH -----
 
     g = digraph(style)
-    replace_r = SubstitutionRoller(
-        H(6),
-        lambda outcome: H(6) if outcome.value == 1 else outcome,
+    r_d6 = R.from_value(H(6))
+    append_r = SubstitutionRoller(
+        lambda outcome: r_d6.roll() if outcome.value == 1 else outcome,
+        r_d6,
         CoalesceMode.APPEND,
         max_depth=2,
     )
-    graphviz_walk(g, replace_r.roll())
+    graphviz_walk(g, append_r.roll())
 
     return g
