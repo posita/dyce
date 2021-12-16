@@ -1,6 +1,8 @@
 all : \
 	graph_classes_dyce_r_dark.svg \
 	graph_classes_dyce_r_light.svg \
+	graph_filter_dark.svg \
+	graph_filter_light.svg \
 	graph_rollin_value_dark.svg \
 	graph_rollin_value_light.svg \
 	graph_rollin_expr_dark.svg \
@@ -11,6 +13,10 @@ all : \
 	graph_rollin_select_1_light.svg \
 	graph_rollin_select_2_dark.svg \
 	graph_rollin_select_2_light.svg \
+	graph_substitute_append_dark.svg \
+	graph_substitute_append_light.svg \
+	graph_substitute_replace_dark.svg \
+	graph_substitute_replace_light.svg \
 	plot_2d6_lo_hi_dark.png \
 	plot_2d6_lo_hi_light.png \
 	plot_4d6_variants_dark.png \

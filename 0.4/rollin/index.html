@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://posita.github.io/dyce/0.4/rollin/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.0">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.2">
     
     
       
@@ -23,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.82f3c0b9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.f7951f6f.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
         
       
     
@@ -306,6 +306,13 @@
         <li class="md-nav__item">
   <a href="#dropping-dice-from-prior-rolls-keeping-the-best-three-of-3d6-and-1d8" class="md-nav__link">
     Dropping dice from prior rolls – keeping the best three of 3d6 and 1d8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtering-and-substitution" class="md-nav__link">
+    Filtering and substitution
   </a>
   
 </li>
@@ -631,7 +638,7 @@ That durned class method created a whole roller <em>tree</em>, which is actually
 </div>
 <p>Let’s use our new roller to create a roll and retrieve its total.</p>
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -762,7 +769,7 @@ Each one has:</p>
 <li>A reference back to the roll that generated it, retrieved via its <a href="../dyce.r/#dyce.r.RollOutcome.source_roll"><code>source_roll</code> property</a> (omitted from the diagram for the sake of readability).</li>
 </ul>
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -792,7 +799,7 @@ Such questions command the response, “Why the heck not? Try it!”</p>
 <h2 id="composing-rollers-with-arithmetic">Composing rollers with arithmetic</h2>
 <p>Rollers support arithmetic operators.</p>
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -968,7 +975,7 @@ Let’s see how to generate rolls that keep the best three outcomes from rolling
 <p>Oh boy!
 Aren’t you super excited to try this thing out?</p>
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -1159,7 +1166,7 @@ However, results from <a href="../dyce/#dyce.p.P.roll"><code>P.roll</code></a> a
 This risks ambiguity.
 Consider:</p>
 <!-- BEGIN MONKEY PATCH --
-For deterministic outcomes
+For deterministic outcomes.
 
 >>> import random
 >>> from dyce import rng
@@ -1183,6 +1190,387 @@ For deterministic outcomes
 <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
+<h2 id="filtering-and-substitution">Filtering and substitution</h2>
+<p><code>dyce</code> provides two additional rollers for outcome manipulation.</p>
+<p><a href="../dyce.r/#dyce.r.FilterRoller"><code>FilterRoller</code></a>s <a href="../dyce.r/#dyce.r.RollOutcome.euthanize"><code>euthanize</code></a> outcomes that don’t meet provided criteria.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">r_values</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_values_iterable</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r_filter</span> <span class="o">=</span> <span class="n">r_values</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">outcome</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">is_odd</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="p">;</span> <span class="n">r_filter</span>
+<span class="n">FilterRoller</span><span class="p">(</span>
+  <span class="n">predicate</span><span class="o">=&lt;</span><span class="n">function</span> <span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span> <span class="n">at</span> <span class="o">...&gt;</span><span class="p">,</span>
+  <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">PoolRoller</span><span class="p">(</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+      <span class="p">),</span>
+      <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+  <span class="p">),</span>
+  <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">roll</span> <span class="o">=</span> <span class="n">r_filter</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">roll</span><span class="o">.</span><span class="n">outcomes</span><span class="p">())</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">roll</span>
+<span class="n">Roll</span><span class="p">(</span>
+  <span class="n">r</span><span class="o">=...</span><span class="p">,</span>
+  <span class="n">roll_outcomes</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+    <span class="p">),</span>
+  <span class="p">),</span>
+  <span class="n">source_rolls</span><span class="o">=...</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><picture>
+  <source srcset="../assets/graph_filter_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Filtered ERD" src="../assets/graph_filter_light.svg" />
+</picture></p>
+<p><a href="../dyce.r/#dyce.r.SubstitutionRoller"><code>SubstitutionRoller</code></a>s replace or append outcomes based on existing ones.</p>
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes.
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1639492287)
+
+  -- END MONKEY PATCH -->
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.r</span> <span class="kn">import</span> <span class="n">CoalesceMode</span><span class="p">,</span> <span class="n">SubstitutionRoller</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r_d6</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r_replace</span> <span class="o">=</span> <span class="n">SubstitutionRoller</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">r_d6</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span> <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">r_d6</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r_replace</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+<span class="n">Roll</span><span class="p">(</span>
+  <span class="n">r</span><span class="o">=</span><span class="n">SubstitutionRoller</span><span class="p">(</span>
+    <span class="n">expansion_op</span><span class="o">=&lt;</span><span class="n">function</span> <span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span> <span class="n">at</span> <span class="o">...&gt;</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+    <span class="n">coalesce_mode</span><span class="o">=&lt;</span><span class="n">CoalesceMode</span><span class="o">.</span><span class="n">REPLACE</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="p">),</span>
+  <span class="n">roll_outcomes</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">RollOutcome</span><span class="p">(</span>
+              <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+            <span class="p">),</span>
+          <span class="p">),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">RollOutcome</span><span class="p">(</span>
+              <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+            <span class="p">),</span>
+          <span class="p">),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+  <span class="p">),</span>
+  <span class="n">source_rolls</span><span class="o">=</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><picture>
+  <source srcset="../assets/graph_substitute_replace_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Replacement substitution ERD" src="../assets/graph_substitute_replace_light.svg" />
+</picture></p>
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes.
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1639492287)
+
+  -- END MONKEY PATCH -->
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">r_append</span> <span class="o">=</span> <span class="n">SubstitutionRoller</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">r_d6</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span> <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">r_d6</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">coalesce_mode</span><span class="o">=</span><span class="n">CoalesceMode</span><span class="o">.</span><span class="n">APPEND</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r_append</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+<span class="n">Roll</span><span class="p">(</span>
+  <span class="n">r</span><span class="o">=</span><span class="n">SubstitutionRoller</span><span class="p">(</span>
+    <span class="n">expansion_op</span><span class="o">=&lt;</span><span class="n">function</span> <span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span> <span class="n">at</span> <span class="o">...&gt;</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">ValueRoller</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+    <span class="n">coalesce_mode</span><span class="o">=&lt;</span><span class="n">CoalesceMode</span><span class="o">.</span><span class="n">APPEND</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="p">),</span>
+  <span class="n">roll_outcomes</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">RollOutcome</span><span class="p">(</span>
+      <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+      <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+        <span class="n">RollOutcome</span><span class="p">(</span>
+          <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">sources</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">RollOutcome</span><span class="p">(</span>
+              <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">sources</span><span class="o">=</span><span class="p">(),</span>
+            <span class="p">),</span>
+          <span class="p">),</span>
+        <span class="p">),</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+  <span class="p">),</span>
+  <span class="n">source_rolls</span><span class="o">=</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<p><picture>
+  <source srcset="../assets/graph_substitute_append_dark.svg" media="(prefers-color-scheme: dark)">
+  <img alt="Appending substitution ERD" src="../assets/graph_substitute_append_light.svg" />
+</picture></p>
 <h2 id="performance">Performance</h2>
 <p>How much overhead do all these data structures contribute?
 It obviously depends on the complexity of the structure.
@@ -1266,8 +1654,8 @@ If ever performance becomes an issue, <a href="../contrib/">let me know</a>, and
 <p>If you’re not already familiar with histograms, consider skimming the <a href="../countin/">counting tutorial</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
-<p>We may still be discovering what those are.
-We have the utmost faith such purposes exist, even if they have yet to reveal themselves.
+<p>We may still be discovering what those purposes are.
+We have the utmost faith they exist, even if they have yet to reveal themselves.
 If you discover one, consider <a href="../contrib/">contributing</a> an example.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
@@ -1341,10 +1729,10 @@ If you discover one, consider <a href="../contrib/">contributing</a> an example.
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.0bbba5b5.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.17f42bbf.min.js"></script>
+      <script src="../assets/javascripts/bundle.649a939e.min.js"></script>
       
         <script src="../js/site.js"></script>
       
