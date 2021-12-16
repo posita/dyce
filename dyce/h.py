@@ -700,11 +700,7 @@ class H(_MappingT):
     # ---- Methods ---------------------------------------------------------------------
 
     @beartype
-    def map(
-        self,
-        bin_op: _BinaryOperatorT,
-        right_operand: _OperandT,
-    ) -> H:
+    def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> H:
         r"""
         Applies *bin_op* to each outcome of the histogram as the left operand and
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
@@ -751,11 +747,7 @@ class H(_MappingT):
             )
 
     @beartype
-    def rmap(
-        self,
-        left_operand: RealLikeSCU,
-        bin_op: _BinaryOperatorT,
-    ) -> H:
+    def rmap(self, left_operand: RealLikeSCU, bin_op: _BinaryOperatorT) -> H:
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
         *left_operand*.
@@ -781,10 +773,7 @@ class H(_MappingT):
         )
 
     @beartype
-    def umap(
-        self,
-        un_op: _UnaryOperatorT,
-    ) -> H:
+    def umap(self, un_op: _UnaryOperatorT) -> H:
         r"""
         Applies *un_op* to each outcome of the histogram.
 
@@ -815,10 +804,7 @@ class H(_MappingT):
         return h
 
     @beartype
-    def lt(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def lt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__lt__, other).umap(bool)``.
 
@@ -833,10 +819,7 @@ class H(_MappingT):
         return self.map(__lt__, other).umap(bool)
 
     @beartype
-    def le(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def le(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__le__, other).umap(bool)``.
 
@@ -851,10 +834,7 @@ class H(_MappingT):
         return self.map(__le__, other).umap(bool)
 
     @beartype
-    def eq(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def eq(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__eq__, other).umap(bool)``.
 
@@ -869,10 +849,7 @@ class H(_MappingT):
         return self.map(__eq__, other).umap(bool)
 
     @beartype
-    def ne(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def ne(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__ne__, other).umap(bool)``.
 
@@ -887,10 +864,7 @@ class H(_MappingT):
         return self.map(__ne__, other).umap(bool)
 
     @beartype
-    def gt(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def gt(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__gt__, other).umap(bool)``.
 
@@ -905,10 +879,7 @@ class H(_MappingT):
         return self.map(__gt__, other).umap(bool)
 
     @beartype
-    def ge(
-        self,
-        other: _OperandT,
-    ) -> H:
+    def ge(self, other: _OperandT) -> H:
         r"""
         Shorthand for ``#!python self.map(operator.__ge__, other).umap(bool)``.
 

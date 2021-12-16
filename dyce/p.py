@@ -731,11 +731,7 @@ class P(Sequence[H], HableOpsMixin):
             yield taken_outcomes, roll_count
 
     @beartype
-    def map(
-        self,
-        op: _BinaryOperatorT,
-        right_operand: _OperandT,
-    ) -> P:
+    def map(self, op: _BinaryOperatorT, right_operand: _OperandT) -> P:
         r"""
         Shorthand for ``#!python P(*(h.map(op, right_operand) for h in self))``. See the
         [``H.map`` method][dyce.h.H.map].
@@ -751,11 +747,7 @@ class P(Sequence[H], HableOpsMixin):
         return P(*(h.map(op, right_operand) for h in self))
 
     @beartype
-    def rmap(
-        self,
-        left_operand: RealLikeSCU,
-        op: _BinaryOperatorT,
-    ) -> P:
+    def rmap(self, left_operand: RealLikeSCU, op: _BinaryOperatorT) -> P:
         r"""
         Shorthand for ``#!python P(*(h.rmap(left_operand, op) for h in self))``. See the
         [``H.rmap`` method][dyce.h.H.rmap].
@@ -794,10 +786,7 @@ class P(Sequence[H], HableOpsMixin):
 
 
 @beartype
-def _analyze_selection(
-    n: int,
-    which: Iterable[_GetItemT],
-) -> Optional[int]:
+def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
     r"""
     Examines the selection *which* as applied to the values ``#!python range(n)`` and
     returns one of:
@@ -945,11 +934,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         return _wrapped
 
     @_memoize
-    def _selected_distributions(
-        h: H,
-        n: int,
-        k: int,
-    ) -> _DistributionT:
+    def _selected_distributions(h: H, n: int, k: int) -> _DistributionT:
         if len(h) <= 1:
             whole = k * tuple(h)
             yield whole, Fraction(1)

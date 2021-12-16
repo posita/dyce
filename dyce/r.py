@@ -2502,11 +2502,7 @@ class RollOutcome:
             raise NotImplementedError
 
     @beartype
-    def rmap(
-        self,
-        left_operand: RealLikeSCU,
-        bin_op: _BinaryOperatorT,
-    ) -> RollOutcome:
+    def rmap(self, left_operand: RealLikeSCU, bin_op: _BinaryOperatorT) -> RollOutcome:
         r"""
         Analogous to the [``map`` method][dyce.r.RollOutcome.map], but where the caller
         supplies *left_operand*.
