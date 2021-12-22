@@ -1677,7 +1677,7 @@ class FilterRoller(R):
     ``` python
     >>> r_d6 = R.from_value(H(6))
     >>> filter_r = (2@r_d6).filter(
-    ...   lambda outcome: outcome.value is not None and outcome.value > 3,  # type: ignore
+    ...   lambda outcome: outcome.value is not None and outcome.value > 3,  # type: ignore [operator]
     ... )
     >>> (filter_r).roll()
     Roll(

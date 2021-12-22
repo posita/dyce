@@ -8,11 +8,10 @@ build-backend = "setuptools.build_meta"
 [tool.mypy]  # -------------------------------------------------------------------------
 
 check_untyped_defs = true
-# See <https://github.com/python/mypy/issues/10250#issuecomment-899187636> and
-# <https://github.com/python/mypy/issues/10310>
-exclude = """(?x)(
-  (^|/)build/
-)"""
+# See <https://github.com/python/mypy/issues/10250#issuecomment-899187636>,
+# <https://github.com/python/mypy/issues/10310>, and
+# <https://github.com/python/mypy/issues/11825>
+exclude = "(?x)( (^|/)build/ )"
 ignore_missing_imports = true
 strict_optional = true
 show_error_codes = true
