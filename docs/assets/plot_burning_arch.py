@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from anydyce.viz import plot_line
+
 from dyce import H
 
 
@@ -24,10 +26,5 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
-    outcomes, probabilities = damage_half_on_save.distribution_xy()
-    matplotlib.pyplot.plot(outcomes, probabilities, marker=".")
-    matplotlib.pyplot.title(
-        "Attack with saving throw for half damage",
-        color=text_color,
-    )
+    plot_line(ax, [("", damage_half_on_save)])
+    ax.set_title("Attack with saving throw for half damage", color=text_color)

@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from anydyce.viz import plot_line
+
 from dyce import H, P
 
 
@@ -33,24 +35,13 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
-    matplotlib.pyplot.plot(
-        *normal_hit.distribution_xy(),
-        marker=".",
-        label="Normal hit",
+    plot_line(
+        ax,
+        [
+            ("Normal hit", normal_hit),
+            ("Critical hit", critical_hit),
+            ("Advantage-weighted", advantage_weighted),
+        ],
     )
-    matplotlib.pyplot.plot(
-        *critical_hit.distribution_xy(),
-        marker=".",
-        label="Critical hit",
-    )
-    matplotlib.pyplot.plot(
-        *advantage_weighted.distribution_xy(),
-        marker=".",
-        label="Advantage-weighted",
-    )
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.title(
-        "Advantage-weighted attack with critical hits",
-        color=text_color,
-    )
+    ax.legend()
+    ax.set_title("Advantage-weighted attack with critical hits", color=text_color)

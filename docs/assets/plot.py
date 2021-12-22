@@ -43,11 +43,12 @@ def _main() -> None:
     mod_name, mod_do_it = args.fig
     png_path = f"plot_{mod_name}_{args.style}.png"
 
+    matplotlib.pyplot.figure().set_size_inches(8, 6, forward=True)
     matplotlib.style.use("bmh")
     mod_do_it(args.style)
     matplotlib.pyplot.tight_layout()
     print(f"saving {png_path}")
-    matplotlib.pyplot.savefig(png_path, dpi=72, transparent=True)
+    matplotlib.pyplot.savefig(png_path, dpi=144, transparent=True)
 
 
 # ---- Initialization ------------------------------------------------------------------

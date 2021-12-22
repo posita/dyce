@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from anydyce.viz import plot_line
+
 from dyce import H, P
 
 
@@ -19,17 +21,19 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
-
-    for depth in range(6):
-        res = (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None))
-        matplotlib.pyplot.plot(
-            *res.distribution_xy(),
-            marker=".",
-            label=f"{depth} rerolls",
-        )
-
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.title(
-        "Taking the three highest of ten exploding d10s", color=text_color
+    plot_line(
+        ax,
+        [
+            (
+                f"{depth} rerolls",
+                (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None)),
+            )
+            for depth in range(5, -1, -1)
+        ],
     )
+
+    for line in ax.lines:
+        line.set_marker("")
+
+    ax.legend()
+    ax.set_title("Taking the three highest of ten exploding d10s", color=text_color)

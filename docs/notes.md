@@ -15,9 +15,9 @@
 
 # ``dyce`` release notes
 
-## [0.4.6](https://github.com/posita/dyce/releases/tag/v0.4.6)
+## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
-* TODO
+* Breaks ``dyce.viz`` out into [``anydyce``](https://github.com/posita/anydyce/).
 
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
@@ -73,7 +73,7 @@
 * Removes deprecated synonym methods ``#!python H.even`` and ``#!python H.odd``.
     Uses [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
 * Removes deprecated synonym package ``#!python dyce.plt``.
-    Uses [``dyce.viz``](dyce.viz.md) instead.
+    Uses ``dyce.viz`` instead.
 * Removes special case handling of ``#!python H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.
@@ -133,7 +133,7 @@
 * Renames experimental ``#!python P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
 * Removes ``#!python coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
-* Renames ``#!python dyce.plt`` to [``dyce.viz``](dyce.viz.md).
+* Renames ``#!python dyce.plt`` to ``dyce.viz``.
 * Deprecates synonym package ``#!python dyce.plt``.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)

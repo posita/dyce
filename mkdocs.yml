@@ -20,7 +20,6 @@ nav:
     - <tt>dyce</tt>: dyce.md
     - <tt>dyce.h</tt>: dyce.h.md
     - <tt>dyce.r</tt>: dyce.r.md
-    - <tt>dyce.viz</tt>: dyce.viz.md
 
 # See:
 # * <https://squidfunk.github.io/mkdocs-material/reference/admonitions/>, etc.
@@ -54,6 +53,8 @@ markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.tilde
 
 plugins:
@@ -81,6 +82,7 @@ theme:
   name: "material"  # required by arithmatex and mkdocstrings
   features:
     - content.code.annotate
+    - content.tabs.link
     - navigation.expand
     - navigation.sections
     - toc.integrate

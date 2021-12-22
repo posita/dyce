@@ -52,7 +52,7 @@ def do_it(style: str) -> None:
                 else IronSoloResult.FAILURE
             )
 
-    fig, ax = matplotlib.pyplot.subplots()
+    ax = matplotlib.pyplot.axes()
     by_result = defaultdict(list)
     mods = list(range(0, 5))
     text_color = "white" if style == "dark" else "black"
@@ -87,4 +87,3 @@ def do_it(style: str) -> None:
     ax.legend()
     ax.set_xlabel("Modifier", color=text_color)
     ax.set_title("Ironsworn distributions", color=text_color)
-    fig.tight_layout()

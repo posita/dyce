@@ -19,11 +19,10 @@ def do_it(style: str) -> None:
     col_names = ["Loss", "Tie", "Win"]
     col_ticks = list(range(len(col_names)))
     num_scenarios = 3
-    fig, axes = matplotlib.pyplot.subplots(1, num_scenarios)
     text_color = "white" if style == "dark" else "black"
 
     for i, them in enumerate(range(3, 3 + num_scenarios)):
-        ax = axes[i]
+        ax = matplotlib.pyplot.subplot(1, num_scenarios, i + 1)
         row_names: List[str] = []
         rows: List[Tuple[float, ...]] = []
         num_rows = 3
@@ -49,5 +48,3 @@ def do_it(style: str) -> None:
                     va="center",
                     color="w",
                 )
-
-    fig.tight_layout()

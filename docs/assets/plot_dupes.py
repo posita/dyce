@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from anydyce.viz import plot_scatter
+
 from dyce import H, P
 
 
@@ -26,23 +28,11 @@ def do_it(style: str) -> None:
     res_15d6 = H(dupes(15 @ P(6)))
     res_8d10 = H(dupes(8 @ P(10)))
 
+    matplotlib.pyplot.rcParams["lines.markersize"] *= 2
     ax = matplotlib.pyplot.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
-    matplotlib.pyplot.plot(
-        *res_15d6.distribution_xy(),
-        marker="o",
-        label="15d6",
-    )
-    matplotlib.pyplot.plot(
-        *res_8d10.distribution_xy(),
-        marker="o",
-        label="8d10",
-    )
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.title(
-        "Chances of rolling $n$ duplicates",
-        color=text_color,
-    )
+    plot_scatter(ax, [("15d6", res_15d6), ("8d10", res_8d10)], alpha=1.0)
+    ax.legend()
+    ax.set_title("Chances of rolling $n$ duplicates", color=text_color)

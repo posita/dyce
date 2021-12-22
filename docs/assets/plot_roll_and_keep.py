@@ -8,6 +8,10 @@
 
 from __future__ import annotations
 
+from typing import Iterator, Tuple
+
+from anydyce.viz import plot_line
+
 from dyce import H, P
 
 
@@ -29,25 +33,29 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
+    marker_start = 0
 
-    for n in range(k + 1, k + 9):
-        p = n @ P(d)
-        res_roll_and_keep = H(roll_and_keep(p, k))
-        matplotlib.pyplot.plot(
-            *res_roll_and_keep.distribution_xy(),
-            marker="o",
-            label=f"{n}d{d} keep {k} add +1",
-        )
+    def _roll_and_keep_hs() -> Iterator[Tuple[str, H]]:
+        for n in range(k + 1, k + 9):
+            p = n @ P(d)
+            yield f"{n}d{d} keep {k} add +1", H(roll_and_keep(p, k))
 
-    for n in range(k + 1, k + 9):
-        p = n @ P(d)
-        res_normal = p.h(slice(-k, None))
-        matplotlib.pyplot.plot(
-            *res_normal.distribution_xy(),
-            marker="s",
-            label=f"{n}d{d} keep {k}",
-        )
+    plot_line(ax, tuple(_roll_and_keep_hs()), alpha=0.75)
 
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.title("Roll-and-keep mechanic comparison", color=text_color)
+    for i in range(marker_start, len(ax.lines)):
+        ax.lines[i].set_marker(".")
+
+    marker_start = len(ax.lines)
+
+    def _normal() -> Iterator[Tuple[str, H]]:
+        for n in range(k + 1, k + 9):
+            p = n @ P(d)
+            yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
+
+    plot_line(ax, tuple(_normal()), alpha=0.25)
+
+    for i in range(marker_start, len(ax.lines)):
+        ax.lines[i].set_marker("o")
+
+    ax.legend(loc="upper left")
+    ax.set_title("Roll-and-keep mechanic comparison", color=text_color)
