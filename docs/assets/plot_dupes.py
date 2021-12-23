@@ -13,6 +13,7 @@ from dyce import H, P
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
+    import matplotlib.ticker
 
     def dupes(p: P):
         for roll, count in p.rolls_with_counts():
@@ -25,6 +26,11 @@ def do_it(style: str) -> None:
     res_15d6 = H(dupes(15 @ P(6)))
     res_8d10 = H(dupes(8 @ P(10)))
 
+    ax = matplotlib.pyplot.axes()
+    text_color = "white" if style == "dark" else "black"
+    ax.tick_params(axis="x", colors=text_color)
+    ax.tick_params(axis="y", colors=text_color)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
     matplotlib.pyplot.plot(
         *res_15d6.distribution_xy(),
         marker="o",
@@ -36,5 +42,7 @@ def do_it(style: str) -> None:
         label="8d10",
     )
     matplotlib.pyplot.legend()
-    # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title("Chances of rolling $n$ duplicates")
+    matplotlib.pyplot.title(
+        "Chances of rolling $n$ duplicates",
+        color=text_color,
+    )

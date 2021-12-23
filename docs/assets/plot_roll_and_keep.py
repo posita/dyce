@@ -11,17 +11,25 @@ from __future__ import annotations
 from dyce import H, P
 
 
-def do_it(__: str) -> None:
+def do_it(style: str) -> None:
     import matplotlib.pyplot
+    import matplotlib.ticker
 
     def roll_and_keep(p: P, k: int):
         assert p.is_homogeneous
         max_d = max(p[-1]) if p else 0
+
         for roll, count in p.rolls_with_counts():
             total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
             yield total, count
 
     d, k = 6, 3
+
+    ax = matplotlib.pyplot.axes()
+    text_color = "white" if style == "dark" else "black"
+    ax.tick_params(axis="x", colors=text_color)
+    ax.tick_params(axis="y", colors=text_color)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
 
     for n in range(k + 1, k + 9):
         p = n @ P(d)
@@ -42,5 +50,4 @@ def do_it(__: str) -> None:
         )
 
     matplotlib.pyplot.legend()
-    # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title("Roll-and-keep mechanic comparison")
+    matplotlib.pyplot.title("Roll-and-keep mechanic comparison", color=text_color)

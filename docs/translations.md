@@ -284,47 +284,19 @@ H({<IronSoloResult.SPECTACULAR_FAILURE: -1>: 9,
 
 By defining our dependent term function to include ``#!python mod`` as a parameter with a default argument, we can use ``#!python partial`` to manipulate it, which is helpful for visualization.
 
-``` python
->>> from collections import defaultdict
->>> from functools import partial
->>> import matplotlib  # doctest: +SKIP
->>> fig, axes = matplotlib.pyplot.subplots()  # doctest: +SKIP
->>> by_result = defaultdict(list)
->>> mods = list(range(0, 5))
->>> for mod in mods:
-...   results_for_mod = resolve_dependent_probability(
-...     partial(iron_solo_dependent_term, mod=mod),
-...     action=d6,
-...     first_challenge=d10,
-...     second_challenge=d10,
-...   )
-...   distribution_for_mod = dict(results_for_mod.distribution())
-...   for result in IronSoloResult:
-...     result_val = float(distribution_for_mod.get(result, 0))
-...     by_result[result].append(result_val)
->>> labels = [str(mod) for mod in mods]
->>> bottoms = [0.0 for _ in mods]
->>> for result in IronSoloResult:
-...   result_vals = by_result[result]
-...   assert len(result_vals) == len(mods)
-...   axes.bar(labels, result_vals, bottom=bottoms, label=result.name)  # doctest: +SKIP
-...   bottoms = [
-...     bottom + result_val
-...     for bottom, result_val in zip(bottoms, result_vals)
-...   ]
->>> axes.legend()  # doctest: +SKIP
->>> axes.set_xlabel("modifier")  # doctest: +SKIP
->>> fig.title("Ironsworn distributions")  # doctest: +SKIP
-
-```
-
-Calling ``#!python matplotlib.pyplot.show`` presents:
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_ironsworn_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Ironsworn distributions](assets/plot_ironsworn_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_ironsworn.py"
+```
+</details>
 
 ## Advanced topic – modeling *Risis*
 
@@ -355,43 +327,19 @@ We can easily model the first round of its opposed combat system for various sta
 
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
 
-``` python
->>> from typing import List, Tuple
->>> col_names = ["Loss", "Tie", "Win"]  # mapping from [-1, 0, 1], respectively
->>> col_ticks = list(range(len(col_names)))
->>> num_rows = 3
->>> fig, axes = matplotlib.pyplot.subplots(1, num_rows)  # doctest: +SKIP
->>> for i, them in enumerate(range(3, 3 + num_rows)):
-...   ax = axes[i]  # doctest: +SKIP
-...   row_names: List[str] = []
-...   rows: List[Tuple[float, ...]] = []
-...   for us in range(them, them + num_rows):
-...     row_names.append(f"{us}d6 …")
-...     rows.append((us@H(6)).vs(them@H(6)).distribution_xy()[-1])
-...   ax.imshow(rows)  # doctest: +SKIP
-...   ax.set_title(f"… vs {them}d6")  # doctest: +SKIP
-...   ax.set_xticks(col_ticks)  # doctest: +SKIP
-...   ax.set_xticklabels(col_names, rotation=90)  # doctest: +SKIP
-...   ax.set_yticks(list(range(len(rows))))  # doctest: +SKIP
-...   ax.set_yticklabels(row_names)  # doctest: +SKIP
-...   for y in range(len(row_names)):
-...     for x in range(len(col_names)):
-...       ax.text(
-...         x, y,
-...         f"{rows[y][x]:.0%}",
-...         ha="center", va="center",color="w",
-...       )  # doctest: +SKIP
->>> fig.tight_layout()  # doctest: +SKIP
-
-```
-
-Calling ``#!python matplotlib.pyplot.show`` presents:
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_risus_first_round_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Modeling the Risus combat mechanic after the first roll](assets/plot_risus_first_round_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_risus_first_round.py"
+```
+</details>
 
 ### Modeling entire multi-round combats
 
@@ -698,48 +646,19 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 
 Visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res4.distribution_xy(),
-...   marker="D",
-...   label="3d6",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res1.distribution_xy(),
-...   marker="s",
-...   label="4d6 - discard lowest",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res2.distribution_xy(),
-...   marker="^",
-...   label="4d6 - re-roll first 1, discard lowest",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res3.distribution_xy(),
-...   marker="*",
-...   label="4d6 - re-roll all 1s (i.e., 4d5), discard lowest",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res5.distribution_xy(),
-...   marker="x",
-...   label="2d6 + 6",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res6.distribution_xy(),
-...   marker="o",
-...   label="4d4 + 2",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_4d6_variants_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Comparing various take-three-of-4d6 methods](assets/plot_4d6_variants_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_4d6_variants.py"
+```
+</details>
 
 ## Translating one example from [``markbrockettrobson/python_dice``](https://github.com/markbrockettrobson/python_dice#usage)
 
@@ -770,20 +689,19 @@ Translation:
 
 Visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> outcomes, probabilities = damage_half_on_save.distribution_xy()
->>> matplotlib.pyplot.plot(outcomes, probabilities, marker=".")  # doctest: +SKIP
->>> matplotlib.pyplot.title("Expected outcomes for attack with saving throw for half damage")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_burning_arch_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Expected outcomes for attack with saving throw for half damage](assets/plot_burning_arch_light.png)
+  ![Plot: Attack with saving throw for half damage](assets/plot_burning_arch_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_burning_arch.py"
+```
+</details>
 
 An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
 
@@ -893,45 +811,19 @@ Example 1 translation:
 
 Example 1 visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> from dyce.viz import display_burst
->>> ax_plot = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))  # doctest: +SKIP
->>> ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))  # doctest: +SKIP
->>> label_sa = "Normal attack"
->>> ax_plot.plot(
-...     *single_attack.distribution_xy(),
-...     color="tab:green",
-...     label=label_sa,
-...     marker=".",
-... )  # doctest: +SKIP
->>> label_gwf = "“Great Weapon Fighting”"
->>> ax_plot.plot(
-...     *great_weapon_fighting.distribution_xy(),
-...     color="tab:blue",
-...     label=label_gwf,
-...     marker=".",
-... )  # doctest: +SKIP
->>> ax_plot.legend()  # doctest: +SKIP
->>> ax_plot.set_title("Comparing a normal attack to an enhanced one")  # doctest: +SKIP
->>> display_burst(
-...     ax_burst,
-...     h_inner=great_weapon_fighting,
-...     outer=single_attack,
-...     desc=f"{label_sa} vs. {label_gwf}",
-...     inner_color="RdYlBu_r",
-...     outer_color="RdYlGn_r",
-...     alpha=0.9,
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_great_weapon_fighting_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Comparing a normal attack to an enhanced one](assets/plot_great_weapon_fighting_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_great_weapon_fighting.py"
+```
+</details>
 
 Example 2 source:
 
@@ -971,34 +863,19 @@ Example 2 translation:
 
 Example 2 visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *normal_hit.distribution_xy(),
-...   marker=".",
-...   label="Normal hit",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *critical_hit.distribution_xy(),
-...   marker=".",
-...   label="Critical hit",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *advantage_weighted.distribution_xy(),
-...   marker=".",
-...   label="Advantage-weighted",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title("Modeling an advantage-weighted attack with critical hits")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_advantage_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling an advantage-weighted attack with critical hits](assets/plot_advantage_light.png)
+  ![Plot: Advantage-weighted attack with critical hits](assets/plot_advantage_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_advantage.py"
+```
+</details>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
 
@@ -1018,26 +895,19 @@ Translation:
 
 Visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> for depth in range(6):
-...   res = (10@P(H(10).explode(max_depth=depth))).h(slice(-3, None))
-...   matplotlib.pyplot.plot(
-...     *res.distribution_xy(),
-...     marker=".",
-...     label=f"{depth} rerolls",
-...   )  # doctest: +SKIP
-    matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title("Modeling taking the three highest of ten exploding d10s")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_d10_explode_dark.png" media="(prefers-color-scheme: dark)">
-  ![Plot: Modeling taking the three highest of ten exploding d10s](assets/plot_d10_explode_light.png)
+  ![Plot: Taking the three highest of ten exploding d10s](assets/plot_d10_explode_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_d10_explode.py"
+```
+</details>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
 
@@ -1074,28 +944,19 @@ Translation:
 
 Visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res_15d6.distribution_xy(),
-...   marker="o",
-...   label="15d6",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.plot(
-...   *res_8d10.distribution_xy(),
-...   marker="o",
-...   label="8d10",
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title("Chances of rolling $n$ duplicates")  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_dupes_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Chances of rolling <i>n</i> duplicates](assets/plot_dupes_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_dupes.py"
+```
+</details>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
 
@@ -1132,36 +993,19 @@ H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 2
 
 Visualization:
 
-``` python
->>> import matplotlib  # doctest: +SKIP
->>> d, k = 6, 3
->>> for n in range(k + 1, k + 9):
-...   p = n@P(d)
-...   res_roll_and_keep = H(roll_and_keep(p, k))
-...   matplotlib.pyplot.plot(
-...     *res_roll_and_keep.distribution_xy(),
-...     marker="o",
-...     label=f"{n}d{d} keep {k} add +1",
-...   )  # doctest: +SKIP
->>> for n in range(k + 1, k + 9):
-...   p = n@P(d)
-...   res_normal = p.h(slice(-k, None))
-...   matplotlib.pyplot.plot(
-...     *res_normal.distribution_xy(),
-...     marker="s",
-...     label=f"{n}d{d} keep {k}",
-...   )  # doctest: +SKIP
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title("Roll-and-keep mechanic comparison")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_roll_and_keep_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Roll-and-keep mechanic comparison](assets/plot_roll_and_keep_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_roll_and_keep.py"
+```
+</details>
 
 ## Translation of the accepted answer to “[Modelling \[sic\] opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
 

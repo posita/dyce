@@ -14,6 +14,7 @@ from dyce.viz import display_burst
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
+    import matplotlib.ticker
 
     single_attack = 2 @ H(6) + 5
 
@@ -22,21 +23,25 @@ def do_it(style: str) -> None:
 
     great_weapon_fighting = 2 @ (H(6).substitute(gwf)) + 5
 
+    text_color = "white" if style == "dark" else "black"
     fig = matplotlib.pyplot.figure()
-    fig.set_size_inches(10, 5, forward=True)
+    fig.set_size_inches(11, 5.5, forward=True)
     ax_plot = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))
     ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
     label_sa = "Normal attack"
+    ax_plot.tick_params(axis="x", colors=text_color)
+    ax_plot.tick_params(axis="y", colors=text_color)
+    ax_plot.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
     ax_plot.plot(
         *single_attack.distribution_xy(),
-        color="lightgreen" if style == "dark" else "tab:green",
+        color="tab:green",
         label=label_sa,
         marker=".",
     )
     label_gwf = "“Great Weapon Fighting”"
     ax_plot.plot(
         *great_weapon_fighting.distribution_xy(),
-        color="lightblue" if style == "dark" else "tab:blue",
+        color="tab:blue",
         label=label_gwf,
         marker=".",
     )
@@ -48,6 +53,7 @@ def do_it(style: str) -> None:
         desc=f"{label_sa} vs. {label_gwf}",
         inner_color="RdYlBu_r",
         outer_color="RdYlGn_r",
-        text_color="white" if style == "dark" else "black",
+        text_color=text_color,
         alpha=0.9,
     )
+    fig.tight_layout()

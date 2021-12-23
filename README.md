@@ -178,6 +178,14 @@ light/dark image rendering dumpster fire. See
 [https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87].
 -->
 
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_2d6_lo_hi.py"
+```
+</details>
+
 [``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
 
 ``` python

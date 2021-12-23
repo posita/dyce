@@ -36,19 +36,14 @@ _PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))
 
 def _main() -> None:
     import matplotlib.pyplot
+    import matplotlib.style
 
     args = _PARSER.parse_args()
     logging.getLogger().setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     png_path = f"plot_{mod_name}_{args.style}.png"
 
-    if args.style == "dark":
-        matplotlib.pyplot.style.use("dark_background")
-    elif args.style == "light":
-        pass
-    else:
-        assert False, f"unrecognized style {args.style}"
-
+    matplotlib.style.use("bmh")
     mod_do_it(args.style)
     matplotlib.pyplot.tight_layout()
     print(f"saving {png_path}")

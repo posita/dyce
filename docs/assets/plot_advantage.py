@@ -11,8 +11,9 @@ from __future__ import annotations
 from dyce import H, P
 
 
-def do_it(__: str) -> None:
+def do_it(style: str) -> None:
     import matplotlib.pyplot
+    import matplotlib.ticker
 
     normal_hit = H(12) + 5
     critical_hit = 3 @ H(12) + 5
@@ -28,6 +29,11 @@ def do_it(__: str) -> None:
 
     advantage_weighted = advantage.substitute(crit)
 
+    ax = matplotlib.pyplot.axes()
+    text_color = "white" if style == "dark" else "black"
+    ax.tick_params(axis="x", colors=text_color)
+    ax.tick_params(axis="y", colors=text_color)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
     matplotlib.pyplot.plot(
         *normal_hit.distribution_xy(),
         marker=".",
@@ -44,5 +50,7 @@ def do_it(__: str) -> None:
         label="Advantage-weighted",
     )
     matplotlib.pyplot.legend()
-    # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title("Modeling an advantage-weighted attack with critical hits")
+    matplotlib.pyplot.title(
+        "Advantage-weighted attack with critical hits",
+        color=text_color,
+    )

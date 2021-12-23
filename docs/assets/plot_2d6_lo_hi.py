@@ -11,10 +11,18 @@ from __future__ import annotations
 from dyce import H, P
 
 
-def do_it(__: str) -> None:
+def do_it(style: str) -> None:
     import matplotlib.pyplot
+    import matplotlib.ticker
 
     p_2d6 = 2 @ P(H(6))
+
+    ax = matplotlib.pyplot.axes()
+    text_color = "white" if style == "dark" else "black"
+    ax.tick_params(axis="x", colors=text_color)
+    ax.tick_params(axis="y", colors=text_color)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
+
     outcomes, probabilities = p_2d6.h(0).distribution_xy()
     matplotlib.pyplot.bar(
         [v - 0.125 for v in outcomes],
@@ -34,5 +42,4 @@ def do_it(__: str) -> None:
     )
 
     matplotlib.pyplot.legend()
-    # Should match the corresponding img[alt] text
-    matplotlib.pyplot.title("Taking the lowest or highest die of 2d6")
+    matplotlib.pyplot.title("Taking the lowest or highest die of 2d6", color=text_color)

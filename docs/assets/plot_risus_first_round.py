@@ -13,13 +13,14 @@ from typing import List, Tuple
 from dyce import H
 
 
-def do_it(__: str) -> None:
+def do_it(style: str) -> None:
     import matplotlib.pyplot
 
     col_names = ["Loss", "Tie", "Win"]
     col_ticks = list(range(len(col_names)))
     num_scenarios = 3
     fig, axes = matplotlib.pyplot.subplots(1, num_scenarios)
+    text_color = "white" if style == "dark" else "black"
 
     for i, them in enumerate(range(3, 3 + num_scenarios)):
         ax = axes[i]
@@ -30,13 +31,13 @@ def do_it(__: str) -> None:
         for us in range(them, them + num_rows):
             row_names.append(f"{us}d6 …")
             rows.append((us @ H(6)).vs(them @ H(6)).distribution_xy()[-1])
-        ax.imshow(rows)
 
-        ax.set_title(f"… vs {them}d6")
+        ax.imshow(rows)
+        ax.set_title(f"… vs {them}d6", color=text_color)
         ax.set_xticks(col_ticks)
-        ax.set_xticklabels(col_names, rotation=90)
+        ax.set_xticklabels(col_names, color=text_color, rotation=90)
         ax.set_yticks(list(range(len(rows))))
-        ax.set_yticklabels(row_names)
+        ax.set_yticklabels(row_names, color=text_color)
 
         for y in range(len(row_names)):
             for x in range(len(col_names)):

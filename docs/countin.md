@@ -439,27 +439,24 @@ True
 
 [``H`` objects][dyce.h.H] provide a [``distribution`` method][dyce.h.H.distribution] and a [``distribution_xy`` method][dyce.h.H.distribution_xy] to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html).
 
-``` python
->>> outcomes, probabilities = (2@H(6)).distribution_xy()
->>> import matplotlib  # doctest: +SKIP
->>> matplotlib.pyplot.bar(
-...   [str(v) for v in outcomes],
-...   probabilities,
-... )  # doctest: +SKIP
->>> matplotlib.pyplot.title("Distribution for 2d6")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
-
 <!-- Should match any title of the corresponding plot title -->
 <picture>
   <source srcset="../assets/plot_histogram_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Distribution for 2d6](assets/plot_histogram_light.png)
 </picture>
 
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_histogram.py"
+```
+</details>
+
 [``dyce.viz``](dyce.viz.md) provides some experimental, rudimentary conveniences if it detects that ``#!python matplotlib`` is installed (e.g., via [Jupyter](https://jupyter.org/)).
 
 ``` python
+>>> import matplotlib.pyplot  # doctest: +SKIP
 >>> from dyce.viz import plot_burst
 >>> fig, ax = plot_burst(2@H(6))  # doctest: +SKIP
 >>> matplotlib.pyplot.show()  # doctest: +SKIP
@@ -471,6 +468,14 @@ True
   <source srcset="../assets/plot_burst_1_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: Basic plot_burst example](assets/plot_burst_1_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burst_1.py"><code>plot_burst_1.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_burst_1.py"
+```
+</details>
 
 The outer ring and corresponding labels can be overridden for interesting, at-a-glance displays.
 Overrides apply counter-clockwise, starting from the 12 o’clock position.
@@ -493,6 +498,14 @@ Overrides apply counter-clockwise, starting from the 12 o’clock position.
   ![Plot: Advanced plot_burst example](assets/plot_burst_2_light.png)
 </picture>
 
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burst_2.py"><code>plot_burst_2.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_burst_2.py"
+```
+</details>
+
 The outer ring can also be used to compare two histograms directly.
 Ever been curious how your four shiny new fudge dice stack up against your trusty ol’ double six-siders?
 Well wonder no more!
@@ -511,6 +524,14 @@ The ``dyce`` abides.
   <source srcset="../assets/plot_burst_3_dark.png" media="(prefers-color-scheme: dark)">
   ![Plot: plot_burst example (2d6 vs. d20)](assets/plot_burst_3_light.png)
 </picture>
+
+<details>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burst_3.py"><code>plot_burst_3.py</code></a></summary>
+
+``` python
+--8<-- "docs/assets/plot_burst_3.py"
+```
+</details>
 
 ## Time to get meta-evil on those outcomes!
 

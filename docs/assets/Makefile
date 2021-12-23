@@ -65,9 +65,9 @@ graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py 
 graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py ../../dyce/viz.py
 	"$${PYTHON:-python}" graph.py --style=light $*
 
-perf_%.txt : perf_%.ipy Makefile ../../dyce/h.py ../../dyce/p.py ../../dyce/viz.py
+perf_%.txt : perf_%.ipy Makefile ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
 	ipython --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy \
-		| cut >perf_$*.txt -f 2 -d $$'\a'
+		| cut >$@ -f 2 -d $$'\a'
 
 ../dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'
