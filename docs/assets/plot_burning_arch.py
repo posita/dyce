@@ -15,7 +15,6 @@ from dyce import H
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     save_roll = H(20)
     burning_arch_damage = 10 @ H(6) + 10

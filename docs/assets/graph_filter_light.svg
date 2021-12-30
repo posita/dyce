@@ -7,20 +7,20 @@
 <svg width="1746pt" height="402pt"
  viewBox="0.00 0.00 1746.00 402.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 398)">
-<g id="clust1" class="cluster">
-<title>cluster_rolls</title>
-<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="681,-203 681,-386 1340,-386 1340,-203 681,-203"/>
-<text text-anchor="start" x="982" y="-371.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Tree</text>
+<g id="clust3" class="cluster">
+<title>cluster_roll_outcomes</title>
+<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="1000,-8 1000,-170 1730,-170 1730,-8 1000,-8"/>
+<text text-anchor="start" x="1319" y="-155.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Outcomes</text>
 </g>
 <g id="clust2" class="cluster">
 <title>cluster_rollers</title>
 <polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="8,-95 8,-278 673,-278 673,-95 8,-95"/>
 <text text-anchor="start" x="306" y="-263.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roller Tree</text>
 </g>
-<g id="clust3" class="cluster">
-<title>cluster_roll_outcomes</title>
-<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="1000,-8 1000,-170 1730,-170 1730,-8 1000,-8"/>
-<text text-anchor="start" x="1319" y="-155.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Outcomes</text>
+<g id="clust1" class="cluster">
+<title>cluster_rolls</title>
+<polygon fill="transparent" stroke="DarkSlateGray" stroke-dasharray="1,5" points="681,-203 681,-386 1340,-386 1340,-203 681,-203"/>
+<text text-anchor="start" x="982" y="-371.8" font-family="Helvetica,sans-Serif" font-style="italic" font-size="14.00" fill="DarkSlateGray">Roll Tree</text>
 </g>
 <!-- Roll&#45;1 -->
 <g id="node1" class="node">

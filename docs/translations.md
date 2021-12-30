@@ -295,7 +295,10 @@ By defining our dependent term function to include ``#!python mod`` as a paramet
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a></summary>
+<summary>
+Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fironsworn.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_ironsworn.py"
@@ -338,7 +341,10 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Frisus.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_risus_first_round.py"
@@ -351,7 +357,13 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 
 ``` python
 >>> from dyce import H, P
+>>> from enum import IntEnum, auto
 >>> from typing import Callable, Dict, Tuple
+
+>>> class Risus(IntEnum):
+...   LOSS = -1
+...   DRAW = auto()
+...   WIN = auto()
 
 >>> def risus_combat_driver(
 ...     us: int,  # number of dice we still have
@@ -371,9 +383,10 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...     this_round = us_vs_them_func(us, them)
 ...
 ...     def _next_round(__: H, outcome) -> H:
-...       if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
-...       elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
-...       else: return H({})  # ignore (immediately re-roll) all ties
+...       if outcome == Risus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
+...       elif outcome == Risus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
+...       elif outcome == Risus.DRAW: return H({})  # ignore (immediately re-roll) all ties
+...       else: assert False, f"unrecognized outcome {outcome}"
 ...
 ...     already_solved[(us, them)] = this_round.substitute(_next_round)
 ...     return already_solved[(us, them)]
@@ -530,7 +543,7 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 ...   h = h.substitute(lambda __, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
 ...   return h
 
->>> for t in range(3, 5):
+>>> for t in range(3, 6):
 ...   print("---")
 ...   for u in range(t, t + 3):
 ...     results = risus_combat_driver(u, t, deadly_combat_vs).format(width=0)
@@ -543,6 +556,10 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 4d6 vs 4d6: {..., -1: 50.00%, 1: 50.00%}
 5d6 vs 4d6: {..., -1: 40.67%, 1: 59.33%}
 6d6 vs 4d6: {..., -1: 30.59%, 1: 69.41%}
+---
+5d6 vs 5d6: {..., -1: 50.00%, 1: 50.00%}
+6d6 vs 5d6: {..., -1: 44.13%, 1: 55.87%}
+7d6 vs 5d6: {..., -1: 36.89%, 1: 63.11%}
 
 ```
 
@@ -657,7 +674,10 @@ Visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2F4d6_variants.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_4d6_variants.py"
@@ -700,7 +720,10 @@ Visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fburning_arch.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_burning_arch.py"
@@ -822,7 +845,10 @@ Example 1 visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fgreat_weapon_fighting.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_great_weapon_fighting.py"
@@ -874,7 +900,10 @@ Example 2 visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fadvantage.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_advantage.py"
@@ -906,7 +935,10 @@ Visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fd10_explode.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_d10_explode.py"
@@ -955,7 +987,10 @@ Visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fdupes.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_dupes.py"
@@ -1004,7 +1039,10 @@ Visualization:
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Froll_and_keep.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_roll_and_keep.py"

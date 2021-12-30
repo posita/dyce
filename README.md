@@ -139,34 +139,8 @@ var |    1.97
 
 ```
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages like [``matplotlib``](https://matplotlib.org/stable/api/index.html).
-
-``` python
->>> import matplotlib  # doctest: +SKIP
-
->>> outcomes, probabilities = p_2d6.h(0).distribution_xy()
->>> matplotlib.pyplot.bar(
-...   [v - 0.125 for v in outcomes],
-...   probabilities,
-...   alpha=0.75,
-...   width=0.5,
-...   label="Lowest",
-... )  # doctest: +SKIP
-
->>> outcomes, probabilities = p_2d6.h(-1).distribution_xy()
->>> matplotlib.pyplot.bar(
-...   [v + 0.125 for v in outcomes],
-...   probabilities,
-...   alpha=0.75,
-...   width=0.5,
-...   label="Highest",
-... )  # doctest: +SKIP
-
->>> matplotlib.pyplot.legend()  # doctest: +SKIP
->>> matplotlib.pyplot.title(r"Taking the lowest or highest die of 2d6")  # doctest: +SKIP
->>> matplotlib.pyplot.show()  # doctest: +SKIP
-
-```
+[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages
+[``anydyce``](https://github.com/posita/anydyce/), for example, makes use of these to integrate with [``matplotlib``](https://matplotlib.org/stable/api/index.html).
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -179,7 +153,10 @@ light/dark image rendering dumpster fire. See
 -->
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2F2d6_lo_hi.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_2d6_lo_hi.py"

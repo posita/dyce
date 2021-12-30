@@ -15,7 +15,6 @@ from dyce import H
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     single_attack = 2 @ H(6) + 5
 
@@ -33,18 +32,6 @@ def do_it(style: str) -> None:
     plot_line(ax_plot, [(label_sa, single_attack), (label_gwf, great_weapon_fighting)])
     ax_plot.lines[0].set_color("tab:green")
     ax_plot.lines[1].set_color("tab:blue")
-
-    # so_far = 0
-
-    # for count, color in zip(
-    #     (len(h) for h in (single_attack, great_weapon_fighting)),
-    #     ("tab:green", "tab:blue"),
-    # ):
-    #     for i in range(count):
-    #         ax_plot.patches[i + so_far].set_color(color)
-
-    #     so_far += count
-
     ax_plot.legend()
     ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
     plot_burst(

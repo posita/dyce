@@ -15,7 +15,6 @@ from dyce import H, P
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     normal_hit = H(12) + 5
     critical_hit = 3 @ H(12) + 5

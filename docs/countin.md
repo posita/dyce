@@ -448,7 +448,10 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 </picture>
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a></summary>
+<summary>
+  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+</summary>
 
 ``` python
 --8<-- "docs/assets/plot_histogram.py"
@@ -567,3 +570,6 @@ H({7/9: 9, 8/9: 9, 1: 9})
 ## Further exploration
 
 Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API](dyce.md).
+
+Anywhere you see a Binder logo ![Binder](https://mybinder.org/badge_logo.svg), you can click on it to immediately start tinkering with a temporal instance of that example using [``anydyce``](https://posita.github.io/anydyce/).
+Just be aware that Binder will eventually delete any changes, so make sure to download any notebooks you want to preserve.

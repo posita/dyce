@@ -17,7 +17,6 @@ from dyce import H, P
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     def roll_and_keep(p: P, k: int):
         assert p.is_homogeneous

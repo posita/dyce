@@ -15,7 +15,6 @@ from dyce import H
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     ax = matplotlib.pyplot.axes()
     text_color = "white" if style == "dark" else "black"

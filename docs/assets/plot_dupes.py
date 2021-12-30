@@ -15,7 +15,6 @@ from dyce import H, P
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
-    import matplotlib.ticker
 
     def dupes(p: P):
         for roll, count in p.rolls_with_counts():
