@@ -10,22 +10,22 @@ from __future__ import annotations
 
 from anydyce.viz import plot_scatter
 
-from dyce import H, P
+from dyce import P
+from dyce.p import RollT
 
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
 
-    def dupes(p: P):
-        for roll, count in p.rolls_with_counts():
-            dupes = 0
-            for i in range(1, len(roll)):
-                if roll[i] == roll[i - 1]:
-                    dupes += 1
-            yield dupes, count
+    def dupes(roll: RollT):
+        dupes = 0
+        for i in range(1, len(roll)):
+            if roll[i] == roll[i - 1]:
+                dupes += 1
+        return dupes
 
-    res_15d6 = H(dupes(15 @ P(6)))
-    res_8d10 = H(dupes(8 @ P(10)))
+    res_15d6 = P.foreach(dupes, roll=15 @ P(6))
+    res_8d10 = P.foreach(dupes, roll=8 @ P(10))
 
     matplotlib.pyplot.rcParams["lines.markersize"] *= 2
     ax = matplotlib.pyplot.axes()

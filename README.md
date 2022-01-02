@@ -155,7 +155,7 @@ light/dark image rendering dumpster fire. See
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2F2d6_lo_hi.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2F2d6_lo_hi.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -228,21 +228,20 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Latest release                             | 2021	| N/A		| 2021		| Unknown	| 2021		| 2016		| 2021		| 2021		|
-| Actively maintained and documented         | ✅	| ⚠️[^4]	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		|
-| Suitable as a dependency in other projects | ✅	| ⚠️[^5]	| ✅		| ❌		| ✅		| ⚠️[^5]	| ✅		| ❌		|
-| Discrete outcome enumeration               | ✅	| ✅		| ✅		| ✅		| ❌		| ✅		| ❌		| ❌		|
-| Arbitrary expressions                      | ✅	| ⚠️[^6]	| ✅		| ✅		| ✅		| ⚠️[^7]	| ❌		| ❌		|
-| Arbitrary dice definitions                 | ✅	| ✅		| ✅		| ✅		| ❌		| ❌		| ❌		| ❌		|
-| Integrates with other tools                | ✅	| ✅		| ⚠️[^8]	| ❌		| ⚠️[^8]	| ✅		| ⚠️[^8]	| ⚠️[^8]	|
-| Open source (can inspect)                  | ✅	| ✅		| ✅		| ❌		| ✅		| ✅		| ✅		| ✅		|
-| Permissive licensing (can use and extend)  | ✅	| ✅		| ✅		| N/A		| ✅		| ✅		| ✅		| ✅		|
-<!--                                         	🔺 dyce			🔺 python-dice		🔺 d20					🔺 dice
-                                             			🔺 dyce_roll.py		🔺 AnyDice				🔺 DnDice				🔺 dice-notation -->
+| Latest release | 2022 | N/A | 2021 | Unknown | 2021 | 2016 | 2021 | 2021 |
+| Actively maintained and documented         | ✅ | ⚠️[^4] | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Combinatorics optimizations                | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Suitable as a dependency in other projects | ✅ | ⚠️[^5] | ✅ | ❌ | ✅ | ⚠️[^5] | ✅ | ❌ |
+| Discrete outcome enumeration               | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Arbitrary expressions                      | ✅ | ⚠️[^6] | ✅ | ✅ | ✅ | ⚠️[^7] | ❌ | ❌ |
+| Arbitrary dice definitions                 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Integrates with other tools                | ✅ | ✅ | ⚠️[^8] | ❌ | ⚠️[^8] | ✅ | ⚠️[^8] | ⚠️[^8] |
+| Open source (can inspect)                  | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Permissive licensing (can use and extend)  | ✅ | ✅ | ✅ | N/A | ✅ | ✅ | ✅ | ✅ |
 
 [^4]:
 
-    Actively maintained, but sparsely documented.
+    Sparsely documented.
     The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version.
 
 [^5]:

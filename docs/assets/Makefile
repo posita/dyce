@@ -42,9 +42,9 @@ all : \
 
 perf : \
 	perf_appearances_in_rolls.txt \
+	perf_foreach.txt \
 	perf_order_stat_for_n.txt \
 	perf_pools_vs_rollers.txt \
-	perf_resolve_dependent_probability.txt \
 	perf_rolls_with_counts.txt
 
 graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py

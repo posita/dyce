@@ -831,7 +831,7 @@ Let’s compare that to our roller.
 ```
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_resolve_dependent_probability.ipy"><code>perf_resolve_dependent_probability.ipy</code></a></summary>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_pools_vs_rollers.ipy"><code>perf_pools_vs_rollers.ipy</code></a></summary>
 
 ``` python
 --8<-- "docs/assets/perf_pools_vs_rollers.ipy"

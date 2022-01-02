@@ -20,7 +20,7 @@ def do_it(style: str) -> None:
     p_4d6 = 4 @ P(6)
     res2 = p_4d6.h(slice(1, None))
     d6_reroll_first_one = H(6).substitute(
-        lambda __, outcome: H(6) if outcome == 1 else outcome
+        lambda h, outcome: h if outcome == 1 else outcome
     )
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     res3 = p_4d6_reroll_first_one.h(slice(1, None))

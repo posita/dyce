@@ -382,56 +382,81 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Dependent probabilities
 
-In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute] or [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability], although it takes some practice to adjust to the semantics.
+In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute],[``H.foreach``][dyce.h.H.foreach], or [``P.foreach``][dyce.p.P.foreach].
 
-Where we can identify independent terms and reduce dependent terms to calculations solely involving independent terms, there is a fairly straightforward translation.
-First, we express independent terms as histograms.
-Second, we express dependent terms as substitution functions.
-Finally, we pass the dependent substitution functions to the independent histograms via [``H.substitute``][dyce.h.H.substitute] or [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability].
+Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, there are fairly straightforward translations.
+First, we express independent terms as histograms or pools.
+Second, we express the dependent term as a callback function.
+Finally, we can pass the dependent callback function to [``H.substitute``][dyce.h.H.substitute],  [``H.foreach``][dyce.h.H.foreach], or  [``P.foreach``][dyce.p.P.foreach], along with the independent terms (as arguments in the cases of the latter two).
 
+[``H.substitute``][dyce.h.H.substitute] is well suited to situations with a single independent term that can be expressed as a histogram.
 Say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
 
 ``` python
 >>> d6 = H(6)  # independent term
 >>> constant = 4
->>> def outcome_vs_distance_to_constant(__, d6_outcome):
+
+>>> def outcome_vs_distance_to_constant(__: H, d6_outcome):
 ...   return d6_outcome > abs(d6_outcome - constant)  # dependent term
->>> d6.substitute(outcome_vs_distance_to_constant)
-H({False: 1, True: 2})
+
+>>> print(d6.substitute(outcome_vs_distance_to_constant).format())
+avg |    0.67
+std |    0.47
+var |    0.22
+  0 |  33.33% |################
+  1 |  66.67% |#################################
 
 ```
 
-Now, instead of a constant, let’s use another die as a second independent variable.
+Instead of a constant, let’s use another die as a second independent term.
 We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
+For multiple independent terms that can be expressed as histograms, the [``H.foreach`` class method][dyce.h.H.foreach] is appropriate.
+
 
 ``` python
 >>> d4 = H(4)  # first independent term
 >>> d6 = H(6)  # second independent term
 
+>>> def outcome_vs_difference_dependent_term(d4_outcome, d6_outcome):
+...   return d6_outcome > abs(d4_outcome - d6_outcome)  # dependent term
+
+>>> h = H.foreach(outcome_vs_difference_dependent_term, d4_outcome=d4, d6_outcome=d6)
+>>> print(h.format())
+avg |    0.83
+std |    0.37
+var |    0.14
+  0 |  16.67% |########
+  1 |  83.33% |#########################################
+
 ```
 
-One way to express the dependent terms is to nest substitution functions, where the innermost holds the dependent probability calculation, and the outer functions each establish the scope of their respective independent outcomes.
+In the alternative, one could nest substitution functions, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
+However, this isn’t very readable, and is often less efficient than using [``H.foreach`` class method][dyce.h.H.foreach].
 
 ``` python
->>> def sub_d4(__, d4_outcome):
-...   def sub_d6(__, d6_outcome):
+>>> def sub_d4(__: H, d4_outcome):
+...   def sub_d6(__: H, d6_outcome):
 ...     return d6_outcome > abs(d4_outcome - d6_outcome)
 ...   return d6.substitute(sub_d6)
->>> h = d4.substitute(sub_d4) ; h
-H({False: 1, True: 5})
+
+>>> d4.substitute(sub_d4) == h
+True
 
 ```
 
-This isn’t the most intuitive thing in the world, so ``dyce`` provides the [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] function as a semantically equivalent shorthand.
+Where the dependent term requires inspection of rolls from one or more pools as independent terms, [``P.foreach`` class method][dyce.p.P.foreach] is useful.
+Let’s compare how often a pool of three six-sided dice shows more fours than a pool of two four-sided dice.
 
 ``` python
->>> from dyce.h import resolve_dependent_probability
+>>> def compare_fours(roll_3d6, roll_2d4):
+...   return sum(1 for v in roll_3d6 if v == 4) > sum(1 for v in roll_2d4 if v == 4)
 
->>> def dependent_term(d4_outcome, d6_outcome):
-...   return d6_outcome > abs(d4_outcome - d6_outcome)
-
->>> resolve_dependent_probability(dependent_term, d4_outcome = d4, d6_outcome = d6) == h
-True
+>>> print(P.foreach(compare_fours, roll_3d6=P(6, 6, 6), roll_2d4=P(4, 4)).format())
+avg |    0.27
+std |    0.44
+var |    0.19
+  0 |  73.50% |####################################
+  1 |  26.50% |#############
 
 ```
 
@@ -450,7 +475,7 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python

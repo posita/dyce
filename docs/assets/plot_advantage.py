@@ -20,7 +20,7 @@ def do_it(style: str) -> None:
     critical_hit = 3 @ H(12) + 5
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(__: H, outcome):
+    def crit(outcome):
         if outcome == 20:
             return critical_hit
         elif outcome + 5 >= 14:
@@ -28,7 +28,7 @@ def do_it(style: str) -> None:
         else:
             return 0
 
-    advantage_weighted = advantage.substitute(crit)
+    advantage_weighted = H.foreach(crit, outcome=advantage)
 
     ax = matplotlib.pyplot.axes()
     text_color = "white" if style == "dark" else "black"

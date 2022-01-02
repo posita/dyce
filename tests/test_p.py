@@ -21,9 +21,9 @@ from numerary.bt import beartype
 
 from dyce import H, P
 from dyce.p import (
+    RollT,
     _analyze_selection,
     _RollCountT,
-    _RollT,
     _rwc_homogeneous_n_h_using_karonen_partial_selection,
     _rwc_homogeneous_n_h_using_multinomial_coefficient,
 )
@@ -762,8 +762,8 @@ def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
-    known_counts: DefaultDict[_RollT, int] = defaultdict(int)
-    test_counts: DefaultDict[_RollT, int] = defaultdict(int)
+    known_counts: DefaultDict[RollT, int] = defaultdict(int)
+    test_counts: DefaultDict[RollT, int] = defaultdict(int)
 
     for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
         known_counts[roll] += count

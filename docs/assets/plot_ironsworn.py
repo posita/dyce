@@ -13,7 +13,6 @@ from enum import IntEnum, auto
 from functools import partial
 
 from dyce import H
-from dyce.h import resolve_dependent_probability
 
 
 class IronSoloResult(IntEnum):
@@ -61,7 +60,7 @@ def do_it(style: str) -> None:
     ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
 
     for mod in mods:
-        results_for_mod = resolve_dependent_probability(
+        results_for_mod = H.foreach(
             partial(iron_solo_dependent_term, mod=mod),
             action=d6,
             first_challenge=d10,

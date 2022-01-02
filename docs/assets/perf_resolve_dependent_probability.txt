@@ -1,6 +1,0 @@
-%timeit resolve_dependent_probability(dependent_term, outcome_1=H(6), outcome_2=H(8), outcome_3=H(10), outcome_n=H(20))
-302 ms ± 17.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-
-%timeit H(6).substitute(sub_source_1)
-234 ms ± 7.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-

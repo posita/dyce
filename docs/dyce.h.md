@@ -25,5 +25,6 @@
         - "HableT"
         - "HableOpsMixin"
         - "coalesce_replace"
+        - "aggregate_with_counts"
         - "resolve_dependent_probability"
         - "sum_h"

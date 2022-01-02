@@ -19,6 +19,7 @@ from typing import (
     Callable,
     Counter,
     DefaultDict,
+    Dict,
     Iterable,
     Iterator,
     List,
@@ -33,7 +34,15 @@ from numerary import RealLike
 from numerary.bt import beartype
 from numerary.types import SupportsIndex, SupportsInt
 
-from .h import H, HableOpsMixin, _MappingT, sum_h
+from .h import (
+    H,
+    HableOpsMixin,
+    HableT,
+    _MappingT,
+    _SourceT,
+    aggregate_with_counts,
+    sum_h,
+)
 from .lifecycle import experimental
 from .types import (
     _BinaryOperatorT,
@@ -50,9 +59,12 @@ __all__ = ("P",)
 # ---- Types ---------------------------------------------------------------------------
 
 
+RollT = Tuple[RealLike, ...]
 _OperandT = Union["P", RealLike]
-_RollT = Tuple[RealLike, ...]
-_RollCountT = Tuple[_RollT, int]
+_RollCountT = Tuple[RollT, int]
+_DistributionEntryT = Tuple[RollT, Fraction]
+_DistributionT = Iterator[_DistributionEntryT]
+_SelectCallableT = Callable[[H, int, int], _DistributionT]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -411,6 +423,160 @@ class P(Sequence[H], HableOpsMixin):
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @classmethod
+    @beartype
+    def foreach(
+        cls,
+        dependent_term: Callable[..., Union[H, RealLike]],
+        **independent_sources: Union["P", H, HableT, _SourceT],
+    ) -> H:
+        r"""
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may change or disappear in
+            future versions.
+
+        Calls ``#!python dependent_term`` for each unique set of rolls from the product
+        of ``independent_sources`` and accumulates the results. This is useful for
+        resolving dependent probabilities. Rolls are sorted least to greatest. Returned
+        histograms are always reduced to their lowest terms.
+
+        ``` python
+        >>> from dyce.p import RollT
+
+        >>> def three_way_vs(first: RollT, second: RollT, third: RollT):
+        ...   first_reversed = first[::-1]
+        ...   second_reversed = second[::-1]
+        ...   third_reversed = third[::-1]
+        ...   if first_reversed > second_reversed and first_reversed > third_reversed:
+        ...     return 1  # first is the clear winner
+        ...   elif second_reversed > first_reversed and second_reversed > third_reversed:
+        ...     return 2  # second is the clear winner
+        ...   elif third_reversed > first_reversed and third_reversed > second_reversed:
+        ...     return 3  # third is the clear winner
+        ...   else:
+        ...     return 0  # there was a tie somewhere
+
+        >>> P.foreach(
+        ...   three_way_vs,
+        ...   first=P(6, 6),  # first has pool of two d6s
+        ...   second=P(6, 6),  # second has pool of two d6s
+        ...   third=P(4, 8),  # third has pool of one d4 and one d8
+        ... )
+        H({0: 1103, 1: 5783, 2: 5783, 3: 8067})
+
+        ```
+
+        When all of ``#!python foreach``’s arguments are [``P`` objects][dyce.p.P] of
+        size 1 or anything other than a ``P`` object, this function behaves similarly to
+        [``H.foreach``][dyce.h.H] (although the signature of the *dependent_term*
+        callback function differs slightly between the two interfaces).
+
+        ``` python
+        >>> from itertools import chain
+        >>> P.foreach(
+        ...   lambda **kw: sum(chain(*kw.values())),  # receives single-element rolls
+        ...   src1=P(6),  # pool of size 1
+        ...   src2=H(6),  # histogram
+        ...   src3=range(6, 0, -1),  # histogram source
+        ... ) == H.foreach(
+        ...   lambda **kw: sum(kw.values()),  # receives outcomes
+        ...   src1=P(6).h(),  # histogram
+        ...   src2=H(6),  # histogram
+        ...   src3={1, 2, 3, 4, 5, 6},  # histogram source
+        ... )
+        True
+
+        ```
+
+        The ``#!python foreach`` class method is semantically equivalent to nesting
+        loops iterating over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for
+        each independent term and then aggregating the results.
+
+        ``` python
+        >>> def dependent_term(
+        ...   *,
+        ...   roll_1,
+        ...   roll_2,
+        ...   # ...
+        ...   roll_n,
+        ... ):
+        ...   return (
+        ...     (roll_2[-1] > roll_1[-1])
+        ...     + (roll_n[-1] > roll_2[-1])
+        ...     # ...
+        ...   )
+
+        >>> source_1 = P(8)
+        >>> source_2 = P(6, 6)
+        >>> # ...
+        >>> source_n = P(4, 4, 4)
+
+        >>> h = P.foreach(
+        ...   dependent_term,
+        ...   roll_1=source_1,
+        ...   roll_2=source_2,
+        ...   # ...
+        ...   roll_n=source_n,
+        ... ) ; h
+        H({0: 3821, 1: 5126, 2: 269})
+
+        >>> def resolve():
+        ...   for roll_1, count_1 in source_1.rolls_with_counts():
+        ...     for roll_2, count_2 in source_2.rolls_with_counts():
+        ...       # ...
+        ...       for roll_n, count_n in source_n.rolls_with_counts():
+        ...         # ...
+        ...           yield dependent_term(
+        ...             roll_1=roll_1,
+        ...             roll_2=roll_2,
+        ...             # ...
+        ...             roll_n=roll_n,
+        ...         ), (
+        ...           count_1
+        ...           * count_2
+        ...           # * ...
+        ...           * count_n
+        ...         )
+
+        >>> from dyce.h import aggregate_with_counts
+        >>> aggregate_with_counts(resolve()) == h
+        True
+
+        ```
+        """
+        pools_by_kw: Dict[str, P] = {}
+
+        for source_name, source in independent_sources.items():
+            if isinstance(source, H):
+                pools_by_kw[source_name] = P(source)
+            elif isinstance(source, P):
+                pools_by_kw[source_name] = source
+            elif isinstance(source, HableT):
+                pools_by_kw[source_name] = P(source.h())
+            else:
+                pools_by_kw[source_name] = P(H(source))
+
+        def _kw_roll_count_tuples(
+            pool_name: str,
+        ) -> Iterator[Tuple[str, RollT, int]]:
+            for roll, count in pools_by_kw[pool_name].rolls_with_counts():
+                yield pool_name, roll, count
+
+        def _resolve_dependent_term_for_rolls() -> Iterator[
+            Tuple[Union[H, RealLike], int]
+        ]:
+            for kw_roll_count_tuples in product(
+                *(_kw_roll_count_tuples(pool_name) for pool_name in pools_by_kw)
+            ):
+                combined_count = reduce(
+                    __mul__, (count for _, _, count in kw_roll_count_tuples), 1
+                )
+                rolls_by_name = {name: roll for name, roll, _ in kw_roll_count_tuples}
+                yield dependent_term(**rolls_by_name), combined_count
+
+        return aggregate_with_counts(_resolve_dependent_term_for_rolls()).lowest_terms()
+
     @experimental
     @beartype
     def appearances_in_rolls(self, outcome: RealLike) -> H:
@@ -493,7 +659,7 @@ class P(Sequence[H], HableOpsMixin):
         return sum_h(H(group_counter) for group_counter in group_counters)
 
     @beartype
-    def roll(self) -> _RollT:
+    def roll(self) -> RollT:
         r"""
         Returns (weighted) random outcomes from contained histograms.
 
@@ -509,8 +675,8 @@ class P(Sequence[H], HableOpsMixin):
     @beartype
     def rolls_with_counts(self, *which: _GetItemT) -> Iterator[_RollCountT]:
         r"""
-        Returns an iterator yielding 2-tuples (pairs) that, collectively, enumerate all
-        possible outcomes for the pool. The first item in the 2-tuple is a sorted
+        Returns an iterator yielding two-tuples (pairs) that, collectively, enumerate all
+        possible outcomes for the pool. The first item in the two-tuple is a sorted
         sequence of the outcomes for a distinct roll. The second is the count for that
         roll. Outcomes in each roll are ordered least to greatest.
 
@@ -522,10 +688,12 @@ class P(Sequence[H], HableOpsMixin):
 
         ``` python
         >>> from collections import Counter
+
         >>> def accumulate_roll_counts(counter, roll_counts):
         ...   for roll, count in roll_counts:
         ...     counter[roll] += count
         ...   return counter
+
         >>> p_6d6 = 6@P(6)
         >>> every_other_d6 = accumulate_roll_counts(Counter(), p_6d6.rolls_with_counts(slice(None, None, -2))) ; every_other_d6
         Counter({(6, 4, 2): 4110, (6, 5, 3): 3390, (6, 4, 3): 3330, ..., (3, 3, 3): 13, (2, 2, 2): 7, (1, 1, 1): 1})
@@ -783,8 +951,6 @@ class P(Sequence[H], HableOpsMixin):
 
 
 # ---- Functions -----------------------------------------------------------------------
-
-
 @beartype
 def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
     r"""
@@ -830,7 +996,7 @@ def _rwc_heterogeneous_h_groups(
     k: Optional[int],
 ) -> Iterator[_RollCountT]:
     r"""
-    Given an iterable of histogram/count pairs, returns an iterator yielding 2-tuples
+    Given an iterable of histogram/count pairs, returns an iterator yielding two-tuples
     (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
 
     The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
@@ -873,7 +1039,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 ) -> Iterator[_RollCountT]:
     r"""
     A memoized adaptation of [Ilmari Karonen’s
-    optimization](https://rpg.stackexchange.com/a/166663/71245) yielding 2-tuples
+    optimization](https://rpg.stackexchange.com/a/166663/71245) yielding two-tuples
     (pairs) for partial rolls. This is analogous to
     [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] reflecting taking *k* outcomes
     from *n* histograms *h* with some additional limitations. If *fill* is ``#!python
@@ -915,10 +1081,6 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         # Maintain consistency with comb(n, k) == 0 where k > n
         return iter(())
 
-    _DistributionEntryT = Tuple[_RollT, Fraction]
-    _DistributionT = Iterator[_DistributionEntryT]
-    _SelectCallableT = Callable[[H, int, int], _DistributionT]
-
     def _memoize(f: _SelectCallableT) -> _SelectCallableT:
         cache: DefaultDict[Tuple[H, int, int], List[_DistributionEntryT]] = defaultdict(
             list
@@ -933,6 +1095,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
         return _wrapped
 
+    # TODO(posita): Can we use functools.cache instead?
     @_memoize
     def _selected_distributions(h: H, n: int, k: int) -> _DistributionT:
         if len(h) <= 1:
@@ -995,8 +1158,8 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
 ) -> Iterator[_RollCountT]:
     r"""
     Given a group of *n* identical histograms *h*, returns an iterator yielding ordered
-    2-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]. See that
-    method’s explanation of homogeneous pools for insight into this implementation.
+    two-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]. See
+    that method’s explanation of homogeneous pools for insight into this implementation.
     """
     # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
     # order is preserved and H outcomes are already sorted

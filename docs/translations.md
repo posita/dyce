@@ -113,10 +113,10 @@ Now let’s use our map to validate the probabilities of a particular outcome us
 | Very Rare or Extreme | 12.5%                                         |
 
 ``` python
->>> def outcome_to_rarity(h, outcome):
-...   return OUTCOME_TO_RARITY_MAP[outcome]
-
->>> prob_of_complication = ((H(8) + H(12)).substitute(outcome_to_rarity))
+>>> prob_of_complication = H.foreach(
+...   lambda outcome: OUTCOME_TO_RARITY_MAP[outcome],
+...   outcome=H(8) + H(12),
+... )
 >>> {outcome: f"{float(prob):6.2%}" for outcome, prob in prob_of_complication.distribution()}
 {<Complication.COMMON: 1>: '41.67%',
  <Complication.UNCOMMON: 2>: '27.08%',
@@ -169,7 +169,7 @@ If it is strictly greater than only one challenge die, the result is a weak succ
 If it is equal to or less than both challenge dice, it’s a failure.
 
 A verbose way to model this is to enumerate the product of the three dice and then perform logical comparisons.
-However, if we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can craft a solution in terms of [``H.substitute``][dyce.h.H.substitute].
+However, if we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can craft a solution in terms of [``H.foreach``][dyce.h.H.foreach].
 We can also deploy a counting trick with the two d10s.
 
 ``` python
@@ -186,9 +186,8 @@ We can also deploy a counting trick with the two d10s.
 ...   STRONG_SUCCESS = auto()
 
 >>> iron_distributions_by_mod = {
-...   mod: (d6 + mod).substitute(
-...     lambda __, action: 2@(d10.lt(action))
-...   ) for mod in range(5)
+...   mod: H.foreach(lambda action: 2@(d10.lt(action)), action=d6 + mod)
+...   for mod in range(5)
 ... }
 >>> for mod, iron_distribution in iron_distributions_by_mod.items():
 ...   print("{:+} -> {}".format(mod, {
@@ -214,7 +213,7 @@ We can also deploy a counting trick with the two d10s.
 
     ```
 
-    By summing those results (and taking advantage of the fact that, in Python, ``#!python bool``s act like ``#!python int``s when it comes to arithmetic operators), we can count how often that happens with more than one interchangeable d10s.
+    By summing those results (and taking advantage of the fact that, in Python, ``#!python bool``s act like ``#!python int``s when it comes to arithmetic operators), we can count how often that happens with more than one interchangeable d10.
 
     ``` python
     >>> h = H(10).lt(5) + H(10).lt(5) ; h
@@ -243,13 +242,12 @@ We can also deploy a counting trick with the two d10s.
     ``#!python H(6).gt(H(10))`` will compute how often a six-sided die is strictly greater than a ten-sided die.
     ``#!python 2@(H(6).gt(H(10)))`` will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
     This isn’t quite what we want, since the mechanic calls for rolling a single six-sided die and comparing that result to each of two ten-sided dice.
-    Other than [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] and [``H.substitute``][dyce.h.H.substitute], ``dyce`` does not provide an internal mechanism for handling dependent probabilities, so we either have to use that or find another way to express the dependency.
 
 Now for a _twist_.
 In cooperative or solo play, a failure or success is particularly spectacular when the d10s come up doubles.
 The key to mapping that to ``dyce`` internals is recognizing that we have a dependent probability that involves *three* independent variables: the (modded) d6, a first d10, and a second d10.
 
-[``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] is especially useful where there are multiple independent terms.
+[``H.foreach``][dyce.h.H.foreach] is especially useful where there are multiple independent terms.
 
 ``` python
 >>> class IronSoloResult(IntEnum):
@@ -271,8 +269,7 @@ The key to mapping that to ``dyce`` internals is recognizing that we have a depe
 ...   else:
 ...     return IronSoloResult.SPECTACULAR_FAILURE if doubles else IronSoloResult.FAILURE
 
->>> from dyce.h import resolve_dependent_probability
->>> resolve_dependent_probability(
+>>> H.foreach(
 ...   iron_solo_dependent_term,  # mod defaults to 0
 ...   action=d6,
 ...   first_challenge=d10,
@@ -297,7 +294,7 @@ By defining our dependent term function to include ``#!python mod`` as a paramet
 <details>
 <summary>
 Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fironsworn.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fironsworn.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -343,7 +340,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Frisus.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Frisus.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -357,15 +354,22 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 
 ``` python
 >>> from dyce import H, P
+>>> import sys
 >>> from enum import IntEnum, auto
 >>> from typing import Callable, Dict, Tuple
+>>> if sys.version_info >= (3, 9):
+...   from functools import cache
+... else:
+...   from functools import lru_cache
+...   cache = lru_cache(maxsize=None)
 
 >>> class Risus(IntEnum):
 ...   LOSS = -1
 ...   DRAW = auto()
 ...   WIN = auto()
 
->>> def risus_combat_driver(
+>>> @cache
+... def risus_combat_driver(
 ...     us: int,  # number of dice we still have
 ...     them: int,  # number of dice they still have
 ...     us_vs_them_func: Callable[[int, int], H],
@@ -374,22 +378,19 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...     raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
 ...   if us == 0 and them == 0:
 ...     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
-...   already_solved: Dict[Tuple[int, int], H] = {}
 ...
 ...   def _resolve(us: int, them: int) -> H:
-...     if (us, them) in already_solved: return already_solved[(us, them)]
-...     elif us == 0: return H({-1: 1})  # we are out of dice, they win
-...     elif them == 0: return H({1: 1})  # they are out of dice, we win
+...     if us == 0: return H({-1: 1})  # we are out of dice, they win
+...     if them == 0: return H({1: 1})  # they are out of dice, we win
 ...     this_round = us_vs_them_func(us, them)
 ...
-...     def _next_round(__: H, outcome) -> H:
-...       if outcome == Risus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
-...       elif outcome == Risus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
-...       elif outcome == Risus.DRAW: return H({})  # ignore (immediately re-roll) all ties
-...       else: assert False, f"unrecognized outcome {outcome}"
+...     def _next_round(this_round_outcome) -> H:
+...       if this_round_outcome == Risus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
+...       elif this_round_outcome == Risus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
+...       elif this_round_outcome == Risus.DRAW: return H({})  # ignore (immediately re-roll) all ties
+...       else: assert False, f"unrecognized this_round_outcome {this_round_outcome}"
 ...
-...     already_solved[(us, them)] = this_round.substitute(_next_round)
-...     return already_solved[(us, them)]
+...     return H.foreach(_next_round, this_round_outcome=this_round)
 ...   return _resolve(us, them)
 
 >>> for t in range(3, 6):
@@ -418,7 +419,8 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 There’s lot going on there.
 Let’s dissect it.
 
-``` python
+``` python linenums="16"
+@cache
 def risus_combat_driver(
     us: int,  # number of dice we still have
     them: int,  # number of dice they still have
@@ -433,46 +435,44 @@ Our “driver” takes three arguments:
 1. How many dice the opposition has left (``#!python them``); and
 1. A resolution function (``#!python us_vs_them_func``) that takes counts of each party’s remaining dice and returns a histogram encoding the probability of winning or losing a single round akin to the [``H.vs`` method][dyce.h.H.vs]:
 
-    * An outcome of ``#!python -1`` signals the likelihood of the opposition’s victory
-    * An outcome of ``#!python 1`` signals the likelihood of our victory.
-    * An outcome of ``#!python 0`` signals the likelihood of a tie.
+    * An outcome of ``#!python -1`` signals the opposition’s victory
+    * An outcome of ``#!python 1`` signals our victory.
+    * An outcome of ``#!python 0`` signals a tie.
 
-``` python linenums="7"
+The [``#!python @cache`` decorator](https://docs.python.org/3/library/functools.html#functools.cache) does simple memoization for us because there are redundancies.
+For example, we might compute a case where we lose a die, then our opposition loses a die.
+We arrive at a similar case where our opposition loses a die, then we lose a die.
+Both cases would be identical from that point on.
+In this context, ``@cache`` helps us avoid recomputing redundant sub-trees.
+
+``` python linenums="22"
   if us < 0 or them < 0:
     raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
   if us == 0 and them == 0:
     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
-  already_solved: Dict[Tuple[int, int], H] = {}
 ```
 
 We make some preliminary checks that guard access to our recursive implementation so that it can be a little cleaner.
-We also set up a ``#!python dict`` to cache results we‘ve already computed.
-For example, we might compute a case where we lose a die, then our opposition loses a die.
-We arrive at a similar case where our opposition loses a die, then we lose a die.
-Both cases would be identical from that point on.
-We’ll detect this redundancy and avoid recomputing identical sub-trees.
 
-``` python linenums="13"
+``` python linenums="27"
   def _resolve(us: int, them: int) -> H:
     ...
 ```
 
-``` python linenums="27"
+``` python linenums="39"
   return _resolve(us, them)
 ```
 
-Skipping over its implementation for now, we define a our recursive implementation (``#!python _resolve``) and then call it with our initial arguments.
+Skipping over its implementation for now, we define a our memoized recursive implementation (``#!python _resolve``) and then call it with our initial arguments.
 
-``` python linenums="13"
+``` python linenums="27"
   def _resolve(us: int, them: int) -> H:
-    if (us, them) in already_solved: return already_solved[(us, them)]
-    elif us == 0: return H({-1: 1})  # we are out of dice, they win
-    elif them == 0: return H({1: 1})  # they are out of dice, we win
+    if us == 0: return H({-1: 1})  # we are out of dice, they win
+    if them == 0: return H({1: 1})  # they are out of dice, we win
 ```
 
 Getting back to that implementation, these are our base cases.
-First we check to see if we’ve already solved for this case (memoization), in which case we can just return it.
-Then we check whether either party has run out of dice, in which case the combat is over.
+We check whether either party has run out of dice, in which case the combat is over.
 If we have none of those cases, we get to work.
 
 !!! note
@@ -482,30 +482,28 @@ If we have none of those cases, we get to work.
     Since we guard against that case in the enclosing function, we don’t have to worry about it here.
     Either ``#!python us`` is zero, ``#!python them`` is zero, or neither is zero.
 
-``` python linenums="17"
+``` python linenums="30"
     this_round = us_vs_them_func(us, them)
 ```
 
 Then, we compute the outcomes for _this round_ using the provided resolution function.
 
-``` python linenums="19"
-    def _next_round(__: H, outcome) -> H:
+``` python linenums="32"
+    def _next_round(this_round_outcome) -> H:
       ...
 ```
 
-``` python linenums="24"
-    already_solved[(us, them)] = this_round.substitute(_next_round)
-    return already_solved[(us, them)]
+``` python linenums="38"
+    return H.foreach(_next_round, this_round_outcome=this_round)
 ```
 
-Keeping in mind that we’re inside our recursive implementation, we define a substitution function specifically for use with [``H.substitute``][dyce.h.H.substitute].
+Keeping in mind that we’re inside our recursive implementation, we define a dependent term specifically for use with [``H.foreach``][dyce.h.H.foreach].
 This allows us to take our computation for this round, and “fold in” subsequent rounds.
-We keep track of the result in our memoization ``#!python dict`` before returning it.
 
-``` python linenums="19"
-    def _next_round(__: H, outcome) -> H:
-      if outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
-      elif outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
+``` python linenums="32"
+    def _next_round(this_round_outcome) -> H:
+      if this_round_outcome < 0: return _resolve(us - 1, them)  # we lost this round, and one die
+      elif this_round_outcome > 0: return _resolve(us, them - 1)  # they lost this round, and one die
       else: return H({})  # ignore (immediately re-roll) all ties
 ```
 
@@ -514,7 +512,7 @@ Where we are asked whether we want to provide a substitution for a round we lost
 Where we are asked for a substitution for a round we won, our opposition loses a die and we recurse.
 We ignore ties (simulating that we re-roll them in place until they are no longer ties).
 
-``` python linenums="32"
+``` python linenums="44"
     ... risus_combat_driver(
       u, t,
       lambda u, t: (u@H(6)).vs(t@H(6))
@@ -525,7 +523,7 @@ At this point, we can define a simple ``#!python lambda`` that wraps [``H.vs``][
 
 !!! note
 
-    This is a complicated example that involves some fairly sophisticated programming techniques (recursion, memoization, closures, etc.).
+    This is a complicated example that involves some fairly sophisticated programming techniques (recursion, memoization, nested functions, etc.).
     The point is not to suggest that such techniques are required to be productive.
     However, it is useful to show that ``dyce`` is flexible enough to model these types of outcomes in a couple dozen lines of code.
     It is high-level enough to lean on for nuanced number crunching without a lot of detailed knowledge, while still being low-level enough that authors knowledgeable of advanced programming techniques are not precluded from using them.
@@ -540,7 +538,10 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 ...   best_them = (them@P(6)).h(-1)
 ...   h = best_us.vs(best_them)
 ...   # Goliath Rule: tie goes to the party with fewer dice in this round
-...   h = h.substitute(lambda __, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
+...   h = H.foreach(
+...     lambda outcome: (us < them) - (us > them) if outcome == 0 else outcome,
+...     outcome=h,
+...   )
 ...   return h
 
 >>> for t in range(3, 6):
@@ -569,7 +570,7 @@ First, ``dyce``’s substitution mechanism only resolves outcomes through a fixe
 Most of the time, the implications are largely theoretical with a sufficient number of iterations.
 This is no exception.
 
-Second, with [one narrow exception][dyce.h.H.substitute], ``dyce`` only provides a mechanism to directly substitute outcomes, not counts.
+Second, with [one narrow exception][dyce.h.aggregate_with_counts], ``dyce`` only provides a mechanism to directly substitute outcomes, not counts.
 This means we can’t arbitrarily *increase* the likelihood of achieving a particular outcome through replacement.
 With some creativity, we can work around that, too.
 
@@ -603,10 +604,10 @@ For every value that is odd, we ended in a hit that will need to be tallied.
 Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
 ``` python
->>> def decode_hits(__, outcome):
+>>> def decode_hits(outcome):
 ...   return (outcome + 1) // 2  # equivalent to outcome // 2 + outcome % 2
 
->>> d_evens_up = d_evens_up_exploded.substitute(decode_hits)
+>>> d_evens_up = H.foreach(decode_hits, outcome=d_evens_up_exploded)
 >>> print(d_evens_up.format())
 avg |    0.60
 std |    0.69
@@ -628,7 +629,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 >>> def evens_up_vs(us: int, them: int, goliath: bool = False) -> H:
 ...   h = (us@d_evens_up).vs(them@d_evens_up)
 ...   if goliath:
-...     h = h.substitute(lambda __, outcome: (us < them) - (us > them) if outcome == 0 else outcome)
+...     h = H.foreach(lambda outcome: (us < them) - (us > them) if outcome == 0 else outcome, outcome=h)
 ...   return h
 
 >>> for t in range(3, 5):
@@ -655,7 +656,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 >>> res1 = 3@H(6)
 >>> p_4d6 = 4@P(6)
 >>> res2 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
->>> d6_reroll_first_one = H(6).substitute(lambda __, outcome: H(6) if outcome == 1 else outcome)
+>>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: h if outcome == 1 else outcome)
 >>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
 >>> res3 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
 >>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
@@ -676,7 +677,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2F4d6_variants.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2F4d6_variants.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -722,7 +723,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fburning_arch.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fburning_arch.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -730,14 +731,17 @@ Visualization:
 ```
 </details>
 
-An alternative using the [``H.substitute`` method][dyce.h.H.substitute]:
+An alternative using the [``H.foreach`` class method][dyce.h.H.foreach]:
 
 ``` python
 >>> import operator
->>> save_roll.substitute(
-...   lambda __, outcome:
-...     burning_arch_damage // 2 if operator.__ge__(outcome, 10)
+>>> H.foreach(
+...   lambda outcome: (
+...     burning_arch_damage // 2
+...     if operator.__ge__(outcome, 10)
 ...     else burning_arch_damage
+...   ),
+...   outcome=save_roll,
 ... ) == damage_half_on_save
 True
 
@@ -847,7 +851,7 @@ Example 1 visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fgreat_weapon_fighting.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fgreat_weapon_fighting.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -882,12 +886,12 @@ Example 2 translation:
 >>> critical_hit = 3@H(12) + 5
 >>> advantage = (2@P(20)).h(-1)
 
->>> def crit(__: H, outcome):
+>>> def crit(outcome):
 ...   if outcome == 20: return critical_hit
 ...   elif outcome + 5 >= 14: return normal_hit
 ...   else: return 0
 
->>> advantage_weighted = advantage.substitute(crit)
+>>> advantage_weighted = H.foreach(crit, outcome=advantage)
 
 ```
 
@@ -902,7 +906,7 @@ Example 2 visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fadvantage.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fadvantage.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -937,7 +941,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fd10_explode.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fd10_explode.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -962,19 +966,18 @@ function: dupes in DICE:s {
 Translation:
 
 ``` python
->>> from dyce import H, P
+>>> from dyce import P
+>>> from dyce.p import RollT
 
->>> def dupes(p: P):
-...   for roll, count in p.rolls_with_counts():
+>>> def dupes(roll: RollT):
 ...     dupes = 0
 ...     for i in range(1, len(roll)):
-...       # Outcomes are ordered, so we only have to look at one neighbor
-...       if roll[i] == roll[i - 1]:
-...         dupes += 1
-...     yield dupes, count
+...         if roll[i] == roll[i - 1]:
+...             dupes += 1
+...     return dupes
 
->>> res_15d6 = H(dupes(15@P(6)))
->>> res_8d10 = H(dupes(8@P(10)))
+>>> res_15d6 = P.foreach(dupes, roll=15@P(6))
+>>> res_8d10 = P.foreach(dupes, roll=8@P(10))
 
 ```
 
@@ -989,7 +992,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Fdupes.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fdupes.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -1041,7 +1044,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/751a24d46dbec2d9be2348d8b6b52e5372e0cfba?labpath=docs%2Fnotebooks%2Froll_and_keep.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Froll_and_keep.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -1068,25 +1071,20 @@ output [brawl 3d6 vs 3d6] named "A vs B Damage"
 Translation:
 
 ``` python
->>> from dyce import P
->>> from itertools import product
+>>> from dyce.p import RollT
 
->>> def brawl(a: P, b: P):
-...   for (roll_a, count_a), (roll_b, count_b) in product(
-...       a.rolls_with_counts(),
-...       b.rolls_with_counts(),
-...   ):
-...     a_successes = sum(1 for v in roll_a if v >= roll_b[-1])
-...     b_successes = sum(1 for v in roll_b if v >= roll_a[-1])
-...     yield a_successes - b_successes, count_a * count_b
+>>> def brawl(roll_a: RollT, roll_b: RollT):
+...   a_successes = sum(1 for v in roll_a if v >= roll_b[-1])
+...   b_successes = sum(1 for v in roll_b if v >= roll_a[-1])
+...   return a_successes - b_successes
 
 ```
 
 Rudimentary visualization using built-in methods:
 
 ``` python
->>> from dyce import H
->>> res = H(brawl(3@P(6), 3@P(6))).lowest_terms()
+>>> from dyce import P
+>>> res = P.foreach(brawl, roll_a=3@P(6), roll_b=3@P(6))
 >>> print(res.format())
 avg |    0.00
 std |    1.73
@@ -1126,26 +1124,27 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 Translation:
 
 ``` python
->>> def brawl_w_optional_swap(a: P, b: P):
-...   for (roll_a, count_a), (roll_b, count_b) in product(
-...       a.rolls_with_counts(),
-...       b.rolls_with_counts(),
-...   ):
-...     if roll_a[0] < roll_b[-1]:
-...       roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]
+>>> def brawl_w_optional_swap(roll_a: RollT, roll_b: RollT):
+...   if roll_a[0] < roll_b[-1]:
+...     roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]
+...     # Sort greatest-to-least after the swap
 ...     roll_a = tuple(sorted(roll_a, reverse=True))
 ...     roll_b = tuple(sorted(roll_b, reverse=True))
-...     a_successes = sum(1 for v in roll_a if v >= roll_b[0])
-...     b_successes = sum(1 for v in roll_b if v >= roll_a[0])
-...     result = a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
-...     yield result, count_a * count_b
+...   else:
+...     # Reverse to be greatest-to-least
+...     roll_a = roll_a[::-1]
+...     roll_b = roll_b[::-1]
+...   a_successes = sum(1 for v in roll_a if v >= roll_b[0])
+...   b_successes = sum(1 for v in roll_b if v >= roll_a[0])
+...   result = a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
+...   return result
 
 ```
 
 Rudimentary visualization using built-in methods:
 
 ``` python
->>> res = H(brawl_w_optional_swap(3@P(6), 3@P(6))).lowest_terms()
+>>> res = P.foreach(brawl_w_optional_swap, roll_a=3@P(6), roll_b=3@P(6))
 >>> print(res.format())
 avg |    2.36
 std |    0.88
@@ -1156,7 +1155,7 @@ var |    0.77
   2 |  23.19% |###########
   3 |  58.15% |#############################
 
->>> res = H(brawl_w_optional_swap(4@P(6), 4@P(6))).lowest_terms()
+>>> res = P.foreach(brawl_w_optional_swap, roll_a=4@P(6), roll_b=4@P(6))
 >>> print(res.format())
 avg |    2.64
 std |    1.28

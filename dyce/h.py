@@ -52,6 +52,7 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
+    Type,
     TypeVar,
     Union,
     ValuesView,
@@ -64,7 +65,7 @@ from numerary.bt import beartype
 from numerary.types import CachingProtocolMeta, Protocol, SupportsInt, runtime_checkable
 
 from . import rng
-from .lifecycle import experimental
+from .lifecycle import deprecated, experimental
 from .symmetries import comb, gcd
 from .types import (
     _BinaryOperatorT,
@@ -92,7 +93,7 @@ _SourceT = Union[
     "HableT",
 ]
 _OperandT = Union[RealLike, "H", "HableT"]
-_ExpandT = Callable[["H", RealLike], Union[RealLike, "H"]]
+_ExpandT = Callable[["H", RealLike], Union["H", RealLike]]
 _CoalesceT = Callable[["H", RealLike], "H"]
 
 
@@ -693,6 +694,82 @@ class H(_MappingT):
 
     # ---- Methods ---------------------------------------------------------------------
 
+    @classmethod
+    @beartype
+    def foreach(
+        cls,
+        dependent_term: Callable[..., Union["H", RealLike]],
+        **independent_sources: _SourceT,
+    ) -> H:
+        r"""
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may change or disappear in
+            future versions.
+
+        Calls ``#!python dependent_term`` for each set of outcomes from the product of
+        ``independent_sources`` and accumulates the results. This is useful for
+        resolving dependent probabilities. Returned histograms are always reduced to
+        their lowest terms.
+
+        For example rolling a d20, re-rolling a ``#!python 1`` if it comes up, and
+        keeping the result might be expressed as[^1]:
+
+        [^1]:
+
+            This is primarily for illustration. [``H.substitute``][dyce.h.H.substitute]
+            is often better suited to cases involving re-rolling a single independent
+            term such as this one.
+
+        ``` python
+        >>> d20 = H(20)
+
+        >>> def reroll_one_dependent_term(d20_outcome):
+        ...   if d20_outcome == 1:
+        ...     return d20
+        ...   else:
+        ...     return d20_outcome
+
+        >>> H.foreach(reroll_one_dependent_term, d20_outcome=d20)
+        H({1: 1,
+         2: 21,
+         3: 21,
+         ...,
+         19: 21,
+         20: 21})
+
+        ```
+
+        The ``#!python foreach`` class method merely wraps *dependent_term* and calls
+        [``P.foreach``][dyce.p.P.foreach]. In doing so, it imposes a very modest
+        overhead that is negligible in most cases.
+
+        ``` python
+        --8<-- "docs/assets/perf_foreach.txt"
+        ```
+
+        <details>
+        <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_foreach.ipy"><code>perf_foreach.ipy</code></a></summary>
+
+        ``` python
+        --8<-- "docs/assets/perf_foreach.ipy"
+        ```
+        </details>
+        """
+        from dyce import P
+
+        def _dependent_term(**roll_kw):
+            outcome_kw: Dict[str, RealLike] = {}
+
+            for key, roll in roll_kw.items():
+                assert isinstance(roll, tuple)
+                assert len(roll) == 1
+                outcome_kw[key] = roll[0]
+
+            return dependent_term(**outcome_kw)
+
+        return P.foreach(_dependent_term, **independent_sources)
+
     @beartype
     def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> H:
         r"""
@@ -1023,6 +1100,8 @@ class H(_MappingT):
 
         Shorthand for ``#!python self.order_stat_func_for_n(n)(pos)``.
         """
+        # TODO(posita): Explore different memoization strategies (e.g., with
+        # functools.cache) for this method and H.order_stat_func_for_n
         return self.order_stat_func_for_n(n)(pos)
 
     @experimental
@@ -1116,8 +1195,8 @@ class H(_MappingT):
         behavior for *coalesce* is to replace the outcome with the expanded histogram.
         Returned histograms are always reduced to their lowest terms.
 
-        See [``coalesce_replace``][dyce.h.coalesce_replace] and the
-        [``lowest_terms`` method][dyce.h.H.lowest_terms].
+        See the [``coalesce_replace``][dyce.h.coalesce_replace] and
+        [``lowest_terms``][dyce.h.H.lowest_terms] methods.
 
         This method can be used to model complex mechanics. The following models
         re-rolling a face of 1 on the first roll:
@@ -1135,47 +1214,29 @@ class H(_MappingT):
         “exploding” dice (i.e., where, if the greatest face come up, the die is
         re-rolled and the result is added to a running sum).
 
-        In nearly all cases, when a histogram is substituted for an outcome, it takes on
-        the substituted outcome’s “scale”. In other words, the sum of the counts of the
-        replacement retains the same proportion as the replaced outcome in relation to
-        other outcomes. This becomes clearer when there is no overlap between the
-        original histogram and the substitution.
+        This method uses the [``aggregate_with_counts``][dyce.h.aggregate_with_counts]
+        function in its implementation. As such, If *coalesce* returns the empty
+        histogram (``H({})``), the corresponding outcome and its counts are omitted from
+        the result without substitution or scaling. A silly example is modeling a d5 by
+        indefinitely re-rolling a d6 until something other than a 6 comes up.
 
         ``` python
-        >>> orig = H({1: 1, 2: 2, 3: 3, 4: 4})
-        >>> sub = orig.substitute(lambda h, outcome: -h if outcome == 4 else outcome) ; sub
-        H({-4: 8, -3: 6, -2: 4, -1: 2, 1: 5, 2: 10, 3: 15})
-        >>> sum(count for outcome, count in orig.items() if outcome == 4) / orig.total
-        0.4
-        >>> sum(count for outcome, count in sub.items() if outcome < 0) / sub.total
-        0.4
+        >>> H(6).substitute(lambda __, outcome: H({}) if outcome == 6 else outcome)
+        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
         ```
 
-        !!! note "An important exception"
+        This technique is more useful when modeling re-rolling certain derived
+        outcomes, like ties in a contest.
 
-            If *coalesce* returns the empty histogram (``H({})``), the corresponding
-            outcome and its counts are omitted from the result without substitution or
-            scaling. A silly example is modeling a d5 by indefinitely re-rolling a d6
-            until something other than a 6 comes up.
+        ``` python
+        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
+        >>> d6_3.vs(d8_2)
+        H({-1: 4553, 0: 1153, 1: 8118})
+        >>> d6_3.vs(d8_2).substitute(lambda __, outcome: H({}) if outcome == 0 else outcome)
+        H({-1: 4553, 1: 8118})
 
-            ``` python
-            >>> H(6).substitute(lambda __, outcome: H({}) if outcome == 6 else outcome)
-            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
-
-            ```
-
-            This technique is more useful when modeling re-rolling certain derived
-            outcomes, like ties in a contest.
-
-            ``` python
-            >>> d6_3, d8_2 = 3@H(6), 2@H(8)
-            >>> d6_3.vs(d8_2)
-            H({-1: 4553, 0: 1153, 1: 8118})
-            >>> d6_3.vs(d8_2).substitute(lambda __, outcome: H({}) if outcome == 0 else outcome)
-            H({-1: 4553, 1: 8118})
-
-            ```
+        ```
 
         Because it delegates to a callback for refereeing substitution decisions,
         ``#!python substitute`` is quite flexible and well suited to modeling (or at
@@ -1268,41 +1329,21 @@ class H(_MappingT):
             if depth == max_depth:
                 return h
 
-            total_scalar = 1
-            items_for_reassembly: List[Tuple[RealLike, int, int]] = []
+            def _expand_and_coalesce() -> Iterator[Tuple[Union[H, RealLike], int]]:
+                for outcome, count in h.items():
+                    expanded = expand(h, outcome)
 
-            for outcome, count in h.items():
-                expanded = expand(h, outcome)
+                    if isinstance(expanded, H):
+                        # Keep expanding deeper, if we can
+                        expanded = _substitute(expanded, depth + 1)
+                        # Coalesce the result
+                        expanded = coalesce(expanded, outcome)
 
-                if isinstance(expanded, H):
-                    # Keep expanding deeper, if we can
-                    expanded = _substitute(expanded, depth + 1)
-                    # Coalesce the result
-                    expanded = coalesce(expanded, outcome)
-                    # Account for the impact of expansion on peers
-                    expanded_scalar = expanded.total
+                    yield expanded, count
 
-                    if expanded_scalar:
-                        total_scalar *= expanded_scalar
-                        # Account for the impact of the original count on the result, but
-                        # keep track of the impact on peers so we can factor it out for
-                        # these items later
-                        items_for_reassembly.extend(
-                            (expanded_outcome, expanded_count * count, expanded_scalar)
-                            for expanded_outcome, expanded_count in expanded.items()
-                        )
-                else:
-                    items_for_reassembly.append((expanded, count, 1))
+            return aggregate_with_counts(_expand_and_coalesce(), type(self))
 
-            return type(self)(
-                (
-                    # Apply the total_scalar, but factor out this item's contribution
-                    (outcome, count * total_scalar // scalar)
-                    for outcome, count, scalar in items_for_reassembly
-                )
-            ).lowest_terms()
-
-        return _substitute(self)
+        return _substitute(self).lowest_terms()
 
     @beartype
     def vs(self, other: _OperandT) -> H:
@@ -2036,132 +2077,80 @@ class HableOpsMixin:
 
 
 @beartype
+def aggregate_with_counts(
+    source_counts: Iterable[Tuple[Union[H, RealLike], int]],
+    h_type: Type[H] = H,
+) -> H:
+    r"""
+    Aggregates *source_counts* into an [``H`` object][dyce.h.H]. Each source_count is a
+    two-tuple of either an outcome-count pair or a histogram-count pair. This function
+    is used in the implementation of the [``H.substitute``][dyce.h.H.substitute] and
+    [``P.foreach``][dyce.p.P.foreach] methods. Unlike those, the histogram returned from
+    this function is *not* reduced to its lowest terms.
+
+    In nearly all cases, when a source contains a histogram, it takes on the
+    corresponding count’s “scale”. In other words, the sum of the counts of the
+    histogram retains the same proportion as the count in relation to other outcomes.
+    This becomes clearer when there is no overlap between the histogram and the other
+    outcomes.
+
+    ``` python
+    >>> from dyce.h import aggregate_with_counts
+    >>> source_counts = ((H(3), 3), (H(-3), 2))
+    >>> h = aggregate_with_counts(source_counts).lowest_terms() ; h
+    H({-3: 2, -2: 2, -1: 2, 1: 3, 2: 3, 3: 3})
+
+    ```
+
+    !!! note "An important exception"
+
+        If a source is the empty histogram (``H({})``), it and its count is omitted from
+        the result without scaling.
+
+        ``` python
+        >>> source_counts = ((H(2), 1), (H({}), 20))
+        >>> aggregate_with_counts(source_counts)
+        H({1: 1, 2: 1})
+
+        ```
+    """
+    aggregate_scalar = 1
+    outcome_counts: List[Tuple[RealLike, int]] = []
+
+    for outcome_or_h, count in source_counts:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+
+                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
+
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append(
+                        (new_outcome, count * aggregate_scalar * new_count)
+                    )
+
+                aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+
+    return h_type(outcome_counts)
+
+
+@deprecated
 def resolve_dependent_probability(
-    dependent_term: Callable[..., H],
+    dependent_term: Callable[..., Union[H, RealLike]],
     **independent_sources: _SourceT,
 ) -> H:
     r"""
-    !!! warning "Experimental"
+    !!! warning "Deprecated"
 
-        This method should be considered experimental and may change or disappear in
-        future versions.
+        This function has been moved to the [``H.foreach``][dyce.h.H.foreach] class
+        method. This alias will be removed in a future release.
 
-    Calls ``#!python dependent_term`` for each set of outcomes from the product of
-    ``independent_sources`` and accumulates the results. This is useful for resolving
-    dependent probabilities and is semantically equivalent to nesting substitution
-    functions.
-
-    ``` python
-    >>> def dependent_term(
-    ...   outcome_1,
-    ...   outcome_2,
-    ...   outcome_3,
-    ...   # ...
-    ...   outcome_n,
-    ... ):
-    ...   return (
-    ...     (outcome_1 == outcome_2) +
-    ...     (outcome_2 == outcome_3) +
-    ...     (outcome_1 == outcome_3) +
-    ...     (
-    ...       outcome_n > outcome_1
-    ...       and outcome_n > outcome_2
-    ...       and outcome_n > outcome_3
-    ...       # ...
-    ...     )
-    ...   )
-
-    >>> source_1 = H(6)
-    >>> source_2 = H(8)
-    >>> source_3 = H(10)
-    >>> # ...
-    >>> source_n = H(20)
-
-    >>> def sub_source_1(__, outcome_1):
-    ...   def sub_source_2(__, outcome_2):
-    ...     def sub_source_3(__, outcome_3):
-    ...       # ...
-    ...       def sub_source_n(__, outcome_n):
-    ...         return dependent_term(
-    ...           outcome_1,
-    ...           outcome_2,
-    ...           outcome_3,
-    ...           # ...
-    ...           outcome_n,
-    ...       )
-    ...       return source_n.substitute(sub_source_n)
-    ...       # ...
-    ...     return source_3.substitute(sub_source_3)
-    ...   return source_2.substitute(sub_source_2)
-
-    >>> from dyce.h import resolve_dependent_probability
-    >>> h = resolve_dependent_probability(
-    ...   dependent_term,
-    ...   outcome_1=source_1,
-    ...   outcome_2=source_2,
-    ...   outcome_3=source_3,
-    ...   # ...
-    ...   outcome_n=source_n,
-    ... ) ; h
-    H({0: 808, 1: 1700, 2: 652, 3: 7, 4: 33})
-    >>> source_1.substitute(sub_source_1) == h
-    True
-
-    ```
-
-    This function imposes a modest overhead when compared to the nesting approach. In
-    most cases, the improved readability is worth it.
-
-    ``` python
-    --8<-- "docs/assets/perf_resolve_dependent_probability.txt"
-    ```
-
-    <details>
-    <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_resolve_dependent_probability.ipy"><code>perf_resolve_dependent_probability.ipy</code></a></summary>
-
-    ``` python
-    --8<-- "docs/assets/perf_resolve_dependent_probability.ipy"
-    ```
-    </details>
+    Shorthand for ``#!python H.foreach(dependent_term, **independent_sources)``.
     """
-    independent_variables_by_name: Dict[str, H] = {}
-
-    for key, value in independent_sources.items():
-        if isinstance(value, H):
-            independent_variables_by_name[key] = value
-        else:
-            independent_variables_by_name[key] = H(value)
-
-    captured_values_by_name: Dict[str, RealLike] = {}
-    uncaptured_value_names = set(independent_variables_by_name)
-
-    def _resolve() -> Union[H, RealLike]:
-        def _capture_dependent_value(h: H, outcome: RealLike) -> Union[RealLike, H]:
-            expanded: Union[RealLike, H]
-            captured_values_by_name[name_to_be_captured] = outcome
-            expanded = _resolve()
-            del captured_values_by_name[name_to_be_captured]
-
-            return expanded
-
-        if uncaptured_value_names:
-            # Used in _capture_dependent_value
-            name_to_be_captured = uncaptured_value_names.pop()
-            expanded = independent_variables_by_name[name_to_be_captured].substitute(
-                _capture_dependent_value
-            )
-            uncaptured_value_names.add(name_to_be_captured)
-        else:
-            return dependent_term(**captured_values_by_name)
-
-        return expanded
-
-    resolved = _resolve()
-
-    if not isinstance(resolved, H):
-        resolved = H({resolved: 1})
-
-    return resolved
+    return H.foreach(dependent_term, **independent_sources)
 
 
 @beartype

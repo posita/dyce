@@ -18,27 +18,29 @@
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
 * Breaks ``dyce.viz`` out into [``anydyce``](https://github.com/posita/anydyce/).
-* Removes use of ``#!python numerary.types.…SCU`` types
+* Removes use of ``#!python numerary.types.…SCU`` types.
+* Adds the [``H.foreach``][dyce.h.H.foreach] and [``P.foreach``][dyce.p.P.foreach] class methods.
+* Migrates ``#!python resolve_dependent_probability`` to the [``H.foreach``][dyce.h.H.foreach] class method.
 
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
-* Fixes [this bullshit](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87) (no, really, I’m serious this time)
+* Fixes [this bullshit](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87) (no, really, I’m serious this time).
 * Adds [``FilterRoller``][dyce.r.FilterRoller].
 * Adds [``SubstitutionRoller``][dyce.r.SubstitutionRoller].
 
 ## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
 
-* Removes ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved
-* Refines Tension Pool example
-* Adds *Ironsworn* example
-* Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example
-* Adds detail around dependent probabilities
-* Adds experimental [``resolve_dependent_probability``][dyce.h.resolve_dependent_probability] function
+* Removes ``…_gh.png`` hack now that [this dumpster fire](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981) is at least partially resolved.
+* Refines Tension Pool example.
+* Adds *Ironsworn* example.
+* Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example.
+* Adds detail around dependent probabilities.
+* Adds experimental ``dyce.h.resolve_dependent_probability`` function.
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 
 * Removes dependencies on deprecated ``#!python numerary.types.…SCT`` tuples
-* Adds [Angry GM Tension Pool mechanic](https://theangrygm.com/definitive-tension-pool/) translation
+* Adds [Angry GM Tension Pool mechanic](https://theangrygm.com/definitive-tension-pool/) translation.
 
 ## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
 
