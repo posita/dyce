@@ -11,10 +11,10 @@
 /.tox/
 /build/
 /dist/
+/dyce/_version.py
 /site/
 /htmlcov/
 .dmypy.json
-.ipynb_checkpoints/
 
 # Objects and packages
 *.7z

@@ -18,18 +18,18 @@ All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/unit-tests.yaml)
-[![Version](https://img.shields.io/pypi/v/dyce.svg)](https://pypi.org/project/dyce/)
-[![Development Stage](https://img.shields.io/pypi/status/dyce.svg)](https://pypi.org/project/dyce/)
-[![License](https://img.shields.io/pypi/l/dyce.svg)](http://opensource.org/licenses/MIT)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce.svg)](https://pypi.org/project/dyce/)
-[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce.svg)](https://pypi.org/project/dyce/)
+[![Version](https://img.shields.io/pypi/v/dyce/0.5.0.svg)](https://pypi.org/project/dyce/0.5.0/)
+[![Development Stage](https://img.shields.io/pypi/status/dyce/0.5.0.svg)](https://pypi.org/project/dyce/0.5.0/)
+[![License](https://img.shields.io/pypi/l/dyce/0.5.0.svg)](http://opensource.org/licenses/MIT)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.5.0.svg)](https://pypi.org/project/dyce/0.5.0/)
+[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.5.0.svg)](https://pypi.org/project/dyce/0.5.0/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
 Now you’re playing with …
 
-<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce.svg" alt="dyce logo">
+<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.5.0/docs/dyce.svg" alt="dyce logo">
 
 # ``dyce`` – simple Python tools for exploring dice outcomes and other finite discrete probabilities
 
@@ -55,15 +55,15 @@ Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_
 If you’re looking at something on which to build your own grammar or interface, ``dyce`` can serve you well.
 
 ``dyce`` should be able to replicate or replace most other dice probability modeling tools.
-It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
+It strives to be [fully documented](https://posita.github.io/dyce/0.5/) and relies heavily on examples to develop understanding.
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying ``LICENSE`` file for details.
 Non-experimental features should be considered stable (but an unquenchable thirst to increase performance remains).
-See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summary of version-to-version changes.
+See the [release notes](https://posita.github.io/dyce/0.5/notes/) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
-If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://posita.github.io/dyce/latest/contrib/).
+If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://posita.github.io/dyce/0.5/contrib/).
 
 ## Donors
 
@@ -77,9 +77,9 @@ When one worries that the flickering light of humanity may be snuffed out at any
 ## A taste
 
 ``dyce`` provides several core primitives.
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) represent histograms for modeling finite discrete outcomes, like individual dice.
-[``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
-[``R`` objects](https://posita.github.io/dyce/latest/dyce.r/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
+[``H`` objects](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H) represent histograms for modeling finite discrete outcomes, like individual dice.
+[``P`` objects](https://posita.github.io/dyce/0.5/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
+[``R`` objects](https://posita.github.io/dyce/0.5/dyce.r/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/0.5/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
 
 ``` python
@@ -104,8 +104,8 @@ True
 
 ```
 
-By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/latest/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest.
-(The [``H.format`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
+By providing an optional argument to the [``P.h`` method](https://posita.github.io/dyce/0.5/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest.
+(The [``H.format`` method](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
 
 ``` python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
@@ -139,13 +139,13 @@ var |    1.97
 
 ```
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages
+[``H`` objects](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H) provide a [``distribution`` method](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.distribution) and a [``distribution_xy`` method](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages
 [``anydyce``](https://github.com/posita/anydyce/), for example, makes use of these to integrate with [``matplotlib``](https://matplotlib.org/stable/api/index.html).
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only"><span style="display: none"><img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only"></span>
+  <source srcset="https://raw.githubusercontent.com/posita/dyce/v0.5.0/docs/assets/plot_2d6_lo_hi_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.5.0/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only"><span style="display: none"><img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.5.0/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only"></span>
 </picture>
 <!-- The above is a ridiculous work-around for GitHub's braindead, proprietary
 light/dark image rendering dumpster fire. See
@@ -154,8 +154,8 @@ light/dark image rendering dumpster fire. See
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2F2d6_lo_hi.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v0.5.0/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2F2d6_lo_hi.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -163,7 +163,7 @@ light/dark image rendering dumpster fire. See
 ```
 </details>
 
-[``H`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/latest/dyce/#dyce.p.P) can generate random rolls.
+[``H`` objects](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H) and [``P`` objects](https://posita.github.io/dyce/0.5/dyce/#dyce.p.P) can generate random rolls.
 
 ``` python
 >>> d6 = H(6)
@@ -180,7 +180,7 @@ light/dark image rendering dumpster fire. See
 
 ```
 
-See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) and [rolling](https://posita.github.io/dyce/latest/rollin/), as well as the [API guide](https://posita.github.io/dyce/latest/dyce/) for much more thorough treatments, including detailed examples.
+See the tutorials on [counting](https://posita.github.io/dyce/0.5/countin/) and [rolling](https://posita.github.io/dyce/0.5/rollin/), as well as the [API guide](https://posita.github.io/dyce/0.5/dyce/) for much more thorough treatments, including detailed examples.
 
 ## Design philosophy
 
@@ -206,7 +206,7 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     You won’t find any lexers, parsers, or tokenizers in ``dyce``’s core, other than straight-up Python.
     That being said, you can always “roll” your own (see what we did there?) and lean on ``dyce`` underneath.
     It doesn’t mind.
-    It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/).
+    It actually [kind of *likes* it](https://posita.github.io/dyce/0.5/rollin/).
 
 [^2]:
 
@@ -215,16 +215,16 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     [Certain restrictions](#requirements) apply.
     [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
 
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), ``dyce`` includes some conveniences, such as minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [``H.distribution``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution), [``H.distribution_xy``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.distribution_xy), and [``H.format``](https://posita.github.io/dyce/latest/dyce/#dyce.h.H.format) methods).
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), ``dyce`` includes some conveniences, such as minor computation optimizations (e.g., the [``H.lowest_terms`` method](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [``H.distribution``](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.distribution), [``H.distribution_xy``](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.distribution_xy), and [``H.format``](https://posita.github.io/dyce/0.5/dyce/#dyce.h.H.format) methods).
 
 ## Comparison to alternatives
 
 The following is a best-effort[^3] summary of the differences between various available tools in this space.
-Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations/) for added color.
+Consider exploring the [applications and translations](https://posita.github.io/dyce/0.5/translations/) for added color.
 
 [^3]:
 
-    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies.
+    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/0.5/contrib/) if you observe discrepancies.
 
 | | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -266,7 +266,7 @@ Consider exploring the [applications and translations](https://posita.github.io/
 ## License
 
 ``dyce`` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the included [``LICENSE``](https://posita.github.io/dyce/latest/license/) file for details.
+See the included [``LICENSE``](https://posita.github.io/dyce/0.5/license/) file for details.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
 ## Installation
@@ -304,26 +304,26 @@ It has the following runtime dependencies:
 
 * [``beartype``](https://pypi.org/project/beartype/) for yummy runtime type-checking goodness (0.8+)
   [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
-* [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/latest/countin/)
+* [``matplotlib``](https://matplotlib.org/) for visualizing [histograms and pools](https://posita.github.io/dyce/0.5/countin/)
 * [``numpy``](https://numpy.org/) to supply ``dyce`` with an alternate random number generator implementation
 
 ``dyce`` leverages ``numerary`` for its opportunistic use of ``beartype``. If you use ``beartype`` for type checking your code, but don’t want ``dyce`` or ``numerary`` to use it internally, disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://posita.github.io/numerary/latest/#requirements).
 
-See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
+See the [hacking quick-start](https://posita.github.io/dyce/0.5/contrib/#hacking-quick-start) for additional development and testing dependencies.
 
 ## Customers [![``dyce``-powered!](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
 
 * This could be _you_! 👋
 
 Do you have a project that uses ``dyce``?
-[Let me know](https://posita.github.io/dyce/latest/contrib/#starting-discussions-and-filing-issues), and I’ll promote it here!
+[Let me know](https://posita.github.io/dyce/0.5/contrib/#starting-discussions-and-filing-issues), and I’ll promote it here!
 
 And don’t forget to do your part in perpetuating gratuitous badge-ification!
 
 ``` markdown
 <!-- Markdown -->
 As of version 1.1, HighRollin is
-[![dyce-powered](https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg)][dyce-powered]!
+[![dyce-powered](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)][dyce-powered]!
 [dyce-powered]: https://posita.github.io/dyce/ "dyce-powered!"
 ```
 
@@ -333,7 +333,7 @@ As of version 1.1, HighRollin is
 
 As of version 1.1, HighRollin is |dyce-powered|!
 
-.. |dyce-powered| image:: https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg
+.. |dyce-powered| image:: https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg
    :align: top
    :target: https://posita.github.io/dyce/
    :alt: dyce-powered
@@ -342,7 +342,7 @@ As of version 1.1, HighRollin is |dyce-powered|!
 ``` html
 <!-- HTML -->
 As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
-  src="https://raw.githubusercontent.com/posita/dyce/master/docs/dyce-powered.svg"
+  src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg"
   alt="dyce-powered"
   style="vertical-align: middle;"></a>!
 ```

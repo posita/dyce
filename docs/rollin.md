@@ -74,7 +74,7 @@ Let’s look at some more substantial examples.
 
 <a href="https://whitewolf.fandom.com/wiki/D100"><img style="float: right; padding: 0 1.0em 0 1.0em; height: 8.0em;" src="../assets/1d100-1.png" alt="d00 &amp; d10"></a>
 
-In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered $[{{0}, {1}, \ldots , {9}}]$) and a “tens” ten-sided die (faces numbered $[{{00}, {10}, \ldots , {90}}]$).
+In many games it is common to emulate a hundred-sided die using a “ones” ten-sided die (faces numbered $[{ {0}, {1}, \ldots , {9} }]$) and a “tens” ten-sided die (faces numbered $[{ {00}, {10}, \ldots , {90} }]$).
 Let’s try to model that as a roller and use it to generate a roll.
 
 We start by creating two histograms[^1] representing our two ten-sided dice (``d00`` for our “tens” die and ``d10`` for our “ones“ die).
@@ -831,7 +831,7 @@ Let’s compare that to our roller.
 ```
 
 <details>
-<summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_pools_vs_rollers.ipy"><code>perf_pools_vs_rollers.ipy</code></a></summary>
+<summary>Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/perf_pools_vs_rollers.ipy"><code>perf_pools_vs_rollers.ipy</code></a></summary>
 
 ``` python
 --8<-- "docs/assets/perf_pools_vs_rollers.ipy"

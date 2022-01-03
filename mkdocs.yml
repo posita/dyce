@@ -29,6 +29,7 @@ nav:
 extra:
   version:
     provider: mike
+  __vers_str__: 0.5.0
 
 extra_javascript:
   - js/site.js
@@ -64,6 +65,7 @@ plugins:
       glob:
         - "Makefile"
         - "*.py"
+  - macros
   - mike:
       version_selector: true
   - mkdocstrings:

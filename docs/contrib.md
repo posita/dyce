@@ -52,7 +52,7 @@ An easy way to bootstrap an isolated development environment is:
 
 Substitute your preferred virtual environment process for [``venv``](https://docs.python.org/3/library/venv.html).
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
-See the ``[options.extras_require]`` section in [``setup.cfg``](https://github.com/posita/dyce/blob/latest/setup.cfg).
+See the ``[options.extras_require]`` section in [``setup.cfg``](https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/setup.cfg).
 
 Unit tests are run with [pytest](https://docs.pytest.org/) via [Tox](https://tox.readthedocs.org/).
 
@@ -107,7 +107,7 @@ There are only a few additional guidelines:
 * Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/latest/tests).
+  Unit tests live in [``tests``](https://github.com/posita/dyce/tree/v{{ __vers_str__ }}/tests).
 
 * If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
   Consider prefixing your pull request’s title with something like, “``NEED FEEDBACK – ``”.

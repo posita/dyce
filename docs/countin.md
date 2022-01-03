@@ -45,7 +45,7 @@ H(6)
 
 ```
 
-``#!python H(n)`` is shorthand for explicitly enumerating outcomes $[{{1} .. {n}}]$, each with a frequency of 1.
+``#!python H(n)`` is shorthand for explicitly enumerating outcomes $[{ {1} .. {n} }]$, each with a frequency of 1.
 
 ``` python
 >>> H(6) == H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
@@ -474,8 +474,8 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python

@@ -293,8 +293,8 @@ By defining our dependent term function to include ``#!python mod`` as a paramet
 
 <details>
 <summary>
-Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fironsworn.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fironsworn.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -339,8 +339,8 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Frisus.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Frisus.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -676,8 +676,8 @@ Visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2F4d6_variants.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2F4d6_variants.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -722,8 +722,8 @@ Visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fburning_arch.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fburning_arch.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -850,8 +850,8 @@ Example 1 visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fgreat_weapon_fighting.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fgreat_weapon_fighting.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -905,8 +905,8 @@ Example 2 visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fadvantage.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fadvantage.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -940,8 +940,8 @@ Visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fd10_explode.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fd10_explode.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -991,8 +991,8 @@ Visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Fdupes.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fdupes.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -1043,8 +1043,8 @@ Visualization:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/78aa6c4b9ac8f221b6285a798c6298a4f25c6f2a?labpath=docs%2Fnotebooks%2Froll_and_keep.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Froll_and_keep.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
