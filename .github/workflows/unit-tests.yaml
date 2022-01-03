@@ -11,6 +11,10 @@ jobs:
         python-version: ["3.7", "3.8", "3.9", "3.10", "pypy-3.7", "pypy-3.8"]
     steps:
     - uses: actions/checkout@v2
+      with:
+        # See <https://github.com/actions/checkout/issues/249> and
+        # <https://github.com/pypa/setuptools_scm/issues/480>
+        fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:

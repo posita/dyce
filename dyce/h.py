@@ -1189,11 +1189,18 @@ class H(_MappingT):
     ) -> H:
         r"""
         Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*
-        returns a number, it replaces the outcome. If it returns an
+        returns a single outcome, it replaces the existing outcome. If it returns an
         [``H`` object][dyce.h.H], *coalesce* is called on the outcome and the expanded
         histogram, and the returned histogram is folded into result. The default
         behavior for *coalesce* is to replace the outcome with the expanded histogram.
         Returned histograms are always reduced to their lowest terms.
+
+        !!! note *coalesce* is not called unless *expand* returns a histogram
+
+            If *expand* returns a single outcome, it *always* replaces the existing
+            outcome. This is intentional. To return a single outcome, but trigger
+            *coalesce*, characterize that outcome as a single-sided die (e.g.,
+            ``#!python H({outcome: 1})``.
 
         See the [``coalesce_replace``][dyce.h.coalesce_replace] and
         [``lowest_terms``][dyce.h.H.lowest_terms] methods.

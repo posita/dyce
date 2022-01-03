@@ -382,9 +382,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Dependent probabilities
 
-In many cases, dependent probabilities can be compactly expressed via [``H.substitute``][dyce.h.H.substitute],[``H.foreach``][dyce.h.H.foreach], or [``P.foreach``][dyce.p.P.foreach].
-
-Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, there are fairly straightforward translations.
+Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via [``H.substitute``][dyce.h.H.substitute],[``H.foreach``][dyce.h.H.foreach], or [``P.foreach``][dyce.p.P.foreach].
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a callback function.
 Finally, we can pass the dependent callback function to [``H.substitute``][dyce.h.H.substitute],  [``H.foreach``][dyce.h.H.foreach], or  [``P.foreach``][dyce.p.P.foreach], along with the independent terms (as arguments in the cases of the latter two).
@@ -410,7 +408,7 @@ var |    0.22
 
 Instead of a constant, let’s use another die as a second independent term.
 We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
-For multiple independent terms that can be expressed as histograms, the [``H.foreach`` class method][dyce.h.H.foreach] is appropriate.
+For multiple independent terms that can be expressed as histograms, the [``H.foreach`` class method][dyce.h.H.foreach] is often easiest.
 
 
 ``` python
@@ -444,19 +442,35 @@ True
 
 ```
 
-Where the dependent term requires inspection of rolls from one or more pools as independent terms, [``P.foreach`` class method][dyce.p.P.foreach] is useful.
-Let’s compare how often a pool of three six-sided dice shows more fours than a pool of two four-sided dice.
+Where the dependent term requires inspection of *rolls* from one or more pools as independent terms, [``P.foreach`` class method][dyce.p.P.foreach] is useful.
+Let’s say we have two pools.
+A roll from the first pool wins if it shows no duplicates but a roll from the second does.
+A roll from the second pool wins if it shows no duplicates but a roll from the first does.
+Otherwise, it’s a tie (i.e., if neither or both rolls show duplicates).
+Let’s compare how three six-sided dice fair against two four-sided dice.
 
 ``` python
->>> def compare_fours(roll_3d6, roll_2d4):
-...   return sum(1 for v in roll_3d6 if v == 4) > sum(1 for v in roll_2d4 if v == 4)
+>>> from enum import IntEnum
 
->>> print(P.foreach(compare_fours, roll_3d6=P(6, 6, 6), roll_2d4=P(4, 4)).format())
-avg |    0.27
-std |    0.44
-var |    0.19
-  0 |  73.50% |####################################
-  1 |  26.50% |#############
+>>> class DupeVs(IntEnum):
+...   SECOND_WINS = -1  # where second_roll shows no duplicates, but first_roll does
+...   TIE = 0  # where both rolls show no duplicates or rolls pools have duplicates
+...   FIRST_WINS = 1  # where first_roll shows no duplicates, but second_roll does
+
+>>> def compare_fours(first_roll, second_roll):
+...   return DupeVs((len(set(first_roll)) == len(first_roll)) - (len(set(second_roll)) == len(second_roll)))
+
+>>> h = P.foreach(compare_fours, first_roll=P(6, 6, 6), second_roll=P(4, 4)) ; h
+H({<DupeVs.SECOND_WINS: -1>: 12,
+ <DupeVs.TIE: 0>: 19,
+ <DupeVs.FIRST_WINS: 1>: 5})
+>>> print(h.format())
+avg |   -0.19
+std |    0.66
+var |    0.43
+ -1 |  33.33% |################
+  0 |  52.78% |##########################
+  1 |  13.89% |######
 
 ```
 
@@ -475,7 +489,7 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=histogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
@@ -485,7 +499,7 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 
 ## Time to get meta-evil on those outcomes!
 
-Thanks to [``#!python numerary``](https://pypi.org/project/numerary/), ``dyce`` offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as [SymPy](https://www.sympy.org/).
+Thanks to [``numerary``](https://pypi.org/project/numerary/), ``dyce`` offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as [SymPy](https://www.sympy.org/).
 
 ``` python
 >>> import sympy.abc

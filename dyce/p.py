@@ -489,9 +489,9 @@ class P(Sequence[H], HableOpsMixin):
 
         ```
 
-        The ``#!python foreach`` class method is semantically equivalent to nesting
-        loops iterating over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for
-        each independent term and then aggregating the results.
+        The ``#!python foreach`` class method is equivalent to nesting loops iterating
+        over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for each independent
+        term and then aggregating the results.
 
         ``` python
         >>> def dependent_term(
