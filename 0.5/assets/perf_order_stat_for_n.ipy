@@ -1,0 +1,9 @@
+from dyce import H
+
+print(f"%timeit [H(6).order_stat_for_n_at_pos(30, i) for i in range(10)]")
+%timeit [H(6).order_stat_for_n_at_pos(30, i) for i in range(10)]
+print()
+
+print(f"%timeit order_stat_for_30d6_at_pos = H(6).order_stat_func_for_n(30) ; [order_stat_for_30d6_at_pos(i) for i in range(10)]")
+%timeit order_stat_for_30d6_at_pos = H(6).order_stat_func_for_n(30) ; [order_stat_for_30d6_at_pos(i) for i in range(10)]
+print()

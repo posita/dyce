@@ -1,0 +1,4 @@
+anydyce
+dyce>=0.5.0
+ipywidgets
+matplotlib

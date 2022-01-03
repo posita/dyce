@@ -1,0 +1,38 @@
+from dyce import H, P
+
+p_2d6 = P(6, 6)
+d4, d6 = H(4), H(6)
+p_3d4_2d6 = P(d4, d4, d4, d6, d6)
+d4_eq3, d6_eq3 = d4.eq(2), d6.eq(2)
+
+print(f"%timeit 3@d4_eq3 + 2@d6_eq3")
+%timeit 3@d4_eq3 + 2@d6_eq3
+print()
+
+print(f"%timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)")
+%timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)
+print()
+
+print(f"%timeit 9@d4_eq3 + 6@d6_eq3")
+%timeit 9@d4_eq3 + 6@d6_eq3
+print()
+
+print(f"%timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)")
+%timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)
+print()
+
+print(f"%timeit 27@d4_eq3 + 18@d6_eq3")
+%timeit 27@d4_eq3 + 18@d6_eq3
+print()
+
+print(f"%timeit P(27@P(4), 18@P(6)).appearances_in_rolls(3)")
+%timeit P(27@P(4), 18@P(6)).appearances_in_rolls(3)
+print()
+
+print(f"%timeit 81@d4_eq3 + 54@d6_eq3")
+%timeit 81@d4_eq3 + 54@d6_eq3
+print()
+
+print(f"%timeit P(81@P(4), 54@P(6)).appearances_in_rolls(3)")
+%timeit P(81@P(4), 54@P(6)).appearances_in_rolls(3)
+print()

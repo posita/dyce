@@ -1,0 +1,2945 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for dice-based probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+        <link rel="canonical" href="https://posita.github.io/dyce/0.5/dyce.h/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.4">
+    
+    
+      
+        <title>dyce.h - dyce</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bb3983ee.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dyceh-package-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              <tt>dyce.h</tt>
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../countin/" class="md-nav__link">
+        Countin’ with histograms and pools
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rollin/" class="md-nav__link">
+        Rollin’ with rollers and rolls
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translations/" class="md-nav__link">
+        Applications and translations
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        Release notes
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        <tt>dyce</tt>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <tt>dyce.h</tt>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        <tt>dyce.h</tt>
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin" class="md-nav__link">
+    HableOpsMixin
+  </a>
+  
+    <nav class="md-nav" aria-label="HableOpsMixin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__slots__" class="md-nav__link">
+    __slots__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__abs__" class="md-nav__link">
+    __abs__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__add__" class="md-nav__link">
+    __add__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__and__" class="md-nav__link">
+    __and__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__floordiv__" class="md-nav__link">
+    __floordiv__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__invert__" class="md-nav__link">
+    __invert__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__mod__" class="md-nav__link">
+    __mod__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__mul__" class="md-nav__link">
+    __mul__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__neg__" class="md-nav__link">
+    __neg__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__or__" class="md-nav__link">
+    __or__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__pos__" class="md-nav__link">
+    __pos__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__pow__" class="md-nav__link">
+    __pow__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__radd__" class="md-nav__link">
+    __radd__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rand__" class="md-nav__link">
+    __rand__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rfloordiv__" class="md-nav__link">
+    __rfloordiv__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rmod__" class="md-nav__link">
+    __rmod__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rmul__" class="md-nav__link">
+    __rmul__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__ror__" class="md-nav__link">
+    __ror__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rpow__" class="md-nav__link">
+    __rpow__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rsub__" class="md-nav__link">
+    __rsub__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rtruediv__" class="md-nav__link">
+    __rtruediv__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__rxor__" class="md-nav__link">
+    __rxor__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__sub__" class="md-nav__link">
+    __sub__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__truediv__" class="md-nav__link">
+    __truediv__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.__xor__" class="md-nav__link">
+    __xor__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.eq" class="md-nav__link">
+    eq()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.explode" class="md-nav__link">
+    explode()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.ge" class="md-nav__link">
+    ge()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.gt" class="md-nav__link">
+    gt()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.is_even" class="md-nav__link">
+    is_even()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.is_odd" class="md-nav__link">
+    is_odd()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.le" class="md-nav__link">
+    le()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.lt" class="md-nav__link">
+    lt()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.ne" class="md-nav__link">
+    ne()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.substitute" class="md-nav__link">
+    substitute()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableOpsMixin.within" class="md-nav__link">
+    within()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.HableT" class="md-nav__link">
+    HableT
+  </a>
+  
+    <nav class="md-nav" aria-label="HableT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableT.__slots__" class="md-nav__link">
+    __slots__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableT.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableT.__subclasshook__" class="md-nav__link">
+    __subclasshook__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dyce.h.HableT.h" class="md-nav__link">
+    h()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.aggregate_with_counts" class="md-nav__link">
+    aggregate_with_counts()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.coalesce_replace" class="md-nav__link">
+    coalesce_replace()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.resolve_dependent_probability" class="md-nav__link">
+    resolve_dependent_probability()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.h.sum_h" class="md-nav__link">
+    sum_h()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.r/" class="md-nav__link">
+        <tt>dyce.r</tt>
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/posita/dyce/edit/master/docs/dyce.h.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<!---
+  Copyright and other protections apply. Please see the accompanying LICENSE file for
+  rights and restrictions governing use of this software. All rights not expressly
+  waived or licensed are reserved. If that file is missing or appears to be modified
+  from its original, then please contact the author before viewing or using this
+  software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+-->
+
+<h1 id="dyceh-package-reference"><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span></code> package reference</h1>
+
+
+  <div class="doc doc-object doc-module">
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="dyce.h.HableOpsMixin" class="doc doc-heading">
+        <code>
+HableOpsMixin        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A “mix-in” class providing arithmetic operations for implementers of the
+<a href="#dyce.h.HableT"><code>HableT</code> protocol</a>. The <a href="../dyce/#dyce.p.P"><code>P</code> class</a> derives from this
+class.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>See <a href="#dyce.h.HableT"><code>HableT</code></a> for notes on pronunciation.</p>
+</div>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">HableOpsMixin</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A “mix-in” class providing arithmetic operations for implementers of the</span>
+<span class="sd">    [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this</span>
+<span class="sd">    class.</span>
+
+<span class="sd">    !!! info</span>
+
+<span class="sd">        See [``HableT``][dyce.h.HableT] for notes on pronunciation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__add__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__add__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__sub__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__mul__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__mod__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__mod__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__pow__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__pow__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__and__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__and__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__and__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__xor__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__xor__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__or__(self.h(), other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__or__(other, self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__or__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__neg__(self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__pos__(self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__abs__(self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python operator.__invert__(self.h())``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().lt(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.lt``][dyce.h.H.lt].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().le(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.le``][dyce.h.H.le].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().eq(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.eq``][dyce.h.H.eq].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().ne(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.ne``][dyce.h.H.ne].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().gt(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.gt``][dyce.h.H.gt].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().ge(other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.ge``][dyce.h.H.ge].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().is_even()``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.is_even``][dyce.h.H.is_even].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_even</span><span class="p">()</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">is_odd</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().is_odd()``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.is_odd``][dyce.h.H.is_odd].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_odd</span><span class="p">()</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().explode(max_depth)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">substitute</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span>
+        <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
+        <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+
+    <span class="nd">@beartype</span>
+    <span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shorthand for ``#!python self.h().within(lo, hi, other)``. See the</span>
+<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__slots__" class="doc doc-heading">
+<code class="highlight language-python"><span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__abs__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__abs__(self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__add__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__add__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__and__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__and__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__floordiv__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__invert__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__invert__(self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__mod__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__mul__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__neg__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__neg__(self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__or__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__or__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__pos__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__pos__(self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__pow__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__radd__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__add__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rand__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__and__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__and__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__and__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rfloordiv__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rmod__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__mod__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__mod__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__mod__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rmul__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__mul__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__ror__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__or__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__or__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__or__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rpow__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__pow__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__pow__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rsub__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__sub__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rtruediv__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__rxor__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__xor__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__xor__(other, self.h())``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__xor__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">())</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__sub__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__truediv__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.__xor__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">operator</span><span class="o">.</span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportsInt</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">HableT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.eq" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.eq"><code>H.eq</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().eq(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.eq``][dyce.h.H.eq].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.explode" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.explode"><code>H.explode</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().explode(max_depth)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.ge" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.ge"><code>H.ge</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().ge(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.ge``][dyce.h.H.ge].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.gt" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.gt"><code>H.gt</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().gt(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.gt``][dyce.h.H.gt].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.is_even" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_even</span><span class="p">()</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.is_even"><code>H.is_even</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().is_even()``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.is_even``][dyce.h.H.is_even].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_even</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.is_odd" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_odd</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_odd</span><span class="p">()</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.is_odd"><code>H.is_odd</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">is_odd</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().is_odd()``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.is_odd``][dyce.h.H.is_odd].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_odd</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.le" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.le"><code>H.le</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().le(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.le``][dyce.h.H.le].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.lt" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.lt"><code>H.lt</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().lt(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.lt``][dyce.h.H.lt].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.ne" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.ne"><code>H.ne</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().ne(other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.ne``][dyce.h.H.ne].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.substitute" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10235f430</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">substitute</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span>
+    <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
+    <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableOpsMixin.within" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></code>. See the
+<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.within"><code>H.within</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python self.h().within(lo, hi, other)``. See the</span>
+<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="dyce.h.HableT" class="doc doc-heading">
+        <code>
+HableT            (<span title="typing.Protocol">Protocol</span>)
+        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A protocol whose implementer can be expressed as (or reduced to) an
+<a href="../dyce/#dyce.h.H"><code>H</code> object</a> by calling its <a href="#dyce.h.HableT.h"><code>h</code> method</a>. Currently,
+only the <a href="../dyce/#dyce.p.P"><code>P</code> class</a> implements this protocol, but this affords an
+integration point for <code class="highlight"><span class="n">dyce</span></code> users.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The intended pronunciation of <code>Hable</code> is <em>AYCH-uh-bul</em><sup id="dyce.h.HableT--fnref:1"><a class="footnote-ref" href="#dyce.h.HableT--fn:1">1</a></sup> (i.e.,
+<a href="../dyce/#dyce.h.H"><code>H</code></a>-able). Yes, that is a clumsy attempt at
+<a href="https://www.gocomics.com/calvinandhobbes/1993/01/25">verbing</a>. (You could
+<em>totally</em> <a href="../dyce/#dyce.h.H"><code>H</code></a> that, dude!) However, if you prefer something else
+(e.g. <em>HAY-bul</em> or <em>AYCH-AY-bul</em>), no one is going to judge you. (Well, they
+<em>might</em>, but they <em>shouldn’t</em>.) We all know what you mean.</p>
+</div>
+<div class="footnote">
+<hr />
+<ol>
+<li id="dyce.h.HableT--fn:1">
+<p>World Book Online (WBO) style <a href="https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems">pronunciation
+respelling</a>.&#160;<a class="footnote-backref" href="#dyce.h.HableT--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">HableT</span><span class="p">(</span>
+    <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">metaclass</span><span class="o">=</span><span class="n">CachingProtocolMeta</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol whose implementer can be expressed as (or reduced to) an</span>
+<span class="sd">    [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HableT.h]. Currently,</span>
+<span class="sd">    only the [``P`` class][dyce.p.P] implements this protocol, but this affords an</span>
+<span class="sd">    integration point for ``#!python dyce`` users.</span>
+
+<span class="sd">    !!! info</span>
+
+<span class="sd">        The intended pronunciation of ``Hable`` is *AYCH-uh-bul*[^1] (i.e.,</span>
+<span class="sd">        [``H``][dyce.h.H]-able). Yes, that is a clumsy attempt at</span>
+<span class="sd">        [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25). (You could</span>
+<span class="sd">        *totally* [``H``][dyce.h.H] that, dude!) However, if you prefer something else</span>
+<span class="sd">        (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you. (Well, they</span>
+<span class="sd">        *might*, but they *shouldn’t*.) We all know what you mean.</span>
+
+<span class="sd">    [^1]:</span>
+
+<span class="sd">        World Book Online (WBO) style [pronunciation</span>
+<span class="sd">        respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Express its implementer as an [``H`` object][dyce.h.H].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="dyce.h.HableT.__slots__" class="doc doc-heading">
+<code class="highlight language-python"><span class="vm">__slots__</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableT.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_no_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Protocols cannot be instantiated&#39;</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableT.__subclasshook__" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">__subclasshook__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_proto_hook</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_is_protocol&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="c1"># First, perform various sanity checks.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_is_runtime_protocol&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_allow_reckless_class_cheks</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Instance and class checks can only be used with&quot;</span>
+                        <span class="s2">&quot; @runtime_checkable protocols&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_callable_members_only</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_allow_reckless_class_cheks</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Protocols with non-method members&quot;</span>
+                        <span class="s2">&quot; don&#39;t support issubclass()&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="c1"># Same error message as for issubclass(1, int).</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;issubclass() arg 1 must be a class&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Second, perform the actual structural compatibility check.</span>
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_get_protocol_attrs</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="c1"># Check if the members appears in the class dictionary...</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">NotImplemented</span>
+                <span class="k">break</span>
+
+            <span class="c1"># ...or in annotations, if it is a sub-protocol.</span>
+            <span class="n">annotations</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s1">&#39;__annotations__&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">annotations</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="n">attr</span> <span class="ow">in</span> <span class="n">annotations</span> <span class="ow">and</span>
+                    <span class="nb">issubclass</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Generic</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">_is_protocol</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="dyce.h.HableT.h" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Express its implementer as an <a href="../dyce/#dyce.h.H"><code>H</code> object</a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Express its implementer as an [``H`` object][dyce.h.H].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="o">...</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="dyce.h.aggregate_with_counts" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">aggregate_with_counts</span><span class="p">(</span><span class="n">source_counts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">],</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">h_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="s1">&#39;&gt;) -&gt; H</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Aggregates <em>source_counts</em> into an <a href="../dyce/#dyce.h.H"><code>H</code> object</a>. Each source_count is a
+two-tuple of either an outcome-count pair or a histogram-count pair. This function
+is used in the implementation of the <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a> and
+<a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code></a> methods. Unlike those, the histogram returned from
+this function is <em>not</em> reduced to its lowest terms.</p>
+<p>In nearly all cases, when a source contains a histogram, it takes on the
+corresponding count’s “scale”. In other words, the sum of the counts of the
+histogram retains the same proportion as the count in relation to other outcomes.
+This becomes clearer when there is no overlap between the histogram and the other
+outcomes.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dyce.h</span> <span class="kn">import</span> <span class="n">aggregate_with_counts</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">source_counts</span> <span class="o">=</span> <span class="p">((</span><span class="n">H</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">aggregate_with_counts</span><span class="p">(</span><span class="n">source_counts</span><span class="p">)</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span> <span class="p">;</span> <span class="n">h</span>
+<span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<div class="admonition note">
+<p class="admonition-title">An important exception</p>
+<p>If a source is the empty histogram (<code>H({})</code>), it and its count is omitted from
+the result without scaling.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">source_counts</span> <span class="o">=</span> <span class="p">((</span><span class="n">H</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">({}),</span> <span class="mi">20</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">aggregate_with_counts</span><span class="p">(</span><span class="n">source_counts</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">aggregate_with_counts</span><span class="p">(</span>
+    <span class="n">source_counts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">],</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="n">h_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregates *source_counts* into an [``H`` object][dyce.h.H]. Each source_count is a</span>
+<span class="sd">    two-tuple of either an outcome-count pair or a histogram-count pair. This function</span>
+<span class="sd">    is used in the implementation of the [``H.substitute``][dyce.h.H.substitute] and</span>
+<span class="sd">    [``P.foreach``][dyce.p.P.foreach] methods. Unlike those, the histogram returned from</span>
+<span class="sd">    this function is *not* reduced to its lowest terms.</span>
+
+<span class="sd">    In nearly all cases, when a source contains a histogram, it takes on the</span>
+<span class="sd">    corresponding count’s “scale”. In other words, the sum of the counts of the</span>
+<span class="sd">    histogram retains the same proportion as the count in relation to other outcomes.</span>
+<span class="sd">    This becomes clearer when there is no overlap between the histogram and the other</span>
+<span class="sd">    outcomes.</span>
+
+<span class="sd">    ``` python</span>
+<span class="sd">    &gt;&gt;&gt; from dyce.h import aggregate_with_counts</span>
+<span class="sd">    &gt;&gt;&gt; source_counts = ((H(3), 3), (H(-3), 2))</span>
+<span class="sd">    &gt;&gt;&gt; h = aggregate_with_counts(source_counts).lowest_terms() ; h</span>
+<span class="sd">    H({-3: 2, -2: 2, -1: 2, 1: 3, 2: 3, 3: 3})</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    !!! note &quot;An important exception&quot;</span>
+
+<span class="sd">        If a source is the empty histogram (``H({})``), it and its count is omitted from</span>
+<span class="sd">        the result without scaling.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; source_counts = ((H(2), 1), (H({}), 20))</span>
+<span class="sd">        &gt;&gt;&gt; aggregate_with_counts(source_counts)</span>
+<span class="sd">        H({1: 1, 2: 1})</span>
+
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aggregate_scalar</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">outcome_counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">RealLike</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">outcome_or_h</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">source_counts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outcome_or_h</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">outcome_or_h</span><span class="p">:</span>
+                <span class="n">h_scalar</span> <span class="o">=</span> <span class="n">outcome_or_h</span><span class="o">.</span><span class="n">total</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">prior_outcome</span><span class="p">,</span> <span class="n">prior_count</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">outcome_counts</span><span class="p">):</span>
+                    <span class="n">outcome_counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">prior_outcome</span><span class="p">,</span> <span class="n">prior_count</span> <span class="o">*</span> <span class="n">h_scalar</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">new_outcome</span><span class="p">,</span> <span class="n">new_count</span> <span class="ow">in</span> <span class="n">outcome_or_h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">outcome_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">new_outcome</span><span class="p">,</span> <span class="n">count</span> <span class="o">*</span> <span class="n">aggregate_scalar</span> <span class="o">*</span> <span class="n">new_count</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="n">aggregate_scalar</span> <span class="o">*=</span> <span class="n">h_scalar</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outcome_counts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">outcome_or_h</span><span class="p">,</span> <span class="n">count</span> <span class="o">*</span> <span class="n">aggregate_scalar</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">h_type</span><span class="p">(</span><span class="n">outcome_counts</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="dyce.h.coalesce_replace" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Default behavior for <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>. Returns <em>h</em> unmodified
+(<em>outcome</em> is ignored).</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">coalesce_replace</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified</span>
+<span class="sd">    (*outcome* is ignored).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">h</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="dyce.h.resolve_dependent_probability" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">resolve_dependent_probability</span><span class="p">(</span><span class="n">dependent_term</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">]],</span> <span class="o">**</span><span class="n">independent_sources</span><span class="p">:</span> <span class="n">_SourceT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <div class="admonition warning">
+<p class="admonition-title">Deprecated</p>
+<p>This function has been moved to the <a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code></a> class
+method. This alias will be removed in a future release.</p>
+</div>
+<p>Shorthand for <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">dependent_term</span><span class="p">,</span> <span class="o">**</span><span class="n">independent_sources</span><span class="p">)</span></code>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@deprecated</span>
+<span class="k">def</span> <span class="nf">resolve_dependent_probability</span><span class="p">(</span>
+    <span class="n">dependent_term</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">]],</span>
+    <span class="o">**</span><span class="n">independent_sources</span><span class="p">:</span> <span class="n">_SourceT</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    !!! warning &quot;Deprecated&quot;</span>
+
+<span class="sd">        This function has been moved to the [``H.foreach``][dyce.h.H.foreach] class</span>
+<span class="sd">        method. This alias will be removed in a future release.</span>
+
+<span class="sd">    Shorthand for ``#!python H.foreach(dependent_term, **independent_sources)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">H</span><span class="o">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">dependent_term</span><span class="p">,</span> <span class="o">**</span><span class="n">independent_sources</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="dyce.h.sum_h" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sum_h</span><span class="p">(</span><span class="n">hs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">])</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Shorthand for <code class="highlight"><span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">h_sum</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">sum</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span></code>.</p>
+<p>This is to ensure that summing zero or more histograms always returns a histograms.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>dyce/h.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
+<span class="k">def</span> <span class="nf">sum_h</span><span class="p">(</span><span class="n">hs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.</span>
+
+<span class="sd">    This is to ensure that summing zero or more histograms always returns a histograms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">H</span><span class="p">({})</span> <span class="k">if</span> <span class="n">h_sum</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">h_sum</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../dyce/" class="md-footer__link md-footer__link--prev" aria-label="Previous: &lt;tt&gt;dyce&lt;/tt&gt;" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <tt>dyce</tt>
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../dyce.r/" class="md-footer__link md-footer__link--next" aria-label="Next: &lt;tt&gt;dyce.r&lt;/tt&gt;" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <tt>dyce.r</tt>
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.361d90f1.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.289a2a4b.min.js"></script>
+      
+        <script src="../js/site.js"></script>
+      
+        <script src="../js/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
