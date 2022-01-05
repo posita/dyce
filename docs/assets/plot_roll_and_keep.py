@@ -19,7 +19,7 @@ def do_it(style: str) -> None:
     import matplotlib.pyplot
 
     def roll_and_keep(p: P, k: int):
-        assert p.is_homogeneous
+        assert p.is_homogeneous()
         max_d = max(p[-1]) if p else 0
 
         for roll, count in p.rolls_with_counts():

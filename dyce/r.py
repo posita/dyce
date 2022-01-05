@@ -1237,7 +1237,7 @@ class ValueRoller(R):
         r"Initializer."
         super().__init__(sources=(), annotation=annotation, **kw)
 
-        if isinstance(value, P) and not value.is_homogeneous:
+        if isinstance(value, P) and not value.is_homogeneous():
             warnings.warn(
                 f"using a heterogeneous pool ({value}) is not recommended where traceability is important",
                 stacklevel=2,

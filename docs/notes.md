@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
+
+* Refactors [``H.total``][dyce.h.H.total] and [``P.is_homogeneous``][dyce.p.P.is_homogeneous] properties into similarly-named methods.
+
 ## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
 
 * Updates binder links that fix requirements ranges.

@@ -102,17 +102,17 @@ class TestH:
         d0 = H({})
         d6_d8 = H(6) + H(8)
         assert len(d0) == 0
-        assert d0.total == 0
+        assert d0.total() == 0
         assert list(d0.counts()) == list(d0.values())
         assert list(d0.outcomes()) == []
         assert list(d0.outcomes()) == list(d0.keys())
         assert len(d6_d8) == 13  # distinct values
-        assert d6_d8.total == 48  # total combinations
+        assert d6_d8.total() == 48  # total combinations
         assert list(d6_d8.counts()) == list(d6_d8.values())
         assert list(d6_d8.outcomes()) == list(range(2, 6 + 8 + 1))
         assert list(d6_d8.outcomes()) == list(d6_d8.keys())
         assert len((d6_d8 + d6_d8)) == 25
-        assert (d6_d8 + d6_d8).total == 2304
+        assert (d6_d8 + d6_d8).total() == 2304
         assert list(d6_d8.items())
 
     def test_getitem(self) -> None:

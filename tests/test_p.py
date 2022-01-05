@@ -534,10 +534,22 @@ class TestP:
         )
 
     def test_homogeneous(self) -> None:
-        assert P().is_homogeneous
-        assert P(2).is_homogeneous
-        assert P(2, 2).is_homogeneous
-        assert not P(2, -3).is_homogeneous
+        assert P().is_homogeneous()
+        assert P(2).is_homogeneous()
+        assert P(2, 2).is_homogeneous()
+        assert not P(2, -3).is_homogeneous()
+
+    def test_total(self) -> None:
+        p_d0_1 = P()
+        p_d0_2 = P(H({}))
+        p_d6 = P(6)
+        p_d8 = P(8)
+        p_2d6_3d8 = P(6, 6, 8, 8, 8)
+        assert p_d0_1.total() == 0
+        assert p_d0_2.total() == 0
+        assert p_d6.total() == H(6).total()
+        assert p_d8.total() == H(8).total()
+        assert p_2d6_3d8.total() == H(6).total() ** 2 * H(8).total() ** 3
 
     def test_appearances_in_rolls(self) -> None:
         def _sum_method(p: P, outcome: RealLike) -> H:

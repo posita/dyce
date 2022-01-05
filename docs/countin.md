@@ -347,7 +347,7 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
 >>> for n in range(6, 0, -1):
 ...   number_of_evens_in_nd6 = n@d6_even
 ...   all_even = number_of_evens_in_nd6.eq(n)
-...   print(f"{n: >2}d6: {all_even[1] / sum(all_even.counts()): >6.2%}")
+...   print(f"{n: >2}d6: {all_even[1] / all_even.total(): >6.2%}")
  6d6:  1.56%
  5d6:  3.12%
  4d6:  6.25%
@@ -366,7 +366,7 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 ...   d6e_ge_9 = exploding_d6.ge(9)
 ...   number_of_nines_or_higher_in_nd6e = n@d6e_ge_9
 ...   at_least_one_9 = number_of_nines_or_higher_in_nd6e.ge(1)
-...   print(f"{n: >2}d6-exploding: {at_least_one_9[1] / sum(at_least_one_9.counts()): >6.2%}")
+...   print(f"{n: >2}d6-exploding: {at_least_one_9[1] / at_least_one_9.total(): >6.2%}")
 10d6-exploding: 69.21%
  9d6-exploding: 65.36%
  8d6-exploding: 61.03%
