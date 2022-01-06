@@ -329,6 +329,30 @@ class TestH:
         lowest_terms = H({i: i for i in range(10)})
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
 
+    def test_substitute_empty(self) -> None:
+        h = H({})
+        assert h.substitute(lambda _, __: H(100)) == h
+
+    def test_substitute_cull_everything(self) -> None:
+        h = H(6)
+        assert (
+            h.substitute(
+                lambda _, __: H(100), max_depth=-1, precision_limit=Fraction(1)
+            )
+            == h
+        )
+
+    def test_substitute_out_of_bounds(self) -> None:
+        with pytest.raises(ValueError):
+            assert H(6).substitute(
+                lambda _, __: 1, max_depth=-1, precision_limit=Fraction(-1)
+            )
+
+        with pytest.raises(ValueError):
+            assert H(6).substitute(
+                lambda _, __: 1, max_depth=-1, precision_limit=Fraction(2)
+            )
+
     def test_substitute_double_odd_values(self) -> None:
         def double_odd_values(h: H, outcome: RealLike) -> Union[H, RealLike]:
             return outcome * 2 if outcome % 2 != 0 else outcome
@@ -361,6 +385,14 @@ class TestH:
         assert h.substitute(reroll_d4_threes, operator.__mul__, max_depth=2) == H(
             {36: 1, 27: 1, 18: 1, 12: 4, 9: 1, 6: 4, 4: 16, 3: 4, 2: 16, 1: 16}
         )
+
+    def test_explode_empty(self) -> None:
+        h = H({})
+        assert h.explode(max_depth=-1) == h
+
+    def test_explode_no_depth(self) -> None:
+        h = H(6)
+        assert h.explode(max_depth=0) == h
 
     def test_format(self) -> None:
         h = H({3: 1, 2: 2, 1: 3})
@@ -445,8 +477,6 @@ class TestH:
 
 def test_within() -> None:
     within_filter = _within(0, 2)
-    assert getattr(within_filter, "lo") == 0
-    assert getattr(within_filter, "hi") == 2
     assert within_filter(5, 2) > 0
     assert within_filter(5, 3) == 0
     assert within_filter(5, 4) == 0

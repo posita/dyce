@@ -18,6 +18,7 @@
 ## [0.5.1](https://github.com/posita/dyce/releases/tag/v0.5.1)
 
 * Fixes broken binder links in docs.
+* Adds ``precision_limit`` argument to [``H.substitute``][dyce.h.H.substitute] and [``H.explode``][dyce.h.H.explode].
 
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
