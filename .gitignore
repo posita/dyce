@@ -8,6 +8,7 @@
 
 # Project
 /.coverage
+/.coverage.*
 /.tox/
 /build/
 /dist/
