@@ -955,8 +955,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 </code></pre></div>
 </td></tr></table>
 <h2 id="dependent-probabilities">Dependent probabilities</h2>
-<p>In many cases, dependent probabilities can be compactly expressed via <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>,<a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code></a>, or <a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code></a>.</p>
-<p>Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, there are fairly straightforward translations.
+<p>Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>,<a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code></a>, or <a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code></a>.
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a callback function.
 Finally, we can pass the dependent callback function to <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>,  <a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code></a>, or  <a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code></a>, along with the independent terms (as arguments in the cases of the latter two).</p>
@@ -989,7 +988,7 @@ Say we want to roll a d6 and compare whether the result is strictly greater than
 </td></tr></table>
 <p>Instead of a constant, let’s use another die as a second independent term.
 We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
-For multiple independent terms that can be expressed as histograms, the <a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code> class method</a> is appropriate.</p>
+For multiple independent terms that can be expressed as histograms, the <a href="../dyce/#dyce.h.H.foreach"><code>H.foreach</code> class method</a> is often easiest.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1034,25 +1033,53 @@ However, this isn’t very readable, and is often less efficient than using <a h
 <span class="kc">True</span>
 </code></pre></div>
 </td></tr></table>
-<p>Where the dependent term requires inspection of rolls from one or more pools as independent terms, <a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code> class method</a> is useful.
-Let’s compare how often a pool of three six-sided dice shows more fours than a pool of two four-sided dice.</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">compare_fours</span><span class="p">(</span><span class="n">roll_3d6</span><span class="p">,</span> <span class="n">roll_2d4</span><span class="p">):</span>
-<span class="o">...</span>   <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_3d6</span> <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_2d4</span> <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+<p>Where the dependent term requires inspection of <em>rolls</em> from one or more pools as independent terms, <a href="../dyce/#dyce.p.P.foreach"><code>P.foreach</code> class method</a> is useful.
+Let’s say we have two pools.
+A roll from the first pool wins if it shows no duplicates but a roll from the second does.
+A roll from the second pool wins if it shows no duplicates but a roll from the first does.
+Otherwise, it’s a tie (i.e., if neither or both rolls show duplicates).
+Let’s compare how three six-sided dice fair against two four-sided dice.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">compare_fours</span><span class="p">,</span> <span class="n">roll_3d6</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">roll_2d4</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
-<span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.27</span>
-<span class="n">std</span> <span class="o">|</span>    <span class="mf">0.44</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">0.19</span>
-  <span class="mi">0</span> <span class="o">|</span>  <span class="mf">73.50</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################################</span>
-  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">26.50</span><span class="o">%</span> <span class="o">|</span><span class="c1">#############</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">DupeVs</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="o">...</span>   <span class="n">SECOND_WINS</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># where second_roll shows no duplicates, but first_roll does</span>
+<span class="o">...</span>   <span class="n">TIE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># where both rolls show no duplicates or rolls pools have duplicates</span>
+<span class="o">...</span>   <span class="n">FIRST_WINS</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># where first_roll shows no duplicates, but second_roll does</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">compare_fours</span><span class="p">(</span><span class="n">first_roll</span><span class="p">,</span> <span class="n">second_roll</span><span class="p">):</span>
+<span class="o">...</span>   <span class="k">return</span> <span class="n">DupeVs</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">first_roll</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_roll</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">second_roll</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_roll</span><span class="p">)))</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">compare_fours</span><span class="p">,</span> <span class="n">first_roll</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">second_roll</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="p">;</span> <span class="n">h</span>
+<span class="n">H</span><span class="p">({</span><span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">SECOND_WINS</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">TIE</span><span class="p">:</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">FIRST_WINS</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">5</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
+<span class="n">avg</span> <span class="o">|</span>   <span class="o">-</span><span class="mf">0.19</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">0.66</span>
+<span class="n">var</span> <span class="o">|</span>    <span class="mf">0.43</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>  <span class="mf">33.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">################</span>
+  <span class="mi">0</span> <span class="o">|</span>  <span class="mf">52.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">##########################</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
 </code></pre></div>
 </td></tr></table>
 <h2 id="visualization">Visualization</h2>
@@ -1066,8 +1093,8 @@ In addition, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></
 </picture></p>
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v0.5.0/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=docs%2Fnotebooks%2Fhistogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Source: <a href="https://github.com/posita/dyce/blob/v0.5.1/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=histogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1122,7 +1149,7 @@ In addition, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></
 </details>
 
 <h2 id="time-to-get-meta-evil-on-those-outcomes">Time to get meta-evil on those outcomes!</h2>
-<p>Thanks to <a href="https://pypi.org/project/numerary/"><code class="highlight"><span class="n">numerary</span></code></a>, <code>dyce</code> offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
+<p>Thanks to <a href="https://pypi.org/project/numerary/"><code>numerary</code></a>, <code>dyce</code> offers best-effort support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>

@@ -2332,10 +2332,15 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
         <span class="k">return</span> <span class="n">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">c_outcome</span> <span class="o">**</span> <span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">-</span> <span class="n">c_outcome</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
 
     <span class="nd">@beartype</span>
-    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Shorthand for ``#!python self.substitute(lambda h, outcome: h if outcome == max(h)</span>
-<span class="sd">        else outcome, operator.__add__, max_depth)``.</span>
+<span class="sd">        Shorthand for ``#!python self.substitute(lambda h, outcome: outcome if len(h) == 1</span>
+<span class="sd">        else h if outcome == max(h) else outcome, operator.__add__, max_depth,</span>
+<span class="sd">        precision_limit)``.</span>
 
 <span class="sd">        ``` python</span>
 <span class="sd">        &gt;&gt;&gt; H(6).explode(max_depth=2)</span>
@@ -2346,9 +2351,14 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
 <span class="sd">        See the [``substitute`` method][dyce.h.H.substitute].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">outcome</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="k">else</span> <span class="n">h</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
             <span class="fm">__add__</span><span class="p">,</span>
             <span class="n">max_depth</span><span class="p">,</span>
+            <span class="n">precision_limit</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@beartype</span>
@@ -2471,14 +2481,30 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
         <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
         <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*</span>
-<span class="sd">        returns a number, it replaces the outcome. If it returns an</span>
-<span class="sd">        [``H`` object][dyce.h.H], *coalesce* is called on the outcome and the expanded</span>
-<span class="sd">        histogram, and the returned histogram is folded into result. The default</span>
-<span class="sd">        behavior for *coalesce* is to replace the outcome with the expanded histogram.</span>
-<span class="sd">        Returned histograms are always reduced to their lowest terms.</span>
+<span class="sd">        !!! warning &quot;Experimental&quot;</span>
+
+<span class="sd">            The *precision_limit* parameter should be considered experimental and may</span>
+<span class="sd">            change or disappear in future versions.</span>
+
+<span class="sd">        Calls *expand* on each outcome. If *expand* returns a single outcome, it</span>
+<span class="sd">        replaces the existing outcome. If it returns an [``H`` object][dyce.h.H],</span>
+<span class="sd">        expansion is performed again (recursively) on that object until *max_depth* or</span>
+<span class="sd">        *precision_limit* is exhausted. *coalesce* is called on the original outcome and</span>
+<span class="sd">        the expanded histogram or outcome and the returned histogram is “folded” into</span>
+<span class="sd">        result. (More on these terms and concepts below.)</span>
+
+<span class="sd">        The default behavior for *coalesce* is to replace the outcome with the expanded</span>
+<span class="sd">        histogram. Returned histograms are always reduced to their lowest terms.</span>
+
+<span class="sd">        !!! note &quot;*coalesce* is not called unless *expand* returns a histogram&quot;</span>
+
+<span class="sd">            If *expand* returns a single outcome, it *always* replaces the existing</span>
+<span class="sd">            outcome. This is intentional. To return a single outcome, but trigger</span>
+<span class="sd">            *coalesce*, characterize that outcome as a single-sided die (e.g.,</span>
+<span class="sd">            ``#!python H({outcome: 1})``.</span>
 
 <span class="sd">        See the [``coalesce_replace``][dyce.h.coalesce_replace] and</span>
 <span class="sd">        [``lowest_terms``][dyce.h.H.lowest_terms] methods.</span>
@@ -2602,25 +2628,246 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
 <span class="sd">         17 |   0.08% |</span>
 
 <span class="sd">        ```</span>
+
+<span class="sd">        When *expand* returns an [``H`` object][dyce.h.H], outcomes produced from the</span>
+<span class="sd">        corresponding *coalesce* are accumulated, but the counts retain their “scale”</span>
+<span class="sd">        within the context of the expansion. This becomes clearer when there is no</span>
+<span class="sd">        overlap between the substituted histogram and the other outcomes.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; d6 = H(6)</span>
+<span class="sd">        &gt;&gt;&gt; d00 = (H(10) - 1) * 10 ; d00</span>
+<span class="sd">        H({0: 1, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})</span>
+<span class="sd">        &gt;&gt;&gt; set(d6) &amp; set(d00) == set()  # no outcomes in common</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; d6_d00 = d6.substitute(</span>
+<span class="sd">        ...   # If a one comes up when rolling the d6,</span>
+<span class="sd">        ...   # roll a d00 and take that result instead</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome == 1 else outcome</span>
+<span class="sd">        ... ) ; d6_d00</span>
+<span class="sd">        H({0: 1,</span>
+<span class="sd">         2: 10,</span>
+<span class="sd">         3: 10,</span>
+<span class="sd">         4: 10,</span>
+<span class="sd">         5: 10,</span>
+<span class="sd">         6: 10,</span>
+<span class="sd">         10: 1,</span>
+<span class="sd">         20: 1,</span>
+<span class="sd">         30: 1,</span>
+<span class="sd">         40: 1,</span>
+<span class="sd">         50: 1,</span>
+<span class="sd">         60: 1,</span>
+<span class="sd">         70: 1,</span>
+<span class="sd">         80: 1,</span>
+<span class="sd">         90: 1})</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        Note that the sum of the outcomes’ counts from the d00 make up the same</span>
+<span class="sd">        proportion as the one’s outcome and count they replaced from the d6.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; from fractions import Fraction</span>
+<span class="sd">        &gt;&gt;&gt; Fraction(</span>
+<span class="sd">        ...   sum(count for outcome, count in d6_d00.items() if outcome in d00),</span>
+<span class="sd">        ...   d6_d00.total,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        Fraction(1, 6)</span>
+<span class="sd">        &gt;&gt;&gt; Fraction(d6[1], d6.total)</span>
+<span class="sd">        Fraction(1, 6)</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        !!! tip &quot;Precision limits&quot;</span>
+
+<span class="sd">            This method will halt recursive substitution on any branch *either* when its</span>
+<span class="sd">            depth exceeds *max_depth* *or* its “contextual precision” is</span>
+<span class="sd">            *precision_limit* or less. In either case, substitution is attempted for all</span>
+<span class="sd">            of the outcomes of a(n expanded) histogram or none of them. The contextual</span>
+<span class="sd">            precision of a histogram is its proportion to the whole. The contextual</span>
+<span class="sd">            precision of the original (or top-level) histogram is ``#!python Fraction(1,</span>
+<span class="sd">            1)``. By setting *precision_limit* to that value, we basically ensure no</span>
+<span class="sd">            substitution.</span>
+
+<span class="sd">            ``` python</span>
+<span class="sd">            &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">            ...   lambda h, outcome: d00 if outcome == 1 else outcome,</span>
+<span class="sd">            ...   precision_limit=Fraction(1, 1),  # no substitution</span>
+<span class="sd">            ... ) == d6</span>
+<span class="sd">            True</span>
+<span class="sd">            &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">            ...   lambda h, outcome: d00 if outcome == 1 else outcome,</span>
+<span class="sd">            ...   max_depth=0,  # no substitution</span>
+<span class="sd">            ... ) == d6</span>
+<span class="sd">            True</span>
+
+<span class="sd">            ```</span>
+
+<span class="sd">            Let’s make a contrived, but illustrative modification to our d6/d00 example</span>
+<span class="sd">            from above. If a one comes up when rolling a d6, roll a d00, but re-roll any</span>
+<span class="sd">            80s.</span>
+
+<span class="sd">            ``` python</span>
+<span class="sd">            &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">            ...   max_depth=100,  # &lt;-- we&#39;ll never hit this</span>
+<span class="sd">            ...   # will halt substitution after the original one from the d6</span>
+<span class="sd">            ...   precision_limit=Fraction(1, 6),</span>
+<span class="sd">            ... ) == d6_d00</span>
+<span class="sd">            True</span>
+<span class="sd">            &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">            ...   max_depth=100,</span>
+<span class="sd">            ...   # will halt substitution after the first 80 substitution</span>
+<span class="sd">            ...   # after the original one from the d6</span>
+<span class="sd">            ...   precision_limit=Fraction(1, 6) * Fraction(1, 10),</span>
+<span class="sd">            ... )</span>
+<span class="sd">            H({0: 11,</span>
+<span class="sd">             2: 100,</span>
+<span class="sd">             ...,</span>
+<span class="sd">             6: 100,</span>
+<span class="sd">             10: 11,</span>
+<span class="sd">             ...,</span>
+<span class="sd">             70: 11,</span>
+<span class="sd">             80: 1,</span>
+<span class="sd">             90: 11})</span>
+<span class="sd">            &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">            ...   max_depth=100,</span>
+<span class="sd">            ...   # will halt substitution after the second 80 substitution</span>
+<span class="sd">            ...   # after the original one from the d6</span>
+<span class="sd">            ...   precision_limit=Fraction(1, 6) * Fraction(1, 10) - Fraction(1, 1000000000),  # &lt;-- juuust under the wire</span>
+<span class="sd">            ... )</span>
+<span class="sd">            H({0: 111,</span>
+<span class="sd">             2: 1000,</span>
+<span class="sd">             ...,</span>
+<span class="sd">             6: 1000,</span>
+<span class="sd">             10: 111,</span>
+<span class="sd">             ...,</span>
+<span class="sd">             70: 111,</span>
+<span class="sd">             80: 1,</span>
+<span class="sd">             90: 111})</span>
+
+<span class="sd">            ```</span>
+
+<span class="sd">            The default value for *precision_limit* is zero, which basically means it is</span>
+<span class="sd">            ignored and recursion is limited solely by *max_depth*. If you want to</span>
+<span class="sd">            ensure that this method stops delving based *solely* on precision, set</span>
+<span class="sd">            *max_depth* to ``#!python -1``, which is equivalent to ``#!python</span>
+<span class="sd">            sys.getrecursionlimit() + 1``[^1]. Be aware that this skews results in favor</span>
+<span class="sd">            of non-limited branches.</span>
+
+<span class="sd">            ``` python</span>
+<span class="sd">            &gt;&gt;&gt; h = H({1: 1, 2: 2, 3: 3})</span>
+<span class="sd">            &gt;&gt;&gt; print(h.explode(max_depth=5).format(scaled=True))</span>
+<span class="sd">            avg |    4.59</span>
+<span class="sd">            std |    3.96</span>
+<span class="sd">            var |   15.65</span>
+<span class="sd">              1 |  16.67% |########################</span>
+<span class="sd">              2 |  33.33% |#################################################</span>
+<span class="sd">              4 |   8.33% |############</span>
+<span class="sd">              5 |  16.67% |########################</span>
+<span class="sd">              7 |   4.17% |######</span>
+<span class="sd">              8 |   8.33% |############</span>
+<span class="sd">             10 |   2.08% |###</span>
+<span class="sd">             11 |   4.17% |######</span>
+<span class="sd">             13 |   1.04% |#</span>
+<span class="sd">             14 |   2.08% |###</span>
+<span class="sd">             16 |   0.52% |</span>
+<span class="sd">             17 |   1.04% |#</span>
+<span class="sd">             18 |   1.56% |##</span>
+<span class="sd">            &gt;&gt;&gt; print(h.explode(max_depth=-1, precision_limit=Fraction(1, 6 ** 2)).format(scaled=True))</span>
+<span class="sd">            avg |    4.63</span>
+<span class="sd">            std |    4.09</span>
+<span class="sd">            var |   16.72</span>
+<span class="sd">              1 |  16.67% |########################</span>
+<span class="sd">              2 |  33.33% |#################################################</span>
+<span class="sd">              4 |   8.33% |############</span>
+<span class="sd">              5 |  16.67% |########################</span>
+<span class="sd">              7 |   4.17% |######</span>
+<span class="sd">              8 |   8.33% |############</span>
+<span class="sd">             10 |   2.08% |###</span>
+<span class="sd">             11 |   4.17% |######</span>
+<span class="sd">             13 |   1.04% |#</span>
+<span class="sd">             14 |   2.08% |###</span>
+<span class="sd">             16 |   0.52% |</span>
+<span class="sd">             17 |   1.04% |#</span>
+<span class="sd">             19 |   0.26% |</span>
+<span class="sd">             20 |   0.52% |</span>
+<span class="sd">             21 |   0.78% |#</span>
+
+<span class="sd">            ```</span>
+
+<span class="sd">            Also be aware that without *max_depth* as a safety net, some substitutions</span>
+<span class="sd">            are guaranteed to result in ``#!python RecursionError``s, even with very</span>
+<span class="sd">            high *precision_limit*s.</span>
+
+<span class="sd">            ``` python</span>
+<span class="sd">            &gt;&gt;&gt; H(1).substitute(</span>
+<span class="sd">            ...   lambda h, outcome: H({outcome + 1: 1}),  # expands to a single-sided die</span>
+<span class="sd">            ...   max_depth=-1,</span>
+<span class="sd">            ...   precision_limit=Fraction(999999, 1000000),</span>
+<span class="sd">            ... )</span>
+<span class="sd">            Traceback (most recent call last):</span>
+<span class="sd">              ...</span>
+<span class="sd">            RecursionError: maximum recursion depth exceeded in comparison</span>
+
+<span class="sd">            ```</span>
+
+<span class="sd">            [``H.explode``][dyce.h.H.explode]’s *expand* implementation guards against</span>
+<span class="sd">            this by returning ``#!python outcome`` if the passed histogram has only one</span>
+<span class="sd">            face. Consider a similar approach for your own *expand* implementations if</span>
+<span class="sd">            outcomes’ contextual probabilities do not asymptotically approach zero.</span>
+
+<span class="sd">        [^1]:</span>
+
+<span class="sd">            This method will “bottom out” far earlier. As of this writing, the practical</span>
+<span class="sd">            limit of its implementation (without optimization) is something close to</span>
+<span class="sd">            $\frac {1} {3} \times \left( limit - depth \right)$, where $limit$ is</span>
+<span class="sd">            ``#!python sys.getrecursionlimit()`` and $depth$ is ``#!python</span>
+<span class="sd">            len(inspect.stack(0))``. This also assumes the provided implementations for</span>
+<span class="sd">            *expand* and *coalesce* don’t contribute significantly to the call stack.</span>
+<span class="sd">            Setting *max_depth* to ``#!python -1`` or one beyond the absolute limit</span>
+<span class="sd">            signals that the caller wants it out of the way.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_depth</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_depth cannot be negative&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">max_depth</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">getrecursionlimit</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="k">def</span> <span class="nf">_substitute</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;max_depth cannot be an arbitrary negative number (use -1 explicitly to indicate no limit)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">precision_limit</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">precision_limit</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;precision_limit (</span><span class="si">{</span><span class="n">precision_limit</span><span class="si">}</span><span class="s2">) must be between zero and one, inclusive&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_substitute</span><span class="p">(</span>
+            <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
+            <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">contextual_precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">coalesce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-            <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">max_depth</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">max_depth</span> <span class="ow">or</span> <span class="n">contextual_precision</span> <span class="o">&lt;=</span> <span class="n">precision_limit</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">h</span>
 
             <span class="k">def</span> <span class="nf">_expand_and_coalesce</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">total</span>
+
                 <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">expanded</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
 
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
                         <span class="c1"># Keep expanding deeper, if we can</span>
-                        <span class="n">expanded</span> <span class="o">=</span> <span class="n">_substitute</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">expanded_precision</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span>
+                            <span class="n">contextual_precision</span><span class="o">.</span><span class="n">numerator</span> <span class="o">*</span> <span class="n">count</span><span class="p">,</span>
+                            <span class="n">contextual_precision</span><span class="o">.</span><span class="n">denominator</span> <span class="o">*</span> <span class="n">total</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">expanded</span> <span class="o">=</span> <span class="n">_substitute</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">expanded_precision</span><span class="p">)</span>
                         <span class="c1"># Coalesce the result</span>
                         <span class="n">expanded</span> <span class="o">=</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
 
@@ -2918,7 +3165,7 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
         <span class="c1"># at all). (I&#39;m looking at you, sage.rings.…!)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mu</span><span class="p">:</span> <span class="n">RealLike</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -2937,17 +3184,15 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
         <span class="k">else</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">15</span>
 
-            <span class="nd">@beartype</span>
-            <span class="k">def</span> <span class="nf">lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-                <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg | </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
-
+            <span class="k">def</span> <span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
                 <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg | </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="n">std</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
                     <span class="n">var</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variance</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
                     <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;std | </span><span class="si">{</span><span class="n">std</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;var | </span><span class="si">{</span><span class="n">var</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                    <span class="k">pass</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">; mu: </span><span class="si">{</span><span class="n">mu</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="p">:</span>
                     <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(</span><span class="n">fill_items</span><span class="p">)</span>
@@ -2964,7 +3209,7 @@ than <code class="highlight"><span class="o">.</span></code> and <code class="hi
                         <span class="n">probability_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span>
                         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outcome_str</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">probability_f</span><span class="si">:</span><span class="s2">7.2%</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ticks</span><span class="si">}</span><span class="s2">&quot;</span>
 
-            <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_lines</span><span class="p">())</span>
 
     <span class="nd">@beartype</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealLike</span><span class="p">:</span>
@@ -4677,14 +4922,14 @@ exactly <em>k</em> times among <code class="highlight"><span class="n">n</span><
 
 
 <h3 id="dyce.h.H.explode" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
 
     <div class="doc doc-contents ">
 
-      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="k">else</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span></code>.</p>
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">outcome</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="k">else</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span><span class="n">precision_limit</span><span class="p">)</span></code>.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
@@ -4695,10 +4940,15 @@ exactly <em>k</em> times among <code class="highlight"><span class="n">n</span><
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Shorthand for ``#!python self.substitute(lambda h, outcome: h if outcome == max(h)</span>
-<span class="sd">    else outcome, operator.__add__, max_depth)``.</span>
+<span class="sd">    Shorthand for ``#!python self.substitute(lambda h, outcome: outcome if len(h) == 1</span>
+<span class="sd">    else h if outcome == max(h) else outcome, operator.__add__, max_depth,</span>
+<span class="sd">    precision_limit)``.</span>
 
 <span class="sd">    ``` python</span>
 <span class="sd">    &gt;&gt;&gt; H(6).explode(max_depth=2)</span>
@@ -4709,9 +4959,14 @@ exactly <em>k</em> times among <code class="highlight"><span class="n">n</span><
 <span class="sd">    See the [``substitute`` method][dyce.h.H.substitute].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">h</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">outcome</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">else</span> <span class="n">h</span>
+        <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
         <span class="fm">__add__</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="p">,</span>
+        <span class="n">precision_limit</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
@@ -5172,7 +5427,7 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
     <span class="c1"># at all). (I&#39;m looking at you, sage.rings.…!)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">mu</span><span class="p">:</span> <span class="n">RealLike</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -5191,17 +5446,15 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">15</span>
 
-        <span class="nd">@beartype</span>
-        <span class="k">def</span> <span class="nf">lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-            <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg | </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
-
+        <span class="k">def</span> <span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg | </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">std</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
                 <span class="n">var</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variance</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
                 <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;std | </span><span class="si">{</span><span class="n">std</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;var | </span><span class="si">{</span><span class="n">var</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">; mu: </span><span class="si">{</span><span class="n">mu</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_xy</span><span class="p">(</span><span class="n">fill_items</span><span class="p">)</span>
@@ -5218,7 +5471,7 @@ are otherwise ignored if <em>width</em> is zero or less).</p>
                     <span class="n">probability_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span>
                     <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outcome_str</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">probability_f</span><span class="si">:</span><span class="s2">7.2%</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ticks</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_lines</span><span class="p">())</span>
 </code></pre></div>
         </details>
     </div>
@@ -6179,19 +6432,33 @@ of operand ordering.</p>
 
 
 <h3 id="dyce.h.H.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10235f430</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10609d040</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
 
     <div class="doc doc-contents ">
 
-      <p>Calls <em>expand</em> on each outcome, recursively up to <em>max_depth</em> times. If <em>expand</em>
-returns a number, it replaces the outcome. If it returns an
-<a href="#dyce.h.H"><code>H</code> object</a>, <em>coalesce</em> is called on the outcome and the expanded
-histogram, and the returned histogram is folded into result. The default
-behavior for <em>coalesce</em> is to replace the outcome with the expanded histogram.
-Returned histograms are always reduced to their lowest terms.</p>
+      <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p>The <em>precision_limit</em> parameter should be considered experimental and may
+change or disappear in future versions.</p>
+</div>
+<p>Calls <em>expand</em> on each outcome. If <em>expand</em> returns a single outcome, it
+replaces the existing outcome. If it returns an <a href="#dyce.h.H"><code>H</code> object</a>,
+expansion is performed again (recursively) on that object until <em>max_depth</em> or
+<em>precision_limit</em> is exhausted. <em>coalesce</em> is called on the original outcome and
+the expanded histogram or outcome and the returned histogram is “folded” into
+result. (More on these terms and concepts below.)</p>
+<p>The default behavior for <em>coalesce</em> is to replace the outcome with the expanded
+histogram. Returned histograms are always reduced to their lowest terms.</p>
+<div class="admonition note">
+<p class="admonition-title"><em>coalesce</em> is not called unless <em>expand</em> returns a histogram</p>
+<p>If <em>expand</em> returns a single outcome, it <em>always</em> replaces the existing
+outcome. This is intentional. To return a single outcome, but trigger
+<em>coalesce</em>, characterize that outcome as a single-sided die (e.g.,
+<code class="highlight"><span class="n">H</span><span class="p">({</span><span class="n">outcome</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span></code>.</p>
+</div>
 <p>See the <a href="../dyce.h/#dyce.h.coalesce_replace"><code>coalesce_replace</code></a> and
 <a href="#dyce.h.H.lowest_terms"><code>lowest_terms</code></a> methods.</p>
 <p>This method can be used to model complex mechanics. The following models
@@ -6354,6 +6621,311 @@ d20-like role playing games.</p>
  <span class="mi">17</span> <span class="o">|</span>   <span class="mf">0.08</span><span class="o">%</span> <span class="o">|</span>
 </code></pre></div>
 </td></tr></table>
+<p>When <em>expand</em> returns an <a href="#dyce.h.H"><code>H</code> object</a>, outcomes produced from the
+corresponding <em>coalesce</em> are accumulated, but the counts retain their “scale”
+within the context of the expansion. This becomes clearer when there is no
+overlap between the substituted histogram and the other outcomes.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d00</span> <span class="o">=</span> <span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span> <span class="p">;</span> <span class="n">d00</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">70</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">80</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">set</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">d00</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># no outcomes in common</span>
+<span class="kc">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6_d00</span> <span class="o">=</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="c1"># If a one comes up when rolling the d6,</span>
+<span class="o">...</span>   <span class="c1"># roll a d00 and take that result instead</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span>
+<span class="o">...</span> <span class="p">)</span> <span class="p">;</span> <span class="n">d6_d00</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">2</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+ <span class="mi">3</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+ <span class="mi">4</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+ <span class="mi">5</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+ <span class="mi">6</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+ <span class="mi">10</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">20</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">30</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">40</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">50</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">60</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">70</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">80</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">90</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>Note that the sum of the outcomes’ counts from the d00 make up the same
+proportion as the one’s outcome and count they replaced from the d6.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Fraction</span><span class="p">(</span>
+<span class="o">...</span>   <span class="nb">sum</span><span class="p">(</span><span class="n">count</span> <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">d6_d00</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">d00</span><span class="p">),</span>
+<span class="o">...</span>   <span class="n">d6_d00</span><span class="o">.</span><span class="n">total</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">d6</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d6</span><span class="o">.</span><span class="n">total</span><span class="p">)</span>
+<span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+<div class="admonition tip">
+<p class="admonition-title">Precision limits</p>
+<p>This method will halt recursive substitution on any branch <em>either</em> when its
+depth exceeds <em>max_depth</em> <em>or</em> its “contextual precision” is
+<em>precision_limit</em> or less. In either case, substitution is attempted for all
+of the outcomes of a(n expanded) histogram or none of them. The contextual
+precision of a histogram is its proportion to the whole. The contextual
+precision of the original (or top-level) histogram is <code class="highlight"><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span></code>. By setting <em>precision_limit</em> to that value, we basically ensure no
+substitution.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># no substitution</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
+<span class="kc">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># no substitution</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
+<span class="kc">True</span>
+</code></pre></div>
+</td></tr></table>
+<p>Let’s make a contrived, but illustrative modification to our d6/d00 example
+from above. If a one comes up when rolling a d6, roll a d00, but re-roll any
+80s.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># &lt;-- we&#39;ll never hit this</span>
+<span class="o">...</span>   <span class="c1"># will halt substitution after the original one from the d6</span>
+<span class="o">...</span>   <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">==</span> <span class="n">d6_d00</span>
+<span class="kc">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="o">...</span>   <span class="c1"># will halt substitution after the first 80 substitution</span>
+<span class="o">...</span>   <span class="c1"># after the original one from the d6</span>
+<span class="o">...</span>   <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+ <span class="mi">2</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+ <span class="o">...</span><span class="p">,</span>
+ <span class="mi">6</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+ <span class="mi">10</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+ <span class="o">...</span><span class="p">,</span>
+ <span class="mi">70</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+ <span class="mi">80</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">90</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">d00</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span> <span class="k">else</span> <span class="n">outcome</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="o">...</span>   <span class="c1"># will halt substitution after the second 80 substitution</span>
+<span class="o">...</span>   <span class="c1"># after the original one from the d6</span>
+<span class="o">...</span>   <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000000000</span><span class="p">),</span>  <span class="c1"># &lt;-- juuust under the wire</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">111</span><span class="p">,</span>
+ <span class="mi">2</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+ <span class="o">...</span><span class="p">,</span>
+ <span class="mi">6</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+ <span class="mi">10</span><span class="p">:</span> <span class="mi">111</span><span class="p">,</span>
+ <span class="o">...</span><span class="p">,</span>
+ <span class="mi">70</span><span class="p">:</span> <span class="mi">111</span><span class="p">,</span>
+ <span class="mi">80</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="mi">90</span><span class="p">:</span> <span class="mi">111</span><span class="p">})</span>
+</code></pre></div>
+</td></tr></table>
+<p>The default value for <em>precision_limit</em> is zero, which basically means it is
+ignored and recursion is limited solely by <em>max_depth</em>. If you want to
+ensure that this method stops delving based <em>solely</em> on precision, set
+<em>max_depth</em> to <code class="highlight"><span class="o">-</span><span class="mi">1</span></code>, which is equivalent to <code class="highlight"><span class="n">sys</span><span class="o">.</span><span class="n">getrecursionlimit</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span></code><sup id="dyce.h.H.substitute--fnref:1"><a class="footnote-ref" href="#dyce.h.H.substitute--fn:1">1</a></sup>. Be aware that this skews results in favor
+of non-limited branches.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.59</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">3.96</span>
+<span class="n">var</span> <span class="o">|</span>   <span class="mf">15.65</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">33.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################</span>
+  <span class="mi">7</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">8</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">2.08</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">1.04</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">2.08</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">0.52</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">1.04</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">18</span> <span class="o">|</span>   <span class="mf">1.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.63</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">4.09</span>
+<span class="n">var</span> <span class="o">|</span>   <span class="mf">16.72</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">33.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################</span>
+  <span class="mi">7</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">8</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">2.08</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">4.17</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">1.04</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">2.08</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">0.52</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">1.04</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">19</span> <span class="o">|</span>   <span class="mf">0.26</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">20</span> <span class="o">|</span>   <span class="mf">0.52</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">21</span> <span class="o">|</span>   <span class="mf">0.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+</code></pre></div>
+</td></tr></table>
+<p>Also be aware that without <em>max_depth</em> as a safety net, some substitutions
+are guaranteed to result in <code class="highlight"><span class="ne">RecursionError</span></code>s, even with very
+high <em>precision_limit</em>s.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<span class="o">...</span>   <span class="k">lambda</span> <span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">H</span><span class="p">({</span><span class="n">outcome</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>  <span class="c1"># expands to a single-sided die</span>
+<span class="o">...</span>   <span class="n">max_depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="o">...</span>   <span class="n">precision_limit</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">999999</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">),</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="o">...</span>
+<span class="ne">RecursionError</span><span class="p">:</span> <span class="n">maximum</span> <span class="n">recursion</span> <span class="n">depth</span> <span class="n">exceeded</span> <span class="ow">in</span> <span class="n">comparison</span>
+</code></pre></div>
+</td></tr></table>
+<p><a href="#dyce.h.H.explode"><code>H.explode</code></a>’s <em>expand</em> implementation guards against
+this by returning <code class="highlight"><span class="n">outcome</span></code> if the passed histogram has only one
+face. Consider a similar approach for your own <em>expand</em> implementations if
+outcomes’ contextual probabilities do not asymptotically approach zero.</p>
+</div>
+<div class="footnote">
+<hr />
+<ol>
+<li id="dyce.h.H.substitute--fn:1">
+<p>This method will “bottom out” far earlier. As of this writing, the practical
+limit of its implementation (without optimization) is something close to
+<span class="arithmatex">\(\frac {1} {3} \times \left( limit - depth \right)\)</span>, where <span class="arithmatex">\(limit\)</span> is
+<code class="highlight"><span class="n">sys</span><span class="o">.</span><span class="n">getrecursionlimit</span><span class="p">()</span></code> and <span class="arithmatex">\(depth\)</span> is <code class="highlight"><span class="nb">len</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span></code>. This also assumes the provided implementations for
+<em>expand</em> and <em>coalesce</em> don’t contribute significantly to the call stack.
+Setting <em>max_depth</em> to <code class="highlight"><span class="o">-</span><span class="mi">1</span></code> or one beyond the absolute limit
+signals that the caller wants it out of the way.&#160;<a class="footnote-backref" href="#dyce.h.H.substitute--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
@@ -6363,14 +6935,30 @@ d20-like role playing games.</p>
     <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
     <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
     <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calls *expand* on each outcome, recursively up to *max_depth* times. If *expand*</span>
-<span class="sd">    returns a number, it replaces the outcome. If it returns an</span>
-<span class="sd">    [``H`` object][dyce.h.H], *coalesce* is called on the outcome and the expanded</span>
-<span class="sd">    histogram, and the returned histogram is folded into result. The default</span>
-<span class="sd">    behavior for *coalesce* is to replace the outcome with the expanded histogram.</span>
-<span class="sd">    Returned histograms are always reduced to their lowest terms.</span>
+<span class="sd">    !!! warning &quot;Experimental&quot;</span>
+
+<span class="sd">        The *precision_limit* parameter should be considered experimental and may</span>
+<span class="sd">        change or disappear in future versions.</span>
+
+<span class="sd">    Calls *expand* on each outcome. If *expand* returns a single outcome, it</span>
+<span class="sd">    replaces the existing outcome. If it returns an [``H`` object][dyce.h.H],</span>
+<span class="sd">    expansion is performed again (recursively) on that object until *max_depth* or</span>
+<span class="sd">    *precision_limit* is exhausted. *coalesce* is called on the original outcome and</span>
+<span class="sd">    the expanded histogram or outcome and the returned histogram is “folded” into</span>
+<span class="sd">    result. (More on these terms and concepts below.)</span>
+
+<span class="sd">    The default behavior for *coalesce* is to replace the outcome with the expanded</span>
+<span class="sd">    histogram. Returned histograms are always reduced to their lowest terms.</span>
+
+<span class="sd">    !!! note &quot;*coalesce* is not called unless *expand* returns a histogram&quot;</span>
+
+<span class="sd">        If *expand* returns a single outcome, it *always* replaces the existing</span>
+<span class="sd">        outcome. This is intentional. To return a single outcome, but trigger</span>
+<span class="sd">        *coalesce*, characterize that outcome as a single-sided die (e.g.,</span>
+<span class="sd">        ``#!python H({outcome: 1})``.</span>
 
 <span class="sd">    See the [``coalesce_replace``][dyce.h.coalesce_replace] and</span>
 <span class="sd">    [``lowest_terms``][dyce.h.H.lowest_terms] methods.</span>
@@ -6494,25 +7082,246 @@ d20-like role playing games.</p>
 <span class="sd">     17 |   0.08% |</span>
 
 <span class="sd">    ```</span>
+
+<span class="sd">    When *expand* returns an [``H`` object][dyce.h.H], outcomes produced from the</span>
+<span class="sd">    corresponding *coalesce* are accumulated, but the counts retain their “scale”</span>
+<span class="sd">    within the context of the expansion. This becomes clearer when there is no</span>
+<span class="sd">    overlap between the substituted histogram and the other outcomes.</span>
+
+<span class="sd">    ``` python</span>
+<span class="sd">    &gt;&gt;&gt; d6 = H(6)</span>
+<span class="sd">    &gt;&gt;&gt; d00 = (H(10) - 1) * 10 ; d00</span>
+<span class="sd">    H({0: 1, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})</span>
+<span class="sd">    &gt;&gt;&gt; set(d6) &amp; set(d00) == set()  # no outcomes in common</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; d6_d00 = d6.substitute(</span>
+<span class="sd">    ...   # If a one comes up when rolling the d6,</span>
+<span class="sd">    ...   # roll a d00 and take that result instead</span>
+<span class="sd">    ...   lambda h, outcome: d00 if outcome == 1 else outcome</span>
+<span class="sd">    ... ) ; d6_d00</span>
+<span class="sd">    H({0: 1,</span>
+<span class="sd">     2: 10,</span>
+<span class="sd">     3: 10,</span>
+<span class="sd">     4: 10,</span>
+<span class="sd">     5: 10,</span>
+<span class="sd">     6: 10,</span>
+<span class="sd">     10: 1,</span>
+<span class="sd">     20: 1,</span>
+<span class="sd">     30: 1,</span>
+<span class="sd">     40: 1,</span>
+<span class="sd">     50: 1,</span>
+<span class="sd">     60: 1,</span>
+<span class="sd">     70: 1,</span>
+<span class="sd">     80: 1,</span>
+<span class="sd">     90: 1})</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    Note that the sum of the outcomes’ counts from the d00 make up the same</span>
+<span class="sd">    proportion as the one’s outcome and count they replaced from the d6.</span>
+
+<span class="sd">    ``` python</span>
+<span class="sd">    &gt;&gt;&gt; from fractions import Fraction</span>
+<span class="sd">    &gt;&gt;&gt; Fraction(</span>
+<span class="sd">    ...   sum(count for outcome, count in d6_d00.items() if outcome in d00),</span>
+<span class="sd">    ...   d6_d00.total,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    Fraction(1, 6)</span>
+<span class="sd">    &gt;&gt;&gt; Fraction(d6[1], d6.total)</span>
+<span class="sd">    Fraction(1, 6)</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    !!! tip &quot;Precision limits&quot;</span>
+
+<span class="sd">        This method will halt recursive substitution on any branch *either* when its</span>
+<span class="sd">        depth exceeds *max_depth* *or* its “contextual precision” is</span>
+<span class="sd">        *precision_limit* or less. In either case, substitution is attempted for all</span>
+<span class="sd">        of the outcomes of a(n expanded) histogram or none of them. The contextual</span>
+<span class="sd">        precision of a histogram is its proportion to the whole. The contextual</span>
+<span class="sd">        precision of the original (or top-level) histogram is ``#!python Fraction(1,</span>
+<span class="sd">        1)``. By setting *precision_limit* to that value, we basically ensure no</span>
+<span class="sd">        substitution.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome == 1 else outcome,</span>
+<span class="sd">        ...   precision_limit=Fraction(1, 1),  # no substitution</span>
+<span class="sd">        ... ) == d6</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome == 1 else outcome,</span>
+<span class="sd">        ...   max_depth=0,  # no substitution</span>
+<span class="sd">        ... ) == d6</span>
+<span class="sd">        True</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        Let’s make a contrived, but illustrative modification to our d6/d00 example</span>
+<span class="sd">        from above. If a one comes up when rolling a d6, roll a d00, but re-roll any</span>
+<span class="sd">        80s.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">        ...   max_depth=100,  # &lt;-- we&#39;ll never hit this</span>
+<span class="sd">        ...   # will halt substitution after the original one from the d6</span>
+<span class="sd">        ...   precision_limit=Fraction(1, 6),</span>
+<span class="sd">        ... ) == d6_d00</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">        ...   max_depth=100,</span>
+<span class="sd">        ...   # will halt substitution after the first 80 substitution</span>
+<span class="sd">        ...   # after the original one from the d6</span>
+<span class="sd">        ...   precision_limit=Fraction(1, 6) * Fraction(1, 10),</span>
+<span class="sd">        ... )</span>
+<span class="sd">        H({0: 11,</span>
+<span class="sd">         2: 100,</span>
+<span class="sd">         ...,</span>
+<span class="sd">         6: 100,</span>
+<span class="sd">         10: 11,</span>
+<span class="sd">         ...,</span>
+<span class="sd">         70: 11,</span>
+<span class="sd">         80: 1,</span>
+<span class="sd">         90: 11})</span>
+<span class="sd">        &gt;&gt;&gt; d6.substitute(</span>
+<span class="sd">        ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,</span>
+<span class="sd">        ...   max_depth=100,</span>
+<span class="sd">        ...   # will halt substitution after the second 80 substitution</span>
+<span class="sd">        ...   # after the original one from the d6</span>
+<span class="sd">        ...   precision_limit=Fraction(1, 6) * Fraction(1, 10) - Fraction(1, 1000000000),  # &lt;-- juuust under the wire</span>
+<span class="sd">        ... )</span>
+<span class="sd">        H({0: 111,</span>
+<span class="sd">         2: 1000,</span>
+<span class="sd">         ...,</span>
+<span class="sd">         6: 1000,</span>
+<span class="sd">         10: 111,</span>
+<span class="sd">         ...,</span>
+<span class="sd">         70: 111,</span>
+<span class="sd">         80: 1,</span>
+<span class="sd">         90: 111})</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        The default value for *precision_limit* is zero, which basically means it is</span>
+<span class="sd">        ignored and recursion is limited solely by *max_depth*. If you want to</span>
+<span class="sd">        ensure that this method stops delving based *solely* on precision, set</span>
+<span class="sd">        *max_depth* to ``#!python -1``, which is equivalent to ``#!python</span>
+<span class="sd">        sys.getrecursionlimit() + 1``[^1]. Be aware that this skews results in favor</span>
+<span class="sd">        of non-limited branches.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; h = H({1: 1, 2: 2, 3: 3})</span>
+<span class="sd">        &gt;&gt;&gt; print(h.explode(max_depth=5).format(scaled=True))</span>
+<span class="sd">        avg |    4.59</span>
+<span class="sd">        std |    3.96</span>
+<span class="sd">        var |   15.65</span>
+<span class="sd">          1 |  16.67% |########################</span>
+<span class="sd">          2 |  33.33% |#################################################</span>
+<span class="sd">          4 |   8.33% |############</span>
+<span class="sd">          5 |  16.67% |########################</span>
+<span class="sd">          7 |   4.17% |######</span>
+<span class="sd">          8 |   8.33% |############</span>
+<span class="sd">         10 |   2.08% |###</span>
+<span class="sd">         11 |   4.17% |######</span>
+<span class="sd">         13 |   1.04% |#</span>
+<span class="sd">         14 |   2.08% |###</span>
+<span class="sd">         16 |   0.52% |</span>
+<span class="sd">         17 |   1.04% |#</span>
+<span class="sd">         18 |   1.56% |##</span>
+<span class="sd">        &gt;&gt;&gt; print(h.explode(max_depth=-1, precision_limit=Fraction(1, 6 ** 2)).format(scaled=True))</span>
+<span class="sd">        avg |    4.63</span>
+<span class="sd">        std |    4.09</span>
+<span class="sd">        var |   16.72</span>
+<span class="sd">          1 |  16.67% |########################</span>
+<span class="sd">          2 |  33.33% |#################################################</span>
+<span class="sd">          4 |   8.33% |############</span>
+<span class="sd">          5 |  16.67% |########################</span>
+<span class="sd">          7 |   4.17% |######</span>
+<span class="sd">          8 |   8.33% |############</span>
+<span class="sd">         10 |   2.08% |###</span>
+<span class="sd">         11 |   4.17% |######</span>
+<span class="sd">         13 |   1.04% |#</span>
+<span class="sd">         14 |   2.08% |###</span>
+<span class="sd">         16 |   0.52% |</span>
+<span class="sd">         17 |   1.04% |#</span>
+<span class="sd">         19 |   0.26% |</span>
+<span class="sd">         20 |   0.52% |</span>
+<span class="sd">         21 |   0.78% |#</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        Also be aware that without *max_depth* as a safety net, some substitutions</span>
+<span class="sd">        are guaranteed to result in ``#!python RecursionError``s, even with very</span>
+<span class="sd">        high *precision_limit*s.</span>
+
+<span class="sd">        ``` python</span>
+<span class="sd">        &gt;&gt;&gt; H(1).substitute(</span>
+<span class="sd">        ...   lambda h, outcome: H({outcome + 1: 1}),  # expands to a single-sided die</span>
+<span class="sd">        ...   max_depth=-1,</span>
+<span class="sd">        ...   precision_limit=Fraction(999999, 1000000),</span>
+<span class="sd">        ... )</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">          ...</span>
+<span class="sd">        RecursionError: maximum recursion depth exceeded in comparison</span>
+
+<span class="sd">        ```</span>
+
+<span class="sd">        [``H.explode``][dyce.h.H.explode]’s *expand* implementation guards against</span>
+<span class="sd">        this by returning ``#!python outcome`` if the passed histogram has only one</span>
+<span class="sd">        face. Consider a similar approach for your own *expand* implementations if</span>
+<span class="sd">        outcomes’ contextual probabilities do not asymptotically approach zero.</span>
+
+<span class="sd">    [^1]:</span>
+
+<span class="sd">        This method will “bottom out” far earlier. As of this writing, the practical</span>
+<span class="sd">        limit of its implementation (without optimization) is something close to</span>
+<span class="sd">        $\frac {1} {3} \times \left( limit - depth \right)$, where $limit$ is</span>
+<span class="sd">        ``#!python sys.getrecursionlimit()`` and $depth$ is ``#!python</span>
+<span class="sd">        len(inspect.stack(0))``. This also assumes the provided implementations for</span>
+<span class="sd">        *expand* and *coalesce* don’t contribute significantly to the call stack.</span>
+<span class="sd">        Setting *max_depth* to ``#!python -1`` or one beyond the absolute limit</span>
+<span class="sd">        signals that the caller wants it out of the way.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">max_depth</span> <span class="o">=</span> <span class="n">as_int</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_depth cannot be negative&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_depth</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">max_depth</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">getrecursionlimit</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">_substitute</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;max_depth cannot be an arbitrary negative number (use -1 explicitly to indicate no limit)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">precision_limit</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">precision_limit</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;precision_limit (</span><span class="si">{</span><span class="n">precision_limit</span><span class="si">}</span><span class="s2">) must be between zero and one, inclusive&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_substitute</span><span class="p">(</span>
+        <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">contextual_precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">coalesce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">max_depth</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">max_depth</span> <span class="ow">or</span> <span class="n">contextual_precision</span> <span class="o">&lt;=</span> <span class="n">precision_limit</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">h</span>
 
         <span class="k">def</span> <span class="nf">_expand_and_coalesce</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">RealLike</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">total</span>
+
             <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">expanded</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
                     <span class="c1"># Keep expanding deeper, if we can</span>
-                    <span class="n">expanded</span> <span class="o">=</span> <span class="n">_substitute</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">expanded_precision</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span>
+                        <span class="n">contextual_precision</span><span class="o">.</span><span class="n">numerator</span> <span class="o">*</span> <span class="n">count</span><span class="p">,</span>
+                        <span class="n">contextual_precision</span><span class="o">.</span><span class="n">denominator</span> <span class="o">*</span> <span class="n">total</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">expanded</span> <span class="o">=</span> <span class="n">_substitute</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">expanded_precision</span><span class="p">)</span>
                     <span class="c1"># Coalesce the result</span>
                     <span class="n">expanded</span> <span class="o">=</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
 
@@ -7407,9 +8216,9 @@ expressed as:</p>
 
 <span class="sd">        ```</span>
 
-<span class="sd">        The ``#!python foreach`` class method is semantically equivalent to nesting</span>
-<span class="sd">        loops iterating over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for</span>
-<span class="sd">        each independent term and then aggregating the results.</span>
+<span class="sd">        The ``#!python foreach`` class method is equivalent to nesting loops iterating</span>
+<span class="sd">        over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for each independent</span>
+<span class="sd">        term and then aggregating the results.</span>
 
 <span class="sd">        ``` python</span>
 <span class="sd">        &gt;&gt;&gt; def dependent_term(</span>
@@ -8634,9 +9443,9 @@ callback function differs slightly between the two interfaces).</p>
 <span class="kc">True</span>
 </code></pre></div>
 </td></tr></table>
-<p>The <code class="highlight"><span class="n">foreach</span></code> class method is semantically equivalent to nesting
-loops iterating over <a href="#dyce.p.P.rolls_with_counts"><code>P.rolls_with_counts</code></a> for
-each independent term and then aggregating the results.</p>
+<p>The <code class="highlight"><span class="n">foreach</span></code> class method is equivalent to nesting loops iterating
+over <a href="#dyce.p.P.rolls_with_counts"><code>P.rolls_with_counts</code></a> for each independent
+term and then aggregating the results.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -8803,9 +9612,9 @@ each independent term and then aggregating the results.</p>
 
 <span class="sd">    ```</span>
 
-<span class="sd">    The ``#!python foreach`` class method is semantically equivalent to nesting</span>
-<span class="sd">    loops iterating over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for</span>
-<span class="sd">    each independent term and then aggregating the results.</span>
+<span class="sd">    The ``#!python foreach`` class method is equivalent to nesting loops iterating</span>
+<span class="sd">    over [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] for each independent</span>
+<span class="sd">    term and then aggregating the results.</span>
 
 <span class="sd">    ``` python</span>
 <span class="sd">    &gt;&gt;&gt; def dependent_term(</span>

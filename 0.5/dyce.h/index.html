@@ -1119,12 +1119,16 @@ class.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">is_odd</span><span class="p">()</span>
 
     <span class="nd">@beartype</span>
-    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Shorthand for ``#!python self.h().explode(max_depth)``. See the</span>
+<span class="sd">        Shorthand for ``#!python self.h().explode(max_depth, precision_limit)``. See the</span>
 <span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">)</span>
 
     <span class="nd">@beartype</span>
     <span class="k">def</span> <span class="nf">substitute</span><span class="p">(</span>
@@ -1132,12 +1136,14 @@ class.</p>
         <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
         <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the</span>
-<span class="sd">        [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].</span>
+<span class="sd">        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth,</span>
+<span class="sd">        precision_limit)``. See the [``h`` method][dyce.h.HableT.h] and</span>
+<span class="sd">        [``H.substitute``][dyce.h.H.substitute].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">)</span>
 
     <span class="nd">@beartype</span>
     <span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="n">RealLike</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">_OperandT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
@@ -2059,25 +2065,29 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.explode" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
 
     <div class="doc doc-contents ">
 
-      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span></code>. See the
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">)</span></code>. See the
 <a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.explode"><code>H.explode</code></a>.</p>
 
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@beartype</span>
-<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">explode</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Shorthand for ``#!python self.h().explode(max_depth)``. See the</span>
+<span class="sd">    Shorthand for ``#!python self.h().explode(max_depth, precision_limit)``. See the</span>
 <span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -2315,15 +2325,15 @@ class.</p>
 
 
 <h3 id="dyce.h.HableOpsMixin.substitute" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10235f430</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
+<code class="highlight language-python"><span class="n">substitute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">HableT</span><span class="p">,</span> <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">coalesce_replace</span> <span class="n">at</span> <span class="mh">0x10609d040</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 
 </h3>
 
     <div class="doc doc-contents ">
 
-      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span></code>. See the
-<a href="#dyce.h.HableT.h"><code>h</code> method</a> and <a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>.</p>
+      <p>Shorthand for <code class="highlight"><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span><span class="n">precision_limit</span><span class="p">)</span></code>. See the <a href="#dyce.h.HableT.h"><code>h</code> method</a> and
+<a href="../dyce/#dyce.h.H.substitute"><code>H.substitute</code></a>.</p>
 
         <details class="quote">
           <summary>Source code in <code>dyce/h.py</code></summary>
@@ -2333,12 +2343,14 @@ class.</p>
     <span class="n">expand</span><span class="p">:</span> <span class="n">_ExpandT</span><span class="p">,</span>
     <span class="n">coalesce</span><span class="p">:</span> <span class="n">_CoalesceT</span> <span class="o">=</span> <span class="n">coalesce_replace</span><span class="p">,</span>
     <span class="n">max_depth</span><span class="p">:</span> <span class="n">SupportsInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision_limit</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the</span>
-<span class="sd">    [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].</span>
+<span class="sd">    Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth,</span>
+<span class="sd">    precision_limit)``. See the [``h`` method][dyce.h.HableT.h] and</span>
+<span class="sd">    [``H.substitute``][dyce.h.H.substitute].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">precision_limit</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
