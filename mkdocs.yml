@@ -29,7 +29,7 @@ nav:
 extra:
   version:
     provider: mike
-  __vers_str__: 0.5.1
+  __vers_str__: 0.5.2
 
 extra_javascript:
   - js/site.js

@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
+
+* Updates binder links that fix requirements ranges.
+
 ## [0.5.1](https://github.com/posita/dyce/releases/tag/v0.5.1)
 
 * Fixes broken binder links in docs.

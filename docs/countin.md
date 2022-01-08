@@ -489,7 +489,7 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/13c591bf6192e2e7ac49e58050d47125c8b326e4?labpath=histogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/9c7bd3f836127850a9ca0429e5daa96cd9b81929?labpath=histogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 </summary>
 
 ``` python
