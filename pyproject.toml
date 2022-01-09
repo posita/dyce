@@ -1,4 +1,12 @@
-[build-system]   # ---------------------------------------------------------------------
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+[build-system]  # ----------------------------------------------------------------------
 
 requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
 build-backend = "setuptools.build_meta"
@@ -11,9 +19,7 @@ write_to = "dyce/_version.py"
 [tool.mypy]  # -------------------------------------------------------------------------
 
 check_untyped_defs = true
-# See <https://github.com/python/mypy/issues/10250#issuecomment-899187636>,
-# <https://github.com/python/mypy/issues/10310>, and
-# <https://github.com/python/mypy/issues/11825>
+# See <https://mypy.readthedocs.io/en/stable/config_file.html#confval-exclude>
 exclude = "(?x)( (^|/)build/ )"
 ignore_missing_imports = true
 strict_optional = true
