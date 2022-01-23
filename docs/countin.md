@@ -339,7 +339,7 @@ An inefficient way to enumerate all possible rolls is:
 
 ```
 
-Both histograms and pools support various comparison operations as well as substitution.
+Both histograms and pools support various comparison operations.
 The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in $[1..6]$ is:
 
 ``` python
@@ -357,11 +357,12 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
 
 ```
 
-The odds of scoring at least one nine or higher on any single die when rolling $n$ “[exploding][dyce.h.H.explode]” six-sided dice, for $n$ in $[1..10]$ is:
+The odds of scoring at least one nine or higher on any single die when rolling $n$ “[exploding][dyce.evaluation.explode]” six-sided dice, for $n$ in $[1..10]$ is:
 
 ``` python
+>>> from dyce.evaluation import explode
 >>> # By the time we're rolling a third die, we're guaranteed a nine or higher, so we only need to look that far
->>> exploding_d6 = H(6).explode(max_depth=2)
+>>> exploding_d6 = explode(H(6), limit=2)
 >>> for n in range(10, 0, -1):
 ...   d6e_ge_9 = exploding_d6.ge(9)
 ...   number_of_nines_or_higher_in_nd6e = n@d6e_ge_9
@@ -382,22 +383,22 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 ## Dependent probabilities
 
-Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via [``H.substitute``][dyce.h.H.substitute],[``H.foreach``][dyce.h.H.foreach], or [``P.foreach``][dyce.p.P.foreach].
+Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via an [``expandable``][dyce.evaluation.expandable]-decorated function or callback passed to [``foreach``][dyce.evaluation.foreach].
 First, we express independent terms as histograms or pools.
-Second, we express the dependent term as a callback function.
-Finally, we can pass the dependent callback function to [``H.substitute``][dyce.h.H.substitute],  [``H.foreach``][dyce.h.H.foreach], or  [``P.foreach``][dyce.p.P.foreach], along with the independent terms (as arguments in the cases of the latter two).
+Second, we express the dependent term as a function.
+Finally, we pass the dependent function to [``foreach``][dyce.evaluation.foreach], along with the independent terms, or, in the alternative, we decorate the function with [``expandable``][dyce.evaluation.expandable], and call it with the independent terms.
 
-[``H.substitute``][dyce.h.H.substitute] is well suited to situations with a single independent term that can be expressed as a histogram.
 Say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
 
 ``` python
+>>> from dyce.evaluation import HResult, foreach
 >>> d6 = H(6)  # independent term
 >>> constant = 4
 
->>> def outcome_vs_distance_to_constant(__: H, d6_outcome):
-...   return d6_outcome > abs(d6_outcome - constant)  # dependent term
+>>> def outcome_strictly_greater_than_constant(h_result: HResult):
+...   return h_result.outcome > abs(h_result.outcome - constant)  # dependent term
 
->>> print(d6.substitute(outcome_vs_distance_to_constant).format())
+>>> print(foreach(outcome_strictly_greater_than_constant, h_result=d6).format())
 avg |    0.67
 std |    0.47
 var |    0.22
@@ -408,17 +409,16 @@ var |    0.22
 
 Instead of a constant, let’s use another die as a second independent term.
 We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
-For multiple independent terms that can be expressed as histograms, the [``H.foreach`` class method][dyce.h.H.foreach] is often easiest.
 
 
 ``` python
 >>> d4 = H(4)  # first independent term
 >>> d6 = H(6)  # second independent term
 
->>> def outcome_vs_difference_dependent_term(d4_outcome, d6_outcome):
-...   return d6_outcome > abs(d4_outcome - d6_outcome)  # dependent term
+>>> def second_is_strictly_greater_than_first(first, second):
+...   return second.outcome > abs(first.outcome - second.outcome)  # dependent term
 
->>> h = H.foreach(outcome_vs_difference_dependent_term, d4_outcome=d4, d6_outcome=d6)
+>>> h = foreach(second_is_strictly_greater_than_first, first=d4, second=d6)
 >>> print(h.format())
 avg |    0.83
 std |    0.37
@@ -428,21 +428,28 @@ var |    0.14
 
 ```
 
-In the alternative, one could nest substitution functions, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
-However, this isn’t very readable, and is often less efficient than using [``H.foreach`` class method][dyce.h.H.foreach].
+In the alternative, one could nest [``expandable``][dyce.evaluation.expandable] functions, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
+However, this isn’t very readable, and is often less efficient than using a single function.
 
 ``` python
->>> def sub_d4(__: H, d4_outcome):
-...   def sub_d6(__: H, d6_outcome):
-...     return d6_outcome > abs(d4_outcome - d6_outcome)
-...   return d6.substitute(sub_d6)
+>>> from dyce.evaluation import expandable
 
->>> d4.substitute(sub_d4) == h
+>>> @expandable
+... def sub_first(first: HResult):
+...
+...   @expandable
+...   def sub_second(second: HResult):
+...     res = second.outcome > abs(first.outcome - second.outcome)
+...     return res
+...
+...   return sub_second(d6)
+
+>>> sub_first(d4, limit=-1) == h
 True
 
 ```
 
-Where the dependent term requires inspection of *rolls* from one or more pools as independent terms, [``P.foreach`` class method][dyce.p.P.foreach] is useful.
+This technique also works where the dependent term requires inspection of *rolls* from one or more pools as independent terms.
 Let’s say we have two pools.
 A roll from the first pool wins if it shows no duplicates but a roll from the second does.
 A roll from the second pool wins if it shows no duplicates but a roll from the first does.
@@ -450,17 +457,18 @@ Otherwise, it’s a tie (i.e., if neither or both rolls show duplicates).
 Let’s compare how three six-sided dice fair against two four-sided dice.
 
 ``` python
+>>> from dyce.evaluation import PResult
 >>> from enum import IntEnum
 
 >>> class DupeVs(IntEnum):
-...   SECOND_WINS = -1  # where second_roll shows no duplicates, but first_roll does
+...   SECOND_WINS = -1  # where second.roll shows no duplicates, but first.roll does
 ...   TIE = 0  # where both rolls show no duplicates or rolls pools have duplicates
-...   FIRST_WINS = 1  # where first_roll shows no duplicates, but second_roll does
+...   FIRST_WINS = 1  # where first.roll shows no duplicates, but second.roll does
 
->>> def compare_fours(first_roll, second_roll):
-...   return DupeVs((len(set(first_roll)) == len(first_roll)) - (len(set(second_roll)) == len(second_roll)))
+>>> def compare_duplicates(first: PResult, second: PResult):
+...   return DupeVs((len(set(first.roll)) == len(first.roll)) - (len(set(second.roll)) == len(second.roll)))
 
->>> h = P.foreach(compare_fours, first_roll=P(6, 6, 6), second_roll=P(4, 4)) ; h
+>>> h = foreach(compare_duplicates, first=P(6, 6, 6), second=P(4, 4)) ; h
 H({<DupeVs.SECOND_WINS: -1>: 12,
  <DupeVs.TIE: 0>: 19,
  <DupeVs.FIRST_WINS: 1>: 5})

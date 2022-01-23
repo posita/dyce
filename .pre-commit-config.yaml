@@ -1,7 +1,6 @@
 repos:
   - repo: meta
     hooks:
-    - id: check-hooks-apply
     - id: check-useless-excludes
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
@@ -34,7 +33,7 @@ repos:
     - id: check-vcs-permalinks
     - id: destroyed-symlinks
     - id: detect-private-key
-    # - id: check-json
+    - id: check-json
     - id: check-toml
     - id: check-xml
     - id: check-yaml

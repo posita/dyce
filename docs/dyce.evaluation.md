@@ -13,17 +13,16 @@
   Thank you!
 -->
 
-# ``#!python dyce.h`` package reference
+# ``#!python dyce.evaluation`` package reference
 
-::: dyce.h
+::: dyce.evaluation
     rendering:
       show_if_no_docstring: true
       show_root_heading: false
       show_root_toc_entry: false
     selection:
       members:
-        - "HableT"
-        - "HableOpsMixin"
-        - "coalesce_replace"
-        - "resolve_dependent_probability"
-        - "sum_h"
+        - "aggregate_weighted"
+        - "expandable"
+        - "explode"
+        - "foreach"

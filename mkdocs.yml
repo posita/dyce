@@ -18,6 +18,7 @@ nav:
   - License: license.md
   - API:
     - <tt>dyce</tt>: dyce.md
+    - <tt>dyce.evaluation</tt>: dyce.evaluation.md
     - <tt>dyce.h</tt>: dyce.h.md
     - <tt>dyce.r</tt>: dyce.r.md
 
@@ -86,7 +87,7 @@ theme:
   features:
     - content.code.annotate
     - content.tabs.link
-    - navigation.expand
+    - navigation.foreach
     - navigation.sections
     - toc.integrate
   palette:

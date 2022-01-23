@@ -11,7 +11,8 @@ from __future__ import annotations
 from enum import IntEnum, auto
 from functools import partial
 
-from dyce import H
+from dyce import H, P
+from dyce.evaluation import HResult, PResult, foreach
 
 
 class IronSoloResult(IntEnum):
@@ -30,19 +31,23 @@ def do_it(style: str) -> None:
     d6 = H(6)
     d10 = H(10)
 
-    def iron_solo_dependent_term(action, first_challenge, second_challenge, mod=0):
-        modded_action = action + mod
-        beats_first = modded_action > first_challenge
-        beats_second = modded_action > second_challenge
-        doubles = first_challenge == second_challenge
-
-        if beats_first and beats_second:
+    def iron_solo_dependent_term(
+        action: HResult,
+        challenges: PResult,
+        mod=0,
+    ):
+        modded_action = action.outcome + mod
+        first_challenge_outcome, second_challenge_outcome = challenges.roll
+        beats_first_challenge = modded_action > first_challenge_outcome
+        beats_second_challenge = modded_action > second_challenge_outcome
+        doubles = first_challenge_outcome == second_challenge_outcome
+        if beats_first_challenge and beats_second_challenge:
             return (
                 IronSoloResult.SPECTACULAR_SUCCESS
                 if doubles
                 else IronSoloResult.STRONG_SUCCESS
             )
-        elif beats_first or beats_second:
+        elif beats_first_challenge or beats_second_challenge:
             return IronSoloResult.WEAK_SUCCESS
         else:
             return (
@@ -55,11 +60,10 @@ def do_it(style: str) -> None:
     df = pandas.DataFrame(columns=IronSoloResult)
 
     for mod in mods:
-        res_for_mod = H.foreach(
+        res_for_mod = foreach(
             partial(iron_solo_dependent_term, mod=mod),
             action=d6,
-            first_challenge=d10,
-            second_challenge=d10,
+            challenges=2 @ P(d10),
         ).zero_fill(IronSoloResult)
         results_for_mod = dict(res_for_mod.distribution(rational_t=lambda n, d: n / d))
         row = pandas.DataFrame(results_for_mod, columns=IronSoloResult, index=[mod])

@@ -17,6 +17,8 @@
 
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
+* Adds the [``expandable`` decorator][dyce.evaluation.expandable] as well as the [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.evaluation.explode] convenience functions.
+* Deprecates [``P.foreach``][dyce.p.P.foreach], [``H.foreach``][dyce.h.H.foreach], and [``H.substitute``][dyce.h.H.substitute].
 * Allows outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
   Outcomes with zero counts are dropped when calling [``H.lowest_terms``][dyce.h.H.lowest_terms].
   Adds the [``H.zero_fill``][dyce.h.H.zero_fill] convenience method.
@@ -35,7 +37,7 @@
 ## [0.5.1](https://github.com/posita/dyce/releases/tag/v0.5.1)
 
 * Fixes broken binder links in docs.
-* Adds ``precision_limit`` argument to [``H.substitute``][dyce.h.H.substitute] and [``H.explode``][dyce.h.H.explode].
+* Adds the ``precision_limit`` argument to [``H.substitute``][dyce.h.H.substitute] and [``H.explode``][dyce.h.H.explode].
 
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 

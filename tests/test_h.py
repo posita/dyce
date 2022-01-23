@@ -369,23 +369,14 @@ class TestH:
 
     def test_substitute_cull_everything(self) -> None:
         h = H(6)
-        assert (
-            h.substitute(
-                lambda _, __: H(100), max_depth=-1, precision_limit=Fraction(1)
-            )
-            == h
-        )
+        assert h.substitute(lambda _, __: H(100), max_depth=0) == h
 
     def test_substitute_out_of_bounds(self) -> None:
         with pytest.raises(ValueError):
-            assert H(6).substitute(
-                lambda _, __: 1, max_depth=-1, precision_limit=Fraction(-1)
-            )
+            assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(-1))
 
         with pytest.raises(ValueError):
-            assert H(6).substitute(
-                lambda _, __: 1, max_depth=-1, precision_limit=Fraction(2)
-            )
+            assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(2))
 
     def test_substitute_double_odd_values(self) -> None:
         def double_odd_values(h: H, outcome: RealLike) -> Union[H, RealLike]:
@@ -422,7 +413,7 @@ class TestH:
 
     def test_explode_empty(self) -> None:
         h = H({})
-        assert h.explode(max_depth=-1) == h
+        assert h.explode(max_depth=1_000) == h
 
     def test_explode_no_depth(self) -> None:
         h = H(6)

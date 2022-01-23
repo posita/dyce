@@ -29,16 +29,8 @@ from numerary import RealLike
 from numerary.bt import beartype
 from numerary.types import SupportsIndex, SupportsInt
 
-from .h import (
-    H,
-    HableOpsMixin,
-    HableT,
-    _MappingT,
-    _SourceT,
-    aggregate_with_counts,
-    sum_h,
-)
-from .lifecycle import experimental
+from .h import H, HableOpsMixin, HableT, _MappingT, _SourceT, sum_h
+from .lifecycle import deprecated, experimental
 from .types import (
     _BinaryOperatorT,
     _GetItemT,
@@ -220,7 +212,7 @@ class P(Sequence[H], HableOpsMixin):
                 elif isinstance(a, SupportsInt):
                     yield H(a)
                 else:
-                    raise ValueError(f"unrecognized initializer {args}")
+                    raise TypeError(f"unrecognized initializer type {a!r}")
 
         hs = list(h for h in _gen_hs() if h)
 
@@ -432,6 +424,7 @@ class P(Sequence[H], HableOpsMixin):
     # ---- Methods ---------------------------------------------------------------------
 
     @classmethod
+    @deprecated
     @beartype
     def foreach(
         cls,
@@ -440,10 +433,12 @@ class P(Sequence[H], HableOpsMixin):
         **independent_sources: Union["P", H, HableT, _SourceT],
     ) -> H:
         r"""
-        !!! warning "Experimental"
+        !!! warning "Deprecated"
 
-            This method should be considered experimental and may change or disappear in
-            future versions.
+            This method has been deprecated and will be removed in a future release. See
+            the [``expandable`` decorator][dyce.evaluation.expandable] and
+            [``foreach`` function][dyce.evaluation.foreach] for more flexible
+            alternatives.
 
         Calls ``#!python dependent_term`` for each unique set of rolls from the product
         of ``independent_sources`` and accumulates the results. This is useful for
@@ -548,12 +543,14 @@ class P(Sequence[H], HableOpsMixin):
         ...           * count_n
         ...         )
 
-        >>> from dyce.h import aggregate_with_counts
-        >>> aggregate_with_counts(resolve()) == h
+        >>> from dyce.evaluation import aggregate_weighted
+        >>> aggregate_weighted(resolve()) == h
         True
 
         ```
         """
+        from dyce.evaluation import aggregate_weighted
+
         pools_by_kw: dict[str, P] = {}
 
         for source_name, source in independent_sources.items():
@@ -582,7 +579,7 @@ class P(Sequence[H], HableOpsMixin):
                 rolls_by_name = {name: roll for name, roll, _ in kw_roll_count_tuples}
                 yield dependent_term(**rolls_by_name), combined_count
 
-        return aggregate_with_counts(_resolve_dependent_term_for_rolls()).lowest_terms()
+        return aggregate_weighted(_resolve_dependent_term_for_rolls()).lowest_terms()
 
     @experimental
     @beartype
@@ -904,12 +901,15 @@ class P(Sequence[H], HableOpsMixin):
                 assert hn == n
 
                 # Still in search of a better (i.e., more efficient) way:
-                # https://math.stackexchange.com/questions/4173084/probability-distribution-of-k-1-k-2-cdots-k-m-selections-of-arbitrary-posi
+                # <https://math.stackexchange.com/questions/4173084/probability-distribution-of-k-1-k-2-cdots-k-m-selections-of-arbitrary-posi>
                 if i and abs(i) < n:
-                    rolls_with_counts_iter = (
-                        _rwc_homogeneous_n_h_using_karonen_partial_selection(
-                            h, n, i, fill=0
-                        )
+                    rolls_with_counts_iter = _rwc_homogeneous_n_h_using_karonen_partial_selection(
+                        h,
+                        n,
+                        i,
+                        # This is just padding to allow for consistent indexing. They
+                        # are deselected (i.e., not returned) below.
+                        fill=0,
                     )
                 else:
                     rolls_with_counts_iter = (
@@ -1048,8 +1048,8 @@ def _rwc_heterogeneous_h_groups(
     for v in product(
         *(_choose_rwc_homogeneous_n_h_implementation(h, n) for h, n in h_groups)
     ):
-        # It's possible v is () if h_groups is empty; see
-        # https://stackoverflow.com/questions/3154301/ for a detailed discussion
+        # It's possible v is () if h_groups is empty. See
+        # <https://stackoverflow.com/questions/3154301/> for a detailed discussion.
         if v:
             rolls_by_group: Iterable[Iterable[RealLike]]
             counts_by_group: Iterable[int]
@@ -1127,7 +1127,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     @_memoize
     def _selected_distributions(h: H, n: int, k: int) -> Iterator[_RollProbT]:
         if len(h) <= 1:
-            whole = k * tuple(h)
+            whole = tuple(h) * k
             yield whole, Fraction(1)
         else:
             this_total = h.total**n

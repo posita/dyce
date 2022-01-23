@@ -15,11 +15,13 @@
 
 # ``#!python dyce`` package reference
 
-``#!python dyce`` provides several core primitives:
+``#!python dyce`` revolves around two core primitives.
+[``H`` objects][dyce.h.H] are histograms (outcomes or individual dice).
+[``P`` objects][dyce.p.P] are collections of histograms (pools).
 
-* [``H``][dyce.h.H] – histograms (outcomes or individual dice)
-* [``P``][dyce.p.P] – collections of histograms (pools)
-* [``R``][dyce.r.R] – scalars, histograms, pools, operators, etc. for assembling roller trees (see [``dyce.r``](dyce.r.md) for details)
+Additionally, the [``dyce.evaluation``](dyce.evaluation.md) package provides the [``expandable`` decorator][dyce.evaluation.expandable], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
+It also provides [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.evaluation.explode] as convenient shorthands.
+The [``dyce.r``](dyce.r.md) package provides scalars, histograms, pools, operators, etc. for assembling reusable roller trees.
 
 ::: dyce.h.H
     rendering:

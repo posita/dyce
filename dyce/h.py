@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import warnings
 from abc import abstractmethod
 from collections.abc import Iterable as IterableC
@@ -48,7 +47,6 @@ from typing import (
     KeysView,
     Mapping,
     Optional,
-    Type,
     TypeVar,
     Union,
     ValuesView,
@@ -56,9 +54,15 @@ from typing import (
     overload,
 )
 
-from numerary import RealLike
+from numerary import IntegralLike, RealLike
 from numerary.bt import beartype
-from numerary.types import CachingProtocolMeta, Protocol, SupportsInt, runtime_checkable
+from numerary.types import (
+    CachingProtocolMeta,
+    Protocol,
+    RationalLikeMixedU,
+    SupportsInt,
+    runtime_checkable,
+)
 
 from . import rng
 from .lifecycle import deprecated, experimental
@@ -79,6 +83,7 @@ __all__ = ("H",)
 # ---- Types ---------------------------------------------------------------------------
 
 
+HOrOutcomeT = Union["H", RealLike]
 _T = TypeVar("_T")
 _MappingT = Mapping[RealLike, int]
 _SourceT = Union[
@@ -89,8 +94,9 @@ _SourceT = Union[
     "HableT",
 ]
 _OperandT = Union[RealLike, "H", "HableT"]
-_ExpandT = Callable[["H", RealLike], Union["H", RealLike]]
-_CoalesceT = Callable[["H", RealLike], "H"]
+_OutcomeCountT = tuple[RealLike, int]
+_SubstituteExpandCallbackT = Callable[["H", RealLike], HOrOutcomeT]
+_SubstituteCoalesceCallbackT = Callable[["H", RealLike], "H"]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -105,8 +111,15 @@ except (KeyError, ValueError):
 # ---- Functions -----------------------------------------------------------------------
 
 
+@deprecated
 def coalesce_replace(h: H, outcome: RealLike) -> H:
     r"""
+    !!! warning "Deprecated"
+
+        This function has been deprecated and will be removed in a future release. See
+        the [``expandable`` decorator][dyce.evaluation.expandable] and
+        [``foreach`` function][dyce.evaluation.foreach] for more flexible alternatives.
+
     Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified
     (*outcome* is ignored).
     """
@@ -432,7 +445,7 @@ class H(_MappingT):
 
                 self._h[outcome] += count
         else:
-            raise ValueError(f"unrecognized initializer {items}")
+            raise TypeError(f"unrecognized initializer type {items!r}")
 
         # We can't use something like functools.lru_cache for these values because those
         # mechanisms call this object's __hash__ method which relies on both of these
@@ -719,18 +732,20 @@ class H(_MappingT):
     # ---- Methods ---------------------------------------------------------------------
 
     @classmethod
+    @deprecated
     @beartype
     def foreach(
         cls,
-        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-        dependent_term: Callable[..., Union["H", RealLike]],
+        dependent_term: Callable[..., HOrOutcomeT],
         **independent_sources: _SourceT,
     ) -> H:
         r"""
-        !!! warning "Experimental"
+        !!! warning "Deprecated"
 
-            This method should be considered experimental and may change or disappear in
-            future versions.
+            This method has been deprecated and will be removed in a future release. See
+            the [``expandable`` decorator][dyce.evaluation.expandable] and
+            [``foreach`` function][dyce.evaluation.foreach] for more flexible
+            alternatives.
 
         Calls ``#!python dependent_term`` for each set of outcomes from the product of
         ``independent_sources`` and accumulates the results. This is useful for
@@ -1054,13 +1069,53 @@ class H(_MappingT):
 
         return comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)
 
+    @overload
+    def explode(
+        self,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self,
+        max_depth: None = None,
+        *,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self,
+        max_depth: None = None,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @deprecated
     @beartype
     def explode(
         self,
-        max_depth: SupportsInt = 1,
-        precision_limit: Fraction = Fraction(0),
+        max_depth: Optional[IntegralLike] = None,
+        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
     ) -> H:
         r"""
+        !!! warning "Deprecated"
+
+            This method has been deprecated and will be removed in a future release. See
+            the [``explode`` function][dyce.evaluation.explode] for a more flexible
+            alternative.
+
         Shorthand for ``#!python self.substitute(lambda h, outcome: outcome if len(h) == 1
         else h if outcome == max(h) else outcome, operator.__add__, max_depth,
         precision_limit)``.
@@ -1071,18 +1126,22 @@ class H(_MappingT):
 
         ```
 
-        See the [``substitute`` method][dyce.h.H.substitute].
+        This method guards against excessive recursion by returning ``#!python outcome``
+        if the passed histogram has only one face. See the [``substitute``
+        method][dyce.h.H.substitute].
         """
-        return self.substitute(
-            lambda h, outcome: outcome
-            if len(h) == 1
-            else h
-            if outcome == max(h)
-            else outcome,
-            __add__,
-            max_depth,
-            precision_limit,
-        )
+
+        def _explode(h: H, outcome: RealLike) -> HOrOutcomeT:
+            return outcome if len(h) == 1 else h if outcome == max(h) else outcome
+
+        if max_depth is not None and precision_limit is not None:
+            raise ValueError("only one of max_depth and precision_limit is allowed")
+        elif max_depth is not None:
+            return self.substitute(_explode, __add__, max_depth)
+        elif precision_limit is not None:
+            return self.substitute(_explode, __add__, precision_limit=precision_limit)
+        else:
+            return self.substitute(_explode, __add__)
 
     @beartype
     def lowest_terms(self) -> H:
@@ -1169,29 +1228,102 @@ class H(_MappingT):
 
         return self._order_stat_funcs_by_n[n](pos)
 
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        *,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        *,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: None = None,
+        *,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: None = None,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @deprecated
     @beartype
     def substitute(
         self,
-        expand: _ExpandT,
-        coalesce: _CoalesceT = coalesce_replace,
-        max_depth: SupportsInt = 1,
-        precision_limit: Fraction = Fraction(0),
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: Optional[IntegralLike] = None,
+        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
     ) -> H:
         r"""
-        !!! warning "Experimental"
+        !!! warning "Deprecated"
 
-            The *precision_limit* parameter should be considered experimental and may
-            change or disappear in future versions.
+            This method has been deprecated and will be removed in a future release. See
+            the [``expandable`` decorator][dyce.evaluation.expandable] and
+            [``foreach`` function][dyce.evaluation.foreach] for more flexible
+            alternatives.
 
         Calls *expand* on each outcome. If *expand* returns a single outcome, it
         replaces the existing outcome. If it returns an [``H`` object][dyce.h.H],
-        expansion is performed again (recursively) on that object until *max_depth* or
-        *precision_limit* is exhausted. *coalesce* is called on the original outcome and
-        the expanded histogram or outcome and the returned histogram is “folded” into
-        result. (More on these terms and concepts below.)
-
-        The default behavior for *coalesce* is to replace the outcome with the expanded
-        histogram. Returned histograms are always reduced to their lowest terms.
+        evaluation is performed again (recursively) on that object until a limit (either
+        *max_depth* or *precision_limit*) is exhausted. *coalesce* is called on the
+        original outcome and the expanded histogram or outcome and the returned
+        histogram is “folded” into result. The default behavior for *coalesce* is to
+        replace the outcome with the expanded histogram. Returned histograms are always
+        reduced to their lowest terms.
 
         !!! note "*coalesce* is not called unless *expand* returns a histogram"
 
@@ -1203,343 +1335,31 @@ class H(_MappingT):
         See the [``coalesce_replace``][dyce.h.coalesce_replace] and
         [``lowest_terms``][dyce.h.H.lowest_terms] methods.
 
-        This method can be used to model complex mechanics. The following models
-        re-rolling a face of 1 on the first roll:
-
-        ``` python
-        >>> def reroll_one(h: H, outcome):
-        ...   return h if outcome == 1 else outcome
-
-        >>> H(6).substitute(reroll_one)
-        H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
-
-        ```
-
-        See the [``explode`` method][dyce.h.H.explode] for a common shorthand for
-        “exploding” dice (i.e., where, if the greatest face come up, the die is
-        re-rolled and the result is added to a running sum).
-
-        This method uses the [``aggregate_with_counts``][dyce.h.aggregate_with_counts]
-        function in its implementation. As such, If *coalesce* returns the empty
-        histogram (``H({})``), the corresponding outcome and its counts are omitted from
-        the result without substitution or scaling. A silly example is modeling a d5 by
-        indefinitely re-rolling a d6 until something other than a 6 comes up.
-
-        ``` python
-        >>> H(6).substitute(lambda __, outcome: H({}) if outcome == 6 else outcome)
-        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
-
-        ```
-
-        This technique is more useful when modeling re-rolling certain derived
-        outcomes, like ties in a contest.
-
-        ``` python
-        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
-        >>> d6_3.vs(d8_2)
-        H({-1: 4553, 0: 1153, 1: 8118})
-        >>> d6_3.vs(d8_2).substitute(lambda __, outcome: H({}) if outcome == 0 else outcome)
-        H({-1: 4553, 1: 8118})
-
-        ```
-
-        Because it delegates to a callback for refereeing substitution decisions,
-        ``#!python substitute`` is quite flexible and well suited to modeling (or at
-        least approximating) logical progressions with dependent variables. Consider the
-        following mechanic:
-
-          1. Start with a total of zero.
-          2. Roll a six-sided die. Add the face to the total. If the face was a six, go
-             to step 3. Otherwise stop.
-          3. Roll a four-sided die. Add the face to the total. If the face was a four,
-             go to step 2. Otherwise stop.
-
-        What is the likelihood of an even final tally? This can be approximated by:
-
-        ``` python
-        >>> d4, d6 = H(4), H(6)
-
-        >>> def reroll_greatest_on_d4_d6(h: H, outcome):
-        ...   if outcome == max(h):
-        ...     if h == d6: return d4
-        ...     if h == d4: return d6
-        ...   return outcome
-
-        >>> import operator
-        >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.__add__, max_depth=6)
-        >>> h_even = h.is_even()
-        >>> print(f"{h_even[1] / h_even.total:.3%}")
-        39.131%
-
-        ```
-
-        Surprised? Because both six and four are even numbers, the only way we keep
-        rolling is if the total is even. You might think this would lead to evens being
-        *more* likely. However, we only care about the final tally and the rules direct
-        us to re-roll certain evens (nudging us toward an odd number more often than
-        not).
-
-        We can also use this method to model expected damage from a single attack in
-        d20-like role playing games.
-
-        ``` python
-        >>> bonus = 1
-        >>> dmg_dice = H(8)
-        >>> dmg = dmg_dice + bonus
-        >>> crit = dmg + dmg_dice
-        >>> target = 15 - bonus
-        >>> d20 = H(20)
-
-        >>> def dmg_from_attack_roll(h: H, outcome):
-        ...   if outcome == 20:
-        ...     return crit
-        ...   elif outcome >= target:
-        ...     return dmg
-        ...   else:
-        ...     return 0
-
-        >>> h = d20.substitute(dmg_from_attack_roll)
-        >>> print(h.format(scaled=True))
-        avg |    2.15
-        std |    3.40
-        var |   11.55
-          0 |  65.00% |##################################################
-          2 |   3.75% |##
-          3 |   3.83% |##
-          4 |   3.91% |###
-          5 |   3.98% |###
-          6 |   4.06% |###
-          7 |   4.14% |###
-          8 |   4.22% |###
-          9 |   4.30% |###
-         10 |   0.62% |
-         11 |   0.55% |
-         12 |   0.47% |
-         13 |   0.39% |
-         14 |   0.31% |
-         15 |   0.23% |
-         16 |   0.16% |
-         17 |   0.08% |
-
-        ```
-
-        When *expand* returns an [``H`` object][dyce.h.H], outcomes produced from the
-        corresponding *coalesce* are accumulated, but the counts retain their “scale”
-        within the context of the expansion. This becomes clearer when there is no
-        overlap between the substituted histogram and the other outcomes.
-
-        ``` python
-        >>> d6 = H(6)
-        >>> d00 = (H(10) - 1) * 10 ; d00
-        H({0: 1, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})
-        >>> set(d6) & set(d00) == set()  # no outcomes in common
-        True
-        >>> d6_d00 = d6.substitute(
-        ...   # If a one comes up when rolling the d6,
-        ...   # roll a d00 and take that result instead
-        ...   lambda h, outcome: d00 if outcome == 1 else outcome
-        ... ) ; d6_d00
-        H({0: 1, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})
-
-        ```
-
-        Note that the sum of the outcomes’ counts from the d00 make up the same
-        proportion as the one’s outcome and count they replaced from the d6.
-
-        ``` python
-        >>> from fractions import Fraction
-        >>> Fraction(
-        ...   sum(count for outcome, count in d6_d00.items() if outcome in d00),
-        ...   d6_d00.total,
-        ... )
-        Fraction(1, 6)
-        >>> Fraction(d6[1], d6.total)
-        Fraction(1, 6)
-
-        ```
-
         !!! tip "Precision limits"
 
-            This method will halt recursive substitution on any branch *either* when its
-            depth exceeds *max_depth* *or* its “contextual precision” is
-            *precision_limit* or less. In either case, substitution is attempted for all
-            of the outcomes of a(n expanded) histogram or none of them. The contextual
-            precision of a histogram is its proportion to the whole. The contextual
-            precision of the original (or top-level) histogram is ``#!python Fraction(1,
-            1)``. By setting *precision_limit* to that value, we basically ensure no
-            substitution.
-
-            ``` python
-            >>> d6.substitute(
-            ...   lambda h, outcome: d00 if outcome == 1 else outcome,
-            ...   precision_limit=Fraction(1, 1),  # no substitution
-            ... ) == d6
-            True
-            >>> d6.substitute(
-            ...   lambda h, outcome: d00 if outcome == 1 else outcome,
-            ...   max_depth=0,  # no substitution
-            ... ) == d6
-            True
-
-            ```
-
-            Let’s make a contrived, but illustrative modification to our d6/d00 example
-            from above. If a one comes up when rolling a d6, roll a d00, but re-roll any
-            80s.
-
-            ``` python
-            >>> d6.substitute(
-            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,
-            ...   max_depth=100,  # <-- we'll never hit this
-            ...   # will halt substitution after the original one from the d6
-            ...   precision_limit=Fraction(1, 6),
-            ... ) == d6_d00
-            True
-            >>> d6.substitute(
-            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,
-            ...   max_depth=100,
-            ...   # will halt substitution after the first 80 substitution
-            ...   # after the original one from the d6
-            ...   precision_limit=Fraction(1, 6) * Fraction(1, 10),
-            ... )
-            H({0: 11, 2: 100, ..., 6: 100, 10: 11, ..., 70: 11, 80: 1, 90: 11})
-            >>> d6.substitute(
-            ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,
-            ...   max_depth=100,
-            ...   # will halt substitution after the second 80 substitution
-            ...   # after the original one from the d6
-            ...   precision_limit=Fraction(1, 6) * Fraction(1, 10) - Fraction(1, 1000000000),  # <-- juuust under the wire
-            ... )
-            H({0: 111, 2: 1000, ..., 6: 1000, 10: 111, ..., 70: 111, 80: 1, 90: 111})
-
-            ```
-
-            The default value for *precision_limit* is zero, which basically means it is
-            ignored and recursion is limited solely by *max_depth*. If you want to
-            ensure that this method stops delving based *solely* on precision, set
-            *max_depth* to ``#!python -1``, which is equivalent to ``#!python
-            sys.getrecursionlimit() + 1``[^1]. Be aware that this skews results in favor
-            of non-limited branches.
-
-            ``` python
-            >>> h = H({1: 1, 2: 2, 3: 3})
-            >>> print(h.explode(max_depth=5).format(scaled=True))
-            avg |    4.59
-            std |    3.96
-            var |   15.65
-              1 |  16.67% |########################
-              2 |  33.33% |#################################################
-              4 |   8.33% |############
-              5 |  16.67% |########################
-              7 |   4.17% |######
-              8 |   8.33% |############
-             10 |   2.08% |###
-             11 |   4.17% |######
-             13 |   1.04% |#
-             14 |   2.08% |###
-             16 |   0.52% |
-             17 |   1.04% |#
-             18 |   1.56% |##
-            >>> print(h.explode(max_depth=-1, precision_limit=Fraction(1, 6 ** 2)).format(scaled=True))
-            avg |    4.63
-            std |    4.09
-            var |   16.72
-              1 |  16.67% |########################
-              2 |  33.33% |#################################################
-              4 |   8.33% |############
-              5 |  16.67% |########################
-              7 |   4.17% |######
-              8 |   8.33% |############
-             10 |   2.08% |###
-             11 |   4.17% |######
-             13 |   1.04% |#
-             14 |   2.08% |###
-             16 |   0.52% |
-             17 |   1.04% |#
-             19 |   0.26% |
-             20 |   0.52% |
-             21 |   0.78% |#
-
-            ```
-
-            Also be aware that without *max_depth* as a safety net, some substitutions
-            are guaranteed to result in ``#!python RecursionError``s, even with very
-            high *precision_limit*s.
-
-            ``` python
-            >>> H(1).substitute(
-            ...   lambda h, outcome: H({outcome + 1: 1}),  # expands to a single-sided die
-            ...   max_depth=-1,
-            ...   precision_limit=Fraction(999999, 1000000),
-            ... )
-            Traceback (most recent call last):
-              ...
-            RecursionError: maximum recursion depth exceeded in comparison
-
-            ```
-
-            [``H.explode``][dyce.h.H.explode]’s *expand* implementation guards against
-            this by returning ``#!python outcome`` if the passed histogram has only one
-            face. Consider a similar approach for your own *expand* implementations if
-            outcomes’ contextual probabilities do not asymptotically approach zero.
-
-        [^1]:
-
-            This method will “bottom out” far earlier. As of this writing, the practical
-            limit of its implementation (without optimization) is something close to
-            $\frac {1} {3} \times \left( limit - depth \right)$, where $limit$ is
-            ``#!python sys.getrecursionlimit()`` and $depth$ is ``#!python
-            len(inspect.stack(0))``. This also assumes the provided implementations for
-            *expand* and *coalesce* don’t contribute significantly to the call stack.
-            Setting *max_depth* to ``#!python -1`` or one beyond the absolute limit
-            signals that the caller wants it out of the way.
+            The *max_depth* parameter is similar to an
+            [``expandable``][dyce.evaluation.expandable]-decorated function’s limit
+            argument when given a whole number. The *precision_limit* parameter is
+            similar to an [``expandable``][dyce.evaluation.expandable]-decorated
+            function’s limit argument being provided a fractional value. It is an error
+            to provide values for both *max_depth* and *precision_limit*.
         """
-        max_depth = as_int(max_depth)
+        from .evaluation import HResult, LimitT, expandable
 
-        if max_depth == -1:
-            max_depth = sys.getrecursionlimit() + 1
+        if max_depth is not None and precision_limit is not None:
+            raise ValueError("only one of max_depth and precision_limit is allowed")
 
-        if max_depth < 0:
-            raise ValueError(
-                "max_depth cannot be an arbitrary negative number (use -1 explicitly to indicate no limit)"
-            )
+        limit: Optional[LimitT] = (
+            max_depth if precision_limit is None else precision_limit
+        )
 
-        if precision_limit < 0 or precision_limit > 1:
-            raise ValueError(
-                f"precision_limit ({precision_limit}) must be between zero and one, inclusive"
-            )
+        @expandable(sentinel=self)
+        def _expand(result: HResult) -> HOrOutcomeT:
+            res = expand(result.h, result.outcome)
 
-        def _substitute(
-            h: H,
-            depth: int = 0,
-            contextual_precision: Fraction = Fraction(1),
-        ) -> H:
-            assert coalesce is not None
+            return coalesce(_expand(res), result.outcome) if isinstance(res, H) else res
 
-            if depth == max_depth or contextual_precision <= precision_limit:
-                return h
-
-            def _expand_and_coalesce() -> Iterator[tuple[Union[H, RealLike], int]]:
-                total = h.total
-
-                for outcome, count in h.items():
-                    expanded = expand(h, outcome)
-
-                    if isinstance(expanded, H):
-                        # Keep expanding deeper, if we can
-                        expanded_precision = Fraction(
-                            contextual_precision.numerator * count,
-                            contextual_precision.denominator * total,
-                        )
-                        expanded = _substitute(expanded, depth + 1, expanded_precision)
-                        # Coalesce the result
-                        expanded = coalesce(expanded, outcome)
-
-                    yield expanded, count
-
-            return aggregate_with_counts(_expand_and_coalesce(), type(self))
-
-        return _substitute(self).lowest_terms()
+        return _expand(self, limit=limit)
 
     @beartype
     def vs(self, other: _OperandT) -> H:
@@ -1921,7 +1741,7 @@ class H(_MappingT):
                 n @ self.lt(outcome),
             )
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[tuple[RealLike, int]]:
+        def _gen_h_items_at_pos(pos: int) -> Iterator[_OutcomeCountT]:
             for outcome, (h_le, h_lt) in betas_by_outcome.items():
                 yield (
                     outcome,
@@ -1948,7 +1768,7 @@ class HableT(
 
     !!! info
 
-        The intended pronunciation of ``Hable`` is *AYCH-uh-bul*[^1] (i.e.,
+        The intended pronunciation of ``Hable`` is *AYCH-uh-BUL*[^1] (i.e.,
         [``H``][dyce.h.H]-able). Yes, that is a clumsy attempt at
         [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25). (You could
         *totally* [``H``][dyce.h.H] that, dude!) However, if you prefer something else
@@ -2241,32 +2061,151 @@ class HableOpsMixin(HableT):
         """
         return self.h().is_odd()
 
+    @overload
+    def explode(
+        self: HableT,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self: HableT,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self: HableT,
+        max_depth: None = None,
+        *,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def explode(
+        self: HableT,
+        max_depth: None = None,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
     @beartype
     def explode(
         self: HableT,
-        max_depth: SupportsInt = 1,
-        precision_limit: Fraction = Fraction(0),
+        max_depth: Optional[IntegralLike] = None,
+        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
     ) -> H:
         r"""
         Shorthand for ``#!python self.h().explode(max_depth, precision_limit)``. See the
         [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].
         """
-        return self.h().explode(max_depth, precision_limit)
+        if max_depth is not None and precision_limit is not None:
+            raise ValueError("only one of max_depth and precision_limit is allowed")
+        elif max_depth is not None:
+            return self.h().explode(max_depth)
+        elif precision_limit is not None:
+            return self.h().explode(precision_limit=precision_limit)
+        else:
+            return self.h().explode()
 
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        *,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT,
+        max_depth: IntegralLike,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        *,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT,
+        max_depth: None,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: None = None,
+        *,
+        precision_limit: Union[RationalLikeMixedU, RealLike],
+    ) -> H:
+        ...
+
+    @overload
+    def substitute(
+        self: HableT,
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: None = None,
+        precision_limit: None = None,
+    ) -> H:
+        ...
+
+    @deprecated
     @beartype
     def substitute(
         self: HableT,
-        expand: _ExpandT,
-        coalesce: _CoalesceT = coalesce_replace,
-        max_depth: SupportsInt = 1,
-        precision_limit: Fraction = Fraction(0),
+        expand: _SubstituteExpandCallbackT,
+        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
+        max_depth: Optional[IntegralLike] = None,
+        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
     ) -> H:
         r"""
-        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth,
-        precision_limit)``. See the [``h`` method][dyce.h.HableT.h] and
-        [``H.substitute``][dyce.h.H.substitute].
+        !!! warning "Deprecated"
+
+            This method has been deprecated and will be removed in a future release. See
+            the [``expandable`` decorator][dyce.evaluation.expandable] and
+            [``foreach`` function][dyce.evaluation.foreach] for more flexible
+            alternatives.
+
+        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the
+        [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].
         """
-        return self.h().substitute(expand, coalesce, max_depth, precision_limit)
+        if max_depth is not None and precision_limit is not None:
+            raise ValueError("only one of max_depth and precision_limit is allowed")
+        elif max_depth is not None:
+            return self.h().substitute(expand, coalesce, max_depth)
+        elif precision_limit is not None:
+            return self.h().substitute(
+                expand, coalesce, precision_limit=precision_limit
+            )
+        else:
+            return self.h().substitute(expand, coalesce)
 
     @beartype
     def within(self: HableT, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> H:
@@ -2280,70 +2219,9 @@ class HableOpsMixin(HableT):
 # ---- Functions -----------------------------------------------------------------------
 
 
-@beartype
-def aggregate_with_counts(
-    source_counts: Iterable[tuple[Union[H, RealLike], int]],
-    h_type: Type[H] = H,
-) -> H:
-    r"""
-    Aggregates *source_counts* into an [``H`` object][dyce.h.H]. Each source_count is a
-    two-tuple of either an outcome-count pair or a histogram-count pair. This function
-    is used in the implementation of the [``H.substitute``][dyce.h.H.substitute] and
-    [``P.foreach``][dyce.p.P.foreach] methods. Unlike those, the histogram returned from
-    this function is *not* reduced to its lowest terms.
-
-    In nearly all cases, when a source contains a histogram, it takes on the
-    corresponding count’s “scale”. In other words, the sum of the counts of the
-    histogram retains the same proportion as the count in relation to other outcomes.
-    This becomes clearer when there is no overlap between the histogram and the other
-    outcomes.
-
-    ``` python
-    >>> from dyce.h import aggregate_with_counts
-    >>> source_counts = ((H(3), 3), (H(-3), 2))
-    >>> h = aggregate_with_counts(source_counts).lowest_terms() ; h
-    H({-3: 2, -2: 2, -1: 2, 1: 3, 2: 3, 3: 3})
-
-    ```
-
-    !!! note "An important exception"
-
-        If a source is the empty histogram (``H({})``), it and its count is omitted from
-        the result without scaling.
-
-        ``` python
-        >>> source_counts = ((H(2), 1), (H({}), 20))
-        >>> aggregate_with_counts(source_counts)
-        H({1: 1, 2: 1})
-
-        ```
-    """
-    aggregate_scalar = 1
-    outcome_counts: list[tuple[RealLike, int]] = []
-
-    for outcome_or_h, count in source_counts:
-        if isinstance(outcome_or_h, H):
-            if outcome_or_h:
-                h_scalar = outcome_or_h.total
-
-                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
-                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
-
-                for new_outcome, new_count in outcome_or_h.items():
-                    outcome_counts.append(
-                        (new_outcome, count * aggregate_scalar * new_count)
-                    )
-
-                aggregate_scalar *= h_scalar
-        else:
-            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
-
-    return h_type(outcome_counts)
-
-
 @deprecated
 def resolve_dependent_probability(
-    dependent_term: Callable[..., Union[H, RealLike]],
+    dependent_term: Callable[..., HOrOutcomeT],
     **independent_sources: _SourceT,
 ) -> H:
     r"""
