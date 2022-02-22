@@ -316,19 +316,19 @@ class TestBinarySumOpRoller:
                 o = o_type(v)
                 r = R.from_value(o, annotation=f"{o_type}({v})")
 
-                two_pow_r = 2 ** r
+                two_pow_r = 2**r
                 assert two_pow_r.bin_op == operator.__pow__
                 left, right = two_pow_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
-                assert tuple(two_pow_r.roll().outcomes()) == (2 ** o,), two_pow_r
+                assert tuple(two_pow_r.roll().outcomes()) == (2**o,), two_pow_r
 
-                r_pow_two = r ** 2
+                r_pow_two = r**2
                 assert r_pow_two.bin_op == operator.__pow__
                 left, right = r_pow_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
-                assert tuple(r_pow_two.roll().outcomes()) == (o ** 2,), r_pow_two
+                assert tuple(r_pow_two.roll().outcomes()) == (o**2,), r_pow_two
 
     def test_op_and(self) -> None:
         for o_type in _INTEGRAL_OUTCOME_TYPES:
@@ -645,7 +645,7 @@ class TestFilterRoller:
         def evens_filter(outcome: RollOutcome) -> bool:
             return bool(outcome.is_even().value)
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_filter = r_squares.filter(evens_filter)
         pattern = (
             re.escape(
@@ -681,7 +681,7 @@ class TestFilterRoller:
         def evens_filter(outcome: RollOutcome) -> bool:
             return bool(outcome.is_even().value)
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_filter = r_squares.filter(evens_filter)
         r_squares_filter_annotated = r_squares_filter.annotate("even squares")
         assert r_squares_filter == r_squares.filter(evens_filter)
@@ -692,7 +692,7 @@ class TestFilterRoller:
         def evens_filter(outcome: RollOutcome) -> bool:
             return bool(outcome.is_even().value)
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_filter = r_squares.filter(evens_filter)
         r_squares_filter_roll = r_squares_filter.roll()
         assert tuple(r_squares_filter_roll.outcomes()) == (36, 16, 4)
@@ -706,7 +706,7 @@ class TestFilterRoller:
 
 class TestSelectionRoller:
     def test_repr(self) -> None:
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1)
         assert (
             repr(r_squares_select)
@@ -730,7 +730,7 @@ class TestSelectionRoller:
         )
 
     def test_op_eq(self) -> None:
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1, 1, -2)
         r_squares_select_annotated = r_squares_select.annotate("0, -1, 1, 2")
         assert r_squares_select == r_squares.select(0, -1, 1, -2)
@@ -738,7 +738,7 @@ class TestSelectionRoller:
         assert r_squares_select_annotated == r_squares_select.annotate("0, -1, 1, 2")
 
     def test_roll(self) -> None:
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1, 1, -2)
         r_squares_select_roll = r_squares_select.roll()
         assert tuple(r_squares_select_roll.outcomes()) == (1, 36, 4, 25)
@@ -755,7 +755,7 @@ class TestSubstitutionRoller:
         def odd_doubler(outcome: RollOutcome) -> RollOutcome:
             return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         pattern = (
             re.escape(
@@ -791,7 +791,7 @@ class TestSubstitutionRoller:
         def odd_doubler(outcome: RollOutcome) -> RollOutcome:
             return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         r_double_odd_squares_annotated = r_double_odd_squares.annotate(
             "doubled odd squares"
@@ -806,7 +806,7 @@ class TestSubstitutionRoller:
         def odd_doubler(outcome: RollOutcome) -> RollOutcome:
             return outcome * 2 if bool(outcome.is_odd().value) else outcome
 
-        r_squares = R.from_values_iterable(v ** 2 for v in range(6, 0, -1))
+        r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         r_double_odd_squares_roll = r_double_odd_squares.roll()
         assert tuple(r_double_odd_squares_roll.outcomes()) == (36, 50, 16, 18, 4, 2)

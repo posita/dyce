@@ -364,15 +364,15 @@ class TestP:
         d3 = H(3)
         p_d2 = P(d2)
         p_d3 = P(d3)
-        d2_pow_d3 = d2 ** d3
-        d3_pow_d2 = d3 ** d2
-        assert p_d2 ** p_d3 == d2_pow_d3
-        assert p_d2 ** d3 == d2_pow_d3
-        assert d2 ** p_d3 == d2_pow_d3
-        assert p_d3 ** p_d2 == d3_pow_d2
-        assert p_d3 ** d2 == d3_pow_d2
-        assert d3 ** p_d2 == d3_pow_d2
-        assert p_d2 ** p_d3 != p_d3 ** p_d2
+        d2_pow_d3 = d2**d3
+        d3_pow_d2 = d3**d2
+        assert p_d2**p_d3 == d2_pow_d3
+        assert p_d2**d3 == d2_pow_d3
+        assert d2**p_d3 == d2_pow_d3
+        assert p_d3**p_d2 == d3_pow_d2
+        assert p_d3**d2 == d3_pow_d2
+        assert d3**p_d2 == d3_pow_d2
+        assert p_d2**p_d3 != p_d3**p_d2
 
         assert p_d2 ** P() == P()
         assert P() ** p_d2 == P()
@@ -380,9 +380,9 @@ class TestP:
 
     def test_op_pow_num(self) -> None:
         p_d5 = P(5)
-        assert p_d5 ** 2 == H((1, 4, 9, 16, 25))
-        assert 2 ** p_d5 == H((2, 4, 8, 16, 32))
-        assert p_d5 ** -1 == H((1, 1 / 2, 1 / 3, 1 / 4, 1 / 5))
+        assert p_d5**2 == H((1, 4, 9, 16, 25))
+        assert 2**p_d5 == H((2, 4, 8, 16, 32))
+        assert p_d5**-1 == H((1, 1 / 2, 1 / 3, 1 / 4, 1 / 5))
         assert (-1) ** p_d5 == H((-1, 1, -1, 1, -1))
 
     def test_op_bitwise(self) -> None:

@@ -63,7 +63,6 @@ if sys.version_info >= (3, 8):
         def __call__(self, numerator: int, denominator: int) -> _T_co:
             pass
 
-
 else:
     _RationalInitializerT = Callable[[int, int], _T_co]
 

@@ -1067,8 +1067,8 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     ``` python
     >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=None))
     [((1, 1), 1), ((1, 2), 3), ((1, 3), 3), ..., ((5, 5), 13), ((5, 6), 27), ((6, 6), 16)]
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=-1))
-    [((-1, 1, 1), 1), ((-1, 1, 2), 3), ((-1, 1, 3), 3), ..., ((-1, 5, 5), 13), ((-1, 5, 6), 27), ((-1, 6, 6), 16)]
+    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=0))
+    [((0, 1, 1), 1), ((0, 1, 2), 3), ((0, 1, 3), 3), ..., ((0, 5, 5), 13), ((0, 5, 6), 27), ((0, 6, 6), 16)]
 
     ```
     """
@@ -1081,6 +1081,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         # Maintain consistency with comb(n, k) == 0 where k > n
         return iter(())
 
+    # TODO(posita): Can we use functools.cache instead?
     def _memoize(f: _SelectCallableT) -> _SelectCallableT:
         cache: DefaultDict[Tuple[H, int, int], List[_DistributionEntryT]] = defaultdict(
             list
@@ -1095,7 +1096,6 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
         return _wrapped
 
-    # TODO(posita): Can we use functools.cache instead?
     @_memoize
     def _selected_distributions(h: H, n: int, k: int) -> _DistributionT:
         if len(h) <= 1:

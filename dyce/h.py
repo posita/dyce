@@ -1029,7 +1029,7 @@ class H(_MappingT):
         assert k <= n
         c_outcome = self.get(outcome, 0)
 
-        return comb(n, k) * c_outcome ** k * (self.total() - c_outcome) ** (n - k)
+        return comb(n, k) * c_outcome**k * (self.total() - c_outcome) ** (n - k)
 
     @beartype
     def explode(
