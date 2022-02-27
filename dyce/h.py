@@ -369,7 +369,12 @@ class H(_MappingT):
 
     ```
     """
-    __slots__: Union[str, Iterable[str]] = ("_h", "_simple_init")
+    __slots__: Union[str, Iterable[str]] = (
+        "_h",
+        "_hash",
+        "_lowest_terms",
+        "_simple_init",
+    )
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -419,6 +424,8 @@ class H(_MappingT):
             for outcome in sorted_outcomes(tmp)
             if tmp[outcome] != 0
         }
+        self._lowest_terms: Optional[H] = None
+        self._hash: Optional[int] = None
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -453,7 +460,10 @@ class H(_MappingT):
 
     @beartype
     def __hash__(self) -> int:
-        return hash(frozenset(self._lowest_terms()))
+        if self._hash is None:
+            self._hash = hash(frozenset(self.lowest_terms().items()))
+
+        return self._hash
 
     @beartype
     def __len__(self) -> int:
@@ -1082,7 +1092,17 @@ class H(_MappingT):
 
         ```
         """
-        return type(self)(self._lowest_terms())
+        if self._lowest_terms is None:
+            counts_gcd = gcd(*self.counts())
+
+            if counts_gcd == 1:
+                self._lowest_terms = self
+            else:
+                self._lowest_terms = type(self)(
+                    (k, v // counts_gcd) for k, v in self.items()
+                )
+
+        return self._lowest_terms
 
     @experimental
     @beartype
@@ -1964,11 +1984,6 @@ class H(_MappingT):
             if self
             else 0
         )
-
-    def _lowest_terms(self) -> Iterable[Tuple[RealLike, int]]:
-        counts_gcd = gcd(*self.counts())
-
-        return ((k, v // counts_gcd) for k, v in self.items())
 
 
 @runtime_checkable
