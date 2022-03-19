@@ -2179,7 +2179,11 @@ class RollOutcome:
     @beartype
     # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __lt__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore [has-type]
-        if isinstance(other, RollOutcome):
+        if (
+            isinstance(other, RollOutcome)
+            and self.value is not None
+            and other.value is not None
+        ):
             return bool(__lt__(self.value, other.value))
         else:
             return NotImplemented
@@ -2187,7 +2191,11 @@ class RollOutcome:
     @beartype
     # TODO(posita): See <https://github.com/python/mypy/issues/10943>
     def __le__(self, other: _RollOutcomeOperandT) -> bool:  # type: ignore [has-type]
-        if isinstance(other, RollOutcome):
+        if (
+            isinstance(other, RollOutcome)
+            and self.value is not None
+            and other.value is not None
+        ):
             return bool(__le__(self.value, other.value))
         else:
             return NotImplemented
@@ -2208,14 +2216,22 @@ class RollOutcome:
 
     @beartype
     def __gt__(self, other: _RollOutcomeOperandT) -> bool:
-        if isinstance(other, RollOutcome):
+        if (
+            isinstance(other, RollOutcome)
+            and self.value is not None
+            and other.value is not None
+        ):
             return bool(__gt__(self.value, other.value))
         else:
             return NotImplemented
 
     @beartype
     def __ge__(self, other: _RollOutcomeOperandT) -> bool:
-        if isinstance(other, RollOutcome):
+        if (
+            isinstance(other, RollOutcome)
+            and self.value is not None
+            and other.value is not None
+        ):
             return bool(__ge__(self.value, other.value))
         else:
             return NotImplemented
@@ -2570,56 +2586,54 @@ class RollOutcome:
     @beartype
     def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__lt__(self.value, other.value)), sources=(self, other)
-            )
-        else:
+            return type(self)(bool(__lt__(self, other)), sources=(self, other))
+        elif self.value is not None:
             return type(self)(bool(__lt__(self.value, other)), sources=(self,))
+        else:
+            raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
     def le(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__le__(self.value, other.value)), sources=(self, other)
-            )
-        else:
+            return type(self)(bool(__le__(self, other)), sources=(self, other))
+        elif self.value is not None:
             return type(self)(bool(__le__(self.value, other)), sources=(self,))
+        else:
+            raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
     def eq(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__eq__(self.value, other.value)), sources=(self, other)
-            )
-        else:
+            return type(self)(bool(__eq__(self, other)), sources=(self, other))
+        elif self.value is not None:
             return type(self)(bool(__eq__(self.value, other)), sources=(self,))
+        else:
+            raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
     def ne(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__ne__(self.value, other.value)), sources=(self, other)
-            )
+            return type(self)(bool(__ne__(self, other)), sources=(self, other))
         else:
             return type(self)(bool(__ne__(self.value, other)), sources=(self,))
 
     @beartype
     def gt(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__gt__(self.value, other.value)), sources=(self, other)
-            )
-        else:
+            return type(self)(bool(__gt__(self, other)), sources=(self, other))
+        elif self.value is not None:
             return type(self)(bool(__gt__(self.value, other)), sources=(self,))
+        else:
+            raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
     def ge(self, other: _RollOutcomeOperandT) -> RollOutcome:
         if isinstance(other, RollOutcome):
-            return type(self)(
-                bool(__ge__(self.value, other.value)), sources=(self, other)
-            )
-        else:
+            return type(self)(bool(__ge__(self, other)), sources=(self, other))
+        elif self.value is not None:
             return type(self)(bool(__ge__(self.value, other)), sources=(self,))
+        else:
+            raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
     def is_even(self) -> RollOutcome:
