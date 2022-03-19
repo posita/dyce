@@ -259,7 +259,7 @@ class H(_MappingT):
 
     ```
 
-    The [``total`` method][dyce.h.H.total] can be used to compute the total number of
+    The [``total`` method][dyce.h.H.total()] can be used to compute the total number of
     combinations and each outcome’s probability.
 
     ``` python
@@ -374,6 +374,7 @@ class H(_MappingT):
         "_hash",
         "_lowest_terms",
         "_simple_init",
+        "_order_stat_funcs_by_n",
     )
 
     # ---- Initializer -----------------------------------------------------------------
@@ -424,8 +425,20 @@ class H(_MappingT):
             for outcome in sorted_outcomes(tmp)
             if tmp[outcome] != 0
         }
-        self._lowest_terms: Optional[H] = None
+
+        # We can't use something like functools.lru_cache for these values because those
+        # mechanisms call this object's __hash__ method which relies on both of these
+        # and we don't want a circular dependency when computing this object's hash.
         self._hash: Optional[int] = None
+        self._lowest_terms: Optional[H] = None
+
+        # We don't use functools' caching mechanisms generally because they don't
+        # present a good mechanism for scoping the cache to object instances such that
+        # the cache will be purged when the object is deleted. functools.cached_property
+        # is an exception, but it requires that objects have proper __dict__ values,
+        # which Hs do not. So we basically do what functools.cached_property does, but
+        # without a __dict__.
+        self._order_stat_funcs_by_n: Dict[int, Callable[[int], "H"]] = {}
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1113,29 +1126,12 @@ class H(_MappingT):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Shorthand for ``#!python self.order_stat_func_for_n(n)(pos)``.
-        """
-        # TODO(posita): Explore different memoization strategies (e.g., with
-        # functools.cache) for this method and H.order_stat_func_for_n
-        return self.order_stat_func_for_n(n)(pos)
-
-    @experimental
-    @beartype
-    def order_stat_func_for_n(self, n: SupportsInt) -> Callable[[SupportsInt], "H"]:
-        r"""
-        !!! warning "Experimental"
-
-            This method should be considered experimental and may change or disappear in
-            future versions.
-
-        Returns a function that takes a single argument (*pos*) and computes the
-        probability distribution for each outcome appearing in that position among
-        ``#!python n@self``.
+        Computes the probability distribution for each outcome appearing in at *pos* for
+        *n* histograms. *pos* is a zero-based index.
 
         ``` python
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
-        >>> order_stat_for_5d6avg = d6avg.order_stat_func_for_n(5)
-        >>> order_stat_for_5d6avg(3)  # counts where outcome appears at index 3
+        >>> d6avg.order_stat_for_n_at_pos(5, 3)  # counts where outcome appears in the fourth of five positions
         H({2: 26, 3: 1432, 4: 4792, 5: 1526})
 
         ```
@@ -1154,46 +1150,30 @@ class H(_MappingT):
 
         ```
 
-        This method exists in addition to the
-        [``H.order_stat_for_n_at_pos`` method][dyce.h.H.order_stat_for_n_at_pos] because
-        computing the betas for each outcome in *n* is unnecessary for each *pos*. Where
-        different *pos* values are needed for the same *n* (e.g., in a loop) and where
-        *n* is large, that overhead can be significant. The returned function caches
-        those betas for *n* such that repeated querying or results at *pos* can be
-        computed much faster.
+        Negative values for *pos* follow Python index semantics:
 
         ``` python
-        --8<-- "docs/assets/perf_order_stat_for_n.txt"
+        >>> d6 = H(6)
+        >>> d6.order_stat_for_n_at_pos(6, 0) == d6.order_stat_for_n_at_pos(6, -6)
+        True
+        >>> d6.order_stat_for_n_at_pos(6, 5) == d6.order_stat_for_n_at_pos(6, -1)
+        True
+
         ```
 
-        <details>
-        <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_order_stat_for_n.ipy"><code>perf_order_stat_for_n.ipy</code></a></summary>
-
-        ``` python
-        --8<-- "docs/assets/perf_order_stat_for_n.ipy"
-        ```
-        </details>
+        This method caches computing the betas for *n* so they can be reused for varying
+        values of *pos* in subsequent calls.
         """
-        betas_by_outcome: Dict[RealLike, Tuple[H, H]] = {}
+        n = as_int(n)
+        pos = as_int(pos)
 
-        for outcome in self.outcomes():
-            betas_by_outcome[outcome] = (
-                n @ self.le(outcome),
-                n @ self.lt(outcome),
-            )
+        if n not in self._order_stat_funcs_by_n:
+            self._order_stat_funcs_by_n[n] = self._order_stat_func_for_n(n)
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[RealLike, int]]:
-            for outcome, (h_le, h_lt) in betas_by_outcome.items():
-                yield (
-                    outcome,
-                    h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
-                )
+        if pos < 0:
+            pos = n + pos
 
-        @beartype
-        def order_stat_for_n_at_pos(pos: SupportsInt) -> H:
-            return type(self)(_gen_h_items_at_pos(as_int(pos)))
-
-        return order_stat_for_n_at_pos
+        return self._order_stat_funcs_by_n[n](pos)
 
     @beartype
     def substitute(
@@ -1984,6 +1964,28 @@ class H(_MappingT):
             if self
             else 0
         )
+
+    def _order_stat_func_for_n(self, n: int) -> Callable[[int], "H"]:
+        betas_by_outcome: Dict[RealLike, Tuple[H, H]] = {}
+
+        for outcome in self.outcomes():
+            betas_by_outcome[outcome] = (
+                n @ self.le(outcome),
+                n @ self.lt(outcome),
+            )
+
+        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[RealLike, int]]:
+            for outcome, (h_le, h_lt) in betas_by_outcome.items():
+                yield (
+                    outcome,
+                    h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
+                )
+
+        @beartype
+        def order_stat_for_n_at_pos(pos: int) -> H:
+            return type(self)(_gen_h_items_at_pos(pos))
+
+        return order_stat_for_n_at_pos
 
 
 @runtime_checkable

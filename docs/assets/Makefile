@@ -43,7 +43,6 @@ all : \
 perf : \
 	perf_appearances_in_rolls.txt \
 	perf_foreach.txt \
-	perf_order_stat_for_n.txt \
 	perf_pools_vs_rollers.txt \
 	perf_rolls_with_counts.txt
 

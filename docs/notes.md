@@ -18,6 +18,7 @@
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
 * Refactors [``H.total``][dyce.h.H.total] and [``P.is_homogeneous``][dyce.p.P.is_homogeneous] properties into similarly-named methods.
+* Removes ``H.order_stat_func_for_n`` and instead caches order stat functions for ``n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].
 
 ## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
 
