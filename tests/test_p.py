@@ -165,12 +165,10 @@ class TestP:
         assert p_3d4n_3d8[2:4] == P(d4n, d8)
 
     def test_getitem_wrong_type(self) -> None:
-        try:
-            import beartype  # noqa: F401
-        except ImportError:
-            pass
-        else:
-            pytest.skip("requires beartype not be installed")
+        from beartype import beartype as _beartype
+
+        if beartype is _beartype:
+            pytest.skip("requires dyce not use beartype")
 
         p_d6 = P(6)
 
@@ -178,7 +176,13 @@ class TestP:
             _ = p_d6[""]  # type: ignore [call-overload]
 
     def test_getitem_wrong_type_beartype(self) -> None:
-        roar = pytest.importorskip("beartype.roar", reason="requires beartype")
+        from beartype import beartype as _beartype
+
+        if beartype is not _beartype:
+            pytest.skip("requires dyce use beartype")
+
+        from beartype import roar
+
         p_d6 = P(6)
 
         with pytest.raises(roar.BeartypeException):

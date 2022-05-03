@@ -25,7 +25,6 @@ __all__ = ()
 SEED_INT_64: int = 0x64656164
 SEED_INT_128: int = 0x6465616462656566
 SEED_INT_192: int = 0x646561646265656663616665
-SEED_INTS: _RandSeed = (SEED_INT_64, SEED_INT_128, SEED_INT_192)
 
 
 # ---- Tests ---------------------------------------------------------------------------
@@ -71,12 +70,6 @@ def test_numpy_rng() -> None:
             0xE0D0D43C6108BD1,
             bytes.fromhex("e0d0d43c6108bd17"),
         ),
-        (
-            SEED_INTS,
-            0.32331170065667836,
-            0x6F230DBC3C8EC45,
-            bytes.fromhex("6f230dbc3c8ec452"),
-        ),
     ):
         _test_random_w_seed_helper(rng, seed, random)
         _test_getrandbits_w_seed_helper(rng, seed, 60, getrandbits)
@@ -101,7 +94,6 @@ def test_standard_rng() -> None:
         SEED_INT_64,
         SEED_INT_128,
         SEED_INT_192,
-        SEED_INTS,
     ):
         _test_random_w_seed_helper(rng, seed)
 

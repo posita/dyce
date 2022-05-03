@@ -57,7 +57,7 @@ if sys.version_info >= (3, 8):
         metaclass=CachingProtocolMeta,
     ):
         # TODO(posita): See <https://github.com/python/mypy/issues/11013>
-        # __slots__: Union[str, Iterable[str]] = ()
+        # __slots__: Any = ()
 
         @abstractmethod
         def __call__(self, numerator: int, denominator: int) -> _T_co:

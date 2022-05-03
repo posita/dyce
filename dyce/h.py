@@ -42,6 +42,7 @@ from operator import (
 )
 from pprint import pformat
 from typing import (
+    Any,
     Callable,
     Counter,
     Dict,
@@ -259,7 +260,7 @@ class H(_MappingT):
 
     ```
 
-    The [``total`` method][dyce.h.H.total()] can be used to compute the total number of
+    The [``total`` method][dyce.h.H.total] can be used to compute the total number of
     combinations and each outcome’s probability.
 
     ``` python
@@ -369,7 +370,7 @@ class H(_MappingT):
 
     ```
     """
-    __slots__: Union[str, Iterable[str]] = (
+    __slots__: Any = (
         "_h",
         "_hash",
         "_lowest_terms",
@@ -2013,7 +2014,7 @@ class HableT(
         World Book Online (WBO) style [pronunciation
         respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
-    __slots__: Union[str, Iterable[str]] = ()
+    __slots__: Any = ()
 
     def h(self) -> H:
         r"""
@@ -2032,7 +2033,7 @@ class HableOpsMixin:
 
         See [``HableT``][dyce.h.HableT] for notes on pronunciation.
     """
-    __slots__: Union[str, Iterable[str]] = ()
+    __slots__: Any = ()
 
     @beartype
     def __add__(self: HableT, other: _OperandT) -> H:

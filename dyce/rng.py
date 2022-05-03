@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import ABC
 from random import Random
 from sys import version_info
-from typing import NewType, Sequence, Type, Union
+from typing import Any, Tuple, Type, Union
 
 from numerary.bt import beartype
 
@@ -21,8 +21,7 @@ __all__ = ("RNG",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_RandState = NewType("_RandState", object)
-_RandSeed = Union[None, int, Sequence[int]]
+_RandSeed = Union[int, float, str, bytes, bytearray, None]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -95,9 +94,8 @@ try:
             return x >> (numbytes * 8 - k)  # trim excess bits
 
         @beartype
-        # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
-        def getstate(self) -> _RandState:  # type: ignore [override]
-            return _RandState(self._generator.bit_generator.state)
+        def getstate(self) -> Tuple[Any, ...]:
+            return (self._generator.bit_generator.state,)
 
         @beartype
         def randbytes(self, n: int) -> bytes:
@@ -116,12 +114,12 @@ try:
             self._generator = default_rng(self.bit_generator(a))
 
         @beartype
-        def setstate(  # type: ignore [override]
+        def setstate(
             self,
-            # TODO(posita): See <https://github.com/python/typeshed/issues/6063>
-            state: _RandState,
+            state: Tuple[Any, ...],
         ) -> None:
-            self._generator.bit_generator.state = state
+            (_state,) = state
+            self._generator.bit_generator.state = _state
 
     class PCG64DXSMRandom(NumPyRandomBase):
         r"""
