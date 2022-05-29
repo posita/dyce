@@ -1,6 +1,3 @@
 [submodule "helpers"]
 	path = helpers
 	url = https://github.com/posita/dev-helpers.git
-[submodule "docs/notebooks"]
-	path = docs/notebooks
-	url = https://gist.github.com/f65800898aa0ad08b8c927246bf32c0f.git

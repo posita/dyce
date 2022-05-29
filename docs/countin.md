@@ -489,7 +489,7 @@ In addition, [``anydyce``](https://github.com/posita/anydyce/) provides addition
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><br>
-  <a href="https://mybinder.org/v2/gist/posita/f65800898aa0ad08b8c927246bf32c0f/9c7bd3f836127850a9ca0429e5daa96cd9b81929?labpath=histogram.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
+  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -610,5 +610,5 @@ H({7/9: 9, 8/9: 9, 1: 9})
 
 Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API](dyce.md).
 
-Anywhere you see a Binder logo ![Binder](https://mybinder.org/badge_logo.svg), you can click on it to immediately start tinkering with a temporal instance of that example using [``anydyce``](https://posita.github.io/anydyce/).
-Just be aware that Binder will eventually delete any changes, so make sure to download any notebooks you want to preserve.
+Anywhere you see a JupyterLite logo ![JupyterLite](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg), you can click on it to immediately start tinkering with a temporal instance of that example using [``anydyce``](https://posita.github.io/anydyce/).
+Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.

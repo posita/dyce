@@ -1,9 +1,11 @@
 name: Tests
+
 on:
   pull_request:
   push:
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
