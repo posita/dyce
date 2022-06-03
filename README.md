@@ -155,7 +155,7 @@ light/dark image rendering dumpster fire. See
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v0.5.2/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="https://posita.github.io/dyce/0.5/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python

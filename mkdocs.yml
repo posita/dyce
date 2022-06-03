@@ -63,8 +63,9 @@ plugins:
       # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>
       # gitignore: true
       glob:
-        - "Makefile"
         - "*.py"
+        - "Makefile"
+        - "notebooks/*"
   - macros
   - mike:
       version_selector: true

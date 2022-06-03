@@ -294,7 +294,7 @@ By defining our dependent term function to include ``#!python mod`` as a paramet
 <details>
 <summary>
 Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -340,7 +340,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -677,7 +677,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -723,7 +723,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -851,7 +851,7 @@ Example 1 visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -906,7 +906,7 @@ Example 2 visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -941,7 +941,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -992,7 +992,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python
@@ -1044,7 +1044,7 @@ Visualization:
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce-notebooks/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+  Interactive version: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
 ``` python

@@ -12,10 +12,13 @@
 /.tox/
 /build/
 /dist/
+/docs/jupyter/
 /dyce/_version.py
 /site/
 /htmlcov/
 .dmypy.json
+.ipynb_checkpoints/
+.jupyterlite.doit.db
 
 # Objects and packages
 *.7z

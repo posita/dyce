@@ -1,0 +1,11 @@
+{
+  "LiteBuildConfig": {
+    "contents": ["docs/notebooks"],
+    "federated_extensions": [
+      "https://files.pythonhosted.org/packages/py3/j/jupyterlab-widgets/jupyterlab_widgets-1.1.0-py3-none-any.whl"
+    ],
+    "output_dir": "docs/jupyter",
+    "ignore_sys_prefix": ["federated_extensions", "mathjax"],
+    "piplite_urls": []
+  }
+}
