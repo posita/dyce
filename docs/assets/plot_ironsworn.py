@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
 from enum import IntEnum, auto
 from functools import partial
 
@@ -26,6 +25,7 @@ class IronSoloResult(IntEnum):
 def do_it(style: str) -> None:
     import matplotlib.pyplot
     import matplotlib.ticker
+    import pandas
 
     d6 = H(6)
     d10 = H(10)
@@ -51,38 +51,33 @@ def do_it(style: str) -> None:
                 else IronSoloResult.FAILURE
             )
 
-    ax = matplotlib.pyplot.axes()
-    by_result = defaultdict(list)
     mods = list(range(0, 5))
+    df = pandas.DataFrame(columns=IronSoloResult)
+
+    for mod in mods:
+        results_for_mod = dict(
+            H.foreach(
+                partial(iron_solo_dependent_term, mod=mod),
+                action=d6,
+                first_challenge=d10,
+                second_challenge=d10,
+            ).distribution(rational_t=lambda n, d: n / d)
+        )
+        row = pandas.DataFrame(results_for_mod, columns=IronSoloResult, index=[mod])
+        df = pandas.concat((df, row))
+
+    df.index.name = "Modifier"
+    # DataFrames use enum's values for displaying column names, so we convert them to
+    # names
+    df = df.rename(columns={v: v.name for v in IronSoloResult})
+
+    ax = df.plot(kind="barh", stacked=True)
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
+    ylabel = ax.get_ylabel()
+    ax.set_ylabel(ylabel, color=text_color)
 
-    for mod in mods:
-        results_for_mod = H.foreach(
-            partial(iron_solo_dependent_term, mod=mod),
-            action=d6,
-            first_challenge=d10,
-            second_challenge=d10,
-        )
-        distribution_for_mod = dict(results_for_mod.distribution())
-
-        for result in IronSoloResult:
-            result_val = float(distribution_for_mod.get(result, 0))
-            by_result[result].append(result_val)
-
-    labels = [str(mod) for mod in mods]
-    bottoms = [0.0 for _ in mods]
-
-    for result in IronSoloResult:
-        result_vals = by_result[result]
-        assert len(result_vals) == len(mods)
-        ax.bar(labels, result_vals, bottom=bottoms, label=result.name)
-        bottoms = [
-            bottom + result_val for bottom, result_val in zip(bottoms, result_vals)
-        ]
-
+    ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1))
     ax.legend()
-    ax.set_xlabel("Modifier", color=text_color)
     ax.set_title("Ironsworn distributions", color=text_color)
