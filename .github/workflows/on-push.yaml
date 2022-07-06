@@ -1,0 +1,104 @@
+name: tests and deployment
+
+on:
+  pull_request:
+  push:
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "pypy-3.8", "pypy-3.9"]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # See <https://github.com/actions/checkout/issues/249> and
+        # <https://github.com/pypa/setuptools_scm/issues/480>
+        fetch-depth: 0
+    - name: set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: test with Tox
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install tox tox-gh-actions
+        git submodule update --init --recursive
+        tox
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: test
+    if: |
+      github.ref_type == 'tag' && (
+        github.ref_name == 'latest' || startsWith(github.ref_name, 'v')
+      )
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: build and check dist and docs
+      run: |
+        sudo apt-get install graphviz libgraphviz-dev
+        python -m pip install --upgrade pip
+        python -m pip install setuptools-scm tox
+        . ./helpers/ci-vars.sh  # defines PKG, TAG, VERS, etc.
+        if [ ${{ github.ref_name }} = "${TAG}" ] ; then
+          ./helpers/propagate-version.sh
+          git update-index -q --refresh
+          if ! git diff-index --quiet HEAD -- ; then
+            git status
+            git diff
+            echo 1>&2 "$( basename "${0}" ): changes detected after substitutions"
+            exit 1
+          fi
+        else
+          [ ${{ github.ref_name }} = latest ]  # assert
+        fi
+        git config user.name "$( git log --max-count 1 --pretty=format:%an )"
+        git config user.email "$( git log --max-count 1 --pretty=format:%ae )"
+        tox -e check
+        [ -f "dist/${PKG}-${VERS_PATCH}-py3-none-any.whl" ]
+        (
+          . .tox/check/bin/activate
+          mike deploy --rebase --update-aliases "${VERS}" latest
+        )
+    - name: publish to test PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      if: |
+        github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+      with:
+        user: __token__
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
+        skip_existing: true
+    - name: post test publish check and publish GHQ pages
+      if: |
+        github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+      run: |
+        . ./helpers/ci-vars.sh
+        for i in {0..45} ; do
+          if pip install \
+              --index-url 'https://test.pypi.org/simple' \
+              --extra-index-url 'https://pypi.org/simple' \
+              "${PROJECT}==${VERS_PATCH}" ; then
+            break
+          fi
+          sleep 2
+        done
+        [ "$( python -c "from ${PKG} import __vers_str__ ; print(__vers_str__)" )" = "${VERS_PATCH}" ]
+        git push origin gh-pages
+    - name: publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      if: |
+        github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
