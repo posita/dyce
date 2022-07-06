@@ -21,11 +21,11 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``git clean -Xdf [-n] [...]``
 
-* [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" [X.Y.Z]``
+* [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" "$( python -m versioningit --next-version . )"``
 
-* [ ] ``git add -u && git commit --edit --message "$( printf 'Release vX.Y.Z\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' )"``
+* [ ] ``git add -u && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python -m versioningit --next-version . )" )"``
 
-* [ ] ``git tag [--force] --sign vX.Y.Z && git tag --force latest``
+* [ ] ``git tag [--force] --sign "v$( python -m versioningit --next-version . )" && git tag --force latest``
 
 * [ ] ``"$( git rev-parse --show-toplevel )/.tox/check/bin/mike" serve`` and spot check docs (links to external references might be missing)
 

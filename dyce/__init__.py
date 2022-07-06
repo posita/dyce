@@ -15,21 +15,20 @@ from .p import *  # noqa: F401,F403
 from .r import *  # noqa: F401,F403
 from .types import *  # noqa: F401,F403
 
-__version__: Union[
-    Tuple[int, int, str],
-    Tuple[int, int, str, str],
+__all__ = ()
+
+_VersionT = Union[
     Tuple[int, int, int],
     Tuple[int, int, int, str],
     Tuple[int, int, int, str, str],
+    Tuple[int, int, int, str, str, str],
 ]
+
+__version__: _VersionT
 __vers_str__: str
 
 try:
-    # See <https://www.moritzkoerber.com/posts/versioning-with-setuptools_scm/>
-    from ._version import version as __vers_str__
-    from ._version import version_tuple as __version__
+    from ._version import __vers_str__, __version__
 except Exception:
-    __vers_str__ = "0.0.unknown version"
-    __version__ = (0, 0, "unknown version")
-
-__all__ = ()
+    __version__ = (0, 0, 0, "post0", "unknown", "d00000000")
+    __vers_str__ = "0.0.0.post0+unknown.d00000000"

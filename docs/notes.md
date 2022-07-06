@@ -17,7 +17,8 @@
 
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
-* Allow deployments to PyPI from CI based on tags.
+* Migrates from [``setuptools_scm``](https://pypi.org/project/setuptools-scm/) to [``versioningit``](https://pypi.org/project/versioningit/) for more flexible version number formatting.
+* Allows deployments to PyPI from CI based on tags.
 * Uses JupyterLite instead of Binder for examples.
 * Refactors [``H.total``][dyce.h.H.total] and [``P.is_homogeneous``][dyce.p.P.is_homogeneous] properties into similarly-named methods.
 * Removes ``H.order_stat_func_for_n`` and instead caches order stat functions for ``n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].

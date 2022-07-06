@@ -15,8 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        # See <https://github.com/actions/checkout/issues/249> and
-        # <https://github.com/pypa/setuptools_scm/issues/480>
+        # See <https://github.com/actions/checkout/issues/249>
         fetch-depth: 0
     - name: set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -48,7 +47,7 @@ jobs:
       run: |
         sudo apt-get install graphviz libgraphviz-dev
         python -m pip install --upgrade pip
-        python -m pip install setuptools-scm tox
+        python -m pip install tox 'versioningit~=2.0'
         . ./helpers/ci-vars.sh  # defines PKG, TAG, VERS, etc.
         if [ ${{ github.ref_name }} = "${TAG}" ] ; then
           ./helpers/propagate-version.sh

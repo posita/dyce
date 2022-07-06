@@ -1,6 +1,7 @@
-_VERS_PATCH="$( python -m setuptools_scm | perl -pe 's/^Guessed Version ([^ ]+).*$/\1/' )"
+_VERS_REGEX='(\d+\.\d+)\.\d+(?:\.post\d+\+g[0-9a-f]{7}(?:\.d\d{8})?|\+d\d{8})?'
+_VERS_PATCH="$( python -m versioningit )"
 VERS_PATCH="${VERS_PATCH-${_VERS_PATCH}}"
-VERS="$( echo "${VERS_PATCH}" | perl -pe 's/^(\d+\.\d+)(\.\d+)+(\.dev\d+(\+dirty)?)?$/\1/' )"
+VERS="$( echo "${VERS_PATCH}" | perl -pe "s/^${_VERS_REGEX}\$/\1/" )"
 TAG="v${VERS_PATCH}"
 
 PROJECT="$( python -c "

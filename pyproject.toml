@@ -8,13 +8,23 @@
 
 [build-system]  # ----------------------------------------------------------------------
 
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=45", "versioningit~=2.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]  # ---------------------------------------------------------------
+[tool.versioningit.next-version]  # ----------------------------------------------------
 
-local_scheme = "dirty-tag"
-write_to = "dyce/_version.py"
+method = "smallest-release"
+
+[tool.versioningit.vcs]  # -------------------------------------------------------------
+
+default-tag = "0.0.0"
+
+[tool.versioningit.write]  # -----------------------------------------------------------
+
+file = "dyce/_version.py"
+template = '''__vers_str__ = "{version}"
+__version__ = {version_tuple}
+'''
 
 [tool.mypy]  # -------------------------------------------------------------------------
 
