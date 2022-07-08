@@ -22,6 +22,9 @@
       show_root_toc_entry: false
     selection:
       members:
+        - "HResult"
+        - "PResult"
+        - "PWithSelection"
         - "aggregate_weighted"
         - "expandable"
         - "explode"

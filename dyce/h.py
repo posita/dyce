@@ -1344,12 +1344,12 @@ class H(_MappingT):
             function’s limit argument being provided a fractional value. It is an error
             to provide values for both *max_depth* and *precision_limit*.
         """
-        from .evaluation import HResult, LimitT, expandable
+        from .evaluation import HResult, _LimitT, expandable
 
         if max_depth is not None and precision_limit is not None:
             raise ValueError("only one of max_depth and precision_limit is allowed")
 
-        limit: Optional[LimitT] = (
+        limit: Optional[_LimitT] = (
             max_depth if precision_limit is None else precision_limit
         )
 

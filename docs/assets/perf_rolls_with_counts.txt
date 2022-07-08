@@ -1,51 +1,51 @@
 (P(6, 6, 6, 6)).h(slice(0)):
-8.57 µs ± 67.2 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
+9.74 µs ± 231 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
 (P(6, 6, 6, 6)).h(slice(1)):
-248 µs ± 5.49 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+282 µs ± 17.1 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(6, 6, 6, 6)).h(slice(2)):
-598 µs ± 17.6 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+629 µs ± 47.3 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(6, 6, 6, 6)).h(slice(3)):
-1.19 ms ± 27.6 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+1.13 ms ± 9.62 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(6, 6, 6, 6, 6, 6)).h(slice(2)):
-601 µs ± 9.3 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+611 µs ± 70.9 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(6, 6, 6, 6, 6, 6)).h(slice(3)):
-1.24 ms ± 32.2 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+1.18 ms ± 27.3 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(6, 6, 6, 6, 6, 6)).h(slice(4)):
-2.24 ms ± 46.8 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+2.08 ms ± 34.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 (P(6, 6, 6, 6, 6, 6)).h(slice(5)):
-3.71 ms ± 41.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+3.47 ms ± 47.8 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 (P(H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6)).h(slice(0)):
-8.71 µs ± 174 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
+8.43 µs ± 51.7 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
 (P(H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6)).h(slice(1)):
-760 µs ± 14.9 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+751 µs ± 4.14 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6)).h(slice(2)):
-1.74 ms ± 26.4 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+1.8 ms ± 8.86 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6)).h(slice(3)):
-1.75 ms ± 17.4 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+1.82 ms ± 11.5 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 (P(H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6, 6)).h(slice(2)):
-11.2 ms ± 364 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+11.4 ms ± 228 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 (P(H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6, 6)).h(slice(3)):
-29.8 ms ± 2.08 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+29 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 (P(H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6, 6)).h(slice(4)):
-29.2 ms ± 1.02 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+29.7 ms ± 495 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 (P(H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}), 6, 6, 6)).h(slice(5)):
-29.6 ms ± 885 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+30.2 ms ± 303 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 (P(H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(0)):
-9.3 µs ± 597 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
+8.43 µs ± 151 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
 (P(H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(1)):
-3.19 ms ± 143 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+3.16 ms ± 23.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 (P(H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(2)):
-3.07 ms ± 122 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+3.14 ms ± 55.4 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 (P(H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(3)):
-3.22 ms ± 147 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+3.14 ms ± 64.8 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 (P(H({-5: 1, -4: 1, -3: 1, -2: 1, -1: 1, 0: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1, 0: 1, 1: 1}), H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(2)):
-111 ms ± 1.62 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+119 ms ± 815 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 (P(H({-5: 1, -4: 1, -3: 1, -2: 1, -1: 1, 0: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1, 0: 1, 1: 1}), H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(3)):
-115 ms ± 1.45 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+120 ms ± 1.06 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 (P(H({-5: 1, -4: 1, -3: 1, -2: 1, -1: 1, 0: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1, 0: 1, 1: 1}), H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(4)):
-116 ms ± 1.59 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+122 ms ± 2.24 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 (P(H({-5: 1, -4: 1, -3: 1, -2: 1, -1: 1, 0: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1, 0: 1, 1: 1}), H({-3: 1, -2: 1, -1: 1, 0: 1, 1: 1, 2: 1}), H({-2: 1, -1: 1, 0: 1, 1: 1, 2: 1, 3: 1}), H({-1: 1, 0: 1, 1: 1, 2: 1, 3: 1, 4: 1}), H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}))).h(slice(5)):
-117 ms ± 878 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+123 ms ± 1.39 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 

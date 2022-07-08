@@ -11,9 +11,9 @@ from __future__ import annotations
 import sys
 from contextvars import ContextVar
 from fractions import Fraction
-from functools import reduce, wraps
+from functools import wraps
 from itertools import chain, product
-from operator import __mul__
+from math import prod
 from typing import (
     Callable,
     Iterable,
@@ -42,7 +42,7 @@ from numerary.types import (
 from .h import H, HableT, HOrOutcomeT, _OutcomeCountT, _SourceT
 from .lifecycle import experimental
 from .p import P, RollT
-from .types import as_int
+from .types import _GetItemT, as_int
 
 __all__ = ()
 
@@ -50,7 +50,7 @@ __all__ = ()
 # ---- Types ---------------------------------------------------------------------------
 
 
-LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
+_LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
 
 
 class HResult(NamedTuple):
@@ -63,10 +63,19 @@ class PResult(NamedTuple):
     roll: RollT
 
 
+class PWithSelection(NamedTuple):
+    p: P
+    which: Iterable[_GetItemT] = ()
+
+    @property
+    def total(self) -> int:
+        return self.p.total
+
+
 _NormalizedLimitT = Union[int, Fraction]
 _ReturnsHOrOutcomeT = Callable[..., HOrOutcomeT]
 _DependentTermT = TypeVar("_DependentTermT", bound=_ReturnsHOrOutcomeT)
-_POrSourceT = Union[P, _SourceT]
+_POrPWithSelectionOrSourceT = Union[P, PWithSelection, _SourceT]
 _PredicateT = Callable[[HResult], bool]
 _HResultCountT = Tuple[HResult, int]
 _PResultCountT = Tuple[PResult, int]
@@ -82,9 +91,9 @@ class _Context(NamedTuple):
 class _ForEachEvaluatorT(Protocol):
     def __call__(
         self,
-        *args: _POrSourceT,
-        limit: Optional[LimitT] = None,
-        **kw: _POrSourceT,
+        *args: _POrPWithSelectionOrSourceT,
+        limit: Optional[_LimitT] = None,
+        **kw: _POrPWithSelectionOrSourceT,
     ) -> H:
         ...
 
@@ -131,10 +140,15 @@ def expandable(
         This function should be considered experimental and may change or disappear in
         future versions.
 
-    Calls ``#!python dependent_term`` for each set of outcomes from the product of
-    ``independent_sources`` and accumulates the results. This is useful for resolving
-    dependent probabilities. Returned histograms are always reduced to their lowest
-    terms.
+    Calls ``#!python dependent_term`` for each set of outcomes from the product of any
+    independent sources provided to the decorated function and accumulates the results.
+    Independent sources are [``H`` objects][dyce.h.H], [``P`` objects][dyce.p.P], or
+    [``PWithSelection`` wrapper objects][dyce.evaluation.PWithSelection]. Results are
+    passed to ``#!python dependent_term`` via
+    [``HResult`` objects][dyce.evaluation.HResult] or
+    [``PResult`` objects][dyce.evaluation.PResult], corresponding to the respective
+    independent term. This is useful for resolving dependent probabilities. Returned
+    histograms are always reduced to their lowest terms.
 
     For example, let’s say we’re rolling a d20 but want to re-roll a ``#!python 1`` if
     it comes up, then keep the result.
@@ -164,7 +178,7 @@ def expandable(
 
     ```
 
-    When the decorated function returns an [``H`` object][dyce.h.H], those histogram’s
+    When the decorated function returns an [``H`` object][dyce.h.H], that histogram’s
     outcomes are accumulated, but the counts retain their “scale” within the context of
     the evaluation. This becomes clearer when there is no overlap between the evaluated
     histogram and the other outcomes.
@@ -207,10 +221,10 @@ def expandable(
     ``` python
     >>> Fraction(
     ...   sum(count for outcome, count in d6_d00.items() if outcome in d00),
-    ...   d6_d00.total(),
+    ...   d6_d00.total,
     ... )
     Fraction(1, 6)
-    >>> Fraction(d6[1], d6.total())
+    >>> Fraction(d6[1], d6.total)
     Fraction(1, 6)
 
     ```
@@ -270,7 +284,7 @@ def expandable(
         ...     return h_result.outcome
 
         >>> h = wicked_explode(H(6), limit=6)
-        >>> print(f"Likelihood of making {max(h)}: {h[max(h)] / h.total():.50%}")
+        >>> print(f"Likelihood of making {max(h)}: {h[max(h)] / h.total:.50%}")
         Likelihood of making 160: 0.00000000000000000000000000000000000000000000000947%
 
         ```
@@ -377,10 +391,9 @@ def expandable(
 
     ```
 
-    We can also foreach multiple independent terms of [``H`` objects][dyce.h.H] and
-    [``P`` objects][dyce.p.P]. Where [``H`` objects’][dyce.h.H] values are passed to the
-    evaluation function as outcomes, [``P`` objects’][dyce.h.H] values are passed as
-    rolls (i.e., ordered sequences of outcomes).
+    We can also evaluate multiple independent sources. For example, let’s say we want to
+    understand when a d6 will beat each face on two d10s. We can use a nested function
+    to also allow for a penalty or bonus modifier to the d6.
 
     ``` python
     >>> from dyce import P
@@ -401,6 +414,78 @@ def expandable(
     H({0: 43, 1: 14, 2: 3})
     >>> times_a_modded_d6_beats_two_d10s(mod=+2)
     H({0: 199, 1: 262, 2: 139})
+
+    ```
+
+    Now let’s say we want to introduce the concept of an “advantage” or “disadvantage”
+    to the above, meaning we roll an extra d10 that can further penalize or benefit us.
+    We *could* just roll 3d10 and look at the best or worst two of each roll.
+
+
+    ``` python
+    >>> from enum import Enum, auto
+    >>> p_3d10 = 3@P(10)
+
+    >>> class Advantage(Enum):
+    ...   DISADVANTAGE = auto()
+    ...   NORMAL = auto()
+    ...   ADVANTAGE = auto()
+
+    >>> def times_a_modded_d6_beats_two_d10s_w_adv_brute_force(mod: int = 0, adv: Advantage = Advantage.NORMAL) -> H:
+    ...
+    ...   @expandable
+    ...   def _expand(d6: HResult, p_d10s: PResult):
+    ...     if adv is Advantage.ADVANTAGE:
+    ...       roll = p_d10s.roll[:2]  # try to beat the worst two values
+    ...     elif adv is Advantage.DISADVANTAGE:
+    ...       roll = p_d10s.roll[-2:]  # try to beat the best two values
+    ...     else:
+    ...       roll = p_d10s.roll
+    ...     return sum(1 for outcome in roll if outcome < d6.outcome + mod)
+    ...
+    ...   if adv is Advantage.NORMAL:
+    ...     return _expand(H(6), p_2d10)
+    ...   else:
+    ...     return _expand(H(6), p_3d10)
+
+    >>> times_a_modded_d6_beats_two_d10s_w_adv_brute_force() == times_a_modded_d6_beats_two_d10s()
+    True
+    >>> times_a_modded_d6_beats_two_d10s_w_adv_brute_force(adv=Advantage.ADVANTAGE)
+    H({0: 39, 1: 25, 2: 16})
+    >>> times_a_modded_d6_beats_two_d10s_w_adv_brute_force(adv=Advantage.DISADVANTAGE)
+    H({0: 64, 1: 13, 2: 3})
+
+    ```
+
+    However, we could be more computationally more efficient by narrowing our selection
+    before we get to our evaluation function. We do this using
+    [``PWithSelection`` objects][dyce.evaluation.PWithSelection] whose ``#!python
+    PWithSelection.which`` values are passed to the
+    [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts] method when enumerating the
+    rolls.
+
+    ``` python
+    >>> from dyce.evaluation import PWithSelection
+
+    >>> def times_a_modded_d6_beats_two_d10s_w_adv(mod: int = 0, adv: Advantage = Advantage.NORMAL) -> H:
+    ...
+    ...   @expandable
+    ...   def _expand(d6: HResult, p_d10s: PResult):
+    ...     return sum(1 for outcome in p_d10s.roll if outcome < d6.outcome + mod)
+    ...
+    ...   if adv is Advantage.ADVANTAGE:
+    ...     return _expand(H(6), PWithSelection(p_3d10, (0, 1)))  # pass only the worst two values
+    ...   elif adv is Advantage.DISADVANTAGE:
+    ...     return _expand(H(6), PWithSelection(p_3d10, (-2, -1)))  # pass only the best two values
+    ...   else:
+    ...     return _expand(H(6), p_2d10)
+
+    >>> times_a_modded_d6_beats_two_d10s_w_adv() == times_a_modded_d6_beats_two_d10s()
+    True
+    >>> times_a_modded_d6_beats_two_d10s_w_adv(adv=Advantage.ADVANTAGE)
+    H({0: 39, 1: 25, 2: 16})
+    >>> times_a_modded_d6_beats_two_d10s_w_adv(adv=Advantage.DISADVANTAGE)
+    H({0: 64, 1: 13, 2: 3})
 
     ```
 
@@ -482,7 +567,7 @@ def expandable(
       6 |   0.73% |#
       7 |   0.03% |
     >>> h_even = h.is_even()
-    >>> print(f"{h_even[True] / h_even.total():.2%}")
+    >>> print(f"{h_even[True] / h_even.total:.2%}")
     44.00%
 
     ```
@@ -542,9 +627,9 @@ def expandable(
     def _decorator(f):
         @wraps(f)
         def _f(
-            *args: _POrSourceT,
-            limit: Optional[LimitT] = None,
-            **kw: _POrSourceT,
+            *args: _POrPWithSelectionOrSourceT,
+            limit: Optional[_LimitT] = None,
+            **kw: _POrPWithSelectionOrSourceT,
         ) -> H:
             try:
                 cur_ctxt = _expandable_ctxt.get()
@@ -573,18 +658,22 @@ def expandable(
                 # Mixing these requires dictionaries' orders to be durable across state
                 # mutations. We're relying on args and kw to remain constant and
                 # ordered.
-                hs_and_ps: Tuple[Union[H, P], ...] = tuple(
-                    _source_to_h_or_p(arg) for arg in chain(args, kw.values())
+                objs: Tuple[Union[H, P, PWithSelection], ...] = tuple(
+                    _source_to_h_or_p_or_p_with_selection(arg)
+                    for arg in chain(args, kw.values())
                 )
 
-                total = sum(h_or_p.total() for h_or_p in hs_and_ps)
+                total = sum(obj.total for obj in objs)
 
                 def _expand_if_we_can_can_can() -> Iterator[Tuple[HOrOutcomeT, int]]:
                     for result_counts in product(
-                        *(_h_or_p_to_result_iterable(h_or_p) for h_or_p in hs_and_ps)
+                        *(
+                            _h_or_p_or_p_with_selection_to_result_iterable(obj)
+                            for obj in objs
+                        )
                     ):
                         results, counts = zip(*result_counts)
-                        combined_count = reduce(__mul__, counts, 1)
+                        combined_count = prod(counts)
                         token = _expandable_ctxt.set(
                             _Context(
                                 normalized_limit=new_norm_limit,
@@ -617,7 +706,7 @@ def expandable(
 
                         yield evaluated, combined_count
 
-                res = aggregate_weighted(_expand_if_we_can_can_can(), H)
+                res = aggregate_weighted(_expand_if_we_can_can_can())
 
             if cur_ctxt.contextual_depth == 0:
                 res = res.lowest_terms()
@@ -681,7 +770,7 @@ def aggregate_weighted(
     for outcome_or_h, count in weighted_sources:
         if isinstance(outcome_or_h, H):
             if outcome_or_h:
-                h_scalar = outcome_or_h.total()
+                h_scalar = outcome_or_h.total
 
                 for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
                     outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
@@ -702,10 +791,10 @@ def aggregate_weighted(
 @beartype
 def foreach(
     callback: _DependentTermT,
-    *args: _POrSourceT,
-    limit: Optional[LimitT] = None,
+    *args: _POrPWithSelectionOrSourceT,
+    limit: Optional[_LimitT] = None,
     sentinel: H = _DEFAULT_SENTINEL,
-    **kw: _POrSourceT,
+    **kw: _POrPWithSelectionOrSourceT,
 ) -> H:
     r"""
     !!! warning "Experimental"
@@ -866,10 +955,10 @@ def explode(
 
 
 @beartype
-def _source_to_h_or_p(
-    source: _POrSourceT,
-) -> Union[H, P]:
-    if isinstance(source, (H, P)):
+def _source_to_h_or_p_or_p_with_selection(
+    source: _POrPWithSelectionOrSourceT,
+) -> Union[H, P, PWithSelection]:
+    if isinstance(source, (H, P, PWithSelection)):
         return source
     elif isinstance(source, HableT):
         return source.h()
@@ -878,8 +967,8 @@ def _source_to_h_or_p(
 
 
 @beartype
-def _h_or_p_to_result_iterable(
-    source: Union[H, P],
+def _h_or_p_or_p_with_selection_to_result_iterable(
+    source: Union[H, P, PWithSelection]
 ) -> Union[Iterable[_HResultCountT], Iterable[_PResultCountT]]:
     if isinstance(source, H):
         return (
@@ -891,13 +980,18 @@ def _h_or_p_to_result_iterable(
             (PResult(p=source, roll=roll), count)
             for roll, count in source.rolls_with_counts()
         )
+    elif isinstance(source, PWithSelection):
+        return (
+            (PResult(p=source.p, roll=roll), count)
+            for roll, count in source.p.rolls_with_counts(*source.which)
+        )
     else:
         raise TypeError(f"unrecognized source type {source}")
 
 
 @beartype
 def _normalize_limit(
-    limit: LimitT,
+    limit: _LimitT,
 ) -> _NormalizedLimitT:
     normalized_limit: _NormalizedLimitT
 

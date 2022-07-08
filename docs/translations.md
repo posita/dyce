@@ -594,9 +594,6 @@ At this point, we can define a simple ``#!python lambda`` that wraps [``H.vs``][
 Using our ``#!python risus_combat_driver`` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule” for resolving ties.
 
 ``` python
->>> from dyce import H, P
->>> from dyce.evaluation import foreach
-
 >>> def deadly_combat_vs(us: int, them: int) -> H:
 ...   best_us = (us@P(6)).h(-1)
 ...   best_them = (them@P(6)).h(-1)
@@ -669,8 +666,6 @@ For every value that is odd, we ended in a hit that will need to be tallied.
 Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
 ``` python
->>> from dyce.evaluation import HResult
-
 >>> def decode_hits(h_result: HResult):
 ...   return (h_result.outcome + 1) // 2  # equivalent to h_result.outcome // 2 + h_result.outcome % 2
 

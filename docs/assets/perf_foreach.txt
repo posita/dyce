@@ -1,6 +1,6 @@
 %timeit P.foreach(dependent_term_p, roll_1=H(6), roll_2=H(8), roll_3=H(10), roll_n=H(20))
-187 ms ± 592 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+204 ms ± 3.03 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 %timeit H.foreach(dependent_term_h, outcome_1=H(6), outcome_2=H(8), outcome_3=H(10), outcome_n=H(20))
-198 ms ± 2.23 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+216 ms ± 7.87 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 

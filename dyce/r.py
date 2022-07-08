@@ -105,10 +105,11 @@ class R:
     Where [``H`` objects][dyce.h.H] and [``P`` objects][dyce.p.P] are used primarily for
     enumerating weighted outcomes, ``#!python R`` objects represent rollers. More
     specifically, they are immutable nodes assembled in tree-like structures to
-    represent calculations. Unlike [``H``][dyce.h.H] or [``P``][dyce.p.P] objects,
-    rollers generate rolls that conform to weighted outcomes without engaging in
-    computationally expensive enumeration. Roller trees are typically composed from
-    various ``#!python R`` class methods and operators as well as arithmetic operations.
+    represent calculations. Unlike [``H`` objects][dyce.h.H] or
+    [``P`` objects][dyce.p.P], rollers generate rolls that conform to weighted outcomes
+    without engaging in computationally expensive enumeration. Roller trees are
+    typically composed from various ``#!python R`` class methods and operators as well
+    as arithmetic operations.
 
     ``` python
     >>> from dyce import H, P, R
@@ -2803,11 +2804,12 @@ class Roll(Sequence[RollOutcome]):
 
             ``dyce`` does not generally contemplate creation of rolls or roll outcomes
             outside the womb of [``R.roll``][dyce.r.R.roll] implementations.
-            [``Roll``][dyce.r.Roll] and [``RollOutcome``][dyce.r.RollOutcome] objects
-            generally mate for life, being created exclusively for (and in close
-            proximity to) one another. A roll manipulating a roll outcome’s internal
-            state post initialization may seem unseemly, but that intimacy is a
-            fundamental part of their primordial ritual.
+            [``Roll`` objects][dyce.r.Roll] and
+            [``RollOutcome`` objects][dyce.r.RollOutcome] generally mate for life, being
+            created exclusively for (and in close proximity to) one another. A roll
+            manipulating a roll outcome’s internal state post initialization may seem
+            unseemly, but that intimacy is a fundamental part of their primordial
+            ritual.
 
             That being said, you’re an adult. Do what you want. Just know that if you’re
             going to create your own roll outcomes and pimp them out all over town, they

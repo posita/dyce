@@ -1,6 +1,6 @@
 %timeit (5000@P(H(20) + H(12) + 4)).roll()[::-2]
-22.2 ms ± 422 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+25.4 ms ± 1.71 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 %timeit (5000@(R.select_from_values((slice(None, None, -2),), H(20), H(12), 4))).roll()
-220 ms ± 2.29 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+240 ms ± 25.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 

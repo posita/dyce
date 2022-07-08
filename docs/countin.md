@@ -385,10 +385,11 @@ The odds of scoring at least one nine or higher on any single die when rolling $
 
 Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via an [``expandable``][dyce.evaluation.expandable]-decorated function or callback passed to [``foreach``][dyce.evaluation.foreach].
 First, we express independent terms as histograms or pools.
-Second, we express the dependent term as a function.
+Second, we express the dependent term as a function that will be called once for each of the Cartesian product of the results from each independent term.
+Results are passed to the dependent function from independent histogram terms as [``HResult`` objects][dyce.evaluation.HResult] or from independent pool terms as [``PResult`` objects][dyce.evaluation.PResult].
 Finally, we pass the dependent function to [``foreach``][dyce.evaluation.foreach], along with the independent terms, or, in the alternative, we decorate the function with [``expandable``][dyce.evaluation.expandable], and call it with the independent terms.
 
-Say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
+To illustrate, say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
 
 ``` python
 >>> from dyce.evaluation import HResult, foreach
@@ -415,7 +416,7 @@ We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than t
 >>> d4 = H(4)  # first independent term
 >>> d6 = H(6)  # second independent term
 
->>> def second_is_strictly_greater_than_first(first, second):
+>>> def second_is_strictly_greater_than_first(first: HResult, second: HResult):
 ...   return second.outcome > abs(first.outcome - second.outcome)  # dependent term
 
 >>> h = foreach(second_is_strictly_greater_than_first, first=d4, second=d6)
