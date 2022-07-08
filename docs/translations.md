@@ -420,8 +420,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...   DRAW = auto()
 ...   WIN = auto()
 
->>> @cache
-... def risus_combat_driver(
+>>> def risus_combat_driver(
 ...     us: int,  # number of dice we still have
 ...     them: int,  # number of dice they still have
 ...     us_vs_them_func: Callable[[int, int], H],
@@ -431,6 +430,7 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...   if us == 0 and them == 0:
 ...     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
 ...
+...   @cache
 ...   def _resolve(us: int, them: int) -> H:
 ...     if us == 0: return H({-1: 1})  # we are out of dice, they win
 ...     if them == 0: return H({1: 1})  # they are out of dice, we win

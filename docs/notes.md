@@ -17,6 +17,7 @@
 
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
+* Fixes memoization in [Risus multi-round combat translation](translations.md#modeling-entire-multi-round-combats).
 * Migrates from [``setuptools_scm``](https://pypi.org/project/setuptools-scm/) to [``versioningit``](https://pypi.org/project/versioningit/) for more flexible version number formatting.
 * Allows deployments to PyPI from CI based on tags.
 * Uses JupyterLite instead of Binder for examples.
