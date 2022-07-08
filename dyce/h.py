@@ -56,13 +56,8 @@ from typing import (
 
 from numerary import IntegralLike, RealLike
 from numerary.bt import beartype
-from numerary.types import (
-    CachingProtocolMeta,
-    Protocol,
-    RationalLikeMixedU,
-    SupportsInt,
-    runtime_checkable,
-)
+from numerary.protocol import CachingProtocolMeta
+from numerary.types import Protocol, RationalLikeMixedU, SupportsInt, runtime_checkable
 
 from . import rng
 from .lifecycle import deprecated, experimental

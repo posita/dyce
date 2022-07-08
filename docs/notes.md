@@ -21,6 +21,7 @@
 
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
+* Now requires ``numerary~=0.4.3``.
 * Adds the [``expandable`` decorator][dyce.evaluation.expandable] as well as the [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.evaluation.explode] convenience functions.
 * Deprecates [``P.foreach``][dyce.p.P.foreach], [``H.foreach``][dyce.h.H.foreach], and [``H.substitute``][dyce.h.H.substitute].
 * Allows outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
@@ -32,7 +33,6 @@
 * Uses JupyterLite instead of Binder for examples.
 * Refactors [``P.is_homogeneous`` property][dyce.p.P.is_homogeneous] into a similarly-named method and adds the [``P.total`` method][dyce.p.P.total] property.
 * Removes ``H.order_stat_func_for_n`` and instead caches order stat functions for ``n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].
-* Now requires ``numerary>=0.4.0``.
 
 ## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
 

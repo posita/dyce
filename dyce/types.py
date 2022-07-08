@@ -14,13 +14,8 @@ from operator import __getitem__, __index__
 from typing import Any, Callable, Iterable, Iterator, Sequence, TypeVar, Union
 
 from numerary.bt import beartype
-from numerary.types import (
-    CachingProtocolMeta,
-    Protocol,
-    SupportsIndex,
-    SupportsInt,
-    runtime_checkable,
-)
+from numerary.protocol import CachingProtocolMeta
+from numerary.types import Protocol, SupportsIndex, SupportsInt, runtime_checkable
 
 __all__ = (
     "as_int",
