@@ -535,7 +535,9 @@ class P(Sequence[H], HableOpsMixin):
             else:
                 pools_by_kw[source_name] = P(H(source))
 
-        def _kw_roll_count_tuples(pool_name: str) -> Iterator[Tuple[str, RollT, int]]:
+        def _kw_roll_count_tuples(
+            pool_name: str,
+        ) -> Iterator[Tuple[str, RollT, int]]:
             for roll, count in pools_by_kw[pool_name].rolls_with_counts():
                 yield pool_name, roll, count
 
@@ -553,11 +555,16 @@ class P(Sequence[H], HableOpsMixin):
 
         return aggregate_with_counts(_resolve_dependent_term_for_rolls()).lowest_terms()
 
+    @experimental
     @beartype
     def is_homogeneous(self) -> bool:
         r"""
-        ``#!python True`` if the pool’s population of histograms is homogeneous, ``#!python
-        False`` if they are heterogeneous.
+        !!! warning "Experimental"
+
+            This property should be considered experimental and may change or disappear
+            in future versions.
+
+        Returns whether the pool’s population of histograms is homogeneous.
 
         ``` python
         >>> P(6, 6).is_homogeneous()
@@ -567,15 +574,25 @@ class P(Sequence[H], HableOpsMixin):
 
         ```
         """
-        return len(set(self._hs)) <= 1
 
+        def _is_homogeneous() -> bool:
+            return len(set(self._hs)) <= 1
+
+        return _is_homogeneous()
+
+    @experimental
     @beartype
     def total(self) -> int:
         r"""
-        Shorthand for ``#!python reduce(operator.__mul__, (h.total() for h in self), 1) if
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may change or disappear in
+            future versions.
+
+        Shorthand for ``#!python reduce(operator.__mul__, (h.total for h in self), 1) if
         self else 0``.
         """
-        return reduce(__mul__, (h.total() for h in self), 1) if self else 0
+        return reduce(__mul__, (h.total for h in self), 1) if self else 0
 
     @experimental
     @beartype
@@ -615,7 +632,7 @@ class P(Sequence[H], HableOpsMixin):
         ``` python
         >>> # Pretty darned efficient, generalizable to other boolean inquiries, and
         >>> # arguably the most readable
-        >>> d4_eq3, d6_eq3 = d4.eq(3), d6.eq(3)
+        >>> d4_eq3, d6_eq3 = d4.eq(2), d6.eq(2)
         >>> 3@d4_eq3 + 2@d6_eq3
         H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
 
@@ -1102,7 +1119,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
             whole = k * tuple(h)
             yield whole, Fraction(1)
         else:
-            this_total = h.total() ** n
+            this_total = h.total**n
 
             if from_upper:
                 this_outcome = max(h)
@@ -1135,7 +1152,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
                 else:
                     yield head, Fraction(1) - accounted_for_p
 
-    total_count = h.total() ** n
+    total_count = h.total**n
 
     for outcomes, count in _selected_distributions(h, n, k):
         count *= total_count

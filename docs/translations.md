@@ -41,7 +41,7 @@ How do we do compute these results using ``dyce``?
 >>> for n in range(1, 7):
 ...   ones_in_nd6 = n@one_in_d6
 ...   at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-...   print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total():6.2%}")
+...   print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
 1: 16.67%
 2: 30.56%
 3: 42.13%
@@ -219,7 +219,7 @@ We can also deploy a counting trick with the two d10s.
     ``` python
     >>> h = H(10).lt(5) + H(10).lt(5) ; h
     H({0: 36, 1: 48, 2: 16})
-    >>> h.total()
+    >>> h.total
     100
 
     ```

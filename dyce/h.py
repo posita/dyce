@@ -260,14 +260,14 @@ class H(_MappingT):
 
     ```
 
-    The [``total`` method][dyce.h.H.total] can be used to compute the total number of
+    The [``total`` property][dyce.h.H.total] can be used to compute the total number of
     combinations and each outcome’s probability.
 
     ``` python
     >>> from fractions import Fraction
-    >>> (2@d6).total()
+    >>> (2@d6).total
     36
-    >>> [(outcome, Fraction(count, (2@d6).total())) for outcome, count in (2@d6).items()]
+    >>> [(outcome, Fraction(count, (2@d6).total)) for outcome, count in (2@d6).items()]
     [(2, Fraction(1, 36)), (3, Fraction(1, 18)), (4, Fraction(1, 12)), (5, Fraction(1, 9)), (6, Fraction(5, 36)), (7, Fraction(1, 6)), ..., (12, Fraction(1, 36))]
 
     ```
@@ -374,8 +374,9 @@ class H(_MappingT):
         "_h",
         "_hash",
         "_lowest_terms",
-        "_simple_init",
         "_order_stat_funcs_by_n",
+        "_simple_init",
+        "_total",
     )
 
     # ---- Initializer -----------------------------------------------------------------
@@ -431,6 +432,7 @@ class H(_MappingT):
         # mechanisms call this object's __hash__ method which relies on both of these
         # and we don't want a circular dependency when computing this object's hash.
         self._hash: Optional[int] = None
+        self._total: int = tmp.total()
         self._lowest_terms: Optional[H] = None
 
         # We don't use functools' caching mechanisms generally because they don't
@@ -698,6 +700,20 @@ class H(_MappingT):
     def values(self) -> ValuesView[int]:
         return self.counts()
 
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def total(self) -> int:
+        r"""
+        !!! warning "Experimental"
+
+            This property should be considered experimental and may change or disappear
+            in future versions.
+
+        Equivalent to ``#!python sum(self.counts())``.
+        """
+        return self._total
+
     # ---- Methods ---------------------------------------------------------------------
 
     @classmethod
@@ -775,13 +791,6 @@ class H(_MappingT):
             return dependent_term(**outcome_kw)
 
         return P.foreach(_dependent_term, **independent_sources)
-
-    @beartype
-    def total(self) -> int:
-        r"""
-        Shorthand for ``#!python sum(self.counts())``.
-        """
-        return sum(self.counts())
 
     @beartype
     def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> H:
@@ -1034,9 +1043,13 @@ class H(_MappingT):
         k: SupportsInt,
     ) -> int:
         r"""
-        Computes $comb(n, k) \times {c}^{k} \times {(t - {c})}^{(n - k)}$ where $c$ is
-        *outcome*’s count and $t$ is ``#!python self.total()``. This is equivalent to
-        ``#!python (n@(self.eq(outcome)))[k]``, but about ten times faster.
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may change or disappear in
+            future versions.
+
+        Computes and returns the probability distribution where *outcome* appears
+        exactly *k* times among ``#!python n@self``.
 
         ``` python
         >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
@@ -1053,7 +1066,7 @@ class H(_MappingT):
         assert k <= n
         c_outcome = self.get(outcome, 0)
 
-        return comb(n, k) * c_outcome**k * (self.total() - c_outcome) ** (n - k)
+        return comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)
 
     @beartype
     def explode(
@@ -1275,7 +1288,7 @@ class H(_MappingT):
         >>> import operator
         >>> h = d6.substitute(reroll_greatest_on_d4_d6, operator.__add__, max_depth=6)
         >>> h_even = h.is_even()
-        >>> print(f"{h_even[1] / h_even.total():.3%}")
+        >>> print(f"{h_even[1] / h_even.total:.3%}")
         39.131%
 
         ```
@@ -1371,10 +1384,10 @@ class H(_MappingT):
         >>> from fractions import Fraction
         >>> Fraction(
         ...   sum(count for outcome, count in d6_d00.items() if outcome in d00),
-        ...   d6_d00.total(),
+        ...   d6_d00.total,
         ... )
         Fraction(1, 6)
-        >>> Fraction(d6[1], d6.total())
+        >>> Fraction(d6[1], d6.total)
         Fraction(1, 6)
 
         ```
@@ -1557,7 +1570,7 @@ class H(_MappingT):
                 return h
 
             def _expand_and_coalesce() -> Iterator[Tuple[Union[H, RealLike], int]]:
-                total = h.total()
+                total = h.total
 
                 for outcome, count in h.items():
                     expanded = expand(h, outcome)
@@ -2374,7 +2387,7 @@ def aggregate_with_counts(
     for outcome_or_h, count in source_counts:
         if isinstance(outcome_or_h, H):
             if outcome_or_h:
-                h_scalar = outcome_or_h.total()
+                h_scalar = outcome_or_h.total
 
                 for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
                     outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
