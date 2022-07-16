@@ -325,9 +325,27 @@ class TestH:
         base = H(range(10))
         assert dict(base) != dict(base.accumulate(base))
 
+    def test_exactly_k_times_in_n(self) -> None:
+        for h in (
+            H(20),
+            H(20).accumulate(H(20)).accumulate(H(20)),
+            H({i: i for i in range(10)}),
+            H({9 - i: i for i in range(10)}),
+            H({i: i for i in range(1, 6)}).accumulate(
+                H({i: 11 - i for i in range(6, 11)})
+            ),
+        ):
+            for n in range(10, 0, -1):
+                for outcome in h:
+                    counts = n @ (h.eq(outcome))
+
+                    for k in range(n + 1):
+                        assert h.exactly_k_times_in_n(outcome, n, k) == counts[k]
+
     def test_lowest_terms_identity(self) -> None:
         lowest_terms = H({i: i for i in range(10)})
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
+        assert lowest_terms is lowest_terms.lowest_terms()
 
     def test_substitute_empty(self) -> None:
         h = H({})

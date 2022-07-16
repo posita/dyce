@@ -62,9 +62,8 @@ __all__ = ("P",)
 RollT = Tuple[RealLike, ...]
 _OperandT = Union["P", RealLike]
 _RollCountT = Tuple[RollT, int]
-_DistributionEntryT = Tuple[RollT, Fraction]
-_DistributionT = Iterator[_DistributionEntryT]
-_SelectCallableT = Callable[[H, int, int], _DistributionT]
+_RollProbT = Tuple[RollT, Fraction]
+_SelectCallableT = Callable[[H, int, int], Iterator[_RollProbT]]
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -1100,12 +1099,10 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
     # TODO(posita): Can we use functools.cache instead?
     def _memoize(f: _SelectCallableT) -> _SelectCallableT:
-        cache: DefaultDict[Tuple[H, int, int], List[_DistributionEntryT]] = defaultdict(
-            list
-        )
+        cache: DefaultDict[Tuple[H, int, int], List[_RollProbT]] = defaultdict(list)
 
         @wraps(f)
-        def _wrapped(h: H, n: int, k: int) -> _DistributionT:
+        def _wrapped(h: H, n: int, k: int) -> Iterator[_RollProbT]:
             if (h, n, k) not in cache:
                 cache[h, n, k].extend(f(h, n, k))
 
@@ -1114,7 +1111,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         return _wrapped
 
     @_memoize
-    def _selected_distributions(h: H, n: int, k: int) -> _DistributionT:
+    def _selected_distributions(h: H, n: int, k: int) -> Iterator[_RollProbT]:
         if len(h) <= 1:
             whole = k * tuple(h)
             yield whole, Fraction(1)

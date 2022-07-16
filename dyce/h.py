@@ -1048,8 +1048,9 @@ class H(_MappingT):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Computes and returns the probability distribution where *outcome* appears
-        exactly *k* times among ``#!python n@self``.
+        Computes (in constant time) and returns the number of times *outcome* appears
+        exactly *k* times among ``#!python n@self``. This is a more efficient
+        alternative to ``#!python (n@(self.eq(outcome)))[k]``.
 
         ``` python
         >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
