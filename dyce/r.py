@@ -1487,11 +1487,7 @@ class BasicOpRoller(R):
         else:
             roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
 
-        return Roll(
-            self,
-            roll_outcomes=roll_outcomes,
-            source_rolls=source_rolls,
-        )
+        return Roll(self, roll_outcomes=roll_outcomes, source_rolls=source_rolls)
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -1531,11 +1527,7 @@ class NarySumOpRoller(BasicOpRoller):
         else:
             roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
 
-        return Roll(
-            self,
-            roll_outcomes=roll_outcomes,
-            source_rolls=source_rolls,
-        )
+        return Roll(self, roll_outcomes=roll_outcomes, source_rolls=source_rolls)
 
 
 class BinarySumOpRoller(NarySumOpRoller):
@@ -1796,9 +1788,7 @@ class FilterRoller(R):
                         yield roll_outcome.euthanize()
 
         return Roll(
-            self,
-            roll_outcomes=_filtered_roll_outcomes(),
-            source_rolls=source_rolls,
+            self, roll_outcomes=_filtered_roll_outcomes(), source_rolls=source_rolls
         )
 
     # ---- Properties ------------------------------------------------------------------

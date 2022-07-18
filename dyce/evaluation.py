@@ -15,19 +15,18 @@ from functools import wraps
 from itertools import chain, product
 from math import prod
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Iterable,
     Iterator,
     List,
     NamedTuple,
     Optional,
-    Protocol,
     Tuple,
     Type,
     TypeVar,
     Union,
     overload,
-    runtime_checkable,
 )
 
 from numerary import IntegralLike, RealLike
@@ -44,13 +43,15 @@ from .lifecycle import experimental
 from .p import P, RollT
 from .types import _GetItemT, as_int
 
+if TYPE_CHECKING:
+    from typing import Protocol
+else:
+    from numerary.types import Protocol
+
 __all__ = ()
 
 
 # ---- Types ---------------------------------------------------------------------------
-
-
-_LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
 
 
 class HResult(NamedTuple):
@@ -72,6 +73,7 @@ class PWithSelection(NamedTuple):
         return self.p.total
 
 
+_LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
 _NormalizedLimitT = Union[int, Fraction]
 _ReturnsHOrOutcomeT = Callable[..., HOrOutcomeT]
 _DependentTermT = TypeVar("_DependentTermT", bound=_ReturnsHOrOutcomeT)
@@ -87,7 +89,6 @@ class _Context(NamedTuple):
     contextual_precision: Fraction = Fraction(1)
 
 
-@runtime_checkable
 class _ForEachEvaluatorT(Protocol):
     def __call__(
         self,
@@ -955,18 +956,6 @@ def explode(
 
 
 @beartype
-def _source_to_h_or_p_or_p_with_selection(
-    source: _POrPWithSelectionOrSourceT,
-) -> Union[H, P, PWithSelection]:
-    if isinstance(source, (H, P, PWithSelection)):
-        return source
-    elif isinstance(source, HableT):
-        return source.h()
-    else:
-        return H(source)
-
-
-@beartype
 def _h_or_p_or_p_with_selection_to_result_iterable(
     source: Union[H, P, PWithSelection]
 ) -> Union[Iterable[_HResultCountT], Iterable[_PResultCountT]]:
@@ -1016,3 +1005,15 @@ def _normalize_limit(
             raise ValueError("fractional limit must be between zero and one, exclusive")
 
     return normalized_limit
+
+
+@beartype
+def _source_to_h_or_p_or_p_with_selection(
+    source: _POrPWithSelectionOrSourceT,
+) -> Union[H, P, PWithSelection]:
+    if isinstance(source, (H, P, PWithSelection)):
+        return source
+    elif isinstance(source, HableT):
+        return source.h()
+    else:
+        return H(source)

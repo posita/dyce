@@ -7,7 +7,6 @@
     ],
     "output_dir": "docs/jupyter",
     "ignore_sys_prefix": ["federated_extensions", "mathjax"],
-    "piplite_urls": [
-    ]
+    "piplite_urls": []
   }
 }

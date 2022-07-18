@@ -11,8 +11,8 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from fractions import Fraction
 from functools import wraps
-from itertools import chain, combinations_with_replacement, groupby, product, repeat
-from math import factorial, prod
+from itertools import chain, groupby, product, repeat
+from math import prod
 from operator import __eq__, __index__, __ne__
 from typing import (
     Any,
@@ -49,7 +49,7 @@ __all__ = ("P",)
 RollT = tuple[RealLike, ...]
 _OperandT = Union["P", RealLike]
 _RollCountT = tuple[RollT, int]
-_RollProbT = tuple[RollT, Fraction]
+_RollProbT = tuple[RollT, int, int]
 _SelectCallableT = Callable[[H, int, int], Iterator[_RollProbT]]
 
 
@@ -621,7 +621,7 @@ class P(Sequence[H], HableOpsMixin):
 
         ``` python
         >>> p_2d6 = P(6, 6)
-        >>> list(p_2d6.rolls_with_counts())
+        >>> sorted(p_2d6.rolls_with_counts())
         [((1, 1), 1), ((1, 2), 2), ((1, 3), 2), ((1, 4), 2), ((1, 5), 2), ((1, 6), 2), ...]
         >>> p_2d6.appearances_in_rolls(1)
         H({0: 25, 1: 10, 2: 1})
@@ -750,8 +750,8 @@ class P(Sequence[H], HableOpsMixin):
         !!! note "In the general case, rolls may appear more than once."
 
         ``` python
-        >>> list(P(H(2), H(3)).rolls_with_counts())
-        [((1, 1), 1), ((1, 2), 1), ((1, 3), 1), ((1, 2), 1), ((2, 2), 1), ((2, 3), 1)]
+        >>> sorted(P(H(2), H(3)).rolls_with_counts())
+        [((1, 1), 1), ((1, 2), 1), ((1, 2), 1), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
 
         ```
 
@@ -763,7 +763,7 @@ class P(Sequence[H], HableOpsMixin):
         implementation below.)
 
         ``` python
-        >>> list((2@P(H((-1, 0, 1)))).rolls_with_counts())
+        >>> sorted((2@P(H((-1, 0, 1)))).rolls_with_counts())
         [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
 
         ```
@@ -785,8 +785,8 @@ class P(Sequence[H], HableOpsMixin):
         ``` python
         >>> p_d3_d4 = P(H(3), H(4))
         >>> # Select the second, first, then second (again) elements
-        >>> list(p_d3_d4.rolls_with_counts(-1, 0, 1))
-        [((1, 1, 1), 1), ((2, 1, 2), 1), ((3, 1, 3), 1), ((4, 1, 4), 1), ..., ((3, 1, 3), 1), ((3, 2, 3), 1), ((3, 3, 3), 1), ((4, 3, 4), 1)]
+        >>> sorted(p_d3_d4.rolls_with_counts(-1, 0, 1))
+        [((1, 1, 1), 1), ((2, 1, 2), 1), ((2, 1, 2), 1), ..., ((4, 1, 4), 1), ((4, 2, 4), 1), ((4, 3, 4), 1)]
 
         ```
 
@@ -794,8 +794,8 @@ class P(Sequence[H], HableOpsMixin):
         comparable.
 
         ``` python
-        >>> select_0_1 = list(p_d3_d4.rolls_with_counts(0, 1))
-        >>> select_1_0 = list(p_d3_d4.rolls_with_counts(1, 0))
+        >>> select_0_1 = sorted(p_d3_d4.rolls_with_counts(0, 1))
+        >>> select_1_0 = sorted(p_d3_d4.rolls_with_counts(1, 0))
         >>> select_0_1 == select_1_0
         False
 
@@ -804,8 +804,8 @@ class P(Sequence[H], HableOpsMixin):
         Equivalence can be tested when selected outcomes are sorted.
 
         ``` python
-        >>> sorted_0_1 = [(sorted(roll), count) for roll, count in select_0_1]
-        >>> sorted_1_0 = [(sorted(roll), count) for roll, count in select_1_0]
+        >>> sorted_0_1 = sorted((sorted(roll), count) for roll, count in select_0_1)
+        >>> sorted_1_0 = sorted((sorted(roll), count) for roll, count in select_1_0)
         >>> sorted_0_1 == sorted_1_0
         True
 
@@ -903,9 +903,9 @@ class P(Sequence[H], HableOpsMixin):
                 # Still in search of a better (i.e., more efficient) way:
                 # <https://math.stackexchange.com/questions/4173084/probability-distribution-of-k-1-k-2-cdots-k-m-selections-of-arbitrary-posi>
                 if i and abs(i) < n:
-                    rolls_with_counts_iter = _rwc_homogeneous_n_h_using_karonen_partial_selection(
-                        h,
+                    rolls_with_counts_iter = _rwc_homogeneous_n_h_using_partial_selection(
                         n,
+                        h,
                         i,
                         # This is just padding to allow for consistent indexing. They
                         # are deselected (i.e., not returned) below.
@@ -913,7 +913,7 @@ class P(Sequence[H], HableOpsMixin):
                     )
                 else:
                     rolls_with_counts_iter = (
-                        _rwc_homogeneous_n_h_using_multinomial_coefficient(h, n)
+                        _rwc_homogeneous_n_h_using_partial_selection(n, h, n)
                     )
             else:
                 rolls_with_counts_iter = _rwc_heterogeneous_h_groups(groups, i)
@@ -1026,27 +1026,26 @@ def _rwc_heterogeneous_h_groups(
     k: Optional[int],
 ) -> Iterator[_RollCountT]:
     r"""
-    Given an iterable of histogram/count pairs, returns an iterator yielding two-tuples
-    (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
+    Given an iterable of histogram/count pairs, returns an iterator yielding
+    two-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts].
 
     The use of histogram/count pairs for *h_groups* is acknowledged as awkward, but
-    intended, since its implementation is optimized to leverage homogeneous
-    optimizations (e.g.,
-    [``_rwc_homogeneous_n_h_using_multinomial_coefficient``][dyce.p._rwc_homogeneous_n_h_using_multinomial_coefficient]).
+    intended, since this implementation leverages homogeneous optimizations (e.g.,
+    [``_rwc_homogeneous_n_h_using_partial_selection``][dyce.p._rwc_homogeneous_n_h_using_partial_selection]).
 
     If provided, *k* signals which outcomes are to be selected from the produced rolls.
     This affords an additional optimization where *k* is less than the size of a
     homogeneous subgroup.
     """
 
-    def _choose_rwc_homogeneous_n_h_implementation(h, n) -> Iterator[_RollCountT]:
+    def _choose_rwc_homogeneous_n_h_implementation(n, h) -> Iterator[_RollCountT]:
         if k and abs(k) < n:
-            return _rwc_homogeneous_n_h_using_karonen_partial_selection(h, n, k)
+            return _rwc_homogeneous_n_h_using_partial_selection(n, h, k)
         else:
-            return _rwc_homogeneous_n_h_using_multinomial_coefficient(h, n)
+            return _rwc_homogeneous_n_h_using_partial_selection(n, h, n)
 
     for v in product(
-        *(_choose_rwc_homogeneous_n_h_implementation(h, n) for h, n in h_groups)
+        *(_choose_rwc_homogeneous_n_h_implementation(n, h) for h, n in h_groups)
     ):
         # It's possible v is () if h_groups is empty. See
         # <https://stackoverflow.com/questions/3154301/> for a detailed discussion.
@@ -1061,9 +1060,9 @@ def _rwc_heterogeneous_h_groups(
 
 
 @beartype
-def _rwc_homogeneous_n_h_using_karonen_partial_selection(
-    h: H,
+def _rwc_homogeneous_n_h_using_partial_selection(
     n: int,
+    h: H,
     k: int,
     fill: Optional[RealLike] = None,
 ) -> Iterator[_RollCountT]:
@@ -1080,24 +1079,24 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
 
     ``` python
-    >>> from dyce.p import _rwc_homogeneous_n_h_using_karonen_partial_selection
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 0))
+    >>> from dyce.p import _rwc_homogeneous_n_h_using_partial_selection
+    >>> sorted(_rwc_homogeneous_n_h_using_partial_selection(3, H(6), 0))
     []
 
     ```
 
     ``` python
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=None))
+    >>> sorted(_rwc_homogeneous_n_h_using_partial_selection(3, H(6), 2, fill=None))
     [((1, 1), 16), ((1, 2), 27), ((1, 3), 21), ..., ((5, 5), 4), ((5, 6), 3), ((6, 6), 1)]
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, 2, fill=0))
+    >>> sorted(_rwc_homogeneous_n_h_using_partial_selection(3, H(6), 2, fill=0))
     [((1, 1, 0), 16), ((1, 2, 0), 27), ((1, 3, 0), 21), ..., ((5, 5, 0), 4), ((5, 6, 0), 3), ((6, 6, 0), 1)]
 
     ```
 
     ``` python
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=None))
+    >>> sorted(_rwc_homogeneous_n_h_using_partial_selection(3, H(6), -2, fill=None))
     [((1, 1), 1), ((1, 2), 3), ((1, 3), 3), ..., ((5, 5), 13), ((5, 6), 27), ((6, 6), 16)]
-    >>> sorted(_rwc_homogeneous_n_h_using_karonen_partial_selection(H(6), 3, -2, fill=0))
+    >>> sorted(_rwc_homogeneous_n_h_using_partial_selection(3, H(6), -2, fill=0))
     [((0, 1, 1), 1), ((0, 1, 2), 3), ((0, 1, 3), 3), ..., ((0, 5, 5), 13), ((0, 5, 6), 27), ((0, 6, 6), 16)]
 
     ```
@@ -1111,7 +1110,6 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
         # Maintain consistency with comb(n, k) == 0 where k > n
         return iter(())
 
-    # TODO(posita): Can we use functools.cache instead?
     def _memoize(f: _SelectCallableT) -> _SelectCallableT:
         cache: defaultdict[tuple[H, int, int], list[_RollProbT]] = defaultdict(list)
 
@@ -1128,7 +1126,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
     def _selected_distributions(h: H, n: int, k: int) -> Iterator[_RollProbT]:
         if len(h) <= 1:
             whole = tuple(h) * k
-            yield whole, Fraction(1)
+            yield whole, 1, 1
         else:
             this_total = h.total**n
 
@@ -1142,32 +1140,38 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
                 for outcome, count in h.items()
                 if outcome != this_outcome
             )
-            accounted_for_p = Fraction(0)
+            cumulative_p = Fraction(0)
 
             for i in range(0, k + 1):
                 head = i * (this_outcome,)
-                head_count = h.exactly_k_times_in_n(this_outcome, n, i)
-                head_p = Fraction(head_count, this_total)
 
                 if i < k:
-                    accounted_for_p += head_p
+                    head_count = h.exactly_k_times_in_n(this_outcome, n, i)
+                    cumulative_p += Fraction(head_count, this_total)
 
-                    for tail, tail_p in _selected_distributions(next_h, n - i, k - i):
+                    for tail, tail_num, tail_denom in _selected_distributions(
+                        next_h, n - i, k - i
+                    ):
                         if from_upper:
                             whole = tail + head
                         else:
                             whole = head + tail
 
-                        whole_p = head_p * tail_p
-                        yield whole, whole_p
+                        whole_num = head_count * tail_num
+                        whole_denom = this_total * tail_denom
+                        yield whole, whole_num, whole_denom
                 else:
-                    yield head, Fraction(1) - accounted_for_p
+                    # This optimization exploits the fact that the probability of all
+                    # rolls comprising [k, n] of outcome is the probability of all rolls
+                    # (i.e., 1) minus the cumulative probabilities of all rolls
+                    # comprising [0, k) of outcome (computed above)
+                    remaining_p = Fraction(1) - cumulative_p
+                    yield head, remaining_p.numerator, remaining_p.denominator
 
     total_count = h.total**n
 
-    for outcomes, count in _selected_distributions(h, n, k):
-        count *= total_count
-        assert count.denominator == 1
+    for outcomes, num, denom in _selected_distributions(h, n, k):
+        count = total_count * num // denom
 
         if fill is not None:
             outcomes = (
@@ -1176,33 +1180,4 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
                 else outcomes + (fill,) * (n - k)
             )
 
-        yield (outcomes, count.numerator)
-
-
-@beartype
-def _rwc_homogeneous_n_h_using_multinomial_coefficient(
-    h: _MappingT,
-    n: int,
-) -> Iterator[_RollCountT]:
-    r"""
-    Given a group of *n* identical histograms *h*, returns an iterator yielding ordered
-    two-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]. See
-    that method’s explanation of homogeneous pools for insight into this implementation.
-    """
-    # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
-    # order is preserved and H outcomes are already sorted
-    multinomial_coefficient_numerator = factorial(n)
-    rolls_iter = combinations_with_replacement(h, n)
-
-    for sorted_outcomes_for_roll in rolls_iter:
-        count_scalar = prod(h[outcome] for outcome in sorted_outcomes_for_roll)
-        multinomial_coefficient_denominator = prod(
-            factorial(sum(1 for _ in g)) for _, g in groupby(sorted_outcomes_for_roll)
-        )
-
-        yield (
-            sorted_outcomes_for_roll,
-            count_scalar
-            * multinomial_coefficient_numerator
-            // multinomial_coefficient_denominator,
-        )
+        yield (outcomes, count)

@@ -10,22 +10,23 @@ from __future__ import annotations
 
 import itertools
 import operator
-from collections import defaultdict
-from math import prod
+from collections import Counter
+from itertools import combinations_with_replacement, groupby
+from math import factorial, prod
 from typing import Iterator, Sequence
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 import pytest
 from numerary import RealLike
 from numerary.bt import beartype
 
 from dyce import H, P
+from dyce.h import _MappingT
 from dyce.p import (
     RollT,
     _analyze_selection,
     _RollCountT,
-    _rwc_homogeneous_n_h_using_karonen_partial_selection,
-    _rwc_homogeneous_n_h_using_multinomial_coefficient,
+    _rwc_homogeneous_n_h_using_partial_selection,
 )
 from dyce.types import _GetItemT
 
@@ -505,7 +506,7 @@ class TestP:
         ):
             assert p_4d3_4d4.h(which) == H(
                 (sum(roll), count)
-                for roll, count in _brute_force_combinations_with_counts(
+                for roll, count in _rwc_heterogeneous_brute_force_combinations(
                     tuple(p_4d3_4d4), which
                 )
             )
@@ -524,7 +525,7 @@ class TestP:
         ):
             assert p_4df.h(which) == H(
                 (sum(roll), count)
-                for roll, count in _brute_force_combinations_with_counts(
+                for roll, count in _rwc_heterogeneous_brute_force_combinations(
                     tuple(p_4df), which
                 )
             )
@@ -633,38 +634,53 @@ class TestP:
             slice(4),
             slice(-4, None),
         ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
-            karonen.assert_not_called()
-            multinomial_coefficient.assert_called()
+            using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, which)
+            using_partial_selection.assert_has_calls(
+                [
+                    call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 4),
+                    call(3, H({1: 1, 2: 1, 3: 1}), 3),
+                ]
+            )
 
-        for which in (
-            # 3 outcomes
-            slice(3),
-            slice(-3, None),
-        ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
-            karonen.assert_called()  # called for 4d4n where k < n
-            multinomial_coefficient.assert_called()  # called for 3d3 where k == n
+        # 3 outcomes
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(3))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 3),
+            call(3, H({1: 1, 2: 1, 3: 1}), 3),
+        ]
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-3, None))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -3),
+            call(3, H({1: 1, 2: 1, 3: 1}), 3),
+        ]
 
-        for which in (
-            # 2 outcomes
-            slice(2),
-            slice(-2, None),
-            # 1 outcome
-            slice(1),
-            slice(-1, None),
-        ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
-            karonen.assert_called()
-            multinomial_coefficient.assert_not_called()
+        # 2 outcomes
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(2))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 2),
+            call(3, H({1: 1, 2: 1, 3: 1}), 2),
+        ]
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-2, None))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -2),
+            call(3, H({1: 1, 2: 1, 3: 1}), -2),
+        ]
 
-        for which in (
-            # No outcomes
-            slice(0, 0),
-        ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_3d3_4d4n, which)
-            karonen.assert_not_called()
-            multinomial_coefficient.assert_not_called()
+        # 1 outcome
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(1))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 1),
+            call(3, H({1: 1, 2: 1, 3: 1}), 1),
+        ]
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-1, None))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -1),
+            call(3, H({1: 1, 2: 1, 3: 1}), -1),
+        ]
+
+        # No outcomes
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(0, 0))
+        using_partial_selection.assert_not_called()
 
     def test_rolls_with_counts_take_homogeneous_dice_vs_known_correct(self) -> None:
         p_df = P(H((-1, 0, 1)))
@@ -675,28 +691,32 @@ class TestP:
             slice(None),
             slice(0, 4),
         ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
-            karonen.assert_not_called()
-            multinomial_coefficient.assert_called()
+            using_partial_selection = _rwc_validation_helper(p_4df, which)
+            assert using_partial_selection.call_args_list == [
+                call(4, H({-1: 1, 0: 1, 1: 1}), 4)
+            ]
 
-        for which in (
-            # 1 Outcome
-            slice(0, 1),
-            slice(1, 2),
-            slice(2, 3),
-            slice(3, 4),
-        ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
-            karonen.assert_called()
-            multinomial_coefficient.assert_not_called()
+        # 1 Outcome
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 1))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), 1, fill=0)
+        ]
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(1, 2))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), 2, fill=0)
+        ]
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(2, 3))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), -2, fill=0)
+        ]
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(3, 4))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), -1, fill=0)
+        ]
 
-        for which in (
-            # No outcomes
-            slice(0, 0),
-        ):
-            karonen, multinomial_coefficient = _rwc_validation_helper(p_4df, which)
-            karonen.assert_not_called()
-            multinomial_coefficient.assert_not_called()
+        # No outcomes
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 0))
+        using_partial_selection.assert_not_called()
 
 
 def test_analyze_selection() -> None:
@@ -759,12 +779,37 @@ def test_analyze_selection() -> None:
         _ = _analyze_selection(0, which)
 
 
+def test_first_principles():
+    for n, h in (
+        (3, H(6)),
+        (3, H((2, 3, 3, 4, 4, 5))),
+        (6, H(4)),
+        (3, H({i: i for i in range(1, 11)})),
+        (3, H({i: 11 - i for i in range(1, 11)})),
+    ):
+        heterogeneous_brute_force_combinations: Counter[RollT] = Counter()
+        homogeneous_n_h_using_multinomial_coefficient: Counter[RollT] = Counter()
+
+        for roll, count in _rwc_heterogeneous_brute_force_combinations(
+            [h] * n, slice(None)
+        ):
+            heterogeneous_brute_force_combinations[roll] += count
+
+        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(n, h):
+            homogeneous_n_h_using_multinomial_coefficient[roll] += count
+
+        assert (
+            heterogeneous_brute_force_combinations
+            == homogeneous_n_h_using_multinomial_coefficient
+        )
+
+
 @beartype
-def _brute_force_combinations_with_counts(
+def _rwc_heterogeneous_brute_force_combinations(
     hs: Sequence[H], key: slice
 ) -> Iterator[_RollCountT]:
-    # Generate combinations naively, via Cartesian product, which is much less
-    # efficient, but also much easier to read and reason about
+    # Generate combinations naively, via Cartesian product, which is not at all
+    # efficient, but much easier to read and reason about
     if len(operator.__getitem__(hs, key)) > 0:
         for rolls in itertools.product(*(h.items() for h in hs)):
             outcomes, counts = tuple(zip(*rolls))
@@ -774,26 +819,52 @@ def _brute_force_combinations_with_counts(
 
 
 @beartype
-def _rwc_validation_helper(p: P, which: slice) -> tuple[Mock, Mock]:
+def _rwc_homogeneous_n_h_using_multinomial_coefficient(
+    n: int,
+    h: _MappingT,
+) -> Iterator[_RollCountT]:
+    r"""
+    Given a group of *n* identical histograms *h*, returns an iterator yielding ordered
+    two-tuples (pairs) per [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]. See
+    that method’s explanation of homogeneous pools for insight into this implementation.
+    """
+    # combinations_with_replacement("ABC", 2) --> AA AB AC BB BC CC; note that input
+    # order is preserved and H outcomes are already sorted
+    multinomial_coefficient_numerator = factorial(n)
+    rolls_iter = combinations_with_replacement(h, n)
+
+    for sorted_outcomes_for_roll in rolls_iter:
+        count_scalar = prod(h[outcome] for outcome in sorted_outcomes_for_roll)
+        multinomial_coefficient_denominator = prod(
+            factorial(sum(1 for _ in g)) for _, g in groupby(sorted_outcomes_for_roll)
+        )
+
+        yield (
+            sorted_outcomes_for_roll,
+            count_scalar
+            * multinomial_coefficient_numerator
+            // multinomial_coefficient_denominator,
+        )
+
+
+@beartype
+def _rwc_validation_helper(p: P, which: slice) -> Mock:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
-    known_counts: defaultdict[RollT, int] = defaultdict(int)
-    test_counts: defaultdict[RollT, int] = defaultdict(int)
+    known_counts: Counter[RollT] = Counter()
+    test_counts: Counter[RollT] = Counter()
 
-    for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
+    for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p), which):
         known_counts[roll] += count
 
     with patch(
-        "dyce.p._rwc_homogeneous_n_h_using_karonen_partial_selection",
-        side_effect=_rwc_homogeneous_n_h_using_karonen_partial_selection,
-    ) as karonen, patch(
-        "dyce.p._rwc_homogeneous_n_h_using_multinomial_coefficient",
-        side_effect=_rwc_homogeneous_n_h_using_multinomial_coefficient,
-    ) as multinomial_coefficient:
+        "dyce.p._rwc_homogeneous_n_h_using_partial_selection",
+        side_effect=_rwc_homogeneous_n_h_using_partial_selection,
+    ) as using_partial_selection:
         for roll, count in p.rolls_with_counts(which):
             test_counts[roll] += count
 
     assert test_counts == known_counts, f"which: {which}"
 
-    return karonen, multinomial_coefficient
+    return using_partial_selection

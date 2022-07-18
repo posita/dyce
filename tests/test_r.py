@@ -447,6 +447,7 @@ class TestBinarySumOpRoller:
                 r_mul_r_roll = r_mul_r.roll()
                 (roll_outcome,) = r_mul_r_roll
                 assert roll_outcome.r == r_mul_r
+                assert roll_outcome.value is not None
                 assert roll_outcome.value in h_mul_h
                 assert r_mul_r_roll.total() in h_mul_h, r_mul_r
 
@@ -456,6 +457,7 @@ class TestBinarySumOpRoller:
                     r_mul_o_roll = r_mul_o.roll()
                     (roll_outcome,) = r_mul_o_roll
                     assert roll_outcome.r == r_mul_o
+                    assert roll_outcome.value is not None
                     assert roll_outcome.value in h_mul_o
                     assert r_mul_o_roll.total() in h_mul_o, r_mul_o
 
@@ -903,18 +905,22 @@ class TestRoll:
 
         for r_d6_mul2_neg_add4_roll in r_d6_mul2_neg_add4_3_roll.source_rolls:
             (r_d6_mul2_neg_add4_ro,) = r_d6_mul2_neg_add4_roll
+            assert r_d6_mul2_neg_add4_ro.value is not None
             assert r_d6_mul2_neg_add4_ro.value in d6_mul2_neg_add4
 
             (r_d6_mul2_neg_roll, _) = r_d6_mul2_neg_add4_roll.source_rolls
             (r_d6_mul2_neg_ro,) = r_d6_mul2_neg_roll
+            assert r_d6_mul2_neg_ro.value is not None
             assert r_d6_mul2_neg_ro.value in d6_mul2_neg
 
             (r_d6_mul2_roll,) = r_d6_mul2_neg_roll.source_rolls
             (r_d6_mul2_ro,) = r_d6_mul2_roll
+            assert r_d6_mul2_ro.value is not None
             assert r_d6_mul2_ro.value in d6_mul2
 
             (r_d6_roll, _) = r_d6_mul2_roll.source_rolls
             (r_d6_ro,) = r_d6_roll
+            assert r_d6_ro.value is not None
             assert r_d6_ro.value in d6
 
         for r_d6_mul2_neg_add4_3_ro in r_d6_mul2_neg_add4_3_roll:

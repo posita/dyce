@@ -506,6 +506,14 @@ class H(_MappingT):
         return iter(self._h)
 
     @beartype
+    def __reversed__(self) -> Iterator[RealLike]:
+        return reversed(self._h)
+
+    @beartype
+    def __contains__(self, key: RealLike) -> bool:  # type: ignore [override]
+        return key in self._h
+
+    @beartype
     def __add__(self, other: _OperandT) -> H:
         try:
             return self.map(__add__, other)
@@ -710,6 +718,10 @@ class H(_MappingT):
         More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
         """
         return self._h.keys()
+
+    @beartype
+    def reversed(self) -> Iterator[RealLike]:
+        return reversed(self)
 
     @beartype
     def values(self) -> ValuesView[int]:
@@ -1159,7 +1171,7 @@ class H(_MappingT):
         if self._lowest_terms is None:
             counts_gcd = gcd(*self.counts())
 
-            if counts_gcd == 1:
+            if counts_gcd in (0, 1):
                 self._lowest_terms = self
             else:
                 self._lowest_terms = type(self)(
@@ -1227,6 +1239,17 @@ class H(_MappingT):
             pos = n + pos
 
         return self._order_stat_funcs_by_n[n](pos)
+
+    @beartype
+    def remove(self, outcome: RealLike) -> H:
+        if outcome not in self:
+            return self
+
+        return type(self)(
+            (orig_outcome, count)
+            for orig_outcome, count in self.items()
+            if orig_outcome != outcome
+        )
 
     @overload
     def substitute(
