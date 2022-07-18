@@ -78,11 +78,11 @@ class TestP:
     def test_repr(self) -> None:
         assert repr(P()) == "P()"
         assert repr(P(0)) == "P()"
-        assert repr(P(-6)) == "P(-6)"
-        assert repr(P(6)) == "P(6)"
+        assert repr(P(-6)) == "P(H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1}))"
+        assert repr(P(6)) == "P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))"
         assert (
             repr(P(P(6), P(8), P(H({3: 1, 2: 2, 1: 3, 0: 1}))))
-            == "P(H({0: 1, 1: 3, 2: 2, 3: 1}), 6, 8)"
+            == "P(H({0: 1, 1: 3, 2: 2, 3: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}))"
         )
 
     def test_equivalence(self) -> None:

@@ -87,8 +87,8 @@ class TestH:
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
         assert repr(H(0)) == "H({})"
-        assert repr(H(-6)) == "H(-6)"
-        assert repr(H(6)) == "H(6)"
+        assert repr(H(-6)) == "H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})"
+        assert repr(H(6)) == "H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})"
         assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({0: 1, 1: 3, 2: 2, 3: 1})"
 
     def test_op_eq(self) -> None:

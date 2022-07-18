@@ -73,15 +73,15 @@ class P(Sequence[H], HableOpsMixin):
     ``` python
     >>> from dyce import P
     >>> p_d6 = P(6) ; p_d6  # shorthand for P(H(6))
-    P(6)
+    P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
 
     ```
 
     ``` python
     >>> P(p_d6, p_d6)  # 2d6
-    P(6, 6)
+    2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
     >>> 2@p_d6  # also 2d6
-    P(6, 6)
+    2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
     >>> 2@(2@p_d6) == 4@p_d6
     True
 
@@ -89,7 +89,7 @@ class P(Sequence[H], HableOpsMixin):
 
     ``` python
     >>> p = P(4, P(6, P(8, P(10, P(12, P(20)))))) ; p
-    P(4, 6, 8, 10, 12, 20)
+    P(H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1, 20: 1}))
     >>> sum(p.roll()) in p.h()
     True
 
@@ -125,7 +125,7 @@ class P(Sequence[H], HableOpsMixin):
     ``` python
     >>> import operator
     >>> P(4, 6, 8).umap(operator.__neg__)
-    P(-8, -6, -4)
+    P(H({-8: 1, -7: 1, -6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1}), H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1}))
 
     ```
 
@@ -154,7 +154,7 @@ class P(Sequence[H], HableOpsMixin):
 
     ``` python
     >>> P(4, 6, 8)[0]
-    H(4)
+    H({1: 1, 2: 1, 3: 1, 4: 1})
 
     ```
 
@@ -162,7 +162,7 @@ class P(Sequence[H], HableOpsMixin):
 
     ``` python
     >>> P(8, 6, 4)
-    P(4, 6, 8)
+    P(H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}))
     >>> P(8, 6, 4)[0] == P(8, 4, 6)[0] == H(4)
     True
 
@@ -234,13 +234,29 @@ class P(Sequence[H], HableOpsMixin):
 
     @beartype
     def __repr__(self) -> str:
-        def _parts() -> Iterator[str]:
-            for h in self:
-                yield (str(h._simple_init) if h._simple_init is not None else repr(h))
+        group_counters: dict[H, int] = {}
 
-        args = ", ".join(_parts())
+        for h, hs in groupby(self):
+            n = sum(1 for _ in hs)
+            group_counters[h] = n
 
-        return f"{type(self).__name__}({args})"
+        def _n_at(h: H, n: int) -> str:
+            if n == 1:
+                return repr(h)
+            else:
+                return f"{n}@{type(self).__name__}({repr(h)})"
+
+        if len(group_counters) == 1:
+            h = next(iter(group_counters))
+
+            if group_counters[h] == 1:
+                return f"{type(self).__name__}({_n_at(h, 1)})"
+            else:
+                return _n_at(h, group_counters[h])
+        else:
+            args = ", ".join(_n_at(h, n) for h, n in group_counters.items())
+
+            return f"{type(self).__name__}({args})"
 
     @beartype
     def __eq__(self, other) -> bool:
@@ -922,7 +938,7 @@ class P(Sequence[H], HableOpsMixin):
         >>> import operator
         >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
         >>> p_3d6.map(operator.__mul__, -1)
-        P(H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}))
+        3@P(H({-4: 1, -2: 1, 1: 1, 3: 1}))
 
         ```
         """
@@ -939,7 +955,7 @@ class P(Sequence[H], HableOpsMixin):
         >>> from fractions import Fraction
         >>> p_3d6 = 2@P(H((-3, -1, 2, 4)))
         >>> p_3d6.umap(Fraction).rmap(1, operator.__truediv__)
-        P(H({Fraction(-1, 1): 1, Fraction(-1, 3): 1, Fraction(1, 4): 1, Fraction(1, 2): 1}), H({Fraction(-1, 1): 1, Fraction(-1, 3): 1, Fraction(1, 4): 1, Fraction(1, 2): 1}))
+        2@P(H({Fraction(-1, 1): 1, Fraction(-1, 3): 1, Fraction(1, 4): 1, Fraction(1, 2): 1}))
 
         ```
         """
@@ -955,9 +971,9 @@ class P(Sequence[H], HableOpsMixin):
         >>> import operator
         >>> p_3d6 = 3@P(H((-3, -1, 2, 4)))
         >>> p_3d6.umap(operator.__neg__)
-        P(H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}), H({-4: 1, -2: 1, 1: 1, 3: 1}))
+        3@P(H({-4: 1, -2: 1, 1: 1, 3: 1}))
         >>> p_3d6.umap(operator.__abs__)
-        P(H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1}))
+        3@P(H({1: 1, 2: 1, 3: 1, 4: 1}))
 
         ```
         """

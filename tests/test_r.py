@@ -54,11 +54,11 @@ class TestValueRoller:
         assert repr(R.from_value(42)) == "ValueRoller(value=42, annotation='')"
         assert (
             repr(R.from_value(H(6), annotation={"one": 1}))
-            == "ValueRoller(value=H(6), annotation={'one': 1})"
+            == "ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation={'one': 1})"
         )
         assert (
             repr(R.from_value(3 @ P(6), annotation={"two": 2}))
-            == "ValueRoller(value=P(6, 6, 6), annotation={'two': 2})"
+            == "ValueRoller(value=3@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})), annotation={'two': 2})"
         )
 
     def test_op_eq(self) -> None:
@@ -105,7 +105,7 @@ class TestRepeatRoller:
             repr(r_d6_2)
             == """RepeatRoller(
   n=2,
-  source=ValueRoller(value=H(6), annotation='d6'),
+  source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
         )
@@ -150,8 +150,8 @@ class TestBinarySumOpRoller:
             repr(r_d6_2)
             == """BinarySumOpRoller(
   bin_op=<built-in function add>,
-  left_source=ValueRoller(value=H(6), annotation='d6'),
-  right_source=ValueRoller(value=H(6), annotation='d6'),
+  left_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
+  right_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
         )
@@ -479,7 +479,7 @@ class TestUnarySumOpRoller:
             repr(r_d6_neg)
             == """UnarySumOpRoller(
   un_op=<built-in function neg>,
-  source=ValueRoller(value=H(6), annotation='d6'),
+  source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
         )
@@ -597,9 +597,9 @@ class TestPoolRoller:
             repr(r_d4_d6_d8)
             == """PoolRoller(
   sources=(
-    ValueRoller(value=H(4), annotation=''),
-    ValueRoller(value=H(6), annotation=''),
-    ValueRoller(value=H(8), annotation=''),
+    ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1}), annotation=''),
+    ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
+    ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), annotation=''),
   ),
   annotation='d4d6d8',
 )"""

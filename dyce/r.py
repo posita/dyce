@@ -114,7 +114,7 @@ class R:
     >>> from dyce import H, P, R
     >>> d6 = H(6)
     >>> r_d6 = R.from_value(d6) ; r_d6
-    ValueRoller(value=H(6), annotation='')
+    ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='')
     >>> ((4 * r_d6 + 3) ** 2 % 5).gt(2)
     BinarySumOpRoller(
       bin_op=<function R.gt.<locals>._gt at ...>,
@@ -127,7 +127,7 @@ class R:
                   left_source=BinarySumOpRoller(
                       bin_op=<built-in function mul>,
                       left_source=ValueRoller(value=4, annotation=''),
-                      right_source=ValueRoller(value=H(6), annotation=''),
+                      right_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
                       annotation='',
                     ),
                   right_source=ValueRoller(value=3, annotation=''),
@@ -222,7 +222,7 @@ class R:
       ),
       source_rolls=(
         Roll(
-          r=ValueRoller(value=H(6), annotation=''),
+          r=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
           roll_outcomes=(
             RollOutcome(
               value=5,
@@ -711,13 +711,13 @@ class R:
 
         ``` python
         >>> R.from_value(H(6))
-        ValueRoller(value=H(6), annotation='')
+        ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='')
 
         ```
 
         ``` python
         >>> R.from_value(P(6, 6))
-        ValueRoller(value=P(6, 6), annotation='')
+        ValueRoller(value=2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})), annotation='')
 
         ```
         """
@@ -983,7 +983,7 @@ class R:
         >>> r_bin_op = R.from_value(H(6)).map(operator.__pow__, 2) ; r_bin_op
         BinarySumOpRoller(
           bin_op=<built-in function pow>,
-          left_source=ValueRoller(value=H(6), annotation=''),
+          left_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
           right_source=ValueRoller(value=2, annotation=''),
           annotation='',
         )
@@ -1018,7 +1018,7 @@ class R:
         BinarySumOpRoller(
           bin_op=<built-in function pow>,
           left_source=ValueRoller(value=2, annotation=''),
-          right_source=ValueRoller(value=H(6), annotation=''),
+          right_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
           annotation='',
         )
         >>> r_bin_op == 2 ** R.from_value(H(6))
@@ -1056,7 +1056,7 @@ class R:
         >>> r_un_op = R.from_value(H(6)).umap(operator.__neg__) ; r_un_op
         UnarySumOpRoller(
           un_op=<built-in function neg>,
-          source=ValueRoller(value=H(6), annotation=''),
+          source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
           annotation='',
         )
         >>> r_un_op == -R.from_value(H(6))
@@ -1364,7 +1364,7 @@ class RepeatRoller(R):
     >>> r_d20_100 = 100@r_d20 ; r_d20_100
     RepeatRoller(
       n=100,
-      source=ValueRoller(value=H(20), annotation=''),
+      source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1, 20: 1}), annotation=''),
       annotation='',
     )
     >>> all(outcome in d20 for outcome in r_d20_100.roll().outcomes())
@@ -1682,7 +1682,7 @@ class FilterRoller(R):
         sources=(
           RepeatRoller(
             n=2,
-            source=ValueRoller(value=H(6), annotation=''),
+            source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
             annotation='',
           ),
         ),
@@ -1707,7 +1707,7 @@ class FilterRoller(R):
         Roll(
           r=RepeatRoller(
             n=2,
-            source=ValueRoller(value=H(6), annotation=''),
+            source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
             annotation='',
           ),
           roll_outcomes=(
@@ -1722,7 +1722,7 @@ class FilterRoller(R):
           ),
           source_rolls=(
             Roll(
-              r=ValueRoller(value=H(6), annotation=''),
+              r=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
               roll_outcomes=(
                 RollOutcome(
                   value=2,
@@ -1732,7 +1732,7 @@ class FilterRoller(R):
               source_rolls=(),
             ),
             Roll(
-              r=ValueRoller(value=H(6), annotation=''),
+              r=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
               roll_outcomes=(
                 RollOutcome(
                   value=5,
@@ -1987,7 +1987,7 @@ class SubstitutionRoller(R):
         n=2,
         source=SubstitutionRoller(
           expansion_op=<function <lambda> at ...>,
-          source=ValueRoller(value=H(6), annotation=''),
+          source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
           coalesce_mode=<CoalesceMode.REPLACE: 1>,
           max_depth=1,
           annotation='',

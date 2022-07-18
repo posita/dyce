@@ -266,7 +266,7 @@ For deterministic outcomes.
 >>> r_d12_add_4 = ValueRoller(d12) + 4 ; r_d12_add_4
 BinarySumOpRoller(
   bin_op=<built-in function add>,
-  left_source=ValueRoller(value=H(12), annotation=''),
+  left_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1}), annotation=''),
   right_source=ValueRoller(value=4, annotation=''),
   annotation='',
 )
@@ -290,7 +290,7 @@ Roll(
   ),
   source_rolls=(
     Roll(
-      r=ValueRoller(value=H(12), annotation=''),
+      r=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1}), annotation=''),
       roll_outcomes=(
         RollOutcome(
           value=7,
@@ -340,9 +340,9 @@ We start by using the [``R.from_value`` class method][dyce.r.R.from_value] to cr
 >>> d6 = H(6)
 >>> d8 = H(8)
 >>> r_d6 = R.from_value(d6) ; r_d6
-ValueRoller(value=H(6), annotation='')
+ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='')
 >>> r_d8 = R.from_value(d8) ; r_d8
-ValueRoller(value=H(8), annotation='')
+ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), annotation='')
 
 ```
 
@@ -352,7 +352,7 @@ For homogeneous pools, we can use the matrix multiplication operator.
 >>> r_3d6 = 3@r_d6 ; r_3d6
 RepeatRoller(
   n=3,
-  source=ValueRoller(value=H(6), annotation=''),
+  source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
   annotation='',
 )
 
@@ -367,10 +367,10 @@ SelectionRoller(
   sources=(
     RepeatRoller(
       n=3,
-      source=ValueRoller(value=H(6), annotation=''),
+      source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
       annotation='',
     ),
-    ValueRoller(value=H(8), annotation=''),
+    ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), annotation=''),
   ),
   annotation='',
 )
@@ -432,10 +432,10 @@ Roll(
     sources=(
       RepeatRoller(
         n=3,
-        source=ValueRoller(value=H(6), annotation=''),
+        source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
         annotation='',
       ),
-      ValueRoller(value=H(8), annotation=''),
+      ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), annotation=''),
     ),
     annotation='',
   ),
@@ -542,8 +542,8 @@ Roll(
   r=SelectionRoller(
     which=(slice(1, None, None),),
     sources=(
-      ValueRoller(value=P(6, 6, 6), annotation=''),
-      ValueRoller(value=H(8), annotation=''),
+      ValueRoller(value=3@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})), annotation=''),
+      ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), annotation=''),
     ),
     annotation='',
   ),
@@ -699,7 +699,7 @@ For deterministic outcomes.
 Roll(
   r=SubstitutionRoller(
     expansion_op=<function <lambda> at ...>,
-    source=ValueRoller(value=H(6), annotation=''),
+    source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
     coalesce_mode=<CoalesceMode.REPLACE: 1>,
     max_depth=2,
     annotation='',
@@ -773,7 +773,7 @@ For deterministic outcomes.
 Roll(
   r=SubstitutionRoller(
     expansion_op=<function <lambda> at ...>,
-    source=ValueRoller(value=H(6), annotation=''),
+    source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
     coalesce_mode=<CoalesceMode.APPEND: 2>,
     max_depth=2,
     annotation='',

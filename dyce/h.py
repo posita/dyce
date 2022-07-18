@@ -41,7 +41,6 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from pprint import pformat
 from typing import (
     Any,
     Callable,
@@ -371,7 +370,6 @@ class H(_MappingT):
         "_hash",
         "_lowest_terms",
         "_order_stat_funcs_by_n",
-        "_simple_init",
         "_total",
     )
 
@@ -381,7 +379,6 @@ class H(_MappingT):
     def __init__(self, items: _SourceT) -> None:
         r"Initializer."
         super().__init__()
-        self._simple_init: Optional[int] = None
         tmp: Counter[RealLike] = Counter()
 
         if isinstance(items, MappingC):
@@ -389,11 +386,11 @@ class H(_MappingT):
 
         if isinstance(items, SupportsInt):
             if items != 0:
-                self._simple_init = as_int(items)
+                simple_init = as_int(items)
                 outcome_range = range(
-                    self._simple_init,
+                    simple_init,
                     0,
-                    1 if self._simple_init < 0 else -1,  # count toward zero
+                    1 if simple_init < 0 else -1,  # count toward zero
                 )
 
                 if isinstance(items, RealLike):
@@ -443,12 +440,7 @@ class H(_MappingT):
 
     @beartype
     def __repr__(self) -> str:
-        if self._simple_init is not None:
-            arg = str(self._simple_init)
-        else:
-            arg = pformat(self._h, sort_dicts=False)
-
-        return f"{type(self).__name__}({arg})"
+        return f"{type(self).__name__}({dict.__repr__(self._h)})"
 
     @beartype
     def __eq__(self, other) -> bool:
@@ -751,12 +743,7 @@ class H(_MappingT):
         ...     return d20_outcome
 
         >>> H.foreach(reroll_one_dependent_term, d20_outcome=d20)
-        H({1: 1,
-         2: 21,
-         3: 21,
-         ...,
-         19: 21,
-         20: 21})
+        H({1: 1, 2: 21, 3: 21, ..., 19: 21, 20: 21})
 
         ```
 
@@ -871,7 +858,7 @@ class H(_MappingT):
         ``` python
         >>> import operator
         >>> H(6).umap(operator.__neg__)
-        H(-6)
+        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
 
         ```
 
@@ -881,18 +868,7 @@ class H(_MappingT):
 
         ```
         """
-        h = type(self)((un_op(outcome), count) for outcome, count in self.items())
-
-        if self._simple_init is not None:
-            simple_init = un_op(self._simple_init)
-
-            if isinstance(simple_init, SupportsInt):
-                h_simple = type(self)(simple_init)
-
-                if h_simple == h:
-                    return h_simple
-
-        return h
+        return type(self)((un_op(outcome), count) for outcome, count in self.items())
 
     @beartype
     def lt(self, other: _OperandT) -> H:
@@ -1358,21 +1334,7 @@ class H(_MappingT):
         ...   # roll a d00 and take that result instead
         ...   lambda h, outcome: d00 if outcome == 1 else outcome
         ... ) ; d6_d00
-        H({0: 1,
-         2: 10,
-         3: 10,
-         4: 10,
-         5: 10,
-         6: 10,
-         10: 1,
-         20: 1,
-         30: 1,
-         40: 1,
-         50: 1,
-         60: 1,
-         70: 1,
-         80: 1,
-         90: 1})
+        H({0: 1, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})
 
         ```
 
@@ -1435,15 +1397,7 @@ class H(_MappingT):
             ...   # after the original one from the d6
             ...   precision_limit=Fraction(1, 6) * Fraction(1, 10),
             ... )
-            H({0: 11,
-             2: 100,
-             ...,
-             6: 100,
-             10: 11,
-             ...,
-             70: 11,
-             80: 1,
-             90: 11})
+            H({0: 11, 2: 100, ..., 6: 100, 10: 11, ..., 70: 11, 80: 1, 90: 11})
             >>> d6.substitute(
             ...   lambda h, outcome: d00 if outcome in (1, 80) else outcome,
             ...   max_depth=100,
@@ -1451,15 +1405,7 @@ class H(_MappingT):
             ...   # after the original one from the d6
             ...   precision_limit=Fraction(1, 6) * Fraction(1, 10) - Fraction(1, 1000000000),  # <-- juuust under the wire
             ... )
-            H({0: 111,
-             2: 1000,
-             ...,
-             6: 1000,
-             10: 111,
-             ...,
-             70: 111,
-             80: 1,
-             90: 111})
+            H({0: 111, 2: 1000, ..., 6: 1000, 10: 111, ..., 70: 111, 80: 1, 90: 111})
 
             ```
 
