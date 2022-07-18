@@ -14,7 +14,7 @@ from typing import Optional
 import pytest
 
 from dyce import rng
-from dyce.rng import _RandSeed
+from dyce.rng import _RandSeedT
 
 __all__ = ()
 
@@ -46,7 +46,7 @@ def test_numpy_rng() -> None:
         pytest.skip("requires numpy")
 
     rng = PCG64DXSMRandom()
-    seed: _RandSeed
+    seed: _RandSeedT
     random: float
     getrandbits: int
     randbytes: bytes
@@ -100,7 +100,7 @@ def test_standard_rng() -> None:
 
 def _test_getrandbits_w_seed_helper(
     rng: Random,
-    seed: _RandSeed,
+    seed: _RandSeedT,
     bits: int,
     expected: int,
 ) -> None:
@@ -114,7 +114,7 @@ def _test_getrandbits_w_seed_helper(
 
 def _test_randbytes_w_seed_helper(
     rng: Random,
-    seed: _RandSeed,
+    seed: _RandSeedT,
     expected: bytes,
 ) -> None:
     rng.seed(seed)
@@ -129,7 +129,7 @@ def _test_randbytes_w_seed_helper(
 
 def _test_random_w_seed_helper(
     rng: Random,
-    seed: _RandSeed,
+    seed: _RandSeedT,
     expected: Optional[float] = None,
 ) -> None:
     rng.seed(seed)

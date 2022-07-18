@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import ABC
 from random import Random
 from sys import version_info
-from typing import Any, Tuple, Type, Union
+from typing import Any, Tuple, Type
 
 from numerary.bt import beartype
 
@@ -21,7 +21,7 @@ __all__ = ("RNG",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_RandSeed = Union[int, float, str, bytes, bytearray, None]
+_RandSeedT = Any
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ try:
         if version_info < (3, 11):
 
             @beartype
-            def __new__(cls, seed: _RandSeed = None):
+            def __new__(cls, seed: _RandSeedT = None):
                 r"""
                 Because ``#!python random.Random`` is broken in versions <3.11, ``#!python
                 random.Random``’s vanilla implementation cannot accept non-hashable
@@ -76,7 +76,7 @@ try:
                 return super(NumPyRandomBase, cls).__new__(cls)
 
         @beartype
-        def __init__(self, seed: _RandSeed = None):
+        def __init__(self, seed: _RandSeedT = None):
             # Parent calls self.seed(seed)
             super().__init__(seed)
 
@@ -106,9 +106,11 @@ try:
             return self._generator.random()
 
         @beartype
+        # TODO(posita): See <https://github.com/python/mypy/issues/8393>
+        # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
         def seed(  # type: ignore [override]
             self,
-            a: _RandSeed,
+            a: _RandSeedT,
             version: int = 2,
         ) -> None:
             self._generator = default_rng(self.bit_generator(a))

@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import sys
 import warnings
+from abc import abstractmethod
 from collections import Counter as counter
 from collections.abc import Iterable as IterableC
 from collections.abc import Mapping as MappingC
@@ -432,7 +433,7 @@ class H(_MappingT):
         # mechanisms call this object's __hash__ method which relies on both of these
         # and we don't want a circular dependency when computing this object's hash.
         self._hash: Optional[int] = None
-        self._total: int = tmp.total()
+        self._total: int = sum(tmp.values())  # TODO(posita): tmp.total() for >=3.10
         self._lowest_terms: Optional[H] = None
 
         # We don't use functools' caching mechanisms generally because they don't
@@ -2030,14 +2031,15 @@ class HableT(
     """
     __slots__: Any = ()
 
+    @abstractmethod
     def h(self) -> H:
         r"""
         Express its implementer as an [``H`` object][dyce.h.H].
         """
-        ...
+        pass
 
 
-class HableOpsMixin:
+class HableOpsMixin(HableT):
     r"""
     A “mix-in” class providing arithmetic operations for implementers of the
     [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this
@@ -2048,6 +2050,9 @@ class HableOpsMixin:
         See [``HableT``][dyce.h.HableT] for notes on pronunciation.
     """
     __slots__: Any = ()
+
+    def __init__(self):
+        object.__init__(self)
 
     @beartype
     def __add__(self: HableT, other: _OperandT) -> H:

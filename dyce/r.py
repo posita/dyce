@@ -2090,6 +2090,8 @@ class SubstitutionRoller(R):
                 if isinstance(expanded, RollOutcome):
                     if expanded is not roll_outcome:
                         expanded = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
+                        # TODO(posita): Not sure why this is necessary
+                        assert isinstance(expanded, RollOutcome)
 
                     yield expanded
                 elif isinstance(expanded, Roll):
