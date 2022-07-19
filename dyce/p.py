@@ -967,6 +967,8 @@ class P(Sequence[H], HableOpsMixin):
 
 
 # ---- Functions -----------------------------------------------------------------------
+
+
 @beartype
 def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
     r"""

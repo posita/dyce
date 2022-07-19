@@ -318,8 +318,16 @@ class TestH:
             _ = H((i + 0.5 for i in range(7, 0, -1))).is_odd()
 
     def test_accumulate(self) -> None:
-        h = H(itertools.chain(range(0, 6), range(3, 9)))
-        assert H(range(0, 6)).accumulate(H(range(3, 9))) == h
+        assert H(4).accumulate(H(6)) == H(4).accumulate(6)
+
+        h = H(itertools.chain(range(0, 6), range(4, 10)))
+        assert H(range(0, 6)).accumulate(range(4, 10)) == h
+        assert (
+            H(range(0, 6))
+            .accumulate(range(0, 6))
+            .accumulate((i, 2) for i in range(4, 10))
+            == h
+        )
 
     def test_accumulate_does_not_invoke_lowest_terms(self) -> None:
         base = H(range(10))

@@ -1031,9 +1031,9 @@ class H(_MappingT):
         if isinstance(other, MappingC):
             other = other.items()
         elif not isinstance(other, IterableC):
-            other = cast(Iterable[RealLike], (other,))
+            other = H(other)
 
-        return type(self)(chain(self.items(), cast(Iterable, other)))
+        return type(self)(cast(_SourceT, chain(self.items(), other)))
 
     @experimental
     @beartype
