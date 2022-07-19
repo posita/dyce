@@ -187,7 +187,7 @@ We can also deploy a counting trick with the two d10s.
 ...   STRONG_SUCCESS = auto()
 
 >>> iron_distributions_by_mod = {
-...   mod: H.foreach(lambda action: 2@(d10.lt(action)), action=d6 + mod)
+...   mod: H.foreach(lambda action: 2@(d10.lt(action)), action=d6 + mod).zero_fill(IronResult)
 ...   for mod in mods
 ... }
 >>> for mod, iron_distribution in iron_distributions_by_mod.items():
@@ -364,8 +364,8 @@ We can easily model the first round of its opposed combat system for various sta
 ...   print("---")
 ...   for us in range(them, them + 3):
 ...     first_round = (us@H(6)).vs(them@H(6))  # -1 is a loss, 0 is a tie, 1 is a win
-...     results = first_round.format(width=0)
-...     print(f"{us}d6 vs {them}d6: {results}")
+...     risus_results = first_round.format(width=0)
+...     print(f"{us}d6 vs {them}d6: {risus_results}")
 ---
 3d6 vs 3d6: {..., -1: 45.36%, 0:  9.28%, 1: 45.36%}
 4d6 vs 3d6: {..., -1: 19.17%, 0:  6.55%, 1: 74.28%}
@@ -444,11 +444,11 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 >>> for t in range(3, 6):
 ...   print("---")
 ...   for u in range(t, t + 3):
-...     results = risus_combat_driver(
+...     risus_results = risus_combat_driver(
 ...       u, t,
 ...       lambda u, t: (u@H(6)).vs(t@H(6))
 ...     ).format(width=0)
-...     print(f"{u}d6 vs {t}d6: {results}")
+...     print(f"{u}d6 vs {t}d6: {risus_results}")
 ---
 3d6 vs 3d6: {..., -1: 50.00%, 1: 50.00%}
 4d6 vs 3d6: {..., -1: 10.50%, 1: 89.50%}
@@ -595,8 +595,8 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 >>> for t in range(3, 6):
 ...   print("---")
 ...   for u in range(t, t + 3):
-...     results = risus_combat_driver(u, t, deadly_combat_vs).format(width=0)
-...     print(f"{u}d6 vs {t}d6: {results}")
+...     risus_results = risus_combat_driver(u, t, deadly_combat_vs).format(width=0)
+...     print(f"{u}d6 vs {t}d6: {risus_results}")
 ---
 3d6 vs 3d6: {..., -1: 50.00%, 1: 50.00%}
 4d6 vs 3d6: {..., -1: 36.00%, 1: 64.00%}
@@ -701,16 +701,21 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 
 ``` python
 >>> from dyce import H, P
->>> res1 = 3@H(6)
->>> p_4d6 = 4@P(6)
->>> res2 = p_4d6.h(slice(1, None))  # discard the lowest die (index 0)
+>>> from itertools import chain
+>>> p_4d6 = 4 @ P(6)
 >>> d6_reroll_first_one = H(6).substitute(lambda h, outcome: h if outcome == 1 else outcome)
->>> p_4d6_reroll_first_one = (4@P(d6_reroll_first_one))
->>> res3 = p_4d6_reroll_first_one.h(slice(1, None))  # discard the lowest
->>> p_4d6_reroll_all_ones = 4@P(H((2, 3, 4, 5, 6)))
->>> res4 = p_4d6_reroll_all_ones.h(slice(1, None))  # discard the lowest
->>> res5 = 2@H(6) + 6
->>> res6 = 4@H(4) + 2
+>>> p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
+>>> p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
+>>> attr_results: dict[str, H] = {
+...     "3d6": 3 @ H(6),
+...     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
+...     "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
+...     "4d6 - re-roll all 1s (i.e., 4d5 + 1), discard lowest": p_4d6_reroll_all_ones.h(slice(1, None)),
+...     "2d6 + 6": 2 @ H(6) + 6,
+...     "4d4 + 2": 4 @ H(4) + 2,
+... }
+>>> zero_fill_outcomes = set(chain(*(res.outcomes() for res in attr_results.values())))
+>>> attr_results = {label: res.zero_fill(zero_fill_outcomes) for label, res in attr_results.items()}
 
 ```
 

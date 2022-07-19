@@ -55,14 +55,13 @@ def do_it(style: str) -> None:
     df = pandas.DataFrame(columns=IronSoloResult)
 
     for mod in mods:
-        results_for_mod = dict(
-            H.foreach(
-                partial(iron_solo_dependent_term, mod=mod),
-                action=d6,
-                first_challenge=d10,
-                second_challenge=d10,
-            ).distribution(rational_t=lambda n, d: n / d)
-        )
+        res_for_mod = H.foreach(
+            partial(iron_solo_dependent_term, mod=mod),
+            action=d6,
+            first_challenge=d10,
+            second_challenge=d10,
+        ).zero_fill(IronSoloResult)
+        results_for_mod = dict(res_for_mod.distribution(rational_t=lambda n, d: n / d))
         row = pandas.DataFrame(results_for_mod, columns=IronSoloResult, index=[mod])
         df = pandas.concat((df, row))
 

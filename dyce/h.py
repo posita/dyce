@@ -413,13 +413,8 @@ class H(_MappingT):
         else:
             raise ValueError(f"unrecognized initializer {items}")
 
-        # Sort and omit zero counts. As of Python 3.7, insertion order of keys is
-        # preserved.
-        self._h: _MappingT = {
-            outcome: tmp[outcome]
-            for outcome in sorted_outcomes(tmp)
-            if tmp[outcome] != 0
-        }
+        # As of Python 3.7, insertion order of keys is preserved.
+        self._h: _MappingT = {outcome: tmp[outcome] for outcome in sorted_outcomes(tmp)}
 
         # We can't use something like functools.lru_cache for these values because those
         # mechanisms call this object's __hash__ method which relies on both of these
@@ -1076,21 +1071,13 @@ class H(_MappingT):
     @beartype
     def lowest_terms(self) -> H:
         r"""
-        Computes and returns a histogram whose counts share a greatest common divisor of 1.
+        Computes and returns a histogram whose nonzero counts share a greatest
+        common divisor of 1.
 
         ``` python
-        >>> df = H((-1, -1, 0, 0, 1, 1)) ; df
-        H({-1: 2, 0: 2, 1: 2})
-        >>> df.lowest_terms()
+        >>> df_obscured = H({-2: 0, -1: 2, 0: 2, 1: 2, 2: 0})
+        >>> df_obscured.lowest_terms()
         H({-1: 1, 0: 1, 1: 1})
-
-        ```
-
-        ``` python
-        >>> d6avg = H((2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5)) ; d6avg
-        H({2: 2, 3: 4, 4: 4, 5: 2})
-        >>> d6avg.lowest_terms()
-        H({2: 1, 3: 2, 4: 2, 5: 1})
 
         ```
         """
@@ -1101,7 +1088,9 @@ class H(_MappingT):
                 self._lowest_terms = self
             else:
                 self._lowest_terms = type(self)(
-                    (k, v // counts_gcd) for k, v in self.items()
+                    (outcome, count // counts_gcd)
+                    for outcome, count in self.items()
+                    if count != 0
                 )
 
         return self._lowest_terms
@@ -1593,25 +1582,29 @@ class H(_MappingT):
         """
         return self.map(_within(lo, hi), other)
 
+    @beartype
+    def zero_fill(self, outcomes: Iterable[RealLike]) -> H:
+        r"""
+        Shorthand for ``#!python self.accumulate({outcome: 0 for outcome in
+        outcomes})``.
+
+        ``` python
+        >>> H(4).zero_fill(H(8).outcomes())
+        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0})
+
+        ```
+        """
+        return self.accumulate({outcome: 0 for outcome in outcomes})
+
     @overload
     def distribution(
         self,
-        fill_items: Optional[_MappingT] = None,
     ) -> Iterator[tuple[RealLike, Fraction]]:
         ...
 
     @overload
     def distribution(
         self,
-        fill_items: _MappingT,
-        rational_t: _RationalInitializerT[_T],
-    ) -> Iterator[tuple[RealLike, _T]]:
-        ...
-
-    @overload
-    def distribution(
-        self,
-        *,
         rational_t: _RationalInitializerT[_T],
     ) -> Iterator[tuple[RealLike, _T]]:
         ...
@@ -1620,11 +1613,7 @@ class H(_MappingT):
     @beartype
     def distribution(
         self,
-        fill_items: Optional[_MappingT] = None,
-        # TODO(posita): See <https://github.com/python/mypy/issues/10854> for context on
-        # all the @overload work-around nonsense above and remove those once that issue
-        # is addressed.
-        rational_t: _RationalInitializerT[_T] = cast(_RationalInitializerT, Fraction),
+        rational_t: _RationalInitializerT[_T] = Fraction,
     ) -> Iterator[tuple[RealLike, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
@@ -1636,16 +1625,6 @@ class H(_MappingT):
         [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
         >>> list(h.ge(3).distribution())
         [(False, Fraction(1, 4)), (True, Fraction(3, 4))]
-
-        ```
-
-        If provided, *fill_items* supplies defaults for any “missing” outcomes.
-
-        ``` python
-        >>> list(h.distribution())
-        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
-        >>> list(h.distribution(fill_items={0: 0, 7: 0}))
-        [(0, Fraction(0, 1)), (1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8)), (7, Fraction(0, 1))]
 
         ```
 
@@ -1708,21 +1687,16 @@ class H(_MappingT):
 
         ```
         """
-        if fill_items is None:
-            fill_items = {}
-
-        combined = dict(chain(fill_items.items(), self.items()))
-        total = sum(combined.values()) or 1
+        total = sum(self.values()) or 1
 
         return (
-            (outcome, rational_t(combined[outcome], total))
-            for outcome in sorted_outcomes(combined)
+            (outcome, rational_t(self[outcome], total))
+            for outcome in sorted_outcomes(self)
         )
 
     @beartype
     def distribution_xy(
         self,
-        fill_items: Optional[_MappingT] = None,
     ) -> tuple[tuple[RealLike, ...], tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
@@ -1742,7 +1716,7 @@ class H(_MappingT):
             zip(
                 *(
                     (outcome, float(probability))
-                    for outcome, probability in self.distribution(fill_items)
+                    for outcome, probability in self.distribution()
                 )
             )
         )
@@ -1750,17 +1724,15 @@ class H(_MappingT):
     @beartype
     def format(
         self,
-        fill_items: _MappingT = None,
         width: SupportsInt = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
         sep: str = os.linesep,
     ) -> str:
         r"""
-        Returns a formatted string representation of the histogram. If provided,
-        *fill_items* supplies defaults for any missing outcomes. If *width* is greater
-        than zero, a horizontal bar ASCII graph is printed using *tick* and *sep* (which
-        are otherwise ignored if *width* is zero or less).
+        Returns a formatted string representation of the histogram. If *width* is
+        greater than zero, a horizontal bar ASCII graph is printed using *tick* and
+        *sep* (which are otherwise ignored if *width* is zero or less).
 
         ``` python
         >>> print(H(6).format(width=0))
@@ -1769,7 +1741,7 @@ class H(_MappingT):
         ```
 
         ``` python
-        >>> print((2@H(6)).format(fill_items={i: 0 for i in range(1, 21)}, tick="@"))
+        >>> print((2@H(6)).zero_fill(range(1, 21)).format(tick="@"))
         avg |    7.00
         std |    2.42
         var |    5.83
@@ -1835,7 +1807,7 @@ class H(_MappingT):
                 for (
                     outcome,
                     probability,
-                ) in self.distribution(fill_items):
+                ) in self.distribution():
                     probability_f = float(probability)
                     yield f"{outcome}:{probability_f:7.2%}"
 
@@ -1854,7 +1826,7 @@ class H(_MappingT):
                     warnings.warn(f"{str(exc)}; mu: {mu}")
 
                 if self:
-                    outcomes, probabilities = self.distribution_xy(fill_items)
+                    outcomes, probabilities = self.distribution_xy()
                     tick_scale = max(probabilities) if scaled else 1.0
 
                     for outcome, probability in zip(outcomes, probabilities):
@@ -2374,7 +2346,7 @@ def sum_h(hs: Iterable[H]):
     """
     Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.
 
-    This is to ensure that summing zero or more histograms always returns a histograms.
+    This is to ensure that summing zero or more histograms always returns a histogram.
     """
     h_sum = sum(hs)
 

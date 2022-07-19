@@ -73,7 +73,6 @@ class TestH:
     def test_init_empty(self) -> None:
         assert H(()) == {}
         assert H(0) == {}
-        assert H((i, 0) for i in range(1, 7)) == {}
 
     def test_init(self) -> None:
         assert H((0, 0, 1, 0, 1)) == {0: 3, 1: 2}
@@ -83,6 +82,11 @@ class TestH:
         for i_type in _INTEGRAL_OUTCOME_TYPES:
             assert H(i_type(-2)) == H(i_type(i) for i in range(-2, 0, 1))
             assert H(i_type(6)) == H(i_type(i) for i in range(6, 0, -1))
+
+    def test_init_preserves_counts(self) -> None:
+        h = H({0: 0, 1: 2, 2: 2, 3: 0})
+        assert h == {0: 0, 1: 2, 2: 2, 3: 0}
+        assert h == H(2)
 
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
@@ -354,6 +358,10 @@ class TestH:
         lowest_terms = H({i: i for i in range(10)})
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
         assert lowest_terms is lowest_terms.lowest_terms()
+
+    def test_lowest_terms_eliminates_outcomes_with_zero_counts(self) -> None:
+        h = H({0: 0, 1: 2, 2: 2, 3: 0})
+        assert h.lowest_terms() == {1: 1, 2: 1}
 
     def test_substitute_empty(self) -> None:
         h = H({})

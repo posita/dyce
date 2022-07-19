@@ -17,6 +17,9 @@
 
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
+* Allows outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
+  Outcomes with zero counts are dropped when calling [``H.lowest_terms``][dyce.h.H.lowest_terms].
+  Adds the [``H.zero_fill``][dyce.h.H.zero_fill] convenience method.
 * Fixes memoization in [Risus multi-round combat translation](translations.md#modeling-entire-multi-round-combats).
 * Migrates from [``setuptools_scm``](https://pypi.org/project/setuptools-scm/) to [``versioningit``](https://pypi.org/project/versioningit/) for more flexible version number formatting.
 * Allows deployments to PyPI from CI based on tags.

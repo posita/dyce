@@ -27,7 +27,8 @@ def do_it(style: str) -> None:
 
         for us in range(them, them + num_rows):
             row_names.append(f"{us}d6 …")
-            rows.append((us @ H(6)).vs(them @ H(6)).distribution_xy()[-1])
+            results = (us @ H(6)).vs(them @ H(6))
+            rows.append(results.distribution_xy()[-1])
 
         ax.imshow(rows)
         ax.set_title(f"… vs {them}d6", color=text_color)

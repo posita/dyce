@@ -642,7 +642,7 @@ class P(Sequence[H], HableOpsMixin):
         ``` python
         >>> # Pretty darned efficient, generalizable to other boolean inquiries, and
         >>> # arguably the most readable
-        >>> d4_eq3, d6_eq3 = d4.eq(2), d6.eq(2)
+        >>> d4_eq3, d6_eq3 = d4.eq(3), d6.eq(3)
         >>> 3@d4_eq3 + 2@d6_eq3
         H({0: 675, 1: 945, 2: 522, 3: 142, 4: 19, 5: 1})
 
