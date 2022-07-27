@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 
-from typing import Iterator, Tuple
+from typing import Iterator
 
 from anydyce.viz import plot_line
 
@@ -34,7 +34,7 @@ def do_it(style: str) -> None:
     ax.tick_params(axis="y", colors=text_color)
     marker_start = 0
 
-    def _roll_and_keep_hs() -> Iterator[Tuple[str, H]]:
+    def _roll_and_keep_hs() -> Iterator[tuple[str, H]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k} add +1", H(roll_and_keep(p, k))
@@ -46,7 +46,7 @@ def do_it(style: str) -> None:
 
     marker_start = len(ax.lines)
 
-    def _normal() -> Iterator[Tuple[str, H]]:
+    def _normal() -> Iterator[tuple[str, H]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k}", p.h(slice(-k, None))

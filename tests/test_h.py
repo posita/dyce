@@ -15,7 +15,7 @@ import os
 import statistics
 from decimal import Decimal
 from fractions import Fraction
-from typing import Tuple, Type, Union
+from typing import Type, Union
 
 import pytest
 from numerary import RealLike
@@ -29,13 +29,13 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-_INTEGRAL_OUTCOME_TYPES: Tuple[Type, ...] = (int,)
-_OUTCOME_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
+_INTEGRAL_OUTCOME_TYPES: tuple[Type, ...] = (int,)
+_OUTCOME_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
     float,
     Decimal,
     Fraction,
 )
-_COUNT_TYPES: Tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
+_COUNT_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
 
 
 try:

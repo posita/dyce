@@ -176,7 +176,7 @@ We can also deploy a counting trick with the two d10s.
 >>> from dyce import H, as_int
 >>> from numerary.types import RealLike
 >>> from enum import IntEnum, auto
->>> from typing import Iterator, Tuple, cast
+>>> from typing import cast
 >>> d6 = H(6)
 >>> d10 = H(10)
 >>> mods = list(range(0, 5))
@@ -408,12 +408,8 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 >>> from dyce import H, P
 >>> import sys
 >>> from enum import IntEnum, auto
->>> from typing import Callable, Dict, Tuple
->>> if sys.version_info >= (3, 9):
-...   from functools import cache
-... else:
-...   from functools import lru_cache
-...   cache = lru_cache(maxsize=None)
+>>> from typing import Callable
+>>> from functools import cache
 
 >>> class Risus(IntEnum):
 ...   LOSS = -1

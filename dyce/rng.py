@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import ABC
 from random import Random
 from sys import version_info
-from typing import Any, Tuple, Type
+from typing import Any, Type
 
 from numerary.bt import beartype
 
@@ -94,7 +94,7 @@ try:
             return x >> (numbytes * 8 - k)  # trim excess bits
 
         @beartype
-        def getstate(self) -> Tuple[Any, ...]:
+        def getstate(self) -> tuple[Any, ...]:
             return (self._generator.bit_generator.state,)
 
         @beartype
@@ -109,17 +109,12 @@ try:
         # TODO(posita): See <https://github.com/python/mypy/issues/8393>
         # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
         def seed(  # type: ignore [override]
-            self,
-            a: _RandSeedT,
-            version: int = 2,
+            self, a: _RandSeedT, version: int = 2
         ) -> None:
             self._generator = default_rng(self.bit_generator(a))
 
         @beartype
-        def setstate(
-            self,
-            state: Tuple[Any, ...],
-        ) -> None:
+        def setstate(self, state: tuple[Any, ...]) -> None:
             (_state,) = state
             self._generator.bit_generator.state = _state
 

@@ -11,10 +11,9 @@ from __future__ import annotations
 import argparse
 import html
 import logging
-import sys
 from collections.abc import Mapping as MappingC
 from functools import partial
-from typing import Any, Dict, Iterator, Mapping, Optional, Union
+from typing import Any, Iterator, Mapping, Optional, Union
 
 from numerary.bt import beartype
 from plug import import_plug
@@ -50,10 +49,7 @@ __all__ = ()
 
 
 try:
-    if sys.version_info >= (3, 9):
-        from typing import Annotated
-    else:
-        from typing_extensions import Annotated
+    from typing import Annotated
 
     from beartype.vale import Is
 
@@ -106,7 +102,7 @@ class GraphvizObjectResolver:
     @beartype
     def __init__(self):
         self._serial = 1
-        self._names: Dict[int, str] = {}
+        self._names: dict[int, str] = {}
 
     @beartype
     def attrs_for_obj(

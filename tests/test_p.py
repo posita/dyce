@@ -12,7 +12,7 @@ import functools
 import itertools
 import operator
 from collections import defaultdict
-from typing import DefaultDict, Iterator, Sequence, Tuple
+from typing import Iterator, Sequence
 from unittest.mock import Mock, patch
 
 import pytest
@@ -700,7 +700,7 @@ class TestP:
 
 
 def test_analyze_selection() -> None:
-    which: Tuple[_GetItemT, ...]
+    which: tuple[_GetItemT, ...]
 
     which = (0,)
     assert _analyze_selection(6, which) == 1
@@ -774,12 +774,12 @@ def _brute_force_combinations_with_counts(
 
 
 @beartype
-def _rwc_validation_helper(p: P, which: slice) -> Tuple[Mock, Mock]:
+def _rwc_validation_helper(p: P, which: slice) -> tuple[Mock, Mock]:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
-    known_counts: DefaultDict[RollT, int] = defaultdict(int)
-    test_counts: DefaultDict[RollT, int] = defaultdict(int)
+    known_counts: defaultdict[RollT, int] = defaultdict(int)
+    test_counts: defaultdict[RollT, int] = defaultdict(int)
 
     for roll, count in _brute_force_combinations_with_counts(tuple(p), which):
         known_counts[roll] += count

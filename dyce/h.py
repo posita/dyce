@@ -12,12 +12,12 @@ import os
 import sys
 import warnings
 from abc import abstractmethod
-from collections import Counter as counter
+from collections import Counter
 from collections.abc import Iterable as IterableC
 from collections.abc import Mapping as MappingC
 from fractions import Fraction
 from itertools import chain, product, repeat
-from math import sqrt
+from math import comb, gcd, sqrt
 from operator import (
     __abs__,
     __add__,
@@ -45,16 +45,12 @@ from pprint import pformat
 from typing import (
     Any,
     Callable,
-    Counter,
-    Dict,
     ItemsView,
     Iterable,
     Iterator,
     KeysView,
-    List,
     Mapping,
     Optional,
-    Tuple,
     Type,
     TypeVar,
     Union,
@@ -69,7 +65,6 @@ from numerary.types import CachingProtocolMeta, Protocol, SupportsInt, runtime_c
 
 from . import rng
 from .lifecycle import deprecated, experimental
-from .symmetries import comb, gcd
 from .types import (
     _BinaryOperatorT,
     _RationalInitializerT,
@@ -91,7 +86,7 @@ _MappingT = Mapping[RealLike, int]
 _SourceT = Union[
     SupportsInt,
     Iterable[RealLike],
-    Iterable[Tuple[RealLike, SupportsInt]],
+    Iterable[tuple[RealLike, SupportsInt]],
     _MappingT,
     "HableT",
 ]
@@ -387,7 +382,7 @@ class H(_MappingT):
         r"Initializer."
         super().__init__()
         self._simple_init: Optional[int] = None
-        tmp: Counter[RealLike] = counter()
+        tmp: Counter[RealLike] = Counter()
 
         if isinstance(items, MappingC):
             items = items.items()
@@ -409,9 +404,9 @@ class H(_MappingT):
         elif isinstance(items, HableT):
             tmp.update(items.h())
         elif isinstance(items, IterableC):
-            # items is either an Iterable[RealLike] or an Iterable[Tuple[RealLike,
-            # SupportsInt]] (although this technically supports Iterable[Union[RealLike,
-            # Tuple[RealLike, SupportsInt]]])
+            # items is either an Iterable[RealLike] or an Iterable[tuple[RealLike,
+            # SupportsInt]] (although this technically supports Iterable[RealLike |
+            # tuple[RealLike, SupportsInt]])
             for item in items:
                 if isinstance(item, tuple):
                     outcome, count = item
@@ -442,7 +437,7 @@ class H(_MappingT):
         # is an exception, but it requires that objects have proper __dict__ values,
         # which Hs do not. So we basically do what functools.cached_property does, but
         # without a __dict__.
-        self._order_stat_funcs_by_n: Dict[int, Callable[[int], "H"]] = {}
+        self._order_stat_funcs_by_n: dict[int, Callable[[int], H]] = {}
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -450,10 +445,8 @@ class H(_MappingT):
     def __repr__(self) -> str:
         if self._simple_init is not None:
             arg = str(self._simple_init)
-        elif sys.version_info >= (3, 8):
-            arg = pformat(self._h, sort_dicts=False)
         else:
-            arg = dict.__repr__(self._h)
+            arg = pformat(self._h, sort_dicts=False)
 
         return f"{type(self).__name__}({arg})"
 
@@ -609,6 +602,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
@@ -626,6 +620,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
@@ -643,6 +638,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
         try:
             if isinstance(other, SupportsInt):
@@ -721,6 +717,7 @@ class H(_MappingT):
     @beartype
     def foreach(
         cls,
+        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
         dependent_term: Callable[..., Union["H", RealLike]],
         **independent_sources: _SourceT,
     ) -> H:
@@ -782,7 +779,7 @@ class H(_MappingT):
         from dyce import P
 
         def _dependent_term(**roll_kw):
-            outcome_kw: Dict[str, RealLike] = {}
+            outcome_kw: dict[str, RealLike] = {}
 
             for key, roll in roll_kw.items():
                 assert isinstance(roll, tuple)
@@ -1571,7 +1568,7 @@ class H(_MappingT):
             if depth == max_depth or contextual_precision <= precision_limit:
                 return h
 
-            def _expand_and_coalesce() -> Iterator[Tuple[Union[H, RealLike], int]]:
+            def _expand_and_coalesce() -> Iterator[tuple[Union[H, RealLike], int]]:
                 total = h.total
 
                 for outcome, count in h.items():
@@ -1654,7 +1651,7 @@ class H(_MappingT):
     def distribution(
         self,
         fill_items: Optional[_MappingT] = None,
-    ) -> Iterator[Tuple[RealLike, Fraction]]:
+    ) -> Iterator[tuple[RealLike, Fraction]]:
         ...
 
     @overload
@@ -1662,7 +1659,7 @@ class H(_MappingT):
         self,
         fill_items: _MappingT,
         rational_t: _RationalInitializerT[_T],
-    ) -> Iterator[Tuple[RealLike, _T]]:
+    ) -> Iterator[tuple[RealLike, _T]]:
         ...
 
     @overload
@@ -1670,7 +1667,7 @@ class H(_MappingT):
         self,
         *,
         rational_t: _RationalInitializerT[_T],
-    ) -> Iterator[Tuple[RealLike, _T]]:
+    ) -> Iterator[tuple[RealLike, _T]]:
         ...
 
     @experimental
@@ -1682,7 +1679,7 @@ class H(_MappingT):
         # all the @overload work-around nonsense above and remove those once that issue
         # is addressed.
         rational_t: _RationalInitializerT[_T] = cast(_RationalInitializerT, Fraction),
-    ) -> Iterator[Tuple[RealLike, _T]]:
+    ) -> Iterator[tuple[RealLike, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
         outcome/probability pair.
@@ -1780,7 +1777,7 @@ class H(_MappingT):
     def distribution_xy(
         self,
         fill_items: Optional[_MappingT] = None,
-    ) -> Tuple[Tuple[RealLike, ...], Tuple[float, ...]]:
+    ) -> tuple[tuple[RealLike, ...], tuple[float, ...]]:
         r"""
         Presentation helper function returning an iterator for a “zipped” arrangement of the
         output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
@@ -1807,7 +1804,7 @@ class H(_MappingT):
     @beartype
     def format(
         self,
-        fill_items: Optional[_MappingT] = None,
+        fill_items: _MappingT = None,
         width: SupportsInt = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
@@ -1981,8 +1978,8 @@ class H(_MappingT):
             else 0
         )
 
-    def _order_stat_func_for_n(self, n: int) -> Callable[[int], "H"]:
-        betas_by_outcome: Dict[RealLike, Tuple[H, H]] = {}
+    def _order_stat_func_for_n(self, n: int) -> Callable[[int], H]:
+        betas_by_outcome: dict[RealLike, tuple[H, H]] = {}
 
         for outcome in self.outcomes():
             betas_by_outcome[outcome] = (
@@ -1990,7 +1987,7 @@ class H(_MappingT):
                 n @ self.lt(outcome),
             )
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[Tuple[RealLike, int]]:
+        def _gen_h_items_at_pos(pos: int) -> Iterator[tuple[RealLike, int]]:
             for outcome, (h_le, h_lt) in betas_by_outcome.items():
                 yield (
                     outcome,
@@ -2351,7 +2348,7 @@ class HableOpsMixin(HableT):
 
 @beartype
 def aggregate_with_counts(
-    source_counts: Iterable[Tuple[Union[H, RealLike], int]],
+    source_counts: Iterable[tuple[Union[H, RealLike], int]],
     h_type: Type[H] = H,
 ) -> H:
     r"""
@@ -2388,7 +2385,7 @@ def aggregate_with_counts(
         ```
     """
     aggregate_scalar = 1
-    outcome_counts: List[Tuple[RealLike, int]] = []
+    outcome_counts: list[tuple[RealLike, int]] = []
 
     for outcome_or_h, count in source_counts:
         if isinstance(outcome_or_h, H):

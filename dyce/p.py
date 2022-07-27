@@ -8,24 +8,19 @@
 
 from __future__ import annotations
 
-from collections import Counter as counter
-from collections import defaultdict
+from collections import Counter, defaultdict
 from fractions import Fraction
 from functools import reduce, wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
 from math import factorial
 from operator import __eq__, __index__, __mul__, __ne__
 from typing import (
+    Any,
     Callable,
-    Counter,
-    DefaultDict,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
     overload,
 )
@@ -59,10 +54,10 @@ __all__ = ("P",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-RollT = Tuple[RealLike, ...]
+RollT = tuple[RealLike, ...]
 _OperandT = Union["P", RealLike]
-_RollCountT = Tuple[RollT, int]
-_RollProbT = Tuple[RollT, Fraction]
+_RollCountT = tuple[RollT, int]
+_RollProbT = tuple[RollT, Fraction]
 _SelectCallableT = Callable[[H, int, int], Iterator[_RollProbT]]
 
 
@@ -202,11 +197,12 @@ class P(Sequence[H], HableOpsMixin):
 
     ```
     """
-    __slots__: Union[str, Iterable[str]] = ("_hs",)
+    __slots__: Any = ("_hs",)
 
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __init__(self, *args: Union[SupportsInt, "P", H]) -> None:
         r"Initializer."
         super().__init__()
@@ -275,6 +271,7 @@ class P(Sequence[H], HableOpsMixin):
     @beartype
     # TODO(posita): See <https://github.com/python/mypy/issues/8393>
     # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore [override]
         if isinstance(key, slice):
             return P(*self._hs[key])
@@ -405,6 +402,7 @@ class P(Sequence[H], HableOpsMixin):
     def foreach(
         cls,
         dependent_term: Callable[..., Union[H, RealLike]],
+        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
         **independent_sources: Union["P", H, HableT, _SourceT],
     ) -> H:
         r"""
@@ -522,7 +520,7 @@ class P(Sequence[H], HableOpsMixin):
 
         ```
         """
-        pools_by_kw: Dict[str, P] = {}
+        pools_by_kw: dict[str, P] = {}
 
         for source_name, source in independent_sources.items():
             if isinstance(source, H):
@@ -536,12 +534,12 @@ class P(Sequence[H], HableOpsMixin):
 
         def _kw_roll_count_tuples(
             pool_name: str,
-        ) -> Iterator[Tuple[str, RollT, int]]:
+        ) -> Iterator[tuple[str, RollT, int]]:
             for roll, count in pools_by_kw[pool_name].rolls_with_counts():
                 yield pool_name, roll, count
 
         def _resolve_dependent_term_for_rolls() -> Iterator[
-            Tuple[Union[H, RealLike], int]
+            tuple[Union[H, RealLike], int]
         ]:
             for kw_roll_count_tuples in product(
                 *(_kw_roll_count_tuples(pool_name) for pool_name in pools_by_kw)
@@ -659,10 +657,10 @@ class P(Sequence[H], HableOpsMixin):
         ```
         </details>
         """
-        group_counters: List[Counter[RealLike]] = []
+        group_counters: list[Counter[RealLike]] = []
 
         for h, hs in groupby(self):
-            group_counter: Counter[RealLike] = counter()
+            group_counter: Counter[RealLike] = Counter()
             n = sum(1 for _ in hs)
 
             for k in range(0, n + 1):
@@ -982,7 +980,7 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
     * ``#!python None`` – any other selection
     """
     indexes = tuple(range(n))
-    counts_by_index: Counter[int] = counter(getitems(indexes, which))
+    counts_by_index: Counter[int] = Counter(getitems(indexes, which))
     found_indexes = set(counts_by_index)
 
     if not found_indexes:
@@ -1010,7 +1008,7 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
 
 @beartype
 def _rwc_heterogeneous_h_groups(
-    h_groups: Iterable[Tuple[_MappingT, int]],
+    h_groups: Iterable[tuple[_MappingT, int]],
     k: Optional[int],
 ) -> Iterator[_RollCountT]:
     r"""
@@ -1101,7 +1099,7 @@ def _rwc_homogeneous_n_h_using_karonen_partial_selection(
 
     # TODO(posita): Can we use functools.cache instead?
     def _memoize(f: _SelectCallableT) -> _SelectCallableT:
-        cache: DefaultDict[Tuple[H, int, int], List[_RollProbT]] = defaultdict(list)
+        cache: defaultdict[tuple[H, int, int], list[_RollProbT]] = defaultdict(list)
 
         @wraps(f)
         def _wrapped(h: H, n: int, k: int) -> Iterator[_RollProbT]:

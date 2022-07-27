@@ -9,20 +9,9 @@
 from __future__ import annotations
 
 import re
-import sys
 from abc import abstractmethod
 from operator import __getitem__, __index__
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    List,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Iterable, Iterator, Sequence, TypeVar, Union
 
 from numerary.bt import beartype
 from numerary.types import (
@@ -49,22 +38,18 @@ _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _GetItemT = Union[SupportsIndex, slice]
 
-if sys.version_info >= (3, 8):
 
-    @runtime_checkable
-    class _RationalInitializerT(
-        Protocol[_T_co],
-        metaclass=CachingProtocolMeta,
-    ):
-        # TODO(posita): See <https://github.com/python/mypy/issues/11013>
-        # __slots__: Any = ()
+@runtime_checkable
+class _RationalInitializerT(
+    Protocol[_T_co],
+    metaclass=CachingProtocolMeta,
+):
+    # TODO(posita): See <https://github.com/python/mypy/issues/11013>
+    # __slots__: Any = ()
 
-        @abstractmethod
-        def __call__(self, numerator: int, denominator: int) -> _T_co:
-            pass
-
-else:
-    _RationalInitializerT = Callable[[int, int], _T_co]
+    @abstractmethod
+    def __call__(self, numerator: int, denominator: int) -> _T_co:
+        pass
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -104,12 +89,12 @@ def is_odd(outcome: SupportsInt) -> bool:
 
 
 @beartype
-def natural_key(val: Any) -> Tuple[Union[int, str], ...]:
+def natural_key(val: Any) -> tuple[Union[int, str], ...]:
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
 
 
 @beartype
-def sorted_outcomes(vals: Iterable[_T]) -> List[_T]:
+def sorted_outcomes(vals: Iterable[_T]) -> list[_T]:
     vals = list(vals)
 
     try:

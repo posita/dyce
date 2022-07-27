@@ -42,15 +42,10 @@ from textwrap import indent
 from typing import (
     Any,
     Callable,
-    DefaultDict,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Optional,
     Sequence,
-    Set,
-    Tuple,
     Union,
     overload,
 )
@@ -266,9 +261,9 @@ class R:
     <!-- BEGIN MONKEY PATCH --
     For type-checking docstrings
 
-    >>> from typing import Tuple, Union
+    >>> from typing import Union
     >>> from dyce.r import PoolRoller, Roll, RollOutcome, ValueRoller
-    >>> which: Tuple[Union[int, slice], ...]
+    >>> which: tuple[Union[int, slice], ...]
 
       -- END MONKEY PATCH -->
     """
@@ -628,7 +623,7 @@ class R:
         return self._annotation
 
     @property
-    def sources(self) -> Tuple[_SourceT, ...]:
+    def sources(self) -> tuple[_SourceT, ...]:
         r"""
         The roller’s direct sources (if any).
         """
@@ -1008,6 +1003,7 @@ class R:
     @beartype
     def rmap(
         self,
+        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
         left_operand: Union[RealLike, "RollOutcome"],
         bin_op: _RollOutcomeBinaryOperatorT,
         annotation: Any = "",
@@ -1411,7 +1407,7 @@ class RepeatRoller(R):
     @beartype
     def roll(self) -> Roll:
         r""""""
-        source_rolls: List[Roll] = []
+        source_rolls: list[Roll] = []
 
         for _ in range(self.n):
             source_rolls.extend(self.source_rolls())
@@ -1755,7 +1751,7 @@ class FilterRoller(R):
     See the section on “[Filtering and
     substitution](rollin.md#filtering-and-substitution)” more examples.
     """
-    __slots__: Tuple[str, ...] = ("_predicate",)
+    __slots__: Any = ("_predicate",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1957,7 +1953,7 @@ class SelectionRoller(R):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def which(self) -> Tuple[_GetItemT, ...]:
+    def which(self) -> tuple[_GetItemT, ...]:
         r"""
         The selector this roller applies to the sorted outcomes of its sole source.
         """
@@ -2021,7 +2017,7 @@ class SubstitutionRoller(R):
     See the section on “[Filtering and
     substitution](rollin.md#filtering-and-substitution)” more examples.
     """
-    __slots__: Tuple[str, ...] = ("_coalesce_mode", "_expansion_op", "_max_depth")
+    __slots__: Any = ("_coalesce_mode", "_expansion_op", "_max_depth")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2068,7 +2064,7 @@ class SubstitutionRoller(R):
     def roll(self) -> Roll:
         r""""""
         (source_roll,) = self.source_rolls()
-        source_rolls: List[Roll] = []
+        source_rolls: list[Roll] = []
 
         def _expanded_roll_outcomes(
             roll: Roll,
@@ -2158,6 +2154,7 @@ class RollOutcome:
     def __init__(
         self,
         value: Optional[RealLike],
+        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
         sources: Iterable["RollOutcome"] = (),
     ):
         r"Initializer."
@@ -2337,6 +2334,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __and__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
         try:
             if isinstance(other, SupportsInt):
@@ -2354,6 +2352,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __xor__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
         try:
             if isinstance(other, SupportsInt):
@@ -2371,6 +2370,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
+    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __or__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
         try:
             if isinstance(other, SupportsInt):
@@ -2464,7 +2464,7 @@ class RollOutcome:
         return self._roll
 
     @property
-    def sources(self) -> Tuple[RollOutcome, ...]:
+    def sources(self) -> tuple[RollOutcome, ...]:
         r"""
         The source roll outcomes from which this roll outcome was generated.
         """
@@ -2510,7 +2510,7 @@ class RollOutcome:
         ```
         """
         if isinstance(right_operand, RollOutcome):
-            sources: Tuple[RollOutcome, ...] = (self, right_operand)
+            sources: tuple[RollOutcome, ...] = (self, right_operand)
             right_operand_value: Optional[RealLike] = right_operand.value
         else:
             sources = (self,)
@@ -2740,8 +2740,8 @@ class RollOutcome:
         See the [``umap`` method][dyce.r.RollOutcome.umap].
         """
 
-        def _euthanize(operand: Optional[RealLike]) -> Optional[RealLike]:
-            return None
+        def _euthanize(operand: Optional[RealLike]) -> None:
+            pass
 
         return self.umap(_euthanize)
 
@@ -2844,7 +2844,7 @@ class Roll(Sequence[RollOutcome]):
         ...
 
     @overload
-    def __getitem__(self, key: slice) -> Tuple[RollOutcome, ...]:
+    def __getitem__(self, key: slice) -> tuple[RollOutcome, ...]:
         ...
 
     @beartype
@@ -2853,7 +2853,7 @@ class Roll(Sequence[RollOutcome]):
     def __getitem__(  # type: ignore [override]
         self,
         key: _GetItemT,
-    ) -> Union[RollOutcome, Tuple[RollOutcome, ...]]:
+    ) -> Union[RollOutcome, tuple[RollOutcome, ...]]:
         if isinstance(key, slice):
             return self._roll_outcomes[key]
         else:
@@ -2882,7 +2882,7 @@ class Roll(Sequence[RollOutcome]):
         return self._r
 
     @property
-    def source_rolls(self) -> Tuple[Roll, ...]:
+    def source_rolls(self) -> tuple[Roll, ...]:
         r"""
         The source rolls from which this roll was generated.
         """
@@ -3032,12 +3032,12 @@ def walk(
         secondary index of referencing objects (parents). Visitors are called back
         grouped first by type, then by order encountered.
     """
-    rolls: Dict[int, Roll] = {}
-    rollers: Dict[int, R] = {}
-    roll_outcomes: Dict[int, RollOutcome] = {}
-    roll_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
-    roller_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
-    roll_outcome_parent_ids: DefaultDict[int, Set[int]] = defaultdict(set)
+    rolls: dict[int, Roll] = {}
+    rollers: dict[int, R] = {}
+    roll_outcomes: dict[int, RollOutcome] = {}
+    roll_parent_ids: defaultdict[int, set[int]] = defaultdict(set)
+    roller_parent_ids: defaultdict[int, set[int]] = defaultdict(set)
+    roll_outcome_parent_ids: defaultdict[int, set[int]] = defaultdict(set)
     queue = deque((root,))
     roll: Roll
     r: R

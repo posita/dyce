@@ -292,8 +292,8 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 
 ``dyce`` requires a relatively modern version of Python:
 
-* [CPython](https://www.python.org/) (3.8+)
-* [PyPy](http://pypy.org/) (CPython 3.8+ compatible)
+* [CPython](https://www.python.org/) (3.9+)
+* [PyPy](http://pypy.org/) (CPython 3.9+ compatible)
 
 It has the following runtime dependencies:
 

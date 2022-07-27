@@ -18,7 +18,7 @@ import re
 import shutil
 import sys
 import tempfile
-from typing import Dict, Iterable, Iterator, Mapping, TextIO
+from typing import Iterable, Iterator, Mapping, TextIO
 
 __all__ = ()
 
@@ -130,7 +130,7 @@ def copy_paths(
     dst_dir_path: pathlib.Path,
     orig_paths: Iterable[pathlib.Path],
 ) -> Mapping[pathlib.Path, pathlib.Path]:
-    dst_paths_to_orig_paths: Dict[pathlib.Path, pathlib.Path] = {}
+    dst_paths_to_orig_paths: dict[pathlib.Path, pathlib.Path] = {}
     cwd_path = pathlib.Path.cwd()
 
     for orig_path in orig_paths:
