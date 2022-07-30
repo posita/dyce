@@ -8,10 +8,10 @@
 
 from __future__ import annotations
 
-import functools
 import itertools
 import operator
 from collections import defaultdict
+from math import prod
 from typing import Iterator, Sequence
 from unittest.mock import Mock, patch
 
@@ -769,7 +769,7 @@ def _brute_force_combinations_with_counts(
         for rolls in itertools.product(*(h.items() for h in hs)):
             outcomes, counts = tuple(zip(*rolls))
             sliced_outcomes = tuple(operator.__getitem__(sorted(outcomes), key))
-            count = functools.reduce(operator.__mul__, counts)
+            count = prod(counts)
             yield sliced_outcomes, count
 
 

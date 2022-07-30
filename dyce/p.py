@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from fractions import Fraction
-from functools import reduce, wraps
+from functools import wraps
 from itertools import chain, combinations_with_replacement, groupby, product, repeat
-from math import factorial
-from operator import __eq__, __index__, __mul__, __ne__
+from math import factorial, prod
+from operator import __eq__, __index__, __ne__
 from typing import (
     Any,
     Callable,
@@ -560,9 +560,7 @@ class P(Sequence[H], HableOpsMixin):
             for kw_roll_count_tuples in product(
                 *(_kw_roll_count_tuples(pool_name) for pool_name in pools_by_kw)
             ):
-                combined_count = reduce(
-                    __mul__, (count for _, _, count in kw_roll_count_tuples), 1
-                )
+                combined_count = prod(count for _, _, count in kw_roll_count_tuples)
                 rolls_by_name = {name: roll for name, roll, _ in kw_roll_count_tuples}
                 yield dependent_term(**rolls_by_name), combined_count
 
@@ -602,10 +600,9 @@ class P(Sequence[H], HableOpsMixin):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Shorthand for ``#!python reduce(operator.__mul__, (h.total for h in self), 1) if
-        self else 0``.
+        Shorthand for ``#!python prod(h.total for h in self) if self else 0``.
         """
-        return reduce(__mul__, (h.total for h in self), 1) if self else 0
+        return prod(h.total for h in self) if self else 0
 
     @experimental
     @beartype
@@ -1057,7 +1054,7 @@ def _rwc_heterogeneous_h_groups(
             counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
             sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
-            total_count = reduce(__mul__, counts_by_group)
+            total_count = prod(counts_by_group)
 
             yield sorted_outcomes_for_roll, total_count
 
@@ -1197,15 +1194,9 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     rolls_iter = combinations_with_replacement(h, n)
 
     for sorted_outcomes_for_roll in rolls_iter:
-        count_scalar = reduce(
-            __mul__, (h[outcome] for outcome in sorted_outcomes_for_roll)
-        )
-        multinomial_coefficient_denominator = reduce(
-            __mul__,
-            (
-                factorial(sum(1 for _ in g))
-                for _, g in groupby(sorted_outcomes_for_roll)
-            ),
+        count_scalar = prod(h[outcome] for outcome in sorted_outcomes_for_roll)
+        multinomial_coefficient_denominator = prod(
+            factorial(sum(1 for _ in g)) for _, g in groupby(sorted_outcomes_for_roll)
         )
 
         yield (
