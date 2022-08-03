@@ -226,18 +226,18 @@ Consider exploring the [applications and translations](https://posita.github.io/
 
     I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/0.5/contrib/) if you observe discrepancies.
 
-| | ``dyce``<br>*Bogosian et al.* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Latest release | 2022 | N/A | 2021 | Unknown | 2021 | 2016 | 2021 | 2021 |
-| Actively maintained and documented         | ✅ | ⚠️[^4] | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
-| Combinatorics optimizations                | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Suitable as a dependency in other projects | ✅ | ⚠️[^5] | ✅ | ❌ | ✅ | ⚠️[^5] | ✅ | ❌ |
-| Discrete outcome enumeration               | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Arbitrary expressions                      | ✅ | ⚠️[^6] | ✅ | ✅ | ✅ | ⚠️[^7] | ❌ | ❌ |
-| Arbitrary dice definitions                 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Integrates with other tools                | ✅ | ✅ | ⚠️[^8] | ❌ | ⚠️[^8] | ✅ | ⚠️[^8] | ⚠️[^8] |
-| Open source (can inspect)                  | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Permissive licensing (can use and extend)  | ✅ | ✅ | ✅ | N/A | ✅ | ✅ | ✅ | ✅ |
+| | [``dyce``](https://pypi.org/project/dyce/)<br>*Bogosian et al.* | [``icepool``](https://pypi.org/project/icepool/)<br>*Albert Julius Liu* | [``dice_roll.py``](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Latest release | 2022 | 2022 | N/A | 2021 | Unknown | 2021 | 2016 | 2021 | 2022 |
+| Actively maintained and documented         | ✅ | ✅ | ⚠️[^4] | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Combinatorics optimizations                | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Suitable as a dependency in other projects | ✅ | ✅ | ⚠️[^5] | ✅ | ❌ | ✅ | ⚠️[^5] | ✅ | ❌ |
+| Discrete outcome enumeration               | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Arbitrary expressions                      | ✅ | ✅ | ⚠️[^6] | ✅ | ✅ | ✅ | ⚠️[^7] | ❌ | ❌ |
+| Arbitrary dice definitions                 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Integrates with other tools                | ✅ | ✅ | ✅ | ⚠️[^8] | ❌ | ⚠️[^8] | ✅ | ⚠️[^8] | ⚠️[^8] |
+| Open source (can inspect)                  | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Permissive licensing (can use and extend)  | ✅ | ✅ | ✅ | ✅ | N/A | ✅ | ✅ | ✅ | ✅ |
 
 [^4]:
 
