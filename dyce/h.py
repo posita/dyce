@@ -12,9 +12,7 @@ import os
 import sys
 import warnings
 from abc import abstractmethod
-from collections import Counter
 from collections.abc import Iterable as IterableC
-from collections.abc import Mapping as MappingC
 from fractions import Fraction
 from itertools import chain, product, repeat
 from math import comb, gcd, sqrt
@@ -71,6 +69,7 @@ from .types import (
     as_int,
     is_even,
     is_odd,
+    natural_key,
     sorted_outcomes,
 )
 
@@ -379,48 +378,67 @@ class H(_MappingT):
     def __init__(self, items: _SourceT) -> None:
         r"Initializer."
         super().__init__()
-        tmp: Counter[RealLike] = Counter()
+        self._h: _MappingT
 
-        if isinstance(items, MappingC):
-            items = items.items()
-
-        if isinstance(items, SupportsInt):
-            if items != 0:
+        if isinstance(items, H):
+            self._h = items._h
+        elif isinstance(items, Mapping):
+            self._h = dict(
+                (outcome, as_int(count)) for outcome, count in sorted(items.items())
+            )
+        elif isinstance(items, SupportsInt):
+            if items == 0:
+                self._h = {}
+            else:
                 simple_init = as_int(items)
                 outcome_range = range(
-                    simple_init,
-                    0,
-                    1 if simple_init < 0 else -1,  # count toward zero
+                    simple_init if simple_init < 0 else 1,
+                    0 if simple_init < 0 else simple_init + 1,
                 )
 
-                if isinstance(items, RealLike):
-                    outcome_type = type(items)
-                    tmp.update({outcome_type(i): 1 for i in outcome_range})
-                else:
-                    tmp.update({i: 1 for i in outcome_range})
+                # if isinstance(items, RealLike):
+                #     outcome_type = type(items)
+                #     self._h = {outcome_type(i): 1 for i in outcome_range}
+                # else:
+                #     self._h = {i: 1 for i in outcome_range}
+                assert isinstance(items, RealLike)
+                outcome_type = type(items)
+                self._h = {outcome_type(i): 1 for i in outcome_range}
         elif isinstance(items, HableT):
-            tmp.update(items.h())
+            self._h = items.h()._h
         elif isinstance(items, IterableC):
             # items is either an Iterable[RealLike] or an Iterable[tuple[RealLike,
             # SupportsInt]] (although this technically supports Iterable[RealLike |
             # tuple[RealLike, SupportsInt]])
-            for item in items:
+            self._h = {}
+            sorted_items = list(items)
+
+            try:
+                sorted_items.sort()
+            except TypeError:
+                sorted_items.sort(key=natural_key)
+
+            # As of Python 3.7, insertion order of keys is preserved
+            for item in sorted_items:
                 if isinstance(item, tuple):
                     outcome, count = item
-                    tmp[outcome] += as_int(count)
+                    count = as_int(count)
                 else:
-                    tmp[item] += 1
+                    outcome = item
+                    count = 1
+
+                if outcome not in self._h:
+                    self._h[outcome] = 0
+
+                self._h[outcome] += count
         else:
             raise ValueError(f"unrecognized initializer {items}")
-
-        # As of Python 3.7, insertion order of keys is preserved.
-        self._h: _MappingT = {outcome: tmp[outcome] for outcome in sorted_outcomes(tmp)}
 
         # We can't use something like functools.lru_cache for these values because those
         # mechanisms call this object's __hash__ method which relies on both of these
         # and we don't want a circular dependency when computing this object's hash.
         self._hash: Optional[int] = None
-        self._total: int = sum(tmp.values())  # TODO(posita): tmp.total() for >=3.10
+        self._total: int = sum(self._h.values())
         self._lowest_terms: Optional[H] = None
 
         # We don't use functools' caching mechanisms generally because they don't
@@ -996,12 +1014,10 @@ class H(_MappingT):
 
         ```
         """
-        if isinstance(other, MappingC):
-            other = other.items()
-        elif not isinstance(other, IterableC):
+        if not isinstance(other, H):
             other = H(other)
 
-        return type(self)(cast(_SourceT, chain(self.items(), other)))
+        return type(self)(cast(_SourceT, chain(self.items(), other.items())))
 
     @experimental
     @beartype
