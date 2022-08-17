@@ -197,7 +197,10 @@ class P(Sequence[H], HableOpsMixin):
 
     ```
     """
-    __slots__: Any = ("_hs",)
+    __slots__: Any = (
+        "_hs",
+        "_total",
+    )
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -229,6 +232,21 @@ class P(Sequence[H], HableOpsMixin):
             hs.sort(key=lambda h: str(tuple(h.items())))
 
         self._hs = tuple(hs)
+        self._total: int = prod(h.total for h in self._hs) if self._hs else 0
+
+    # ---- Properties ------------------------------------------------------------------
+
+    @property
+    def total(self) -> int:
+        r"""
+        !!! warning "Experimental"
+
+            This method should be considered experimental and may change or disappear in
+            future versions.
+
+        Equivalent to ``#!python prod(h.total for h in self) if self else 0``.
+        """
+        return self._total
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -585,24 +603,7 @@ class P(Sequence[H], HableOpsMixin):
 
         ```
         """
-
-        def _is_homogeneous() -> bool:
-            return len(set(self._hs)) <= 1
-
-        return _is_homogeneous()
-
-    @experimental
-    @beartype
-    def total(self) -> int:
-        r"""
-        !!! warning "Experimental"
-
-            This method should be considered experimental and may change or disappear in
-            future versions.
-
-        Shorthand for ``#!python prod(h.total for h in self) if self else 0``.
-        """
-        return prod(h.total for h in self) if self else 0
+        return len(set(self._hs)) <= 1
 
     @experimental
     @beartype

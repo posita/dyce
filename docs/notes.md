@@ -24,7 +24,7 @@
 * Migrates from [``setuptools_scm``](https://pypi.org/project/setuptools-scm/) to [``versioningit``](https://pypi.org/project/versioningit/) for more flexible version number formatting.
 * Allows deployments to PyPI from CI based on tags.
 * Uses JupyterLite instead of Binder for examples.
-* Refactors [``P.is_homogeneous`` property][dyce.p.P.is_homogeneous] into a similarly-named method and adds the [``P.total`` method][dyce.p.P.total].
+* Refactors [``P.is_homogeneous`` property][dyce.p.P.is_homogeneous] into a similarly-named method and adds the [``P.total`` method][dyce.p.P.total] property.
 * Removes ``H.order_stat_func_for_n`` and instead caches order stat functions for ``n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].
 * Now requires ``numerary>=0.4.0``.
 
