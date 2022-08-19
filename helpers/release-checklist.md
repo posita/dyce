@@ -25,8 +25,8 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``git add -u && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python -m versioningit --next-version . )" )"``
 
-* [ ] ``git tag [--force] --sign "v$( python -m versioningit --next-version . )" && git tag --force latest``
+* [ ] ``git tag [--force] --message "$( git rev-list --format=%B --max-count=1 HEAD )" --sign "v$( python -m versioningit --next-version . )" && git tag --force latest``
 
-* [ ] ``"$( git rev-parse --show-toplevel )/.tox/check/bin/mike" serve`` and spot check docs (links to external references might be missing)
+* [ ] ``"$( git rev-parse --show-toplevel )/.tox/check/bin/mkdocs" serve`` and spot check docs
 
 * [ ] ``git push --force origin "$( git describe --abbrev=0 )" latest``
