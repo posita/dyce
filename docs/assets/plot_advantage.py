@@ -11,6 +11,7 @@ from __future__ import annotations
 from anydyce.viz import plot_line
 
 from dyce import H, P
+from dyce.evaluation import HResult, foreach
 
 
 def do_it(style: str) -> None:
@@ -20,15 +21,15 @@ def do_it(style: str) -> None:
     critical_hit = 3 @ H(12) + 5
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(outcome):
-        if outcome == 20:
+    def crit(result: HResult):
+        if result.outcome == 20:
             return critical_hit
-        elif outcome + 5 >= 14:
+        elif result.outcome + 5 >= 14:
             return normal_hit
         else:
             return 0
 
-    advantage_weighted = H.foreach(crit, outcome=advantage)
+    advantage_weighted = foreach(crit, result=advantage)
 
     ax = matplotlib.pyplot.axes()
     text_color = "white" if style == "dark" else "black"

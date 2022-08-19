@@ -262,9 +262,9 @@ def expandable(
     itself takes an optional argument *sentinel*, which defines what is returned once
     *limit* is reached (or a ``#!python RecursionError`` is encountered, whichever comes
     first). The default value for *sentinel* is ``#!python H({0: 1})`` and the value
-    ascribed to *limit* if not provided is ``#!python 1``.
+    ascribed to *limit*, if not provided, is ``#!python 1``.
 
-    If *limit* is an whole number, it defines the maximum recursive evaluation “depth”.
+    If *limit* is a whole number, it defines the maximum recursive evaluation “depth”.
     The way to express no recursion (i.e., merely return *sentinel*) is to set *limit*
     to an integral value of ``#!python 0``. An integral value of ``#!python -1`` is
     equivalent to setting it to ``#!python sys.maxsize``.[^1]

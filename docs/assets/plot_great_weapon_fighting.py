@@ -11,6 +11,7 @@ from __future__ import annotations
 from anydyce.viz import plot_burst, plot_line
 
 from dyce import H
+from dyce.evaluation import HResult, foreach
 
 
 def do_it(style: str) -> None:
@@ -18,10 +19,10 @@ def do_it(style: str) -> None:
 
     single_attack = 2 @ H(6) + 5
 
-    def gwf(h: H, outcome):
-        return h if outcome in (1, 2) else outcome
+    def gwf(result: HResult):
+        return result.h if result.outcome in (1, 2) else result.outcome
 
-    great_weapon_fighting = 2 @ (H(6).substitute(gwf)) + 5
+    great_weapon_fighting = 2 @ foreach(gwf, result=H(6)) + 5
 
     text_color = "white" if style == "dark" else "black"
     label_sa = "Normal attack"

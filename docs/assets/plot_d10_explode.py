@@ -11,6 +11,7 @@ from __future__ import annotations
 from anydyce.viz import plot_line
 
 from dyce import H, P
+from dyce.evaluation import explode
 
 
 def do_it(style: str) -> None:
@@ -25,7 +26,7 @@ def do_it(style: str) -> None:
         [
             (
                 f"{depth} rerolls",
-                (10 @ P(H(10).explode(max_depth=depth))).h(slice(-3, None)),
+                (10 @ P(explode(H(10), limit=depth))).h(slice(-3, None)),
             )
             for depth in range(5, -1, -1)
         ],

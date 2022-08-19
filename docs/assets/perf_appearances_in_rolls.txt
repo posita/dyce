@@ -1,24 +1,24 @@
 %timeit 3@d4_eq3 + 2@d6_eq3
-61.5 µs ± 1 µs per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
+30.3 µs ± 443 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 
 %timeit P(3@P(4), 2@P(6)).appearances_in_rolls(3)
-127 µs ± 2.08 µs per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
+59.7 µs ± 597 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 
 %timeit 9@d4_eq3 + 6@d6_eq3
-276 µs ± 9.13 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+124 µs ± 76.8 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 
 %timeit P(9@P(4), 6@P(6)).appearances_in_rolls(3)
-248 µs ± 6.59 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+114 µs ± 113 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 
 %timeit 27@d4_eq3 + 18@d6_eq3
-1.75 ms ± 13.1 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+787 µs ± 2.23 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 
 %timeit P(27@P(4), 18@P(6)).appearances_in_rolls(3)
-848 µs ± 9.04 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+412 µs ± 889 ns per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
 
 %timeit 81@d4_eq3 + 54@d6_eq3
-13.6 ms ± 167 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+6.31 ms ± 60.1 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 %timeit P(81@P(4), 54@P(6)).appearances_in_rolls(3)
-5.15 ms ± 285 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+2.6 ms ± 18.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 

@@ -13,15 +13,14 @@ from itertools import chain
 from anydyce.viz import plot_line
 
 from dyce import H, P
+from dyce.evaluation import explode
 
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
 
     p_4d6 = 4 @ P(6)
-    d6_reroll_first_one = H(6).substitute(
-        lambda h, outcome: h if outcome == 1 else outcome
-    )
+    d6_reroll_first_one = explode(H(6), lambda result: result.outcome == 1)
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 
