@@ -1,0 +1,25 @@
+from dyce import H, P
+
+for n in (4, 6):
+  p = n@P(6)
+  for i in range(len(p) - 4, len(p)):
+    print(f"({p}).h(slice({i})):")
+    %timeit p.h(slice(i))
+
+print()
+
+for n in (2, 3):
+  p = P(n@P(6), *[H(6) - m for m in range(n, 0, -1)])
+  for i in range(len(p) - 4, len(p)):
+    print(f"({p}).h(slice({i})):")
+    %timeit p.h(slice(i))
+
+print()
+
+for n in (4, 6):
+  p = P(*[H(6) - m for m in range(n, 0, -1)])
+  for i in range(len(p) - 4, len(p)):
+    print(f"({p}).h(slice({i})):")
+    %timeit p.h(slice(i))
+
+print()
