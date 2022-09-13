@@ -15,6 +15,10 @@
 
 # ``dyce`` release notes
 
+## [0.6.1](https://github.com/posita/dyce/releases/tag/v0.6.1)
+
+* Fixes issues pertaining to histograms with zero totals after allowing outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
+
 ## [0.6.0](https://github.com/posita/dyce/releases/tag/v0.6.0)
 
 * Adds the [``expandable`` decorator][dyce.evaluation.expandable] as well as the [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.evaluation.explode] convenience functions.

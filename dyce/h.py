@@ -494,6 +494,10 @@ class H(_MappingT):
         return self._hash
 
     @beartype
+    def __bool__(self) -> int:
+        return bool(self.total)
+
+    @beartype
     def __len__(self) -> int:
         return len(self._h)
 
@@ -1171,7 +1175,7 @@ class H(_MappingT):
         if self._lowest_terms is None:
             counts_gcd = gcd(*self.counts())
 
-            if counts_gcd in (0, 1):
+            if counts_gcd in (0, 1) and 0 not in self.counts():
                 self._lowest_terms = self
             else:
                 self._lowest_terms = type(self)(

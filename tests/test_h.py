@@ -95,6 +95,11 @@ class TestH:
         assert repr(H(6)) == "H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})"
         assert repr(H((1, 2, 3, 0, 1, 2, 1))) == "H({0: 1, 1: 3, 2: 2, 3: 1})"
 
+    def test_bool(self) -> None:
+        assert bool(H({})) is False
+        assert bool(H({0: 1})) is True
+        assert bool(H({i: 0 for i in range(10)})) is False
+
     def test_op_eq(self) -> None:
         base = H(range(10))
         assert base == base.accumulate(base)
@@ -355,13 +360,14 @@ class TestH:
                         assert h.exactly_k_times_in_n(outcome, n, k) == counts[k]
 
     def test_lowest_terms_identity(self) -> None:
-        lowest_terms = H({i: i for i in range(10)})
+        lowest_terms = H({i: i for i in range(1, 11)})
         assert dict(lowest_terms) == dict(lowest_terms.lowest_terms())
         assert lowest_terms is lowest_terms.lowest_terms()
 
     def test_lowest_terms_eliminates_outcomes_with_zero_counts(self) -> None:
-        h = H({0: 0, 1: 2, 2: 2, 3: 0})
-        assert h.lowest_terms() == {1: 1, 2: 1}
+        h = H({0: 0, 1: 1, 2: 2, 3: 0})
+        assert h.lowest_terms() == {1: 1, 2: 2}
+        assert h.accumulate(h).lowest_terms() == {1: 1, 2: 2}
 
     def test_substitute_empty(self) -> None:
         h = H({})
