@@ -15,7 +15,6 @@ from functools import wraps
 from itertools import chain, product
 from math import prod
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Iterable,
     Iterator,
@@ -32,6 +31,8 @@ from typing import (
 from numerary import IntegralLike, RealLike
 from numerary.bt import beartype
 from numerary.types import (
+    CachingProtocolMeta,
+    Protocol,
     RationalLikeMixedT,
     RationalLikeMixedU,
     denominator,
@@ -42,11 +43,6 @@ from .h import H, HableT, HOrOutcomeT, _OutcomeCountT, _SourceT
 from .lifecycle import experimental
 from .p import P, RollT
 from .types import _GetItemT, as_int
-
-if TYPE_CHECKING:
-    from typing import Protocol
-else:
-    from numerary.types import Protocol
 
 __all__ = ()
 
@@ -89,7 +85,7 @@ class _Context(NamedTuple):
     contextual_precision: Fraction = Fraction(1)
 
 
-class _ForEachEvaluatorT(Protocol):
+class _ForEachEvaluatorT(Protocol, metaclass=CachingProtocolMeta):
     def __call__(
         self,
         *args: _POrPWithSelectionOrSourceT,

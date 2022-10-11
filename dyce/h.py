@@ -1783,10 +1783,7 @@ class H(_MappingT):
 
 
 @runtime_checkable
-class HableT(
-    Protocol,
-    metaclass=CachingProtocolMeta,
-):
+class HableT(Protocol, metaclass=CachingProtocolMeta):
     r"""
     A protocol whose implementer can be expressed as (or reduced to) an
     [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HableT.h]. Currently,

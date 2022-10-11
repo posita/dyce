@@ -40,10 +40,7 @@ _GetItemT = Union[SupportsIndex, slice]
 
 
 @runtime_checkable
-class _RationalInitializerT(
-    Protocol[_T_co],
-    metaclass=CachingProtocolMeta,
-):
+class _RationalInitializerT(Protocol[_T_co], metaclass=CachingProtocolMeta):
     # TODO(posita): See <https://github.com/python/mypy/issues/11013>
     # __slots__: Any = ()
 
