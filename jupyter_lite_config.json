@@ -3,7 +3,7 @@
     "contents": ["docs/notebooks"],
     "federated_extensions": [
       "https://pypi.io/packages/py3/J/Jinja2/Jinja2-3.1.2-py3-none-any.whl",
-      "https://pypi.io/packages/py3/j/jupyterlab-widgets/jupyterlab_widgets-1.1.1-py3-none-any.whl"
+      "https://pypi.io/packages/py3/j/jupyterlab-widgets/jupyterlab_widgets-3.0.3-py3-none-any.whl"
     ],
     "output_dir": "docs/jupyter",
     "ignore_sys_prefix": ["federated_extensions", "mathjax"],
