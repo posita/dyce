@@ -31,7 +31,7 @@ def do_it(style: str) -> None:
         "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(
             slice(1, None)
         ),  # marker="^"
-        "4d6 - re-roll all 1s (i.e., 4d5 + 1), discard lowest": p_4d6_reroll_all_ones.h(
+        "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
             slice(1, None)
         ),  # marker="*"
         "2d6 + 6": 2 @ H(6) + 6,  # marker="x"

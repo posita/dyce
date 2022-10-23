@@ -728,7 +728,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 ...     "3d6": 3 @ H(6),
 ...     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
 ...     "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
-...     "4d6 - re-roll all 1s (i.e., 4d5 + 1), discard lowest": p_4d6_reroll_all_ones.h(slice(1, None)),
+...     "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(slice(1, None)),
 ...     "2d6 + 6": 2 @ H(6) + 6,
 ...     "4d4 + 2": 4 @ H(4) + 2,
 ... }
