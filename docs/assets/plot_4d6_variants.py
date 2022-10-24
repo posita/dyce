@@ -8,8 +8,6 @@
 
 from __future__ import annotations
 
-from itertools import chain
-
 from anydyce.viz import plot_line
 
 from dyce import H, P
@@ -36,10 +34,6 @@ def do_it(style: str) -> None:
         ),  # marker="*"
         "2d6 + 6": 2 @ H(6) + 6,  # marker="x"
         "4d4 + 2": 4 @ H(4) + 2,  # marker="o"
-    }
-    zero_fill_outcomes = set(chain(*(res.outcomes() for res in attr_results.values())))
-    attr_results = {
-        label: res.zero_fill(zero_fill_outcomes) for label, res in attr_results.items()
     }
 
     ax = matplotlib.pyplot.axes()

@@ -377,19 +377,19 @@ We can easily model the first round of its opposed combat system for various sta
 ...   for us in range(them, them + 3):
 ...     first_round = (us@H(6)).vs(them@H(6))  # -1 is a loss, 0 is a tie, 1 is a win
 ...     risus_results = first_round.format(width=0)
-...     print(f"{us}d6 vs {them}d6: {risus_results}")
+...     print(f"{us}d6 vs. {them}d6: {risus_results}")
 ---
-3d6 vs 3d6: {..., -1: 45.36%, 0:  9.28%, 1: 45.36%}
-4d6 vs 3d6: {..., -1: 19.17%, 0:  6.55%, 1: 74.28%}
-5d6 vs 3d6: {..., -1:  6.07%, 0:  2.99%, 1: 90.93%}
+3d6 vs. 3d6: {..., -1: 45.36%, 0:  9.28%, 1: 45.36%}
+4d6 vs. 3d6: {..., -1: 19.17%, 0:  6.55%, 1: 74.28%}
+5d6 vs. 3d6: {..., -1:  6.07%, 0:  2.99%, 1: 90.93%}
 ---
-4d6 vs 4d6: {..., -1: 45.95%, 0:  8.09%, 1: 45.95%}
-5d6 vs 4d6: {..., -1: 22.04%, 0:  6.15%, 1: 71.81%}
-6d6 vs 4d6: {..., -1:  8.34%, 0:  3.26%, 1: 88.40%}
+4d6 vs. 4d6: {..., -1: 45.95%, 0:  8.09%, 1: 45.95%}
+5d6 vs. 4d6: {..., -1: 22.04%, 0:  6.15%, 1: 71.81%}
+6d6 vs. 4d6: {..., -1:  8.34%, 0:  3.26%, 1: 88.40%}
 ---
-5d6 vs 5d6: {..., -1: 46.37%, 0:  7.27%, 1: 46.37%}
-6d6 vs 5d6: {..., -1: 24.24%, 0:  5.79%, 1: 69.96%}
-7d6 vs 5d6: {..., -1: 10.36%, 0:  3.40%, 1: 86.24%}
+5d6 vs. 5d6: {..., -1: 46.37%, 0:  7.27%, 1: 46.37%}
+6d6 vs. 5d6: {..., -1: 24.24%, 0:  5.79%, 1: 69.96%}
+7d6 vs. 5d6: {..., -1: 10.36%, 0:  3.40%, 1: 86.24%}
 
 ```
 
@@ -461,19 +461,19 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...       u, t,
 ...       lambda u, t: (u@H(6)).vs(t@H(6))
 ...     ).format(width=0)
-...     print(f"{u}d6 vs {t}d6: {risus_results}")
+...     print(f"{u}d6 vs. {t}d6: {risus_results}")
 ---
-3d6 vs 3d6: {..., -1: 50.00%, 1: 50.00%}
-4d6 vs 3d6: {..., -1: 10.50%, 1: 89.50%}
-5d6 vs 3d6: {..., -1:  0.66%, 1: 99.34%}
+3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
+4d6 vs. 3d6: {..., -1: 10.50%, 1: 89.50%}
+5d6 vs. 3d6: {..., -1:  0.66%, 1: 99.34%}
 ---
-4d6 vs 4d6: {..., -1: 50.00%, 1: 50.00%}
-5d6 vs 4d6: {..., -1: 12.25%, 1: 87.75%}
-6d6 vs 4d6: {..., -1:  1.07%, 1: 98.93%}
+4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
+5d6 vs. 4d6: {..., -1: 12.25%, 1: 87.75%}
+6d6 vs. 4d6: {..., -1:  1.07%, 1: 98.93%}
 ---
-5d6 vs 5d6: {..., -1: 50.00%, 1: 50.00%}
-6d6 vs 5d6: {..., -1: 13.66%, 1: 86.34%}
-7d6 vs 5d6: {..., -1:  1.49%, 1: 98.51%}
+5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
+6d6 vs. 5d6: {..., -1: 13.66%, 1: 86.34%}
+7d6 vs. 5d6: {..., -1:  1.49%, 1: 98.51%}
 
 ```
 
@@ -609,19 +609,19 @@ Using our ``#!python risus_combat_driver`` from above, we can craft a alternativ
 ...   print("---")
 ...   for u in range(t, t + 3):
 ...     risus_results = risus_combat_driver(u, t, deadly_combat_vs).format(width=0)
-...     print(f"{u}d6 vs {t}d6: {risus_results}")
+...     print(f"{u}d6 vs. {t}d6: {risus_results}")
 ---
-3d6 vs 3d6: {..., -1: 50.00%, 1: 50.00%}
-4d6 vs 3d6: {..., -1: 36.00%, 1: 64.00%}
-5d6 vs 3d6: {..., -1: 23.23%, 1: 76.77%}
+3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
+4d6 vs. 3d6: {..., -1: 36.00%, 1: 64.00%}
+5d6 vs. 3d6: {..., -1: 23.23%, 1: 76.77%}
 ---
-4d6 vs 4d6: {..., -1: 50.00%, 1: 50.00%}
-5d6 vs 4d6: {..., -1: 40.67%, 1: 59.33%}
-6d6 vs 4d6: {..., -1: 30.59%, 1: 69.41%}
+4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
+5d6 vs. 4d6: {..., -1: 40.67%, 1: 59.33%}
+6d6 vs. 4d6: {..., -1: 30.59%, 1: 69.41%}
 ---
-5d6 vs 5d6: {..., -1: 50.00%, 1: 50.00%}
-6d6 vs 5d6: {..., -1: 44.13%, 1: 55.87%}
-7d6 vs 5d6: {..., -1: 36.89%, 1: 63.11%}
+5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
+6d6 vs. 5d6: {..., -1: 44.13%, 1: 55.87%}
+7d6 vs. 5d6: {..., -1: 36.89%, 1: 63.11%}
 
 ```
 
@@ -702,15 +702,15 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 ...   for u in range(t, t + 3):
 ...     goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=True)).format(width=0)
 ...     no_goliath_results = risus_combat_driver(u, t, partial(evens_up_vs, goliath=False)).format(width=0)
-...     print(f"{u}d6 vs {t}d6:   {goliath_results}   {no_goliath_results}")
+...     print(f"{u}d6 vs. {t}d6:   {goliath_results}   {no_goliath_results}")
 -----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
-3d6 vs 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-4d6 vs 3d6:   {..., -1: 29.51%, 1: 70.49%}   {..., -1: 19.08%, 1: 80.92%}
-5d6 vs 3d6:   {..., -1: 12.32%, 1: 87.68%}   {..., -1:  4.57%, 1: 95.43%}
+3d6 vs. 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+4d6 vs. 3d6:   {..., -1: 29.51%, 1: 70.49%}   {..., -1: 19.08%, 1: 80.92%}
+5d6 vs. 3d6:   {..., -1: 12.32%, 1: 87.68%}   {..., -1:  4.57%, 1: 95.43%}
 -----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
-4d6 vs 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-5d6 vs 4d6:   {..., -1: 30.52%, 1: 69.48%}   {..., -1: 21.04%, 1: 78.96%}
-6d6 vs 4d6:   {..., -1: 13.68%, 1: 86.32%}   {..., -1:  5.88%, 1: 94.12%}
+4d6 vs. 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+5d6 vs. 4d6:   {..., -1: 30.52%, 1: 69.48%}   {..., -1: 21.04%, 1: 78.96%}
+6d6 vs. 4d6:   {..., -1: 13.68%, 1: 86.32%}   {..., -1:  5.88%, 1: 94.12%}
 
 ```
 
@@ -732,8 +732,6 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 ...     "2d6 + 6": 2 @ H(6) + 6,
 ...     "4d4 + 2": 4 @ H(4) + 2,
 ... }
->>> zero_fill_outcomes = set(chain(*(res.outcomes() for res in attr_results.values())))
->>> attr_results = {label: res.zero_fill(zero_fill_outcomes) for label, res in attr_results.items()}
 
 ```
 

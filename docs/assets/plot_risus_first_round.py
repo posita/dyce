@@ -31,7 +31,7 @@ def do_it(style: str) -> None:
             rows.append(results.distribution_xy()[-1])
 
         ax.imshow(rows)
-        ax.set_title(f"… vs {them}d6", color=text_color)
+        ax.set_title(f"… vs. {them}d6", color=text_color)
         ax.set_xticks(col_ticks)
         ax.set_xticklabels(col_names, color=text_color, rotation=90)
         ax.set_yticks(list(range(len(rows))))

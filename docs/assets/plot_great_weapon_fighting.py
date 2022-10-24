@@ -40,7 +40,7 @@ def do_it(style: str) -> None:
         h_inner=great_weapon_fighting,
         h_outer=single_attack,
         title=f"{label_sa}\nvs.\n{label_gwf}",
-        inner_color="RdYlBu_r",
-        outer_color="RdYlGn_r",
+        inner_cmap="RdYlBu_r",
+        outer_cmap="RdYlGn_r",
         text_color=text_color,
     )
