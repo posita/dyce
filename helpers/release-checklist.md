@@ -23,7 +23,7 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" "$( python -m versioningit --next-version . )"``
 
-* [ ] ``git add -u && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python -m versioningit --next-version . )" )"``
+* [ ] ``git add --update && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python -m versioningit --next-version . )" )"``
 
 * [ ] ``git tag [--force] --message "$( git rev-list --format=%B --max-count=1 HEAD )" --sign "v$( python -m versioningit --next-version . )"``
 

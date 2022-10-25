@@ -24,9 +24,9 @@ It also provides [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.e
 The [``dyce.r``](dyce.r.md) package provides scalars, histograms, pools, operators, etc. for assembling reusable roller trees.
 
 ::: dyce.h.H
-    rendering:
+    options:
       show_root_heading: true
 
 ::: dyce.p.P
-    rendering:
+    options:
       show_root_heading: true
