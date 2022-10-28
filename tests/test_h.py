@@ -21,6 +21,7 @@ import pytest
 from numerary import RealLike
 
 from dyce import H
+from dyce.evaluation import explode
 from dyce.h import _within
 
 __all__ = ()
@@ -500,6 +501,10 @@ class TestH:
                 h_variance,
                 stat_variance,
             ), f"o_type: {o_type}; c_type: {c_type}"
+
+    def test_variance_overflow(self) -> None:
+        assert math.isclose(explode(H(6), limit=800).variance(), 10.64)
+        assert math.isclose(explode(H(20), limit=400).variance(), 52.16066481994455)
 
     def test_roll(self) -> None:
         d6 = H(6)

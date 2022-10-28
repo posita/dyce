@@ -1734,10 +1734,14 @@ class H(_MappingT):
         numerator = denominator = 0
 
         for outcome, count in self.items():
-            numerator += (outcome - mu) ** 2 * count
+            numerator += outcome**2 * count
             denominator += count
 
-        return numerator / (denominator or 1)
+        # While floating point overflow is impossible to eliminate, we avoid it under
+        # some circumstances by exploiting the equivalence of E[(X - E[X])**2] and the
+        # more efficient E[X**2] - E[X]**2. See
+        # <https://dlsun.github.io/probability/variance.html>.
+        return numerator / (denominator or 1) - mu**2
 
     @beartype
     def roll(self) -> RealLike:
