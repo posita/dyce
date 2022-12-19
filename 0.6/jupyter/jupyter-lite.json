@@ -2,7 +2,7 @@
   "jupyter-config-data": {
     "appName": "dyce",
     "appUrl": "./lab",
-    "appVersion": "0.1.0-beta.12",
+    "appVersion": "0.1.0-beta.15",
     "baseUrl": "./",
     "collaborative": false,
     "contentStorageDrivers": [
@@ -16,7 +16,7 @@
       {
         "extension": "./extension",
         "liteExtension": false,
-        "load": "static/remoteEntry.1bd01b57743def902f73.js",
+        "load": "static/remoteEntry.1116b848a6f7126bf3e9.js",
         "name": "@jupyter-widgets/jupyterlab-manager"
       }
     ],
