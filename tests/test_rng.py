@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 from random import Random
+from typing import Optional
 
 import pytest
 
@@ -129,7 +130,7 @@ def _test_randbytes_w_seed_helper(
 def _test_random_w_seed_helper(
     rng: Random,
     seed: _RandSeedT,
-    expected: float = None,
+    expected: Optional[float] = None,
 ) -> None:
     rng.seed(seed)
     state = rng.getstate()

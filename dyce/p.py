@@ -295,10 +295,7 @@ class P(Sequence[H], HableOpsMixin):
         ...
 
     @beartype
-    # TODO(posita): See <https://github.com/python/mypy/issues/8393>
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:  # type: ignore [override]
+    def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:
         if isinstance(key, slice):
             return P(*self._hs[key])
         else:

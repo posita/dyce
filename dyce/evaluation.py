@@ -743,9 +743,9 @@ def aggregate_weighted(
 
     ``` python
     >>> from dyce.evaluation import aggregate_weighted
-    >>> weighted_sources = ((H(3), 3), (H(-3), 2))
+    >>> weighted_sources = ((H({1: 1}), 1), (H({1: 1, 2: 2}), 2))
     >>> h = aggregate_weighted(weighted_sources).lowest_terms() ; h
-    H({-3: 2, -2: 2, -1: 2, 1: 3, 2: 3, 3: 3})
+    H({1: 5, 2: 4})
 
     ```
 
