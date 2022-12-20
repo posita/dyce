@@ -15,11 +15,9 @@
 
 # ``dyce`` release notes
 
-<!--
 ## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
 
-* TODO(posita)
--->
+* Adds the [``H.draw``][dyce.h.H.draw] convenience method for treating a histogram as a deck rather than a die.
 
 ## [0.6.1](https://github.com/posita/dyce/releases/tag/v0.6.1)
 

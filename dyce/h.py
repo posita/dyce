@@ -9,6 +9,7 @@
 import os
 import warnings
 from abc import abstractmethod
+from collections import Counter
 from collections.abc import Iterable as IterableC
 from fractions import Fraction
 from itertools import chain, product, repeat
@@ -387,10 +388,6 @@ class H(_MappingT):
 
         if isinstance(items, H):
             self._h = items._h
-        elif isinstance(items, Mapping):
-            self._h = dict(
-                (outcome, as_int(count)) for outcome, count in sorted(items.items())
-            )
         elif isinstance(items, SupportsInt):
             if items == 0:
                 self._h = {}
@@ -412,6 +409,9 @@ class H(_MappingT):
         elif isinstance(items, HableT):
             self._h = items.h()._h
         elif isinstance(items, IterableC):
+            if isinstance(items, Mapping):
+                items = items.items()
+
             # items is either an Iterable[RealLike] or an Iterable[tuple[RealLike,
             # SupportsInt]] (although this technically supports Iterable[RealLike |
             # tuple[RealLike, SupportsInt]])
@@ -431,6 +431,9 @@ class H(_MappingT):
                 else:
                     outcome = item
                     count = 1
+
+                if count < 0:
+                    raise ValueError(f"count for {outcome} cannot be negative")
 
                 if outcome not in self._h:
                     self._h[outcome] = 0
@@ -1041,6 +1044,91 @@ class H(_MappingT):
             other = H(other)
 
         return type(self)(cast(_SourceT, chain(self.items(), other.items())))
+
+    @beartype
+    def draw(
+        self,
+        outcomes: Optional[Union[RealLike, Iterable[RealLike], _MappingT]] = None,
+    ) -> "H":
+        r"""
+        !!! warning "Experimental"
+
+            This property should be considered experimental and may change or disappear
+            in future versions.
+
+        Returns a new [``H`` object][dyce.h.H] where the counts associated with
+        *outcomes* has been updated. This may be useful for using histograms to model
+        decks of cards (rather than dice). If *outcome* is ``#!python None``, this is
+        equivalent to ``#!python self.draw(self.roll())``.
+
+        If *outcomes* is a single value, that value’s count is decremented by one. If
+        *outcomes* is an iterable of values, those values’ outcomes are decremented by
+        one for each time that outcome appears. If *outcomes* is a mapping of outcomes
+        to counts, those outcomes are decremented by the respective counts.
+
+        Counts are not reduced and zero counts are preserved. To reduce, call the
+        [``lowest_terms`` method][dyce.h.H.lowest_terms].
+
+        <!-- BEGIN MONKEY PATCH --
+        For deterministic outcomes.
+
+        >>> import random
+        >>> from dyce import rng
+        >>> rng.RNG = random.Random(1691413956)
+
+          -- END MONKEY PATCH -->
+
+        ``` python
+        >>> H(6).draw()
+        H({1: 1, 2: 1, 3: 1, 4: 0, 5: 1, 6: 1})
+
+        >>> H(6).draw(2)
+        H({1: 1, 2: 0, 3: 1, 4: 1, 5: 1, 6: 1})
+
+        >>> H(6).draw((2, 3, 4, 5)).lowest_terms()
+        H({1: 1, 6: 1})
+
+        >>> h = H(6).accumulate(H(4)) ; h
+        H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
+        >>> h.draw({1: 2, 4: 1, 6: 1})
+        H({1: 0, 2: 2, 3: 2, 4: 1, 5: 1, 6: 0})
+
+        ```
+
+        !!! tip "Negative counts can be used to increase counts"
+
+            Where *outcomes* is a mapping of outcomes to counts, negative counts can be
+            used to *increase* or “add” outcomes’ counts.
+
+            ``` python
+            >>> H(4).draw({5: -1})
+            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+
+            ```
+        """
+        if outcomes is None:
+            return self.draw(self.roll())
+
+        if isinstance(outcomes, RealLike):
+            outcomes = (outcomes,)
+
+        to_draw_outcome_counts = Counter(outcomes)
+        self_outcome_counts = Counter(self)
+        # This approach is necessary because Counter.__sub__ does not preserve negative
+        # counts and Counter.subtract modifies the counter in-place
+        new_outcome_counts = Counter(self_outcome_counts)
+        new_outcome_counts.subtract(to_draw_outcome_counts)
+        would_go_negative = set(+to_draw_outcome_counts) - set(+self_outcome_counts)
+
+        if would_go_negative:
+            raise ValueError(f"outcomes to be drawn {would_go_negative} not in {self}")
+
+        zeros = set(self_outcome_counts) - set(new_outcome_counts)
+
+        for outcome in zeros:
+            new_outcome_counts[outcome] = 0
+
+        return type(self)(new_outcome_counts)
 
     @experimental
     @beartype
@@ -1754,7 +1842,7 @@ class H(_MappingT):
     @beartype
     def roll(self) -> RealLike:
         r"""
-        Returns a (weighted) random outcome, sorted.
+        Returns a (weighted) random outcome.
         """
         return (
             rng.RNG.choices(

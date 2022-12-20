@@ -87,6 +87,10 @@ class TestH:
         assert h == {0: 0, 1: 2, 2: 2, 3: 0}
         assert h == H(2)
 
+    def test_init_negative_count(self) -> None:
+        with pytest.raises(ValueError):
+            _ = H({0: 0, 1: -1, 2: 2})
+
     def test_repr(self) -> None:
         assert repr(H(())) == "H({})"
         assert repr(H(0)) == "H({})"
@@ -340,6 +344,45 @@ class TestH:
     def test_accumulate_does_not_invoke_lowest_terms(self) -> None:
         base = H(range(10))
         assert dict(base) != dict(base.accumulate(base))
+
+    def test_draw(self) -> None:
+        prv = d20_ish = H(20).accumulate(H(20))
+
+        for _ in range(d20_ish.total):
+            cur = prv.draw()
+            diff = set(prv.items()) - set(cur.items())
+            drawn_outcome, cur_count = diff.pop()
+            assert (
+                prv[drawn_outcome] == cur[drawn_outcome] + 1
+            ), f"drawn_outcome: {drawn_outcome}; cur: {cur}; prv: {prv}"
+            prv = cur
+
+    def test_draw_missing_outcome(self) -> None:
+        d6 = H(6)
+
+        with pytest.raises(ValueError):
+            d6.draw(42)
+
+        with pytest.raises(ValueError):
+            d6.draw(1).draw(1)
+
+    def test_draw_missing_outcomes_iterable(self) -> None:
+        d6 = H(6)
+
+        with pytest.raises(ValueError):
+            d6.draw((42,))
+
+        with pytest.raises(ValueError):
+            d6.draw((1, 1))
+
+    def test_draw_missing_outcomes_mapping(self) -> None:
+        d6 = H(6)
+
+        with pytest.raises(ValueError):
+            d6.draw({42: 1})
+
+        with pytest.raises(ValueError):
+            d6.draw({1: 2})
 
     def test_exactly_k_times_in_n(self) -> None:
         for h in (
