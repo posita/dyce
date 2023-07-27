@@ -550,8 +550,8 @@ class TestP:
         p_d6 = P(6)
         p_d8 = P(8)
         p_2d6_3d8 = P(6, 6, 8, 8, 8)
-        assert p_d0_1.total == 0
-        assert p_d0_2.total == 0
+        assert p_d0_1.total == 1
+        assert p_d0_2.total == 1
         assert p_d6.total == H(6).total
         assert p_d8.total == H(8).total
         assert p_2d6_3d8.total == H(6).total ** 2 * H(8).total ** 3

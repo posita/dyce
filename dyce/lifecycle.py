@@ -56,7 +56,6 @@ def experimental(f: _WrappedT) -> _WrappedT:
 def _warn_decr(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
     @wraps(f)
     def _wrapped(*args, **kw):
-
         warnings.warn(
             warning_txt,
             category=category,

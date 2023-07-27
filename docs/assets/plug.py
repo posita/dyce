@@ -18,7 +18,6 @@ __all__ = ("import_plug",)
 
 
 def import_plug(arg: str, pfx: str) -> tuple[str, Callable[[str], Any]]:
-
     try:
         my_dir = pathlib.Path(__file__).parent
         mod_path = str(my_dir.joinpath(f"{pfx}_{arg}.py"))

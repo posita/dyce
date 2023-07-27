@@ -69,7 +69,7 @@ class PWithSelection(NamedTuple):
         return self.p.total
 
 
-_LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
+LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
 _NormalizedLimitT = Union[int, Fraction]
 _ReturnsHOrOutcomeT = Callable[..., HOrOutcomeT]
 _DependentTermT = TypeVar("_DependentTermT", bound=_ReturnsHOrOutcomeT)
@@ -89,7 +89,7 @@ class _ForEachEvaluatorT(Protocol, metaclass=CachingProtocolMeta):
     def __call__(
         self,
         *args: _POrPWithSelectionOrSourceT,
-        limit: Optional[_LimitT] = None,
+        limit: Optional[LimitT] = None,
         **kw: _POrPWithSelectionOrSourceT,
     ) -> H:
         ...
@@ -625,7 +625,7 @@ def expandable(
         @wraps(f)
         def _f(
             *args: _POrPWithSelectionOrSourceT,
-            limit: Optional[_LimitT] = None,
+            limit: Optional[LimitT] = None,
             **kw: _POrPWithSelectionOrSourceT,
         ) -> H:
             try:
@@ -789,7 +789,7 @@ def aggregate_weighted(
 def foreach(
     callback: _DependentTermT,
     *args: _POrPWithSelectionOrSourceT,
-    limit: Optional[_LimitT] = None,
+    limit: Optional[LimitT] = None,
     sentinel: H = _DEFAULT_SENTINEL,
     **kw: _POrPWithSelectionOrSourceT,
 ) -> H:
@@ -840,7 +840,7 @@ def foreach(
 def explode(
     source: _SourceT,
     predicate: _PredicateT = lambda result: result.outcome == max(result.h),
-    limit=None,
+    limit: Optional[LimitT] = None,
     inf=float("inf"),
 ) -> H:
     r"""
@@ -976,7 +976,7 @@ def _h_or_p_or_p_with_selection_to_result_iterable(
 
 @beartype
 def _normalize_limit(
-    limit: _LimitT,
+    limit: LimitT,
 ) -> _NormalizedLimitT:
     normalized_limit: _NormalizedLimitT
 

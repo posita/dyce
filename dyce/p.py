@@ -224,7 +224,7 @@ class P(Sequence[H], HableOpsMixin):
             hs.sort(key=lambda h: str(tuple(h.items())))
 
         self._hs = tuple(hs)
-        self._total: int = prod(h.total for h in self._hs) if self._hs else 0
+        self._total: int = prod(h.total for h in self._hs)
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -236,7 +236,8 @@ class P(Sequence[H], HableOpsMixin):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Equivalent to ``#!python prod(h.total for h in self) if self else 0``.
+        Equivalent to ``#!python prod(h.total for h in self)``. Note that—consistent
+        with the empty product—this is ``#!python 1`` for an empty pool.
         """
         return self._total
 
@@ -566,9 +567,9 @@ class P(Sequence[H], HableOpsMixin):
             for roll, count in pools_by_kw[pool_name].rolls_with_counts():
                 yield pool_name, roll, count
 
-        def _resolve_dependent_term_for_rolls() -> Iterator[
-            tuple[Union[H, RealLike], int]
-        ]:
+        def _resolve_dependent_term_for_rolls() -> (
+            Iterator[tuple[Union[H, RealLike], int]]
+        ):
             for kw_roll_count_tuples in product(
                 *(_kw_roll_count_tuples(pool_name) for pool_name in pools_by_kw)
             ):
@@ -985,8 +986,8 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
     returns one of:
 
     * $0$ – *which* selects zero elements in the range
-    * $\{ {i} \mid {i < n} \}$ – *which* favors elements $[0..i)$
-    * $\{ {-i} \mid {i < n} \}$ – *which* favors elements $[i..n)$
+    * $\{ {i} \mid {0 < i < n} \}$ – *which* favors elements $[0..i)$
+    * $\{ {i} \mid {-n < i < 0} \}$ – *which* favors elements $[i..n)$
     * $\{ {k} \mid {k \mod n = 0} \}$ – *which* selects each of $[0..n)$ exactly $k$ times
     * ``#!python None`` – any other selection
     """
