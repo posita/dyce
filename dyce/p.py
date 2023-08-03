@@ -29,7 +29,7 @@ from numerary import RealLike
 from numerary.bt import beartype
 from numerary.types import SupportsIndex, SupportsInt
 
-from .h import H, HableOpsMixin, HableT, _MappingT, _SourceT, sum_h
+from .h import H, HableOpsMixin, HableT, _SourceT, sum_h
 from .lifecycle import deprecated, experimental
 from .types import (
     _BinaryOperatorT,
@@ -747,35 +747,35 @@ class P(Sequence[H], HableOpsMixin):
 
         !!! note "In the general case, rolls may appear more than once."
 
-        ``` python
-        >>> sorted(P(H(2), H(3)).rolls_with_counts())
-        [((1, 1), 1), ((1, 2), 1), ((1, 2), 1), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
+            ``` python
+            >>> sorted(P(H(2), H(3)).rolls_with_counts())
+            [((1, 1), 1), ((1, 2), 1), ((1, 2), 1), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
 
-        ```
+            ```
 
-        In the above, ``#!python (1, 2)`` appears a total of two times, each with counts
-        of one.
+            In the above, ``#!python (1, 2)`` appears a total of two times, each with
+            counts of one.
 
-        However, if the pool is homogeneous (meaning it only contains identical
-        histograms), rolls (before selection) are not repeated. (See the note on
-        implementation below.)
+            However, if the pool is homogeneous (meaning it only contains identical
+            histograms), rolls (before selection) are not repeated. (See the note on
+            implementation below.)
 
-        ``` python
-        >>> sorted((2@P(H((-1, 0, 1)))).rolls_with_counts())
-        [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
+            ``` python
+            >>> sorted((2@P(H((-1, 0, 1)))).rolls_with_counts())
+            [((-1, -1), 1), ((-1, 0), 2), ((-1, 1), 2), ((0, 0), 1), ((0, 1), 2), ((1, 1), 1)]
 
-        ```
+            ```
 
-        Either way, by summing and counting all rolls, we can confirm identity.
+            Either way, by summing and counting all rolls, we can confirm identity.
 
-        ``` python
-        >>> d6 = H(6)
-        >>> d6avg = H((2, 3, 3, 4, 4, 5))
-        >>> p = 2@P(d6, d6avg)
-        >>> H((sum(roll), count) for roll, count in p.rolls_with_counts()) == p.h() == d6 + d6 + d6avg + d6avg
-        True
+            ``` python
+            >>> d6 = H(6)
+            >>> d6avg = H((2, 3, 3, 4, 4, 5))
+            >>> p = 2@P(d6, d6avg)
+            >>> H((sum(roll), count) for roll, count in p.rolls_with_counts()) == p.h() == d6 + d6 + d6avg + d6avg
+            True
 
-        ```
+            ```
 
         This method does not try to outsmart callers by (mis)interpreting selection
         arguments. It honors selection identifier order and any redundancy.
@@ -1020,7 +1020,7 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
 
 @beartype
 def _rwc_heterogeneous_h_groups(
-    h_groups: Iterable[tuple[_MappingT, int]],
+    h_groups: Iterable[tuple[H, int]],
     k: Optional[int],
 ) -> Iterator[_RollCountT]:
     r"""
@@ -1035,15 +1035,15 @@ def _rwc_heterogeneous_h_groups(
     This affords an additional optimization where *k* is less than the size of a
     homogeneous subgroup.
     """
-
-    def _choose_rwc_homogeneous_n_h_implementation(n, h) -> Iterator[_RollCountT]:
-        if k and abs(k) < n:
-            return _rwc_homogeneous_n_h_using_partial_selection(n, h, k)
-        else:
-            return _rwc_homogeneous_n_h_using_partial_selection(n, h, n)
+    total_n = sum(n for _, n in h_groups)
 
     for v in product(
-        *(_choose_rwc_homogeneous_n_h_implementation(n, h) for h, n in h_groups)
+        *(
+            _rwc_homogeneous_n_h_using_partial_selection(
+                n, h, k if k and abs(k) < n else n
+            )
+            for h, n in h_groups
+        )
     ):
         # It's possible v is () if h_groups is empty. See
         # <https://stackoverflow.com/questions/3154301/> for a detailed discussion.
@@ -1051,10 +1051,20 @@ def _rwc_heterogeneous_h_groups(
             rolls_by_group: Iterable[Iterable[RealLike]]
             counts_by_group: Iterable[int]
             rolls_by_group, counts_by_group = zip(*v)
-            sorted_outcomes_for_roll = tuple(sorted(chain(*rolls_by_group)))
             total_count = prod(counts_by_group)
+            sorted_outcomes = tuple(sorted(chain(*rolls_by_group)))
 
-            yield sorted_outcomes_for_roll, total_count
+            if k is not None:
+                if k < 0:
+                    sorted_outcomes = (None,) * (
+                        total_n - len(sorted_outcomes)
+                    ) + sorted_outcomes
+                else:
+                    sorted_outcomes = sorted_outcomes + (None,) * (
+                        total_n - len(sorted_outcomes)
+                    )
+
+            yield sorted_outcomes, total_count
 
 
 @beartype

@@ -63,7 +63,6 @@ from . import rng
 from .lifecycle import deprecated, experimental
 from .types import (
     _BinaryOperatorT,
-    _RationalInitializerT,
     _UnaryOperatorT,
     as_int,
     is_even,
@@ -1228,6 +1227,7 @@ class H(_MappingT):
         This method caches computing the betas for *n* so they can be reused for varying
         values of *pos* in subsequent calls.
         """
+        # See <https://math.stackexchange.com/q/4173084/226394> for motivation
         n = as_int(n)
         pos = as_int(pos)
 
@@ -1463,7 +1463,7 @@ class H(_MappingT):
     @overload
     def distribution(
         self,
-        rational_t: _RationalInitializerT[_T],
+        rational_t: Callable[[int, int], _T],
     ) -> Iterator[tuple[RealLike, _T]]:
         ...
 
@@ -1471,7 +1471,7 @@ class H(_MappingT):
     @beartype
     def distribution(
         self,
-        rational_t: _RationalInitializerT[_T] = Fraction,
+        rational_t: Optional[Callable[[int, int], _T]] = None,
     ) -> Iterator[tuple[RealLike, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
@@ -1545,6 +1545,11 @@ class H(_MappingT):
 
         ```
         """
+        if rational_t is None:
+            # TODO(posita): See <https://github.com/python/mypy/issues/10854#issuecomment-1663057450>
+            rational_t = Fraction  # type: ignore [assignment]
+            assert rational_t is not None
+
         total = sum(self.values()) or 1
 
         return (

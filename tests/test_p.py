@@ -633,6 +633,8 @@ class TestP:
             # 4 outcomes
             slice(4),
             slice(-4, None),
+            # Middle
+            slice(2, 4),
         ):
             using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, which)
             using_partial_selection.assert_has_calls(
@@ -682,6 +684,31 @@ class TestP:
         using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(0, 0))
         using_partial_selection.assert_not_called()
 
+        # Non-contiguous
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, 1, 3)
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 4),
+            call(3, H({1: 1, 2: 1, 3: 1}), 3),
+        ]
+
+        # Near the end(s) of combined rolls, but outside any homogeneous sub pool
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(5, 7))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -2),
+            call(3, H({1: 1, 2: 1, 3: 1}), -2),
+        ]
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-7, -5))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 2),
+            call(3, H({1: 1, 2: 1, 3: 1}), 2),
+        ]
+
+        # Off the deep end(s)
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(7, 9))
+        using_partial_selection.assert_not_called()
+        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-9, -7))
+        using_partial_selection.assert_not_called()
+
     def test_rolls_with_counts_take_homogeneous_dice_vs_known_correct(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -690,6 +717,7 @@ class TestP:
             # All outcomes
             slice(None),
             slice(0, 4),
+            slice(-4, None),
         ):
             using_partial_selection = _rwc_validation_helper(p_4df, which)
             assert using_partial_selection.call_args_list == [
@@ -716,6 +744,24 @@ class TestP:
 
         # No outcomes
         using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 0))
+        using_partial_selection.assert_not_called()
+
+        # Middle
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(2, 4))
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), -2, fill=0)
+        ]
+
+        # Non-contiguous
+        using_partial_selection = _rwc_validation_helper(p_4df, 1, 3)
+        assert using_partial_selection.call_args_list == [
+            call(4, H({-1: 1, 0: 1, 1: 1}), -3, fill=0)
+        ]
+
+        # Off the deep end(s)
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(5, 7))
+        using_partial_selection.assert_not_called()
+        using_partial_selection = _rwc_validation_helper(p_4df, slice(-7, -5))
         using_partial_selection.assert_not_called()
 
 
@@ -757,7 +803,11 @@ def test_analyze_selection() -> None:
     assert _analyze_selection(6, which) == 4
     which = (1, 2, 3)
     assert _analyze_selection(6, which) == 4
+    which = (1, 3)
+    assert _analyze_selection(6, which) == 4
     which = (2, 3, 4)
+    assert _analyze_selection(6, which) == -4
+    which = (2, 4)
     assert _analyze_selection(6, which) == -4
 
     which = (2,)
@@ -780,22 +830,27 @@ def test_analyze_selection() -> None:
 
 
 def test_first_principles():
-    for n, h in (
-        (3, H(6)),
-        (3, H((2, 3, 3, 4, 4, 5))),
-        (6, H(4)),
-        (3, H({i: i for i in range(1, 11)})),
-        (3, H({i: 11 - i for i in range(1, 11)})),
+    for n, h, which in (
+        (3, H(6), ()),
+        (3, H((2, 3, 3, 4, 4, 5)), ()),
+        (6, H(4), ()),
+        (3, H({i: i for i in range(1, 11)}), ()),
+        (3, H({i: 11 - i for i in range(1, 11)}), ()),
+        (3, H(6), (0,)),
+        (3, H(6), (1,)),
+        (3, H(6), (-1,)),
+        (4, H((-1, 0, 1)), (0, 2)),
+        (4, H((-1, 0, 1)), (1, 3)),
     ):
         heterogeneous_brute_force_combinations: Counter[RollT] = Counter()
         homogeneous_n_h_using_multinomial_coefficient: Counter[RollT] = Counter()
 
-        for roll, count in _rwc_heterogeneous_brute_force_combinations(
-            [h] * n, slice(None)
-        ):
+        for roll, count in _rwc_heterogeneous_brute_force_combinations([h] * n, *which):
             heterogeneous_brute_force_combinations[roll] += count
 
-        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(n, h):
+        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(
+            n, h, *which
+        ):
             homogeneous_n_h_using_multinomial_coefficient[roll] += count
 
         assert (
@@ -805,23 +860,43 @@ def test_first_principles():
 
 
 @beartype
+def _roll_which(roll: RollT, *keys: _GetItemT) -> RollT:
+    if not keys:
+        keys = (slice(None),)
+
+    def _roll_selection_from_key(key: _GetItemT) -> RollT:
+        if isinstance(key, slice):
+            roll_selection = tuple(operator.__getitem__(roll, key))
+        else:
+            roll_selection = (operator.__getitem__(roll, key),)
+
+        return roll_selection
+
+    return tuple(itertools.chain(*(_roll_selection_from_key(key) for key in keys)))
+
+
+@beartype
 def _rwc_heterogeneous_brute_force_combinations(
-    hs: Sequence[H], key: slice
+    hs: Sequence[H],
+    *keys: _GetItemT,
 ) -> Iterator[_RollCountT]:
     # Generate combinations naively, via Cartesian product, which is not at all
     # efficient, but much easier to read and reason about
-    if len(operator.__getitem__(hs, key)) > 0:
-        for rolls in itertools.product(*(h.items() for h in hs)):
-            outcomes, counts = tuple(zip(*rolls))
-            sliced_outcomes = tuple(operator.__getitem__(sorted(outcomes), key))
-            count = prod(counts)
-            yield sliced_outcomes, count
+    for rolls in itertools.product(*(h.items() for h in hs)):
+        outcomes, counts = tuple(zip(*rolls))
+        roll = tuple(sorted(outcomes))
+        count = prod(counts)
+        roll_selection = _roll_which(roll, *keys)
+
+        if roll_selection:
+            yield roll_selection, count
 
 
 @beartype
 def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     n: int,
     h: _MappingT,
+    *keys: _GetItemT,
 ) -> Iterator[_RollCountT]:
     r"""
     Given a group of *n* identical histograms *h*, returns an iterator yielding ordered
@@ -838,33 +913,35 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
         multinomial_coefficient_denominator = prod(
             factorial(sum(1 for _ in g)) for _, g in groupby(sorted_outcomes_for_roll)
         )
+        roll_selection = _roll_which(sorted_outcomes_for_roll, *keys)
 
-        yield (
-            sorted_outcomes_for_roll,
-            count_scalar
-            * multinomial_coefficient_numerator
-            // multinomial_coefficient_denominator,
-        )
+        if roll_selection:
+            yield (
+                roll_selection,
+                count_scalar
+                * multinomial_coefficient_numerator
+                // multinomial_coefficient_denominator,
+            )
 
 
 @beartype
-def _rwc_validation_helper(p: P, which: slice) -> Mock:
+def _rwc_validation_helper(p: P, *which: _GetItemT) -> Mock:
     # Use the brute-force mechanism to validate our harder-to-understand implementation.
     # Note that there can be repeats and order is not guaranteed, which is why we have
     # to accumulate counts for rolls and then compare entire results.
     known_counts: Counter[RollT] = Counter()
     test_counts: Counter[RollT] = Counter()
 
-    for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p), which):
+    for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p), *which):
         known_counts[roll] += count
 
     with patch(
         "dyce.p._rwc_homogeneous_n_h_using_partial_selection",
         side_effect=_rwc_homogeneous_n_h_using_partial_selection,
     ) as using_partial_selection:
-        for roll, count in p.rolls_with_counts(which):
+        for roll, count in p.rolls_with_counts(*which):
             test_counts[roll] += count
 
-    assert test_counts == known_counts, f"which: {which}"
+    assert test_counts == known_counts
 
     return using_partial_selection

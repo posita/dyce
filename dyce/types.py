@@ -9,13 +9,11 @@
 from __future__ import annotations
 
 import re
-from abc import abstractmethod
 from operator import __getitem__, __index__
 from typing import Any, Callable, Iterable, Iterator, Sequence, TypeVar, Union
 
 from numerary.bt import beartype
-from numerary.protocol import CachingProtocolMeta
-from numerary.types import Protocol, SupportsIndex, SupportsInt, runtime_checkable
+from numerary.types import SupportsIndex, SupportsInt
 
 __all__ = (
     "as_int",
@@ -32,16 +30,6 @@ _T_co = TypeVar("_T_co", covariant=True)
 _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
 _GetItemT = Union[SupportsIndex, slice]
-
-
-@runtime_checkable
-class _RationalInitializerT(Protocol[_T_co], metaclass=CachingProtocolMeta):
-    # TODO(posita): See <https://github.com/python/mypy/issues/11013>
-    # __slots__: Any = ()
-
-    @abstractmethod
-    def __call__(self, numerator: int, denominator: int) -> _T_co:
-        pass
 
 
 # ---- Functions -----------------------------------------------------------------------
