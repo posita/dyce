@@ -19,6 +19,8 @@ The following assumes you are working from the repository root and have a develo
   * Solidify current release start section for next release in [release notes](../docs/notes.md)
   * If necessary, update copyright in [``LICENSE``](../LICENSE)
 
+* [ ] ``tox -e assets  # sanity check``
+
 * [ ] ``git clean -Xdf [-n] [...]``
 
 * [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" "$( python -m versioningit --next-version . )"``

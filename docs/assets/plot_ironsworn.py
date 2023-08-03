@@ -57,7 +57,8 @@ def do_it(style: str) -> None:
             )
 
     mods = list(range(0, 5))
-    df = pandas.DataFrame(columns=IronSoloResult)
+    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+    df = pandas.DataFrame(columns=[v.name for v in IronSoloResult])
 
     for mod in mods:
         h_for_mod = foreach(
@@ -65,18 +66,27 @@ def do_it(style: str) -> None:
             action=d6,
             challenges=2 @ P(d10),
         )
-        results_for_mod = dict(
-            h_for_mod.zero_fill(IronSoloResult).distribution(
+        # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+        results_for_mod = {
+            outcome.name: count  # type: ignore
+            for outcome, count in h_for_mod.zero_fill(IronSoloResult).distribution(
                 rational_t=lambda n, d: n / d
             )
+        }
+        row = pandas.DataFrame(
+            # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+            results_for_mod,
+            columns=[v.name for v in IronSoloResult],
+            index=[mod],
         )
-        row = pandas.DataFrame(results_for_mod, columns=IronSoloResult, index=[mod])
         df = pandas.concat((df, row))
 
     df.index.name = "Modifier"
-    # DataFrames use enum's values for displaying column names, so we convert them to
-    # names
-    df = df.rename(columns={v: v.name for v in IronSoloResult})
+    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+    # # DataFrames use enum's values for displaying column names, so we convert them to
+    # # names
+    # df = df.rename(columns={v: v.name for v in IronSoloResult})
+    print(df.style.format("{:.2%}").to_html())
 
     ax = df.plot(kind="barh", stacked=True)
     text_color = "white" if style == "dark" else "black"

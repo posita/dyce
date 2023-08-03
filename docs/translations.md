@@ -286,15 +286,15 @@ H({<IronSoloResult.SPECTACULAR_FAILURE: -1>: 9,
 
 By defining our dependent term function to include ``#!python mod`` as a parameter with a default argument, we can use ``#!python partial`` to manipulate it, which is helpful for visualization.
 
-<table id="T_0f1c3">
+<table id="T_ironsworn">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_0f1c3_level0_col0" class="col_heading level0 col0" >SPECTACULAR_FAILURE</th>
-      <th id="T_0f1c3_level0_col1" class="col_heading level0 col1" >FAILURE</th>
-      <th id="T_0f1c3_level0_col2" class="col_heading level0 col2" >WEAK_SUCCESS</th>
-      <th id="T_0f1c3_level0_col3" class="col_heading level0 col3" >STRONG_SUCCESS</th>
-      <th id="T_0f1c3_level0_col4" class="col_heading level0 col4" >SPECTACULAR_SUCCESS</th>
+      <th id="T_ironsworn_level0_col0" class="col_heading level0 col0" >SPECTACULAR_FAILURE</th>
+      <th id="T_ironsworn_level0_col1" class="col_heading level0 col1" >FAILURE</th>
+      <th id="T_ironsworn_level0_col2" class="col_heading level0 col2" >WEAK_SUCCESS</th>
+      <th id="T_ironsworn_level0_col3" class="col_heading level0 col3" >STRONG_SUCCESS</th>
+      <th id="T_ironsworn_level0_col4" class="col_heading level0 col4" >SPECTACULAR_SUCCESS</th>
     </tr>
     <tr>
       <th class="index_name level0" >Modifier</th>
@@ -307,44 +307,44 @@ By defining our dependent term function to include ``#!python mod`` as a paramet
   </thead>
   <tbody>
     <tr>
-      <th id="T_0f1c3_level0_row0" class="row_heading level0 row0" >0</th>
-      <td id="T_0f1c3_row0_col0" class="data row0 col0" >7.50%</td>
-      <td id="T_0f1c3_row0_col1" class="data row0 col1" >51.67%</td>
-      <td id="T_0f1c3_row0_col2" class="data row0 col2" >31.67%</td>
-      <td id="T_0f1c3_row0_col3" class="data row0 col3" >6.67%</td>
-      <td id="T_0f1c3_row0_col4" class="data row0 col4" >2.50%</td>
+      <th id="T_ironsworn_level0_row0" class="row_heading level0 row0" >0</th>
+      <td id="T_ironsworn_row0_col0" class="data row0 col0" >7.50%</td>
+      <td id="T_ironsworn_row0_col1" class="data row0 col1" >51.67%</td>
+      <td id="T_ironsworn_row0_col2" class="data row0 col2" >31.67%</td>
+      <td id="T_ironsworn_row0_col3" class="data row0 col3" >6.67%</td>
+      <td id="T_ironsworn_row0_col4" class="data row0 col4" >2.50%</td>
     </tr>
     <tr>
-      <th id="T_0f1c3_level0_row1" class="row_heading level0 row1" >1</th>
-      <td id="T_0f1c3_row1_col0" class="data row1 col0" >6.50%</td>
-      <td id="T_0f1c3_row1_col1" class="data row1 col1" >38.67%</td>
-      <td id="T_0f1c3_row1_col2" class="data row1 col2" >39.67%</td>
-      <td id="T_0f1c3_row1_col3" class="data row1 col3" >11.67%</td>
-      <td id="T_0f1c3_row1_col4" class="data row1 col4" >3.50%</td>
+      <th id="T_ironsworn_level0_row1" class="row_heading level0 row1" >1</th>
+      <td id="T_ironsworn_row1_col0" class="data row1 col0" >6.50%</td>
+      <td id="T_ironsworn_row1_col1" class="data row1 col1" >38.67%</td>
+      <td id="T_ironsworn_row1_col2" class="data row1 col2" >39.67%</td>
+      <td id="T_ironsworn_row1_col3" class="data row1 col3" >11.67%</td>
+      <td id="T_ironsworn_row1_col4" class="data row1 col4" >3.50%</td>
     </tr>
     <tr>
-      <th id="T_0f1c3_level0_row2" class="row_heading level0 row2" >2</th>
-      <td id="T_0f1c3_row2_col0" class="data row2 col0" >5.50%</td>
-      <td id="T_0f1c3_row2_col1" class="data row2 col1" >27.67%</td>
-      <td id="T_0f1c3_row2_col2" class="data row2 col2" >43.67%</td>
-      <td id="T_0f1c3_row2_col3" class="data row2 col3" >18.67%</td>
-      <td id="T_0f1c3_row2_col4" class="data row2 col4" >4.50%</td>
+      <th id="T_ironsworn_level0_row2" class="row_heading level0 row2" >2</th>
+      <td id="T_ironsworn_row2_col0" class="data row2 col0" >5.50%</td>
+      <td id="T_ironsworn_row2_col1" class="data row2 col1" >27.67%</td>
+      <td id="T_ironsworn_row2_col2" class="data row2 col2" >43.67%</td>
+      <td id="T_ironsworn_row2_col3" class="data row2 col3" >18.67%</td>
+      <td id="T_ironsworn_row2_col4" class="data row2 col4" >4.50%</td>
     </tr>
     <tr>
-      <th id="T_0f1c3_level0_row3" class="row_heading level0 row3" >3</th>
-      <td id="T_0f1c3_row3_col0" class="data row3 col0" >4.50%</td>
-      <td id="T_0f1c3_row3_col1" class="data row3 col1" >18.67%</td>
-      <td id="T_0f1c3_row3_col2" class="data row3 col2" >43.67%</td>
-      <td id="T_0f1c3_row3_col3" class="data row3 col3" >27.67%</td>
-      <td id="T_0f1c3_row3_col4" class="data row3 col4" >5.50%</td>
+      <th id="T_ironsworn_level0_row3" class="row_heading level0 row3" >3</th>
+      <td id="T_ironsworn_row3_col0" class="data row3 col0" >4.50%</td>
+      <td id="T_ironsworn_row3_col1" class="data row3 col1" >18.67%</td>
+      <td id="T_ironsworn_row3_col2" class="data row3 col2" >43.67%</td>
+      <td id="T_ironsworn_row3_col3" class="data row3 col3" >27.67%</td>
+      <td id="T_ironsworn_row3_col4" class="data row3 col4" >5.50%</td>
     </tr>
     <tr>
-      <th id="T_0f1c3_level0_row4" class="row_heading level0 row4" >4</th>
-      <td id="T_0f1c3_row4_col0" class="data row4 col0" >3.50%</td>
-      <td id="T_0f1c3_row4_col1" class="data row4 col1" >11.67%</td>
-      <td id="T_0f1c3_row4_col2" class="data row4 col2" >39.67%</td>
-      <td id="T_0f1c3_row4_col3" class="data row4 col3" >38.67%</td>
-      <td id="T_0f1c3_row4_col4" class="data row4 col4" >6.50%</td>
+      <th id="T_ironsworn_level0_row4" class="row_heading level0 row4" >4</th>
+      <td id="T_ironsworn_row4_col0" class="data row4 col0" >3.50%</td>
+      <td id="T_ironsworn_row4_col1" class="data row4 col1" >11.67%</td>
+      <td id="T_ironsworn_row4_col2" class="data row4 col2" >39.67%</td>
+      <td id="T_ironsworn_row4_col3" class="data row4 col3" >38.67%</td>
+      <td id="T_ironsworn_row4_col4" class="data row4 col4" >6.50%</td>
     </tr>
   </tbody>
 </table>

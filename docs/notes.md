@@ -15,10 +15,16 @@
 
 # ``dyce`` release notes
 
+<!--
+## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
+
+* TODO(posita)
+-->
+
 ## [0.6.1](https://github.com/posita/dyce/releases/tag/v0.6.1)
 
-* Fixes [``P.total``][dyce.p.P.total] to return ``#!python 1`` for empty pools, consistent with the empty product (see [this
-        explanation](https://www.johndcook.com/blog/2015/04/14/empty-sum-product/).
+* Fixes [``P.total``][dyce.p.P.total] to return ``#!python 1`` for empty pools, consistent with the empty product.
+  (See [this explanation](https://www.johndcook.com/blog/2015/04/14/empty-sum-product/)).
 * Renames ``#!python dyce.evaluation._LimitT`` to ``#!python dyce.evaluation.LimitT``.
 * Fixes issues pertaining to histograms with zero totals after allowing outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
 * Fixes issue that would lead to incorrect results when making certain arbitrary selections with heterogeneous pools (e.g., with [``P.rolls_with_counts``][dyce.p.P.rolls_with_counts]).
