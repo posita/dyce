@@ -12,13 +12,13 @@
 <g id="node1" class="node">
 <title>dyce.r.BasicOpRoller</title>
 <polygon fill="none" stroke="Azure" points="680,-146.5 680,-182.5 784,-182.5 784,-146.5 680,-146.5"/>
-<text text-anchor="middle" x="732" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">BasicOpRoller</text>
+<text text-anchor="start" x="688" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">BasicOpRoller</text>
 </g>
 <!-- dyce.r.R -->
 <g id="node2" class="node">
 <title>dyce.r.R</title>
 <polygon fill="none" stroke="Azure" points="337,-219.5 337,-255.5 391,-255.5 391,-219.5 337,-219.5"/>
-<text text-anchor="middle" x="364" y="-233.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">R</text>
+<text text-anchor="start" x="359" y="-233.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">R</text>
 </g>
 <!-- dyce.r.BasicOpRoller&#45;&gt;dyce.r.R -->
 <g id="edge1" class="edge">
@@ -30,13 +30,13 @@
 <g id="node3" class="node">
 <title>dyce.r.BinarySumOpRoller</title>
 <polygon fill="none" stroke="Azure" points="586.5,-0.5 586.5,-36.5 723.5,-36.5 723.5,-0.5 586.5,-0.5"/>
-<text text-anchor="middle" x="655" y="-14.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">BinarySumOpRoller</text>
+<text text-anchor="start" x="594.5" y="-14.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">BinarySumOpRoller</text>
 </g>
 <!-- dyce.r.NarySumOpRoller -->
 <g id="node4" class="node">
 <title>dyce.r.NarySumOpRoller</title>
 <polygon fill="none" stroke="Azure" points="668,-73.5 668,-109.5 796,-109.5 796,-73.5 668,-73.5"/>
-<text text-anchor="middle" x="732" y="-87.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">NarySumOpRoller</text>
+<text text-anchor="start" x="676" y="-87.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">NarySumOpRoller</text>
 </g>
 <!-- dyce.r.BinarySumOpRoller&#45;&gt;dyce.r.NarySumOpRoller -->
 <g id="edge2" class="edge">
@@ -54,7 +54,7 @@
 <g id="node5" class="node">
 <title>dyce.r.FilterRoller</title>
 <polygon fill="none" stroke="Azure" points="0,-146.5 0,-182.5 82,-182.5 82,-146.5 0,-146.5"/>
-<text text-anchor="middle" x="41" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">FilterRoller</text>
+<text text-anchor="start" x="8" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">FilterRoller</text>
 </g>
 <!-- dyce.r.FilterRoller&#45;&gt;dyce.r.R -->
 <g id="edge4" class="edge">
@@ -66,7 +66,7 @@
 <g id="node6" class="node">
 <title>dyce.r.PoolRoller</title>
 <polygon fill="none" stroke="Azure" points="100.5,-146.5 100.5,-182.5 179.5,-182.5 179.5,-146.5 100.5,-146.5"/>
-<text text-anchor="middle" x="140" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">PoolRoller</text>
+<text text-anchor="start" x="108.5" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">PoolRoller</text>
 </g>
 <!-- dyce.r.PoolRoller&#45;&gt;dyce.r.R -->
 <g id="edge5" class="edge">
@@ -78,7 +78,7 @@
 <g id="node7" class="node">
 <title>dyce.r.RepeatRoller</title>
 <polygon fill="none" stroke="Azure" points="197.5,-146.5 197.5,-182.5 292.5,-182.5 292.5,-146.5 197.5,-146.5"/>
-<text text-anchor="middle" x="245" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">RepeatRoller</text>
+<text text-anchor="start" x="205.5" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">RepeatRoller</text>
 </g>
 <!-- dyce.r.RepeatRoller&#45;&gt;dyce.r.R -->
 <g id="edge6" class="edge">
@@ -90,7 +90,7 @@
 <g id="node8" class="node">
 <title>dyce.r.SelectionRoller</title>
 <polygon fill="none" stroke="Azure" points="310.5,-146.5 310.5,-182.5 417.5,-182.5 417.5,-146.5 310.5,-146.5"/>
-<text text-anchor="middle" x="364" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">SelectionRoller</text>
+<text text-anchor="start" x="318.5" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">SelectionRoller</text>
 </g>
 <!-- dyce.r.SelectionRoller&#45;&gt;dyce.r.R -->
 <g id="edge7" class="edge">
@@ -102,7 +102,7 @@
 <g id="node9" class="node">
 <title>dyce.r.SubstitutionRoller</title>
 <polygon fill="none" stroke="Azure" points="436,-146.5 436,-182.5 558,-182.5 558,-146.5 436,-146.5"/>
-<text text-anchor="middle" x="497" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">SubstitutionRoller</text>
+<text text-anchor="start" x="444" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">SubstitutionRoller</text>
 </g>
 <!-- dyce.r.SubstitutionRoller&#45;&gt;dyce.r.R -->
 <g id="edge8" class="edge">
@@ -114,7 +114,7 @@
 <g id="node10" class="node">
 <title>dyce.r.UnarySumOpRoller</title>
 <polygon fill="none" stroke="Azure" points="741.5,-0.5 741.5,-36.5 876.5,-36.5 876.5,-0.5 741.5,-0.5"/>
-<text text-anchor="middle" x="809" y="-14.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">UnarySumOpRoller</text>
+<text text-anchor="start" x="749.5" y="-14.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">UnarySumOpRoller</text>
 </g>
 <!-- dyce.r.UnarySumOpRoller&#45;&gt;dyce.r.NarySumOpRoller -->
 <g id="edge9" class="edge">
@@ -126,7 +126,7 @@
 <g id="node11" class="node">
 <title>dyce.r.ValueRoller</title>
 <polygon fill="none" stroke="Azure" points="576,-146.5 576,-182.5 662,-182.5 662,-146.5 576,-146.5"/>
-<text text-anchor="middle" x="619" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">ValueRoller</text>
+<text text-anchor="start" x="584" y="-160.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="Azure">ValueRoller</text>
 </g>
 <!-- dyce.r.ValueRoller&#45;&gt;dyce.r.R -->
 <g id="edge10" class="edge">
