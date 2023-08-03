@@ -78,18 +78,18 @@ PARSER.add_argument(
 )
 PARSER.add_argument(
     "-k",
-    "--keep-temp-files",
+    "--keep-tmp-files",
     help="keep temporary files on exit, e.g., for debugging or inspection (default)",
     action="store_true",
     default=False,
-    dest="keep_temp_files",
+    dest="keep_tmp_files",
 )
 PARSER.add_argument(
     "-K",
-    "--no-keep-temp-files",
+    "--no-keep-tmp-files",
     help="remove temporary files on exit",
     action="store_false",
-    dest="keep_temp_files",
+    dest="keep_tmp_files",
 )
 PARSER.add_argument(
     "paths",
@@ -153,7 +153,7 @@ def copy_paths(
             continue
 
         if dst_path.stat().st_size == 0:
-            if parsed_args.keep_temp_files:
+            if parsed_args.keep_tmp_files:
                 logging.debug("%s had no tests", dst_path)
             else:
                 logging.debug("%s had no tests, deleting", dst_path)
@@ -218,7 +218,7 @@ def main(*args: str) -> int:
 
         return results[2]
     finally:
-        if parsed_args.keep_temp_files:
+        if parsed_args.keep_tmp_files:
             print(f"leaving temporary files in {dst_dir_path}", file=sys.stderr)
         else:
             logging.debug("removing %s", dst_dir_path)
