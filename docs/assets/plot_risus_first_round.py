@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 from dyce import H
 
 

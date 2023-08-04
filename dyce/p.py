@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 from collections import Counter, defaultdict
 from fractions import Fraction
 from functools import wraps
@@ -292,7 +290,7 @@ class P(Sequence[H], HableOpsMixin):
         ...
 
     @overload
-    def __getitem__(self, key: slice) -> P:
+    def __getitem__(self, key: slice) -> "P":
         ...
 
     @beartype
@@ -307,7 +305,7 @@ class P(Sequence[H], HableOpsMixin):
         return iter(self._hs)
 
     @beartype
-    def __matmul__(self, other: SupportsInt) -> P:
+    def __matmul__(self, other: SupportsInt) -> "P":
         try:
             other = as_int(other)
         except TypeError:
@@ -319,7 +317,7 @@ class P(Sequence[H], HableOpsMixin):
             return P(*chain.from_iterable(repeat(self, other)))
 
     @beartype
-    def __rmatmul__(self, other: SupportsInt) -> P:
+    def __rmatmul__(self, other: SupportsInt) -> "P":
         return self.__matmul__(other)
 
     @beartype
@@ -925,7 +923,7 @@ class P(Sequence[H], HableOpsMixin):
             yield taken_outcomes, roll_count
 
     @beartype
-    def map(self, op: _BinaryOperatorT, right_operand: _OperandT) -> P:
+    def map(self, op: _BinaryOperatorT, right_operand: _OperandT) -> "P":
         r"""
         Shorthand for ``#!python P(*(h.map(op, right_operand) for h in self))``. See the
         [``H.map`` method][dyce.h.H.map].
@@ -941,7 +939,7 @@ class P(Sequence[H], HableOpsMixin):
         return P(*(h.map(op, right_operand) for h in self))
 
     @beartype
-    def rmap(self, left_operand: RealLike, op: _BinaryOperatorT) -> P:
+    def rmap(self, left_operand: RealLike, op: _BinaryOperatorT) -> "P":
         r"""
         Shorthand for ``#!python P(*(h.rmap(left_operand, op) for h in self))``. See the
         [``H.rmap`` method][dyce.h.H.rmap].
@@ -958,7 +956,7 @@ class P(Sequence[H], HableOpsMixin):
         return P(*(h.rmap(left_operand, op) for h in self))
 
     @beartype
-    def umap(self, op: _UnaryOperatorT) -> P:
+    def umap(self, op: _UnaryOperatorT) -> "P":
         r"""
         Shorthand for ``#!python P(*(h.umap(op) for h in self))``. See the
         [``H.umap`` method][dyce.h.H.umap].

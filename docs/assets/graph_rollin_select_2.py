@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 import random
 
 from graph import COLORS, Dot, digraph, graphviz_walk

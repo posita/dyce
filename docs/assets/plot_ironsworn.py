@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 from enum import IntEnum, auto
 from functools import partial
 

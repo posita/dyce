@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 import sys
 from contextvars import ContextVar
 from fractions import Fraction

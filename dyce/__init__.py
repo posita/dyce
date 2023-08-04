@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 from typing import Union
 
 from .evaluation import *  # noqa: F401,F403

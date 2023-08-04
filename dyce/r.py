@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 import enum
 import warnings
 from abc import abstractmethod
@@ -313,49 +311,49 @@ class R:
             return super().__ne__(other)
 
     @beartype
-    def __add__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __add__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: RealLike) -> BinarySumOpRoller:
+    def __radd__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __sub__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __sub__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rsub__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mul__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __mul__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rmul__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __matmul__(self, other: SupportsInt) -> R:
+    def __matmul__(self, other: SupportsInt) -> "R":
         try:
             other = as_int(other)
         except TypeError:
@@ -367,67 +365,67 @@ class R:
             return RepeatRoller(other, self)
 
     @beartype
-    def __rmatmul__(self, other: SupportsInt) -> R:
+    def __rmatmul__(self, other: SupportsInt) -> "R":
         return self.__matmul__(other)
 
     @beartype
-    def __truediv__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __truediv__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rtruediv__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __floordiv__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __floordiv__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rfloordiv__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mod__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __mod__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rmod__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __pow__(self, other: _ROperandT) -> BinarySumOpRoller:
+    def __pow__(self, other: _ROperandT) -> "BinarySumOpRoller":
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: RealLike) -> BinarySumOpRoller:
+    def __rpow__(self, other: RealLike) -> "BinarySumOpRoller":
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __and__(self, other: Union[_SourceT, SupportsInt]) -> BinarySumOpRoller:
+    def __and__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
                 return self.map(__and__, other)
@@ -437,14 +435,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: SupportsInt) -> BinarySumOpRoller:
+    def __rand__(self, other: SupportsInt) -> "BinarySumOpRoller":
         try:
             return self.rmap(as_int(other), __and__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __xor__(self, other: Union[_SourceT, SupportsInt]) -> BinarySumOpRoller:
+    def __xor__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
                 return self.map(__xor__, other)
@@ -454,14 +452,14 @@ class R:
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: SupportsInt) -> BinarySumOpRoller:
+    def __rxor__(self, other: SupportsInt) -> "BinarySumOpRoller":
         try:
             return self.rmap(as_int(other), __xor__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __or__(self, other: Union[_SourceT, SupportsInt]) -> BinarySumOpRoller:
+    def __or__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
                 return self.map(__or__, other)
@@ -471,30 +469,30 @@ class R:
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: SupportsInt) -> BinarySumOpRoller:
+    def __ror__(self, other: SupportsInt) -> "BinarySumOpRoller":
         try:
             return self.rmap(as_int(other), __or__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __neg__(self) -> UnarySumOpRoller:
+    def __neg__(self) -> "UnarySumOpRoller":
         return self.umap(__neg__)
 
     @beartype
-    def __pos__(self) -> UnarySumOpRoller:
+    def __pos__(self) -> "UnarySumOpRoller":
         return self.umap(__pos__)
 
     @beartype
-    def __abs__(self) -> UnarySumOpRoller:
+    def __abs__(self) -> "UnarySumOpRoller":
         return self.umap(__abs__)
 
     @beartype
-    def __invert__(self) -> UnarySumOpRoller:
+    def __invert__(self) -> "UnarySumOpRoller":
         return self.umap(__invert__)
 
     @abstractmethod
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r"""
         Sub-classes should implement this method to return a new
         [``Roll`` object][dyce.r.Roll] taking into account any
@@ -638,7 +636,7 @@ class R:
         cls,
         *sources: _SourceT,
         annotation: Any = "",
-    ) -> PoolRoller:
+    ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_sources_iterable(rs, annotation=annotation)``.
 
@@ -652,7 +650,7 @@ class R:
         cls,
         sources: Iterable[_SourceT],
         annotation: Any = "",
-    ) -> PoolRoller:
+    ) -> "PoolRoller":
         r"""
         Creates and returns a roller for “pooling” zero or more *sources*.
 
@@ -700,7 +698,7 @@ class R:
         cls,
         value: _ValueT,
         annotation: Any = "",
-    ) -> ValueRoller:
+    ) -> "ValueRoller":
         r"""
         Creates and returns a [``ValueRoller``][dyce.r.ValueRoller] from *value*.
 
@@ -730,7 +728,7 @@ class R:
         cls,
         *values: _ValueT,
         annotation: Any = "",
-    ) -> PoolRoller:
+    ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_values_iterable(values, annotation=annotation)``.
 
@@ -744,7 +742,7 @@ class R:
         cls,
         values: Iterable[_ValueT],
         annotation: Any = "",
-    ) -> PoolRoller:
+    ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_sources_iterable((cls.from_value(value) for value
         in values), annotation=annotation)``.
@@ -764,7 +762,7 @@ class R:
         predicate: _PredicateT,
         *sources: _SourceT,
         annotation: Any = "",
-    ) -> FilterRoller:
+    ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_sources_iterable(predicate, sources,
         annotation=annotation)``.
@@ -783,7 +781,7 @@ class R:
         predicate: _PredicateT,
         sources: Iterable[_SourceT],
         annotation: Any = "",
-    ) -> FilterRoller:
+    ) -> "FilterRoller":
         r"""
         Creates and returns a [``FilterRoller``][dyce.r.FilterRoller] for applying filterion
         *predicate* to sorted outcomes from *sources*.
@@ -818,7 +816,7 @@ class R:
         predicate: _PredicateT,
         *values: _ValueT,
         annotation: Any = "",
-    ) -> FilterRoller:
+    ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_values_iterable(predicate, values,
         annotation=annotation)``.
@@ -835,7 +833,7 @@ class R:
         predicate: _PredicateT,
         values: Iterable[_ValueT],
         annotation: Any = "",
-    ) -> FilterRoller:
+    ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_sources_iterable((cls.from_value(value) for
         value in values), annotation=annotation)``.
@@ -857,7 +855,7 @@ class R:
         which: Iterable[_GetItemT],
         *sources: _SourceT,
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_sources_iterable(which, sources,
         annotation=annotation)``.
@@ -874,7 +872,7 @@ class R:
         which: Iterable[_GetItemT],
         sources: Iterable[_SourceT],
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Creates and returns a [``SelectionRoller``][dyce.r.SelectionRoller] for applying
         selection *which* to sorted outcomes from *sources*.
@@ -909,7 +907,7 @@ class R:
         which: Iterable[_GetItemT],
         *values: _ValueT,
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_values_iterable(which, values,
         annotation=annotation)``.
@@ -926,7 +924,7 @@ class R:
         which: Iterable[_GetItemT],
         values: Iterable[_ValueT],
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_sources_iterable((cls.from_value(value) for
         value in values), annotation=annotation)``.
@@ -950,7 +948,7 @@ class R:
             yield source.roll()
 
     @beartype
-    def annotate(self, annotation: Any = "") -> R:
+    def annotate(self, annotation: Any = "") -> "R":
         r"""
         Generates a copy of the roller with the desired annotation.
 
@@ -973,7 +971,7 @@ class R:
         bin_op: _RollOutcomeBinaryOperatorT,
         right_operand: _ROperandT,
         annotation: Any = "",
-    ) -> BinarySumOpRoller:
+    ) -> "BinarySumOpRoller":
         r"""
         Creates and returns a [``BinarySumOpRoller``][dyce.r.BinarySumOpRoller] for applying
         *bin_op* to this roller and *right_operand* as its sources. Shorthands exist for
@@ -1008,7 +1006,7 @@ class R:
         left_operand: Union[RealLike, "RollOutcome"],
         bin_op: _RollOutcomeBinaryOperatorT,
         annotation: Any = "",
-    ) -> BinarySumOpRoller:
+    ) -> "BinarySumOpRoller":
         r"""
         Analogous to the [``map`` method][dyce.r.R.map], but where the caller supplies
         *left_operand*.
@@ -1047,7 +1045,7 @@ class R:
         self,
         un_op: _RollOutcomeUnaryOperatorT,
         annotation: Any = "",
-    ) -> UnarySumOpRoller:
+    ) -> "UnarySumOpRoller":
         r"""
         Creates and returns a [``UnarySumOpRoller``][dyce.r.UnarySumOpRoller] roller for
         applying *un_op* to this roller as its source.
@@ -1068,7 +1066,7 @@ class R:
         return UnarySumOpRoller(un_op, self, annotation=annotation)
 
     @beartype
-    def lt(self, other: _ROperandT) -> BinarySumOpRoller:
+    def lt(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.lt(right), other)``.
 
@@ -1081,7 +1079,7 @@ class R:
         return self.map(_lt, other)
 
     @beartype
-    def le(self, other: _ROperandT) -> BinarySumOpRoller:
+    def le(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.le(right), other)``.
 
@@ -1094,7 +1092,7 @@ class R:
         return self.map(_le, other)
 
     @beartype
-    def eq(self, other: _ROperandT) -> BinarySumOpRoller:
+    def eq(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.eq(right), other)``.
 
@@ -1107,7 +1105,7 @@ class R:
         return self.map(_eq, other)
 
     @beartype
-    def ne(self, other: _ROperandT) -> BinarySumOpRoller:
+    def ne(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ne(right), other)``.
 
@@ -1120,7 +1118,7 @@ class R:
         return self.map(_ne, other)
 
     @beartype
-    def gt(self, other: _ROperandT) -> BinarySumOpRoller:
+    def gt(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.gt(right), other)``.
 
@@ -1133,7 +1131,7 @@ class R:
         return self.map(_gt, other)
 
     @beartype
-    def ge(self, other: _ROperandT) -> BinarySumOpRoller:
+    def ge(self, other: _ROperandT) -> "BinarySumOpRoller":
         r"""
         Shorthand for ``#!python self.map(lambda left, right: left.ge(right), other)``.
 
@@ -1146,7 +1144,7 @@ class R:
         return self.map(_ge, other)
 
     @beartype
-    def is_even(self) -> UnarySumOpRoller:
+    def is_even(self) -> "UnarySumOpRoller":
         r"""
         Shorthand for: ``#!python self.umap(lambda operand: operand.is_even())``.
 
@@ -1159,7 +1157,7 @@ class R:
         return self.umap(_is_even)
 
     @beartype
-    def is_odd(self) -> UnarySumOpRoller:
+    def is_odd(self) -> "UnarySumOpRoller":
         r"""
         Shorthand for: ``#!python self.umap(lambda operand: operand.is_odd())``.
 
@@ -1176,7 +1174,7 @@ class R:
         self,
         predicate: _PredicateT,
         annotation: Any = "",
-    ) -> FilterRoller:
+    ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python type(self).filter_from_sources(predicate, self,
         annotation=annotation)``.
@@ -1190,7 +1188,7 @@ class R:
         self,
         *which: _GetItemT,
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python self.select_iterable(which, annotation=annotation)``.
 
@@ -1203,7 +1201,7 @@ class R:
         self,
         which: Iterable[_GetItemT],
         annotation: Any = "",
-    ) -> SelectionRoller:
+    ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python type(self).select_from_sources(which, self,
         annotation=annotation)``.
@@ -1249,7 +1247,7 @@ class ValueRoller(R):
         return f"{type(self).__name__}(value={self.value!r}, annotation={self.annotation!r})"
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         if isinstance(self.value, P):
             return Roll(
@@ -1338,7 +1336,7 @@ class PoolRoller(R):
     # ---- Overrides -------------------------------------------------------------------
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
 
@@ -1406,7 +1404,7 @@ class RepeatRoller(R):
         return super().__eq__(other) and self.n == other.n
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls: list[Roll] = []
 
@@ -1470,7 +1468,7 @@ class BasicOpRoller(R):
         return super().__eq__(other) and (_callable_cmp(self.op, other.op))
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
         res = self.op(
@@ -1509,7 +1507,7 @@ class NarySumOpRoller(BasicOpRoller):
     # ---- Overrides -------------------------------------------------------------------
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
 
@@ -1775,7 +1773,7 @@ class FilterRoller(R):
         return super().__eq__(other) and _callable_cmp(self.predicate, other.predicate)
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
 
@@ -1914,7 +1912,7 @@ class SelectionRoller(R):
         return super().__eq__(other) and self.which == other.which
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
         roll_outcomes = list(
@@ -2052,7 +2050,7 @@ class SubstitutionRoller(R):
         )
 
     @beartype
-    def roll(self) -> Roll:
+    def roll(self) -> "Roll":
         r""""""
         (source_roll,) = self.source_rolls()
         source_rolls: list[Roll] = []
@@ -2227,98 +2225,98 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __add__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __add__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: RealLike) -> RollOutcome:
+    def __radd__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __sub__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __sub__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: RealLike) -> RollOutcome:
+    def __rsub__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mul__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __mul__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: RealLike) -> RollOutcome:
+    def __rmul__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __truediv__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __truediv__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: RealLike) -> RollOutcome:
+    def __rtruediv__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __floordiv__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __floordiv__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLike) -> RollOutcome:
+    def __rfloordiv__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mod__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __mod__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: RealLike) -> RollOutcome:
+    def __rmod__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __pow__(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def __pow__(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: RealLike) -> RollOutcome:
+    def __rpow__(self, other: RealLike) -> "RollOutcome":
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
@@ -2326,7 +2324,7 @@ class RollOutcome:
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __and__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
+    def __and__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -2336,7 +2334,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: SupportsInt) -> RollOutcome:
+    def __rand__(self, other: SupportsInt) -> "RollOutcome":
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
@@ -2344,7 +2342,7 @@ class RollOutcome:
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __xor__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
+    def __xor__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -2354,7 +2352,7 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: SupportsInt) -> RollOutcome:
+    def __rxor__(self, other: SupportsInt) -> "RollOutcome":
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
@@ -2362,7 +2360,7 @@ class RollOutcome:
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __or__(self, other: Union["RollOutcome", SupportsInt]) -> RollOutcome:
+    def __or__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -2372,26 +2370,26 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: SupportsInt) -> RollOutcome:
+    def __ror__(self, other: SupportsInt) -> "RollOutcome":
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __neg__(self) -> RollOutcome:
+    def __neg__(self) -> "RollOutcome":
         return self.umap(__neg__)
 
     @beartype
-    def __pos__(self) -> RollOutcome:
+    def __pos__(self) -> "RollOutcome":
         return self.umap(__pos__)
 
     @beartype
-    def __abs__(self) -> RollOutcome:
+    def __abs__(self) -> "RollOutcome":
         return self.umap(__abs__)
 
     @beartype
-    def __invert__(self) -> RollOutcome:
+    def __invert__(self) -> "RollOutcome":
         return self.umap(__invert__)
 
     # ---- Properties ------------------------------------------------------------------
@@ -2417,7 +2415,7 @@ class RollOutcome:
         return self.source_roll.r
 
     @property
-    def source_roll(self) -> Roll:
+    def source_roll(self) -> "Roll":
         r"""
         Returns the roll if one has been associated with this roll outcome. Usually that
         happens by submitting the roll outcome to the
@@ -2455,7 +2453,7 @@ class RollOutcome:
         return self._roll
 
     @property
-    def sources(self) -> tuple[RollOutcome, ...]:
+    def sources(self) -> tuple["RollOutcome", ...]:
         r"""
         The source roll outcomes from which this roll outcome was generated.
         """
@@ -2476,7 +2474,7 @@ class RollOutcome:
         self,
         bin_op: _BinaryOperatorT,
         right_operand: _RollOutcomeOperandT,
-    ) -> RollOutcome:
+    ) -> "RollOutcome":
         r"""
         Applies *bin_op* to the value of this roll outcome as the left operand and
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
@@ -2513,7 +2511,7 @@ class RollOutcome:
             raise NotImplementedError
 
     @beartype
-    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> RollOutcome:
+    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> "RollOutcome":
         r"""
         Analogous to the [``map`` method][dyce.r.RollOutcome.map], but where the caller
         supplies *left_operand*.
@@ -2551,7 +2549,7 @@ class RollOutcome:
     def umap(
         self,
         un_op: _UnaryOperatorT,
-    ) -> RollOutcome:
+    ) -> "RollOutcome":
         r"""
         Applies *un_op* to the value of this roll outcome. Shorthands exist for many
         arithmetic operators and comparators.
@@ -2577,7 +2575,7 @@ class RollOutcome:
         return type(self)(un_op(self.value), sources=(self,))
 
     @beartype
-    def lt(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def lt(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__lt__(self, other)), sources=(self, other))
         elif self.value is not None:
@@ -2586,7 +2584,7 @@ class RollOutcome:
             raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
-    def le(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def le(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__le__(self, other)), sources=(self, other))
         elif self.value is not None:
@@ -2595,7 +2593,7 @@ class RollOutcome:
             raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
-    def eq(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def eq(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__eq__(self, other)), sources=(self, other))
         elif self.value is not None:
@@ -2604,14 +2602,14 @@ class RollOutcome:
             raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
-    def ne(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def ne(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__ne__(self, other)), sources=(self, other))
         else:
             return type(self)(bool(__ne__(self.value, other)), sources=(self,))
 
     @beartype
-    def gt(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def gt(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__gt__(self, other)), sources=(self, other))
         elif self.value is not None:
@@ -2620,7 +2618,7 @@ class RollOutcome:
             raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
-    def ge(self, other: _RollOutcomeOperandT) -> RollOutcome:
+    def ge(self, other: _RollOutcomeOperandT) -> "RollOutcome":
         if isinstance(other, RollOutcome):
             return type(self)(bool(__ge__(self, other)), sources=(self, other))
         elif self.value is not None:
@@ -2629,7 +2627,7 @@ class RollOutcome:
             raise ValueError(f"unable to compare {self} to {other}")
 
     @beartype
-    def is_even(self) -> RollOutcome:
+    def is_even(self) -> "RollOutcome":
         r"""
         Shorthand for: ``#!python self.umap(dyce.types.is_even)``.
 
@@ -2638,7 +2636,7 @@ class RollOutcome:
         return self.umap(is_even)
 
     @beartype
-    def is_odd(self) -> RollOutcome:
+    def is_odd(self) -> "RollOutcome":
         r"""
         Shorthand for: ``#!python self.umap(dyce.types.is_even)``.
 
@@ -2651,7 +2649,7 @@ class RollOutcome:
         self,
         sources: Iterable["RollOutcome"] = (),
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
-    ) -> RollOutcome:
+    ) -> "RollOutcome":
         r"""
         Creates and returns a new roll outcome identical to this roll outcome, but with
         *sources* replacing or appended to this roll outcome’s sources in accordance
@@ -2709,7 +2707,7 @@ class RollOutcome:
         return adopted_roll_outcome
 
     @beartype
-    def euthanize(self) -> RollOutcome:
+    def euthanize(self) -> "RollOutcome":
         r"""
         Shorthand for ``#!python self.umap(lambda operand: None)``.
 
@@ -2872,7 +2870,7 @@ class Roll(Sequence[RollOutcome]):
         return self._r
 
     @property
-    def source_rolls(self) -> tuple[Roll, ...]:
+    def source_rolls(self) -> tuple["Roll", ...]:
         r"""
         The source rolls from which this roll was generated.
         """
@@ -2885,7 +2883,7 @@ class Roll(Sequence[RollOutcome]):
         self,
         sources: Iterable["RollOutcome"] = (),
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
-    ) -> Roll:
+    ) -> "Roll":
         r"""
         Shorthand for ``#!python Roll(self.r, (roll_outcome.adopt(sources,
         coalesce_mode) for roll_outcome in self), self.source_rolls)``.

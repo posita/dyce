@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 from anydyce.viz import plot_burst, plot_line
 
 from dyce import H

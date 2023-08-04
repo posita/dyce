@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 import os
 import warnings
 from abc import abstractmethod
@@ -106,7 +104,7 @@ except (KeyError, ValueError):
 
 
 @deprecated
-def coalesce_replace(h: H, outcome: RealLike) -> H:
+def coalesce_replace(h: "H", outcome: RealLike) -> "H":
     r"""
     !!! warning "Deprecated"
 
@@ -512,49 +510,49 @@ class H(_MappingT):
         return key in self._h
 
     @beartype
-    def __add__(self, other: _OperandT) -> H:
+    def __add__(self, other: _OperandT) -> "H":
         try:
             return self.map(__add__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __radd__(self, other: RealLike) -> H:
+    def __radd__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __add__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __sub__(self, other: _OperandT) -> H:
+    def __sub__(self, other: _OperandT) -> "H":
         try:
             return self.map(__sub__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rsub__(self, other: RealLike) -> H:
+    def __rsub__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __sub__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mul__(self, other: _OperandT) -> H:
+    def __mul__(self, other: _OperandT) -> "H":
         try:
             return self.map(__mul__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmul__(self, other: RealLike) -> H:
+    def __rmul__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __mul__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __matmul__(self, other: SupportsInt) -> H:
+    def __matmul__(self, other: SupportsInt) -> "H":
         try:
             other = as_int(other)
         except TypeError:
@@ -566,60 +564,60 @@ class H(_MappingT):
             return sum_h(repeat(self, other))
 
     @beartype
-    def __rmatmul__(self, other: SupportsInt) -> H:
+    def __rmatmul__(self, other: SupportsInt) -> "H":
         return self.__matmul__(other)
 
     @beartype
-    def __truediv__(self, other: _OperandT) -> H:
+    def __truediv__(self, other: _OperandT) -> "H":
         try:
             return self.map(__truediv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rtruediv__(self, other: RealLike) -> H:
+    def __rtruediv__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __truediv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __floordiv__(self, other: _OperandT) -> H:
+    def __floordiv__(self, other: _OperandT) -> "H":
         try:
             return self.map(__floordiv__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rfloordiv__(self, other: RealLike) -> H:
+    def __rfloordiv__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __floordiv__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __mod__(self, other: _OperandT) -> H:
+    def __mod__(self, other: _OperandT) -> "H":
         try:
             return self.map(__mod__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rmod__(self, other: RealLike) -> H:
+    def __rmod__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __mod__)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __pow__(self, other: _OperandT) -> H:
+    def __pow__(self, other: _OperandT) -> "H":
         try:
             return self.map(__pow__, other)
         except NotImplementedError:
             return NotImplemented
 
     @beartype
-    def __rpow__(self, other: RealLike) -> H:
+    def __rpow__(self, other: RealLike) -> "H":
         try:
             return self.rmap(other, __pow__)
         except NotImplementedError:
@@ -627,7 +625,7 @@ class H(_MappingT):
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
+    def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -637,7 +635,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rand__(self, other: SupportsInt) -> H:
+    def __rand__(self, other: SupportsInt) -> "H":
         try:
             return self.rmap(as_int(other), __and__)
         except (NotImplementedError, TypeError):
@@ -645,7 +643,7 @@ class H(_MappingT):
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
+    def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -655,7 +653,7 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __rxor__(self, other: SupportsInt) -> H:
+    def __rxor__(self, other: SupportsInt) -> "H":
         try:
             return self.rmap(as_int(other), __xor__)
         except (NotImplementedError, TypeError):
@@ -663,7 +661,7 @@ class H(_MappingT):
 
     @beartype
     # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> H:
+    def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
                 other = as_int(other)
@@ -673,26 +671,26 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    def __ror__(self, other: SupportsInt) -> H:
+    def __ror__(self, other: SupportsInt) -> "H":
         try:
             return self.rmap(as_int(other), __or__)
         except (NotImplementedError, TypeError):
             return NotImplemented
 
     @beartype
-    def __neg__(self) -> H:
+    def __neg__(self) -> "H":
         return self.umap(__neg__)
 
     @beartype
-    def __pos__(self) -> H:
+    def __pos__(self) -> "H":
         return self.umap(__pos__)
 
     @beartype
-    def __abs__(self) -> H:
+    def __abs__(self) -> "H":
         return self.umap(__abs__)
 
     @beartype
-    def __invert__(self) -> H:
+    def __invert__(self) -> "H":
         return self.umap(__invert__)
 
     @beartype
@@ -748,7 +746,7 @@ class H(_MappingT):
         cls,
         dependent_term: Callable[..., HOrOutcomeT],
         **independent_sources: _SourceT,
-    ) -> H:
+    ) -> "H":
         r"""
         !!! warning "Deprecated"
 
@@ -816,7 +814,7 @@ class H(_MappingT):
         return P.foreach(_dependent_term, **independent_sources)
 
     @beartype
-    def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> H:
+    def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> "H":
         r"""
         Applies *bin_op* to each outcome of the histogram as the left operand and
         *right_operand* as the right. Shorthands exist for many arithmetic operators and
@@ -863,7 +861,7 @@ class H(_MappingT):
             )
 
     @beartype
-    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> H:
+    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> "H":
         r"""
         Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
         *left_operand*.
@@ -889,7 +887,7 @@ class H(_MappingT):
         )
 
     @beartype
-    def umap(self, un_op: _UnaryOperatorT) -> H:
+    def umap(self, un_op: _UnaryOperatorT) -> "H":
         r"""
         Applies *un_op* to each outcome of the histogram.
 
@@ -909,7 +907,7 @@ class H(_MappingT):
         return type(self)((un_op(outcome), count) for outcome, count in self.items())
 
     @beartype
-    def lt(self, other: _OperandT) -> H:
+    def lt(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__lt__, other).umap(bool)``.
 
@@ -924,7 +922,7 @@ class H(_MappingT):
         return self.map(__lt__, other).umap(bool)
 
     @beartype
-    def le(self, other: _OperandT) -> H:
+    def le(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__le__, other).umap(bool)``.
 
@@ -939,7 +937,7 @@ class H(_MappingT):
         return self.map(__le__, other).umap(bool)
 
     @beartype
-    def eq(self, other: _OperandT) -> H:
+    def eq(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__eq__, other).umap(bool)``.
 
@@ -954,7 +952,7 @@ class H(_MappingT):
         return self.map(__eq__, other).umap(bool)
 
     @beartype
-    def ne(self, other: _OperandT) -> H:
+    def ne(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__ne__, other).umap(bool)``.
 
@@ -969,7 +967,7 @@ class H(_MappingT):
         return self.map(__ne__, other).umap(bool)
 
     @beartype
-    def gt(self, other: _OperandT) -> H:
+    def gt(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__gt__, other).umap(bool)``.
 
@@ -984,7 +982,7 @@ class H(_MappingT):
         return self.map(__gt__, other).umap(bool)
 
     @beartype
-    def ge(self, other: _OperandT) -> H:
+    def ge(self, other: _OperandT) -> "H":
         r"""
         Shorthand for ``#!python self.map(operator.__ge__, other).umap(bool)``.
 
@@ -999,7 +997,7 @@ class H(_MappingT):
         return self.map(__ge__, other).umap(bool)
 
     @beartype
-    def is_even(self) -> H:
+    def is_even(self) -> "H":
         r"""
         Equivalent to ``#!python self.umap(dyce.types.is_even)``.
 
@@ -1014,7 +1012,7 @@ class H(_MappingT):
         return self.umap(is_even)
 
     @beartype
-    def is_odd(self) -> H:
+    def is_odd(self) -> "H":
         r"""
         Equivalent to ``#!python self.umap(dyce.types.is_odd)``.
 
@@ -1029,7 +1027,7 @@ class H(_MappingT):
         return self.umap(is_odd)
 
     @beartype
-    def accumulate(self, other: _SourceT) -> H:
+    def accumulate(self, other: _SourceT) -> "H":
         r"""
         Accumulates counts.
 
@@ -1084,7 +1082,7 @@ class H(_MappingT):
         self,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1092,7 +1090,7 @@ class H(_MappingT):
         self,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1101,7 +1099,7 @@ class H(_MappingT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1109,7 +1107,7 @@ class H(_MappingT):
         self,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> H:
+    ) -> "H":
         ...
 
     @deprecated
@@ -1118,7 +1116,7 @@ class H(_MappingT):
         self,
         max_depth: Optional[IntegralLike] = None,
         precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> H:
+    ) -> "H":
         r"""
         !!! warning "Deprecated"
 
@@ -1154,7 +1152,7 @@ class H(_MappingT):
             return self.substitute(_explode, __add__)
 
     @beartype
-    def lowest_terms(self) -> H:
+    def lowest_terms(self) -> "H":
         r"""
         Computes and returns a histogram whose nonzero counts share a greatest
         common divisor of 1.
@@ -1182,7 +1180,7 @@ class H(_MappingT):
 
     @experimental
     @beartype
-    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> H:
+    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> "H":
         r"""
         !!! warning "Experimental"
 
@@ -1240,7 +1238,7 @@ class H(_MappingT):
         return self._order_stat_funcs_by_n[n](pos)
 
     @beartype
-    def remove(self, outcome: RealLike) -> H:
+    def remove(self, outcome: RealLike) -> "H":
         if outcome not in self:
             return self
 
@@ -1255,7 +1253,7 @@ class H(_MappingT):
         self,
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1266,7 +1264,7 @@ class H(_MappingT):
         *,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1276,7 +1274,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1287,7 +1285,7 @@ class H(_MappingT):
         *,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1297,7 +1295,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1308,7 +1306,7 @@ class H(_MappingT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
+    ) -> "H":
         ...
 
     @overload
@@ -1318,7 +1316,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> H:
+    ) -> "H":
         ...
 
     @deprecated
@@ -1329,7 +1327,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: Optional[IntegralLike] = None,
         precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> H:
+    ) -> "H":
         r"""
         !!! warning "Deprecated"
 
@@ -1384,7 +1382,7 @@ class H(_MappingT):
         return _expand(self, limit=limit)
 
     @beartype
-    def vs(self, other: _OperandT) -> H:
+    def vs(self, other: _OperandT) -> "H":
         r"""
         Compares the histogram with *other*. -1 represents where *other* is greater. 0
         represents where they are equal. 1 represents where *other* is less.
@@ -1404,7 +1402,7 @@ class H(_MappingT):
         return self.within(0, 0, other)
 
     @beartype
-    def within(self, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> H:
+    def within(self, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> "H":
         r"""
         Computes the difference between the histogram and *other*. -1 represents where that
         difference is less than *lo*. 0 represents where that difference between *lo*
@@ -1441,7 +1439,7 @@ class H(_MappingT):
         return self.map(_within(lo, hi), other)
 
     @beartype
-    def zero_fill(self, outcomes: Iterable[RealLike]) -> H:
+    def zero_fill(self, outcomes: Iterable[RealLike]) -> "H":
         r"""
         Shorthand for ``#!python self.accumulate({outcome: 0 for outcome in
         outcomes})``.
@@ -1637,6 +1635,11 @@ class H(_MappingT):
         >>> h = (2@H(6)).ge(7)
         >>> print(f"{' 65 chars wide -->|':->65}")
         ---------------------------------------------- 65 chars wide -->|
+        >>> print(H(1).format(scaled=False))
+        avg |    1.00
+        std |    0.00
+        var |    0.00
+          1 | 100.00% |##################################################
         >>> print(h.format(scaled=False))
         avg |    0.58
         std |    0.49
@@ -1763,7 +1766,7 @@ class H(_MappingT):
             else 0
         )
 
-    def _order_stat_func_for_n(self, n: int) -> Callable[[int], H]:
+    def _order_stat_func_for_n(self, n: int) -> Callable[[int], "H"]:
         betas_by_outcome: dict[RealLike, tuple[H, H]] = {}
 
         for outcome in self.outcomes():
@@ -1780,7 +1783,7 @@ class H(_MappingT):
                 )
 
         @beartype
-        def order_stat_for_n_at_pos(pos: int) -> H:
+        def order_stat_for_n_at_pos(pos: int) -> "H":
             return type(self)(_gen_h_items_at_pos(pos))
 
         return order_stat_for_n_at_pos

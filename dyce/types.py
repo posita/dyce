@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from __future__ import annotations
-
 import re
 from operator import __getitem__, __index__
 from typing import Any, Callable, Iterable, Iterator, Sequence, TypeVar, Union
