@@ -655,9 +655,9 @@
 
             <details class="quote">
               <summary>Source code in <code>dyce/evaluation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">RealLike</span>
 </code></pre></div></td></tr></table></div>
@@ -739,9 +739,9 @@
 
             <details class="quote">
               <summary>Source code in <code>dyce/evaluation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">p</span><span class="p">:</span> <span class="n">P</span>
     <span class="n">roll</span><span class="p">:</span> <span class="n">RollT</span>
 </code></pre></div></td></tr></table></div>
@@ -823,13 +823,13 @@
 
             <details class="quote">
               <summary>Source code in <code>dyce/evaluation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PWithSelection</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PWithSelection</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">p</span><span class="p">:</span> <span class="n">P</span>
     <span class="n">which</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_GetItemT</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -966,7 +966,9 @@ the result without scaling.</p>
 
           <details class="quote">
             <summary>Source code in <code>dyce/evaluation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">723</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">721</span>
+<span class="normal">722</span>
+<span class="normal">723</span>
 <span class="normal">724</span>
 <span class="normal">725</span>
 <span class="normal">726</span>
@@ -1025,9 +1027,7 @@ the result without scaling.</p>
 <span class="normal">779</span>
 <span class="normal">780</span>
 <span class="normal">781</span>
-<span class="normal">782</span>
-<span class="normal">783</span>
-<span class="normal">784</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@beartype</span>
+<span class="normal">782</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@beartype</span>
 <span class="k">def</span> <span class="nf">aggregate_weighted</span><span class="p">(</span>
     <span class="n">weighted_sources</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">HOrOutcomeT</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
     <span class="n">h_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">,</span>
@@ -1822,7 +1822,9 @@ render it intractable.&#160;<a class="footnote-backref" href="#dyce.evaluation.e
 
           <details class="quote">
             <summary>Source code in <code>dyce/evaluation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
@@ -2410,9 +2412,7 @@ render it intractable.&#160;<a class="footnote-backref" href="#dyce.evaluation.e
 <span class="normal">712</span>
 <span class="normal">713</span>
 <span class="normal">714</span>
-<span class="normal">715</span>
-<span class="normal">716</span>
-<span class="normal">717</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">715</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="nd">@beartype</span>
 <span class="k">def</span> <span class="nf">expandable</span><span class="p">(</span>
     <span class="n">f</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_DependentTermT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3156,7 +3156,9 @@ fractional value, this function returns special histograms, possibly leveraging 
 
           <details class="quote">
             <summary>Source code in <code>dyce/evaluation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">838</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
 <span class="normal">839</span>
 <span class="normal">840</span>
 <span class="normal">841</span>
@@ -3267,9 +3269,7 @@ fractional value, this function returns special histograms, possibly leveraging 
 <span class="normal">946</span>
 <span class="normal">947</span>
 <span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="nd">@beartype</span>
 <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span>
     <span class="n">source</span><span class="p">:</span> <span class="n">_SourceT</span><span class="p">,</span>
@@ -3457,7 +3457,9 @@ simpler or more readable under those circumstances (e.g., where the callback is 
 
           <details class="quote">
             <summary>Source code in <code>dyce/evaluation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">787</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
 <span class="normal">788</span>
 <span class="normal">789</span>
 <span class="normal">790</span>
@@ -3503,9 +3505,7 @@ simpler or more readable under those circumstances (e.g., where the callback is 
 <span class="normal">830</span>
 <span class="normal">831</span>
 <span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="nd">@beartype</span>
 <span class="k">def</span> <span class="nf">foreach</span><span class="p">(</span>
     <span class="n">callback</span><span class="p">:</span> <span class="n">_DependentTermT</span><span class="p">,</span>
