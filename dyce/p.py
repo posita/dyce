@@ -6,9 +6,9 @@
 # software in any capacity.
 # ======================================================================================
 
-from collections import Counter, defaultdict
+from collections import Counter
 from fractions import Fraction
-from functools import wraps
+from functools import cache
 from itertools import chain, groupby, product, repeat
 from math import prod
 from operator import __eq__, __index__, __ne__
@@ -1109,37 +1109,44 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     """
     n = as_int(n)
     k = as_int(k)
-    from_upper = k < 0
+    from_right = k < 0
     k = abs(k)
 
     if k == 0 or k > n:
         # Maintain consistency with comb(n, k) == 0 where k > n
         return iter(())
 
-    def _memoize(f: _SelectCallableT) -> _SelectCallableT:
-        cache: defaultdict[tuple[H, int, int], list[_RollProbT]] = defaultdict(list)
+    total_count = h.total**n
 
-        @wraps(f)
-        def _wrapped(h: H, n: int, k: int) -> Iterator[_RollProbT]:
-            if (h, n, k) not in cache:
-                cache[h, n, k].extend(f(h, n, k))
+    for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
+        h, n, k, from_right
+    ):
+        count = total_count * prob_nmr8r // prob_dnmn8r
 
-            return iter(cache[h, n, k])
+        if fill is not None:
+            outcomes = (
+                (fill,) * (n - k) + outcomes
+                if from_right
+                else outcomes + (fill,) * (n - k)
+            )
 
-        return _wrapped
+        yield (outcomes, count)
 
-    @_memoize
-    def _selected_distributions(h: H, n: int, k: int) -> Iterator[_RollProbT]:
+
+@cache
+def _selected_distros_memoized(
+    h: H,
+    n: int,
+    k: int,
+    from_right: bool,
+) -> tuple[_RollProbT, ...]:
+    def _selected_distros_gen() -> Iterator[_RollProbT]:
         if len(h) <= 1:
             whole = tuple(h) * k
             yield whole, 1, 1
         else:
             this_total = h.total**n
-
-            if from_upper:
-                this_outcome = max(h)
-            else:
-                this_outcome = min(h)
+            this_outcome = max(h) if from_right else min(h)
 
             next_h = type(h)(
                 (outcome, count)
@@ -1155,17 +1162,13 @@ def _rwc_homogeneous_n_h_using_partial_selection(
                     head_count = h.exactly_k_times_in_n(this_outcome, n, i)
                     cumulative_p += Fraction(head_count, this_total)
 
-                    for tail, tail_num, tail_denom in _selected_distributions(
-                        next_h, n - i, k - i
+                    for tail, tail_nmr8r, tail_dnmn8r in _selected_distros_memoized(
+                        next_h, n - i, k - i, from_right
                     ):
-                        if from_upper:
-                            whole = tail + head
-                        else:
-                            whole = head + tail
-
-                        whole_num = head_count * tail_num
-                        whole_denom = this_total * tail_denom
-                        yield whole, whole_num, whole_denom
+                        whole = tail + head if from_right else head + tail
+                        whole_nmr8r = head_count * tail_nmr8r
+                        whole_dnmn8r = this_total * tail_dnmn8r
+                        yield whole, whole_nmr8r, whole_dnmn8r
                 else:
                     # This optimization exploits the fact that the probability of all
                     # rolls comprising [k, n] of outcome is the probability of all rolls
@@ -1174,16 +1177,4 @@ def _rwc_homogeneous_n_h_using_partial_selection(
                     remaining_p = Fraction(1) - cumulative_p
                     yield head, remaining_p.numerator, remaining_p.denominator
 
-    total_count = h.total**n
-
-    for outcomes, num, denom in _selected_distributions(h, n, k):
-        count = total_count * num // denom
-
-        if fill is not None:
-            outcomes = (
-                (fill,) * (n - k) + outcomes
-                if from_upper
-                else outcomes + (fill,) * (n - k)
-            )
-
-        yield (outcomes, count)
+    return tuple(_selected_distros_gen())
