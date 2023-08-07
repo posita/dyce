@@ -838,7 +838,7 @@ Let’s compare that to our roller.
 ```
 </details>
 
-In this particular case, our roller takes over ten times longer than our histogram pool.
+In this particular case, our roller takes approximately ten times longer than our histogram pool.
 It is unsurprising that a simple roller is slower than a simple pool, at least in part because the math is deferred until [``R.roll``][dyce.r.R.roll] time.
 In more sophisticated cases, rollers may be more competitive with (or even surpass) their histogram or pool analogies, especially when initialization time is taken into account.
 

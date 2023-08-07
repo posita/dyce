@@ -18,18 +18,18 @@ All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
-[![Version](https://img.shields.io/pypi/v/dyce/0.6.1.svg)](https://pypi.org/project/dyce/0.6.1/)
-[![Development Stage](https://img.shields.io/pypi/status/dyce/0.6.1.svg)](https://pypi.org/project/dyce/0.6.1/)
-[![License](https://img.shields.io/pypi/l/dyce/0.6.1.svg)](http://opensource.org/licenses/MIT)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.6.1.svg)](https://pypi.org/project/dyce/0.6.1/)
-[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.6.1.svg)](https://pypi.org/project/dyce/0.6.1/)
+[![Version](https://img.shields.io/pypi/v/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
+[![Development Stage](https://img.shields.io/pypi/status/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
+[![License](https://img.shields.io/pypi/l/dyce/0.6.2.svg)](http://opensource.org/licenses/MIT)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
+[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
 Now you’re playing with …
 
-<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.6.1/docs/dyce.svg" alt="dyce logo">
+<img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.6.2/docs/dyce.svg" alt="dyce logo">
 
 # ``dyce`` – simple Python tools for exploring dice outcomes and other finite discrete probabilities
 
@@ -144,8 +144,8 @@ var |    1.97
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source srcset="https://raw.githubusercontent.com/posita/dyce/v0.6.1/docs/assets/plot_2d6_lo_hi_dark.png" media="(prefers-color-scheme: dark)">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.6.1/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only"><span style="display: none"><img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.6.1/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only"></span>
+  <source srcset="https://raw.githubusercontent.com/posita/dyce/v0.6.2/docs/assets/plot_2d6_lo_hi_dark.png" media="(prefers-color-scheme: dark)">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.6.2/docs/assets/plot_2d6_lo_hi_light.png#gh-light-mode-only"><span style="display: none"><img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.6.2/docs/assets/plot_2d6_lo_hi_dark.png#gh-dark-mode-only"></span>
 </picture>
 <!-- The above is a ridiculous work-around for GitHub's braindead, proprietary
 light/dark image rendering dumpster fire. See
@@ -154,7 +154,7 @@ light/dark image rendering dumpster fire. See
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v0.6.1/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
+  Source: <a href="https://github.com/posita/dyce/blob/v0.6.2/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
   Interactive version: <a href="https://posita.github.io/dyce/0.6/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
