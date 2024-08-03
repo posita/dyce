@@ -121,6 +121,7 @@ try:
         A [``NumPyRandomBase``][dyce.rng.NumPyRandomBase] based on
         [``numpy.random.PCG64DXSM``](https://numpy.org/doc/stable/reference/random/bit_generators/pcg64dxsm.html#numpy.random.PCG64DXSM).
         """
+
         bit_generator = PCG64DXSM
 
     DEFAULT_RNG = PCG64DXSMRandom()

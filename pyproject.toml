@@ -11,20 +11,12 @@
 requires = ["setuptools>=45", "versioningit~=2.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.versioningit.next-version]  # ----------------------------------------------------
+[tool.isort]  # ------------------------------------------------------------------------
 
-method = "smallest-release"
-
-[tool.versioningit.vcs]  # -------------------------------------------------------------
-
-default-tag = "0.0.0"
-
-[tool.versioningit.write]  # -----------------------------------------------------------
-
-file = "dyce/_version.py"
-template = '''__vers_str__ = "{version}"
-__version__ = {version_tuple}
-'''
+# See <https://pycqa.github.io/isort/docs/configuration/profiles.html#black>
+profile = "black"
+# See <https://pycqa.github.io/isort/docs/configuration/options.html#skip-gitignore>
+skip_gitignore = true
 
 [tool.mypy]  # -------------------------------------------------------------------------
 
@@ -46,3 +38,18 @@ doctest_optionflags = [
   "NORMALIZE_WHITESPACE",
   "NUMBER",
 ]
+
+[tool.versioningit.next-version]  # ----------------------------------------------------
+
+method = "smallest-release"
+
+[tool.versioningit.vcs]  # -------------------------------------------------------------
+
+default-tag = "0.0.0"
+
+[tool.versioningit.write]  # -----------------------------------------------------------
+
+file = "dyce/_version.py"
+template = '''__vers_str__ = "{version}"
+__version__ = {version_tuple}
+'''

@@ -34,6 +34,7 @@ _OUTCOME_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
     Decimal,
     Fraction,
 )
+_INCONSISTENT_EQUALITY_OUTCOME_TYPES: tuple[Type, ...] = ()
 _COUNT_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
 
 
@@ -54,7 +55,7 @@ try:
 except ImportError:
     pass
 else:
-    _OUTCOME_TYPES += (
+    _INCONSISTENT_EQUALITY_OUTCOME_TYPES += (
         sympy.Integer,
         sympy.Float,
         sympy.Number,
@@ -256,11 +257,31 @@ class TestH:
             assert h.eq(h) == H(
                 (True, False, False, False, True, False, False, False, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
+        for o_type, c_type in itertools.product(
+            _INCONSISTENT_EQUALITY_OUTCOME_TYPES, _COUNT_TYPES
+        ):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.eq(o_type(0)) == H(
+                (False, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.eq(h) == H(
+                (True, False, False, False, True, False, False, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
 
     def test_cmp_ne(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
             assert h.ne(0) == H(
+                (True, False, True)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ne(h) == H(
+                (False, True, True, True, False, True, True, True, False)
+            ), f"o_type: {o_type}; c_type: {c_type}"
+        for o_type, c_type in itertools.product(
+            _INCONSISTENT_EQUALITY_OUTCOME_TYPES, _COUNT_TYPES
+        ):
+            h = H({o_type(i): c_type(1) for i in range(-1, 2)})
+            assert h.ne(o_type(0)) == H(
                 (True, False, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
             assert h.ne(h) == H(

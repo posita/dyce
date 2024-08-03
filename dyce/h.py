@@ -370,6 +370,7 @@ class H(_MappingT):
 
     ```
     """
+
     __slots__: Any = (
         "_h",
         "_hash",
@@ -502,7 +503,7 @@ class H(_MappingT):
 
     @beartype
     def __iter__(self) -> Iterator[RealLike]:
-        return iter(self._h)
+        yield from self._h
 
     @beartype
     def __reversed__(self) -> Iterator[RealLike]:
@@ -804,7 +805,7 @@ class H(_MappingT):
         """
         from dyce import P
 
-        def _dependent_term(**roll_kw):
+        def _dependent_term(**roll_kw) -> HOrOutcomeT:
             outcome_kw: dict[str, RealLike] = {}
 
             for key, roll in roll_kw.items():
@@ -1145,8 +1146,11 @@ class H(_MappingT):
             future versions.
 
         Computes (in constant time) and returns the number of times *outcome* appears
-        exactly *k* times among ``#!python n@self``. This is a more efficient
-        alternative to ``#!python (n@(self.eq(outcome)))[k]``.
+        exactly *k* times among ``#!python n@self``. This computes the binomial
+        coefficient as a more efficient alternative to ``#!python
+        (n@(self.eq(outcome)))[k]``. See [this
+        video](https://www.khanacademy.org/math/ap-statistics/random-variables-ap/binomial-random-variable/v/generalizing-k-scores-in-n-attempts)
+        for a pretty clear explanation.
 
         ``` python
         >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
@@ -1157,29 +1161,69 @@ class H(_MappingT):
         8
 
         ```
+
+        !!! note "Counts, *not* probabilities"
+
+            This computes the *number* of ways to get exactly *k* of *outcome* from *n*
+            like histograms, which may not expressed in the lowest terms. (See the
+            [``lowest_terms`` method][dyce.h.H.lowest_terms].) If we want the
+            *probability* of getting exactly *k* of *outcome* from *n* like histograms,
+            we can divide by ``#!python h.total ** n``. (See the
+            [``total`` property][dyce.h.H.total].)
+
+            ``` python
+            >>> from fractions import Fraction
+            >>> h = H((2, 3, 3, 4, 4, 5))
+            >>> n, k = 3, 2
+            >>> (n @ h).total == h.total ** n
+            True
+            >>> Fraction(
+            ...   h.exactly_k_times_in_n(outcome=3, n=n, k=k),
+            ...   h.total ** n,
+            ... )
+            Fraction(2, 9)
+            >>> h_not_lowest_terms = h.accumulate(h)
+            >>> h == h_not_lowest_terms
+            True
+            >>> h_not_lowest_terms
+            H({2: 2, 3: 4, 4: 4, 5: 2})
+            >>> h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k)
+            384
+            >>> Fraction(
+            ...   h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k),
+            ...   h_not_lowest_terms.total ** n,
+            ... )
+            Fraction(2, 9)
+
+            ```
         """
         n = as_int(n)
         k = as_int(k)
         assert k <= n
         c_outcome = self.get(outcome, 0)
 
-        return comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)
+        return (
+            # number of ways to choose k things from n things (k <= n)
+            comb(n, k)
+            # cumulative counts for the particular outcomes we want
+            * c_outcome**k
+            # cumulative counts for all other outcomes
+            * (self.total - c_outcome) ** (n - k)
+        )
 
     @overload
     def explode(
         self,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def explode(
         self,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def explode(
@@ -1187,16 +1231,14 @@ class H(_MappingT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def explode(
         self,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @deprecated
     @beartype
@@ -1275,8 +1317,9 @@ class H(_MappingT):
             This method should be considered experimental and may change or disappear in
             future versions.
 
-        Computes the probability distribution for each outcome appearing in at *pos* for
-        *n* histograms. *pos* is a zero-based index.
+        Computes the probability distribution for each outcome appearing in at *pos* in
+        rolls of *n* histograms where rolls are ordered least-to-greatest. *pos* is a
+        zero-based index.
 
         ``` python
         >>> d6avg = H((2, 3, 3, 4, 4, 5))
@@ -1341,8 +1384,7 @@ class H(_MappingT):
         self,
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1352,8 +1394,7 @@ class H(_MappingT):
         *,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1362,8 +1403,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1373,8 +1413,7 @@ class H(_MappingT):
         *,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1383,8 +1422,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1394,8 +1432,7 @@ class H(_MappingT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @overload
     def substitute(
@@ -1404,8 +1441,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> "H":
-        ...
+    ) -> "H": ...
 
     @deprecated
     @beartype
@@ -1543,15 +1579,13 @@ class H(_MappingT):
     @overload
     def distribution(
         self,
-    ) -> Iterator[tuple[RealLike, Fraction]]:
-        ...
+    ) -> Iterator[tuple[RealLike, Fraction]]: ...
 
     @overload
     def distribution(
         self,
         rational_t: Callable[[int, int], _T],
-    ) -> Iterator[tuple[RealLike, _T]]:
-        ...
+    ) -> Iterator[tuple[RealLike, _T]]: ...
 
     @experimental
     @beartype
@@ -1661,7 +1695,7 @@ class H(_MappingT):
         ```
         """
         # TODO(posita): See <https://github.com/python/typing/issues/193>
-        return tuple(  # type: ignore [return-value]
+        return tuple(
             zip(
                 *(
                     (outcome, float(probability))
@@ -1899,6 +1933,7 @@ class HableT(Protocol, metaclass=CachingProtocolMeta):
         World Book Online (WBO) style [pronunciation
         respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
+
     __slots__: Any = ()
 
     @abstractmethod
@@ -1919,6 +1954,7 @@ class HableOpsMixin(HableT):
 
         See [``HableT``][dyce.h.HableT] for notes on pronunciation.
     """
+
     __slots__: Any = ()
 
     def __init__(self):
@@ -2185,16 +2221,14 @@ class HableOpsMixin(HableT):
         self: HableT,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def explode(
         self: HableT,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def explode(
@@ -2202,16 +2236,14 @@ class HableOpsMixin(HableT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def explode(
         self: HableT,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @beartype
     def explode(
@@ -2240,8 +2272,7 @@ class HableOpsMixin(HableT):
         *,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def substitute(
@@ -2250,8 +2281,7 @@ class HableOpsMixin(HableT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: IntegralLike,
         precision_limit: None = None,
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def substitute(
@@ -2261,8 +2291,7 @@ class HableOpsMixin(HableT):
         *,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def substitute(
@@ -2271,8 +2300,7 @@ class HableOpsMixin(HableT):
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: None,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def substitute(
@@ -2282,8 +2310,7 @@ class HableOpsMixin(HableT):
         max_depth: None = None,
         *,
         precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @overload
     def substitute(
@@ -2292,8 +2319,7 @@ class HableOpsMixin(HableT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: None = None,
         precision_limit: None = None,
-    ) -> H:
-        ...
+    ) -> H: ...
 
     @deprecated
     @beartype

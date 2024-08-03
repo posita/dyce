@@ -89,8 +89,7 @@ class _ForEachEvaluatorT(Protocol, metaclass=CachingProtocolMeta):
         *args: _POrPWithSelectionOrSourceT,
         limit: Optional[LimitT] = None,
         **kw: _POrPWithSelectionOrSourceT,
-    ) -> H:
-        ...
+    ) -> H: ...
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -109,8 +108,7 @@ _expandable_ctxt: ContextVar[_Context] = ContextVar("DYCE_EXPANDABLE_CONTEXT")
 def expandable(
     *,
     sentinel: H = _DEFAULT_SENTINEL,
-) -> Callable[[_DependentTermT], _ForEachEvaluatorT]:
-    ...
+) -> Callable[[_DependentTermT], _ForEachEvaluatorT]: ...
 
 
 @overload
@@ -118,8 +116,7 @@ def expandable(
     f: _DependentTermT,
     *,
     sentinel: H = _DEFAULT_SENTINEL,
-) -> _ForEachEvaluatorT:
-    ...
+) -> _ForEachEvaluatorT: ...
 
 
 @experimental

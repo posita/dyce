@@ -10,7 +10,7 @@ from collections import Counter
 from fractions import Fraction
 from functools import cache
 from itertools import chain, groupby, product, repeat
-from math import prod
+from math import inf, prod
 from operator import __eq__, __index__, __ne__
 from typing import (
     Any,
@@ -187,6 +187,7 @@ class P(Sequence[H], HableOpsMixin):
 
     ```
     """
+
     __slots__: Any = (
         "_hs",
         "_total",
@@ -286,12 +287,10 @@ class P(Sequence[H], HableOpsMixin):
         return len(self._hs)
 
     @overload
-    def __getitem__(self, key: SupportsIndex) -> H:
-        ...
+    def __getitem__(self, key: SupportsIndex) -> H: ...
 
     @overload
-    def __getitem__(self, key: slice) -> "P":
-        ...
+    def __getitem__(self, key: slice) -> "P": ...
 
     @beartype
     def __getitem__(self, key: _GetItemT) -> Union[H, "P"]:
@@ -302,7 +301,7 @@ class P(Sequence[H], HableOpsMixin):
 
     @beartype
     def __iter__(self) -> Iterator[H]:
-        return iter(self._hs)
+        yield from self._hs
 
     @beartype
     def __matmul__(self, other: SupportsInt) -> "P":
@@ -828,12 +827,10 @@ class P(Sequence[H], HableOpsMixin):
             homogeneous pool benefits from [Ilmari Karonen’s
             optimization](https://rpg.stackexchange.com/a/166663/71245), which appears
             to scale geometrically with $k$ times some factor of $n$ (e.g., $\log n$,
-            but I haven’t bothered to figure that out yet), such that—in observed
-            testing, at least—it is generally the fastest approach for $k < n$.
-
-            Where $k = n$, we leverage the [*multinomial
-            coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets),
-            which appears to scale generally with $n$.
+            but I haven’t bothered to figure that out yet), such that—at least in
+            observed testing—it is generally the fastest approach, especially for $k <
+            n$. Where $k = n$, this is equivalent to leveraging the [*multinomial
+            coefficient*](https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets).
 
             $$
             {{n} \choose {{{k}_{1}},{{k}_{2}},\ldots,{{k}_{m}}}}
@@ -849,8 +846,8 @@ class P(Sequence[H], HableOpsMixin):
             m), (m, m, …, m))``
 
             To determine the count for a particular roll ``#!python (a, b, …, n)``, we
-            compute the multinomial coefficient for that roll and multiply by the scalar
-            ``#!python H(m)[a] * H(m)[b] * … * H(m)[n]``. (See
+            compute the equivalent of the multinomial coefficient for that roll and
+            multiply by the scalar ``#!python H(m)[a] * H(m)[b] * … * H(m)[n]``. (See
             [this](https://www.lucamoroni.it/the-dice-roll-sum-problem/) for an in-depth
             exploration of the topic.)
 
@@ -1054,11 +1051,11 @@ def _rwc_heterogeneous_h_groups(
 
             if k is not None:
                 if k < 0:
-                    sorted_outcomes = (None,) * (
+                    sorted_outcomes = (-inf,) * (
                         total_n - len(sorted_outcomes)
                     ) + sorted_outcomes
                 else:
-                    sorted_outcomes = sorted_outcomes + (None,) * (
+                    sorted_outcomes = sorted_outcomes + (inf,) * (
                         total_n - len(sorted_outcomes)
                     )
 
@@ -1114,23 +1111,23 @@ def _rwc_homogeneous_n_h_using_partial_selection(
 
     if k == 0 or k > n:
         # Maintain consistency with comb(n, k) == 0 where k > n
-        return iter(())
+        yield from ()
+    else:
+        total_count = h.total**n
 
-    total_count = h.total**n
+        for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
+            h, n, k, from_right
+        ):
+            count = total_count * prob_nmr8r // prob_dnmn8r
 
-    for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
-        h, n, k, from_right
-    ):
-        count = total_count * prob_nmr8r // prob_dnmn8r
+            if fill is not None:
+                outcomes = (
+                    (fill,) * (n - k) + outcomes
+                    if from_right
+                    else outcomes + (fill,) * (n - k)
+                )
 
-        if fill is not None:
-            outcomes = (
-                (fill,) * (n - k) + outcomes
-                if from_right
-                else outcomes + (fill,) * (n - k)
-            )
-
-        yield (outcomes, count)
+            yield (outcomes, count)
 
 
 @cache
