@@ -1037,7 +1037,11 @@ class R:
                 bin_op, ValueRoller(left_operand), self, annotation=annotation
             )
         elif isinstance(left_operand, RollOutcome):
-            return BinarySumOpRoller(bin_op, left_operand, self, annotation=annotation)
+            assert left_operand.value is not None
+
+            return BinarySumOpRoller(
+                bin_op, ValueRoller(left_operand.value), self, annotation=annotation
+            )
         else:
             raise NotImplementedError
 

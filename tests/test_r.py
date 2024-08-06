@@ -88,25 +88,19 @@ class TestRepeatRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_3 = r_42 @ 3
-        assert (
-            repr(r_42_3)
-            == """RepeatRoller(
+        assert repr(r_42_3) == """RepeatRoller(
   n=3,
   source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
-        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_2 = 2 @ r_d6
-        assert (
-            repr(r_d6_2)
-            == """RepeatRoller(
+        assert repr(r_d6_2) == """RepeatRoller(
   n=2,
   source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
-        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -132,27 +126,21 @@ class TestBinarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_squared = r_42 * r_42
-        assert (
-            repr(r_42_squared)
-            == """BinarySumOpRoller(
+        assert repr(r_42_squared) == """BinarySumOpRoller(
   bin_op=<built-in function mul>,
   left_source=ValueRoller(value=42, annotation=''),
   right_source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
-        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_2 = r_d6 + r_d6
-        assert (
-            repr(r_d6_2)
-            == """BinarySumOpRoller(
+        assert repr(r_d6_2) == """BinarySumOpRoller(
   bin_op=<built-in function add>,
   left_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   right_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
-        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -464,25 +452,19 @@ class TestUnarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_neg = -r_42
-        assert (
-            repr(r_42_neg)
-            == """UnarySumOpRoller(
+        assert repr(r_42_neg) == """UnarySumOpRoller(
   un_op=<built-in function neg>,
   source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
-        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_neg = -r_d6
-        assert (
-            repr(r_d6_neg)
-            == """UnarySumOpRoller(
+        assert repr(r_d6_neg) == """UnarySumOpRoller(
   un_op=<built-in function neg>,
   source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
-        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -580,9 +562,7 @@ class TestUnarySumOpRoller:
 class TestPoolRoller:
     def test_repr(self) -> None:
         r_4_6_8 = R.from_values(4, 6, 8)
-        assert (
-            repr(r_4_6_8)
-            == """PoolRoller(
+        assert repr(r_4_6_8) == """PoolRoller(
   sources=(
     ValueRoller(value=4, annotation=''),
     ValueRoller(value=6, annotation=''),
@@ -590,12 +570,9 @@ class TestPoolRoller:
   ),
   annotation='',
 )"""
-        )
 
         r_d4_d6_d8 = R.from_values(H(4), H(6), H(8), annotation="d4d6d8")
-        assert (
-            repr(r_d4_d6_d8)
-            == """PoolRoller(
+        assert repr(r_d4_d6_d8) == """PoolRoller(
   sources=(
     ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1}), annotation=''),
     ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
@@ -603,7 +580,6 @@ class TestPoolRoller:
   ),
   annotation='d4d6d8',
 )"""
-        )
 
     def test_op_eq(self) -> None:
         r_4_6_8 = R.from_values(4, 6, 8)
@@ -648,13 +624,10 @@ class TestFilterRoller:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_filter = r_squares.filter(evens_filter)
         pattern = (
-            re.escape(
-                """FilterRoller(
-  predicate=<function TestFilterRoller.test_repr.<locals>.evens_filter at """
-            )
+            re.escape("""FilterRoller(
+  predicate=<function TestFilterRoller.test_repr.<locals>.evens_filter at """)
             + r"(?:0x)?([0-9A-Fa-f]+)"
-            + re.escape(
-                """>,
+            + re.escape(""">,
   sources=(
     PoolRoller(
       sources=(
@@ -669,8 +642,7 @@ class TestFilterRoller:
     ),
   ),
   annotation='',
-)"""
-            )
+)""")
         )
         assert re.search(
             pattern,
@@ -708,9 +680,7 @@ class TestSelectionRoller:
     def test_repr(self) -> None:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1)
-        assert (
-            repr(r_squares_select)
-            == """SelectionRoller(
+        assert repr(r_squares_select) == """SelectionRoller(
   which=(0, -1),
   sources=(
     PoolRoller(
@@ -727,7 +697,6 @@ class TestSelectionRoller:
   ),
   annotation='',
 )"""
-        )
 
     def test_op_eq(self) -> None:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
@@ -758,13 +727,10 @@ class TestSubstitutionRoller:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_double_odd_squares = SubstitutionRoller(odd_doubler, r_squares)
         pattern = (
-            re.escape(
-                """SubstitutionRoller(
-  expansion_op=<function TestSubstitutionRoller.test_repr.<locals>.odd_doubler at """
-            )
+            re.escape("""SubstitutionRoller(
+  expansion_op=<function TestSubstitutionRoller.test_repr.<locals>.odd_doubler at """)
             + r"(?:0x)?([0-9A-Fa-f]+)"
-            + re.escape(
-                """>,
+            + re.escape(""">,
   source=PoolRoller(
     sources=(
       ValueRoller(value=36, annotation=''),
@@ -779,8 +745,7 @@ class TestSubstitutionRoller:
   coalesce_mode=<CoalesceMode.REPLACE: 1>,
   max_depth=1,
   annotation='',
-)"""
-            )
+)""")
         )
         assert re.search(
             pattern,
@@ -817,9 +782,7 @@ class TestRoll:
         r_42 = R.from_value(42)
         r_42_neg = -r_42
         r_42_neg_roll = r_42_neg.roll()
-        assert (
-            repr(r_42_neg_roll)
-            == """Roll(
+        assert repr(r_42_neg_roll) == """Roll(
   r=UnarySumOpRoller(
     un_op=<built-in function neg>,
     source=ValueRoller(value=42, annotation=''),
@@ -849,7 +812,6 @@ class TestRoll:
     ),
   ),
 )"""
-        )
 
     def test_getitem(self) -> None:
         r_123 = R.from_values(1, 2, 3)
@@ -906,7 +868,7 @@ class TestRoll:
             assert r_d6_mul2_neg_add4_ro.value is not None
             assert r_d6_mul2_neg_add4_ro.value in d6_mul2_neg_add4
 
-            (r_d6_mul2_neg_roll, _) = r_d6_mul2_neg_add4_roll.source_rolls
+            r_d6_mul2_neg_roll, _ = r_d6_mul2_neg_add4_roll.source_rolls
             (r_d6_mul2_neg_ro,) = r_d6_mul2_neg_roll
             assert r_d6_mul2_neg_ro.value is not None
             assert r_d6_mul2_neg_ro.value in d6_mul2_neg
@@ -916,7 +878,7 @@ class TestRoll:
             assert r_d6_mul2_ro.value is not None
             assert r_d6_mul2_ro.value in d6_mul2
 
-            (r_d6_roll, _) = r_d6_mul2_roll.source_rolls
+            r_d6_roll, _ = r_d6_mul2_roll.source_rolls
             (r_d6_ro,) = r_d6_roll
             assert r_d6_ro.value is not None
             assert r_d6_ro.value in d6
@@ -924,13 +886,13 @@ class TestRoll:
         for r_d6_mul2_neg_add4_3_ro in r_d6_mul2_neg_add4_3_roll:
             assert r_d6_mul2_neg_add4_3_ro.r == r_d6_mul2_neg_add4
 
-            (r_d6_mul2_neg_ro, _) = r_d6_mul2_neg_add4_3_ro.sources
+            r_d6_mul2_neg_ro, _ = r_d6_mul2_neg_add4_3_ro.sources
             assert r_d6_mul2_neg_ro.r == r_d6_mul2_neg
 
             (r_d6_mul2_ro,) = r_d6_mul2_neg_ro.sources
             assert r_d6_mul2_ro.r == r_d6_mul2
 
-            (_, r_d6_ro) = r_d6_mul2_ro.sources
+            _, r_d6_ro = r_d6_mul2_ro.sources
             assert r_d6_ro.r == r_d6
 
 

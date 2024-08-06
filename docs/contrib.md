@@ -24,7 +24,7 @@ You can [file new issues](https://github.com/posita/dyce/issues) as you find the
 Please try to avoid duplicating issues.
 [“Writing Effective Bug Reports” by Elisabeth Hendrickson](http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf) (PDF) may be helpful.
 
-For more free-flow discussions (beefs, rants, ideas, recipes, etc.), consider starting or joining a [discussion](https://github.com/posita/numerary/discussions).
+For more free-flow discussions (beefs, rants, ideas, recipes, etc.), consider starting or joining a [discussion](https://github.com/beartype/numerary/discussions).
 
 <!--
 ## Posting on StackExchange

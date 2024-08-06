@@ -24,7 +24,7 @@ If that file is missing or appears to be modified from its original, then please
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
 [![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
+[![``numerary``-encumbered](https://raw.githubusercontent.com/beartype/numerary/latest/docs/numerary-encumbered.svg)](https://beartype.github.io/numerary/)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
 Now you’re playing with …
@@ -110,7 +110,7 @@ By providing an optional argument to the [``P.h`` method](https://posita.github.
 ``` python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
->>> print(p_2d6.h(0).format())
+>>> print(p_2d6.h(0).format(width=65))
 avg |    2.53
 std |    1.40
 var |    1.97
@@ -126,7 +126,7 @@ var |    1.97
 ``` python
 >>> p_2d6.h(-1)  # take the highest die of 2d6
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
->>> print(p_2d6.h(-1).format())
+>>> print(p_2d6.h(-1).format(width=65))
 avg |    4.47
 std |    1.40
 var |    1.97
@@ -292,13 +292,13 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 
 ``dyce`` requires a relatively modern version of Python:
 
-* [CPython](https://www.python.org/) (3.9+)
-* [PyPy](http://pypy.org/) (CPython 3.9+ compatible)
+* [CPython](https://www.python.org/) (3.10+)
+* [PyPy](http://pypy.org/) (CPython 3.10+ compatible)
 
 It has the following runtime dependencies:
 
 * [``numerary``](https://pypi.org/project/numerary/) for ~~proper~~ *best-effort hacking around deficiencies in* static and runtime numeric type-checking
-  [![``numerary``-encumbered](https://raw.githubusercontent.com/posita/numerary/latest/docs/numerary-encumbered.svg)](https://posita.github.io/numerary/)
+  [![``numerary``-encumbered](https://raw.githubusercontent.com/beartype/numerary/latest/docs/numerary-encumbered.svg)](https://beartype.github.io/numerary/)
 
 * [``beartype``](https://pypi.org/project/beartype/) for yummy runtime type-checking goodness (a dependency of ``numerary``)
   [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
@@ -307,7 +307,7 @@ It has the following runtime dependencies:
 
 * [``numpy``](https://numpy.org/) to supply ``dyce`` with an alternate random number generator implementation
 
-If you use ``beartype`` for type checking your code, but don’t want ``dyce`` or ``numerary`` to use it internally, disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://posita.github.io/numerary/latest/#requirements).
+If you use ``beartype`` for type checking your code, but don’t want ``dyce`` or ``numerary`` to use it internally, disable it with [``numerary``’s ``NUMERARY_BEARTYPE`` environment variable](https://beartype.github.io/numerary/latest/#requirements).
 
 See the [hacking quick-start](https://posita.github.io/dyce/0.6/contrib/#hacking-quick-start) for additional development and testing dependencies.
 

@@ -16,10 +16,8 @@ from typing import (
     Callable,
     Iterable,
     Iterator,
-    List,
     NamedTuple,
     Optional,
-    Tuple,
     Type,
     TypeVar,
     Union,
@@ -73,8 +71,8 @@ _ReturnsHOrOutcomeT = Callable[..., HOrOutcomeT]
 _DependentTermT = TypeVar("_DependentTermT", bound=_ReturnsHOrOutcomeT)
 _POrPWithSelectionOrSourceT = Union[P, PWithSelection, _SourceT]
 _PredicateT = Callable[[HResult], bool]
-_HResultCountT = Tuple[HResult, int]
-_PResultCountT = Tuple[PResult, int]
+_HResultCountT = tuple[HResult, int]
+_PResultCountT = tuple[PResult, int]
 
 
 class _Context(NamedTuple):
@@ -547,7 +545,7 @@ def expandable(
     ...   return _expand(d6, limit=limit)
 
     >>> h = alternating_d6_d4_mechanic(limit=Fraction(1, 5_000))
-    >>> print(h.format(scaled=True))
+    >>> print(h.format(width=65, scaled=True))
     avg |    3.04
     std |    1.37
     var |    1.87
@@ -584,7 +582,7 @@ def expandable(
     ...   return _expand(H(20))
 
     >>> h = expected_dmg_from_attack_roll(dmg_h=H(8), dmg_bonus=+1, target=14)
-    >>> print(h.format(scaled=True))
+    >>> print(h.format(width=65, scaled=True))
     avg |    2.15
     std |    3.40
     var |   11.55
@@ -650,14 +648,14 @@ def expandable(
                 # Mixing these requires dictionaries' orders to be durable across state
                 # mutations. We're relying on args and kw to remain constant and
                 # ordered.
-                objs: Tuple[Union[H, P, PWithSelection], ...] = tuple(
+                objs: tuple[Union[H, P, PWithSelection], ...] = tuple(
                     _source_to_h_or_p_or_p_with_selection(arg)
                     for arg in chain(args, kw.values())
                 )
 
                 total = sum(obj.total for obj in objs)
 
-                def _expand_if_we_can_can_can() -> Iterator[Tuple[HOrOutcomeT, int]]:
+                def _expand_if_we_can_can_can() -> Iterator[tuple[HOrOutcomeT, int]]:
                     for result_counts in product(
                         *(
                             _h_or_p_or_p_with_selection_to_result_iterable(obj)
@@ -717,7 +715,7 @@ def expandable(
 
 @beartype
 def aggregate_weighted(
-    weighted_sources: Iterable[Tuple[HOrOutcomeT, int]],
+    weighted_sources: Iterable[tuple[HOrOutcomeT, int]],
     h_type: Type[H] = H,
 ) -> H:
     r"""
@@ -757,7 +755,7 @@ def aggregate_weighted(
         ```
     """
     aggregate_scalar = 1
-    outcome_counts: List[_OutcomeCountT] = []
+    outcome_counts: list[_OutcomeCountT] = []
 
     for outcome_or_h, count in weighted_sources:
         if isinstance(outcome_or_h, H):
@@ -948,7 +946,7 @@ def explode(
 
 @beartype
 def _h_or_p_or_p_with_selection_to_result_iterable(
-    source: Union[H, P, PWithSelection]
+    source: Union[H, P, PWithSelection],
 ) -> Union[Iterable[_HResultCountT], Iterable[_PResultCountT]]:
     if isinstance(source, H):
         return (

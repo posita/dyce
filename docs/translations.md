@@ -670,7 +670,7 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 ...   return (h_result.outcome + 1) // 2  # equivalent to h_result.outcome // 2 + h_result.outcome % 2
 
 >>> d_evens_up = foreach(decode_hits, h_result=d_evens_up_exploded)
->>> print(d_evens_up.format())
+>>> print(d_evens_up.format(width=65))
 avg |    0.60
 std |    0.69
 var |    0.48
@@ -1159,7 +1159,7 @@ Rudimentary visualization using built-in methods:
 >>> from dyce import P
 >>> from dyce.evaluation import foreach
 >>> res = foreach(brawl, p_result_a=3@P(6), p_result_b=3@P(6))
->>> print(res.format())
+>>> print(res.format(width=65))
 avg |    0.00
 std |    1.73
 var |    2.99
@@ -1219,7 +1219,7 @@ Rudimentary visualization using built-in methods:
 
 ``` python
 >>> res = foreach(brawl_w_optional_swap, p_result_a=3@P(6), p_result_b=3@P(6))
->>> print(res.format())
+>>> print(res.format(width=65))
 avg |    2.36
 std |    0.88
 var |    0.77
@@ -1230,7 +1230,7 @@ var |    0.77
   3 |  58.15% |#############################
 
 >>> res = foreach(brawl_w_optional_swap, p_result_a=4@P(6), p_result_b=4@P(6))
->>> print(res.format())
+>>> print(res.format(width=65))
 avg |    2.64
 std |    1.28
 var |    1.64

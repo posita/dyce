@@ -15,6 +15,13 @@
 
 # ``dyce`` release notes
 
+## [0.6.3](https://github.com/posita/dyce/releases/tag/v0.6.3)
+
+* Stablized Jupyter Lite installation
+* Adjusted typing slightly
+* Defaulted to collapsed installation cells
+* Acknowledged removal of PyPy support ([beartype/beartype#324](https://github.com/beartype/beartype/issues/324))
+
 ## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
 
 * Adds the [``H.draw``][dyce.h.H.draw] convenience method for treating a histogram as a deck rather than a die.
@@ -86,7 +93,7 @@
 
 ## [0.4.1](https://github.com/posita/dyce/releases/tag/v0.4.1)
 
-* Splits out protocol checking into its own fancy library: [``numerary``](https://github.com/posita/numerary/)!
+* Splits out protocol checking into its own fancy library: [``numerary``](https://github.com/beartype/numerary/)!
 * Is now [available on PyPI as ``dyce``_](https://pypi.org/project/dyce/), thanks to the generosity of [David Eyk](https://eykd.net/about/)!
 * Introduces experimental generic [``walk``][dyce.r.walk] function and supporting visitor data structures.
 * Uses ``#!python pygraphviz`` to automate class diagram generation.
@@ -151,7 +158,7 @@
 ### Other changes
 
 * Documentation overhaul including augmented examples and reorganized images and JavaScript.
-* Fixes ``#!python H({}).format()`` bug.
+* Fixes ``#!python H({}).format(width=65)`` bug.
 * Adds [``beartype``](https://github.com/beartype/beartype) runtime type checking.
 * *Maintains* support for Python 3.7 (for now).
 

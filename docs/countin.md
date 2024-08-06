@@ -119,7 +119,7 @@ The results show there is one way to make ``#!python 18``, two ways to make ``#!
 Histograms provide rudimentary formatting for convenience.
 
 ``` python
->>> print((2@H(6)).format())
+>>> print((2@H(6)).format(width=65))
 avg |    7.00
 std |    2.42
 var |    5.83
@@ -145,7 +145,7 @@ The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative
 >>> miwin_v = H((2, 3, 4, 6, 7, 8))
 >>> miwin_dist = miwin_iii + miwin_iv + miwin_v ; miwin_dist
 H({4: 1, 5: 2, 6: 3, 7: 4, 8: 7, ..., 22: 7, 23: 4, 24: 3, 25: 2, 26: 1})
->>> print((miwin_dist).format(scaled=True))
+>>> print((miwin_dist).format(width=65, scaled=True))
 avg |   15.00
 std |    4.47
 var |   20.00
@@ -228,7 +228,7 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
 >>> p_3d6 = 3@P(6)
 >>> p_3d6.h(0)
 H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
->>> print(p_3d6.h(0).format())
+>>> print(p_3d6.h(0).format(width=65))
 avg |    2.04
 std |    1.14
 var |    1.31
@@ -244,7 +244,7 @@ var |    1.31
 ``` python
 >>> p_3d6.h(1)
 H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
->>> print(p_3d6.h(1).format())
+>>> print(p_3d6.h(1).format(width=65))
 avg |    3.50
 std |    1.37
 var |    1.88
@@ -260,7 +260,7 @@ var |    1.88
 ``` python
 >>> p_3d6.h(2)
 H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
->>> print(p_3d6.h(-1).format())
+>>> print(p_3d6.h(-1).format(width=65))
 avg |    4.96
 std |    1.14
 var |    1.31
@@ -279,7 +279,7 @@ Summing the greatest and the least faces when rolling a typical six-die polygona
 >>> d10 = H(10)-1 ; d10  # a common “d10” with faces [0 .. 9]
 H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
 >>> h = P(4, 6, 8, d10, 12, 20).h(0, -1)
->>> print(h.format(scaled=True))
+>>> print(h.format(width=65, scaled=True))
 avg |   13.48
 std |    4.40
 var |   19.39
@@ -399,7 +399,7 @@ To illustrate, say we want to roll a d6 and compare whether the result is strict
 >>> def outcome_strictly_greater_than_constant(h_result: HResult):
 ...   return h_result.outcome > abs(h_result.outcome - constant)  # dependent term
 
->>> print(foreach(outcome_strictly_greater_than_constant, h_result=d6).format())
+>>> print(foreach(outcome_strictly_greater_than_constant, h_result=d6).format(width=65))
 avg |    0.67
 std |    0.47
 var |    0.22
@@ -420,7 +420,7 @@ We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than t
 ...   return second.outcome > abs(first.outcome - second.outcome)  # dependent term
 
 >>> h = foreach(second_is_strictly_greater_than_first, first=d4, second=d6)
->>> print(h.format())
+>>> print(h.format(width=65))
 avg |    0.83
 std |    0.37
 var |    0.14
@@ -473,7 +473,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.
 H({<DupeVs.SECOND_WINS: -1>: 12,
  <DupeVs.TIE: 0>: 19,
  <DupeVs.FIRST_WINS: 1>: 5})
->>> print(h.format())
+>>> print(h.format(width=65))
 avg |   -0.19
 std |    0.66
 var |    0.43
