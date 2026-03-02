@@ -14,25 +14,34 @@ jobs:
     strategy:
       matrix:
         python-version: [
-          "3.10", "3.11", "3.12", "3.13", "3.14",
-          "pypy-3.10", "pypy-3.11"
+          "3.10",
+          "3.11",
+          "3.12",
+          "3.13", "3.13t",
+          "3.14", "3.14t",
+          "pypy-3.10",
+          "pypy-3.11"
         ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
       with:
         # See <https://github.com/actions/checkout/issues/249>
         fetch-depth: 0
     - name: set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-    - name: test ${{ matrix.python-version }} with Tox
+    - name: install prerequisites
       run: |
         sudo apt-get install \
           libjpeg-dev
-        python -m pip install --upgrade 'pip>=23,!=23.1.2,!=23.2'
-        python -m pip install 'tox-gh-actions~=2.12.0'
+        python -m pip install --upgrade pip
+        python -m pip install \
+          tox \
+          tox-gh-actions
         git submodule update --init --recursive
+    - name: test ${{ matrix.python-version }} with Tox
+      run: |
         tox --verbose
 
   deploy:
@@ -47,10 +56,10 @@ jobs:
       group: ${{ github.ref }}
       cancel-in-progress: true
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v6
       with:
         python-version: ">=3.10"
     - name: build and check dist and docs
@@ -59,10 +68,10 @@ jobs:
           graphviz \
           libgraphviz-dev \
           libjpeg-dev
-        python -m pip install --upgrade 'pip>=23,!=23.1.2,!=23.2'
+        python -m pip install --upgrade pip
         python -m pip install \
           tox \
-          'versioningit~=2.0'
+          versioningit
         . ./helpers/ci-vars.sh  # defines PKG, TAG, VERS, etc.
         if [ ${{ github.ref_name }} = "${TAG}" ] ; then
           ./helpers/propagate-version.sh
