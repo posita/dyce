@@ -61,7 +61,8 @@ markdown_extensions:
 
 plugins:
   - exclude:
-      # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>
+      # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>, but
+      # mkdocs-exclude is no longer maintained
       # gitignore: true
       glob:
         - "*.py"

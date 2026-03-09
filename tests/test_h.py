@@ -13,7 +13,6 @@ import os
 import statistics
 from decimal import Decimal
 from fractions import Fraction
-from typing import Type, Union
 
 import pytest
 from numerary import RealLike
@@ -28,14 +27,14 @@ __all__ = ()
 # ---- Data ----------------------------------------------------------------------------
 
 
-_INTEGRAL_OUTCOME_TYPES: tuple[Type, ...] = (int,)
-_OUTCOME_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES + (
+_INTEGRAL_OUTCOME_TYPES: tuple[type, ...] = (int,)
+_OUTCOME_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES + (
     float,
     Decimal,
     Fraction,
 )
-_INCONSISTENT_EQUALITY_OUTCOME_TYPES: tuple[Type, ...] = ()
-_COUNT_TYPES: tuple[Type, ...] = _INTEGRAL_OUTCOME_TYPES
+_INCONSISTENT_EQUALITY_OUTCOME_TYPES: tuple[type, ...] = ()
+_COUNT_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES
 
 
 try:
@@ -448,7 +447,7 @@ class TestH:
             assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(2))
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(h: H, outcome: RealLike) -> Union[H, RealLike]:
+        def double_odd_values(h: H, outcome: RealLike) -> H | RealLike:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -460,7 +459,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(d: H, outcome: RealLike) -> Union[H, RealLike]:
+        def never_expand(d: H, outcome: RealLike) -> H | RealLike:
             return outcome
 
         d20 = H(20)
@@ -468,7 +467,7 @@ class TestH:
         assert d20.substitute(never_expand, operator.__add__, 20) == d20
 
     def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, outcome: RealLike) -> Union[H, RealLike]:
+        def reroll_d4_threes(h: H, outcome: RealLike) -> H | RealLike:
             return h if max(h) == 4 and outcome == 3 else outcome
 
         h = H(4)
@@ -564,6 +563,7 @@ class TestH:
                 stat_variance,
             ), f"o_type: {o_type}; c_type: {c_type}"
 
+    @pytest.mark.slow
     def test_variance_overflow(self) -> None:
         assert math.isclose(explode(H(6), limit=800).variance(), 10.64)
         assert math.isclose(explode(H(20), limit=400).variance(), 52.16066481994455)

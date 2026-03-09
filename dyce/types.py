@@ -7,8 +7,9 @@
 # ======================================================================================
 
 import re
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from operator import __getitem__, __index__
-from typing import Any, Callable, Iterable, Iterator, Sequence, TypeVar, Union
+from typing import TypeVar
 
 from numerary.bt import beartype
 from numerary.types import SupportsIndex, SupportsInt
@@ -27,7 +28,7 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _UnaryOperatorT = Callable[[_T_co], _T_co]
 _BinaryOperatorT = Callable[[_T_co, _T_co], _T_co]
-_GetItemT = Union[SupportsIndex, slice]
+_GetItemT = SupportsIndex | slice
 
 
 # ---- Functions -----------------------------------------------------------------------
@@ -67,7 +68,7 @@ def is_odd(outcome: SupportsInt) -> bool:
 
 
 @beartype
-def natural_key(val: Any) -> tuple[Union[int, str], ...]:
+def natural_key(val: object) -> tuple[int | str, ...]:
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
 
 

@@ -6,8 +6,6 @@
 # software in any capacity.
 # ======================================================================================
 
-from typing import Union
-
 from .evaluation import *  # noqa: F401,F403
 from .h import *  # noqa: F401,F403
 from .p import *  # noqa: F401,F403
@@ -16,12 +14,12 @@ from .types import *  # noqa: F401,F403
 
 __all__ = ()
 
-_VersionT = Union[
-    tuple[int, int, int],
-    tuple[int, int, int, str],
-    tuple[int, int, int, str, str],
-    tuple[int, int, int, str, str, str],
-]
+_VersionT = (
+    tuple[int, int, int]
+    | tuple[int, int, int, str]
+    | tuple[int, int, int, str, str]
+    | tuple[int, int, int, str, str, str]
+)
 
 __version__: _VersionT
 __vers_str__: str

@@ -7,8 +7,9 @@
 # ======================================================================================
 
 import warnings
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Type, TypeVar, cast
+from typing import TypeVar, cast
 
 __all__ = ()
 
@@ -23,7 +24,7 @@ _WrappedT = TypeVar("_WrappedT", bound=Callable)
 
 
 class ExperimentalWarning(PendingDeprecationWarning):
-    __slots__: Any = ()
+    __slots__ = ()
 
 
 # ---- Decorators ----------------------------------------------------------------------
@@ -51,7 +52,7 @@ def experimental(f: _WrappedT) -> _WrappedT:
     )
 
 
-def _warn_decr(f: _WrappedT, category: Type[Warning], warning_txt: str) -> _WrappedT:
+def _warn_decr(f: _WrappedT, category: type[Warning], warning_txt: str) -> _WrappedT:
     @wraps(f)
     def _wrapped(*args, **kw):
         warnings.warn(

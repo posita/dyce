@@ -17,10 +17,7 @@ from typing import (
     Iterable,
     Iterator,
     NamedTuple,
-    Optional,
-    Type,
     TypeVar,
-    Union,
     overload,
 )
 
@@ -65,18 +62,18 @@ class PWithSelection(NamedTuple):
         return self.p.total
 
 
-LimitT = Union[IntegralLike, RationalLikeMixedU, RealLike]
-_NormalizedLimitT = Union[int, Fraction]
+LimitT = IntegralLike | RationalLikeMixedU | RealLike
+_NormalizedLimitT = int | Fraction
 _ReturnsHOrOutcomeT = Callable[..., HOrOutcomeT]
 _DependentTermT = TypeVar("_DependentTermT", bound=_ReturnsHOrOutcomeT)
-_POrPWithSelectionOrSourceT = Union[P, PWithSelection, _SourceT]
+_POrPWithSelectionOrSourceT = P | PWithSelection | _SourceT
 _PredicateT = Callable[[HResult], bool]
 _HResultCountT = tuple[HResult, int]
 _PResultCountT = tuple[PResult, int]
 
 
 class _Context(NamedTuple):
-    normalized_limit: Optional[_NormalizedLimitT] = None
+    normalized_limit: _NormalizedLimitT | None = None
     contextual_depth: int = 0
     contextual_precision: Fraction = Fraction(1)
 
@@ -85,7 +82,7 @@ class _ForEachEvaluatorT(Protocol, metaclass=CachingProtocolMeta):
     def __call__(
         self,
         *args: _POrPWithSelectionOrSourceT,
-        limit: Optional[LimitT] = None,
+        limit: LimitT | None = None,
         **kw: _POrPWithSelectionOrSourceT,
     ) -> H: ...
 
@@ -120,10 +117,10 @@ def expandable(
 @experimental
 @beartype
 def expandable(
-    f: Optional[_DependentTermT] = None,
+    f: _DependentTermT | None = None,
     *,
     sentinel: H = _DEFAULT_SENTINEL,
-) -> Union[Callable[[_DependentTermT], _ForEachEvaluatorT], _ForEachEvaluatorT]:
+) -> Callable[[_DependentTermT], _ForEachEvaluatorT] | _ForEachEvaluatorT:
     r"""
     !!! warning "Experimental"
 
@@ -425,12 +422,13 @@ def expandable(
     ...
     ...   @expandable
     ...   def _expand(d6: HResult, p_d10s: PResult):
-    ...     if adv is Advantage.ADVANTAGE:
-    ...       roll = p_d10s.roll[:2]  # try to beat the worst two values
-    ...     elif adv is Advantage.DISADVANTAGE:
-    ...       roll = p_d10s.roll[-2:]  # try to beat the best two values
-    ...     else:
-    ...       roll = p_d10s.roll
+    ...     match adv:
+    ...       case Advantage.ADVANTAGE:
+    ...         roll = p_d10s.roll[:2]  # try to beat the worst two values
+    ...       case  Advantage.DISADVANTAGE:
+    ...         roll = p_d10s.roll[-2:]  # try to beat the best two values
+    ...       case _:
+    ...         roll = p_d10s.roll
     ...     return sum(1 for outcome in roll if outcome < d6.outcome + mod)
     ...
     ...   if adv is Advantage.NORMAL:
@@ -463,12 +461,13 @@ def expandable(
     ...   def _expand(d6: HResult, p_d10s: PResult):
     ...     return sum(1 for outcome in p_d10s.roll if outcome < d6.outcome + mod)
     ...
-    ...   if adv is Advantage.ADVANTAGE:
-    ...     return _expand(H(6), PWithSelection(p_3d10, (0, 1)))  # pass only the worst two values
-    ...   elif adv is Advantage.DISADVANTAGE:
-    ...     return _expand(H(6), PWithSelection(p_3d10, (-2, -1)))  # pass only the best two values
-    ...   else:
-    ...     return _expand(H(6), p_2d10)
+    ...   match adv:
+    ...     case Advantage.ADVANTAGE:
+    ...       return _expand(H(6), PWithSelection(p_3d10, (0, 1)))  # pass only the worst two values
+    ...     case Advantage.DISADVANTAGE:
+    ...       return _expand(H(6), PWithSelection(p_3d10, (-2, -1)))  # pass only the best two values
+    ...     case _:
+    ...       return _expand(H(6), p_2d10)
 
     >>> times_a_modded_d6_beats_two_d10s_w_adv() == times_a_modded_d6_beats_two_d10s()
     True
@@ -618,7 +617,7 @@ def expandable(
         @wraps(f)
         def _f(
             *args: _POrPWithSelectionOrSourceT,
-            limit: Optional[LimitT] = None,
+            limit: LimitT | None = None,
             **kw: _POrPWithSelectionOrSourceT,
         ) -> H:
             try:
@@ -648,7 +647,7 @@ def expandable(
                 # Mixing these requires dictionaries' orders to be durable across state
                 # mutations. We're relying on args and kw to remain constant and
                 # ordered.
-                objs: tuple[Union[H, P, PWithSelection], ...] = tuple(
+                objs: tuple[H | P | PWithSelection, ...] = tuple(
                     _source_to_h_or_p_or_p_with_selection(arg)
                     for arg in chain(args, kw.values())
                 )
@@ -716,7 +715,7 @@ def expandable(
 @beartype
 def aggregate_weighted(
     weighted_sources: Iterable[tuple[HOrOutcomeT, int]],
-    h_type: Type[H] = H,
+    h_type: type[H] = H,
 ) -> H:
     r"""
     Aggregates *weighted_sources* into an [``H`` object][dyce.h.H]. Each of
@@ -782,7 +781,7 @@ def aggregate_weighted(
 def foreach(
     callback: _DependentTermT,
     *args: _POrPWithSelectionOrSourceT,
-    limit: Optional[LimitT] = None,
+    limit: LimitT | None = None,
     sentinel: H = _DEFAULT_SENTINEL,
     **kw: _POrPWithSelectionOrSourceT,
 ) -> H:
@@ -833,7 +832,7 @@ def foreach(
 def explode(
     source: _SourceT,
     predicate: _PredicateT = lambda result: result.outcome == max(result.h),
-    limit: Optional[LimitT] = None,
+    limit: LimitT | None = None,
     inf=float("inf"),
 ) -> H:
     r"""
@@ -946,8 +945,8 @@ def explode(
 
 @beartype
 def _h_or_p_or_p_with_selection_to_result_iterable(
-    source: Union[H, P, PWithSelection],
-) -> Union[Iterable[_HResultCountT], Iterable[_PResultCountT]]:
+    source: H | P | PWithSelection,
+) -> Iterable[_HResultCountT] | Iterable[_PResultCountT]:
     if isinstance(source, H):
         return (
             (HResult(h=source, outcome=outcome), count)
@@ -999,7 +998,7 @@ def _normalize_limit(
 @beartype
 def _source_to_h_or_p_or_p_with_selection(
     source: _POrPWithSelectionOrSourceT,
-) -> Union[H, P, PWithSelection]:
+) -> H | P | PWithSelection:
     if isinstance(source, (H, P, PWithSelection)):
         return source
     elif isinstance(source, HableT):

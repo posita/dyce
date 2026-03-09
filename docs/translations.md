@@ -446,10 +446,11 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...     this_round = us_vs_them_func(us, them)
 ...
 ...     def _next_round(this_round: HResult) -> H:
-...       if this_round.outcome == Risus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
-...       elif this_round.outcome == Risus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
-...       elif this_round.outcome == Risus.DRAW: return H({})  # ignore (immediately re-roll) all ties
-...       else: assert False, f"unrecognized this_round.outcome {this_round.outcome}"
+...       match this_round.outcome:
+...         case Risus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
+...         case Risus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
+...         case Risus.DRAW: return H({})  # ignore (immediately re-roll) all ties
+...         case _: assert False, f"unrecognized this_round.outcome {this_round.outcome}"
 ...
 ...     return foreach(_next_round, this_round=this_round, limit=-1)
 ...   return _resolve(us, them)

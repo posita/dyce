@@ -10,7 +10,15 @@ import os
 import warnings
 from abc import abstractmethod
 from collections import Counter
-from collections.abc import Iterable as IterableC
+from collections.abc import (
+    Callable,
+    ItemsView,
+    Iterable,
+    Iterator,
+    KeysView,
+    Mapping,
+    ValuesView,
+)
 from fractions import Fraction
 from itertools import chain, product, repeat
 from math import comb, gcd, sqrt
@@ -37,21 +45,7 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from typing import (
-    Any,
-    Callable,
-    ItemsView,
-    Iterable,
-    Iterator,
-    KeysView,
-    Mapping,
-    Optional,
-    TypeVar,
-    Union,
-    ValuesView,
-    cast,
-    overload,
-)
+from typing import TypeVar, Union, cast, overload
 
 from numerary import IntegralLike, RealLike
 from numerary.bt import beartype
@@ -75,7 +69,8 @@ __all__ = ("H",)
 
 # ---- Types ---------------------------------------------------------------------------
 
-
+# TODO(posita): Get rid of Union in favor of | notation once we can use proper forward
+# references. See <https://github.com/beartype/beartype/issues/152>.
 HOrOutcomeT = Union["H", RealLike]
 _T = TypeVar("_T")
 _MappingT = Mapping[RealLike, int]
@@ -371,7 +366,7 @@ class H(_MappingT):
     ```
     """
 
-    __slots__: Any = (
+    __slots__ = (
         "_h",
         "_hash",
         "_lowest_terms",
@@ -409,7 +404,7 @@ class H(_MappingT):
                 self._h = {outcome_type(i): 1 for i in outcome_range}
         elif isinstance(items, HableT):
             self._h = items.h()._h
-        elif isinstance(items, IterableC):
+        elif isinstance(items, Iterable):
             if isinstance(items, Mapping):
                 items = items.items()
 
@@ -446,9 +441,9 @@ class H(_MappingT):
         # We can't use something like functools.lru_cache for these values because those
         # mechanisms call this object's __hash__ method which relies on both of these
         # and we don't want a circular dependency when computing this object's hash.
-        self._hash: Optional[int] = None
+        self._hash: int | None = None
         self._total: int = sum(self._h.values())
-        self._lowest_terms: Optional[H] = None
+        self._lowest_terms: H | None = None
 
         # We don't use functools' caching mechanisms generally because they don't
         # present a good mechanism for scoping the cache to object instances such that
@@ -456,7 +451,7 @@ class H(_MappingT):
         # is an exception, but it requires that objects have proper __dict__ values,
         # which Hs do not. So we basically do what functools.cached_property does, but
         # without a __dict__.
-        self._order_stat_funcs_by_n: dict[int, Callable[[int], H]] = {}
+        self._order_stat_funcs_by_n: dict[int, Callable[[int], "H"]] = {}
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -628,7 +623,6 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
@@ -646,7 +640,6 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
@@ -664,7 +657,6 @@ class H(_MappingT):
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
         try:
             if isinstance(other, SupportsInt):
@@ -1049,7 +1041,7 @@ class H(_MappingT):
     @beartype
     def draw(
         self,
-        outcomes: Optional[Union[RealLike, Iterable[RealLike], _MappingT]] = None,
+        outcomes: RealLike | Iterable[RealLike] | _MappingT | None = None,
     ) -> "H":
         r"""
         !!! warning "Experimental"
@@ -1222,7 +1214,7 @@ class H(_MappingT):
     def explode(
         self,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> "H": ...
 
     @overload
@@ -1230,7 +1222,7 @@ class H(_MappingT):
         self,
         max_depth: None = None,
         *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> "H": ...
 
     @overload
@@ -1244,8 +1236,8 @@ class H(_MappingT):
     @beartype
     def explode(
         self,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
+        max_depth: IntegralLike | None = None,
+        precision_limit: RationalLikeMixedU | RealLike | None = None,
     ) -> "H":
         r"""
         !!! warning "Deprecated"
@@ -1412,7 +1404,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         *,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> "H": ...
 
     @overload
@@ -1421,7 +1413,7 @@ class H(_MappingT):
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> "H": ...
 
     @overload
@@ -1431,7 +1423,7 @@ class H(_MappingT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: None = None,
         *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> "H": ...
 
     @overload
@@ -1449,8 +1441,8 @@ class H(_MappingT):
         self,
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
+        max_depth: IntegralLike | None = None,
+        precision_limit: RationalLikeMixedU | RealLike | None = None,
     ) -> "H":
         r"""
         !!! warning "Deprecated"
@@ -1493,9 +1485,7 @@ class H(_MappingT):
         if max_depth is not None and precision_limit is not None:
             raise ValueError("only one of max_depth and precision_limit is allowed")
 
-        limit: Optional[LimitT] = (
-            max_depth if precision_limit is None else precision_limit
-        )
+        limit: LimitT | None = max_depth if precision_limit is None else precision_limit
 
         @expandable(sentinel=self)
         def _expand(result: HResult) -> HOrOutcomeT:
@@ -1591,7 +1581,7 @@ class H(_MappingT):
     @beartype
     def distribution(
         self,
-        rational_t: Optional[Callable[[int, int], _T]] = None,
+        rational_t: Callable[[int, int], _T] | None = None,
     ) -> Iterator[tuple[RealLike, _T]]:
         r"""
         Presentation helper function returning an iterator for each outcome/count or
@@ -1694,7 +1684,6 @@ class H(_MappingT):
 
         ```
         """
-        # TODO(posita): See <https://github.com/python/typing/issues/193>
         return tuple(
             zip(
                 *(
@@ -1846,21 +1835,21 @@ class H(_MappingT):
         return numerator / (denominator or 1)
 
     @beartype
-    def stdev(self, mu: Optional[RealLike] = None) -> RealLike:
+    def stdev(self, mu: RealLike | None = None) -> RealLike:
         r"""
         Shorthand for ``#!python math.sqrt(self.variance(mu))``.
         """
         return sqrt(self.variance(mu))
 
     @beartype
-    def variance(self, mu: Optional[RealLike] = None) -> RealLike:
+    def variance(self, mu: RealLike | None = None) -> RealLike:
         r"""
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
         """
         mu = mu if mu else self.mean()
-        numerator: float
-        denominator: float
+        numerator: int
+        denominator: int
         numerator = denominator = 0
 
         for outcome, count in self.items():
@@ -1934,7 +1923,7 @@ class HableT(Protocol, metaclass=CachingProtocolMeta):
         respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     @abstractmethod
     def h(self) -> H:
@@ -1955,7 +1944,7 @@ class HableOpsMixin(HableT):
         See [``HableT``][dyce.h.HableT] for notes on pronunciation.
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     def __init__(self):
         object.__init__(self)
@@ -2073,7 +2062,7 @@ class HableOpsMixin(HableT):
         return __pow__(other, self.h())
 
     @beartype
-    def __and__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
+    def __and__(self: HableT, other: SupportsInt | H | HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -2089,7 +2078,7 @@ class HableOpsMixin(HableT):
         return __and__(other, self.h())
 
     @beartype
-    def __xor__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
+    def __xor__(self: HableT, other: SupportsInt | H | HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -2105,7 +2094,7 @@ class HableOpsMixin(HableT):
         return __xor__(other, self.h())
 
     @beartype
-    def __or__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
+    def __or__(self: HableT, other: SupportsInt | H | HableT) -> H:
         r"""
         Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
         [``h`` method][dyce.h.HableT.h].
@@ -2227,7 +2216,7 @@ class HableOpsMixin(HableT):
     def explode(
         self: HableT,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> H: ...
 
     @overload
@@ -2235,7 +2224,7 @@ class HableOpsMixin(HableT):
         self: HableT,
         max_depth: None = None,
         *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> H: ...
 
     @overload
@@ -2248,8 +2237,8 @@ class HableOpsMixin(HableT):
     @beartype
     def explode(
         self: HableT,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
+        max_depth: IntegralLike | None = None,
+        precision_limit: RationalLikeMixedU | RealLike | None = None,
     ) -> H:
         r"""
         Shorthand for ``#!python self.h().explode(max_depth, precision_limit)``. See the
@@ -2290,7 +2279,7 @@ class HableOpsMixin(HableT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         *,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> H: ...
 
     @overload
@@ -2299,7 +2288,7 @@ class HableOpsMixin(HableT):
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT,
         max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> H: ...
 
     @overload
@@ -2309,7 +2298,7 @@ class HableOpsMixin(HableT):
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
         max_depth: None = None,
         *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
+        precision_limit: RationalLikeMixedU | RealLike,
     ) -> H: ...
 
     @overload
@@ -2327,8 +2316,8 @@ class HableOpsMixin(HableT):
         self: HableT,
         expand: _SubstituteExpandCallbackT,
         coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
+        max_depth: IntegralLike | None = None,
+        precision_limit: RationalLikeMixedU | RealLike | None = None,
     ) -> H:
         r"""
         !!! warning "Deprecated"

@@ -8,8 +8,7 @@
 
 from abc import ABC
 from random import Random
-from sys import version_info
-from typing import Any, Type
+from typing import Any
 
 from numerary.bt import beartype
 
@@ -19,14 +18,14 @@ __all__ = ("RNG",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_RandSeedT = Any
+_RandSeedT = int | float | str | bytes | bytearray | None
 
 
 # ---- Data ----------------------------------------------------------------------------
 
 
-RNG: Random
 DEFAULT_RNG: Random
+RNG: Random
 
 
 # ---- Classes -------------------------------------------------------------------------
@@ -35,7 +34,7 @@ DEFAULT_RNG: Random
 try:
     from numpy.random import PCG64DXSM, BitGenerator, Generator, default_rng
 
-    _BitGeneratorT = Type[BitGenerator]
+    _BitGeneratorT = type[BitGenerator]
 
     class NumPyRandomBase(Random, ABC):
         r"""
@@ -54,24 +53,6 @@ try:
 
         bit_generator: _BitGeneratorT
         _generator: Generator
-
-        if version_info < (3, 11):
-
-            @beartype
-            def __new__(cls, seed: _RandSeedT = None):
-                r"""
-                Because ``#!python random.Random`` is broken in versions <3.11, ``#!python
-                random.Random``’s vanilla implementation cannot accept non-hashable
-                values as the first argument. For example, it will reject lists of
-                ``#!python int``s as *seed*. This implementation of ``#!python __new__``
-                fixes that.
-
-                See:
-
-                * https://bugs.python.org/issue44260
-                * https://bugs.python.org/issue40346#msg402508
-                """
-                return super(NumPyRandomBase, cls).__new__(cls)
 
         @beartype
         def __init__(self, seed: _RandSeedT = None):
@@ -104,11 +85,7 @@ try:
             return self._generator.random()
 
         @beartype
-        # TODO(posita): See <https://github.com/python/mypy/issues/8393>
-        # TODO(posita): See <https://github.com/beartype/beartype/issues/39#issuecomment-871914114> et seq.
-        def seed(  # type: ignore [override]
-            self, a: _RandSeedT, version: int = 2
-        ) -> None:
+        def seed(self, a: object = ..., version: int = 2) -> None:
             self._generator = default_rng(self.bit_generator(a))
 
         @beartype

@@ -16,7 +16,8 @@ import re
 import shutil
 import sys
 import tempfile
-from typing import Iterable, Iterator, Mapping, TextIO
+from collections.abc import Iterable, Iterator, Mapping
+from typing import TextIO
 
 __all__ = ()
 
