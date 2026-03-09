@@ -9,9 +9,9 @@
 import itertools
 import operator
 from collections import Counter
+from collections.abc import Iterator, Sequence
 from itertools import combinations_with_replacement, groupby
 from math import factorial, prod
-from typing import Iterator, Sequence
 from unittest.mock import Mock, call, patch
 
 import pytest

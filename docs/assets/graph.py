@@ -9,9 +9,9 @@
 import argparse
 import html
 import logging
-from collections.abc import Mapping as MappingC
+from collections.abc import Iterator, Mapping
 from functools import partial
-from typing import Any, Iterator, Mapping, Optional, Union
+from typing import Any
 
 from numerary.bt import beartype
 from plug import import_plug
@@ -105,23 +105,23 @@ class GraphvizObjectResolver:
     @beartype
     def attrs_for_obj(
         self,
-        obj: Union[R, Roll, RollOutcome],
+        obj: R | Roll | RollOutcome,
         attr_type: _GraphvizAttrTypeT,
-    ) -> Optional[Mapping[str, str]]:
+    ) -> Mapping[str, str] | None:
         annotation = obj.annotation
 
-        if not isinstance(annotation, MappingC):
+        if not isinstance(annotation, Mapping):
             return None
 
         attrs = annotation.get(attr_type)
 
-        if not isinstance(attrs, MappingC):
+        if not isinstance(attrs, Mapping):
             return None
 
         return attrs
 
     @beartype
-    def name_for_obj(self, obj: Union[R, Roll, RollOutcome]) -> str:
+    def name_for_obj(self, obj: R | Roll | RollOutcome) -> str:
         if id(obj) not in self._names:
             self._names[id(obj)] = f"{type(obj).__name__}-{self._serial}"
             self._serial += 1
@@ -300,7 +300,7 @@ def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, Any]]) -> Digraph:
 @beartype
 def graphviz_walk(
     g: Digraph,
-    obj: Union[R, Roll, RollOutcome],
+    obj: R | Roll | RollOutcome,
 ) -> None:
     resolver = GraphvizObjectResolver()
     walk(obj, InterObjectVisitor(g, resolver))
@@ -331,7 +331,7 @@ def _main() -> None:
     logging.getLogger().setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     svg_path = f"graph_{mod_name}_{args.style}"
-    g: Optional[Dot] = mod_do_it(args.style)
+    g: Dot | None = mod_do_it(args.style)
 
     if g is None:
         logging.warning(f"nothing generated for {svg_path}; skipping")

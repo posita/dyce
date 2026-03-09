@@ -10,12 +10,11 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from graph import COLORS, Dot
 
 
-def do_it(style: str) -> Optional[Dot]:
+def do_it(style: str) -> Dot | None:
     from graphviz import Source
 
     try:

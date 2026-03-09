@@ -10,6 +10,7 @@ import enum
 import warnings
 from abc import abstractmethod
 from collections import defaultdict, deque
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from copy import copy
 from itertools import chain
 from operator import (
@@ -37,16 +38,7 @@ from operator import (
     attrgetter,
 )
 from textwrap import indent
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Optional,
-    Sequence,
-    Union,
-    overload,
-)
+from typing import Union, overload
 
 from numerary import RealLike
 from numerary.bt import beartype
@@ -71,7 +63,9 @@ __all__ = ("R",)
 # ---- Types ---------------------------------------------------------------------------
 
 
-_ValueT = Union[RealLike, H, P]
+# TODO(posita): Get rid of Union in favor of | notation once we can use proper forward
+# references. See <https://github.com/beartype/beartype/issues/152>.
+_ValueT = RealLike | H | P
 _SourceT = Union["R"]
 _ROperandT = Union[RealLike, _SourceT]
 _RollOutcomeOperandT = Union[RealLike, "RollOutcome"]
@@ -260,14 +254,13 @@ class R:
     <!-- BEGIN MONKEY PATCH --
     For type-checking docstrings
 
-    >>> from typing import Union
     >>> from dyce.r import PoolRoller, Roll, RollOutcome, ValueRoller
-    >>> which: tuple[Union[int, slice], ...]
+    >>> which: tuple[int | slice, ...]
 
       -- END MONKEY PATCH -->
     """
 
-    __slots__: Any = ("_annotation", "_sources")
+    __slots__ = ("_annotation", "_sources")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -276,7 +269,7 @@ class R:
     def __init__(
         self,
         sources: Iterable[_SourceT] = (),
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -426,6 +419,8 @@ class R:
             return NotImplemented
 
     @beartype
+    # TODO(posita): Remove Union after giving up support for 3.11. See
+    # <https://bugs.python.org/issue45857>.
     def __and__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
@@ -443,6 +438,8 @@ class R:
             return NotImplemented
 
     @beartype
+    # TODO(posita): Remove Union after giving up support for 3.11. See
+    # <https://bugs.python.org/issue45857>.
     def __xor__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
@@ -460,6 +457,8 @@ class R:
             return NotImplemented
 
     @beartype
+    # TODO(posita): Remove Union after giving up support for 3.11. See
+    # <https://bugs.python.org/issue45857>.
     def __or__(self, other: Union[_SourceT, SupportsInt]) -> "BinarySumOpRoller":
         try:
             if isinstance(other, R):
@@ -616,7 +615,7 @@ class R:
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def annotation(self) -> Any:
+    def annotation(self) -> object:
         r"""
         Any provided annotation.
         """
@@ -636,7 +635,7 @@ class R:
     def from_sources(
         cls,
         *sources: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_sources_iterable(rs, annotation=annotation)``.
@@ -650,7 +649,7 @@ class R:
     def from_sources_iterable(
         cls,
         sources: Iterable[_SourceT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "PoolRoller":
         r"""
         Creates and returns a roller for “pooling” zero or more *sources*.
@@ -698,7 +697,7 @@ class R:
     def from_value(
         cls,
         value: _ValueT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "ValueRoller":
         r"""
         Creates and returns a [``ValueRoller``][dyce.r.ValueRoller] from *value*.
@@ -728,7 +727,7 @@ class R:
     def from_values(
         cls,
         *values: _ValueT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_values_iterable(values, annotation=annotation)``.
@@ -742,7 +741,7 @@ class R:
     def from_values_iterable(
         cls,
         values: Iterable[_ValueT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "PoolRoller":
         r"""
         Shorthand for ``#!python cls.from_sources_iterable((cls.from_value(value) for value
@@ -762,7 +761,7 @@ class R:
         cls,
         predicate: _PredicateT,
         *sources: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_sources_iterable(predicate, sources,
@@ -781,7 +780,7 @@ class R:
         cls,
         predicate: _PredicateT,
         sources: Iterable[_SourceT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "FilterRoller":
         r"""
         Creates and returns a [``FilterRoller``][dyce.r.FilterRoller] for applying filterion
@@ -816,7 +815,7 @@ class R:
         cls,
         predicate: _PredicateT,
         *values: _ValueT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_values_iterable(predicate, values,
@@ -833,7 +832,7 @@ class R:
         cls,
         predicate: _PredicateT,
         values: Iterable[_ValueT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python cls.filter_from_sources_iterable((cls.from_value(value) for
@@ -855,7 +854,7 @@ class R:
         cls,
         which: Iterable[_GetItemT],
         *sources: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_sources_iterable(which, sources,
@@ -872,7 +871,7 @@ class R:
         cls,
         which: Iterable[_GetItemT],
         sources: Iterable[_SourceT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Creates and returns a [``SelectionRoller``][dyce.r.SelectionRoller] for applying
@@ -907,7 +906,7 @@ class R:
         cls,
         which: Iterable[_GetItemT],
         *values: _ValueT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_values_iterable(which, values,
@@ -924,7 +923,7 @@ class R:
         cls,
         which: Iterable[_GetItemT],
         values: Iterable[_ValueT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python cls.select_from_sources_iterable((cls.from_value(value) for
@@ -949,7 +948,7 @@ class R:
             yield source.roll()
 
     @beartype
-    def annotate(self, annotation: Any = "") -> "R":
+    def annotate(self, annotation: object = "") -> "R":
         r"""
         Generates a copy of the roller with the desired annotation.
 
@@ -971,7 +970,7 @@ class R:
         self,
         bin_op: _RollOutcomeBinaryOperatorT,
         right_operand: _ROperandT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "BinarySumOpRoller":
         r"""
         Creates and returns a [``BinarySumOpRoller``][dyce.r.BinarySumOpRoller] for applying
@@ -1003,10 +1002,9 @@ class R:
     @beartype
     def rmap(
         self,
-        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
         left_operand: Union[RealLike, "RollOutcome"],
         bin_op: _RollOutcomeBinaryOperatorT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "BinarySumOpRoller":
         r"""
         Analogous to the [``map`` method][dyce.r.R.map], but where the caller supplies
@@ -1049,7 +1047,7 @@ class R:
     def umap(
         self,
         un_op: _RollOutcomeUnaryOperatorT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "UnarySumOpRoller":
         r"""
         Creates and returns a [``UnarySumOpRoller``][dyce.r.UnarySumOpRoller] roller for
@@ -1178,7 +1176,7 @@ class R:
     def filter(
         self,
         predicate: _PredicateT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "FilterRoller":
         r"""
         Shorthand for ``#!python type(self).filter_from_sources(predicate, self,
@@ -1192,7 +1190,7 @@ class R:
     def select(
         self,
         *which: _GetItemT,
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python self.select_iterable(which, annotation=annotation)``.
@@ -1205,7 +1203,7 @@ class R:
     def select_iterable(
         self,
         which: Iterable[_GetItemT],
-        annotation: Any = "",
+        annotation: object = "",
     ) -> "SelectionRoller":
         r"""
         Shorthand for ``#!python type(self).select_from_sources(which, self,
@@ -1224,7 +1222,7 @@ class ValueRoller(R):
     [``Roll`` objects][dyce.r.Roll], instead of other source rollers.
     """
 
-    __slots__: Any = ("_value",)
+    __slots__ = ("_value",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1232,7 +1230,7 @@ class ValueRoller(R):
     def __init__(
         self,
         value: _ValueT,
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1338,7 +1336,7 @@ class PoolRoller(R):
     ```
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1379,7 +1377,7 @@ class RepeatRoller(R):
     ```
     """
 
-    __slots__: Any = ("_n",)
+    __slots__ = ("_n",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1388,7 +1386,7 @@ class RepeatRoller(R):
         self,
         n: SupportsInt,
         source: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1446,7 +1444,7 @@ class BasicOpRoller(R):
     creation of a new [``Roll``][dyce.r.Roll].
     """
 
-    __slots__: Any = ("_op",)
+    __slots__ = ("_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1455,7 +1453,7 @@ class BasicOpRoller(R):
         self,
         op: BasicOperatorT,
         sources: Iterable[_SourceT],
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1490,9 +1488,11 @@ class BasicOpRoller(R):
         )
 
         if isinstance(res, RollOutcome):
-            roll_outcomes = (res,)
+            roll_outcomes: Iterable[RollOutcome] = (res,)
         else:
-            roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
+            # TODO(posita): Not sure why this is necessary
+            assert isinstance(res, Iterable)
+            roll_outcomes = res
 
         return Roll(self, roll_outcomes=roll_outcomes, source_rolls=source_rolls)
 
@@ -1512,7 +1512,7 @@ class NarySumOpRoller(BasicOpRoller):
     grouped by each of *sources*.
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1531,9 +1531,11 @@ class NarySumOpRoller(BasicOpRoller):
         res = self.op(self, _sum_roll_outcomes_by_rolls())
 
         if isinstance(res, RollOutcome):
-            roll_outcomes = (res,)
+            roll_outcomes: Iterable[RollOutcome] = (res,)
         else:
-            roll_outcomes = res  # type: ignore [assignment]  # TODO(posita): WTF?
+            # TODO(posita): Not sure why this is necessary
+            assert isinstance(res, Iterable)
+            roll_outcomes = res
 
         return Roll(self, roll_outcomes=roll_outcomes, source_rolls=source_rolls)
 
@@ -1545,7 +1547,7 @@ class BinarySumOpRoller(NarySumOpRoller):
     outcomes from its *right_source*.
     """
 
-    __slots__: Any = ("_bin_op",)
+    __slots__ = ("_bin_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1555,7 +1557,7 @@ class BinarySumOpRoller(NarySumOpRoller):
         bin_op: _RollOutcomeBinaryOperatorT,
         left_source: _SourceT,
         right_source: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1563,7 +1565,7 @@ class BinarySumOpRoller(NarySumOpRoller):
         def _op(
             r: R,
             roll_outcomes: Iterable[RollOutcome],
-        ) -> Union[RollOutcome, Iterable[RollOutcome]]:
+        ) -> RollOutcome | Iterable[RollOutcome]:
             left_operand, right_operand = roll_outcomes
 
             return bin_op(left_operand, right_operand)
@@ -1609,7 +1611,7 @@ class UnarySumOpRoller(NarySumOpRoller):
     *un_op* to the sum of all outcomes from its sole *source*.
     """
 
-    __slots__: Any = ("_un_op",)
+    __slots__ = ("_un_op",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1618,7 +1620,7 @@ class UnarySumOpRoller(NarySumOpRoller):
         self,
         un_op: _RollOutcomeUnaryOperatorT,
         source: _SourceT,
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1626,7 +1628,7 @@ class UnarySumOpRoller(NarySumOpRoller):
         def _op(
             r: R,
             roll_outcomes: Iterable[RollOutcome],
-        ) -> Union[RollOutcome, Iterable[RollOutcome]]:
+        ) -> RollOutcome | Iterable[RollOutcome]:
             (operand,) = roll_outcomes
 
             return un_op(operand)
@@ -1755,7 +1757,7 @@ class FilterRoller(R):
     substitution](rollin.md#filtering-and-substitution)” more examples.
     """
 
-    __slots__: Any = ("_predicate",)
+    __slots__ = ("_predicate",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1764,7 +1766,7 @@ class FilterRoller(R):
         self,
         predicate: _PredicateT,
         sources: Iterable[R],
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -1895,7 +1897,7 @@ class SelectionRoller(R):
     ```
     """
 
-    __slots__: Any = ("_which",)
+    __slots__ = ("_which",)
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -1904,7 +1906,7 @@ class SelectionRoller(R):
         self,
         which: Iterable[_GetItemT],
         sources: Iterable[_SourceT],
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -2021,7 +2023,7 @@ class SubstitutionRoller(R):
     substitution](rollin.md#filtering-and-substitution)” more examples.
     """
 
-    __slots__: Any = ("_coalesce_mode", "_expansion_op", "_max_depth")
+    __slots__ = ("_coalesce_mode", "_expansion_op", "_max_depth")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2032,7 +2034,7 @@ class SubstitutionRoller(R):
         source: _SourceT,
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
         max_depth: SupportsInt = 1,
-        annotation: Any = "",
+        annotation: object = "",
         **kw,
     ):
         r"Initializer."
@@ -2090,19 +2092,18 @@ class SubstitutionRoller(R):
                 if isinstance(expanded, RollOutcome):
                     if expanded is not roll_outcome:
                         expanded = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
-                        # TODO(posita): Not sure why this is necessary
-                        assert isinstance(expanded, RollOutcome)
 
                     yield expanded
                 elif isinstance(expanded, Roll):
-                    if self.coalesce_mode == CoalesceMode.REPLACE:
-                        yield roll_outcome.euthanize()
-                    elif self.coalesce_mode == CoalesceMode.APPEND:
-                        yield roll_outcome
-                    else:
-                        assert (
-                            False
-                        ), f"unrecognized substitution mode {self.coalesce_mode!r}"
+                    match self.coalesce_mode:
+                        case CoalesceMode.REPLACE:
+                            yield roll_outcome.euthanize()
+                        case CoalesceMode.APPEND:
+                            yield roll_outcome
+                        case _:
+                            assert (
+                                False
+                            ), f"unrecognized substitution mode {self.coalesce_mode!r}"
 
                     expanded_roll = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
                     yield from _expanded_roll_outcomes(expanded_roll, depth + 1)
@@ -2150,7 +2151,7 @@ class RollOutcome:
     A single, ([mostly][dyce.r.Roll.__init__]) immutable outcome generated by a roll.
     """
 
-    __slots__: Any = ("_roll", "_sources", "_value")
+    __slots__ = ("_roll", "_sources", "_value")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2158,15 +2159,14 @@ class RollOutcome:
     @beartype
     def __init__(
         self,
-        value: Optional[RealLike],
-        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
+        value: RealLike | None,
         sources: Iterable["RollOutcome"] = (),
     ):
         r"Initializer."
         super().__init__()
         self._value = value
         self._sources = tuple(sources)
-        self._roll: Optional[Roll] = None
+        self._roll: Roll | None = None
 
         if self._value is None and not self._sources:
             raise ValueError("value can only be None if sources is non-empty")
@@ -2339,7 +2339,6 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __and__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
@@ -2357,7 +2356,6 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __xor__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
@@ -2375,7 +2373,6 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __or__(self, other: Union["RollOutcome", SupportsInt]) -> "RollOutcome":
         try:
             if isinstance(other, SupportsInt):
@@ -2411,7 +2408,7 @@ class RollOutcome:
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def annotation(self) -> Any:
+    def annotation(self) -> object:
         r"""
         Shorthand for ``#!python self.source_roll.annotation``.
 
@@ -2476,7 +2473,7 @@ class RollOutcome:
         return self._sources
 
     @property
-    def value(self) -> Optional[RealLike]:
+    def value(self) -> RealLike | None:
         r"""
         The outcome value. A value of ``#!python None`` is used to signal that a source’s
         roll outcome was excluded by the roller.
@@ -2516,7 +2513,7 @@ class RollOutcome:
         """
         if isinstance(right_operand, RollOutcome):
             sources: tuple[RollOutcome, ...] = (self, right_operand)
-            right_operand_value: Optional[RealLike] = right_operand.value
+            right_operand_value: RealLike | None = right_operand.value
         else:
             sources = (self,)
             right_operand_value = right_operand
@@ -2745,7 +2742,7 @@ class RollOutcome:
         See the [``umap`` method][dyce.r.RollOutcome.umap].
         """
 
-        def _euthanize(operand: Optional[RealLike]) -> None:
+        def _euthanize(operand: RealLike | None) -> None:
             pass
 
         return self.umap(_euthanize)
@@ -2763,7 +2760,7 @@ class Roll(Sequence[RollOutcome]):
     [``RollOutcome`` objects][dyce.r.RollOutcome] that can be assembled into trees.
     """
 
-    __slots__: Any = ("_r", "_roll_outcomes", "_source_rolls")
+    __slots__ = ("_r", "_roll_outcomes", "_source_rolls")
 
     # ---- Initializer -----------------------------------------------------------------
 
@@ -2856,7 +2853,7 @@ class Roll(Sequence[RollOutcome]):
     def __getitem__(
         self,
         key: _GetItemT,
-    ) -> Union[RollOutcome, tuple[RollOutcome, ...]]:
+    ) -> RollOutcome | tuple[RollOutcome, ...]:
         if isinstance(key, slice):
             return self._roll_outcomes[key]
         else:
@@ -2869,7 +2866,7 @@ class Roll(Sequence[RollOutcome]):
     # ---- Properties ------------------------------------------------------------------
 
     @property
-    def annotation(self) -> Any:
+    def annotation(self) -> object:
         r"""
         Shorthand for ``#!python self.r.annotation``.
 
@@ -2896,7 +2893,7 @@ class Roll(Sequence[RollOutcome]):
     @beartype
     def adopt(
         self,
-        sources: Iterable["RollOutcome"] = (),
+        sources: Iterable[RollOutcome] = (),
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
     ) -> "Roll":
         r"""
@@ -2966,7 +2963,7 @@ class RollWalkerVisitor:
     [``Roll`` object][dyce.r.Roll] found.
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -2985,7 +2982,7 @@ class RollOutcomeWalkerVisitor:
     [``RollOutcome`` object][dyce.r.RollOutcome] found.
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -3006,7 +3003,7 @@ class RollerWalkerVisitor:
     [``R`` object][dyce.r.R] found.
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -3017,8 +3014,8 @@ class RollerWalkerVisitor:
 @experimental
 @beartype
 def walk(
-    root: Union[Roll, R, RollOutcome],
-    visitor: Union[RollWalkerVisitor, RollerWalkerVisitor, RollOutcomeWalkerVisitor],
+    root: Roll | R | RollOutcome,
+    visitor: RollWalkerVisitor | RollerWalkerVisitor | RollOutcomeWalkerVisitor,
 ) -> None:
     r"""
     !!! warning "Experimental"

@@ -7,21 +7,13 @@
 # ======================================================================================
 
 from collections import Counter
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from fractions import Fraction
 from functools import cache
 from itertools import chain, groupby, product, repeat
 from math import inf, prod
 from operator import __eq__, __index__, __ne__
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Optional,
-    Sequence,
-    Union,
-    overload,
-)
+from typing import Union, overload
 
 from numerary import RealLike
 from numerary.bt import beartype
@@ -44,6 +36,8 @@ __all__ = ("P",)
 # ---- Types ---------------------------------------------------------------------------
 
 
+# TODO(posita): Get rid of Union in favor of | notation once we can use proper forward
+# references. See <https://github.com/beartype/beartype/issues/152>.
 RollT = tuple[RealLike, ...]
 _OperandT = Union["P", RealLike]
 _RollCountT = tuple[RollT, int]
@@ -188,7 +182,7 @@ class P(Sequence[H], HableOpsMixin):
     ```
     """
 
-    __slots__: Any = (
+    __slots__ = (
         "_hs",
         "_total",
     )
@@ -196,7 +190,6 @@ class P(Sequence[H], HableOpsMixin):
     # ---- Initializer -----------------------------------------------------------------
 
     @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
     def __init__(self, *args: Union[SupportsInt, "P", H]) -> None:
         r"Initializer."
         super().__init__()
@@ -423,8 +416,7 @@ class P(Sequence[H], HableOpsMixin):
     @beartype
     def foreach(
         cls,
-        dependent_term: Callable[..., Union[H, RealLike]],
-        # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
+        dependent_term: Callable[..., H | RealLike],
         **independent_sources: Union["P", H, HableT, _SourceT],
     ) -> H:
         r"""
@@ -564,9 +556,7 @@ class P(Sequence[H], HableOpsMixin):
             for roll, count in pools_by_kw[pool_name].rolls_with_counts():
                 yield pool_name, roll, count
 
-        def _resolve_dependent_term_for_rolls() -> (
-            Iterator[tuple[Union[H, RealLike], int]]
-        ):
+        def _resolve_dependent_term_for_rolls() -> Iterator[tuple[H | RealLike, int]]:
             for kw_roll_count_tuples in product(
                 *(_kw_roll_count_tuples(pool_name) for pool_name in pools_by_kw)
             ):
@@ -876,7 +866,7 @@ class P(Sequence[H], HableOpsMixin):
         n = len(self)
 
         if not which:
-            i: Optional[int] = n
+            i: int | None = n
         else:
             i = _analyze_selection(n, which)
 
@@ -975,7 +965,7 @@ class P(Sequence[H], HableOpsMixin):
 
 
 @beartype
-def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
+def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> int | None:
     r"""
     Examines the selection *which* as applied to the values ``#!python range(n)`` and
     returns one of:
@@ -1016,7 +1006,7 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> Optional[int]:
 @beartype
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H, int]],
-    k: Optional[int],
+    k: int | None,
 ) -> Iterator[_RollCountT]:
     r"""
     Given an iterable of histogram/count pairs, returns an iterator yielding
@@ -1067,7 +1057,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     n: int,
     h: H,
     k: int,
-    fill: Optional[RealLike] = None,
+    fill: RealLike | None = None,
 ) -> Iterator[_RollCountT]:
     r"""
     A memoized adaptation of [Ilmari Karonen’s

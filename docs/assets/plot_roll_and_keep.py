@@ -6,7 +6,7 @@
 # software in any capacity.
 # ======================================================================================
 
-from typing import Iterator
+from collections.abc import Iterator
 
 from anydyce.viz import plot_line
 

@@ -10,7 +10,8 @@ import argparse
 import importlib.machinery
 import importlib.util
 import pathlib
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 __all__ = ("import_plug",)
 
