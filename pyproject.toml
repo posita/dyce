@@ -67,6 +67,18 @@ packages = ["dyce"]
 
 dyce = ["py.typed"]
 
+[tool.flake8]  # ------------------------------------------------------------------------
+
+# See:
+# * <https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes>
+# * <https://flake8.readthedocs.io/en/latest/user/error-codes.html>
+ignore = [
+  "E203",  # whitespace before ':'
+  "E501",  # line too long (... > ... characters)
+  "E704",  # multiple statements on one line
+  "W503",  # line break occurred before a binary operator
+]
+
 [tool.isort]  # ------------------------------------------------------------------------
 
 # See <https://pycqa.github.io/isort/docs/configuration/profiles.html#black>
