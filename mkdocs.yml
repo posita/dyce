@@ -60,14 +60,6 @@ markdown_extensions:
   - pymdownx.tilde
 
 plugins:
-  - exclude:
-      # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>, but
-      # mkdocs-exclude is no longer maintained
-      # gitignore: true
-      glob:
-        - "*.py"
-        - "Makefile"
-        - "notebooks/*"
   - macros
   - mike:
       version_selector: true

@@ -41,12 +41,12 @@ An easy way to bootstrap an isolated development environment is:
 % git clone --recurse-submodules https://github.com/posita/dyce.git
 …
 % cd dyce
-% /path/to/python -m venv .venv
+% /path/to/python3 -m venv .venv
 …
 % . .venv/bin/activate
 % pip install --upgrade --editable '.[dev]'
 …
-% python -m pre_commit install
+% python3 -m pre_commit install
 …
 ```
 

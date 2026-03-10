@@ -284,7 +284,7 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 % git clone https://github.com/posita/dyce.git
 ...
 % cd dyce
-% python -m pip install .  # -or- python -c 'from setuptools import setup ; setup()' install .
+% python3 -m pip install .  # -or- python3 -c 'from setuptools import setup ; setup()' install .
 ...
 ```
 
