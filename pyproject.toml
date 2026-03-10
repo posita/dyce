@@ -6,10 +6,66 @@
 # software in any capacity.
 # ======================================================================================
 
+[project]  # ---------------------------------------------------------------------------
+
+name = "dyce"
+dynamic = ["version"]
+description = "Simple Python tools for exploring dice outcomes and other finite discrete probabilities"
+readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Matt Bogosian", email = "matt@bogosian.net"}]
+requires-python = ">=3.10"
+dependencies = ["numerary~=0.4.3"]
+classifiers = [
+  "Topic :: Education",
+  "Topic :: Games/Entertainment",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[project.optional-dependencies]  # -----------------------------------------------------
+
+dev = [
+  "numpy",
+  "pandas",
+  "pre-commit",
+  "sympy~=1.9",
+  "tox~=4.0",
+  "versioningit~=2.0",
+]
+
+[project.urls]  # ----------------------------------------------------------------------
+
+Homepage = "https://posita.github.io/dyce/"
+"Source Repository" = "https://github.com/posita/dyce/"
+
 [build-system]  # ----------------------------------------------------------------------
 
-requires = ["setuptools>=45", "versioningit~=2.0", "wheel"]
+requires = ["setuptools>=61", "versioningit~=2.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]  # -------------------------------------------------------------------
+
+packages = ["dyce"]
+
+[tool.setuptools.package-data]  # ------------------------------------------------------
+
+dyce = ["py.typed"]
 
 [tool.isort]  # ------------------------------------------------------------------------
 
