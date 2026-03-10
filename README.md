@@ -8,7 +8,7 @@
 
   WARNING: THIS DOCUMENT MUST BE SELF-CONTAINED.
   ALL LINKS MUST BE ABSOLUTE.
-  This file is used on GitHub and PyPi (via setup.cfg).
+  This file is used on GitHub and PyPi (via pyproject.toml).
   There is no guarantee that other docs/resources will be available where this content is displayed.
 -->
 
