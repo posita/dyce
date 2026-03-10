@@ -15,25 +15,21 @@ jobs:
       matrix:
         python-version: [
           "3.10", "3.11", "3.12", "3.13", "3.14",
+          "3.13t", "3.14t",
           "pypy-3.10", "pypy-3.11"
         ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         # See <https://github.com/actions/checkout/issues/249>
-        fetch-depth: 0
-    - name: set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+        fetch-depth: 0  # needed for versioningit
+    - uses: astral-sh/setup-uv@v7
       with:
+        enable-cache: true
         python-version: ${{ matrix.python-version }}
     - name: test ${{ matrix.python-version }} with Tox
       run: |
-        sudo apt-get install \
-          libjpeg-dev
-        python -m pip install --upgrade pip
-        python -m pip install tox 'tox-gh-actions~=3.0'
-        git submodule update --init --recursive
-        tox --verbose
+        uv run --no-project --with tox --with tox-gh-actions -- tox --verbose
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,22 +43,26 @@ jobs:
       group: ${{ github.ref }}
       cancel-in-progress: true
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
-        fetch-depth: 0
-    - uses: actions/setup-python@v5
+        # See <https://github.com/actions/checkout/issues/249>
+        fetch-depth: 0  # needed for versioningit
+    - uses: astral-sh/setup-uv@v7
       with:
-        python-version: ">=3.10"
-    - name: build and check dist and docs
+        enable-cache: true
+        python-version: "3.13"  # should match base_python in Tox config
+    - name: install system dependencies
       run: |
         sudo apt-get install \
           graphviz \
           libgraphviz-dev \
           libjpeg-dev
-        python -m pip install --upgrade 'pip>=23,!=23.1.2,!=23.2'
-        python -m pip install \
-          tox \
-          'versioningit~=2.0'
+    - name: install Python tools
+      run: |
+        uv tool install tox
+        uv pip install --system versioningit
+    - name: verify version consistency
+      run: |
         . ./helpers/ci-vars.sh  # defines PKG, TAG, VERS, etc.
         if [ ${{ github.ref_name }} = "${TAG}" ] ; then
           ./helpers/propagate-version.sh
@@ -76,6 +76,9 @@ jobs:
         else
           [ ${{ github.ref_name }} = latest ]  # assert
         fi
+    - name: build dist and docs
+      run: |
+        . ./helpers/ci-vars.sh
         git config user.name "$( git log --max-count 1 --pretty=format:%an )"
         git config user.email "$( git log --max-count 1 --pretty=format:%ae )"
         tox -e check
@@ -89,17 +92,16 @@ jobs:
       if: |
         github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
       with:
-        user: __token__
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
         skip_existing: true
-    - name: post test publish check and publish GHQ pages
+    - name: verify test PyPI package
       if: |
         github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
       run: |
         . ./helpers/ci-vars.sh
         for i in {0..45} ; do
-          if pip install \
+          if uv pip install --system \
               --index-url 'https://test.pypi.org/simple' \
               --extra-index-url 'https://pypi.org/simple' \
               "${PROJECT}==${VERS_PATCH}" ; then
@@ -107,12 +109,16 @@ jobs:
           fi
           sleep 2
         done
-        [ "$( python -c "from ${PKG} import __vers_str__ ; print(__vers_str__)" )" = "${VERS_PATCH}" ]
+    - name: publish GitHub Pages
+      if: |
+        github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+      run: |
+        . ./helpers/ci-vars.sh
+        [ "$( python3 -c "from ${PKG} import __vers_str__ ; print(__vers_str__)" )" = "${VERS_PATCH}" ]
         git push origin gh-pages
     - name: publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       if: |
         github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
       with:
-        user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}

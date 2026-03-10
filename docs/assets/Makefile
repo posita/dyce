@@ -47,19 +47,19 @@ perf : \
 	perf_rolls_with_counts.txt
 
 graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
-	"$${PYTHON:-python}" graph.py --style=dark $*
+	"$${PYTHON:-python3}" graph.py --style=dark $*
 
 graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
-	"$${PYTHON:-python}" graph.py --style=light $*
+	"$${PYTHON:-python3}" graph.py --style=light $*
 
 plot_%_dark.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py
-	"$${PYTHON:-python}" plot.py --style=dark $*
+	"$${PYTHON:-python3}" plot.py --style=dark $*
 
 plot_%_light.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py
-	"$${PYTHON:-python}" plot.py --style=light $*
+	"$${PYTHON:-python3}" plot.py --style=light $*
 
 perf_%.txt : perf_%.ipy Makefile ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
-	ipython >$@ --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy
+	ipython3 >$@ --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy
 
 ../dyce-powered.svg : Makefile
 	curl --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'

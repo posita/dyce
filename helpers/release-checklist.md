@@ -13,7 +13,7 @@
   Thank you!
 -->
 
-The following assumes you are working from the repository root and have a development environment similar to one created by ``pip install install --editable '.[dev]' && python -m pre_commit install``.
+The following assumes you are working from the repository root and have a development environment similar to one created by ``pip install install --editable '.[dev]' && python3 -m pre_commit install``.
 
 * [ ] Update docs and commit
   * Solidify current release start section for next release in [release notes](../docs/notes.md)
@@ -23,11 +23,11 @@ The following assumes you are working from the repository root and have a develo
 
 * [ ] ``git clean -Xdf [-n] [...]``
 
-* [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" "$( python -m versioningit --next-version . )"``
+* [ ] ``"$( git rev-parse --show-toplevel )/helpers/propagate-version.sh" "$( python3 -m versioningit --next-version . )"``
 
-* [ ] ``git add --update && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python -m versioningit --next-version . )" )"``
+* [ ] ``git add --update && git commit --edit --message "$( printf 'Release v%s\n\n<TODO: Copy [release notes](docs/notes.md) here. Hope you were keeping track!>' "$( python3 -m versioningit --next-version . )" )"``
 
-* [ ] ``git tag [--force] --message "$( git rev-list --format=%B --max-count=1 HEAD )" --sign "v$( python -m versioningit --next-version . )"``
+* [ ] ``git tag [--force] --message "$( git rev-list --format=%B --max-count=1 HEAD )" --sign "v$( python3 -m versioningit --next-version . )"``
 
 * [ ] ``tox -e check && "$( git rev-parse --show-toplevel )/.tox/check/bin/mkdocs" serve`` and spot check docs
 

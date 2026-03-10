@@ -44,9 +44,9 @@ dev = [
   "numpy",
   "pandas",
   "pre-commit",
-  "sympy~=1.9",
-  "tox~=4.0",
-  "versioningit~=2.0",
+  "sympy",
+  "tox",
+  "versioningit",
   # TODO(posita): Remove when retiring support for 3.10
   "tomli; python_version < '3.11'",
 ]
@@ -58,7 +58,7 @@ Homepage = "https://posita.github.io/dyce/"
 
 [build-system]  # ----------------------------------------------------------------------
 
-requires = ["setuptools>=61", "versioningit~=2.0", "wheel"]
+requires = ["setuptools>=61", "versioningit", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]  # -------------------------------------------------------------------
@@ -101,7 +101,7 @@ warn_unused_configs = true
 
 [tool.pytest.ini_options]  # -----------------------------------------------------------
 
-addopts = "--doctest-continue-on-failure --doctest-glob='*.md' --doctest-modules --pythonwarnings=ignore"
+addopts = "--doctest-continue-on-failure --doctest-glob='*.md' --doctest-modules --ignore=docs/assets --pythonwarnings=ignore"
 doctest_optionflags = [
   "ELLIPSIS",
   "IGNORE_EXCEPTION_DETAIL",
