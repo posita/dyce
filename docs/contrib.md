@@ -52,7 +52,7 @@ An easy way to bootstrap an isolated development environment is:
 
 Substitute your preferred virtual environment process for [``venv``](https://docs.python.org/3/library/venv.html).
 The ``[dev]`` variant includes additional dependencies necessary for development and testing.
-See the ``[options.extras_require]`` section in [``setup.cfg``](https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/setup.cfg).
+See the ``[project.optional-dependencies]`` section in [``pyproject.toml``](https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/pyproject.toml).
 
 Unit tests are run with [pytest](https://docs.pytest.org/) via [Tox](https://tox.readthedocs.org/).
 

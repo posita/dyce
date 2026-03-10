@@ -47,6 +47,8 @@ dev = [
   "sympy~=1.9",
   "tox~=4.0",
   "versioningit~=2.0",
+  # TODO(posita): Remove when retiring support for 3.10
+  "tomli; python_version < '3.11'",
 ]
 
 [project.urls]  # ----------------------------------------------------------------------
