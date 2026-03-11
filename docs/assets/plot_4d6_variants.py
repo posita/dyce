@@ -9,14 +9,17 @@
 from anydyce.viz import plot_line
 
 from dyce import H, P
-from dyce.evaluation import explode
+from dyce.evaluation import foreach
 
 
 def do_it(style: str) -> None:
     import matplotlib.pyplot
 
     p_4d6 = 4 @ P(6)
-    d6_reroll_first_one = explode(H(6), lambda result: result.outcome == 1)
+    d6_reroll_first_one = foreach(
+        lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome,
+        h_result=H(6),
+    )
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 
@@ -43,7 +46,7 @@ def do_it(style: str) -> None:
         [(label, res) for label, res in attr_results.items()],
     )
 
-    for line, marker in zip(ax.lines, markers):
+    for line, marker in zip(ax.lines, markers, strict=True):
         line.set_marker(marker)
 
     ax.legend()
