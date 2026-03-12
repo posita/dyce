@@ -6,8 +6,12 @@
 # software in any capacity.
 # ======================================================================================
 
+# ruff: noqa: T201
+
+import operator
 from enum import IntEnum, auto
 from functools import partial
+from typing import cast
 
 from dyce import H, P
 from dyce.evaluation import HResult, PResult, foreach
@@ -22,9 +26,8 @@ class IronSoloResult(IntEnum):
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
     import matplotlib.ticker
-    import pandas
+    import pandas as pd
 
     d6 = H(6)
     d10 = H(10)
@@ -32,8 +35,8 @@ def do_it(style: str) -> None:
     def iron_solo_dependent_term(
         action: HResult,
         challenges: PResult,
-        mod=0,
-    ):
+        mod: int = 0,
+    ) -> IronSoloResult:
         modded_action = action.outcome + mod
         first_challenge_outcome, second_challenge_outcome = challenges.roll
         beats_first_challenge = modded_action > first_challenge_outcome
@@ -54,9 +57,9 @@ def do_it(style: str) -> None:
                 else IronSoloResult.FAILURE
             )
 
-    mods = list(range(0, 5))
+    mods = list(range(5))
     # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
-    df = pandas.DataFrame(columns=[v.name for v in IronSoloResult])
+    df = pd.DataFrame(columns=[v.name for v in IronSoloResult])
 
     for mod in mods:
         h_for_mod = foreach(
@@ -66,24 +69,20 @@ def do_it(style: str) -> None:
         )
         # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
         results_for_mod = {
-            outcome.name: count  # type: ignore
+            cast("IronSoloResult", outcome).name: count
             for outcome, count in h_for_mod.zero_fill(IronSoloResult).distribution(
-                rational_t=lambda n, d: n / d
+                rational_t=operator.truediv
             )
         }
-        row = pandas.DataFrame(
+        row = pd.DataFrame(
             # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
             results_for_mod,
             columns=[v.name for v in IronSoloResult],
             index=[mod],
         )
-        df = pandas.concat((df, row))
+        df = pd.concat((df, row))
 
     df.index.name = "Modifier"
-    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
-    # # DataFrames use enum's values for displaying column names, so we convert them to
-    # # names
-    # df = df.rename(columns={v: v.name for v in IronSoloResult})
     print(df.style.format("{:.2%}").to_html())
 
     ax = df.plot(kind="barh", stacked=True)

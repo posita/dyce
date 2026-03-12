@@ -26,12 +26,12 @@ def do_it(style: str) -> Dot:
     r_3d6 = ValueRoller(
         3 @ P(d6),
         annotation={
-            "node": dict(
+            "node": dict(  # noqa: C408
                 color=COLORS[style]["blue"],
                 fontcolor=COLORS[style]["blue"],
                 style="dashed",
             ),
-            "edge": dict(
+            "edge": dict(  # noqa: C408
                 color=COLORS[style]["blue"],
                 fontcolor=COLORS[style]["blue"],
                 style="dashed",
@@ -41,12 +41,12 @@ def do_it(style: str) -> Dot:
     r_d8 = ValueRoller(
         d8,
         annotation={
-            "node": dict(
+            "node": dict(  # noqa: C408
                 color=COLORS[style]["red"],
                 fontcolor=COLORS[style]["red"],
                 style="dashed",
             ),
-            "edge": dict(
+            "edge": dict(  # noqa: C408
                 color=COLORS[style]["red"],
                 fontcolor=COLORS[style]["red"],
                 style="dashed",

@@ -36,9 +36,9 @@ def _positive_int(val: str) -> int:
 def _parsable_expr(val: str) -> str:
     if val:
         try:
-            eval(val, _EXEC_GLOBALS)
+            eval(val, _EXEC_GLOBALS)  # noqa: S307
         except SyntaxError as exc:
-            raise ValueError(exc)
+            raise ValueError from exc
 
     return val
 
@@ -46,9 +46,9 @@ def _parsable_expr(val: str) -> str:
 def _parsable_stmt(val: str) -> str:
     if val:
         try:
-            exec(val, _EXEC_GLOBALS)
+            exec(val, _EXEC_GLOBALS)  # noqa: S102
         except SyntaxError as exc:
-            raise ValueError(exc)
+            raise ValueError from exc
 
     return val
 
@@ -94,27 +94,28 @@ _PARSER.add_argument(
     help="The Python expression to compare input_expr against for each seed.",
 )
 
+_LOGGER = logging.getLogger(__name__)
 
 # ---- Functions -----------------------------------------------------------------------
 
 
 def _main() -> None:
     args = _PARSER.parse_args()
-    logging.getLogger().setLevel(args.log_level)
+    _LOGGER.setLevel(args.log_level)
 
-    seed = args.seed if args.seed else int(time())
-    desired_result = eval(args.desired_result, _EXEC_GLOBALS)
+    seed = args.seed or int(time())
+    desired_result = eval(args.desired_result, _EXEC_GLOBALS)  # noqa: S307
 
     for i in range(args.limit):
         rng.RNG = random.Random(seed + i)
-        res = eval(args.input_expr, _EXEC_GLOBALS)
-        logging.debug(f"{seed + i} -> {res}")
+        res = eval(args.input_expr, _EXEC_GLOBALS)  # noqa: S307
+        _LOGGER.debug("%d -> %s", seed + i, res)
 
         if res == desired_result:
-            logging.info(f"found {res!r} at {seed + i} after {i + 1} tries")
+            _LOGGER.info("found %r at %d after %d tries", res, seed + i, i + 1)
             break
     else:
-        logging.error(f"{res!r} not found after {i + 1} tries")
+        _LOGGER.error("%r not found after %d tries", res, i + 1)
         sys.exit(1)
 
 

@@ -13,9 +13,9 @@ from dyce.evaluation import PResult, foreach
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
-    def dupes(result: PResult):
+    def dupes(result: PResult) -> int:
         dupes = 0
         for i in range(1, len(result.roll)):
             if result.roll[i] == result.roll[i - 1]:
@@ -25,8 +25,8 @@ def do_it(style: str) -> None:
     res_15d6 = foreach(dupes, result=15 @ P(6))
     res_8d10 = foreach(dupes, result=8 @ P(10))
 
-    matplotlib.pyplot.rcParams["lines.markersize"] *= 2
-    ax = matplotlib.pyplot.axes()
+    plt.rcParams["lines.markersize"] *= 2
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)

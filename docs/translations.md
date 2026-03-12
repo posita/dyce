@@ -420,8 +420,8 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 >>> from dyce import H, P
 >>> from dyce.evaluation import HResult, foreach
 >>> import sys
+>>> from collections.abc import Callable
 >>> from enum import IntEnum, auto
->>> from typing import Callable
 >>> from functools import cache
 
 >>> class Risus(IntEnum):
@@ -722,7 +722,7 @@ We can also deploy a trick using ``#!python partial`` to parameterize use of the
 >>> from dyce.evaluation import foreach
 >>> from itertools import chain
 >>> p_4d6 = 4 @ P(6)
->>> d6_reroll_first_one = foreach(lambda h_result: h if h_result.outcome == 1 else h_result.outcome, h_result=H(6))
+>>> d6_reroll_first_one = foreach(lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome, h_result=H(6))
 >>> p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
 >>> p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 >>> attr_results: dict[str, H] = {

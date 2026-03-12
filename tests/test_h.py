@@ -28,7 +28,8 @@ __all__ = ()
 
 
 _INTEGRAL_OUTCOME_TYPES: tuple[type, ...] = (int,)
-_OUTCOME_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES + (
+_OUTCOME_TYPES: tuple[type, ...] = (
+    *_INTEGRAL_OUTCOME_TYPES,
     float,
     Decimal,
     Fraction,
@@ -38,16 +39,16 @@ _COUNT_TYPES: tuple[type, ...] = _INTEGRAL_OUTCOME_TYPES
 
 
 try:
-    import numpy
+    import numpy as np
 except ImportError:
     pass
 else:
     _OUTCOME_TYPES += (
-        numpy.int64,
-        numpy.float128,
+        np.int64,
+        np.float128,
     )
-    _INTEGRAL_OUTCOME_TYPES += (numpy.int64,)
-    _COUNT_TYPES += (numpy.int64,)
+    _INTEGRAL_OUTCOME_TYPES += (np.int64,)
+    _COUNT_TYPES += (np.int64,)
 
 try:
     import sympy
@@ -88,7 +89,7 @@ class TestH:
         assert h == H(2)
 
     def test_init_negative_count(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r"^count for \d+ cannot be negative$"):
             _ = H({0: 0, 1: -1, 2: 2})
 
     def test_repr(self) -> None:
@@ -101,7 +102,7 @@ class TestH:
     def test_bool(self) -> None:
         assert bool(H({})) is False
         assert bool(H({0: 1})) is True
-        assert bool(H({i: 0 for i in range(10)})) is False
+        assert bool(H(dict.fromkeys(range(10), 0))) is False
 
     def test_op_eq(self) -> None:
         base = H(range(10))
@@ -123,7 +124,7 @@ class TestH:
         assert list(d6_d8.counts()) == list(d6_d8.values())
         assert list(d6_d8.outcomes()) == list(range(2, 6 + 8 + 1))
         assert list(d6_d8.outcomes()) == list(d6_d8.keys())
-        assert len((d6_d8 + d6_d8)) == 25
+        assert len(d6_d8 + d6_d8) == 25
         assert (d6_d8 + d6_d8).total == 2304
         assert list(d6_d8.items())
 
@@ -210,7 +211,7 @@ class TestH:
 
     def test_op_matmul(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
-            d6 = H((o_type(i) for i in range(6, 0, -1)))
+            d6 = H(o_type(i) for i in range(6, 0, -1))
             d6_2 = d6 + d6
             d6_3 = d6_2 + d6
             assert 0 @ d6 == H({}), f"o_type: {o_type}; c_type: {c_type}"
@@ -239,20 +240,20 @@ class TestH:
             d6 = H({o_type(i): c_type(1) for i in range(6, 0, -1)})
             d8 = H({o_type(i): c_type(1) for i in range(8, 0, -1)})
 
-            assert (
-                d8.map(within_1_filter, d6) == d8_v_d6
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert d8.map(within_1_filter, d6) == d8_v_d6, (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
 
-            assert (2 @ d6).map(
-                within_7_9_filter, 0
-            ) == d6_2_v_7_9, f"o_type: {o_type}; c_type: {c_type}"
+            assert (2 @ d6).map(within_7_9_filter, 0) == d6_2_v_7_9, (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
 
     def test_cmp_eq(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.eq(0) == H(
-                (False, True, False)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.eq(0) == H((False, True, False)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.eq(h) == H(
                 (True, False, False, False, True, False, False, False, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -260,9 +261,9 @@ class TestH:
             _INCONSISTENT_EQUALITY_OUTCOME_TYPES, _COUNT_TYPES
         ):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.eq(o_type(0)) == H(
-                (False, True, False)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.eq(o_type(0)) == H((False, True, False)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.eq(h) == H(
                 (True, False, False, False, True, False, False, False, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -270,9 +271,9 @@ class TestH:
     def test_cmp_ne(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.ne(0) == H(
-                (True, False, True)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ne(0) == H((True, False, True)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.ne(h) == H(
                 (False, True, True, True, False, True, True, True, False)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -280,9 +281,9 @@ class TestH:
             _INCONSISTENT_EQUALITY_OUTCOME_TYPES, _COUNT_TYPES
         ):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.ne(o_type(0)) == H(
-                (True, False, True)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ne(o_type(0)) == H((True, False, True)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.ne(h) == H(
                 (False, True, True, True, False, True, True, True, False)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -290,9 +291,9 @@ class TestH:
     def test_cmp_lt(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.lt(0) == H(
-                (True, False, False)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.lt(0) == H((True, False, False)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.lt(h) == H(
                 (False, True, True, False, False, True, False, False, False)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -300,9 +301,9 @@ class TestH:
     def test_cmp_le(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.le(0) == H(
-                (True, True, False)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.le(0) == H((True, True, False)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.le(h) == H(
                 (True, True, True, False, True, True, False, False, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -310,9 +311,9 @@ class TestH:
     def test_cmp_gt(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.gt(0) == H(
-                (False, False, True)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.gt(0) == H((False, False, True)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.gt(h) == H(
                 (False, False, False, True, False, False, True, True, False)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -320,9 +321,9 @@ class TestH:
     def test_cmp_ge(self) -> None:
         for o_type, c_type in itertools.product(_OUTCOME_TYPES, _COUNT_TYPES):
             h = H({o_type(i): c_type(1) for i in range(-1, 2)})
-            assert h.ge(0) == H(
-                (False, True, True)
-            ), f"o_type: {o_type}; c_type: {c_type}"
+            assert h.ge(0) == H((False, True, True)), (
+                f"o_type: {o_type}; c_type: {c_type}"
+            )
             assert h.ge(h) == H(
                 (True, False, False, True, True, False, True, True, True)
             ), f"o_type: {o_type}; c_type: {c_type}"
@@ -336,7 +337,7 @@ class TestH:
 
     def test_even_wrong_type(self) -> None:
         with pytest.raises(TypeError):
-            _ = H((i + 0.5 for i in range(7, 0, -1))).is_even()
+            _ = H(i + 0.5 for i in range(7, 0, -1)).is_even()
 
     def test_odd(self) -> None:
         for o_type in _INTEGRAL_OUTCOME_TYPES:
@@ -347,17 +348,15 @@ class TestH:
 
     def test_odd_wrong_type(self) -> None:
         with pytest.raises(TypeError):
-            _ = H((i + 0.5 for i in range(7, 0, -1))).is_odd()
+            _ = H(i + 0.5 for i in range(7, 0, -1)).is_odd()
 
     def test_accumulate(self) -> None:
         assert H(4).accumulate(H(6)) == H(4).accumulate(6)
 
-        h = H(itertools.chain(range(0, 6), range(4, 10)))
-        assert H(range(0, 6)).accumulate(range(4, 10)) == h
+        h = H(itertools.chain(range(6), range(4, 10)))
+        assert H(range(6)).accumulate(range(4, 10)) == h
         assert (
-            H(range(0, 6))
-            .accumulate(range(0, 6))
-            .accumulate((i, 2) for i in range(4, 10))
+            H(range(6)).accumulate(range(6)).accumulate((i, 2) for i in range(4, 10))
             == h
         )
 
@@ -371,37 +370,45 @@ class TestH:
         for _ in range(d20_ish.total):
             cur = prv.draw()
             diff = set(prv.items()) - set(cur.items())
-            drawn_outcome, cur_count = diff.pop()
-            assert (
-                prv[drawn_outcome] == cur[drawn_outcome] + 1
-            ), f"drawn_outcome: {drawn_outcome}; cur: {cur}; prv: {prv}"
+            drawn_outcome, _cur_count = diff.pop()
+            assert prv[drawn_outcome] == cur[drawn_outcome] + 1, (
+                f"drawn_outcome: {drawn_outcome}; cur: {cur}; prv: {prv}"
+            )
             prv = cur
 
     def test_draw_missing_outcome(self) -> None:
         d6 = H(6)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r"^outcomes to be drawn \{.*\} not in H\(.*\)$"
+        ):
             d6.draw(42)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r"^outcomes to be drawn \{.*\} not in H\(.*\)$"
+        ):
             d6.draw(1).draw(1)
 
     def test_draw_missing_outcomes_iterable(self) -> None:
         d6 = H(6)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r"^outcomes to be drawn \{.*\} not in H\(.*\)$"
+        ):
             d6.draw((42,))
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r"^count for \d+ cannot be negative$"):
             d6.draw((1, 1))
 
     def test_draw_missing_outcomes_mapping(self) -> None:
         d6 = H(6)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r"^outcomes to be drawn \{.*\} not in H\(.*\)$"
+        ):
             d6.draw({42: 1})
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r"^count for \d+ cannot be negative$"):
             d6.draw({1: 2})
 
     def test_exactly_k_times_in_n(self) -> None:
@@ -440,14 +447,20 @@ class TestH:
         assert h.substitute(lambda _, __: H(100), max_depth=0) == h
 
     def test_substitute_out_of_bounds(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match=r"^fractional limit must be between zero and one, exclusive$",
+        ):
             assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(-1))
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match=r"^fractional limit must be between zero and one, exclusive$",
+        ):
             assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(2))
 
     def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(h: H, outcome: RealLike) -> H | RealLike:
+        def double_odd_values(_: H, outcome: RealLike) -> H | RealLike:
             return outcome * 2 if outcome % 2 != 0 else outcome
 
         d8 = H(8)
@@ -459,7 +472,7 @@ class TestH:
         )
 
     def test_substitute_never_expand(self) -> None:
-        def never_expand(d: H, outcome: RealLike) -> H | RealLike:
+        def never_expand(_: H, outcome: RealLike) -> H | RealLike:
             return outcome
 
         d20 = H(20)

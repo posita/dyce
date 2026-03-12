@@ -7,19 +7,20 @@
 # ======================================================================================
 
 from anydyce.viz import plot_line
+from numerary import RealLike
 
 from dyce import H, P
 from dyce.evaluation import HResult, foreach
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
     normal_hit = H(12) + 5
     critical_hit = 3 @ H(12) + 5
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(result: HResult):
+    def crit(result: HResult) -> H | RealLike:
         if result.outcome == 20:
             return critical_hit
         elif result.outcome + 5 >= 14:
@@ -29,7 +30,7 @@ def do_it(style: str) -> None:
 
     advantage_weighted = foreach(crit, result=advantage)
 
-    ax = matplotlib.pyplot.axes()
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)

@@ -13,7 +13,7 @@ from dyce.evaluation import foreach
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
     p_4d6 = 4 @ P(6)
     d6_reroll_first_one = foreach(
@@ -37,14 +37,11 @@ def do_it(style: str) -> None:
         "4d4 + 2": 4 @ H(4) + 2,  # marker="o"
     }
 
-    ax = matplotlib.pyplot.axes()
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    plot_line(
-        ax,
-        [(label, res) for label, res in attr_results.items()],
-    )
+    plot_line(ax, tuple(attr_results.items()))
 
     for line, marker in zip(ax.lines, markers, strict=True):
         line.set_marker(marker)

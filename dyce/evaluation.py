@@ -7,15 +7,13 @@
 # ======================================================================================
 
 import sys
+from collections.abc import Callable, Iterable, Iterator
 from contextvars import ContextVar
 from fractions import Fraction
 from functools import wraps
 from itertools import chain, product
 from math import prod
 from typing import (
-    Callable,
-    Iterable,
-    Iterator,
     NamedTuple,
     TypeVar,
     overload,
@@ -613,7 +611,7 @@ def expandable(
         state.
     """
 
-    def _decorator(f):
+    def _decorator(f: _DependentTermT) -> _ForEachEvaluatorT:
         @wraps(f)
         def _f(
             *args: _POrPWithSelectionOrSourceT,
@@ -639,7 +637,8 @@ def expandable(
             if (
                 isinstance(new_norm_limit, int)
                 and cur_ctxt.contextual_depth >= new_norm_limit
-                or isinstance(new_norm_limit, Fraction)
+            ) or (
+                isinstance(new_norm_limit, Fraction)
                 and cur_ctxt.contextual_precision <= new_norm_limit
             ):
                 res = sentinel
@@ -661,7 +660,7 @@ def expandable(
                             for obj in objs
                         )
                     ):
-                        results, counts = zip(*result_counts)
+                        results, counts = zip(*result_counts, strict=True)
                         combined_count = prod(counts)
                         token = _expandable_ctxt.set(
                             _Context(
@@ -681,7 +680,9 @@ def expandable(
                             # the args, and the second part as the ordered kw values,
                             # then zip them back up with the ordered kw keys.
                             callback_args = results[: len(args)]
-                            callback_kw = dict(zip(kw.keys(), results[len(args) :]))
+                            callback_kw = dict(
+                                zip(kw.keys(), results[len(args) :], strict=True)
+                            )
 
                             # This is either our callback or our sentinel function (if
                             # we hit our limit above)
@@ -833,7 +834,7 @@ def explode(
     source: _SourceT,
     predicate: _PredicateT = lambda result: result.outcome == max(result.h),
     limit: LimitT | None = None,
-    inf=float("inf"),
+    inf: RealLike = float("inf"),
 ) -> H:
     r"""
     !!! warning "Experimental"
@@ -989,7 +990,9 @@ def _normalize_limit(
                 "limit cannot be an arbitrary negative integral (use -1 explicitly to indicate no limit)"
             )
     elif isinstance(normalized_limit, Fraction):
-        if normalized_limit <= 0 or normalized_limit >= 1:
+        if normalized_limit > 0 and normalized_limit < 1:
+            pass  # 's all good, man
+        else:
             raise ValueError("fractional limit must be between zero and one, exclusive")
 
     return normalized_limit

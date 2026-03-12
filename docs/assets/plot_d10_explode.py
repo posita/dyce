@@ -13,9 +13,9 @@ from dyce.evaluation import explode
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
-    ax = matplotlib.pyplot.axes()
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)

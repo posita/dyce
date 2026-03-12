@@ -6,11 +6,11 @@
 # software in any capacity.
 # ======================================================================================
 
-from .evaluation import *  # noqa: F401,F403
-from .h import *  # noqa: F401,F403
-from .p import *  # noqa: F401,F403
-from .r import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from .evaluation import *  # noqa: F403
+from .h import *  # noqa: F403
+from .p import *  # noqa: F403
+from .r import *  # noqa: F403
+from .types import *  # noqa: F403
 
 __all__ = ()
 
@@ -26,6 +26,6 @@ __vers_str__: str
 
 try:
     from ._version import __vers_str__, __version__
-except Exception:
+except ImportError:
     __version__ = (0, 0, 0, "post0", "unknown", "d00000000")
     __vers_str__ = "0.0.0.post0+unknown.d00000000"

@@ -6,17 +6,18 @@
 # software in any capacity.
 # ======================================================================================
 
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 
 from anydyce.viz import plot_line
+from numerary import RealLike
 
 from dyce import H, P
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
-    def roll_and_keep(p: P, k: int):
+    def roll_and_keep(p: P, k: int) -> Generator[tuple[RealLike, int]]:
         assert p.is_homogeneous()
         max_d = max(p[-1]) if p else 0
 
@@ -26,7 +27,7 @@ def do_it(style: str) -> None:
 
     d, k = 6, 3
 
-    ax = matplotlib.pyplot.axes()
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)

@@ -7,17 +7,18 @@
 # ======================================================================================
 
 from anydyce.viz import plot_burst, plot_line
+from numerary import RealLike
 
 from dyce import H
 from dyce.evaluation import HResult, foreach
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
     single_attack = 2 @ H(6) + 5
 
-    def gwf(result: HResult):
+    def gwf(result: HResult) -> H | RealLike:
         return result.h if result.outcome in (1, 2) else result.outcome
 
     great_weapon_fighting = 2 @ foreach(gwf, result=H(6)) + 5
@@ -25,14 +26,14 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
     label_sa = "Normal attack"
     label_gwf = "“Great Weapon Fighting”"
-    ax_plot = matplotlib.pyplot.subplot2grid((1, 2), (0, 0))
+    ax_plot = plt.subplot2grid((1, 2), (0, 0))
     ax_plot.tick_params(axis="x", colors=text_color)
     ax_plot.tick_params(axis="y", colors=text_color)
     plot_line(ax_plot, [(label_sa, single_attack), (label_gwf, great_weapon_fighting)])
     ax_plot.lines[0].set_color("tab:green")
     ax_plot.lines[1].set_color("tab:blue")
     ax_plot.legend()
-    ax_burst = matplotlib.pyplot.subplot2grid((1, 2), (0, 1))
+    ax_burst = plt.subplot2grid((1, 2), (0, 1))
     plot_burst(
         ax_burst,
         h_inner=great_weapon_fighting,

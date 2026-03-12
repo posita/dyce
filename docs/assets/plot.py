@@ -6,6 +6,8 @@
 # software in any capacity.
 # ======================================================================================
 
+# ruff: noqa: T201
+
 import argparse
 import logging
 from functools import partial
@@ -33,20 +35,20 @@ _PARSER.add_argument("fig", type=partial(import_plug, pfx="plot"))
 
 
 def _main() -> None:
-    import matplotlib.pyplot
     import matplotlib.style
+    from matplotlib import pyplot as plt
 
     args = _PARSER.parse_args()
     logging.getLogger().setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     png_path = f"plot_{mod_name}_{args.style}.png"
 
-    matplotlib.pyplot.figure().set_size_inches(8, 6, forward=True)
+    plt.figure().set_size_inches(8, 6, forward=True)
     matplotlib.style.use("bmh")
     mod_do_it(args.style)
-    matplotlib.pyplot.tight_layout()
+    plt.tight_layout()
     print(f"saving {png_path}")
-    matplotlib.pyplot.savefig(png_path, dpi=144, transparent=True)
+    plt.savefig(png_path, dpi=144, transparent=True)
 
 
 # ---- Initialization ------------------------------------------------------------------

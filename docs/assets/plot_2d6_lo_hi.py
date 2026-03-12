@@ -12,13 +12,13 @@ from dyce import H, P
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
     p_2d6 = 2 @ P(H(6))
     p_2d6_lowest = p_2d6.h(0)
     p_2d6_highest = p_2d6.h(-1)
 
-    ax = matplotlib.pyplot.axes()
+    ax = plt.axes()
     text_color = "white" if style == "dark" else "black"
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)

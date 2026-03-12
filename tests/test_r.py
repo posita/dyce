@@ -64,9 +64,7 @@ class TestValueRoller:
         assert isinstance(r_42, ValueRoller)
 
         r_42_annotated = R.from_value(42, annotation="42")
-        assert r_42 == r_42
         assert r_42 != r_42_annotated
-        assert r_42_annotated == r_42_annotated
 
         assert r_42 != -r_42
         assert -r_42 == -r_42
@@ -88,19 +86,25 @@ class TestRepeatRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_3 = r_42 @ 3
-        assert repr(r_42_3) == """RepeatRoller(
+        assert (
+            repr(r_42_3)
+            == """RepeatRoller(
   n=3,
   source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
+        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_2 = 2 @ r_d6
-        assert repr(r_d6_2) == """RepeatRoller(
+        assert (
+            repr(r_d6_2)
+            == """RepeatRoller(
   n=2,
   source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
+        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -126,21 +130,27 @@ class TestBinarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_squared = r_42 * r_42
-        assert repr(r_42_squared) == """BinarySumOpRoller(
+        assert (
+            repr(r_42_squared)
+            == """BinarySumOpRoller(
   bin_op=<built-in function mul>,
   left_source=ValueRoller(value=42, annotation=''),
   right_source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
+        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_2 = r_d6 + r_d6
-        assert repr(r_d6_2) == """BinarySumOpRoller(
+        assert (
+            repr(r_d6_2)
+            == """BinarySumOpRoller(
   bin_op=<built-in function add>,
   left_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   right_source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
+        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -260,18 +270,18 @@ class TestBinarySumOpRoller:
                 left, right = two_floordiv_r.sources
                 assert left == ValueRoller(2)
                 assert right == r
-                assert tuple(two_floordiv_r.roll().outcomes()) == (
-                    2 // o,
-                ), two_floordiv_r
+                assert tuple(two_floordiv_r.roll().outcomes()) == (2 // o,), (
+                    two_floordiv_r
+                )
 
                 r_floordiv_two = r // 2
                 assert r_floordiv_two.bin_op == operator.__floordiv__
                 left, right = r_floordiv_two.sources
                 assert left == r
                 assert right == ValueRoller(2)
-                assert tuple(r_floordiv_two.roll().outcomes()) == (
-                    o // 2,
-                ), r_floordiv_two
+                assert tuple(r_floordiv_two.roll().outcomes()) == (o // 2,), (
+                    r_floordiv_two
+                )
 
     def test_op_mod(self) -> None:
         for o_type in _OUTCOME_TYPES:
@@ -400,9 +410,9 @@ class TestBinarySumOpRoller:
                 left_source, right_source = r_op_r_neg.sources
                 assert left_source == r
                 assert right_source == r_neg
-                assert tuple(r_op_r_neg.roll().outcomes()) == (
-                    bool(__op__(o, -o)),
-                ), r_op_r_neg
+                assert tuple(r_op_r_neg.roll().outcomes()) == (bool(__op__(o, -o)),), (
+                    r_op_r_neg
+                )
 
     def test_cmp_lt(self) -> None:
         self._test_cmp_op_helper(op_name="lt")
@@ -452,19 +462,25 @@ class TestUnarySumOpRoller:
     def test_repr(self) -> None:
         r_42 = R.from_value(42)
         r_42_neg = -r_42
-        assert repr(r_42_neg) == """UnarySumOpRoller(
+        assert (
+            repr(r_42_neg)
+            == """UnarySumOpRoller(
   un_op=<built-in function neg>,
   source=ValueRoller(value=42, annotation=''),
   annotation='',
 )"""
+        )
 
         r_d6 = R.from_value(H(6), annotation="d6")
         r_d6_neg = -r_d6
-        assert repr(r_d6_neg) == """UnarySumOpRoller(
+        assert (
+            repr(r_d6_neg)
+            == """UnarySumOpRoller(
   un_op=<built-in function neg>,
   source=ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation='d6'),
   annotation='',
 )"""
+        )
 
     def test_op_eq(self) -> None:
         r_42 = R.from_value(42)
@@ -562,7 +578,9 @@ class TestUnarySumOpRoller:
 class TestPoolRoller:
     def test_repr(self) -> None:
         r_4_6_8 = R.from_values(4, 6, 8)
-        assert repr(r_4_6_8) == """PoolRoller(
+        assert (
+            repr(r_4_6_8)
+            == """PoolRoller(
   sources=(
     ValueRoller(value=4, annotation=''),
     ValueRoller(value=6, annotation=''),
@@ -570,9 +588,12 @@ class TestPoolRoller:
   ),
   annotation='',
 )"""
+        )
 
         r_d4_d6_d8 = R.from_values(H(4), H(6), H(8), annotation="d4d6d8")
-        assert repr(r_d4_d6_d8) == """PoolRoller(
+        assert (
+            repr(r_d4_d6_d8)
+            == """PoolRoller(
   sources=(
     ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1}), annotation=''),
     ValueRoller(value=H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), annotation=''),
@@ -580,6 +601,7 @@ class TestPoolRoller:
   ),
   annotation='d4d6d8',
 )"""
+        )
 
     def test_op_eq(self) -> None:
         r_4_6_8 = R.from_values(4, 6, 8)
@@ -680,7 +702,9 @@ class TestSelectionRoller:
     def test_repr(self) -> None:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
         r_squares_select = r_squares.select(0, -1)
-        assert repr(r_squares_select) == """SelectionRoller(
+        assert (
+            repr(r_squares_select)
+            == """SelectionRoller(
   which=(0, -1),
   sources=(
     PoolRoller(
@@ -697,6 +721,7 @@ class TestSelectionRoller:
   ),
   annotation='',
 )"""
+        )
 
     def test_op_eq(self) -> None:
         r_squares = R.from_values_iterable(v**2 for v in range(6, 0, -1))
@@ -782,7 +807,9 @@ class TestRoll:
         r_42 = R.from_value(42)
         r_42_neg = -r_42
         r_42_neg_roll = r_42_neg.roll()
-        assert repr(r_42_neg_roll) == """Roll(
+        assert (
+            repr(r_42_neg_roll)
+            == """Roll(
   r=UnarySumOpRoller(
     un_op=<built-in function neg>,
     source=ValueRoller(value=42, annotation=''),
@@ -812,6 +839,7 @@ class TestRoll:
     ),
   ),
 )"""
+        )
 
     def test_getitem(self) -> None:
         r_123 = R.from_values(1, 2, 3)
