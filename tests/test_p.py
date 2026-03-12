@@ -242,7 +242,7 @@ class TestP:
         p_d6 = P(6)
         p_minus_d6 = P(H(range(0, -6, -1)))
         p_d8 = P(8)
-        p_d8_minus = P(H(range(0, 8)))
+        p_d8_minus = P(H(range(8)))
         assert 1 - p_d6 == p_minus_d6
         assert p_d8_minus == p_d8 - 1
 
@@ -295,9 +295,17 @@ class TestP:
 
     def test_op_truediv_num(self) -> None:
         p_d10 = P(10)
+
+        # All outcomes in p1 are multiples of ten, so dividing by 10 should result in
+        # floats without any fractional components (i.e., floating point errors should
+        # be absent)
         p1 = P(H(range(100, 0, -10)))
-        assert p_d10 == p1 / 10
-        assert (2 * 2 * 2 * 3 * 3 * 5 * 7) / p_d10 == H(
+        assert p_d10 == p1 / 10  # noqa: RUF069
+
+        # Everything should divide evenly again (i.e., floating point errors should
+        # still be absent)
+        lcm_of_1_to_10 = 2 * 2 * 2 * 3 * 3 * 5 * 7
+        assert lcm_of_1_to_10 / p_d10 == H(
             {
                 252.0: 1,
                 280.0: 1,
@@ -764,70 +772,42 @@ class TestP:
 
 
 def test_analyze_selection() -> None:
-    which: tuple[_GetItemT, ...]
+    assert _analyze_selection(6, which=(0,)) == 1
+    assert _analyze_selection(6, which=(-1,)) == -1
+    assert _analyze_selection(6, which=(0, 1, 0, 0, 1)) == 2
+    assert _analyze_selection(6, which=(0, 1, 0, 0, 1, 4)) == 5
+    assert _analyze_selection(6, which=(5, 1, 5, 5, 1, 4)) == -5
 
-    which = (0,)
-    assert _analyze_selection(6, which) == 1
-    which = (-1,)
-    assert _analyze_selection(6, which) == -1
-    which = (0, 1, 0, 0, 1)
-    assert _analyze_selection(6, which) == 2
-    which = (0, 1, 0, 0, 1, 4)
-    assert _analyze_selection(6, which) == 5
-    which = (5, 1, 5, 5, 1, 4)
-    assert _analyze_selection(6, which) == -5
+    assert _analyze_selection(6, which=tuple(range(6))) == 6
+    assert _analyze_selection(6, which=tuple(range(0, -6, -1))) == 6
+    assert _analyze_selection(6, which=tuple(range(6)) + tuple(range(0, -6, -1))) == 12
+    assert _analyze_selection(6, which=(slice(None),)) == 6
+    assert _analyze_selection(6, which=(slice(0, None), slice(-6, None))) == 12
 
-    which = tuple(range(6))
-    assert _analyze_selection(6, which) == 6
-    which = tuple(range(0, -6, -1))
-    assert _analyze_selection(6, which) == 6
-    which = tuple(range(6)) + tuple(range(0, -6, -1))
-    assert _analyze_selection(6, which) == 12
-    which = (slice(None),)
-    assert _analyze_selection(6, which) == 6
-    which = (slice(0, None), slice(-6, None))
-    assert _analyze_selection(6, which) == 12
+    assert _analyze_selection(6, which=(-1, 0)) is None
+    assert _analyze_selection(6, which=tuple(range(6)) + tuple(range(3))) is None
 
-    which = (-1, 0)
-    assert _analyze_selection(6, which) is None
-    which = tuple(range(6)) + tuple(range(3))
-    assert _analyze_selection(6, which) is None
+    assert _analyze_selection(6, which=(2,)) == 3
+    assert _analyze_selection(6, which=(3,)) == -3
+    assert _analyze_selection(6, which=(2, 3)) == 4
+    assert _analyze_selection(6, which=(1, 2, 3)) == 4
+    assert _analyze_selection(6, which=(1, 3)) == 4
+    assert _analyze_selection(6, which=(2, 3, 4)) == -4
+    assert _analyze_selection(6, which=(2, 4)) == -4
 
-    which = (2,)
-    assert _analyze_selection(6, which) == 3
-    which = (3,)
-    assert _analyze_selection(6, which) == -3
-    which = (2, 3)
-    assert _analyze_selection(6, which) == 4
-    which = (1, 2, 3)
-    assert _analyze_selection(6, which) == 4
-    which = (1, 3)
-    assert _analyze_selection(6, which) == 4
-    which = (2, 3, 4)
-    assert _analyze_selection(6, which) == -4
-    which = (2, 4)
-    assert _analyze_selection(6, which) == -4
+    assert _analyze_selection(5, which=(2,)) == 3
+    assert _analyze_selection(5, which=(1, 2)) == 3
+    assert _analyze_selection(5, which=(2, 3)) == -3
 
-    which = (2,)
-    assert _analyze_selection(5, which) == 3
-    which = (1, 2)
-    assert _analyze_selection(5, which) == 3
-    which = (2, 3)
-    assert _analyze_selection(5, which) == -3
-
-    which = ()
-    assert _analyze_selection(0, which) == 0
-    which = ()
-    assert _analyze_selection(6, which) == 0
-    which = (slice(0, 0),)
-    assert _analyze_selection(6, which) == 0
+    assert _analyze_selection(0, which=()) == 0
+    assert _analyze_selection(6, which=()) == 0
+    assert _analyze_selection(6, which=(slice(0, 0),)) == 0
 
     with pytest.raises(IndexError):
-        which = (1,)
-        _ = _analyze_selection(0, which)
+        _ = _analyze_selection(0, which=(1,))
 
 
-def test_first_principles():
+def test_first_principles() -> None:
     for n, h, which in (
         (3, H(6), ()),
         (3, H((2, 3, 3, 4, 4, 5)), ()),
@@ -881,7 +861,7 @@ def _rwc_heterogeneous_brute_force_combinations(
     # Generate combinations naively, via Cartesian product, which is not at all
     # efficient, but much easier to read and reason about
     for rolls in itertools.product(*(h.items() for h in hs)):
-        outcomes, counts = tuple(zip(*rolls))
+        outcomes, counts = tuple(zip(*rolls, strict=True))
         roll = tuple(sorted(outcomes))
         count = prod(counts)
         roll_selection = _roll_which(roll, *keys)

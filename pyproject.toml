@@ -69,25 +69,6 @@ packages = ["dyce"]
 
 dyce = ["py.typed"]
 
-[tool.flake8]  # ------------------------------------------------------------------------
-
-# See:
-# * <https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes>
-# * <https://flake8.readthedocs.io/en/latest/user/error-codes.html>
-ignore = [
-  "E203",  # whitespace before ':'
-  "E501",  # line too long (... > ... characters)
-  "E704",  # multiple statements on one line
-  "W503",  # line break occurred before a binary operator
-]
-
-[tool.isort]  # ------------------------------------------------------------------------
-
-# See <https://pycqa.github.io/isort/docs/configuration/profiles.html#black>
-profile = "black"
-# See <https://pycqa.github.io/isort/docs/configuration/options.html#skip-gitignore>
-skip_gitignore = true
-
 [tool.mypy]  # -------------------------------------------------------------------------
 
 check_untyped_defs = true
@@ -107,6 +88,35 @@ doctest_optionflags = [
   "IGNORE_EXCEPTION_DETAIL",
   "NORMALIZE_WHITESPACE",
   "NUMBER",
+]
+
+[tool.ruff.lint]  # --------------------------------------------------------------------
+
+preview = true
+ignore = [
+  "C90",  # TODO(posita): someday...
+  "CPY",
+  "D",
+  "DOC",
+  "EM",
+  "FIX",  # TODO(posita): run occasionally, or figure out how to make these warnings
+  "PLC",
+  "PLR",
+  "PLW",  # TODO(posita): remove this
+  "COM812",  # Trailing comma missing
+  "E501",  # Line too long (... > ...)
+  "RET505",  # Unnecessary `else` after `return` statement
+  "RET506",  # Unnecessary `else` after `raise` statement
+  "RUF002",  # Docstring contains ambiguous ...
+  "RUF067",  # `__init__` module should only contain docstrings and re-exports
+  "S101",  # Use of `assert` detected
+  "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
+  "TD003",  # Missing issue link for this TODO  # TODO(posita): remove this after creating issues
+  "TRY003",  # Avoid specifying long messages outside the exception class
+  "UP007",  # Use `X | Y` for type annotations  # TODO(posita): remove after forward refs are properly supported
+]
+select = [
+  "ALL",
 ]
 
 [tool.versioningit.next-version]  # ----------------------------------------------------

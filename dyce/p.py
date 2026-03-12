@@ -10,7 +10,7 @@ from collections import Counter
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from fractions import Fraction
 from functools import cache
-from itertools import chain, groupby, product, repeat
+from itertools import chain, groupby, product, repeat, starmap
 from math import inf, prod
 from operator import __eq__, __index__, __ne__
 from typing import Union, overload
@@ -199,14 +199,13 @@ class P(Sequence[H], HableOpsMixin):
                 if isinstance(a, H):
                     yield a
                 elif isinstance(a, P):
-                    for h in a._hs:
-                        yield h
+                    yield from a._hs  # noqa: SLF001
                 elif isinstance(a, SupportsInt):
                     yield H(a)
                 else:
                     raise TypeError(f"unrecognized initializer type {a!r}")
 
-        hs = list(h for h in _gen_hs() if h)
+        hs = [h for h in _gen_hs() if h]
 
         try:
             hs.sort(key=lambda h: tuple(h.items()))
@@ -247,7 +246,7 @@ class P(Sequence[H], HableOpsMixin):
             if n == 1:
                 return repr(h)
             else:
-                return f"{n}@{type(self).__name__}({repr(h)})"
+                return f"{n}@{type(self).__name__}({h!r})"
 
         if len(group_counters) == 1:
             h = next(iter(group_counters))
@@ -257,19 +256,19 @@ class P(Sequence[H], HableOpsMixin):
             else:
                 return _n_at(h, group_counters[h])
         else:
-            args = ", ".join(_n_at(h, n) for h, n in group_counters.items())
+            args = ", ".join(starmap(_n_at, group_counters.items()))
 
             return f"{type(self).__name__}({args})"
 
     @beartype
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, P):
             return __eq__(self._hs, other._hs)
         else:
             return NotImplemented
 
     @beartype
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         if isinstance(other, P):
             return __ne__(self._hs, other._hs)
         else:
@@ -659,9 +658,9 @@ class P(Sequence[H], HableOpsMixin):
             group_counter: Counter[RealLike] = Counter()
             n = sum(1 for _ in hs)
 
-            for k in range(0, n + 1):
+            for k in range(n + 1):
                 group_counter[k] = h.exactly_k_times_in_n(outcome, n, k) * (
-                    group_counter[k] if group_counter[k] else 1
+                    group_counter[k] or 1
                 )
 
             group_counters.append(group_counter)
@@ -1000,7 +999,7 @@ def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> int | None:
     elif min_index <= n - max_index:
         return max_index
     else:
-        assert False, "logically impossible (should never be here)"
+        raise RuntimeError("logically impossible (should never be here)")
 
 
 @beartype
@@ -1035,7 +1034,7 @@ def _rwc_heterogeneous_h_groups(
         if v:
             rolls_by_group: Iterable[Iterable[RealLike]]
             counts_by_group: Iterable[int]
-            rolls_by_group, counts_by_group = zip(*v)
+            rolls_by_group, counts_by_group = zip(*v, strict=True)
             total_count = prod(counts_by_group)
             sorted_outcomes = tuple(sorted(chain(*rolls_by_group)))
 
@@ -1106,7 +1105,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
         total_count = h.total**n
 
         for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
-            h, n, k, from_right
+            h, n, k, from_right=from_right
         ):
             count = total_count * prob_nmr8r // prob_dnmn8r
 
@@ -1125,6 +1124,7 @@ def _selected_distros_memoized(
     h: H,
     n: int,
     k: int,
+    *,
     from_right: bool,
 ) -> tuple[_RollProbT, ...]:
     def _selected_distros_gen() -> Iterator[_RollProbT]:
@@ -1142,7 +1142,7 @@ def _selected_distros_memoized(
             )
             cumulative_p = Fraction(0)
 
-            for i in range(0, k + 1):
+            for i in range(k + 1):
                 head = i * (this_outcome,)
 
                 if i < k:
@@ -1150,7 +1150,7 @@ def _selected_distros_memoized(
                     cumulative_p += Fraction(head_count, this_total)
 
                     for tail, tail_nmr8r, tail_dnmn8r in _selected_distros_memoized(
-                        next_h, n - i, k - i, from_right
+                        next_h, n - i, k - i, from_right=from_right
                     ):
                         whole = tail + head if from_right else head + tail
                         whole_nmr8r = head_count * tail_nmr8r

@@ -54,7 +54,7 @@ def experimental(f: _WrappedT) -> _WrappedT:
 
 def _warn_decr(f: _WrappedT, category: type[Warning], warning_txt: str) -> _WrappedT:
     @wraps(f)
-    def _wrapped(*args, **kw):
+    def _wrapped(*args: object, **kw: object) -> object:
         warnings.warn(
             warning_txt,
             category=category,
@@ -63,4 +63,4 @@ def _warn_decr(f: _WrappedT, category: type[Warning], warning_txt: str) -> _Wrap
 
         return f(*args, **kw)
 
-    return cast(_WrappedT, _wrapped)
+    return cast("_WrappedT", _wrapped)

@@ -7,6 +7,8 @@
 # software in any capacity.
 # ======================================================================================
 
+# ruff: noqa: T201
+
 import argparse
 import doctest
 import logging
@@ -96,6 +98,8 @@ PARSER.add_argument(
     metavar="PATH",
 )
 
+_LOGGER = logging.getLogger(__name__)
+
 
 # ---- Functions -----------------------------------------------------------------------
 
@@ -103,15 +107,18 @@ PARSER.add_argument(
 def copy_doctests(
     src_path: pathlib.Path,
     dst_f: TextIO,
-    dp: doctest.DocTestParser = doctest.DocTestParser(),
+    dp: doctest.DocTestParser | None = None,
 ) -> None:
+    if dp is None:
+        dp = doctest.DocTestParser()
+
     with src_path.open() as src_f:
         src_p = str(src_path.resolve())
         dt = dp.get_doctest(src_f.read(), {"__name__": "__main__"}, src_p, src_p, 0)
         cur_lineno = 0
 
         if not dt.examples:
-            logging.debug("no doctests found in %s", src_path)
+            _LOGGER.debug("no doctests found in %s", src_path)
 
         for example in dt.examples:
             assert cur_lineno <= example.lineno
@@ -137,28 +144,28 @@ def copy_paths(
         dst_path = dst_dir_path.joinpath(src_path.relative_to(cwd_path))
         dst_path = dst_path.with_name(dst_path.name + parsed_args.tmp_file_suffix)
         dst_path.parent.mkdir(parents=True, exist_ok=True)
-        logging.debug("checking %s", orig_path)
+        _LOGGER.debug("checking %s", orig_path)
 
         try:
             with dst_path.open("w") as dst:
                 copy_doctests(src_path, dst)
         except FileNotFoundError:
-            logging.warning("%s does not exist; skipping", orig_path)
+            _LOGGER.warning("%s does not exist; skipping", orig_path)
             dst_path.unlink()
             continue
         except UnicodeDecodeError:
-            logging.warning("unable to make sense of %s; skipping", orig_path)
+            _LOGGER.warning("unable to make sense of %s; skipping", orig_path)
             dst_path.unlink()
             continue
 
         if dst_path.stat().st_size == 0:
             if parsed_args.keep_tmp_files:
-                logging.debug("%s had no tests", dst_path)
+                _LOGGER.debug("%s had no tests", dst_path)
             else:
-                logging.debug("%s had no tests, deleting", dst_path)
+                _LOGGER.debug("%s had no tests, deleting", dst_path)
                 dst_path.unlink()
         else:
-            logging.debug("extracted tests from %s into %s", orig_path, dst_path)
+            _LOGGER.debug("extracted tests from %s into %s", orig_path, dst_path)
             dst_paths_to_orig_paths[dst_path] = orig_path
 
     return dst_paths_to_orig_paths
@@ -192,23 +199,23 @@ def main(*args: str) -> int:
     import mypy.api
 
     parsed_args = PARSER.parse_args(args) if args else PARSER.parse_args()
-    logging.getLogger().setLevel(parsed_args.log_level)
+    _LOGGER.setLevel(parsed_args.log_level)
     dst_dir = tempfile.mkdtemp()
     dst_dir_path = pathlib.Path(dst_dir)
-    logging.debug("created temporary directory %s", dst_dir_path)
+    _LOGGER.debug("created temporary directory %s", dst_dir_path)
     dst_paths_to_orig_paths = copy_paths(
         parsed_args, dst_dir_path, gather_paths(parsed_args)
     )
 
     try:
-        results = mypy.api.run(parsed_args.mypy_args + [str(dst_dir)])
+        results = mypy.api.run([*parsed_args.mypy_args, str(dst_dir)])
 
         if results[0]:
             for line in results[0].rstrip("\n").split("\n"):
                 if line.startswith(str(dst_dir)):
                     p, rest = line.split(":", 1)
                     path = pathlib.Path(p)
-                    line = f"{str(dst_paths_to_orig_paths.get(path, path))}:{rest}"
+                    line = f"{dst_paths_to_orig_paths.get(path, path)!s}:{rest}"
 
                 print(line)
 
@@ -220,7 +227,7 @@ def main(*args: str) -> int:
         if parsed_args.keep_tmp_files:
             print(f"leaving temporary files in {dst_dir_path}", file=sys.stderr)
         else:
-            logging.debug("removing %s", dst_dir_path)
+            _LOGGER.debug("removing %s", dst_dir_path)
             shutil.rmtree(dst_dir)
 
 

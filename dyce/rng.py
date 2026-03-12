@@ -55,7 +55,7 @@ try:
         _generator: Generator
 
         @beartype
-        def __init__(self, seed: _RandSeedT = None):
+        def __init__(self, seed: _RandSeedT = None) -> None:
             # Parent calls self.seed(seed)
             super().__init__(seed)
 
@@ -85,13 +85,13 @@ try:
             return self._generator.random()
 
         @beartype
-        def seed(self, a: object = ..., version: int = 2) -> None:
+        def seed(self, a: object = ..., version: int = 2) -> None:  # noqa: ARG002
             self._generator = default_rng(self.bit_generator(a))
 
         @beartype
         def setstate(self, state: tuple[Any, ...]) -> None:
-            (_state,) = state
-            self._generator.bit_generator.state = _state
+            (state_item,) = state
+            self._generator.bit_generator.state = state_item
 
     class PCG64DXSMRandom(NumPyRandomBase):
         r"""

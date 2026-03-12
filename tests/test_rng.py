@@ -132,7 +132,8 @@ def _test_random_w_seed_helper(
     rng.seed(seed)
     state = rng.getstate()
     val = rng.random()
-    assert val >= 0.0 and val < 1.0
+    assert val >= 0.0
+    assert val < 1.0
 
     if expected is not None:
         assert val == expected

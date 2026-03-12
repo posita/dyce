@@ -7,11 +7,12 @@
 # ======================================================================================
 
 import logging
-import os
-import subprocess
+import subprocess  # noqa: S404
 from pathlib import Path
 
 from graph import COLORS, Dot
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def do_it(style: str) -> Dot | None:
@@ -20,7 +21,7 @@ def do_it(style: str) -> Dot | None:
     try:
         from pygraphviz import AGraph
     except ImportError as exc:
-        logging.critical(exc)
+        _LOGGER.critical(exc)
 
         return None
 
@@ -32,12 +33,12 @@ def do_it(style: str) -> Dot | None:
         f"--project=dyce_r_{style}",
         str(r_path),
     )
-    logging.info(" ".join(cmd))
-    subprocess.run(cmd)
+    _LOGGER.info(" ".join(cmd))
+    subprocess.run(cmd)  # noqa: S603
 
     src_g = AGraph()
     src_g.read(f"classes_dyce_r_{style}.dot")
-    os.remove(f"classes_dyce_r_{style}.dot")
+    Path(f"classes_dyce_r_{style}.dot").unlink()
 
     src_g.remove_node("dyce.r.CoalesceMode")
     src_g.remove_node("dyce.r.Roll")
@@ -68,6 +69,4 @@ def do_it(style: str) -> Dot | None:
             fontname="Helvetica",
         )
 
-    s = Source(src_g.string_nop())
-
-    return s
+    return Source(src_g.string_nop())

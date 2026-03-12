@@ -10,7 +10,7 @@ from dyce import H
 
 
 def do_it(style: str) -> None:
-    import matplotlib.pyplot
+    from matplotlib import pyplot as plt
 
     col_names = ["Loss", "Tie", "Win"]
     col_ticks = list(range(len(col_names)))
@@ -18,7 +18,7 @@ def do_it(style: str) -> None:
     text_color = "white" if style == "dark" else "black"
 
     for i, them in enumerate(range(3, 3 + num_scenarios)):
-        ax = matplotlib.pyplot.subplot(1, num_scenarios, i + 1)
+        ax = plt.subplot(1, num_scenarios, i + 1)
         row_names: list[str] = []
         rows: list[tuple[float, ...]] = []
         num_rows = 3

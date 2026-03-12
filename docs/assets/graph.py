@@ -6,6 +6,8 @@
 # software in any capacity.
 # ======================================================================================
 
+# ruff: noqa: T201
+
 import argparse
 import html
 import logging
@@ -92,13 +94,15 @@ _PARSER.add_argument("fig", type=partial(import_plug, pfx="graph"))
 
 _VALUE_LEN = 24
 
+_LOGGER = logging.getLogger(__name__)
+
 
 # ---- Classes -------------------------------------------------------------------------
 
 
 class GraphvizObjectResolver:
     @beartype
-    def __init__(self):
+    def __init__(self) -> None:
         self._serial = 1
         self._names: dict[int, str] = {}
 
@@ -131,7 +135,7 @@ class GraphvizObjectResolver:
 
 class GraphizObjectResolverMixin:
     @beartype
-    def __init__(self, g: Digraph, resolver: GraphvizObjectResolver):
+    def __init__(self, g: Digraph, resolver: GraphvizObjectResolver) -> None:
         self._g = g
         self._resolver = resolver
 
@@ -146,7 +150,7 @@ class GraphizObjectResolverMixin:
 
 class InterObjectVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
     @beartype
-    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
+    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:  # noqa: ARG002
         edge_attrs = self.resolver.attrs_for_obj(roll, "edge") or {}
         self.g.edge(
             self.resolver.name_for_obj(roll),
@@ -167,7 +171,7 @@ class InterObjectVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
 
 class RollClusterVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
     @beartype
-    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:
+    def on_roll(self, roll: Roll, parents: Iterator[Roll]) -> None:  # noqa: ARG002
         node_attrs = self.resolver.attrs_for_obj(roll, "node") or {}
         self.g.node(
             self.resolver.name_for_obj(roll),
@@ -187,7 +191,7 @@ class RollClusterVisitor(GraphizObjectResolverMixin, RollWalkerVisitor):
 
 class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
     @beartype
-    def on_roller(self, r: R, parents: Iterator[R]) -> None:
+    def on_roller(self, r: R, parents: Iterator[R]) -> None:  # noqa: ARG002
         node_attrs = self.resolver.attrs_for_obj(r, "node") or {}
 
         if isinstance(r, PoolRoller):
@@ -208,18 +212,11 @@ class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
             bin_op = _truncate(bin_op, is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">bin_op={bin_op}</font>>'
         elif isinstance(r, (UnarySumOpRoller)):
-            if hasattr(r.un_op, "__name__"):
-                un_op = r.un_op.__name__
-            else:
-                un_op = repr(r.un_op)
-
+            un_op = r.un_op.__name__ if hasattr(r.un_op, "__name__") else repr(r.un_op)
             un_op = _truncate(un_op, is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">un_op={un_op}</font>>'
         elif isinstance(r, (NarySumOpRoller)):
-            if hasattr(r.op, "__name__"):
-                op = r.op.__name__
-            else:
-                op = repr(r.op)
+            op = r.op.__name__ if hasattr(r.op, "__name__") else repr(r.op)
 
             op = _truncate(op, is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">op={op}</font>>'
@@ -241,7 +238,9 @@ class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
 class RollOutcomeClusterVisitor(GraphizObjectResolverMixin, RollOutcomeWalkerVisitor):
     @beartype
     def on_roll_outcome(
-        self, roll_outcome: RollOutcome, parents: Iterator[RollOutcome]
+        self,
+        roll_outcome: RollOutcome,
+        parents: Iterator[RollOutcome],  # noqa: ARG002
     ) -> None:
         node_attrs = self.resolver.attrs_for_obj(roll_outcome, "node")
         node_attrs = (
@@ -292,7 +291,7 @@ def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, Any]]) -> Digraph:
     )
 
     for kw, attrs in kw_attrs.items():
-        g.attr(kw if kw else None, **attrs)
+        g.attr(kw or None, **attrs)
 
     return g
 
@@ -319,7 +318,7 @@ def graphviz_walk(
 
 
 @beartype
-def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) -> str:
+def _truncate(value: str, value_len: int = _VALUE_LEN, *, is_html: bool = False) -> str:
     value = value if len(value) <= value_len else (value[: value_len - 3] + "...")
 
     return html.escape(value) if is_html else value
@@ -328,13 +327,13 @@ def _truncate(value: str, value_len: int = _VALUE_LEN, is_html: bool = False) ->
 @beartype
 def _main() -> None:
     args = _PARSER.parse_args()
-    logging.getLogger().setLevel(args.log_level)
+    _LOGGER.setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     svg_path = f"graph_{mod_name}_{args.style}"
     g: Dot | None = mod_do_it(args.style)
 
     if g is None:
-        logging.warning(f"nothing generated for {svg_path}; skipping")
+        _LOGGER.warning("nothing generated for %s; skipping", svg_path)
     else:
         print(f"saving {svg_path}")
         g.render(filename=svg_path, cleanup=True, format="svg")

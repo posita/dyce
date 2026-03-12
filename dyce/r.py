@@ -10,7 +10,7 @@ import enum
 import warnings
 from abc import abstractmethod
 from collections import defaultdict, deque
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from copy import copy
 from itertools import chain
 from operator import (
@@ -270,8 +270,8 @@ class R:
         self,
         sources: Iterable[_SourceT] = (),
         annotation: object = "",
-        **kw,
-    ):
+        **__: object,
+    ) -> None:
         r"Initializer."
         super().__init__()
         self._sources = tuple(sources)
@@ -287,7 +287,7 @@ class R:
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, R):
             return (
                 (isinstance(self, type(other)) or isinstance(other, type(self)))
@@ -298,7 +298,7 @@ class R:
             return super().__eq__(other)
 
     @beartype
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         if isinstance(other, R):
             return not __eq__(self, other)
         else:
@@ -961,7 +961,7 @@ class R:
         ```
         """
         r = copy(self)
-        r._annotation = annotation
+        r._annotation = annotation  # noqa: SLF001
 
         return r
 
@@ -1231,8 +1231,8 @@ class ValueRoller(R):
         self,
         value: _ValueT,
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=(), annotation=annotation, **kw)
 
@@ -1263,7 +1263,7 @@ class ValueRoller(R):
         elif isinstance(self.value, RealLike):
             return Roll(self, roll_outcomes=(RollOutcome(self.value),))
         else:
-            assert False, f"unrecognized value type {self.value!r}"
+            raise TypeError(f"unrecognized value type {self.value!r}")
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -1387,8 +1387,8 @@ class RepeatRoller(R):
         n: SupportsInt,
         source: _SourceT,
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=(source,), annotation=annotation, **kw)
         self._n = as_int(n)
@@ -1406,8 +1406,12 @@ class RepeatRoller(R):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.n == other.n
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, RepeatRoller)  # shouldn't be necessary
+            and self.n == other.n
+        )
 
     @beartype
     def roll(self) -> "Roll":
@@ -1454,8 +1458,8 @@ class BasicOpRoller(R):
         op: BasicOperatorT,
         sources: Iterable[_SourceT],
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=sources, annotation=annotation, **kw)
         self._op = op
@@ -1471,8 +1475,12 @@ class BasicOpRoller(R):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and (_callable_cmp(self.op, other.op))
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, BasicOpRoller)  # shouldn't be necessary
+            and (_callable_cmp(self.op, other.op))
+        )
 
     @beartype
     def roll(self) -> "Roll":
@@ -1558,12 +1566,12 @@ class BinarySumOpRoller(NarySumOpRoller):
         left_source: _SourceT,
         right_source: _SourceT,
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
 
         def _op(
-            r: R,
+            r: R,  # noqa: ARG001
             roll_outcomes: Iterable[RollOutcome],
         ) -> RollOutcome | Iterable[RollOutcome]:
             left_operand, right_operand = roll_outcomes
@@ -1601,8 +1609,12 @@ class BinarySumOpRoller(NarySumOpRoller):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and (_callable_cmp(self.bin_op, other.bin_op))
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, BinarySumOpRoller)  # shouldn't be necessary
+            and (_callable_cmp(self.bin_op, other.bin_op))
+        )
 
 
 class UnarySumOpRoller(NarySumOpRoller):
@@ -1621,12 +1633,12 @@ class UnarySumOpRoller(NarySumOpRoller):
         un_op: _RollOutcomeUnaryOperatorT,
         source: _SourceT,
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
 
         def _op(
-            r: R,
+            r: R,  # noqa: ARG001
             roll_outcomes: Iterable[RollOutcome],
         ) -> RollOutcome | Iterable[RollOutcome]:
             (operand,) = roll_outcomes
@@ -1649,8 +1661,12 @@ class UnarySumOpRoller(NarySumOpRoller):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and (_callable_cmp(self.un_op, other.un_op))
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, UnarySumOpRoller)  # shouldn't be necessary
+            and (_callable_cmp(self.un_op, other.un_op))
+        )
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -1767,8 +1783,8 @@ class FilterRoller(R):
         predicate: _PredicateT,
         sources: Iterable[R],
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=sources, annotation=annotation, **kw)
         self._predicate = predicate
@@ -1784,8 +1800,12 @@ class FilterRoller(R):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and _callable_cmp(self.predicate, other.predicate)
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, FilterRoller)  # shouldn't be necessary
+            and _callable_cmp(self.predicate, other.predicate)
+        )
 
     @beartype
     def roll(self) -> "Roll":
@@ -1907,8 +1927,8 @@ class SelectionRoller(R):
         which: Iterable[_GetItemT],
         sources: Iterable[_SourceT],
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=sources, annotation=annotation, **kw)
         self._which = tuple(which)
@@ -1924,23 +1944,27 @@ class SelectionRoller(R):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.which == other.which
+    def __eq__(self, other: object) -> bool:
+        return (
+            super().__eq__(other)
+            and isinstance(other, SelectionRoller)  # shouldn't be necessary
+            and self.which == other.which
+        )
 
     @beartype
     def roll(self) -> "Roll":
         r""""""
         source_rolls = list(self.source_rolls())
-        roll_outcomes = list(
+        roll_outcomes = [
             roll_outcome
             for roll_outcome in chain.from_iterable(source_rolls)
             if roll_outcome.value is not None
-        )
+        ]
         roll_outcomes.sort(key=attrgetter("value"))
         all_indexes = tuple(range(len(roll_outcomes)))
         selected_indexes = tuple(getitems(all_indexes, self.which))
 
-        def _selected_roll_outcomes():
+        def _selected_roll_outcomes() -> Generator[RollOutcome]:
             for selected_index in selected_indexes:
                 selected_roll_outcome = roll_outcomes[selected_index]
                 assert selected_roll_outcome.value is not None
@@ -2035,8 +2059,8 @@ class SubstitutionRoller(R):
         coalesce_mode: CoalesceMode = CoalesceMode.REPLACE,
         max_depth: SupportsInt = 1,
         annotation: object = "",
-        **kw,
-    ):
+        **kw: object,
+    ) -> None:
         r"Initializer."
         super().__init__(sources=(source,), annotation=annotation, **kw)
         self._expansion_op = expansion_op
@@ -2058,9 +2082,10 @@ class SubstitutionRoller(R):
 )"""
 
     @beartype
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return (
             super().__eq__(other)
+            and isinstance(other, SubstitutionRoller)  # shouldn't be necessary
             and _callable_cmp(self.expansion_op, other.expansion_op)
             and self.coalesce_mode == other.coalesce_mode
             and self.max_depth == other.max_depth
@@ -2101,14 +2126,16 @@ class SubstitutionRoller(R):
                         case CoalesceMode.APPEND:
                             yield roll_outcome
                         case _:
-                            assert (
-                                False
-                            ), f"unrecognized substitution mode {self.coalesce_mode!r}"
+                            raise ValueError(
+                                f"unrecognized substitution mode {self.coalesce_mode!r}"
+                            )
 
                     expanded_roll = expanded.adopt((roll_outcome,), CoalesceMode.APPEND)
                     yield from _expanded_roll_outcomes(expanded_roll, depth + 1)
                 else:
-                    assert False, f"unrecognized type for expanded value {expanded!r}"
+                    raise TypeError(
+                        f"unrecognized type for expanded value {expanded!r}"
+                    )
 
         return Roll(
             self,
@@ -2161,7 +2188,7 @@ class RollOutcome:
         self,
         value: RealLike | None,
         sources: Iterable["RollOutcome"] = (),
-    ):
+    ) -> None:
         r"Initializer."
         super().__init__()
         self._value = value
@@ -2176,7 +2203,7 @@ class RollOutcome:
     @beartype
     def __repr__(self) -> str:
         return f"""{type(self).__name__}(
-  value={repr(self.value)},
+  value={self.value!r},
   sources=({_seq_repr(self.sources)}),
 )"""
 
@@ -2205,14 +2232,14 @@ class RollOutcome:
             return NotImplemented
 
     @beartype
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, RollOutcome):
             return bool(__eq__(self.value, other.value))
         else:
             return super().__eq__(other)
 
     @beartype
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         if isinstance(other, RollOutcome):
             return bool(__ne__(self.value, other.value))
         else:
@@ -2459,9 +2486,9 @@ class RollOutcome:
 
         ```
         """
-        assert (
-            self._roll is not None
-        ), "RollOutcome.source_roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
+        assert self._roll is not None, (
+            "RollOutcome.source_roll accessed before associating the roll outcome with a roll (usually via Roll.__init__)"
+        )
 
         return self._roll
 
@@ -2712,10 +2739,10 @@ class RollOutcome:
         elif coalesce_mode is CoalesceMode.APPEND:
             adopted_sources = chain(self.sources, sources)
         else:
-            assert False, f"unrecognized substitution mode {self.coalesce_mode!r}"
+            raise ValueError(f"unrecognized substitution mode {self.coalesce_mode!r}")
 
         adopted_roll_outcome = type(self)(self.value, adopted_sources)
-        adopted_roll_outcome._roll = self._roll
+        adopted_roll_outcome._roll = self._roll  # noqa: SLF001
 
         return adopted_roll_outcome
 
@@ -2771,7 +2798,7 @@ class Roll(Sequence[RollOutcome]):
         r: R,
         roll_outcomes: Iterable[RollOutcome],
         source_rolls: Iterable["Roll"] = (),
-    ):
+    ) -> None:
         r"""
         Initializer.
 
@@ -2826,8 +2853,8 @@ class Roll(Sequence[RollOutcome]):
         self._source_rolls = tuple(source_rolls)
 
         for roll_outcome in self._roll_outcomes:
-            if roll_outcome._roll is None:
-                roll_outcome._roll = self
+            if roll_outcome._roll is None:  # noqa: SLF001
+                roll_outcome._roll = self  # noqa: SLF001
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -3054,7 +3081,7 @@ def walk(
 
                 queue.append(roll.r)
 
-                for i, roll_outcome in enumerate(roll):
+                for roll_outcome in roll:
                     queue.append(roll_outcome)
 
                 for source_roll in roll.source_rolls:

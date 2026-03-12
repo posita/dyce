@@ -9,6 +9,8 @@
 from collections import Counter
 from enum import IntEnum, auto
 
+from numerary import RealLike
+
 from dyce import H, P
 from dyce.evaluation import (
     HResult,
@@ -32,7 +34,7 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     p_3d42d6 = P(d4, d4, d4, d6, d6)
 
     @expandable
-    def roll_sum(result: PResult):
+    def roll_sum(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert roll_sum(p_3d42d6) == H(
@@ -51,13 +53,13 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_head_p(result: PResult):
+    def roll_sum_head_p(result: PResult) -> RealLike:
         return sum(result.roll[:3])
 
     assert roll_sum_head_p(p_3d42d6) == head_sum
 
     @expandable
-    def roll_sum_head_p_with_selection(result: PResult):
+    def roll_sum_head_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -80,13 +82,13 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_tail_p(result: PResult):
+    def roll_sum_tail_p(result: PResult) -> RealLike:
         return sum(result.roll[-3:])
 
     assert roll_sum_tail_p(p_3d42d6) == tail_sum
 
     @expandable
-    def roll_sum_tail_p_with_selection(result: PResult):
+    def roll_sum_tail_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -104,13 +106,13 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_mid_p(result: PResult):
+    def roll_sum_mid_p(result: PResult) -> RealLike:
         return sum(result.roll[1:-1])
 
     assert roll_sum_mid_p(p_3d42d6) == mid_sum
 
     @expandable
-    def roll_sum_mid_p_with_selection(result: PResult):
+    def roll_sum_mid_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -128,13 +130,13 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_skip_p(result: PResult):
+    def roll_sum_skip_p(result: PResult) -> RealLike:
         return sum(result.roll[1::2])
 
     assert roll_sum_skip_p(p_3d42d6) == window_sum
 
     @expandable
-    def roll_sum_skip_p_with_selection(result: PResult):
+    def roll_sum_skip_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -152,13 +154,13 @@ def test_expandable_equivalence_heterogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_window_p(result: PResult):
+    def roll_sum_window_p(result: PResult) -> RealLike:
         return result.roll[2] + result.roll[4]
 
     assert roll_sum_window_p(p_3d42d6) == window_sum
 
     @expandable
-    def roll_sum_window_p_with_selection(result: PResult):
+    def roll_sum_window_p_with_selection(result: PResult) -> RealLike:
         return result.roll[0] + result.roll[2]
 
     assert (
@@ -175,7 +177,7 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     assert H((sum(roll), count) for roll, count in p_6d4.rolls_with_counts()) == d4_6
 
     @expandable
-    def roll_sum(result: PResult):
+    def roll_sum(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert roll_sum(p_6d4) == d4_6
@@ -191,13 +193,13 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_head_p(result: PResult):
+    def roll_sum_head_p(result: PResult) -> RealLike:
         return sum(result.roll[:3])
 
     assert roll_sum_head_p(p_6d4) == head_sum
 
     @expandable
-    def roll_sum_head_p_with_selection(result: PResult):
+    def roll_sum_head_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert roll_sum_head_p_with_selection(PWithSelection(p_6d4, (0, 1, 2))) == head_sum
@@ -216,13 +218,13 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_tail_p(result: PResult):
+    def roll_sum_tail_p(result: PResult) -> RealLike:
         return sum(result.roll[-3:])
 
     assert roll_sum_tail_p(p_6d4) == tail_sum
 
     @expandable
-    def roll_sum_tail_p_with_selection(result: PResult):
+    def roll_sum_tail_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -240,13 +242,13 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_mid_p(result: PResult):
+    def roll_sum_mid_p(result: PResult) -> RealLike:
         return sum(result.roll[1:-1])
 
     assert roll_sum_mid_p(p_6d4) == mid_sum
 
     @expandable
-    def roll_sum_mid_p_with_selection(result: PResult):
+    def roll_sum_mid_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -267,13 +269,13 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_skip_p(result: PResult):
+    def roll_sum_skip_p(result: PResult) -> RealLike:
         return sum(result.roll[1::2])
 
     assert roll_sum_skip_p(p_6d4) == skip_sum
 
     @expandable
-    def roll_sum_skip_p_with_selection(result: PResult):
+    def roll_sum_skip_p_with_selection(result: PResult) -> RealLike:
         return sum(result.roll)
 
     assert (
@@ -295,13 +297,13 @@ def test_expandable_equivalence_homogeneous_pool() -> None:
     )
 
     @expandable
-    def roll_sum_window_p(result: PResult):
+    def roll_sum_window_p(result: PResult) -> RealLike:
         return result.roll[2] + result.roll[4]
 
     assert roll_sum_window_p(p_6d4) == window_sum
 
     @expandable
-    def roll_sum_window_p_with_selection(result: PResult):
+    def roll_sum_window_p_with_selection(result: PResult) -> RealLike:
         return result.roll[0] + result.roll[2]
 
     assert (
@@ -391,7 +393,7 @@ def test_expandable_accommodates_h_with_zero_total() -> None:
 
 
 def test_explode_single_sided_die_integral_limit() -> None:
-    def is_even_predicate(h_result: HResult):
+    def is_even_predicate(h_result: HResult) -> bool:
         return h_result.outcome % 2 == 0
 
     assert explode(H({3: 1}), is_even_predicate, limit=5) == H({3: 1})

@@ -45,7 +45,7 @@ from operator import (
     __truediv__,
     __xor__,
 )
-from typing import TypeVar, Union, cast, overload
+from typing import Literal, TypeVar, Union, cast, overload
 
 from numerary import IntegralLike, RealLike
 from numerary.bt import beartype
@@ -100,7 +100,7 @@ except (KeyError, ValueError):
 
 
 @deprecated
-def coalesce_replace(h: "H", outcome: RealLike) -> "H":
+def coalesce_replace(h: "H", _: RealLike) -> "H":
     r"""
     !!! warning "Deprecated"
 
@@ -383,7 +383,7 @@ class H(_MappingT):
         self._h: _MappingT
 
         if isinstance(items, H):
-            self._h = items._h
+            self._h = items._h  # noqa: SLF001
         elif isinstance(items, SupportsInt):
             if items == 0:
                 self._h = {}
@@ -393,17 +393,11 @@ class H(_MappingT):
                     simple_init if simple_init < 0 else 1,
                     0 if simple_init < 0 else simple_init + 1,
                 )
-
-                # if isinstance(items, RealLike):
-                #     outcome_type = type(items)
-                #     self._h = {outcome_type(i): 1 for i in outcome_range}
-                # else:
-                #     self._h = {i: 1 for i in outcome_range}
                 assert isinstance(items, RealLike)
                 outcome_type = type(items)
                 self._h = {outcome_type(i): 1 for i in outcome_range}
         elif isinstance(items, HableT):
-            self._h = items.h()._h
+            self._h = items.h()._h  # noqa: SLF001
         elif isinstance(items, Iterable):
             if isinstance(items, Mapping):
                 items = items.items()
@@ -451,7 +445,7 @@ class H(_MappingT):
         # is an exception, but it requires that objects have proper __dict__ values,
         # which Hs do not. So we basically do what functools.cached_property does, but
         # without a __dict__.
-        self._order_stat_funcs_by_n: dict[int, Callable[[int], "H"]] = {}
+        self._order_stat_funcs_by_n: dict[int, Callable[[int], H]] = {}
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -460,7 +454,7 @@ class H(_MappingT):
         return f"{type(self).__name__}({dict.__repr__(self._h)})"
 
     @beartype
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, HableT):
             return __eq__(self, other.h())
         elif isinstance(other, H):
@@ -469,7 +463,7 @@ class H(_MappingT):
             return super().__eq__(other)
 
     @beartype
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         if isinstance(other, HableT):
             return __ne__(self, other.h())
         elif isinstance(other, H):
@@ -485,7 +479,7 @@ class H(_MappingT):
         return self._hash
 
     @beartype
-    def __bool__(self) -> int:
+    def __bool__(self) -> bool:
         return bool(self.total)
 
     @beartype
@@ -797,11 +791,10 @@ class H(_MappingT):
         """
         from dyce import P
 
-        def _dependent_term(**roll_kw) -> HOrOutcomeT:
+        def _dependent_term(**roll_kw: tuple) -> HOrOutcomeT:
             outcome_kw: dict[str, RealLike] = {}
 
             for key, roll in roll_kw.items():
-                assert isinstance(roll, tuple)
                 assert len(roll) == 1
                 outcome_kw[key] = roll[0]
 
@@ -1036,7 +1029,7 @@ class H(_MappingT):
         if not isinstance(other, H):
             other = H(other)
 
-        return type(self)(cast(_SourceT, chain(self.items(), other.items())))
+        return type(self)(cast("_SourceT", chain(self.items(), other.items())))
 
     @beartype
     def draw(
@@ -1564,7 +1557,7 @@ class H(_MappingT):
 
         ```
         """
-        return self.accumulate({outcome: 0 for outcome in outcomes})
+        return self.accumulate(dict.fromkeys(outcomes, 0))
 
     @overload
     def distribution(
@@ -1689,13 +1682,15 @@ class H(_MappingT):
                 *(
                     (outcome, float(probability))
                     for outcome, probability in self.distribution()
-                )
-            )
+                ),
+                strict=True,
+            ),
         )
 
     @beartype
     def format(
         self,
+        *,
         width: SupportsInt = _ROW_WIDTH,
         scaled: bool = False,
         tick: str = "#",
@@ -1800,13 +1795,15 @@ class H(_MappingT):
                     yield f"std | {std:7.2f}"
                     yield f"var | {var:7.2f}"
                 except (OverflowError, TypeError) as exc:
-                    warnings.warn(f"{str(exc)}; mu: {mu}")
+                    warnings.warn(f"{exc!s}; mu: {mu}", stacklevel=1)
 
                 if self:
                     outcomes, probabilities = self.distribution_xy()
                     tick_scale = max(probabilities) if scaled else 1.0
 
-                    for outcome, probability in zip(outcomes, probabilities):
+                    for outcome, probability in zip(
+                        outcomes, probabilities, strict=True
+                    ):
                         try:
                             outcome_str = f"{outcome: 3}"
                         except (TypeError, ValueError):
@@ -1847,7 +1844,7 @@ class H(_MappingT):
         Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
         (to avoid duplicate computation).
         """
-        mu = mu if mu else self.mean()
+        mu = mu or self.mean()
         numerator: int
         denominator: int
         numerator = denominator = 0
@@ -1930,7 +1927,6 @@ class HableT(Protocol, metaclass=CachingProtocolMeta):
         r"""
         Express its implementer as an [``H`` object][dyce.h.H].
         """
-        pass
 
 
 class HableOpsMixin(HableT):
@@ -1946,7 +1942,7 @@ class HableOpsMixin(HableT):
 
     __slots__ = ()
 
-    def __init__(self):
+    def __init__(self) -> None:
         object.__init__(self)
 
     @beartype
@@ -2370,15 +2366,15 @@ def resolve_dependent_probability(
 
 
 @beartype
-def sum_h(hs: Iterable[H]):
+def sum_h(hs: Iterable[H]) -> H:
     """
     Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.
 
     This is to ensure that summing zero or more histograms always returns a histogram.
     """
-    h_sum = sum(hs)
+    h_sum: H | Literal[0] = sum(hs)
 
-    return H({}) if h_sum == 0 else h_sum
+    return cast("H", H({}) if h_sum == 0 else h_sum)
 
 
 @beartype

@@ -33,6 +33,6 @@ def import_plug(arg: str, pfx: str) -> tuple[str, Callable[[str], Any]]:
         ImportError,
         SyntaxError,
     ) as exc:
-        raise argparse.ArgumentTypeError(f'unable to load "{arg}" ({exc})')
+        raise argparse.ArgumentTypeError(f'unable to load "{arg}"') from exc
     else:
         return (arg, do_it)

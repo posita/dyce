@@ -13,7 +13,7 @@ from dyce.r import R
 
 def do_it(style: str) -> Dot:
     g = digraph(style)
-    colors_by_index = tuple(name for name in COLORS[style].keys() if name != "line")
+    colors_by_index = tuple(name for name in COLORS[style] if name != "line")
     r_filter = R.filter_from_sources_iterable(
         lambda outcome: bool(outcome.is_odd().value),
         sources=(
