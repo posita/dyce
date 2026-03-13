@@ -6,12 +6,17 @@
 # software in any capacity.
 # ======================================================================================
 
-from graph import Dot, digraph, graphviz_walk
+from typing import TYPE_CHECKING
 
 from dyce.r import ValueRoller
 
+if TYPE_CHECKING:
+    from .graph import digraph, graphviz_walk
+else:
+    from graph import digraph, graphviz_walk
 
-def do_it(style: str) -> Dot:
+
+def do_it(style: str) -> object:
     g = digraph(style)
     r_1 = ValueRoller(1)
     graphviz_walk(g, r_1.roll())

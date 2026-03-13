@@ -51,7 +51,7 @@ else:
     _COUNT_TYPES += (np.int64,)
 
 try:
-    import sympy
+    import sympy  # type: ignore[import-untyped]
 except ImportError:
     pass
 else:

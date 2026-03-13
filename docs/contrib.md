@@ -76,7 +76,7 @@ Unit tests are run with [pytest](https://docs.pytest.org/) via [Tox](https://tox
     This can often be remedied by setting the appropriate [``gcc`` environment variables](https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html).
 
     ``` sh
-    CPATH=/opt/local/include LIBRARY_PATH=/optlocal/lib tox -e check-classdiagrams
+    CPATH=/opt/local/include LIBRARY_PATH=/optlocal/lib tox -e assets
     ```
 
 [^1]:

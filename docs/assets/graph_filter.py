@@ -6,12 +6,17 @@
 # software in any capacity.
 # ======================================================================================
 
-from graph import COLORS, Dot, digraph, graphviz_walk
+from typing import TYPE_CHECKING
 
 from dyce.r import R
 
+if TYPE_CHECKING:
+    from .graph import COLORS, digraph, graphviz_walk
+else:
+    from graph import COLORS, digraph, graphviz_walk
 
-def do_it(style: str) -> Dot:
+
+def do_it(style: str) -> object:
     g = digraph(style)
     colors_by_index = tuple(name for name in COLORS[style] if name != "line")
     r_filter = R.filter_from_sources_iterable(
