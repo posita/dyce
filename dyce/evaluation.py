@@ -37,6 +37,18 @@ from .types import _GetItemT, as_int
 
 __all__ = ()
 
+_ = """
+``` python
+>>> import sage  # type: ignore [import-not-found]
+>>> import sage.rings  # type: ignore [import-not-found]
+>>> import sage.rings.rational  # type: ignore [import-not-found]
+>>> import sympy  # type: ignore [import-untyped]
+>>> import sympy.abc  # type: ignore [import-untyped]
+>>> import sympy.solvers  # type: ignore [import-untyped]
+
+```
+"""
+
 
 # ---- Types ---------------------------------------------------------------------------
 

@@ -9,17 +9,21 @@
 import logging
 import subprocess  # noqa: S404
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
-from graph import COLORS, Dot
+if TYPE_CHECKING:
+    from .graph import COLORS
+else:
+    from graph import COLORS
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def do_it(style: str) -> Dot | None:
-    from graphviz import Source
+def do_it(style: str) -> object:
+    from graphviz import Source  # type: ignore [import-untyped]
 
     try:
-        from pygraphviz import AGraph
+        from pygraphviz import AGraph  # type: ignore [import-untyped]
     except ImportError as exc:
         _LOGGER.critical(exc)
 
@@ -69,4 +73,4 @@ def do_it(style: str) -> Dot | None:
             fontname="Helvetica",
         )
 
-    return Source(src_g.string_nop())
+    return cast("object", Source(src_g.string_nop()))

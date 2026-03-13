@@ -7,6 +7,7 @@
 # ======================================================================================
 
 from abc import ABC
+from collections.abc import Hashable
 from random import Random
 from typing import Any
 
@@ -85,8 +86,17 @@ try:
             return self._generator.random()
 
         @beartype
-        def seed(self, a: object = ..., version: int = 2) -> None:  # noqa: ARG002
-            self._generator = default_rng(self.bit_generator(a))
+        def seed(
+            self,
+            a: object | None = ...,
+            version: int = 2,  # noqa: ARG002
+        ) -> None:
+            if a is None or isinstance(a, (bool, int)):
+                seed = a
+            else:
+                seed = abs(hash(a) if isinstance(a, Hashable) else id(a))
+
+            self._generator = default_rng(self.bit_generator(seed))
 
         @beartype
         def setstate(self, state: tuple[Any, ...]) -> None:

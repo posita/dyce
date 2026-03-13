@@ -10,7 +10,7 @@ import enum
 import warnings
 from abc import abstractmethod
 from collections import defaultdict, deque
-from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from copy import copy
 from itertools import chain
 from operator import (
@@ -1694,7 +1694,7 @@ class FilterRoller(R):
     ``` python
     >>> r_d6 = R.from_value(H(6))
     >>> filter_r = (2@r_d6).filter(
-    ...   lambda outcome: outcome.value is not None and outcome.value > 3,  # type: ignore [operator]
+    ...   lambda outcome: outcome.value is not None and outcome.value > 3,
     ... )
     >>> (filter_r).roll()
     Roll(
@@ -1964,7 +1964,7 @@ class SelectionRoller(R):
         all_indexes = tuple(range(len(roll_outcomes)))
         selected_indexes = tuple(getitems(all_indexes, self.which))
 
-        def _selected_roll_outcomes() -> Generator[RollOutcome]:
+        def _selected_roll_outcomes() -> Iterator[RollOutcome]:
             for selected_index in selected_indexes:
                 selected_roll_outcome = roll_outcomes[selected_index]
                 assert selected_roll_outcome.value is not None

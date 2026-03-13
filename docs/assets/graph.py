@@ -13,10 +13,10 @@ import html
 import logging
 from collections.abc import Iterator, Mapping
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Literal, cast
 
+from graphviz import Digraph  # type: ignore [import-untyped]
 from numerary.bt import beartype
-from plug import import_plug
 
 from dyce import R
 from dyce.r import (
@@ -35,28 +35,12 @@ from dyce.r import (
     walk,
 )
 
-try:
-    from graphviz import Digraph
-    from graphviz.dot import Dot
-except ImportError:
-    Digraph = Any
-    Dot = Any
+if TYPE_CHECKING:
+    from .plug import import_plug
+else:
+    from plug import import_plug
 
 __all__ = ()
-
-
-# ---- Types ---------------------------------------------------------------------------
-
-
-try:
-    from typing import Annotated
-
-    from beartype.vale import Is
-
-    _GraphvizAttrTypeVals = ("edge", "graph", "node")
-    _GraphvizAttrTypeT = Annotated[str, Is[lambda text: text in _GraphvizAttrTypeVals]]
-except ImportError:
-    _GraphvizAttrTypeT = str  # type: ignore [misc]
 
 
 # ---- Data ----------------------------------------------------------------------------
@@ -110,19 +94,17 @@ class GraphvizObjectResolver:
     def attrs_for_obj(
         self,
         obj: R | Roll | RollOutcome,
-        attr_type: _GraphvizAttrTypeT,
+        attr_type: Literal["edge", "graph", "node"],
     ) -> Mapping[str, str] | None:
         annotation = obj.annotation
 
-        if not isinstance(annotation, Mapping):
-            return None
+        if isinstance(annotation, Mapping):
+            attrs = cast("Mapping[str, object]", annotation).get(attr_type)
 
-        attrs = annotation.get(attr_type)
+            if isinstance(attrs, Mapping):
+                return cast("Mapping[str, str]", attrs)
 
-        if not isinstance(attrs, Mapping):
-            return None
-
-        return attrs
+        return None
 
     @beartype
     def name_for_obj(self, obj: R | Roll | RollOutcome) -> str:
@@ -144,7 +126,7 @@ class GraphizObjectResolverMixin:
         return self._g
 
     @property
-    def resolver(self) -> Digraph:
+    def resolver(self) -> GraphvizObjectResolver:
         return self._resolver
 
 
@@ -204,11 +186,9 @@ class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
             value = _truncate(repr(r.value), is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">value={value}</font>>'
         elif isinstance(r, (BinarySumOpRoller)):
-            if hasattr(r.bin_op, "__name__"):
-                bin_op = r.bin_op.__name__
-            else:
-                bin_op = repr(r.bin_op)
-
+            bin_op = (
+                r.bin_op.__name__ if hasattr(r.bin_op, "__name__") else repr(r.bin_op)
+            )
             bin_op = _truncate(bin_op, is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">bin_op={bin_op}</font>>'
         elif isinstance(r, (UnarySumOpRoller)):
@@ -217,7 +197,6 @@ class RollerClusterVisitor(GraphizObjectResolverMixin, RollerWalkerVisitor):
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">un_op={un_op}</font>>'
         elif isinstance(r, (NarySumOpRoller)):
             op = r.op.__name__ if hasattr(r.op, "__name__") else repr(r.op)
-
             op = _truncate(op, is_html=True)
             label = f'<<b>{type(r).__name__}</b><br/><font face="Courier New">op={op}</font>>'
         else:
@@ -268,7 +247,7 @@ class RollOutcomeClusterVisitor(GraphizObjectResolverMixin, RollOutcomeWalkerVis
 
 
 @beartype
-def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, Any]]) -> Digraph:
+def digraph(style: str, **kw_attrs: Mapping[str, Mapping[str, object]]) -> Digraph:
     g = Digraph()
     g.attr(
         bgcolor="transparent",
@@ -330,7 +309,7 @@ def _main() -> None:
     _LOGGER.setLevel(args.log_level)
     mod_name, mod_do_it = args.fig
     svg_path = f"graph_{mod_name}_{args.style}"
-    g: Dot | None = mod_do_it(args.style)
+    g = mod_do_it(args.style)
 
     if g is None:
         _LOGGER.warning("nothing generated for %s; skipping", svg_path)

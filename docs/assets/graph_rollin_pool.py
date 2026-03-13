@@ -7,14 +7,18 @@
 # ======================================================================================
 
 import random
-
-from graph import COLORS, Dot, digraph, graphviz_walk
+from typing import TYPE_CHECKING
 
 from dyce import H, rng
 from dyce.r import PoolRoller, ValueRoller
 
+if TYPE_CHECKING:
+    from .graph import COLORS, digraph, graphviz_walk
+else:
+    from graph import COLORS, digraph, graphviz_walk
 
-def do_it(style: str) -> Dot:
+
+def do_it(style: str) -> object:
     # ---- BEGIN MONKEY PATCH ----
     # For deterministic outcomes
     rng.RNG = random.Random(1633438594)

@@ -27,9 +27,13 @@ jobs:
       with:
         enable-cache: true
         python-version: ${{ matrix.python-version }}
+    - name: install system dependencies
+      run: |
+        sudo apt-get install \
+          libgraphviz-dev
     - name: test ${{ matrix.python-version }} with Tox
       run: |
-        uv run --no-project --with tox --with tox-gh-actions -- tox --verbose
+        uv run --no-project --with tox --with tox-uv --with tox-gh-actions -- tox --verbose
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,9 +61,6 @@ jobs:
           graphviz \
           libgraphviz-dev \
           libjpeg-dev
-    - name: install Python tools
-      run: |
-        uv tool install tox
         uv pip install --system versioningit
     - name: verify version consistency
       run: |
@@ -81,7 +82,7 @@ jobs:
         . ./helpers/ci-vars.sh
         git config user.name "$( git log --max-count 1 --pretty=format:%an )"
         git config user.email "$( git log --max-count 1 --pretty=format:%ae )"
-        tox -e check
+        uv run --no-project --with tox --with tox-uv -- tox -e check
         [ -f "dist/${PKG}-${VERS_PATCH}-py3-none-any.whl" ]
         (
           . .tox/check/bin/activate

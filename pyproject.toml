@@ -46,6 +46,7 @@ dev = [
   "pre-commit",
   "sympy",
   "tox",
+  "tox-uv",
   "versioningit",
   # TODO(posita): Remove when retiring support for 3.10
   "tomli; python_version < '3.11'",
@@ -71,14 +72,16 @@ dyce = ["py.typed"]
 
 [tool.mypy]  # -------------------------------------------------------------------------
 
-check_untyped_defs = true
 # See <https://mypy.readthedocs.io/en/stable/config_file.html#confval-exclude>
-exclude = "(?x)( (^|/)build/ )"
-ignore_missing_imports = true
-strict_optional = true
-show_error_codes = true
+exclude = """(?x)(
+  (^|/)build/
+  | (^|/)site/
+)"""
 warn_redundant_casts = true
 warn_unused_configs = true
+warn_unused_ignores = true
+# warn_return_any = true
+warn_unreachable = true
 
 [tool.pytest.ini_options]  # -----------------------------------------------------------
 

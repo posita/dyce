@@ -1,4 +1,5 @@
 all : \
+	../dyce-powered.svg \
 	graph_classes_dyce_r_dark.svg \
 	graph_classes_dyce_r_light.svg \
 	graph_filter_dark.svg \

@@ -9,65 +9,24 @@
 # Project
 /.coverage
 /.coverage.*
-/.tox/
+/.jupyterlite.doit.db
 /build/
 /dist/
-/docs/jupyter/
 /docs/index.md
+/docs/jupyter/
 /docs/license.md
 /dyce/_version.py
 /site/
-/htmlcov/
-.dmypy.json
-.ipynb_checkpoints/
-.jupyterlite.doit.db
-
-# Objects and packages
-*.7z
-*.bz2
-*.class
-*.com
-*.dll
-*.dmg
-*.egg
-*.egg-info/
-*.exe
-*.gz
-*.iso
-*.jar
-*.o
-*.py[cdo]
-*.rar
-*.so
-*.tar
-*.xz
-*.zip
-.mypy_cache/
-.pytest_cache/
-/.cache/
-/.eggs/
 __pycache__/
-dropin.cache
-node_modules/
+*.py[oc]
+*.egg-info
+.venv*/
 
-# Logs, databases, etc.
-*.err
-*.log
-*.log.[0-9]*
-*.out
-*.pid
-*.sqlite
-nohup.out
-
-# OS/app generated entities
+# Common OS/app generated entities
 .DS_Store
 .DS_Store?
-.Spotlight-V100/
-.Trashes/
 ._*
 .~*
 Thumbs.db
 desktop.ini
 ehthumbs.db
-
-# Exceptions

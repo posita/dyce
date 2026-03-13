@@ -12,6 +12,15 @@
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
 -->
+<!-- BEGIN MONKEY PATCH --
+For typing.
+
+>>> import sympy  # type: ignore [import-untyped]
+>>> import sympy.abc  # type: ignore [import-untyped]
+>>> import sympy.solvers  # type: ignore [import-untyped]
+>>> import sympy.solvers.inequalities  # type: ignore [import-untyped]
+
+  -- END MONKEY PATCH -->
 
 ``dyce`` provides two core primitives for enumeration[^1].
 

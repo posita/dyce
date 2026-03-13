@@ -11,8 +11,12 @@
 import argparse
 import logging
 from functools import partial
+from typing import TYPE_CHECKING
 
-from plug import import_plug
+if TYPE_CHECKING:
+    from .plug import import_plug
+else:
+    from plug import import_plug
 
 __all__ = ()
 
