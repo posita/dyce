@@ -575,7 +575,7 @@ def expandable(
     d20-like role playing games.
 
     ``` python
-    >>> def expected_dmg_from_attack_roll(dmg_h, dmg_bonus, target):
+    >>> def expected_dmg_from_attack_roll(dmg_h: H, dmg_bonus: int, target: int) -> H:
     ...   normal_dmg = dmg_h + dmg_bonus
     ...   crit_dmg = 2@dmg_h + dmg_bonus
     ...
@@ -735,10 +735,8 @@ def aggregate_weighted(
     *weighted_sources* is a two-tuple of either an outcome-count pair or a
     histogram-count pair. This function is used in the implementation of the
     [``expandable`` decorator][dyce.evaluation.expandable] and derivatives (like the
-    [``foreach`` function][dyce.evaluation.foreach]) as well as the (deprecated)
-    [``H.substitute``][dyce.h.H.substitute] and [``P.foreach``][dyce.p.P.foreach]
-    methods. Unlike those, the histogram returned from this function is *not* reduced to
-    its lowest terms.
+    [``foreach`` function][dyce.evaluation.foreach]) method. Unlike those, the histogram
+    returned from this function is *not* reduced to its lowest terms.
 
     In nearly all cases, when a source contains a histogram, its total takes on the
     corresponding count’s weight. In other words, the sum of the counts of the histogram
@@ -814,26 +812,40 @@ def foreach(
 
     ``` python
     >>> from dyce.evaluation import foreach
-    >>> foreach(lambda d8, d12: d8.outcome + d12.outcome, d8=H(8), d12=H(12))
-    H({2: 1,
-     3: 2,
-     4: 3,
-     5: 4,
-     6: 5,
-     7: 6,
-     8: 7,
-     9: 8,
-     10: 8,
-     11: 8,
-     12: 8,
-     13: 8,
-     14: 7,
-     15: 6,
-     16: 5,
-     17: 4,
-     18: 3,
-     19: 2,
-     20: 1})
+
+    >>> def three_way_vs(first: PResult, second: PResult, third: PResult) -> int:
+    ...   first_roll_reversed = first.roll[::-1]
+    ...   second_roll_reversed = second.roll[::-1]
+    ...   third_roll_reversed = third.roll[::-1]
+    ...   if first_roll_reversed > second_roll_reversed and first_roll_reversed > third_roll_reversed:
+    ...     return 1  # first is the clear winner
+    ...   elif second_roll_reversed > first_roll_reversed and second_roll_reversed > third_roll_reversed:
+    ...     return 2  # second is the clear winner
+    ...   elif third_roll_reversed > first_roll_reversed and third_roll_reversed > second_roll_reversed:
+    ...     return 3  # third is the clear winner
+    ...   else:
+    ...     return 0  # there was a tie somewhere
+
+    >>> foreach(
+    ...   three_way_vs,
+    ...   first=P(6, 6),  # first has pool of two d6s
+    ...   second=P(6, 6),  # second has pool of two d6s
+    ...   third=P(4, 8),  # third has pool of one d4 and one d8
+    ... )
+    H({0: 1103, 1: 5783, 2: 5783, 3: 8067})
+
+    ```
+
+    # TODO(posita): Add description
+
+    ``` python
+    >>> foreach(
+    ...   lambda src1, src2, src3: sum(src1.roll) + src2.outcome + src3.outcome,
+    ...   src1=P(6, 6),
+    ...   src2=H(6),  # histogram
+    ...   src3=range(6, 0, -1),  # histogram source
+    ... ) == 4 @ H(6)
+    True
 
     ```
     """
