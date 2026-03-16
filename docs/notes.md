@@ -15,12 +15,23 @@
 
 # ``dyce`` release notes
 
-## [0.6.3](https://github.com/posita/dyce/releases/tag/v0.6.3)
+## [0.7.0](https://github.com/posita/dyce/releases/tag/v0.7.0)
 
-* Stablized Jupyter Lite installation
-* Adjusted typing slightly
-* Defaulted to collapsed installation cells
-* Acknowledged removal of PyPy support ([beartype/beartype#324](https://github.com/beartype/beartype/issues/324))
+* Stabilizes Jupyter Lite installation
+* Adjusts typing slightly
+* Defaults to collapsed installation cells
+* Modernizes ``setup.cfg`` -> ``pyproject.toml`` (and ``tox.ini``)
+* Drops support for 3.9 and extend support to 3.14
+* Updates CI workflow
+* Fixes error in 4d6 variants example
+* Lets dogs out (migrates to `ruff` for linting)
+* *(Finally!)* removes deprecated interfaces
+  * ``#!python H.explode``
+  * ``#!python H.foreach``
+  * ``#!python H.substitute``
+  * ``#!python P.foreach``
+  * ``#!python dyce.h.coalesce_replace``
+  * ``#!python dyce.h.resolve_dependent_probability``
 
 ## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
 
@@ -38,7 +49,7 @@
 
 * Now requires ``numerary~=0.4.3``.
 * Adds the [``expandable`` decorator][dyce.evaluation.expandable] as well as the [``foreach``][dyce.evaluation.foreach] and [``explode``][dyce.evaluation.explode] convenience functions.
-* Deprecates [``P.foreach``][dyce.p.P.foreach], [``H.foreach``][dyce.h.H.foreach], and [``H.substitute``][dyce.h.H.substitute].
+* Deprecates ``#!python P.foreach``, ``#!python H.foreach``, and ``#!python H.substitute``.
 * Allows outcomes with zero counts in non-normalized [``H`` objects][dyce.h.H].
   Outcomes with zero counts are dropped when calling [``H.lowest_terms``][dyce.h.H.lowest_terms].
   Adds the [``H.zero_fill``][dyce.h.H.zero_fill] convenience method.
@@ -47,7 +58,7 @@
 * Allows deployments to PyPI from CI based on tags.
 * Uses JupyterLite instead of Binder for examples.
 * Refactors [``P.is_homogeneous`` property][dyce.p.P.is_homogeneous] into a similarly-named method and adds the [``P.total`` method][dyce.p.P.total] property.
-* Removes ``H.order_stat_func_for_n`` and instead caches order stat functions for ``n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].
+* Removes ``#!python H.order_stat_func_for_n`` and instead caches order stat functions for ``#!python n`` inside [``H.order_stat_for_n_at_pos``][dyce.h.H.order_stat_for_n_at_pos].
 
 ## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
 
@@ -56,14 +67,14 @@
 ## [0.5.1](https://github.com/posita/dyce/releases/tag/v0.5.1)
 
 * Fixes broken binder links in docs.
-* Adds the ``precision_limit`` argument to [``H.substitute``][dyce.h.H.substitute] and [``H.explode``][dyce.h.H.explode].
+* Adds the ``#!python precision_limit`` argument to ``#!python H.substitute`` and ``#!python H.explode``.
 
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
-* Breaks ``dyce.viz`` out into [``anydyce``](https://github.com/posita/anydyce/).
+* Breaks ``#!python dyce.viz`` out into [``anydyce``](https://github.com/posita/anydyce/).
 * Removes use of ``#!python numerary.types.…SCU`` types.
-* Adds the [``H.foreach``][dyce.h.H.foreach] and [``P.foreach``][dyce.p.P.foreach] class methods.
-* Migrates ``#!python resolve_dependent_probability`` to the [``H.foreach``][dyce.h.H.foreach] class method.
+* Adds the ``#!python H.foreach`` and ``#!python P.foreach`` class methods.
+* Migrates ``#!python resolve_dependent_probability`` to the ``#!python H.foreach`` class method.
 
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
@@ -78,7 +89,7 @@
 * Adds *Ironsworn* example.
 * Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example.
 * Adds detail around dependent probabilities.
-* Adds experimental ``dyce.h.resolve_dependent_probability`` function.
+* Adds experimental ``#!python dyce.h.resolve_dependent_probability`` function.
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 
@@ -119,7 +130,7 @@
 * Removes deprecated synonym methods ``#!python H.even`` and ``#!python H.odd``.
     Uses [``H.is_even``][dyce.h.H.is_even] and [``H.is_odd``][dyce.h.H.is_odd] instead.
 * Removes deprecated synonym package ``#!python dyce.plt``.
-    Uses ``dyce.viz`` instead.
+    Uses ``#!python dyce.viz`` instead.
 * Removes special case handling of ``#!python H({})`` for addition and subtraction.
     Check for code that relied on, e.g., ``#!python h + H({})`` resolving to ``#!python h``.
     It is probably not correct.
@@ -179,7 +190,7 @@
 * Renames experimental ``#!python P.homogeneous`` property to [``P.is_homogeneous``][dyce.p.P.is_homogeneous].
 * Introduces experimental [``R``][dyce.r.R] and [``Roll``][dyce.r.Roll] primitives.
 * Removes ``#!python coerce`` parameter from [``H.map``][dyce.h.H.map], [``H.rmap``][dyce.h.H.rmap], and [``H.umap``][dyce.h.H.umap].
-* Renames ``#!python dyce.plt`` to ``dyce.viz``.
+* Renames ``#!python dyce.plt`` to ``#!python dyce.viz``.
 * Deprecates synonym package ``#!python dyce.plt``.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)

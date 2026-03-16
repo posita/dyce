@@ -8,14 +8,12 @@
 
 import itertools
 import math
-import operator
 import os
 import statistics
 from decimal import Decimal
 from fractions import Fraction
 
 import pytest
-from numerary import RealLike
 
 from dyce import H
 from dyce.evaluation import explode
@@ -438,67 +436,13 @@ class TestH:
         assert h.lowest_terms() == {1: 1, 2: 2}
         assert h.accumulate(h).lowest_terms() == {1: 1, 2: 2}
 
-    def test_substitute_empty(self) -> None:
-        h = H({})
-        assert h.substitute(lambda _, __: H(100)) == h
-
-    def test_substitute_cull_everything(self) -> None:
-        h = H(6)
-        assert h.substitute(lambda _, __: H(100), max_depth=0) == h
-
-    def test_substitute_out_of_bounds(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match=r"^fractional limit must be between zero and one, exclusive$",
-        ):
-            assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(-1))
-
-        with pytest.raises(
-            ValueError,
-            match=r"^fractional limit must be between zero and one, exclusive$",
-        ):
-            assert H(6).substitute(lambda _, __: 1, precision_limit=Fraction(2))
-
-    def test_substitute_double_odd_values(self) -> None:
-        def double_odd_values(_: H, outcome: RealLike) -> H | RealLike:
-            return outcome * 2 if outcome % 2 != 0 else outcome
-
-        d8 = H(8)
-        assert d8.substitute(double_odd_values) == H(
-            {14: 1, 10: 1, 8: 1, 6: 2, 4: 1, 2: 2}
-        )
-        assert d8.substitute(double_odd_values, max_depth=2) == H(
-            {14: 1, 10: 1, 8: 1, 6: 2, 4: 1, 2: 2}
-        )
-
-    def test_substitute_never_expand(self) -> None:
-        def never_expand(_: H, outcome: RealLike) -> H | RealLike:
-            return outcome
-
-        d20 = H(20)
-        assert d20.substitute(never_expand) == d20
-        assert d20.substitute(never_expand, operator.__add__, 20) == d20
-
-    def test_substitute_reroll_d4_threes(self) -> None:
-        def reroll_d4_threes(h: H, outcome: RealLike) -> H | RealLike:
-            return h if max(h) == 4 and outcome == 3 else outcome
-
-        h = H(4)
-        assert h.substitute(reroll_d4_threes) == H({4: 5, 3: 1, 2: 5, 1: 5})
-        assert h.substitute(reroll_d4_threes, operator.__add__) == H(
-            {7: 1, 6: 1, 5: 1, 4: 5, 2: 4, 1: 4}
-        )
-        assert h.substitute(reroll_d4_threes, operator.__mul__, max_depth=2) == H(
-            {36: 1, 27: 1, 18: 1, 12: 4, 9: 1, 6: 4, 4: 16, 3: 4, 2: 16, 1: 16}
-        )
-
     def test_explode_empty(self) -> None:
         h = H({})
-        assert h.explode(max_depth=1_000) == h
+        assert explode(h, limit=1_000) == h
 
     def test_explode_no_depth(self) -> None:
         h = H(6)
-        assert h.explode(max_depth=0) == h
+        assert explode(h, limit=0) == h
 
     def test_format(self) -> None:
         h = H({3: 1, 2: 2, 1: 3})

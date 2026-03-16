@@ -23,6 +23,4 @@
       members:
         - "HableT"
         - "HableOpsMixin"
-        - "coalesce_replace"
-        - "resolve_dependent_probability"
         - "sum_h"
