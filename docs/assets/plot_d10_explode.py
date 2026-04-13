@@ -11,6 +11,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+from matplotlib import ticker
 
 from dyce import H, P, explode_n
 from dyce.viz import plot_line
@@ -29,7 +30,8 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     ax = plot_line(*hs, labels=labels)
     for line in ax.lines:
         line.set_marker("")
-    ax.tick_params(axis="x", colors=text_color)
+    ax.xaxis.set_major_locator(ticker.IndexLocator(base=5, offset=2))
+    ax.tick_params(axis="x", labelrotation=60, colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
     ax.legend()
     ax.set_title("Taking the three highest of ten exploding d10s", color=text_color)

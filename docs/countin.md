@@ -1,9 +1,8 @@
 <!---
-  Copyright and other protections apply. Please see the accompanying LICENSE file for
-  rights and restrictions governing use of this software. All rights not expressly
-  waived or licensed are reserved. If that file is missing or appears to be modified
-  from its original, then please contact the author before viewing or using this
-  software in any capacity.
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
@@ -427,6 +426,7 @@ To illustrate, say we want to roll a d6 and compare whether the result is strict
 
 ```python
 >>> from dyce.evaluation import HResult, expand
+
 >>> d6 = H(6)  # independent term
 >>> constant = 4
 
@@ -579,7 +579,7 @@ var |   10.64
  ...
  47 |   0.00% |
 >>> h
-H({1: 233280, ..., 5: 233280, 7: 38880, ..., 11: 38880, 13: 6480, 14: ..., 17: 6480, 19: 1080, ..., 23: 1080, 25: 180, ..., 29: 180, 31: 30, ..., 35: 30, 37: 5, ..., 41: 5, 43: 1, ..., 47: 1})
+H({1: 233280, ..., 5: 233280, ..., 43: 1, ..., 47: 1})
 
 ```
 
@@ -659,12 +659,13 @@ We can check!
 ...     return result.outcome
 
 >>> expand(guarded_explode, d6)
-H({1: 279936, ..., 5: 279936, 7: 46656, ..., 11: 46656, 13: 7776, ..., 17: 7776, 19: 1296, ..., 23: 1296, 25: 216, ..., 29: 216, 31: 36, ..., 35: 36, 37: 6, ..., 41: 6, 43: 1, ..., 48: 1})
+H({1: 279936, ..., 5: 279936, ..., 43: 1, ..., 47: 1, 48: 1})
 
 ```
 
 *Much* better.
 And with counts we can recognize as powers of our maximum face.
+
 But how can we control the number of explosions?
 Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `#!python precision` parameter.
 
