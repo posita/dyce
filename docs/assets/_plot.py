@@ -63,7 +63,7 @@ def main(name: str, callback: CallbackT) -> None:
         format="%(levelname)s: %(message)s",
     )
 
-    plt.figure().set_size_inches(8, 6, forward=True)
+    plt.figure().set_size_inches(8, 6)
     style.use("bmh")
     output_file = (
         Path(f"{name}_{args.style}.png") if not args.output_file else args.output_file

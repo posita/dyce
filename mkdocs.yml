@@ -99,4 +99,5 @@ nav:
   - License: license.md
   - API:
     - Core: dyce.md
+    - Conveniences: dyce.d.md
     - Visualization (optional): dyce.viz.md
