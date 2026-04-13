@@ -18,6 +18,10 @@ all : \
 	plot_histogram_light.png \
 	plot_ironsworn_dark.png \
 	plot_ironsworn_light.png \
+	plot_risus_advanced_dark.png \
+	plot_risus_advanced_light.png \
+	plot_risus_complete_dark.png \
+	plot_risus_complete_light.png \
 	plot_risus_first_round_dark.png \
 	plot_risus_first_round_light.png \
 	plot_roll_and_keep_dark.png \
@@ -69,6 +73,18 @@ plot_%_dark.png : plot_%.py Makefile _plot.py ../../dyce/*.py
 
 plot_%_light.png : plot_%.py Makefile _plot.py ../../dyce/*.py
 	"$${PYTHON:-python3}" plot_$*.py --log-level INFO --style=light
+
+plot_risus_advanced_dark.png : _risus*.py
+
+plot_risus_advanced_light.png : _risus*.py
+
+plot_risus_complete_dark.png : _risus*.py
+
+plot_risus_complete_light.png : _risus*.py
+
+plot_risus_first_round_dark.png : _risus*.py
+
+plot_risus_first_round_light.png : _risus*.py
 
 perf_%.txt : perf_%.ipy Makefile ../../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy | tee $@

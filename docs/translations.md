@@ -1,9 +1,8 @@
 <!---
-  Copyright and other protections apply. Please see the accompanying LICENSE file for
-  rights and restrictions governing use of this software. All rights not expressly
-  waived or licensed are reserved. If that file is missing or appears to be modified
-  from its original, then please contact the author before viewing or using this
-  software in any capacity.
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
@@ -198,8 +197,8 @@ We can also deploy a counting trick with the two d10s.
 
 >>> class IronResult(IntEnum):
 ...     FAILURE = 0
-...     WEAK_SUCCESS = auto()
-...     STRONG_SUCCESS = auto()
+...     WEAK_SUCCESS = 1
+...     STRONG_SUCCESS = 2
 
 >>> iron_distributions_by_mod = {
 ...     mod: expand(lambda action: 2 @ (d10.lt(action.outcome)), d6 + mod).zero_fill(
@@ -212,7 +211,7 @@ We can also deploy a counting trick with the two d10s.
 ...         "{:+} -> {}".format(
 ...             mod,
 ...             {
-...                 IronResult(cast(int, outcome)).name: f"{float(prob):6.2%}"
+...                 IronResult(outcome).name: f"{float(prob):6.2%}"
 ...                 for outcome, prob in iron_distribution.probability_items()
 ...             },
 ...         )
@@ -275,26 +274,26 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 [`expand`][dyce.expand] is especially useful where there are multiple independent terms.
 
 ```python
->>> from dyce.evaluation import HResult
+>>> from dyce.evaluation import HResult, P, PResult
 
 >>> class IronDramaticResult(IntEnum):
-...     FAILURE = 0
-...     WEAK_SUCCESS = auto()
-...     STRONG_SUCCESS = auto()
-...     SPECTACULAR_SUCCESS = auto()
 ...     SPECTACULAR_FAILURE = -1
+...     FAILURE = 0
+...     WEAK_SUCCESS = 1
+...     STRONG_SUCCESS = 2
+...     SPECTACULAR_SUCCESS = 3
 
 >>> def iron_dramatic_dependent_term(
 ...     action: HResult[int],
-...     first_challenge: HResult[int],
-...     second_challenge: HResult[int],
+...     challenges: PResult[int],
 ...     *,
-...     mod=0,
+...     mod: int = 0,
 ... ) -> IronDramaticResult:
 ...     modded_action = action.outcome + mod
-...     beats_first_challenge = modded_action > first_challenge.outcome
-...     beats_second_challenge = modded_action > second_challenge.outcome
-...     doubles = first_challenge.outcome == second_challenge.outcome
+...     first_challenge_outcome, second_challenge_outcome = challenges.roll
+...     beats_first_challenge = modded_action > first_challenge_outcome
+...     beats_second_challenge = modded_action > second_challenge_outcome
+...     doubles = first_challenge_outcome == second_challenge_outcome
 ...     if beats_first_challenge and beats_second_challenge:
 ...         return (
 ...             IronDramaticResult.SPECTACULAR_SUCCESS
@@ -311,7 +310,7 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 ...         )
 
 >>> from pprint import pprint
->>> iron_dramatic = expand(iron_dramatic_dependent_term, d6, d10, d10)
+>>> iron_dramatic = expand(iron_dramatic_dependent_term, d6, 2 @ P(d10))
 >>> pprint(dict(iron_dramatic))
 {<IronDramaticResult.SPECTACULAR_FAILURE: -1>: 9,
  <IronDramaticResult.FAILURE: 0>: 62,
@@ -412,35 +411,44 @@ We can easily model the first round of its opposed combat system for various sta
 Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head-to-head contest of values:
 
 ```python
->>> from dyce import H, HResult, PResult
->>> from enum import IntEnum
+>>> from collections.abc import Callable
+>>> from typing import TypeVar
+>>> from dyce import H
+>>> T = TypeVar("T")
+>>> VersusFuncT = Callable[[int, int], H["Versus"]]
+>>> d6 = H(6)
 
 >>> class Versus(IntEnum):
-...     LOSS = -1
+...     LOSE = -1
 ...     DRAW = 0
 ...     WIN = 1
-
->>> def vs(us_outcome: int, them_outcome: int) -> Versus:
-...     return (
-...         Versus.LOSS
-...         if us_outcome < them_outcome
-...         else Versus.WIN
-...         if us_outcome > them_outcome
-...         else Versus.DRAW
-...     )
+...
+...     @staticmethod
+...     def raw_vs(us_outcome: int, them_outcome: int) -> "Versus":
+...         return (
+...             Versus.LOSE
+...             if us_outcome < them_outcome
+...             else Versus.WIN
+...             if us_outcome > them_outcome
+...             else Versus.DRAW
+...         )
+...
+...     @staticmethod
+...     def us_vs_them(our_pool_size: int, their_pool_size: int) -> H["Versus"]:
+...         return (our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6)
 
 ```
 
 Example use for a single round of combat:
 
 ```python
->>> us_d = 2 @ H(6)
->>> them_d = 3 @ H(6)
->>> print(us_d.apply(vs, them_d).format(width=65))
+>>> our_pool_size = 2
+>>> their_pool_size = 3
+>>> print((our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6).format(width=65))
               avg |   -0.63
               std |    0.73
               var |    0.54
-<Versus.LOSS: -1> |  77.85% |############################
+<Versus.LOSE: -1> |  77.85% |############################
  <Versus.DRAW: 0> |   6.94% |##
   <Versus.WIN: 1> |  15.20% |#####
 
@@ -451,7 +459,7 @@ Example use for a single round of combat:
     As an aside, this reasonably common pattern can be characterized in a more concise (albeit less readable) way:
 
     ```python
-    >>> (us_d - them_d).apply(
+    >>> (our_pool_size @ d6 - their_pool_size @ d6).apply(
     ...     lambda outcome: outcome // abs(outcome) if outcome else outcome
     ... ).lowest_terms()
     H({-1: 1009, 0: 90, 1: 197})
@@ -465,7 +473,7 @@ TODO
 ...     print("---")
 ...     for us in range(them, them + 3):
 ...         first_round = (us @ H(6)).apply(
-...             vs, them @ H(6)
+...             Versus.raw_vs, them @ H(6)
 ...         )  # -1 is a loss, 0 is a tie, 1 is a win
 ...         risus_results = first_round.format_short()
 ...         print(f"{us}d6 vs. {them}d6: {risus_results}")
@@ -485,6 +493,21 @@ TODO
 ```
 
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
+
+| Standard<br>(First Round) | LOSE | DRAW | WIN |
+|:---:|:---:|:---:|:---:|
+|  |  |  |  |
+| our 3d6 vs. their 3d6 | 45.36% | 9.28% | 45.36% |
+| our 4d6 vs. their 3d6 | 19.17% | 6.55% | 74.28% |
+| our 5d6 vs. their 3d6 | 6.07% | 2.99% | 90.93% |
+|  |  |  |  |
+| our 3d6 vs. their 4d6 | 74.28% | 6.55% | 19.17% |
+| our 4d6 vs. their 4d6 | 45.95% | 8.09% | 45.95% |
+| our 5d6 vs. their 4d6 | 22.04% | 6.15% | 71.81% |
+|  |  |  |  |
+| our 3d6 vs. their 5d6 | 90.93% | 2.99% | 6.07% |
+| our 4d6 vs. their 5d6 | 71.81% | 6.15% | 22.04% |
+| our 5d6 vs. their 5d6 | 46.37% | 7.27% | 46.37% |
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -518,31 +541,37 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 >>> from functools import cache
 
 >>> def risus_combat_driver(
-...     us: int,  # number of dice we still have
-...     them: int,  # number of dice they still have
+...     our_pool_size: int,  # number of dice we still have
+...     their_pool_size: int,  # number of dice they still have
 ...     us_vs_them_func: Callable[[int, int], H[int]],
 ... ) -> H[Versus]:
-...     if us < 0 or them < 0:
-...         raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
-...     if us == 0 and them == 0:
+...     if our_pool_size < 0 or their_pool_size < 0:
+...         raise ValueError(
+...             f"cannot have negative numbers (us: {our_pool_size}, them: {their_pool_size})"
+...         )
+...     elif our_pool_size == 0 and their_pool_size == 0:
 ...         return H(
 ...             {Versus.DRAW: 1}
 ...         )  # should not happen unless combat(0, 0) is called from the start
 ...
 ...     @cache
-...     def _resolve(us: int, them: int) -> H[Versus]:
-...         if us == 0:
-...             return H({Versus.LOSS: 1})  # we are out of dice, they win
-...         if them == 0:
+...     def _resolve(our_pool_size: int, their_pool_size: int) -> H[Versus]:
+...         if our_pool_size == 0:
+...             return H({Versus.LOSE: 1})  # we are out of dice, they win
+...         if their_pool_size == 0:
 ...             return H({Versus.WIN: 1})  # they are out of dice, we win
-...         this_round = us_vs_them_func(us, them)
+...         this_round = us_vs_them_func(our_pool_size, their_pool_size)
 ...
 ...         def _next_round(this_round: HResult[Versus]) -> H[Versus]:
 ...             match this_round.outcome:
-...                 case Versus.LOSS:
-...                     return _resolve(us - 1, them)  # we lost this round, and one die
+...                 case Versus.LOSE:
+...                     return _resolve(
+...                         our_pool_size - 1, their_pool_size
+...                     )  # we lost this round, and one die
 ...                 case Versus.WIN:
-...                     return _resolve(us, them - 1)  # they lost this round, and one die
+...                     return _resolve(
+...                         our_pool_size, their_pool_size - 1
+...                     )  # they lost this round, and one die
 ...                 case Versus.DRAW:
 ...                     return H({})  # ignore (immediately re-roll) all ties
 ...                 case _:
@@ -552,13 +581,13 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 ...
 ...         return expand(_next_round, this_round, precision=Fraction(1, 0x7FFFFFFF))
 ...
-...     return _resolve(us, them)
+...     return _resolve(our_pool_size, their_pool_size)
 
 >>> for t in range(3, 6):
 ...     print("---")
 ...     for u in range(t, t + 3):
 ...         risus_results = risus_combat_driver(
-...             u, t, lambda u, t: (u @ H(6)).apply(vs, t @ H(6))
+...             u, t, lambda u, t: (u @ H(6)).apply(Versus.raw_vs, t @ H(6))
 ...         ).format_short()
 ...         print(f"{u}d6 vs. {t}d6: {risus_results}")
 ---
@@ -576,14 +605,29 @@ With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerle
 
 ```
 
+| Standard<br>(Complete Combat) | LOSE | DRAW | WIN |
+|:---:|:---:|:---:|:---:|
+|  |  |  |  |
+| our 3d6 vs. their 3d6 | 50.00% | 0.00% | 50.00% |
+| our 4d6 vs. their 3d6 | 10.50% | 0.00% | 89.50% |
+| our 5d6 vs. their 3d6 | 0.66% | 0.00% | 99.34% |
+|  |  |  |  |
+| our 3d6 vs. their 4d6 | 89.50% | 0.00% | 10.50% |
+| our 4d6 vs. their 4d6 | 50.00% | 0.00% | 50.00% |
+| our 5d6 vs. their 4d6 | 12.25% | 0.00% | 87.75% |
+|  |  |  |  |
+| our 3d6 vs. their 5d6 | 99.34% | 0.00% | 0.66% |
+| our 4d6 vs. their 5d6 | 87.75% | 0.00% | 12.25% |
+| our 5d6 vs. their 5d6 | 50.00% | 0.00% | 50.00% |
+
 There’s lot going on there.
 Let’s dissect it.
 
 ```python linenums="17"
 @cache
 def risus_combat_driver(
-    us: int,  # number of dice we still have
-    them: int,  # number of dice they still have
+    our_pool_size: int,  # number of dice we still have
+    their_pool_size: int,  # number of dice they still have
     us_vs_them_func: Callable[[int, int], H[int]],
 ) -> H[Versus]:
   ...
@@ -591,8 +635,8 @@ def risus_combat_driver(
 
 Our “driver” takes three arguments:
 
-1. How many dice we have left (`#!python us`);
-1. How many dice the opposition has left (`#!python them`); and
+1. How many dice we have left (`#!python our_pool_size`);
+1. How many dice the opposition has left (`#!python their_pool_size`); and
 1. A resolution function (`#!python us_vs_them_func`) that takes counts of each party’s remaining dice and returns a histogram encoding the probability of winning or losing a single round akin to our `#!python vs` callback.
 
 The [`#!python @cache` decorator](https://docs.python.org/3/library/functools.html#functools.cache) does simple memoization for us because there are redundancies.
@@ -602,29 +646,29 @@ Both cases would be identical from that point on.
 In this context, `@cache` helps us avoid recomputing redundant sub-trees.
 
 ```python linenums="23"
-  if us < 0 or them < 0:
-    raise ValueError(f"cannot have negative numbers (us: {us}, them: {them})")
-  if us == 0 and them == 0:
+  if our_pool_size < 0 or their_pool_size < 0:
+    raise ValueError(f"cannot have negative numbers (us: {our_pool_size}, them: {their_pool_size})")
+  if our_pool_size == 0 and their_pool_size == 0:
     return H({0: 1})  # should not happen unless combat(0, 0) is called from the start
 ```
 
 We make some preliminary checks that guard access to our recursive implementation so that it can be a little cleaner.
 
 ```python linenums="28"
-  def _resolve(us: int, them: int) -> H[Versus]:
+  def _resolve(our_pool_size: int, their_pool_size: int) -> H[Versus]:
     ...
 ```
 
 ```python linenums="40"
-  return _resolve(us, them)
+  return _resolve(our_pool_size, their_pool_size)
 ```
 
 Skipping over its implementation for now, we define a our memoized recursive implementation (`#!python _resolve`) and then call it with our initial arguments.
 
 ```python linenums="28"
-  def _resolve(us: int, them: int) -> H[Versus]:
-    if us == 0: return H({-1: 1})  # we are out of dice, they win
-    if them == 0: return H({1: 1})  # they are out of dice, we win
+  def _resolve(our_pool_size: int, their_pool_size: int) -> H[Versus]:
+    if our_pool_size == 0: return H({-1: 1})  # we are out of dice, they win
+    if their_pool_size == 0: return H({1: 1})  # they are out of dice, we win
 ```
 
 Getting back to that implementation, these are our base cases.
@@ -636,10 +680,10 @@ If we have none of those cases, we get to work.
     In this function, we do not check for the case where *both* parties are at zero.
     Because only one party can lose a die during each round, the only way both parties can be at zero simultaneously is if they both started at zero.
     Since we guard against that case in the enclosing function, we don’t have to worry about it here.
-    Either `#!python us` is zero, `#!python them` is zero, or neither is zero.
+    Either `#!python our_pool_size` is zero, `#!python their_pool_size` is zero, or neither is zero.
 
 ```python linenums="31"
-    this_round = us_vs_them_func(us, them)
+    this_round = us_vs_them_func(our_pool_size, their_pool_size)
 ```
 
 Then, we compute the outcomes for _this round_ using the provided resolution function.
@@ -659,8 +703,8 @@ This allows us to take our computation for this round, and “fold in” subsequ
 ```python linenums="33"
     def _next_round(this_round: HResult[Versus]) -> H[Versus]:
       match this_round.outcome:
-        case Versus.LOSS: return _resolve(us - 1, them)  # we lost this round, and one die
-        case Versus.WIN: return _resolve(us, them - 1)  # they lost this round, and one die
+        case Versus.LOSE: return _resolve(our_pool_size - 1, their_pool_size)  # we lost this round, and one die
+        case Versus.WIN: return _resolve(our_pool_size, their_pool_size - 1)  # they lost this round, and one die
         case Versus.DRAW: return H({})  # ignore (immediately re-roll) all ties
         case _: assert False, f"unrecognized this_round.outcome {this_round.outcome}"
 ```
@@ -691,15 +735,17 @@ At this point, we can define a simple `#!python lambda` that wraps our `#!python
 Using our `#!python risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule” for resolving ties.
 
 ```python
->>> def deadly_combat_vs(us: int, them: int) -> H[int]:
-...     best_us = (us @ P(6)).h(-1)
-...     best_them = (them @ P(6)).h(-1)
-...     h: H[int] = best_us.apply(vs, best_them)
+>>> def deadly_combat_vs(our_pool_size: int, their_pool_size: int) -> H[int]:
+...     best_us = (our_pool_size @ P(6)).h(-1)
+...     best_them = (their_pool_size @ P(6)).h(-1)
+...     h: H[int] = best_us.apply(Versus.raw_vs, best_them)
 ...     # Goliath Rule: tie goes to the party with fewer dice in this
 ...     # round
 ...     return expand(
 ...         lambda h_result: (
-...             (us < them) - (us > them) if h_result.outcome == 0 else h_result.outcome
+...             (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
+...             if h_result.outcome == 0
+...             else h_result.outcome
 ...         ),
 ...         h,
 ...     )
@@ -793,12 +839,14 @@ We can also deploy a trick using `#!python partial` to parameterize use of the G
 ```python
 >>> from functools import partial
 
->>> def evens_up_vs(us: int, them: int, goliath: bool = False) -> H:
-...     h = (us @ d_evens_up).apply(vs, them @ d_evens_up)
+>>> def evens_up_vs(our_pool_size: int, their_pool_size: int, goliath: bool = False) -> H:
+...     h = (our_pool_size @ d_evens_up).apply(Versus.raw_vs, their_pool_size @ d_evens_up)
 ...     if goliath:
 ...         h = expand(
 ...             lambda h_result: (
-...                 (us < them) - (us > them) if h_result.outcome == 0 else h_result.outcome
+...                 (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
+...                 if h_result.outcome == 0
+...                 else h_result.outcome
 ...             ),
 ...             h,
 ...         )

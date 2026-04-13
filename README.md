@@ -12,17 +12,19 @@
   There is no guarantee that other docs/resources will be available where this content is displayed.
 -->
 
+<!-- mkdocs:hide:start -->
 *Copyright and other protections apply.
 Please see the accompanying `LICENSE` file for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
+<!-- mkdocs:hide:end -->
 
-[![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
+  [![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
 [![Version](https://img.shields.io/pypi/v/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
-[![Development Stage](https://img.shields.io/pypi/status/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
+![Development Stage](https://img.shields.io/pypi/status/dyce/0.6.2.svg)
 [![License](https://img.shields.io/pypi/l/dyce/0.6.2.svg)](http://opensource.org/licenses/MIT)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
-[![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.6.2.svg)](https://pypi.org/project/dyce/0.6.2/)
+![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce/0.6.2.svg)
+![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce/0.6.2.svg)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
@@ -76,10 +78,14 @@ When one worries that the flickering light of humanity may be snuffed out at any
 ## A taste
 
 `dyce` provides several core primitives.
-[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H) represent histograms for modeling finite discrete outcomes, like individual dice.
-[`P` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.p.P) represent pools (ordered sequences) of histograms.
-[`R` objects](https://posita.github.io/dyce/0.7/dyce.r/#dyce.r.R) (covered [elsewhere](https://posita.github.io/dyce/0.7/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
+[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.H) represent histograms for modeling finite discrete outcomes, like individual dice.
+[`P` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.P) represent pools (ordered sequences) of histograms.
+[`expand`](https://posita.github.io/dyce/0.7/dyce/#expand) for mechanics that include dependent variables.
+<!-- TODO(posita): Figure out what we're doing with dyce.r -->
+<!--
+[`R` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.R) (covered [elsewhere](https://posita.github.io/dyce/0.7/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
+ -->
 
 ```python
 >>> from dyce import H
@@ -103,8 +109,8 @@ True
 
 ```
 
-By providing an optional argument to the [`P.h` method](https://posita.github.io/dyce/0.7/dyce/#dyce.p.P.h), one can “take” individual dice from pools, ordered least to greatest.
-(The [`H.format` method](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.format) provides rudimentary visualization for convenience.)
+By providing an optional argument to the [`P.h` method](https://posita.github.io/dyce/0.7/dyce/#dyce.P.h), one can “take” individual dice from pools, ordered least to greatest.
+(The [`H.format` method](https://posita.github.io/dyce/0.7/dyce/#dyce.H.format) provides rudimentary visualization for convenience.)
 
 ```python
 >>> p_2d6.h(0)  # take the lowest die of 2d6
@@ -138,7 +144,7 @@ var |    1.97
 
 ```
 
-[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H) provide a [`distribution` method](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.distribution) and a [`distribution_xy` method](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.distribution_xy) to ease integration with plotting packages
+[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.H) provide a [`distribution` method](https://posita.github.io/dyce/0.7/dyce/#dyce.H.distribution) and a [`distribution_xy` method](https://posita.github.io/dyce/0.7/dyce/#dyce.H.distribution_xy) to ease integration with plotting packages
 [`anydyce`](https://github.com/posita/anydyce/), for example, makes use of these to integrate with [Matplotlib](https://matplotlib.org/stable/api/index.html).
 
 <!-- Should match any title of the corresponding plot title -->
@@ -161,7 +167,7 @@ var |    1.97
 ```
 </details>
 
-[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H) and [`P` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.p.P) can generate random rolls.
+[`H` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.H) and [`P` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.P) can generate random rolls.
 
 ```python
 >>> d6 = H(6)
@@ -213,7 +219,7 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     [Certain restrictions](#requirements) apply.
     [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
 
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.distribution`](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.distribution), [`H.distribution_xy`](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.distribution_xy), and [`H.format`](https://posita.github.io/dyce/0.7/dyce/#dyce.h.H.format) methods).
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/0.7/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.distribution`](https://posita.github.io/dyce/0.7/dyce/#dyce.H.distribution), [`H.distribution_xy`](https://posita.github.io/dyce/0.7/dyce/#dyce.H.distribution_xy), and [`H.format`](https://posita.github.io/dyce/0.7/dyce/#dyce.H.format) methods).
 
 ## Comparison to alternatives
 

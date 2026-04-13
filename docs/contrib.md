@@ -1,9 +1,8 @@
 <!---
-  Copyright and other protections apply. Please see the accompanying LICENSE file for
-  rights and restrictions governing use of this software. All rights not expressly
-  waived or licensed are reserved. If that file is missing or appears to be modified
-  from its original, then please contact the author before viewing or using this
-  software in any capacity.
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
@@ -22,8 +21,6 @@ You have only but to try.
 
 You can [file new issues](https://github.com/posita/dyce/issues) as you find them.
 Please try to avoid duplicating issues.
-[“Writing Effective Bug Reports” by Elisabeth Hendrickson](http://testobsessed.com/wp-content/uploads/2011/07/webr.pdf) (PDF) may be helpful.
-
 For more free-flow discussions (beefs, rants, ideas, recipes, etc.), consider starting or joining a [discussion](https://github.com/posita/dyce/discussions).
 
 <!--
@@ -62,6 +59,8 @@ Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type chec
 …
 ```
 
+<!--
+
 !!! fail "Special considerations for regenerating class diagrams"
 
     We use [Pyreverse](https://www.logilab.org/blogentry/6883) to generate class diagrams.
@@ -82,6 +81,8 @@ Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type chec
 
     It is uncanny how often those two properties are found together.
 
+  -->
+
 ## Submission guidelines
 
 If you are willing and able, consider [submitting a pull request](https://github.com/posita/dyce/pulls) with a fix.
@@ -97,9 +98,9 @@ There are only a few additional guidelines:
 ...
 ```
 
-- Use [Black](https://pypi.org/project/black/) to format your changes.
+- Use [Ruff](https://docs.astral.sh/ruff/) to format your changes.
   Do your best to follow the source conventions as you observe them.
-  If it’s important to you, Existing comments are wrapped at 88 characters per line to match Black’s default.
+  If it’s important to you, existing comments are wrapped at 88 characters per line to match Black’s default.
   (Don’t spend too much effort on strict conformance, though.
   I can clean things up later if they really bother me.)
 

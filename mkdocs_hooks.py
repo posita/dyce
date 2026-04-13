@@ -1,9 +1,19 @@
 import logging
 import pathlib  # noqa: TC003
+import re
 import shutil
 import subprocess  # noqa: S404
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def on_page_markdown(markdown: str, **_kwargs: object) -> str:
+    return re.sub(
+        r"<!-- mkdocs:hide:start -->.*?<!-- mkdocs:hide:end -->",
+        "",
+        markdown,
+        flags=re.DOTALL,
+    )
 
 
 def on_pre_build(**_kwargs: object) -> None:

@@ -41,6 +41,7 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     }
 
     labels, hs = zip(*attr_results.items(), strict=True)
+
     text_color = "white" if args.style == "dark" else "black"
     ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
     ax.tick_params(axis="x", colors=text_color)

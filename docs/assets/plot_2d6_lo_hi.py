@@ -22,8 +22,9 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     p_2d6 = 2 @ P(H(6))
     h_2d6_lowest = p_2d6.h(0)
     h_2d6_highest = p_2d6.h(-1)
-    ax = plot_bar(h_2d6_lowest, h_2d6_highest, labels=("Lowest", "Highest"))
+
     text_color = "white" if args.style == "dark" else "black"
+    ax = plot_bar(h_2d6_lowest, h_2d6_highest, labels=("Lowest", "Highest"))
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
     ax.legend()

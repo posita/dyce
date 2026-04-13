@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def callback(args: Namespace, _name: str, _output_path: Path) -> None:
-    def _roll_and_keep(p: P[int], k: int) -> H[int]:
+    def roll_and_keep(p: P[int], k: int) -> H[int]:
         assert all(h == p[0] for h in p), "pool must be homogeneous"
         max_d = max(p[-1]) if p else 0
         return H.from_counts(
@@ -33,23 +33,23 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
 
     d, k = 6, 3
 
-    def _roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
+    def roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
-            yield f"{n}d{d} keep {k} add +1", H(_roll_and_keep(p, k))
+            yield f"{n}d{d} keep {k} add +1", roll_and_keep(p, k)
 
-    def _normal() -> Iterator[tuple[str, H[int]]]:
+    def normal() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
 
-    text_color = "white" if args.style == "dark" else "black"
+    pairs1 = tuple(normal())
+    pairs2 = tuple(roll_and_keep_hs())
 
-    pairs1 = tuple(_roll_and_keep_hs())
+    text_color = "white" if args.style == "dark" else "black"
     labels1, hs1 = zip(*pairs1, strict=True)
     ax = plot_line(*hs1, labels=labels1, markers=".", alpha=0.75)
 
-    pairs2 = tuple(_normal())
     labels2, hs2 = zip(*pairs2, strict=True)
     plot_line(*hs2, labels=labels2, markers="o", alpha=0.25, ax=ax)
 
