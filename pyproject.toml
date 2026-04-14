@@ -46,6 +46,7 @@ docs = [
     "jupyterlite-pyodide-kernel",
     "jupyter_server",
     "markdown-pycon",
+    "mike",
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings[python]",
