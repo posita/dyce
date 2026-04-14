@@ -21,7 +21,9 @@ from collections.abc import Callable
 from typing import ParamSpec, TypeVar
 
 if sys.version_info >= (3, 13):
-    from warnings import deprecated  # pyright: ignore[reportUnreachable]
+    from warnings import (
+        deprecated,
+    )  # pragma: no cover # pyright: ignore[reportUnreachable]
 else:
     from typing_extensions import deprecated
 

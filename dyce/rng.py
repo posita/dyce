@@ -90,7 +90,7 @@ try:
             return PCG64DXSM
 
     _DEFAULT_RNG = PCG64DXSMRandom()
-except ImportError:
+except ImportError:  # pragma: no cover
     _DEFAULT_RNG = Random()
 
 RNG = _DEFAULT_RNG

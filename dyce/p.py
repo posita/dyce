@@ -505,9 +505,13 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         if isinstance(sel, _SelectionEmpty) or n == 0:
             return
         groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self))
-        # Fast path: heterogeneous pool with lo=1,hi=1 extremes selection.
-        # The inclusion-exclusion algorithm in _rwc_heterogeneous_extremes only supports
-        # (lo=1, hi=1); larger (lo, hi) fall through to full enumeration below.
+        # The fast path inclusion-exclusion algorithm in _rwc_heterogeneous_extremes
+        # only supports (lo=1, hi=1). Otherwise, fall through and convert selection to
+        # the integer k hint consumed by other lower-level functions:
+        #
+        # * positive k - take k from left (prefix)
+        # * negative k - take k from right (suffix)
+        # * None - full enumeration (uniform, extremes fallback, or arbitrary)
         if (
             isinstance(sel, _SelectionExtremes)
             and len(groups) > 1
@@ -516,11 +520,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         ):
             yield from _rwc_heterogeneous_extremes(groups, sel.lo, sel.hi)
             return
-        # Convert selection to the integer k hint consumed by the lower-level functions:
-        # * positive k - take k from left (prefix)
-        # * negative k - take k from right (suffix)
-        # * None - full enumeration (uniform, extremes fallback, or arbitrary)
-        if isinstance(sel, _SelectionPrefix):
+        elif isinstance(sel, _SelectionPrefix):
             k: int | None = sel.max_index if sel.max_index >= 0 else n + sel.max_index
         elif isinstance(sel, _SelectionSuffix):
             k = sel.min_index if sel.min_index < 0 else sel.min_index - n
@@ -724,7 +724,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     from_right = k < 0
     k = abs(k)
     if k == 0 or k > n:
-        return
+        return  # pragma: no cover
     total_count = h.total**n
     for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
         h, n, k, from_right=from_right
@@ -769,25 +769,23 @@ def _rwc_heterogeneous_h_groups(
     ):
         # It's possible v is () if h_groups is empty. See
         # <https://stackoverflow.com/questions/3154301/> for a detailed discussion.
-        if v:
-            rolls_by_group, counts_by_group = zip(*v, strict=True)
-            total_count = prod(counts_by_group)
-            sorted_roll_list = list(chain(*rolls_by_group))
-            try:
-                sorted_roll_list.sort()
-            except TypeError:
-                sorted_roll_list.sort(key=natural_key)
-            sorted_roll = tuple(sorted_roll_list)
-            if k is not None:
-                if k < 0:
-                    sorted_roll = (_MIN_FILL,) * (
-                        total_n - len(sorted_roll)
-                    ) + sorted_roll
-                else:
-                    sorted_roll = sorted_roll + (_MAX_FILL,) * (
-                        total_n - len(sorted_roll)
-                    )
-            yield sorted_roll, total_count
+        if not v:
+            continue  # pragma: no cover
+
+        rolls_by_group, counts_by_group = zip(*v, strict=True)
+        total_count = prod(counts_by_group)
+        sorted_roll_list = list(chain(*rolls_by_group))
+        try:
+            sorted_roll_list.sort()
+        except TypeError:
+            sorted_roll_list.sort(key=natural_key)
+        sorted_roll = tuple(sorted_roll_list)
+        if k is not None:
+            if k < 0:
+                sorted_roll = (_MIN_FILL,) * (total_n - len(sorted_roll)) + sorted_roll
+            else:
+                sorted_roll = sorted_roll + (_MAX_FILL,) * (total_n - len(sorted_roll))
+        yield sorted_roll, total_count
 
 
 # TODO(posita): # noqa: TD003 - Maybe break this up at some point?
@@ -848,10 +846,11 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     all_outcomes = list(all_outcome_set)
     try:
         all_outcomes.sort()
-        # Verify comparability (sorted may silently accept non-comparable types
-        # when the set happens to be ordered by identity hash)
+        # TODO(posita): # noqa: TD003 - Is this true? Does this need to be everywhere we do sorting?
+        # Verify comparability (sorted may silently accept non-comparable types when the
+        # set happens to be ordered by identity hash)
         if len(all_outcomes) >= 2:
-            _ = all_outcomes[0] <= all_outcomes[1]
+            _ = all_outcomes[0] <= all_outcomes[1]  # pragma: no cover
         use_natural = False
     except TypeError:
         all_outcomes.sort(key=natural_key)

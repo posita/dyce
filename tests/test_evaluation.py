@@ -15,13 +15,14 @@
 
 import sys
 import warnings
-from collections import Counter
+from collections import Counter, UserString
 from enum import IntEnum, auto
 from fractions import Fraction
+from typing import Any, Never
 
 import pytest
 
-from dyce import H, HResult, P, PResult, expand
+from dyce import H, HResult, P, PResult, expand, explode_n
 from dyce.evaluation import TruncationWarning
 from dyce.lifecycle import ExperimentalWarning
 
@@ -50,6 +51,24 @@ class TestExpand:
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
             assert expand(_fn, d6, p_2d8, d10) == d6 + p_2d8 + d10
 
+    def test_source_neither_h_nor_p_raises(self) -> None:
+        class TotalStr(UserString):
+            __slots__ = ()
+
+            @property
+            def total(self) -> int:
+                return len(self)
+
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+            return H({})
+
+        with (  # noqa: PT012
+            pytest.raises(TypeError, match=r"^unrecognized source type\b"),
+            warnings.catch_warnings(),
+        ):
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            expand(_fn, TotalStr("I'm an imposter!"))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+
     def test_callback_returns_h_with_zero_count_outcomes(self) -> None:
         class Result(IntEnum):
             ONES = auto()
@@ -64,6 +83,17 @@ class TestExpand:
             assert expand(_fn, 4 @ P(6)) == H(
                 {Result.ONES: 1, Result.FIVES_OR_SIXES: 2}
             )
+
+    def test_no_sources_raises(self) -> None:
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+            return H({})
+
+        with (  # noqa: PT012
+            warnings.catch_warnings(),
+            pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"),
+        ):
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            expand(_fn)
 
 
 class TestExpandTruncation:
@@ -140,6 +170,30 @@ class TestExpandTruncation:
             with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
                 result = expand(_always_recurses, d1)
         assert result == H({})
+
+
+class TestExplodeN:
+    def test_explode_n_natural_order(self) -> None:
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d6x = H(6) + x
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            assert explode_n(d6x, n=1) == H(
+                {
+                    2 * x + 7: 1,
+                    2 * x + 8: 1,
+                    2 * x + 9: 1,
+                    2 * x + 10: 1,
+                    2 * x + 11: 1,
+                    2 * x + 12: 1,
+                    x + 1: 6,
+                    x + 2: 6,
+                    x + 3: 6,
+                    x + 4: 6,
+                    x + 5: 6,
+                }
+            )
 
 
 def _explode_with_truncation(
