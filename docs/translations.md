@@ -43,21 +43,18 @@ Let’s reproduce his tables (with slightly different names to provide context).
 
 How do we do compute these results using `dyce`?
 
-```python
->>> from dyce import H
->>> one_in_d6 = H(6).eq(1)
->>> for n in range(1, 7):
-...     ones_in_nd6 = n @ one_in_d6
-...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-...     print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
-1: 16.67%
-2: 30.56%
-3: 42.13%
-4: 51.77%
-5: 59.81%
-6: 66.51%
-
-```
+    >>> from dyce import H
+    >>> one_in_d6 = H(6).eq(1)
+    >>> for n in range(1, 7):
+    ...     ones_in_nd6 = n @ one_in_d6
+    ...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
+    ...     print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
+    1: 16.67%
+    2: 30.56%
+    3: 42.13%
+    4: 51.77%
+    5: 59.81%
+    6: 66.51%
 
 So far so good.
 Let’s keep going.
@@ -77,39 +74,36 @@ How can we represent those in `dyce`?
 One way is [`IntEnum`](https://docs.python.org/3/library/enum.html#intenum)s.
 `IntEnum`s have a property that allows them to substitute directly for `int`s, which, with a little nudging, is very convenient.
 
-```python
->>> from enum import IntEnum
+    >>> from enum import IntEnum
 
->>> class Complication(IntEnum):
-...     NONE = 0  # this will come in handy later
-...     COMMON = 1
-...     UNCOMMON = 2
-...     RARE = 3
-...     VERY_RARE = 4
+    >>> class Complication(IntEnum):
+    ...     NONE = 0  # this will come in handy later
+    ...     COMMON = 1
+    ...     UNCOMMON = 2
+    ...     RARE = 3
+    ...     VERY_RARE = 4
 
->>> OUTCOME_TO_RARITY_MAP = {
-...     2: Complication.VERY_RARE,
-...     3: Complication.VERY_RARE,
-...     4: Complication.VERY_RARE,
-...     5: Complication.RARE,
-...     6: Complication.RARE,
-...     7: Complication.UNCOMMON,
-...     8: Complication.UNCOMMON,
-...     9: Complication.COMMON,
-...     10: Complication.COMMON,
-...     11: Complication.COMMON,
-...     12: Complication.COMMON,
-...     13: Complication.COMMON,
-...     14: Complication.UNCOMMON,
-...     15: Complication.UNCOMMON,
-...     16: Complication.RARE,
-...     17: Complication.RARE,
-...     18: Complication.VERY_RARE,
-...     19: Complication.VERY_RARE,
-...     20: Complication.VERY_RARE,
-... }
-
-```
+    >>> OUTCOME_TO_RARITY_MAP = {
+    ...     2: Complication.VERY_RARE,
+    ...     3: Complication.VERY_RARE,
+    ...     4: Complication.VERY_RARE,
+    ...     5: Complication.RARE,
+    ...     6: Complication.RARE,
+    ...     7: Complication.UNCOMMON,
+    ...     8: Complication.UNCOMMON,
+    ...     9: Complication.COMMON,
+    ...     10: Complication.COMMON,
+    ...     11: Complication.COMMON,
+    ...     12: Complication.COMMON,
+    ...     13: Complication.COMMON,
+    ...     14: Complication.UNCOMMON,
+    ...     15: Complication.UNCOMMON,
+    ...     16: Complication.RARE,
+    ...     17: Complication.RARE,
+    ...     18: Complication.VERY_RARE,
+    ...     19: Complication.VERY_RARE,
+    ...     20: Complication.VERY_RARE,
+    ... }
 
 Now let’s use our map to validate the probabilities of a particular outcome using that d8 and d12.
 
@@ -120,25 +114,22 @@ Now let’s use our map to validate the probabilities of a particular outcome us
 | Rare or Major        | 18.8%                                         |
 | Very Rare or Extreme | 12.5%                                         |
 
-```python
->>> from dyce import H, expand
->>> from pprint import pprint
->>> prob_of_complication = expand(
-...     lambda h_result: OUTCOME_TO_RARITY_MAP[h_result.outcome],
-...     H(8) + H(12),
-... )
->>> pprint(
-...     {
-...         outcome: f"{float(prob):6.2%}"
-...         for outcome, prob in prob_of_complication.probability_items()
-...     }
-... )
-{<Complication.COMMON: 1>: '41.67%',
- <Complication.UNCOMMON: 2>: '27.08%',
- <Complication.RARE: 3>: '18.75%',
- <Complication.VERY_RARE: 4>: '12.50%'}
-
-```
+    >>> from dyce import H, expand
+    >>> from pprint import pprint
+    >>> prob_of_complication = expand(
+    ...     lambda h_result: OUTCOME_TO_RARITY_MAP[h_result.outcome],
+    ...     H(8) + H(12),
+    ... )
+    >>> pprint(
+    ...     {
+    ...         outcome: f"{float(prob):6.2%}"
+    ...         for outcome, prob in prob_of_complication.probability_items()
+    ...     }
+    ... )
+    {<Complication.COMMON: 1>: '41.67%',
+     <Complication.UNCOMMON: 2>: '27.08%',
+     <Complication.RARE: 3>: '18.75%',
+     <Complication.VERY_RARE: 4>: '12.50%'}
 
 Lookin’ good!
 Now let’s put everything together.
@@ -152,25 +143,22 @@ Now let’s put everything together.
 | 5           | 40.2% | 24.9%  | 16.2%    | 11.2% | 7.5%      |
 | 6           | 33.5% | 27.7%  | 18.0%    | 12.5% | 8.3%      |
 
-```python
->>> from typing import cast
->>> for n in range(1, 7):
-...     ones_in_nd6 = n @ one_in_d6
-...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-...     prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
-...     complications_for_nd6 = {
-...         Complication(outcome).name: f"{float(prob):6.2%}"
-...         for outcome, prob in (prob_complication_in_nd6).probability_items()
-...     }
-...     print("{} -> {}".format(n, complications_for_nd6))
-1 -> {'NONE': '83.33%', 'COMMON': ' 6.94%', 'UNCOMMON': ' 4.51%', 'RARE': ' 3.12%', 'VERY_RARE': ' 2.08%'}
-2 -> {'NONE': '69.44%', 'COMMON': '12.73%', 'UNCOMMON': ' 8.28%', 'RARE': ' 5.73%', 'VERY_RARE': ' 3.82%'}
-3 -> {'NONE': '57.87%', 'COMMON': '17.55%', 'UNCOMMON': '11.41%', 'RARE': ' 7.90%', 'VERY_RARE': ' 5.27%'}
-4 -> {'NONE': '48.23%', 'COMMON': '21.57%', 'UNCOMMON': '14.02%', 'RARE': ' 9.71%', 'VERY_RARE': ' 6.47%'}
-5 -> {'NONE': '40.19%', 'COMMON': '24.92%', 'UNCOMMON': '16.20%', 'RARE': '11.21%', 'VERY_RARE': ' 7.48%'}
-6 -> {'NONE': '33.49%', 'COMMON': '27.71%', 'UNCOMMON': '18.01%', 'RARE': '12.47%', 'VERY_RARE': ' 8.31%'}
-
-```
+    >>> from typing import cast
+    >>> for n in range(1, 7):
+    ...     ones_in_nd6 = n @ one_in_d6
+    ...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
+    ...     prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
+    ...     complications_for_nd6 = {
+    ...         Complication(outcome).name: f"{float(prob):6.2%}"
+    ...         for outcome, prob in (prob_complication_in_nd6).probability_items()
+    ...     }
+    ...     print("{} -> {}".format(n, complications_for_nd6))
+    1 -> {'NONE': '83.33%', 'COMMON': ' 6.94%', 'UNCOMMON': ' 4.51%', 'RARE': ' 3.12%', 'VERY_RARE': ' 2.08%'}
+    2 -> {'NONE': '69.44%', 'COMMON': '12.73%', 'UNCOMMON': ' 8.28%', 'RARE': ' 5.73%', 'VERY_RARE': ' 3.82%'}
+    3 -> {'NONE': '57.87%', 'COMMON': '17.55%', 'UNCOMMON': '11.41%', 'RARE': ' 7.90%', 'VERY_RARE': ' 5.27%'}
+    4 -> {'NONE': '48.23%', 'COMMON': '21.57%', 'UNCOMMON': '14.02%', 'RARE': ' 9.71%', 'VERY_RARE': ' 6.47%'}
+    5 -> {'NONE': '40.19%', 'COMMON': '24.92%', 'UNCOMMON': '16.20%', 'RARE': '11.21%', 'VERY_RARE': ' 7.48%'}
+    6 -> {'NONE': '33.49%', 'COMMON': '27.71%', 'UNCOMMON': '18.01%', 'RARE': '12.47%', 'VERY_RARE': ' 8.31%'}
 
 Well butter my butt, and call me a biscuit!
 That Angry guy sure knows his math!
@@ -187,64 +175,56 @@ A verbose way to model this is to enumerate the product of the three dice and th
 However, if we recognize that our problem involves a [dependent probability](countin.md#dependent-probabilities), we can craft a solution in terms of [`expand`][dyce.expand].
 We can also deploy a counting trick with the two d10s.
 
-```python
->>> from dyce import H, expand
->>> from enum import IntEnum, auto
->>> from typing import cast
->>> d6 = H(6)
->>> d10 = H(10)
->>> mods = list(range(0, 5))
+    >>> from dyce import H, expand
+    >>> from enum import IntEnum, auto
+    >>> from typing import cast
+    >>> d6 = H(6)
+    >>> d10 = H(10)
+    >>> mods = list(range(0, 5))
 
->>> class IronResult(IntEnum):
-...     FAILURE = 0
-...     WEAK_SUCCESS = 1
-...     STRONG_SUCCESS = 2
+    >>> class IronResult(IntEnum):
+    ...     FAILURE = 0
+    ...     WEAK_SUCCESS = 1
+    ...     STRONG_SUCCESS = 2
 
->>> iron_distributions_by_mod = {
-...     mod: expand(lambda action: 2 @ (d10.lt(action.outcome)), d6 + mod).zero_fill(
-...         IronResult
-...     )
-...     for mod in mods
-... }
->>> for mod, iron_distribution in iron_distributions_by_mod.items():
-...     print(
-...         "{:+} -> {}".format(
-...             mod,
-...             {
-...                 IronResult(outcome).name: f"{float(prob):6.2%}"
-...                 for outcome, prob in iron_distribution.probability_items()
-...             },
-...         )
-...     )
-+0 -> {'FAILURE': '59.17%', 'WEAK_SUCCESS': '31.67%', 'STRONG_SUCCESS': ' 9.17%'}
-+1 -> {'FAILURE': '45.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '15.17%'}
-+2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
-+3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
-+4 -> {'FAILURE': '15.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '45.17%'}
-
-```
+    >>> iron_distributions_by_mod = {
+    ...     mod: expand(lambda action: 2 @ (d10.lt(action.outcome)), d6 + mod).zero_fill(
+    ...         IronResult
+    ...     )
+    ...     for mod in mods
+    ... }
+    >>> for mod, iron_distribution in iron_distributions_by_mod.items():
+    ...     print(
+    ...         "{:+} -> {}".format(
+    ...             mod,
+    ...             {
+    ...                 IronResult(outcome).name: f"{float(prob):6.2%}"
+    ...                 for outcome, prob in iron_distribution.probability_items()
+    ...             },
+    ...         )
+    ...     )
+    +0 -> {'FAILURE': '59.17%', 'WEAK_SUCCESS': '31.67%', 'STRONG_SUCCESS': ' 9.17%'}
+    +1 -> {'FAILURE': '45.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '15.17%'}
+    +2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
+    +3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
+    +4 -> {'FAILURE': '15.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '45.17%'}
 
 !!! question "What’s with that `#!python 2@(d10.lt(action))`?"
 
     Let’s break it down.
     `#!python H(10).lt(value)` will tell us how often a single d10 is less than `#!python value`.
 
-    ```python
-    >>> H(10).lt(5)  # how often a d10 is strictly less than 5
-    H({False: 6, True: 4})
-
-    ```
+            >>> H(10).lt(5)  # how often a d10 is strictly less than 5
+            H({False: 6, True: 4})
 
     By summing those results (and taking advantage of the fact that, in Python, `#!python bool`s act like `#!python int`s when it comes to arithmetic operators), we can count how often that happens with more than one interchangeable d10.
 
-    ```python
-    >>> d10_lt5 = H(10).lt(5)
-    >>> d10_lt5 + d10_lt5
-    H({0: 36, 1: 48, 2: 16})
-    >>> (d10_lt5 + d10_lt5).total
-    100
+            >>> d10_lt5 = H(10).lt(5)
+            >>> d10_lt5 + d10_lt5
+            H({0: 36, 1: 48, 2: 16})
+            >>> (d10_lt5 + d10_lt5).total
+            100
 
-    ```
 
     How do we interpret those results?
     36 times out of a hundred, neither d10 will be strictly less than five.
@@ -253,13 +233,10 @@ We can also deploy a counting trick with the two d10s.
 
     [`H`][dyce.H]’s `#!python @` operator provides a shorthand.
 
-    ```python
-    >>> # The parentheses are technically redundant, but clarify the
-    >>> # intention
-    >>> 2 @ (H(10).lt(5)) == H(10).lt(5) + H(10).lt(5)
-    True
-
-    ```
+            >>> # The parentheses are technically redundant, but clarify the
+            >>> # intention
+            >>> 2 @ (H(10).lt(5)) == H(10).lt(5) + H(10).lt(5)
+            True
 
 !!! question "Why doesn’t `#!python 2@(H(6).gt(H(10))` work?"
 
@@ -273,52 +250,49 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 
 [`expand`][dyce.expand] is especially useful where there are multiple independent terms.
 
-```python
->>> from dyce.evaluation import HResult, P, PResult
+    >>> from dyce.evaluation import HResult, P, PResult
 
->>> class IronDramaticResult(IntEnum):
-...     SPECTACULAR_FAILURE = -1
-...     FAILURE = 0
-...     WEAK_SUCCESS = 1
-...     STRONG_SUCCESS = 2
-...     SPECTACULAR_SUCCESS = 3
+    >>> class IronDramaticResult(IntEnum):
+    ...     SPECTACULAR_FAILURE = -1
+    ...     FAILURE = 0
+    ...     WEAK_SUCCESS = 1
+    ...     STRONG_SUCCESS = 2
+    ...     SPECTACULAR_SUCCESS = 3
 
->>> def iron_dramatic_dependent_term(
-...     action: HResult[int],
-...     challenges: PResult[int],
-...     *,
-...     mod: int = 0,
-... ) -> IronDramaticResult:
-...     modded_action = action.outcome + mod
-...     first_challenge_outcome, second_challenge_outcome = challenges.roll
-...     beats_first_challenge = modded_action > first_challenge_outcome
-...     beats_second_challenge = modded_action > second_challenge_outcome
-...     doubles = first_challenge_outcome == second_challenge_outcome
-...     if beats_first_challenge and beats_second_challenge:
-...         return (
-...             IronDramaticResult.SPECTACULAR_SUCCESS
-...             if doubles
-...             else IronDramaticResult.STRONG_SUCCESS
-...         )
-...     elif beats_first_challenge or beats_second_challenge:
-...         return IronDramaticResult.WEAK_SUCCESS
-...     else:
-...         return (
-...             IronDramaticResult.SPECTACULAR_FAILURE
-...             if doubles
-...             else IronDramaticResult.FAILURE
-...         )
+    >>> def iron_dramatic_dependent_term(
+    ...     action: HResult[int],
+    ...     challenges: PResult[int],
+    ...     *,
+    ...     mod: int = 0,
+    ... ) -> IronDramaticResult:
+    ...     modded_action = action.outcome + mod
+    ...     first_challenge_outcome, second_challenge_outcome = challenges.roll
+    ...     beats_first_challenge = modded_action > first_challenge_outcome
+    ...     beats_second_challenge = modded_action > second_challenge_outcome
+    ...     doubles = first_challenge_outcome == second_challenge_outcome
+    ...     if beats_first_challenge and beats_second_challenge:
+    ...         return (
+    ...             IronDramaticResult.SPECTACULAR_SUCCESS
+    ...             if doubles
+    ...             else IronDramaticResult.STRONG_SUCCESS
+    ...         )
+    ...     elif beats_first_challenge or beats_second_challenge:
+    ...         return IronDramaticResult.WEAK_SUCCESS
+    ...     else:
+    ...         return (
+    ...             IronDramaticResult.SPECTACULAR_FAILURE
+    ...             if doubles
+    ...             else IronDramaticResult.FAILURE
+    ...         )
 
->>> from pprint import pprint
->>> iron_dramatic = expand(iron_dramatic_dependent_term, d6, 2 @ P(d10))
->>> pprint(dict(iron_dramatic))
-{<IronDramaticResult.SPECTACULAR_FAILURE: -1>: 9,
- <IronDramaticResult.FAILURE: 0>: 62,
- <IronDramaticResult.WEAK_SUCCESS: 1>: 38,
- <IronDramaticResult.STRONG_SUCCESS: 2>: 8,
- <IronDramaticResult.SPECTACULAR_SUCCESS: 3>: 3}
-
-```
+    >>> from pprint import pprint
+    >>> iron_dramatic = expand(iron_dramatic_dependent_term, d6, 2 @ P(d10))
+    >>> pprint(dict(iron_dramatic))
+    {<IronDramaticResult.SPECTACULAR_FAILURE: -1>: 9,
+     <IronDramaticResult.FAILURE: 0>: 62,
+     <IronDramaticResult.WEAK_SUCCESS: 1>: 38,
+     <IronDramaticResult.STRONG_SUCCESS: 2>: 8,
+     <IronDramaticResult.SPECTACULAR_SUCCESS: 3>: 3}
 
 By defining our dependent term function to include `#!python mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
 
@@ -399,9 +373,7 @@ Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets
   <!-- Interactive version: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_ironsworn.py"
-```
+    --8<-- "docs/assets/plot_ironsworn.py"
 </details>
 
 ## Advanced topic—modeling *Risis*
@@ -410,87 +382,75 @@ Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets
 We can easily model the first round of its opposed combat system for various starting configurations.
 Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head-to-head contest of values:
 
-```python
->>> from collections.abc import Callable
->>> from typing import TypeVar
->>> from dyce import H
->>> T = TypeVar("T")
->>> VersusFuncT = Callable[[int, int], H["Versus"]]
->>> d6 = H(6)
+    >>> from collections.abc import Callable
+    >>> from typing import TypeVar
+    >>> from dyce import H
+    >>> T = TypeVar("T")
+    >>> VersusFuncT = Callable[[int, int], H["Versus"]]
+    >>> d6 = H(6)
 
->>> class Versus(IntEnum):
-...     LOSE = -1
-...     DRAW = 0
-...     WIN = 1
-...
-...     @staticmethod
-...     def raw_vs(us_outcome: int, them_outcome: int) -> "Versus":
-...         return (
-...             Versus.LOSE
-...             if us_outcome < them_outcome
-...             else Versus.WIN
-...             if us_outcome > them_outcome
-...             else Versus.DRAW
-...         )
-...
-...     @staticmethod
-...     def us_vs_them(our_pool_size: int, their_pool_size: int) -> H["Versus"]:
-...         return (our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6)
-
-```
+    >>> class Versus(IntEnum):
+    ...     LOSE = -1
+    ...     DRAW = 0
+    ...     WIN = 1
+    ...
+    ...     @staticmethod
+    ...     def raw_vs(us_outcome: int, them_outcome: int) -> "Versus":
+    ...         return (
+    ...             Versus.LOSE
+    ...             if us_outcome < them_outcome
+    ...             else Versus.WIN
+    ...             if us_outcome > them_outcome
+    ...             else Versus.DRAW
+    ...         )
+    ...
+    ...     @staticmethod
+    ...     def us_vs_them(our_pool_size: int, their_pool_size: int) -> H["Versus"]:
+    ...         return (our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6)
 
 Example use for a single round of combat:
 
-```python
->>> our_pool_size = 2
->>> their_pool_size = 3
->>> print((our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6).format(width=65))
-              avg |   -0.63
-              std |    0.73
-              var |    0.54
-<Versus.LOSE: -1> |  77.85% |############################
- <Versus.DRAW: 0> |   6.94% |##
-  <Versus.WIN: 1> |  15.20% |#####
-
-```
+    >>> our_pool_size = 2
+    >>> their_pool_size = 3
+    >>> print((our_pool_size @ d6).apply(Versus.raw_vs, their_pool_size @ d6).format(width=65))
+                  avg |   -0.63
+                  std |    0.73
+                  var |    0.54
+    <Versus.LOSE: -1> |  77.85% |############################
+     <Versus.DRAW: 0> |   6.94% |##
+      <Versus.WIN: 1> |  15.20% |#####
 
 !!! note
 
     As an aside, this reasonably common pattern can be characterized in a more concise (albeit less readable) way:
 
-    ```python
-    >>> (our_pool_size @ d6 - their_pool_size @ d6).apply(
-    ...     lambda outcome: outcome // abs(outcome) if outcome else outcome
-    ... ).lowest_terms()
-    H({-1: 1009, 0: 90, 1: 197})
-
-    ```
+            >>> (our_pool_size @ d6 - their_pool_size @ d6).apply(
+            ...     lambda outcome: outcome // abs(outcome) if outcome else outcome
+            ... ).lowest_terms()
+            H({-1: 1009, 0: 90, 1: 197})
 
 TODO
 
-```python
->>> for them in range(3, 6):
-...     print("---")
-...     for us in range(them, them + 3):
-...         first_round = (us @ H(6)).apply(
-...             Versus.raw_vs, them @ H(6)
-...         )  # -1 is a loss, 0 is a tie, 1 is a win
-...         risus_results = first_round.format_short()
-...         print(f"{us}d6 vs. {them}d6: {risus_results}")
----
-3d6 vs. 3d6: {..., -1: 45.36%, 0:  9.28%, 1: 45.36%}
-4d6 vs. 3d6: {..., -1: 19.17%, 0:  6.55%, 1: 74.28%}
-5d6 vs. 3d6: {..., -1:  6.07%, 0:  2.99%, 1: 90.93%}
----
-4d6 vs. 4d6: {..., -1: 45.95%, 0:  8.09%, 1: 45.95%}
-5d6 vs. 4d6: {..., -1: 22.04%, 0:  6.15%, 1: 71.81%}
-6d6 vs. 4d6: {..., -1:  8.34%, 0:  3.26%, 1: 88.40%}
----
-5d6 vs. 5d6: {..., -1: 46.37%, 0:  7.27%, 1: 46.37%}
-6d6 vs. 5d6: {..., -1: 24.24%, 0:  5.79%, 1: 69.96%}
-7d6 vs. 5d6: {..., -1: 10.36%, 0:  3.40%, 1: 86.24%}
-
-```
+    >>> for them in range(3, 6):
+    ...     print("---")
+    ...     for us in range(them, them + 3):
+    ...         first_round = (us @ H(6)).apply(
+    ...             Versus.raw_vs, them @ H(6)
+    ...         )  # -1 is a loss, 0 is a tie, 1 is a win
+    ...         risus_results = first_round.format_short()
+    ...         print(f"{us}d6 vs. {them}d6: {risus_results}")
+    ---
+    3d6 vs. 3d6: {..., -1: 45.36%, 0:  9.28%, 1: 45.36%}
+    4d6 vs. 3d6: {..., -1: 19.17%, 0:  6.55%, 1: 74.28%}
+    5d6 vs. 3d6: {..., -1:  6.07%, 0:  2.99%, 1: 90.93%}
+    ---
+    4d6 vs. 4d6: {..., -1: 45.95%, 0:  8.09%, 1: 45.95%}
+    5d6 vs. 4d6: {..., -1: 22.04%, 0:  6.15%, 1: 71.81%}
+    6d6 vs. 4d6: {..., -1:  8.34%, 0:  3.26%, 1: 88.40%}
+    ---
+    5d6 vs. 5d6: {..., -1: 46.37%, 0:  7.27%, 1: 46.37%}
+    6d6 vs. 5d6: {..., -1: 24.24%, 0:  5.79%, 1: 69.96%}
+    7d6 vs. 5d6: {..., -1: 10.36%, 0:  3.40%, 1: 86.24%}
 
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
 
@@ -523,87 +483,82 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
   <!-- Interactive version: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_risus_first_round.py"
-```
+    --8<-- "docs/assets/plot_risus_first_round.py"
 </details>
 
 ### Modeling entire multi-round combats
 
 With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerless gloves and even model various starting configurations through to completion to get a better sense of the impact of any initial disparity (in this case, applying dynamic programming to avoid redundant computations).
 
-```python
->>> from dyce import H, HResult, P, expand
->>> import sys
->>> from collections.abc import Callable
->>> from enum import IntEnum
->>> from fractions import Fraction
->>> from functools import cache
+    >>> from dyce import H, HResult, P, expand
+    >>> import sys
+    >>> from collections.abc import Callable
+    >>> from enum import IntEnum
+    >>> from fractions import Fraction
+    >>> from functools import cache
 
->>> def risus_combat_driver(
-...     our_pool_size: int,  # number of dice we still have
-...     their_pool_size: int,  # number of dice they still have
-...     us_vs_them_func: Callable[[int, int], H[int]],
-... ) -> H[Versus]:
-...     if our_pool_size < 0 or their_pool_size < 0:
-...         raise ValueError(
-...             f"cannot have negative numbers (us: {our_pool_size}, them: {their_pool_size})"
-...         )
-...     elif our_pool_size == 0 and their_pool_size == 0:
-...         return H(
-...             {Versus.DRAW: 1}
-...         )  # should not happen unless combat(0, 0) is called from the start
-...
-...     @cache
-...     def _resolve(our_pool_size: int, their_pool_size: int) -> H[Versus]:
-...         if our_pool_size == 0:
-...             return H({Versus.LOSE: 1})  # we are out of dice, they win
-...         if their_pool_size == 0:
-...             return H({Versus.WIN: 1})  # they are out of dice, we win
-...         this_round = us_vs_them_func(our_pool_size, their_pool_size)
-...
-...         def _next_round(this_round: HResult[Versus]) -> H[Versus]:
-...             match this_round.outcome:
-...                 case Versus.LOSE:
-...                     return _resolve(
-...                         our_pool_size - 1, their_pool_size
-...                     )  # we lost this round, and one die
-...                 case Versus.WIN:
-...                     return _resolve(
-...                         our_pool_size, their_pool_size - 1
-...                     )  # they lost this round, and one die
-...                 case Versus.DRAW:
-...                     return H({})  # ignore (immediately re-roll) all ties
-...                 case _:
-...                     assert False, (
-...                         f"unrecognized this_round.outcome {this_round.outcome}"
-...                     )
-...
-...         return expand(_next_round, this_round, precision=Fraction(1, 0x7FFFFFFF))
-...
-...     return _resolve(our_pool_size, their_pool_size)
+    >>> def risus_combat_driver(
+    ...     our_pool_size: int,  # number of dice we still have
+    ...     their_pool_size: int,  # number of dice they still have
+    ...     us_vs_them_func: Callable[[int, int], H[int]],
+    ... ) -> H[Versus]:
+    ...     if our_pool_size < 0 or their_pool_size < 0:
+    ...         raise ValueError(
+    ...             f"cannot have negative numbers (us: {our_pool_size}, them: {their_pool_size})"
+    ...         )
+    ...     elif our_pool_size == 0 and their_pool_size == 0:
+    ...         return H(
+    ...             {Versus.DRAW: 1}
+    ...         )  # should not happen unless combat(0, 0) is called from the start
+    ...
+    ...     @cache
+    ...     def _resolve(our_pool_size: int, their_pool_size: int) -> H[Versus]:
+    ...         if our_pool_size == 0:
+    ...             return H({Versus.LOSE: 1})  # we are out of dice, they win
+    ...         if their_pool_size == 0:
+    ...             return H({Versus.WIN: 1})  # they are out of dice, we win
+    ...         this_round = us_vs_them_func(our_pool_size, their_pool_size)
+    ...
+    ...         def _next_round(this_round: HResult[Versus]) -> H[Versus]:
+    ...             match this_round.outcome:
+    ...                 case Versus.LOSE:
+    ...                     return _resolve(
+    ...                         our_pool_size - 1, their_pool_size
+    ...                     )  # we lost this round, and one die
+    ...                 case Versus.WIN:
+    ...                     return _resolve(
+    ...                         our_pool_size, their_pool_size - 1
+    ...                     )  # they lost this round, and one die
+    ...                 case Versus.DRAW:
+    ...                     return H({})  # ignore (immediately re-roll) all ties
+    ...                 case _:
+    ...                     assert False, (
+    ...                         f"unrecognized this_round.outcome {this_round.outcome}"
+    ...                     )
+    ...
+    ...         return expand(_next_round, this_round, precision=Fraction(1, 0x7FFFFFFF))
+    ...
+    ...     return _resolve(our_pool_size, their_pool_size)
 
->>> for t in range(3, 6):
-...     print("---")
-...     for u in range(t, t + 3):
-...         risus_results = risus_combat_driver(
-...             u, t, lambda u, t: (u @ H(6)).apply(Versus.raw_vs, t @ H(6))
-...         ).format_short()
-...         print(f"{u}d6 vs. {t}d6: {risus_results}")
----
-3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
-4d6 vs. 3d6: {..., -1: 10.50%, 1: 89.50%}
-5d6 vs. 3d6: {..., -1:  0.66%, 1: 99.34%}
----
-4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
-5d6 vs. 4d6: {..., -1: 12.25%, 1: 87.75%}
-6d6 vs. 4d6: {..., -1:  1.07%, 1: 98.93%}
----
-5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
-6d6 vs. 5d6: {..., -1: 13.66%, 1: 86.34%}
-7d6 vs. 5d6: {..., -1:  1.49%, 1: 98.51%}
-
-```
+    >>> for t in range(3, 6):
+    ...     print("---")
+    ...     for u in range(t, t + 3):
+    ...         risus_results = risus_combat_driver(
+    ...             u, t, lambda u, t: (u @ H(6)).apply(Versus.raw_vs, t @ H(6))
+    ...         ).format_short()
+    ...         print(f"{u}d6 vs. {t}d6: {risus_results}")
+    ---
+    3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
+    4d6 vs. 3d6: {..., -1: 10.50%, 1: 89.50%}
+    5d6 vs. 3d6: {..., -1:  0.66%, 1: 99.34%}
+    ---
+    4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
+    5d6 vs. 4d6: {..., -1: 12.25%, 1: 87.75%}
+    6d6 vs. 4d6: {..., -1:  1.07%, 1: 98.93%}
+    ---
+    5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
+    6d6 vs. 5d6: {..., -1: 13.66%, 1: 86.34%}
+    7d6 vs. 5d6: {..., -1:  1.49%, 1: 98.51%}
 
 | Standard<br>(Complete Combat) | LOSE | DRAW | WIN |
 |:---:|:---:|:---:|:---:|
@@ -734,41 +689,38 @@ At this point, we can define a simple `#!python lambda` that wraps our `#!python
 
 Using our `#!python risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://ghalev.itch.io/risus-companion)* with the optional “Goliath Rule” for resolving ties.
 
-```python
->>> def deadly_combat_vs(our_pool_size: int, their_pool_size: int) -> H[int]:
-...     best_us = (our_pool_size @ P(6)).h(-1)
-...     best_them = (their_pool_size @ P(6)).h(-1)
-...     h: H[int] = best_us.apply(Versus.raw_vs, best_them)
-...     # Goliath Rule: tie goes to the party with fewer dice in this
-...     # round
-...     return expand(
-...         lambda h_result: (
-...             (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
-...             if h_result.outcome == 0
-...             else h_result.outcome
-...         ),
-...         h,
-...     )
+    >>> def deadly_combat_vs(our_pool_size: int, their_pool_size: int) -> H[int]:
+    ...     best_us = (our_pool_size @ P(6)).h(-1)
+    ...     best_them = (their_pool_size @ P(6)).h(-1)
+    ...     h: H[int] = best_us.apply(Versus.raw_vs, best_them)
+    ...     # Goliath Rule: tie goes to the party with fewer dice in this
+    ...     # round
+    ...     return expand(
+    ...         lambda h_result: (
+    ...             (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
+    ...             if h_result.outcome == 0
+    ...             else h_result.outcome
+    ...         ),
+    ...         h,
+    ...     )
 
->>> for t in range(3, 6):
-...     print("---")
-...     for u in range(t, t + 3):
-...         risus_results = risus_combat_driver(u, t, deadly_combat_vs).format_short()
-...         print(f"{u}d6 vs. {t}d6: {risus_results}")
----
-3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
-4d6 vs. 3d6: {..., -1: 36.00%, 1: 64.00%}
-5d6 vs. 3d6: {..., -1: 23.23%, 1: 76.77%}
----
-4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
-5d6 vs. 4d6: {..., -1: 40.67%, 1: 59.33%}
-6d6 vs. 4d6: {..., -1: 30.59%, 1: 69.41%}
----
-5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
-6d6 vs. 5d6: {..., -1: 44.13%, 1: 55.87%}
-7d6 vs. 5d6: {..., -1: 36.89%, 1: 63.11%}
-
-```
+    >>> for t in range(3, 6):
+    ...     print("---")
+    ...     for u in range(t, t + 3):
+    ...         risus_results = risus_combat_driver(u, t, deadly_combat_vs).format_short()
+    ...         print(f"{u}d6 vs. {t}d6: {risus_results}")
+    ---
+    3d6 vs. 3d6: {..., -1: 50.00%, 1: 50.00%}
+    4d6 vs. 3d6: {..., -1: 36.00%, 1: 64.00%}
+    5d6 vs. 3d6: {..., -1: 23.23%, 1: 76.77%}
+    ---
+    4d6 vs. 4d6: {..., -1: 50.00%, 1: 50.00%}
+    5d6 vs. 4d6: {..., -1: 40.67%, 1: 59.33%}
+    6d6 vs. 4d6: {..., -1: 30.59%, 1: 69.41%}
+    ---
+    5d6 vs. 5d6: {..., -1: 50.00%, 1: 50.00%}
+    6d6 vs. 5d6: {..., -1: 44.13%, 1: 55.87%}
+    7d6 vs. 5d6: {..., -1: 36.89%, 1: 63.11%}
 
 The “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
 
@@ -786,116 +738,104 @@ Further, we can observe that every “run” will be zero or more exploding hits
 
 If we choose our values carefully, we can encode how many times we’ve encountered relevant events as we explode.
 
-```python
->>> from dyce import explode_n
->>> import operator
->>> from fractions import Fraction
->>> MISS = 0
->>> HIT = 1
->>> HIT_EXPLODE = 2
->>> d_evens_up_raw = H(
-...     (
-...         MISS,  # 1
-...         HIT,  # 2
-...         MISS,  # 3
-...         HIT,  # 4
-...         MISS,  # 5
-...         HIT_EXPLODE,  # 6
-...     )
-... )
+    >>> from dyce import explode_n
+    >>> import operator
+    >>> from fractions import Fraction
+    >>> MISS = 0
+    >>> HIT = 1
+    >>> HIT_EXPLODE = 2
+    >>> d_evens_up_raw = H(
+    ...     (
+    ...         MISS,  # 1
+    ...         HIT,  # 2
+    ...         MISS,  # 3
+    ...         HIT,  # 4
+    ...         MISS,  # 5
+    ...         HIT_EXPLODE,  # 6
+    ...     )
+    ... )
 
->>> d_evens_up_exploded = explode_n(d_evens_up_raw, n=3)
->>> d_evens_up_exploded
-H({0: 648, 1: 432, 2: 108, 3: 72, 4: 18, 5: 12, 6: 3, 7: 2, 8: 1})
-
-```
+    >>> d_evens_up_exploded = explode_n(d_evens_up_raw, n=3)
+    >>> d_evens_up_exploded
+    H({0: 648, 1: 432, 2: 108, 3: 72, 4: 18, 5: 12, 6: 3, 7: 2, 8: 1})
 
 For every value that is even, we ended in a miss.
 For every value that is odd, we ended in a hit that will need to be tallied.
 Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
-```python
->>> def decode_hits(h_result: HResult):
-...     return (
-...         h_result.outcome + 1
-...     ) // 2  # equivalent to h_result.outcome // 2 + h_result.outcome % 2
+    >>> def decode_hits(h_result: HResult):
+    ...     return (
+    ...         h_result.outcome + 1
+    ...     ) // 2  # equivalent to h_result.outcome // 2 + h_result.outcome % 2
 
->>> d_evens_up = expand(decode_hits, d_evens_up_exploded)
->>> print(d_evens_up.format(width=65))
-avg |    0.60
-std |    0.69
-var |    0.48
-  0 |  50.00% |#########################
-  1 |  41.67% |####################
-  2 |   6.94% |###
-  3 |   1.16% |
-  4 |   0.23% |
-
-```
+    >>> d_evens_up = expand(decode_hits, d_evens_up_exploded)
+    >>> print(d_evens_up.format(width=65))
+    avg |    0.60
+    std |    0.69
+    var |    0.48
+      0 |  50.00% |#########################
+      1 |  41.67% |####################
+      2 |   6.94% |###
+      3 |   1.16% |
+      4 |   0.23% |
 
 We can now approximate a complete “Evens Up” combat using our `#!python risus_combat_driver` from above.
 We can also deploy a trick using `#!python partial` to parameterize use of the Goliath Rule.
 
-```python
->>> from functools import partial
+    >>> from functools import partial
 
->>> def evens_up_vs(our_pool_size: int, their_pool_size: int, goliath: bool = False) -> H:
-...     h = (our_pool_size @ d_evens_up).apply(Versus.raw_vs, their_pool_size @ d_evens_up)
-...     if goliath:
-...         h = expand(
-...             lambda h_result: (
-...                 (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
-...                 if h_result.outcome == 0
-...                 else h_result.outcome
-...             ),
-...             h,
-...         )
-...     return h
+    >>> def evens_up_vs(our_pool_size: int, their_pool_size: int, goliath: bool = False) -> H:
+    ...     h = (our_pool_size @ d_evens_up).apply(Versus.raw_vs, their_pool_size @ d_evens_up)
+    ...     if goliath:
+    ...         h = expand(
+    ...             lambda h_result: (
+    ...                 (our_pool_size < their_pool_size) - (our_pool_size > their_pool_size)
+    ...                 if h_result.outcome == 0
+    ...                 else h_result.outcome
+    ...             ),
+    ...             h,
+    ...         )
+    ...     return h
 
->>> for t in range(3, 5):
-...     print("-----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---")
-...     for u in range(t, t + 3):
-...         goliath_results = risus_combat_driver(
-...             u, t, partial(evens_up_vs, goliath=True)
-...         ).format_short()
-...         no_goliath_results = risus_combat_driver(
-...             u, t, partial(evens_up_vs, goliath=False)
-...         ).format_short()
-...         print(f"{u}d6 vs. {t}d6:   {goliath_results}   {no_goliath_results}")
------------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
-3d6 vs. 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-4d6 vs. 3d6:   {..., -1: 29.51%, 1: 70.49%}   {..., -1: 19.08%, 1: 80.92%}
-5d6 vs. 3d6:   {..., -1: 12.32%, 1: 87.68%}   {..., -1:  4.57%, 1: 95.43%}
------------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
-4d6 vs. 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
-5d6 vs. 4d6:   {..., -1: 30.52%, 1: 69.48%}   {..., -1: 21.04%, 1: 78.96%}
-6d6 vs. 4d6:   {..., -1: 13.68%, 1: 86.32%}   {..., -1:  5.88%, 1: 94.12%}
-
-```
+    >>> for t in range(3, 5):
+    ...     print("-----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---")
+    ...     for u in range(t, t + 3):
+    ...         goliath_results = risus_combat_driver(
+    ...             u, t, partial(evens_up_vs, goliath=True)
+    ...         ).format_short()
+    ...         no_goliath_results = risus_combat_driver(
+    ...             u, t, partial(evens_up_vs, goliath=False)
+    ...         ).format_short()
+    ...         print(f"{u}d6 vs. {t}d6:   {goliath_results}   {no_goliath_results}")
+    -----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
+    3d6 vs. 3d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+    4d6 vs. 3d6:   {..., -1: 29.51%, 1: 70.49%}   {..., -1: 19.08%, 1: 80.92%}
+    5d6 vs. 3d6:   {..., -1: 12.32%, 1: 87.68%}   {..., -1:  4.57%, 1: 95.43%}
+    -----------   ---- With Goliath Rule -----   --- Without Goliath Rule ---
+    4d6 vs. 4d6:   {..., -1: 50.00%, 1: 50.00%}   {..., -1: 50.00%, 1: 50.00%}
+    5d6 vs. 4d6:   {..., -1: 30.52%, 1: 69.48%}   {..., -1: 21.04%, 1: 78.96%}
+    6d6 vs. 4d6:   {..., -1: 13.68%, 1: 86.32%}   {..., -1:  5.88%, 1: 94.12%}
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
-```python
->>> from dyce import H, P, expand
->>> from itertools import chain
->>> p_4d6 = 4 @ P(6)
->>> d6_reroll_first_one = expand(
-...     lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome, H(6)
-... )
->>> p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
->>> p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
->>> attr_results: dict[str, H] = {
-...     "3d6": 3 @ H(6),
-...     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
-...     "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
-...     "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
-...         slice(1, None)
-...     ),
-...     "2d6 + 6": 2 @ H(6) + 6,
-...     "4d4 + 2": 4 @ H(4) + 2,
-... }
-
-```
+    >>> from dyce import H, P, expand
+    >>> from itertools import chain
+    >>> p_4d6 = 4 @ P(6)
+    >>> d6_reroll_first_one = expand(
+    ...     lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome, H(6)
+    ... )
+    >>> p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
+    >>> p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
+    >>> attr_results: dict[str, H] = {
+    ...     "3d6": 3 @ H(6),
+    ...     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
+    ...     "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
+    ...     "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
+    ...         slice(1, None)
+    ...     ),
+    ...     "2d6 + 6": 2 @ H(6) + 6,
+    ...     "4d4 + 2": 4 @ H(4) + 2,
+    ... }
 
 Visualization:
 
@@ -913,37 +853,30 @@ Visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_4d6_variants.py"
-```
+    --8<-- "docs/assets/plot_4d6_variants.py"
 </details>
 
 ## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
 Source:
 
-```python
-# …
-program = [
-  "VAR save_roll = d20",
-  "VAR burning_arch_damage = 10d6 + 10",
-  "VAR pass_save = ( save_roll >= 10 ) ",
-  "VAR damage_half_on_save = burning_arch_damage // (pass_save + 1)",
-  "damage_half_on_save"
-]
-# …
-```
+    # …
+    program = [
+      "VAR save_roll = d20",
+      "VAR burning_arch_damage = 10d6 + 10",
+      "VAR pass_save = ( save_roll >= 10 ) ",
+      "VAR damage_half_on_save = burning_arch_damage // (pass_save + 1)",
+      "damage_half_on_save"
+    ]
+    # …
 
 Translation:
 
-```python
->>> from dyce import H
->>> save_roll = H(20)
->>> burning_arch_damage = 10 @ H(6) + 10
->>> pass_save = save_roll.ge(10)
->>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
-
-```
+    >>> from dyce import H
+    >>> save_roll = H(20)
+    >>> burning_arch_damage = 10 @ H(6) + 10
+    >>> pass_save = save_roll.ge(10)
+    >>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
 
 Visualization:
 
@@ -961,122 +894,103 @@ Visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_burning_arch.py"
-```
+    --8<-- "docs/assets/plot_burning_arch.py"
 </details>
 
 An alternative using [`expand`][dyce.expand]:
 
-```python
->>> from dyce import expand
->>> import operator
->>> expand(
-...     lambda h_result: (
-...         burning_arch_damage // 2
-...         if operator.__ge__(h_result.outcome, 10)
-...         else burning_arch_damage
-...     ),
-...     save_roll,
-... ) == damage_half_on_save
-True
-
-```
+    >>> from dyce import expand
+    >>> import operator
+    >>> expand(
+    ...     lambda h_result: (
+    ...         burning_arch_damage // 2
+    ...         if operator.__ge__(h_result.outcome, 10)
+    ...         else burning_arch_damage
+    ...     ),
+    ...     save_roll,
+    ... ) == damage_half_on_save
+    True
 
 ## More translations from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
-```python
->>> # VAR name = 1 + 2d3 - 3 * 4d2 // 5
->>> name = 1 + (2 @ H(3)) - 3 * (4 @ H(2)) // 5
->>> print(name.format_short())
-{avg: 1.75, -1:  3.47%, 0: 13.89%, 1: 25.00%, 2: 29.17%, 3: 19.44%, 4:  8.33%, 5:  0.69%}
+    >>> # VAR name = 1 + 2d3 - 3 * 4d2 // 5
+    >>> name = 1 + (2 @ H(3)) - 3 * (4 @ H(2)) // 5
+    >>> print(name.format_short())
+    {avg: 1.75, -1:  3.47%, 0: 13.89%, 1: 25.00%, 2: 29.17%, 3: 19.44%, 4:  8.33%, 5:  0.69%}
 
-```
+<!-- -->
 
-```python
->>> # VAR out = 3 * ( 1 + 1d4 )
->>> out = 3 * (1 + 2 @ H(4))
->>> print(out.format_short())
-{avg: 18.00, 9:  6.25%, 12: 12.50%, 15: 18.75%, 18: 25.00%, 21: 18.75%, 24: 12.50%, 27:  6.25%}
+    >>> # VAR out = 3 * ( 1 + 1d4 )
+    >>> out = 3 * (1 + 2 @ H(4))
+    >>> print(out.format_short())
+    {avg: 18.00, 9:  6.25%, 12: 12.50%, 15: 18.75%, 18: 25.00%, 21: 18.75%, 24: 12.50%, 27:  6.25%}
 
-```
+<!-- -->
 
-```python
->>> # VAR g = (1d4 >= 2) AND !(1d20 == 2)
->>> g = H(4).ge(2) & H(20).ne(2)
->>> print(g.format_short())
-{..., False: 28.75%, True: 71.25%}
+    >>> # VAR g = (1d4 >= 2) AND !(1d20 == 2)
+    >>> g = H(4).ge(2) & H(20).ne(2)
+    >>> print(g.format_short())
+    {..., False: 28.75%, True: 71.25%}
 
-```
+<!-- -->
 
-```python
->>> # VAR h = (1d4 >= 2) OR !(1d20 == 2)
->>> h_bool = H(4).ge(2) | H(20).ne(2)
->>> print(h_bool.format_short())
-{..., False:  1.25%, True: 98.75%}
+    >>> # VAR h = (1d4 >= 2) OR !(1d20 == 2)
+    >>> h_bool = H(4).ge(2) | H(20).ne(2)
+    >>> print(h_bool.format_short())
+    {..., False:  1.25%, True: 98.75%}
 
-```
+<!-- -->
 
-```python
->>> # VAR abs = ABS( 1d6 - 1d6 )
->>> abs_h = abs(H(6) - H(6))
->>> print(abs_h.format_short())
-{avg: 1.94, 0: 16.67%, 1: 27.78%, 2: 22.22%, 3: 16.67%, 4: 11.11%, 5:  5.56%}
+    >>> # VAR abs = ABS( 1d6 - 1d6 )
+    >>> abs_h = abs(H(6) - H(6))
+    >>> print(abs_h.format_short())
+    {avg: 1.94, 0: 16.67%, 1: 27.78%, 2: 22.22%, 3: 16.67%, 4: 11.11%, 5:  5.56%}
 
-```
+<!-- -->
 
-```python
->>> # MAX(4d7, 2d10)
->>> max_h = P(4 @ H(7), 2 @ H(10)).h(-1)
->>> print(max_h.format_short())
-{avg: 16.60, 4:  0.00%, 5:  0.02%, 6:  0.07%, 7:  0.21%, ..., 25:  0.83%, 26:  0.42%, 27:  0.17%, 28:  0.04%}
+    >>> # MAX(4d7, 2d10)
+    >>> max_h = P(4 @ H(7), 2 @ H(10)).h(-1)
+    >>> print(max_h.format_short())
+    {avg: 16.60, 4:  0.00%, 5:  0.02%, 6:  0.07%, 7:  0.21%, ..., 25:  0.83%, 26:  0.42%, 27:  0.17%, 28:  0.04%}
 
-```
+<!-- -->
 
-```python
->>> # MIN(50, d%)
->>> min_h = P(H((50,)), P(100)).h(0)
->>> print(min_h.format_short())
-{avg: 37.75, 1:  1.00%, 2:  1.00%, 3:  1.00%, ..., 47:  1.00%, 48:  1.00%, 49:  1.00%, 50: 51.00%}
-
-```
+    >>> # MIN(50, d%)
+    >>> min_h = P(H((50,)), P(100)).h(0)
+    >>> print(min_h.format_short())
+    {avg: 37.75, 1:  1.00%, 2:  1.00%, 3:  1.00%, ..., 47:  1.00%, 48:  1.00%, 49:  1.00%, 50: 51.00%}
 
 ## Translations from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples)
 
 Example 1 source:
 
-```python
-from DnDice import d, gwf
-single_attack = 2*d(6) + 5
-# …
-great_weapon_fighting = gwf(2*d(6)) + 5
-# …
-# comparison of the probability
-print(single_attack.expectancies())
-print(great_weapon_fighting.expectancies())
-# [ 0.03,  0.06, 0.08, 0.11, 0.14, 0.17, 0.14, ...] (single attack)
-# [0.003, 0.006, 0.03, 0.05, 0.10, 0.15, 0.17, ...] (gwf attack)
-# …
-```
+    from DnDice import d, gwf
+    single_attack = 2*d(6) + 5
+    # …
+    great_weapon_fighting = gwf(2*d(6)) + 5
+    # …
+    # comparison of the probability
+    print(single_attack.expectancies())
+    print(great_weapon_fighting.expectancies())
+    # [ 0.03,  0.06, 0.08, 0.11, 0.14, 0.17, 0.14, ...] (single attack)
+    # [0.003, 0.006, 0.03, 0.05, 0.10, 0.15, 0.17, ...] (gwf attack)
+    # …
 
 Example 1 translation:
 
-```python
->>> from dyce import H, HResult, expand
->>> single_attack = 2 @ H(6) + 5
+    >>> from dyce import H, HResult, expand
+    >>> single_attack = 2 @ H(6) + 5
 
->>> def gwf(dmg):
-...     return dmg.h if dmg.outcome in (1, 2) else dmg.outcome
+    >>> def gwf(dmg):
+    ...     return dmg.h if dmg.outcome in (1, 2) else dmg.outcome
 
->>> great_weapon_fighting = (
-...     2 @ (expand(gwf, H(6))) + 5
-... )  # reroll either die if it is a one or two
->>> print(single_attack.format_short())
-{..., 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, ...}
->>> print(great_weapon_fighting.format_short())
-{..., 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, ...}
-
-```
+    >>> great_weapon_fighting = (
+    ...     2 @ (expand(gwf, H(6))) + 5
+    ... )  # reroll either die if it is a one or two
+    >>> print(single_attack.format_short())
+    {..., 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, ...}
+    >>> print(great_weapon_fighting.format_short())
+    {..., 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, ...}
 
 Example 1 visualization:
 
@@ -1094,50 +1008,43 @@ Example 1 visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_great_weapon_fighting.py"
-```
+    --8<-- "docs/assets/plot_great_weapon_fighting.py"
 </details>
 
 Example 2 source:
 
-```python
-from DnDice import d, advantage, plot
+    from DnDice import d, advantage, plot
 
-normal_hit = 1*d(12) + 5
-critical_hit = 3*d(12) + 5
+    normal_hit = 1*d(12) + 5
+    critical_hit = 3*d(12) + 5
 
-result = d()
-for value, probability in advantage():
-  if value == 20:
-    result.layer(critical_hit, weight=probability)
-  elif value + 5 >= 14:
-    result.layer(normal_hit, weight=probability)
-  else:
-    result.layer(d(0), weight=probability)
-result.normalizeExpectancies()
-# …
-```
+    result = d()
+    for value, probability in advantage():
+      if value == 20:
+        result.layer(critical_hit, weight=probability)
+      elif value + 5 >= 14:
+        result.layer(normal_hit, weight=probability)
+      else:
+        result.layer(d(0), weight=probability)
+    result.normalizeExpectancies()
+    # …
 
 Example 2 translation:
 
-```python
->>> from dyce import H, HResult, expand
->>> normal_hit = H(12) + 5
->>> critical_hit = 3 @ H(12) + 5
->>> advantage = (2 @ P(20)).h(-1)
+    >>> from dyce import H, HResult, expand
+    >>> normal_hit = H(12) + 5
+    >>> critical_hit = 3 @ H(12) + 5
+    >>> advantage = (2 @ P(20)).h(-1)
 
->>> def crit(attack: HResult):
-...     if attack.outcome == 20:
-...         return critical_hit
-...     elif attack.outcome + 5 >= 14:
-...         return normal_hit
-...     else:
-...         return 0
+    >>> def crit(attack: HResult):
+    ...     if attack.outcome == 20:
+    ...         return critical_hit
+    ...     elif attack.outcome + 5 >= 14:
+    ...         return normal_hit
+    ...     else:
+    ...         return 0
 
->>> advantage_weighted = expand(crit, advantage)
-
-```
+    >>> advantage_weighted = expand(crit, advantage)
 
 Example 2 visualization:
 
@@ -1155,9 +1062,7 @@ Example 2 visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_advantage.py"
-```
+    --8<-- "docs/assets/plot_advantage.py"
 </details>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
@@ -1170,12 +1075,9 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 
 Translation:
 
-```python
->>> from dyce import H, P, explode_n
->>> from fractions import Fraction
->>> res = (10 @ P(explode_n(H(10)))).h(slice(-3, None))
-
-```
+    >>> from dyce import H, P, explode_n
+    >>> from fractions import Fraction
+    >>> res = (10 @ P(explode_n(H(10)))).h(slice(-3, None))
 
 Visualization:
 
@@ -1193,9 +1095,7 @@ Visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_d10_explode.py"
-```
+    --8<-- "docs/assets/plot_d10_explode.py"
 </details>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
@@ -1214,20 +1114,17 @@ function: dupes in DICE:s {
 
 Translation:
 
-```python
->>> from dyce import P, PResult, expand
+    >>> from dyce import P, PResult, expand
 
->>> def dupes(p_result: PResult):
-...     dupes = 0
-...     for i in range(1, len(p_result.roll)):
-...         if p_result.roll[i] == p_result.roll[i - 1]:
-...             dupes += 1
-...     return dupes
+    >>> def dupes(p_result: PResult):
+    ...     dupes = 0
+    ...     for i in range(1, len(p_result.roll)):
+    ...         if p_result.roll[i] == p_result.roll[i - 1]:
+    ...             dupes += 1
+    ...     return dupes
 
->>> res_15d6 = expand(dupes, 15 @ P(6))
->>> res_8d10 = expand(dupes, 8 @ P(10))
-
-```
+    >>> res_15d6 = expand(dupes, 15 @ P(6))
+    >>> res_8d10 = expand(dupes, 8 @ P(10))
 
 Visualization:
 
@@ -1245,9 +1142,7 @@ Visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_dupes.py"
-```
+    --8<-- "docs/assets/plot_dupes.py"
 </details>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
@@ -1268,19 +1163,16 @@ function: helper ROLL:s SIZE:n K:n {
 
 Translation:
 
-```python
->>> from dyce import H, P
+    >>> from dyce import H, P
 
->>> def roll_and_keep(p: P[int], k: int):
-...     max_d = max(p[-1]) if p else 0
-...     for roll, count in p.rolls_with_counts():
-...         total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
-...         yield total, count
+    >>> def roll_and_keep(p: P[int], k: int):
+    ...     max_d = max(p[-1]) if p else 0
+    ...     for roll, count in p.rolls_with_counts():
+    ...         total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
+    ...         yield total, count
 
->>> H.from_counts(roll_and_keep(6 @ P(6), 3))
-H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 21: 1})
-
-```
+    >>> H.from_counts(roll_and_keep(6 @ P(6), 3))
+    H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 21: 1})
 
 Visualization:
 
@@ -1298,9 +1190,7 @@ Visualization:
   <!-- Interactive version: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
 
-```python
---8<-- "docs/assets/plot_roll_and_keep.py"
-```
+    --8<-- "docs/assets/plot_roll_and_keep.py"
 </details>
 
 ## Translation of the accepted answer to “[Modelling opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
@@ -1321,34 +1211,28 @@ output [brawl 3d6 vs 3d6] named "A vs B Damage"
 
 Translation:
 
-```python
->>> from dyce.evaluation import PResult
+    >>> from dyce.evaluation import PResult
 
->>> def brawl(p_result_a: PResult[int], p_result_b: PResult[int]):
-...     a_successes = sum(1 for v in p_result_a.roll if v >= p_result_b.roll[-1])
-...     b_successes = sum(1 for v in p_result_b.roll if v >= p_result_a.roll[-1])
-...     return a_successes - b_successes
-
-```
+    >>> def brawl(p_result_a: PResult[int], p_result_b: PResult[int]):
+    ...     a_successes = sum(1 for v in p_result_a.roll if v >= p_result_b.roll[-1])
+    ...     b_successes = sum(1 for v in p_result_b.roll if v >= p_result_a.roll[-1])
+    ...     return a_successes - b_successes
 
 Rudimentary textual visualization using built-in methods:
 
-```python
->>> from dyce import P, expand
->>> res = expand(brawl, 3 @ P(6), 3 @ P(6))
->>> print(res.format(width=65))
-avg |    0.00
-std |    1.73
-var |    2.99
- -3 |   7.86% |###
- -2 |  15.52% |#######
- -1 |  16.64% |########
-  0 |  19.96% |#########
-  1 |  16.64% |########
-  2 |  15.52% |#######
-  3 |   7.86% |###
-
-```
+    >>> from dyce import P, expand
+    >>> res = expand(brawl, 3 @ P(6), 3 @ P(6))
+    >>> print(res.format(width=65))
+    avg |    0.00
+    std |    1.73
+    var |    2.99
+     -3 |   7.86% |###
+     -2 |  15.52% |#######
+     -1 |  16.64% |########
+      0 |  19.96% |#########
+      1 |  16.64% |########
+      2 |  15.52% |#######
+      3 |   7.86% |###
 
 Source of `brawl` with an optional dice swap:
 
@@ -1374,52 +1258,46 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 
 Translation:
 
-```python
->>> def brawl_w_optional_swap(p_result_a: PResult[int], p_result_b: PResult[int]):
-...     roll_a, roll_b = p_result_a.roll, p_result_b.roll
-...     if roll_a[0] < roll_b[-1]:
-...         roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]
-...         # Sort greatest-to-least after the swap
-...         roll_a = tuple(sorted(roll_a, reverse=True))
-...         roll_b = tuple(sorted(roll_b, reverse=True))
-...     else:
-...         # Reverse to be greatest-to-least
-...         roll_a = roll_a[::-1]
-...         roll_b = roll_b[::-1]
-...     a_successes = sum(1 for v in roll_a if v >= roll_b[0])
-...     b_successes = sum(1 for v in roll_b if v >= roll_a[0])
-...     return a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
-
-```
+    >>> def brawl_w_optional_swap(p_result_a: PResult[int], p_result_b: PResult[int]):
+    ...     roll_a, roll_b = p_result_a.roll, p_result_b.roll
+    ...     if roll_a[0] < roll_b[-1]:
+    ...         roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]
+    ...         # Sort greatest-to-least after the swap
+    ...         roll_a = tuple(sorted(roll_a, reverse=True))
+    ...         roll_b = tuple(sorted(roll_b, reverse=True))
+    ...     else:
+    ...         # Reverse to be greatest-to-least
+    ...         roll_a = roll_a[::-1]
+    ...         roll_b = roll_b[::-1]
+    ...     a_successes = sum(1 for v in roll_a if v >= roll_b[0])
+    ...     b_successes = sum(1 for v in roll_b if v >= roll_a[0])
+    ...     return a_successes - b_successes or (roll_a > roll_b) - (roll_a < roll_b)
 
 Rudimentary visualization using built-in methods:
 
-```python
->>> res = expand(brawl_w_optional_swap, 3 @ P(6), 3 @ P(6))
->>> print(res.format(width=65))
-avg |    2.36
-std |    0.88
-var |    0.77
- -1 |   1.42% |
-  0 |   0.59% |
-  1 |  16.65% |########
-  2 |  23.19% |###########
-  3 |  58.15% |#############################
+    >>> res = expand(brawl_w_optional_swap, 3 @ P(6), 3 @ P(6))
+    >>> print(res.format(width=65))
+    avg |    2.36
+    std |    0.88
+    var |    0.77
+     -1 |   1.42% |
+      0 |   0.59% |
+      1 |  16.65% |########
+      2 |  23.19% |###########
+      3 |  58.15% |#############################
 
->>> res = expand(brawl_w_optional_swap, 4 @ P(6), 4 @ P(6))
->>> print(res.format(width=65))
-avg |    2.64
-std |    1.28
-var |    1.64
- -2 |   0.06% |
- -1 |   2.94% |#
-  0 |   0.31% |
-  1 |  18.16% |#########
-  2 |  19.97% |#########
-  3 |  25.19% |############
-  4 |  33.37% |################
-
-```
+    >>> res = expand(brawl_w_optional_swap, 4 @ P(6), 4 @ P(6))
+    >>> print(res.format(width=65))
+    avg |    2.64
+    std |    1.28
+    var |    1.64
+     -2 |   0.06% |
+     -1 |   2.94% |#
+      0 |   0.31% |
+      1 |  18.16% |#########
+      2 |  19.97% |#########
+      3 |  25.19% |############
+      4 |  33.37% |################
 
 <!-- BEGIN MONKEY PATCH --
 >>> warnings.resetwarnings()
