@@ -19,7 +19,7 @@ All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
 <!-- mkdocs:hide:end -->
 
-  [![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
+[![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
 [![Version](https://img.shields.io/pypi/v/dyce.svg)](https://pypi.org/project/dyce/)
 ![Development Stage](https://img.shields.io/pypi/status/dyce.svg)
 [![License](https://img.shields.io/pypi/l/dyce.svg)](http://opensource.org/licenses/MIT)
@@ -88,9 +88,11 @@ All support a variety of operations.
  -->
 
 ```python
->>> from dyce.d import d6
 >>> from dyce import H
->>> d6 == H(6)  # a standard six-sided die
+>>> H(6)  # a standard six-sided die
+H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
+>>> from dyce.d import d6  # dyce.d contains some convenient shorthands
+>>> d6 == H(6)
 True
 >>> 2 @ d6 * 3 - 4  # 2d6 × 3 - 4
 H({2: 1, 5: 2, 8: 3, 11: 4, 14: 5, 17: 6, 20: 5, 23: 4, 26: 3, 29: 2, 32: 1})
@@ -102,13 +104,16 @@ H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
 ```
 
 ```python
->>> from dyce.d import p2d6
 >>> from dyce import P
->>> p2d6 == 2 @ P(d6)  # a pool of two six-sided dice
+>>> 2 @ P(d6)  # a pool of two six-sided dice
+2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
+>>> from dyce.d import p2d6
+>>> p2d6 == 2 @ P(d6)
 True
 >>> p2d6.h()  # pools can be collapsed into histograms
 H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
->>> p2d6 == 2 @ d6  # pools and histograms are comparable
+>>> from dyce.d import h2d6
+>>> p2d6 == h2d6 == 2 @ d6  # pools and histograms are comparable
 True
 
 ```
@@ -189,9 +194,9 @@ For deterministic outcomes.
 ```
 
 ```python
->>> d10 = H(10) - 1
->>> p6d10 = 6 @ P(d10)
->>> p6d10.roll()
+>>> d0to9 = H(10) - 1
+>>> p6d0to9 = 6 @ P(d0to9)
+>>> p6d0to9.roll()
 (0, 0, 2, 3, 5, 9)
 
 ```
