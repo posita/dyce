@@ -868,7 +868,7 @@ In addition, [`anydyce`](https://github.com/posita/anydyce/) provides additional
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><BR>
+  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><BR>
   <!-- TODO(posita): Re-enable once appropriate -->
   <!-- Interactive version: <a href="../Jupiter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
 </summary>
@@ -970,9 +970,18 @@ Enumerating rolls works.
 
 [`P.roll`][dyce.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.
 
+<!-- BEGIN MONKEY PATCH --
+For deterministic outcomes.
+
+>>> import random
+>>> from dyce import rng
+>>> rng.RNG = random.Random(1776137574)
+
+  -- END MONKEY PATCH -->
+
 ```python
->>> p.roll()  # doctest: +SKIP
-(2*x/3, 2*x/3 + 1/3, x/3 + 2/3)
+>>> p.roll()
+(2*x/3, 2*x/3 + 2/3, x + 1/3)
 
 ```
 
