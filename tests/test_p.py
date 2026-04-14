@@ -41,7 +41,7 @@ from dyce.p import (
     _SelectionSuffix,
     _SelectionUniform,
 )
-from dyce.types import _GetItemT
+from dyce.types import _GetItemT, natural_key
 
 from .test_h import _OUTCOME_TYPES
 from .test_types import _NoCompare
@@ -1201,6 +1201,20 @@ def test_rwc_heterogeneous_extremes_via_h() -> None:
     assert p.h(0, -1) == from_brute
 
 
+def test_rwc_heterogeneous_extremes_natural_order() -> None:
+    r"""P.h(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
+    sympy = pytest.importorskip("sympy", reason="requires sympy")
+    x = sympy.symbols("x")
+    d6x = H(6) + x
+    d8x = H(8) + x
+    p = P(d6x, d6x, d8x)
+    from_brute = H.from_counts(
+        (sum(roll), count)
+        for roll, count in _rwc_heterogeneous_brute_force_combinations(list(p), 0, -1)
+    )
+    assert p.h(0, -1) == from_brute
+
+
 def test_first_principles() -> None:
     for n, h, which in (
         (3, H(6), ()),
@@ -1253,7 +1267,10 @@ def _rwc_heterogeneous_brute_force_combinations(
     r"""Naive Cartesian-product enumeration correct for any count magnitude."""
     for rolls in iproduct(*(h.items() for h in hs)):
         outcomes, counts = tuple(zip(*rolls, strict=True))
-        roll = tuple(sorted(outcomes))
+        try:
+            roll = tuple(sorted(outcomes))
+        except TypeError:
+            roll = tuple(sorted(outcomes, key=natural_key))
         count = prod(counts)
         roll_selection = _roll_which(roll, *keys)
         if roll_selection:

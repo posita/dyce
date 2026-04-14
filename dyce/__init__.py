@@ -47,5 +47,5 @@ __all__ = (
 
 try:
     __version__: str = version("dyce")
-except PackageNotFoundError:
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "0.0.0+unknown"

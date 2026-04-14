@@ -42,7 +42,7 @@ try:
     from matplotlib import ticker
     from matplotlib.axes import Axes
     from matplotlib.colors import Colormap
-except ImportError as exc:
+except ImportError as exc:  # pragma: no cover
     raise ImportError(
         "dyce[viz] requires matplotlib; install with: pip install 'dyce[viz]'"
     ) from exc
@@ -219,7 +219,7 @@ def plot_bar(
             else:
                 ax.set_xticks(unique_outcomes)
                 ax.set_xlim(lo - 1.0, hi + 1.0)
-        except TypeError:
+        except TypeError:  # pragma: no cover
             pass  # non-comparable outcomes: matplotlib handles categorical axes
 
     for i, (label, h) in enumerate(hs_list):
@@ -462,7 +462,7 @@ def plot_line(
             lo, hi = min(unique_outcomes), max(unique_outcomes)
             ax.set_xticks(unique_outcomes)
             ax.set_xlim(lo - 0.5, hi + 0.5)
-        except TypeError:
+        except TypeError:  # pragma: no cover
             pass  # non-comparable outcomes: matplotlib handles categorical axes
 
     markers_cycle_forever = cycle(markers or " ")
@@ -521,5 +521,5 @@ def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
     all_outcomes: set[_T] = {o for _, h in hs_list for o in h}
     try:
         return sorted(all_outcomes)  # type: ignore[type-var]
-    except TypeError:
+    except TypeError:  # pragma: no cover
         return sorted(all_outcomes, key=natural_key)

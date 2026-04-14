@@ -171,6 +171,10 @@ class TestPlotLine:
         ax = plot_line(H({}))
         assert ax is not None
 
+    def test_no_args(self) -> None:
+        ax = plot_line()
+        assert ax is not None
+
     def test_graph_type_at_most(self) -> None:
         ax = plot_line(H(6), graph_type="at_most")
         assert ax is not None

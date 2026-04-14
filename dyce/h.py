@@ -69,7 +69,7 @@ try:
             strategy=BeartypeStrategy.O0,
         )
     )  # pyright: ignore[reportAssignmentType]
-except ImportError:
+except ImportError:  # pragma: no cover
 
     def nobeartype(arg: _T) -> _T:
         return arg
@@ -1729,7 +1729,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
 
 
 @deprecated("may be removed in future versions")
-def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:
+def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
     r"""
     Original `#!math O\left( n \right)` implementation of `sum_h`, preserved for performance comparison.
     Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
@@ -1821,7 +1821,7 @@ def _convolve_fast(
             else:
                 new_acc = _h_binary_opname(acc, base, "__add__", "__radd__")
                 if new_acc is NotImplemented:
-                    return NotImplemented
+                    return NotImplemented  # pragma: no cover
                 acc = new_acc
         n >>= 1
         if n:
