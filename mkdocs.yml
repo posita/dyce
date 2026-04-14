@@ -61,6 +61,10 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tilde
 
+extra:
+  version:
+    provider: mike
+
 extra_javascript:
   # For tracking OS-level theme changes after page load
   - js/theme.js

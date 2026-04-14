@@ -47,7 +47,7 @@ An easy way to bootstrap an isolated development environment is:
 
 Substitute your preferred virtual environment process for [`venv`](https://docs.python.org/3/library/venv.html).
 The `[dev]` variant includes additional dependencies necessary for development and testing.
-See the `[project.optional-dependencies]` section in [`pyproject.toml`](https://github.com/posita/dyce/blob/v{{ __vers_str__ }}/pyproject.toml).
+See the `[project.optional-dependencies]` section in [`pyproject.toml`](https://github.com/posita/dyce/blob/v{dyce_git_ref}/pyproject.toml).
 
 Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type checking are run via [pre-commit](https://pre-commit.com/).
 
@@ -87,7 +87,7 @@ Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type chec
 
 If you are willing and able, consider [submitting a pull request](https://github.com/posita/dyce/pulls) with a fix.
 See [the docs](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) if you’re not already familiar with pull requests.
-`dyce` releases from [`master`](https://github.com/posita/dyce/tree/master) (although not always immediately), so a lot of [these workflows](http://scottchacon.com/2011/08/31/github-flow.html#how-we-do-it) are helpful.
+`dyce` releases from [`master`](https://github.com/posita/dyce/tree/master) (although not always immediately), so [this workflow](https://githubflow.github.io/#how-we-do-it) might be helpful to understand.
 There are only a few additional guidelines:
 
 - If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [`LICENSE`](license.md) file.
@@ -107,7 +107,7 @@ There are only a few additional guidelines:
 - Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in [`tests`](https://github.com/posita/dyce/tree/v{{ __vers_str__ }}/tests).
+  Unit tests live in [`tests`](https://github.com/posita/dyce/tree/v{dyce_git_ref}/tests).
 
 - If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
   Consider prefixing your pull request’s title with something like, “`NEED FEEDBACK – `”.
