@@ -71,7 +71,7 @@ test = [
 viz = ["matplotlib"]
 
 [tool.codespell]
-ignore-words-list = "CanGe,countin,rollin"
+ignore-words-list = "CanGe,countin,ot,rollin"
 skip = ["*.ipynb"]
 
 [tool.coverage.run]
@@ -105,7 +105,7 @@ reportUnnecessaryTypeIgnoreComment = "warning"
 typeCheckingMode = "basic"
 
 [tool.pytest.ini_options]
-addopts = ["--doctest-glob=*.md", "--doctest-modules"]
+addopts = ["--doctest-glob=*.md", "--doctest-modules", "--pdbcls=IPython.terminal.debugger:TerminalPdb"]
 testpaths = ["README.md", "docs", "dyce", "helpers", "tests", "*.py"]
 
 [tool.ruff.format]

@@ -93,13 +93,13 @@ class TestHInit:
             assert h.total == abs(i)
 
     def test_non_int_scalar_raises(self) -> None:
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             H(None)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             H(3.0)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             H(Fraction(3))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             H(Decimal(3))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
 
     def test_iterable(self) -> None:
@@ -547,7 +547,7 @@ class TestHUnsupportedOperations:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             try:
-                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[misc,var-annotated] # ty: ignore[invalid-argument-type]
+                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload]
                 assert result is NotImplemented
                 assert any(
                     issubclass(w.category, _ConvolveFallbackWarning) for w in caught
@@ -734,7 +734,7 @@ class TestHMean:
             h_mean = h.mean()
             stat_mean = statistics.mean(
                 itertools.chain(
-                    *(
+                    *(  # type: ignore[var-annotated]
                         itertools.repeat(float(outcome), count)
                         for outcome, count in h.items()
                     )
@@ -853,7 +853,7 @@ class TestHStdev:
             h_stdev = h.stdev()
             stat_stdev = statistics.pstdev(
                 itertools.chain(
-                    *(
+                    *(  # type: ignore[var-annotated]
                         itertools.repeat(float(outcome), count)
                         for outcome, count in h.items()
                     )
