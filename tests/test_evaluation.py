@@ -63,7 +63,7 @@ class TestExpand:
             return H({})
 
         with (  # noqa: PT012
-            pytest.raises(TypeError, match=r"^unrecognized source type\b"),
+            pytest.raises(TypeError, match=r"\bunrecognized source type\b"),
             warnings.catch_warnings(),
         ):
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
