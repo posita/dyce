@@ -14,6 +14,7 @@
 # ======================================================================================
 
 import operator
+import warnings
 from collections import Counter
 from collections.abc import Iterator, Sequence
 from decimal import Decimal
@@ -27,6 +28,7 @@ from unittest.mock import Mock, call, patch
 import pytest
 
 from dyce import H, P
+from dyce.h import _ConvolveFallbackWarning
 from dyce.p import (
     _MAX_FILL,
     _MIN_FILL,
@@ -67,13 +69,13 @@ class TestPInit:
         assert P(-6) == P(H(-6))
 
     def test_non_int_scalar_raises(self) -> None:
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             P(None)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             P(3.0)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             P(Fraction(3))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-        with pytest.raises(TypeError, match=r"^scalar\b.*\bmust be int\b"):
+        with pytest.raises(TypeError, match=r"\bscalar\b.*\bmust be int\b"):
             P(Decimal(3))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
 
     def test_h(self) -> None:
@@ -640,6 +642,27 @@ class TestPH:
         x = sympy.symbols("x")
         d6x = H(6) * x
         assert (2 @ P(d6x)).h() == 2 @ d6x
+
+    def test_no_args_weird_single(
+        self,
+    ) -> None:
+        h = H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2})
+        p_weird = P(h)
+        assert p_weird.h() == h
+
+    def test_no_args_weird_multiple_raises(
+        self,
+    ) -> None:
+        p_weird = 2 @ P(
+            H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2}),
+            H({_NoCompare("oh-03"): 3, _NoCompare("oh-04"): 4}),
+        )
+        with (  # noqa: PT012
+            pytest.raises(TypeError, match=r"\bunsupported operand\b"),
+            warnings.catch_warnings(record=True),
+        ):
+            warnings.simplefilter("always", category=_ConvolveFallbackWarning)
+            p_weird.h()
 
     def test_which_selects_all_shortcuts(self) -> None:
         class MockableP(P):
@@ -1268,9 +1291,9 @@ def _rwc_heterogeneous_brute_force_combinations(
     for rolls in iproduct(*(h.items() for h in hs)):
         outcomes, counts = tuple(zip(*rolls, strict=True))
         try:
-            roll = tuple(sorted(outcomes))
+            roll: RollT[_T] = tuple(sorted(outcomes))
         except TypeError:
-            roll = tuple(sorted(outcomes, key=natural_key))
+            roll = tuple(sorted(outcomes, key=natural_key))  # pyrefly: ignore[bad-argument-type]
         count = prod(counts)
         roll_selection = _roll_which(roll, *keys)
         if roll_selection:

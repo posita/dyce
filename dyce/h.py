@@ -47,7 +47,7 @@ from typing import (
     runtime_checkable,
 )
 
-import optype
+import optype as ot
 
 from . import rng
 from .lifecycle import deprecated, experimental
@@ -59,6 +59,7 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
+_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
 
 
 try:
@@ -437,9 +438,22 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     # ---- Forward operators -----------------------------------------------------------
 
+    @overload
+    def __matmul__(self: "H[Never]", rhs: SupportsInt) -> "H[Never]": ...
+    @overload
+    def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
+    @overload
+    # See: <https://github.com/jorenham/optype/discussions/574>
     def __matmul__(
-        self: "H[optype.CanAdd[_T, _ResultT]]", rhs: SupportsInt
-    ) -> "H[_ResultT]":
+        self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
+    ) -> "H[int]": ...
+    @overload
+    def __matmul__(
+        self: "H[_ConvolvableT]", rhs: SupportsInt
+    ) -> "H[_ConvolvableT]": ...
+    @overload
+    def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
+    def __matmul__(self: "H", rhs: SupportsInt) -> "H":
         n = _lossless_int_or_not_implemented(rhs)
         if n is NotImplemented:
             return NotImplemented
@@ -450,26 +464,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __add__(
-        self: "H[optype.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(
-        self: "H[optype.CanAdd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(
-        self: "H[optype.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __add__(self: "H[_T]", rhs: "H[ot.CanAdd[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __add__(
-        self: "H[_T]", rhs: "H[optype.CanAdd[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanAdd[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __add__(
-        self: "H[_T]", rhs: "HableT[optype.CanAdd[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __add__(self: "H[_T]", rhs: optype.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __add__(self: "H[_T]", rhs: ot.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __add__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -480,26 +492,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __sub__(
-        self: "H[optype.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(
-        self: "H[optype.CanSub[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(
-        self: "H[optype.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __sub__(self: "H[_T]", rhs: "H[ot.CanSub[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __sub__(
-        self: "H[_T]", rhs: "H[optype.CanSub[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanSub[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __sub__(
-        self: "H[_T]", rhs: "HableT[optype.CanSub[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __sub__(self: "H[_T]", rhs: optype.CanSub[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __sub__(self: "H[_T]", rhs: ot.CanSub[_T, _ResultT]) -> "H[_ResultT]": ...
     def __sub__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -510,26 +520,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __mul__(
-        self: "H[optype.CanMul[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mul__(
-        self: "H[optype.CanMul[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mul__(
-        self: "H[optype.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __mul__(self: "H[_T]", rhs: "H[ot.CanMul[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __mul__(
-        self: "H[_T]", rhs: "H[optype.CanMul[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanMul[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __mul__(
-        self: "H[_T]", rhs: "HableT[optype.CanMul[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __mul__(self: "H[_T]", rhs: optype.CanMul[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __mul__(self: "H[_T]", rhs: ot.CanMul[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mul__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -540,27 +548,27 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __truediv__(
-        self: "H[optype.CanTruediv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[optype.CanTruediv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[optype.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[_T]", rhs: "H[optype.CanTruediv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "H[ot.CanTruediv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[_T]", rhs: "HableT[optype.CanTruediv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanTruediv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[_T]", rhs: optype.CanTruediv[_T, _ResultT]
+        self: "H[_T]", rhs: ot.CanTruediv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __truediv__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
@@ -572,27 +580,27 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __floordiv__(
-        self: "H[optype.CanFloordiv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[optype.CanFloordiv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[optype.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[_T]", rhs: "H[optype.CanFloordiv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "H[ot.CanFloordiv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[_T]", rhs: "HableT[optype.CanFloordiv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanFloordiv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[_T]", rhs: optype.CanFloordiv[_T, _ResultT]
+        self: "H[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
@@ -604,26 +612,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __mod__(
-        self: "H[optype.CanMod[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mod__(
-        self: "H[optype.CanMod[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mod__(
-        self: "H[optype.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __mod__(self: "H[_T]", rhs: "H[ot.CanMod[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __mod__(
-        self: "H[_T]", rhs: "H[optype.CanMod[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanMod[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __mod__(
-        self: "H[_T]", rhs: "HableT[optype.CanMod[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __mod__(self: "H[_T]", rhs: optype.CanMod[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __mod__(self: "H[_T]", rhs: ot.CanMod[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mod__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -634,26 +640,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __pow__(
-        self: "H[optype.CanPow2[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __pow__(
-        self: "H[optype.CanPow2[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __pow__(
-        self: "H[optype.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __pow__(self: "H[_T]", rhs: "H[ot.CanPow2[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __pow__(
-        self: "H[_T]", rhs: "H[optype.CanPow2[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanPow2[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __pow__(
-        self: "H[_T]", rhs: "HableT[optype.CanPow2[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __pow__(self: "H[_T]", rhs: optype.CanPow2[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __pow__(self: "H[_T]", rhs: ot.CanPow2[_T, _ResultT]) -> "H[_ResultT]": ...
     def __pow__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -664,28 +668,26 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __lshift__(
-        self: "H[optype.CanLshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[optype.CanLshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[optype.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[_T]", rhs: "H[optype.CanLshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "H[ot.CanLshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[_T]", rhs: "HableT[optype.CanLshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanLshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __lshift__(
-        self: "H[_T]", rhs: optype.CanLshift[_T, _ResultT]
-    ) -> "H[_ResultT]": ...
+    def __lshift__(self: "H[_T]", rhs: ot.CanLshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -696,28 +698,26 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __rshift__(
-        self: "H[optype.CanRshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[optype.CanRshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[optype.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[_T]", rhs: "H[optype.CanRshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "H[ot.CanRshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[_T]", rhs: "HableT[optype.CanRshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanRshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __rshift__(
-        self: "H[_T]", rhs: optype.CanRshift[_T, _ResultT]
-    ) -> "H[_ResultT]": ...
+    def __rshift__(self: "H[_T]", rhs: ot.CanRshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rshift__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -728,26 +728,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __and__(
-        self: "H[optype.CanAnd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __and__(
-        self: "H[optype.CanAnd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __and__(
-        self: "H[optype.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __and__(self: "H[_T]", rhs: "H[ot.CanAnd[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __and__(
-        self: "H[_T]", rhs: "H[optype.CanAnd[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanAnd[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __and__(
-        self: "H[_T]", rhs: "HableT[optype.CanAnd[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __and__(self: "H[_T]", rhs: optype.CanAnd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __and__(self: "H[_T]", rhs: ot.CanAnd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __and__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -758,26 +756,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __or__(
-        self: "H[optype.CanOr[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __or__(
-        self: "H[optype.CanOr[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __or__(
-        self: "H[optype.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __or__(self: "H[_T]", rhs: "H[ot.CanOr[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __or__(
-        self: "H[_T]", rhs: "H[optype.CanOr[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanOr[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __or__(
-        self: "H[_T]", rhs: "HableT[optype.CanOr[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __or__(self: "H[_T]", rhs: optype.CanOr[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __or__(self: "H[_T]", rhs: ot.CanOr[_T, _ResultT]) -> "H[_ResultT]": ...
     def __or__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -788,26 +784,24 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __xor__(
-        self: "H[optype.CanXor[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __xor__(
-        self: "H[optype.CanXor[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __xor__(
-        self: "H[optype.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "H[_ResultT]": ...
+    @overload
+    def __xor__(self: "H[_T]", rhs: "H[ot.CanXor[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __xor__(
-        self: "H[_T]", rhs: "H[optype.CanXor[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableT[ot.CanXor[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
-    def __xor__(
-        self: "H[_T]", rhs: "HableT[optype.CanXor[_T, _ResultT]]"
-    ) -> "H[_ResultT]": ...
-    @overload
-    def __xor__(self: "H[_T]", rhs: optype.CanXor[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __xor__(self: "H[_T]", rhs: ot.CanXor[_T, _ResultT]) -> "H[_ResultT]": ...
     def __xor__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -818,48 +812,61 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     # ---- Reflected operators ---------------------------------------------------------
 
+    @overload
+    def __rmatmul__(self: "H[Never]", lhs: SupportsInt) -> "H[Never]": ...
+    @overload
+    def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
+    @overload
+    # See: <https://github.com/jorenham/optype/discussions/574>
     def __rmatmul__(
-        self: "H[optype.CanAdd[_T, _ResultT]]", lhs: SupportsInt
-    ) -> "H[_ResultT]":
+        self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
+    ) -> "H[int]": ...
+    @overload
+    def __rmatmul__(
+        self: "H[_ConvolvableT]", lhs: SupportsInt
+    ) -> "H[_ConvolvableT]": ...
+    @overload
+    def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
+    def __rmatmul__(self: "H", lhs: SupportsInt) -> "H":
         return self.__matmul__(lhs)
 
     @overload
     def __radd__(
-        self: "H[optype.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __radd__(self: "H[_T]", lhs: optype.CanRAdd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __radd__(self: "H[_T]", lhs: ot.CanRAdd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __radd__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__add__", "__radd__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rsub__(
-        self: "H[optype.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rsub__(self: "H[_T]", lhs: optype.CanRSub[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rsub__(self: "H[_T]", lhs: ot.CanRSub[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rsub__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__sub__", "__rsub__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rmul__(
-        self: "H[optype.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rmul__(self: "H[_T]", lhs: optype.CanRMul[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rmul__(self: "H[_T]", lhs: ot.CanRMul[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rmul__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__mul__", "__rmul__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rtruediv__(
-        self: "H[optype.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __rtruediv__(
-        self: "H[_T]", lhs: optype.CanRTruediv[_T, _ResultT]
+        self: "H[_T]", lhs: ot.CanRTruediv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __rtruediv__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__truediv__", "__rtruediv__", lhs)
@@ -867,11 +874,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __rfloordiv__(
-        self: "H[optype.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __rfloordiv__(
-        self: "H[_T]", lhs: optype.CanRFloordiv[_T, _ResultT]
+        self: "H[_T]", lhs: ot.CanRFloordiv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __rfloordiv__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__floordiv__", "__rfloordiv__", lhs)
@@ -879,31 +886,31 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __rmod__(
-        self: "H[optype.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rmod__(self: "H[_T]", lhs: optype.CanRMod[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rmod__(self: "H[_T]", lhs: ot.CanRMod[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rmod__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__mod__", "__rmod__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rpow__(
-        self: "H[optype.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rpow__(self: "H[_T]", lhs: optype.CanRPow[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rpow__(self: "H[_T]", lhs: ot.CanRPow[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rpow__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__pow__", "__rpow__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rlshift__(
-        self: "H[optype.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __rlshift__(
-        self: "H[_T]", lhs: optype.CanRLshift[_T, _ResultT]
+        self: "H[_T]", lhs: ot.CanRLshift[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __rlshift__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__lshift__", "__rlshift__", lhs)
@@ -911,11 +918,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __rrshift__(
-        self: "H[optype.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
     def __rrshift__(
-        self: "H[_T]", lhs: optype.CanRRshift[_T, _ResultT]
+        self: "H[_T]", lhs: ot.CanRRshift[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __rrshift__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__rshift__", "__rrshift__", lhs)
@@ -923,38 +930,38 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     @overload
     def __rand__(
-        self: "H[optype.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rand__(self: "H[_T]", lhs: optype.CanRAnd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rand__(self: "H[_T]", lhs: ot.CanRAnd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rand__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__and__", "__rand__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __ror__(
-        self: "H[optype.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __ror__(self: "H[_T]", lhs: optype.CanROr[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __ror__(self: "H[_T]", lhs: ot.CanROr[_T, _ResultT]) -> "H[_ResultT]": ...
     def __ror__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__or__", "__ror__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
     def __rxor__(
-        self: "H[optype.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "H[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "H[_ResultT]": ...
     @overload
-    def __rxor__(self: "H[_T]", lhs: optype.CanRXor[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rxor__(self: "H[_T]", lhs: ot.CanRXor[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rxor__(self, lhs: object) -> "H[object]":
         result = _map_opname_ref(self._h, "__xor__", "__rxor__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
-    def lt(self: "H[optype.CanLt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def lt(self: "H[optype.CanLt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def lt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.lt, rhs)`.
@@ -967,9 +974,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return self.apply(operator.lt, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
 
     @overload
-    def le(self: "H[optype.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def le(self: "H[optype.CanLe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def le(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.le, rhs)`.
@@ -982,9 +989,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return self.apply(operator.le, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
 
     @overload
-    def eq(self: "H[optype.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def eq(self: "H[optype.CanEq[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def eq(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.eq, rhs)`.
@@ -997,9 +1004,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return self.apply(operator.eq, rhs)
 
     @overload
-    def ne(self: "H[optype.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def ne(self: "H[optype.CanNe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ne(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.ne, rhs)`.
@@ -1012,9 +1019,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return self.apply(operator.ne, rhs)
 
     @overload
-    def ge(self: "H[optype.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def ge(self: "H[optype.CanGe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ge(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.ge, rhs)`.
@@ -1027,9 +1034,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return self.apply(operator.ge, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
 
     @overload
-    def gt(self: "H[optype.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
     @overload
-    def gt(self: "H[optype.CanGt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def gt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
         Shorthand for `#!python self.apply(operator.gt, rhs)`.
@@ -1043,7 +1050,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     # ---- Unary operators -------------------------------------------------------------
 
-    def __neg__(self: "H[optype.CanNeg[_ResultT]]") -> "H[_ResultT]":
+    def __neg__(self: "H[ot.CanNeg[_ResultT]]") -> "H[_ResultT]":
         result = _h_unary_opname(self._h, "__neg__")
         if result is NotImplemented:
             raise TypeError(
@@ -1051,7 +1058,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             )
         return H(result)
 
-    def __pos__(self: "H[optype.CanPos[_ResultT]]") -> "H[_ResultT]":
+    def __pos__(self: "H[ot.CanPos[_ResultT]]") -> "H[_ResultT]":
         result = _h_unary_opname(self._h, "__pos__")
         if result is NotImplemented:
             raise TypeError(
@@ -1059,7 +1066,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             )
         return H(result)
 
-    def __abs__(self: "H[optype.CanAbs[_ResultT]]") -> "H[_ResultT]":
+    def __abs__(self: "H[ot.CanAbs[_ResultT]]") -> "H[_ResultT]":
         result = _h_unary_opname(self._h, "__abs__")
         if result is NotImplemented:
             raise TypeError(
@@ -1067,7 +1074,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             )
         return H(result)
 
-    def __invert__(self: "H[optype.CanInvert[_ResultT]]") -> "H[_ResultT]":
+    def __invert__(self: "H[ot.CanInvert[_ResultT]]") -> "H[_ResultT]":
         result = _h_unary_opname(self._h, "__invert__")
         if result is NotImplemented:
             raise TypeError(
@@ -1723,7 +1730,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     result: H[_T] | None = None
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
-        batch = h @ n if n > 1 else h  # type: ignore[misc] # ty: ignore[unsupported-operator]
+        batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
         result = batch if result is None else result + batch  # type: ignore[operator]
     return cast("H[_T]", H({})) if result is None else result
 
@@ -1764,9 +1771,9 @@ def _apply_opname(
 
 
 def _convolve(
-    mapping: Mapping[optype.CanAdd[_T, _ResultT], int],
+    mapping: Mapping[_ConvolvableT, int],
     n: int,
-) -> dict[_ResultT, int] | NotImplementedType:
+) -> dict[_ConvolvableT, int] | NotImplementedType:
     r"""
     Sum *n* independent copies of *mapping* (*n*-fold additive convolution).
 
@@ -1789,9 +1796,12 @@ def _convolve(
 
 
 def _convolve_fast(
-    mapping: Mapping[Any, int],
+    mapping: Mapping[_ConvolvableT, int],
     n: int,
-) -> dict[Any, int] | NotImplementedType:
+) -> dict[_ConvolvableT, int] | NotImplementedType:
+    #     mapping: Mapping[Any, int],
+    #     n: int,
+    # ) -> dict[Any, int] | NotImplementedType:
     r"""
     Compute n-fold additive convolution in `#!math O\left( \log n \right)` steps.
 
@@ -1833,9 +1843,12 @@ def _convolve_fast(
 
 
 def _convolve_linear(
-    mapping: Mapping[Any, int],
+    mapping: Mapping[_ConvolvableT, int],
     n: int,
-) -> dict[Any, int] | NotImplementedType:
+) -> dict[_ConvolvableT, int] | NotImplementedType:
+    #     mapping: Mapping[Any, int],
+    #     n: int,
+    # ) -> dict[Any, int] | NotImplementedType:
     r"""
     Linear fallback: `#!math O \left( n \right)` steps, always adding the original mapping.
     """
