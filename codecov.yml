@@ -11,7 +11,6 @@ coverage:
         target: 80%
 
 comment:
-  layout: "condensed_header, condensed_diff"
   behavior: default
   require_changes: true   # skip comment if coverage is unaffected
 

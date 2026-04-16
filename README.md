@@ -20,6 +20,7 @@ If that file is missing or appears to be modified from its original, then please
 <!-- mkdocs:hide:end -->
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/on-push.yaml/badge.svg)](https://github.com/posita/dyce/actions/workflows/on-push.yaml)
+[![Coverage](https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg)](https://app.codecov.io/gh/posita/dyce)
 [![Version](https://img.shields.io/pypi/v/dyce.svg)](https://pypi.org/project/dyce/)
 ![Development Stage](https://img.shields.io/pypi/status/dyce.svg)
 [![License](https://img.shields.io/pypi/l/dyce.svg)](http://opensource.org/licenses/MIT)
