@@ -23,7 +23,7 @@ from itertools import product as iproduct
 from math import prod
 from typing import Any, Generic, NamedTuple, TypeVar, overload
 
-from dyce.types import natural_key
+from dyce.types import natural_key, nobeartype
 
 from .h import H
 from .lifecycle import ExperimentalWarning, experimental, experimental_msg
@@ -474,6 +474,7 @@ def expand(
     return h
 
 
+@nobeartype
 def _explode_on_max(result: HResult[_T], _n_left: int, _n_done: int) -> H[_T] | _T:
     try:
         max_result = max(result.h)  # type: ignore[type-var]
@@ -561,6 +562,7 @@ def explode_n(
        -- END MONKEY PATCH -->
     """
 
+    @nobeartype
     def _callback(result: HResult[_T], *, n_left: int) -> H[_T] | _T:
         if n_left <= 0:
             return result.outcome

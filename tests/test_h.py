@@ -32,18 +32,9 @@ from dyce.h import (
     _ConvolveFallbackWarning,
 )
 from dyce.lifecycle import ExperimentalWarning
+from dyce.types import BeartypeCallHintViolation
 
 __all__ = ()
-
-try:
-    from beartype.roar import (
-        BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType]
-    )
-except ImportError:
-
-    class BeartypeCallHintViolation(Exception):  # type: ignore[no-redef] # noqa: N818
-        pass
-
 
 _OUTCOME_TYPES: tuple[type, ...] = (
     int,
