@@ -25,6 +25,7 @@ import pytest
 from dyce import H, HResult, P, PResult, expand, explode_n
 from dyce.evaluation import TruncationWarning
 from dyce.lifecycle import ExperimentalWarning
+from dyce.types import BeartypeCallHintViolation
 
 __all__ = ()
 
@@ -63,7 +64,10 @@ class TestExpand:
             return H({})
 
         with (  # noqa: PT012
-            pytest.raises(TypeError, match=r"\bunrecognized source type\b"),
+            pytest.raises(
+                (TypeError, BeartypeCallHintViolation),
+                match=r"\b(unrecognized source type|violates type hint)\b",
+            ),
             warnings.catch_warnings(),
         ):
             warnings.filterwarnings("ignore", category=ExperimentalWarning)

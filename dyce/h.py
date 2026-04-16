@@ -51,7 +51,12 @@ import optype as ot
 
 from . import rng
 from .lifecycle import deprecated, experimental
-from .types import _lossless_int_or_not_implemented, lossless_int, natural_key
+from .types import (
+    _lossless_int_or_not_implemented,
+    lossless_int,
+    natural_key,
+    nobeartype,
+)
 
 __all__ = ("H", "HableT")
 
@@ -60,21 +65,6 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
-
-
-try:
-    from beartype import BeartypeConf, BeartypeStrategy, beartype
-
-    nobeartype = beartype(
-        conf=BeartypeConf(
-            strategy=BeartypeStrategy.O0,
-        )
-    )  # pyright: ignore[reportAssignmentType]
-except ImportError:  # pragma: no cover
-
-    def nobeartype(arg: _T) -> _T:
-        return arg
-
 
 try:
     _ROW_WIDTH = int(os.environ["COLUMNS"])

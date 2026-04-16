@@ -19,14 +19,45 @@ from collections.abc import Iterable, Iterator, Sequence
 from types import NotImplementedType  # noqa: TC003
 from typing import SupportsIndex, SupportsInt, TypeVar
 
+__all__ = (
+    "BeartypeCallHintViolation",
+    "GetItemT",
+    "getitems",
+    "lossless_int",
+    "natural_key",
+    "nobeartype",
+)
+
+try:
+    from beartype.roar import (
+        BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType]
+    )
+except ImportError:  # pragma: no cover
+
+    class BeartypeCallHintViolation(Exception):  # type: ignore[no-redef] # noqa: N818
+        pass
+
+
 _T = TypeVar("_T")
 
-_GetItemT = SupportsIndex | slice
+try:
+    from beartype import BeartypeConf, BeartypeStrategy, beartype
 
-__all__ = ("getitems", "lossless_int", "natural_key")
+    nobeartype = beartype(
+        conf=BeartypeConf(
+            strategy=BeartypeStrategy.O0,
+        )
+    )  # pyright: ignore[reportAssignmentType]
+except ImportError:  # pragma: no cover
+
+    def nobeartype(arg: _T) -> _T:
+        return arg
 
 
-def getitems(seq: Sequence[_T], keys: Iterable[_GetItemT]) -> Iterator[_T]:
+GetItemT = SupportsIndex | slice
+
+
+def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterator[_T]:
     r"""
     Yield items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `#!python slice`.
 

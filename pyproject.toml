@@ -33,13 +33,15 @@ dev = [
     "pyrefly",
     "pyright",
     "ruff",
+    "tox",
+    "tox-uv",
     "ty",
     {include-group = "viz"},
     {include-group = "docs"},
     {include-group = "test"},
 ]
 docs = [
-    "click!=8.2.1,!=8.2.2,!=8.3.0,!=8.3.1",  # TODO(posita): Remove after 8.3.2 is released; see <https://github.com/mkdocs/mkdocs/issues/4032>
+    "click>=8.3.2",  # See <https://github.com/mkdocs/mkdocs/issues/4032>
     "griffe-warnings-deprecated",
     "jupyter-server",
     "jupyterlab-server",
@@ -60,14 +62,17 @@ test = [
     "beartype",
     "coverage[toml]",
     "numpy",
-    "pytest",
+    "pandas",
     "pytest-beartype",
     "pytest-cov",
+    {include-group = "test-pypy"},
+    {include-group = "viz"},
+]
+test-pypy = [
+    "griffe-warnings-deprecated",
+    "pytest",
     "pytest-gitignore",
     "sympy",
-    "tox",
-    "tox-uv",
-    {include-group = "viz"},
 ]
 viz = ["matplotlib"]
 

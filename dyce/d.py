@@ -18,20 +18,23 @@ Lots of common dice and combinations: d1 through d20, d24, d30, d60, d100, and d
 as well as two and three of d1 through d20. as both [`H`][dyce.H] and [`P`][dyce.P]
 objects. For example, a twenty-sided die in [`H`][dyce.H] form is `#!python d20`. In
 [`P`][dyce.P] form, it is `#!python pd20`. `#!python 2 @ d10` in [`H`][dyce.H] form is
-either `#!python d10_2` or `#!python h2d10`. In [`P`][dyce.P] form, it is is either
+either `#!python d10_2` or `#!python h2d10`. In [`P`][dyce.P] form, it is either
 `#!python pd10_2` or `#!python p2d10`.
+
+For example, consider these different shorthands for expressing 3d6:
+
 
     >>> from dyce.d import d6, d6_3, h3d6, pd6, pd6_3, p3d6
     >>> (3 @ d6) == d6_3 == h3d6 == (3 @ pd6) == pd6_3 == p3d6
     True
-    >>> d6_3 is h3d6
+    >>> d6_3 is h3d6  # these are aliases for the same H object
     True
-    >>> pd6_3 is p3d6
+    >>> pd6_3 is p3d6  # these are aliases for the same P object
     True
-    >>> 3 @ d6 is h3d6  # equivalent, but not the same object
-    False
-    >>> p3d6.h() is h3d6  # equivalent, but not the same object
-    False
+    >>> 3 @ d6 == h3d6, 3 @ d6 is h3d6  # equivalent, but not the same object
+    (True, False)
+    >>> p3d6.h() == h3d6, p3d6.h() is h3d6  # equivalent, but not the same object
+    (True, False)
     >>> print(h3d6.format(width=65, scaled=True))
     avg |   10.50
     std |    2.96

@@ -32,7 +32,7 @@ from typing import (
 
 from .h import H, sum_h
 from .hable import HableOpsMixin
-from .types import _GetItemT, getitems, lossless_int, natural_key
+from .types import GetItemT, getitems, lossless_int, natural_key, nobeartype
 
 __all__ = ("P", "RollCountT", "RollProbT", "RollT")
 
@@ -254,6 +254,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def __getitem__(self: "P[_T]", key: SupportsIndex) -> H[_T]: ...
     @overload
     def __getitem__(self: "P[_T]", key: slice) -> "P[_T]": ...
+    @nobeartype  # TODO(posita): # noqa: TD003 - Avoids RecursionError. WTF?!
     def __getitem__(self: "P[_T]", key: SupportsIndex | slice) -> "P[_T] | H[_T]":
         if isinstance(key, slice):
             return P(*self._hs[key])
@@ -340,7 +341,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         return P(*_gen_hs())
 
-    def h(self: "P[_T]", *which: _GetItemT) -> H[_T]:
+    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
 
@@ -434,7 +435,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: _GetItemT) -> Iterator[RollCountT[_T]]:
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:
         r"""
         Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -615,7 +616,7 @@ _MIN_FILL = _MinFill()
 _MAX_FILL = _MaxFill()
 
 
-def _analyze_selection(n: int, which: Iterable[_GetItemT]) -> "_SelectionResult":
+def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     r"""
     Examines the selection *which* as applied to the values `#!python range(n)` and returns one of:
 
