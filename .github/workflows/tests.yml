@@ -28,7 +28,7 @@ jobs:
       - uses: astral-sh/setup-uv@v8.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: uv sync --group test
+      - run: uv sync --no-dev --group test
       - run: uv run tox -e ${{ matrix.tox-env }}
 
   coverage:
@@ -40,8 +40,9 @@ jobs:
       - uses: astral-sh/setup-uv@v8.0.0
         with:
           python-version: "3.13"
-      - run: uv sync --group test
+      - run: uv sync --no-dev --group test
       - run: uv run pytest --cov --cov-report=xml
+      - run: uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
       - uses: codecov/codecov-action@v5.5.4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
