@@ -25,7 +25,7 @@ if sys.version_info >= (3, 13):
         deprecated,
     )  # pragma: no cover # pyright: ignore[reportUnreachable]
 else:
-    from typing_extensions import deprecated
+    from typing_extensions import deprecated  # pragma: no cover
 
 __all__ = ("ExperimentalWarning", "deprecated", "experimental")
 

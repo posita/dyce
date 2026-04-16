@@ -28,7 +28,7 @@ jobs:
       - uses: astral-sh/setup-uv@v8.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: uv sync --no-dev --group test
+      - run: uv sync --no-dev --group tox
       - run: uv run tox -e ${{ matrix.tox-env }}
 
   coverage:
