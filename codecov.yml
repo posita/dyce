@@ -1,0 +1,23 @@
+coverage:
+  status:
+    project:
+      default:
+        # Flag any drop in overall coverage
+        target: auto
+        threshold: 1%   # allow up to 1% tolerance for floating point noise
+    patch:
+      default:
+        # New/changed lines in a PR should be covered
+        target: 80%
+
+comment:
+  layout: "condensed_header, condensed_diff"
+  behavior: default
+  require_changes: true   # skip comment if coverage is unaffected
+
+ignore:
+  - "docs/"
+  - "helpers/"
+  - "_griffe_ext.py"
+  - "conftest.py"
+  - "mkdocs_hooks.py"
