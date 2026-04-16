@@ -33,12 +33,11 @@ dev = [
     "pyrefly",
     "pyright",
     "ruff",
-    "tox",
-    "tox-uv",
     "ty",
-    {include-group = "viz"},
     {include-group = "docs"},
     {include-group = "test"},
+    {include-group = "tox"},
+    {include-group = "viz"},
 ]
 docs = [
     "click>=8.3.2",  # See <https://github.com/mkdocs/mkdocs/issues/4032>
@@ -73,6 +72,10 @@ test-pypy = [
     "pytest",
     "pytest-gitignore",
     "sympy",
+]
+tox = [
+    "tox",
+    "tox-uv",
 ]
 viz = ["matplotlib"]
 
