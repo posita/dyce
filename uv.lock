@@ -721,15 +721,20 @@ docs = [
 test = [
     { name = "beartype" },
     { name = "coverage", extra = ["toml"] },
-    { name = "matplotlib" },
+    { name = "griffe-warnings-deprecated" },
     { name = "numpy" },
+    { name = "pandas" },
     { name = "pytest" },
     { name = "pytest-beartype" },
     { name = "pytest-cov" },
     { name = "pytest-gitignore" },
     { name = "sympy" },
-    { name = "tox" },
-    { name = "tox-uv" },
+]
+test-pypy = [
+    { name = "griffe-warnings-deprecated" },
+    { name = "pytest" },
+    { name = "pytest-gitignore" },
+    { name = "sympy" },
 ]
 viz = [
     { name = "matplotlib" },
@@ -747,7 +752,7 @@ provides-extras = ["viz"]
 dev = [
     { name = "beartype" },
     { name = "blacken-docs", specifier = ">=1.20.0" },
-    { name = "click", specifier = "!=8.2.1,!=8.2.2,!=8.3.0,!=8.3.1" },
+    { name = "click", specifier = ">=8.3.2" },
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipython" },
@@ -781,7 +786,7 @@ dev = [
     { name = "ty" },
 ]
 docs = [
-    { name = "click", specifier = "!=8.2.1,!=8.2.2,!=8.3.0,!=8.3.1" },
+    { name = "click", specifier = ">=8.3.2" },
     { name = "griffe-warnings-deprecated" },
     { name = "jupyter-server" },
     { name = "jupyterlab-server" },
@@ -801,15 +806,20 @@ docs = [
 test = [
     { name = "beartype" },
     { name = "coverage", extras = ["toml"] },
-    { name = "matplotlib" },
+    { name = "griffe-warnings-deprecated" },
     { name = "numpy" },
+    { name = "pandas" },
     { name = "pytest" },
     { name = "pytest-beartype" },
     { name = "pytest-cov" },
     { name = "pytest-gitignore" },
     { name = "sympy" },
-    { name = "tox" },
-    { name = "tox-uv" },
+]
+test-pypy = [
+    { name = "griffe-warnings-deprecated" },
+    { name = "pytest" },
+    { name = "pytest-gitignore" },
+    { name = "sympy" },
 ]
 viz = [{ name = "matplotlib" }]
 
@@ -2138,7 +2148,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [

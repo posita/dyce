@@ -43,7 +43,7 @@ from dyce.p import (
     _SelectionSuffix,
     _SelectionUniform,
 )
-from dyce.types import _GetItemT, natural_key
+from dyce.types import BeartypeCallHintViolation, GetItemT, natural_key
 
 from .test_h import _OUTCOME_TYPES
 from .test_types import _NoCompare
@@ -658,7 +658,10 @@ class TestPH:
             H({_NoCompare("oh-03"): 3, _NoCompare("oh-04"): 4}),
         )
         with (  # noqa: PT012
-            pytest.raises(TypeError, match=r"\bunsupported operand\b"),
+            pytest.raises(
+                (TypeError, BeartypeCallHintViolation),
+                match=r"\b(unsupported operand type|violates type hint)\b",
+            ),
             warnings.catch_warnings(record=True),
         ):
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
@@ -1270,11 +1273,11 @@ class _NoCompareCanOnlyAdd(_NoCompare):
         return _NoCompareCanOnlyAdd(f"{self.val}+{other}")
 
 
-def _roll_which(roll: RollT[_T], *keys: _GetItemT) -> RollT[_T]:
+def _roll_which(roll: RollT[_T], *keys: GetItemT) -> RollT[_T]:
     if not keys:
         keys = (slice(None),)
 
-    def _roll_selection_from_key(key: _GetItemT) -> RollT[_T]:
+    def _roll_selection_from_key(key: GetItemT) -> RollT[_T]:
         if isinstance(key, slice):
             return tuple(roll[key])
         else:
@@ -1285,7 +1288,7 @@ def _roll_which(roll: RollT[_T], *keys: _GetItemT) -> RollT[_T]:
 
 def _rwc_heterogeneous_brute_force_combinations(
     hs: Sequence[H[_T]],
-    *keys: _GetItemT,
+    *keys: GetItemT,
 ) -> Iterator[RollCountT[_T]]:
     r"""Naive Cartesian-product enumeration correct for any count magnitude."""
     for rolls in iproduct(*(h.items() for h in hs)):
@@ -1303,7 +1306,7 @@ def _rwc_heterogeneous_brute_force_combinations(
 def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     n: int,
     h: H[_T],
-    *keys: _GetItemT,
+    *keys: GetItemT,
 ) -> Iterator[RollCountT[_T]]:
     r"""Independent reference implementation using multinomial coefficients."""
     multinomial_coefficient_numerator = factorial(n)
@@ -1322,7 +1325,7 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
             )
 
 
-def _rwc_validation_helper(p: P[_T], *which: _GetItemT) -> Mock:
+def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
     r"""
     Validate rolls_with_counts against brute force and return a mock used to track would-be calls to _rwc_homogeneous_n_h_using_partial_selection.
     """
