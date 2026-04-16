@@ -25,16 +25,11 @@ fallback_version = "0.0.0+unknown"
 
 [dependency-groups]
 dev = [
-    "blacken-docs>=1.20.0",
     "ipython",
-    "mypy",
     "pre-commit",
     "pre-commit-uv",
-    "pyrefly",
-    "pyright",
-    "ruff",
-    "ty",
     {include-group = "docs"},
+    {include-group = "lint"},
     {include-group = "test"},
     {include-group = "tox"},
     {include-group = "viz"},
@@ -56,6 +51,13 @@ docs = [
     "pandas",
     "pymdown-extensions",
     "sympy",
+]
+lint = [
+    "mypy",
+    "pyrefly",
+    "pyright",
+    "ruff",
+    "ty",
 ]
 test = [
     "beartype",
