@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,20 +6,14 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from collections.abc import Iterator
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # --8<-- [start:core]
+    from collections.abc import Iterator
 
-from dyce import H, P
-from dyce.viz import plot_line
+    from dyce import H, P
 
-_LOGGER = logging.getLogger(__name__)
-
-
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     def roll_and_keep(p: P[int], k: int) -> H[int]:
         assert all(h == p[0] for h in p), "pool must be homogeneous"
         max_d = max(p[-1]) if p else 0
@@ -43,21 +37,29 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
             p = n @ P(d)
             yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
 
-    pairs1 = tuple(normal())
-    pairs2 = tuple(roll_and_keep_hs())
+    # --8<-- [end:core]
 
-    text_color = "white" if args.style == "dark" else "black"
-    labels1, hs1 = zip(*pairs1, strict=True)
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # --8<-- [start:viz]
+    from dyce.viz import plot_line
+
+    labels1, hs1 = zip(*tuple(normal()), strict=True)
     ax = plot_line(*hs1, labels=labels1, markers=".", alpha=0.75)
 
-    labels2, hs2 = zip(*pairs2, strict=True)
+    labels2, hs2 = zip(*tuple(roll_and_keep_hs()), strict=True)
     plot_line(*hs2, labels=labels2, markers="o", alpha=0.25, ax=ax)
 
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
+    ax.set_title("Roll-and-keep mechanic comparison")
     ax.legend(loc="upper left")
-    ax.set_title("Roll-and-keep mechanic comparison", color=text_color)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

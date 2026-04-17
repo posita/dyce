@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,30 +6,36 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
+    # --8<-- [start:core]
+    from dyce.d import p2d6
 
-from dyce import H, P
-from dyce.viz import plot_bar
+    h2d6_lowest = p2d6.h(0)
+    h2d6_highest = p2d6.h(-1)
+    # --8<-- [end:core]
 
-_LOGGER = logging.getLogger(__name__)
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
+    # --8<-- [start:viz]
+    from dyce.viz import plot_bar
 
-
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
-    p_2d6 = 2 @ P(H(6))
-    h_2d6_lowest = p_2d6.h(0)
-    h_2d6_highest = p_2d6.h(-1)
-
-    text_color = "white" if args.style == "dark" else "black"
-    ax = plot_bar(h_2d6_lowest, h_2d6_highest, labels=("Lowest", "Highest"))
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
+    ax = plot_bar(
+        h2d6_lowest,
+        h2d6_highest,
+        labels=("Lowest", "Highest"),
+    )
+    ax.set_title("Taking the lowest or highest die of 2d6")
     ax.legend()
-    ax.set_title("Taking the lowest or highest die of 2d6", color=text_color)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

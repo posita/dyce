@@ -100,8 +100,10 @@
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
 - Fixes [this bullshit](https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87) (no, really, I’m serious this time).
-- Adds [`FilterRoller`][dyce.r.FilterRoller].
-- Adds [`SubstitutionRoller`][dyce.r.SubstitutionRoller].
+<!-- - Adds [`FilterRoller`][dyce.r.FilterRoller]. -->
+- Adds `dyce.r.FilterRoller`.
+<!-- - Adds [`SubstitutionRoller`][dyce.r.SubstitutionRoller]. -->
+- Adds `dyce.r.SubstitutionRoller`.
 
 ## [0.4.4](https://github.com/posita/dyce/releases/tag/v0.4.4)
 
@@ -127,7 +129,8 @@
 
 - Splits out protocol checking into its own fancy library: [`numerary`](https://github.com/beartype/numerary/)!
 - Is now [available on PyPI as `dyce`_](https://pypi.org/project/dyce/), thanks to the generosity of [David Eyk](https://eykd.net/about/)!
-- Introduces experimental generic [`walk`][dyce.r.walk] function and supporting visitor data structures.
+<!-- - Introduces experimental generic [`walk`][dyce.r.walk] function and supporting visitor data structures. -->
+- Introduces experimental generic `dyce.r.walk` function and supporting visitor data structures.
 - Uses `#!python pygraphviz` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
 - Introduces experimental use of `#!python numpy` for RNG, if present.
@@ -198,7 +201,8 @@
 - Removes incorrectly non-flattening unary operation methods `#!python P.__abs__` and `#!python P.__invert__`.
 - Deprecates non-flattening unary operation methods `#!python P.__neg__` and `#!python P.__pos__`.
 - Renames experimental `#!python P.homogeneous` property to `P.is_homogeneous`.
-- Introduces experimental [`R`][dyce.r.R] and [`Roll`][dyce.r.Roll] primitives.
+<!-- - Introduces experimental [`R`][dyce.r.R] and [`Roll`][dyce.r.Roll] primitives. -->
+- Introduces experimental `dyce.r.R` and `dyce.r.Roll` primitives.
 - Removes `#!python coerce` parameter from `#!python H.map`, `#!python H.rmap`, and `#!python H.umap`.
 - Renames `#!python dyce.plt` to `#!python dyce.viz`.
 - Deprecates synonym package `#!python dyce.plt`.

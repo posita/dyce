@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,36 +6,68 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
-from matplotlib import ticker
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
+    # --8<-- [start:core]
+    from math import ceil
 
-from dyce import H, P, explode_n
-from dyce.viz import plot_line
+    from dyce import H, P, explode_n
 
-_LOGGER = logging.getLogger(__name__)
+    explode_depth = 2
 
+    def keep(p: P[int], k: int) -> H[int]:
+        r"Negative k keeps lowest, otherwise keeps highest"
+        return p.h(slice(-k, None) if k > 0 else slice(-k))
 
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
-    pairs = [
-        (f"{depth} rerolls", (10 @ P(explode_n(H(10), n=depth))).h(slice(-3, None)))
-        for depth in range(5, -1, -1)
-    ]
-    labels, hs = zip(*pairs, strict=True)
+    def nkk(n: int, k: int) -> H[int]:
+        return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)
 
-    text_color = "white" if args.style == "dark" else "black"
-    ax = plot_line(*hs, labels=labels)
-    for line in ax.lines:
-        line.set_marker("")
-    ax.xaxis.set_major_locator(ticker.IndexLocator(base=5, offset=2))
-    ax.tick_params(axis="x", labelrotation=60, colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
-    ax.legend()
-    ax.set_title("Taking the three highest of ten exploding d10s", color=text_color)
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
+    # --8<-- [start:viz]
+    from matplotlib import pyplot as plt
+    from matplotlib import ticker
+
+    from dyce.viz import plot_line
+
+    # Range: [start_k..end_k)
+    k_start, k_end = 3, 6
+    # Range: [start_n..end_n)
+    n_start, n_end = 5, 11
+    # For normalizing axes scale
+    all_nkk: list[H[int]] = []
+
+    for k in range(k_start, k_end):
+        label_value_pairs = [(f"{n}k{k}", nkk(n, k)) for n in range(n_start, n_end)]
+        labels, hs = zip(*label_value_pairs, strict=True)
+        all_nkk.extend(hs)
+        ax = plt.subplot2grid((k_end - k_start, 1), (k - k_start, 0))
+        plot_line(*hs, labels=labels, ax=ax)
+        for line in ax.lines:
+            line.set_marker("")
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
+        ax.tick_params(axis="x", labelrotation=60)
+        ax.set_title(f"Taking the {k} highest of $n$ exploding d10s")
+        ax.legend()
+
+    max_x = max(max(h) for h in all_nkk)
+    max_y = max(prob for h in all_nkk for _, prob in h.probability_items())
+    for ax in plt.gcf().get_axes():
+        ax.set_xlim(left=0, right=max_x)
+        ax.set_ylim(top=ceil(max_y * 100) / 100)
+    plt.gcf().set_size_inches(6.4, 8.0)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    for ax in plt.gcf().get_axes():
+        ax.tick_params(axis="x", colors=line_color)
+        ax.tick_params(axis="y", colors=line_color)
+        ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

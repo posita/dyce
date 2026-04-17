@@ -154,27 +154,28 @@ var |    1.97
 
 ```
 
-[`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) provide a [`distribution` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.distribution) and a [`distribution_xy` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.distribution_xy) to ease integration with plotting packages
-[`anydyce`](https://github.com/posita/anydyce/), for example, makes use of these to integrate with [Matplotlib](https://matplotlib.org/stable/api/index.html).
+[`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) provides a [`probability_items` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) to ease integration with plotting packages.
+[`dyce.viz`](https://posita.github.io/dyce/latest/dyce.viz/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
+[`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
+
+```python
+--8<-- "docs/assets/plot_2d6_lo_hi.py:core"
+```
+
+Visualization: <a href="https://posita.github.io/dyce/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+
+```python
+--8<-- "docs/assets/plot_2d6_lo_hi.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <!-- See https://github.blog/developer-skills/github/how-to-make-your-images-in-markdown-on-github-adjust-for-dark-mode-and-light-mode/ -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.png">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/main/docs/assets/plot_2d6_lo_hi.py"><code>plot_2d6_lo_hi.py</code></a><br>
-  Interactive version: <a href="https://posita.github.io/dyce/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
-</summary>
-
-```python
---8<-- "docs/assets/plot_2d6_lo_hi.py"
-```
-</details>
 
 [`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) and [`P` objects](https://posita.github.io/dyce/latest/dyce/#dyce.P) can generate random rolls.
 
@@ -202,7 +203,7 @@ For deterministic outcomes.
 
 ```
 
-See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) and [rolling](https://posita.github.io/dyce/latest/rollin/), as well as the [API guide](https://posita.github.io/dyce/latest/dyce/) for much more thorough treatments, including detailed examples.
+See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) <!-- and [rolling](https://posita.github.io/dyce/latest/rollin/), --> as well as the [API guide](https://posita.github.io/dyce/latest/dyce/) for much more thorough treatments, including detailed examples.
 
 ## Design philosophy
 
@@ -228,16 +229,18 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     You won’t find any lexers, parsers, or tokenizers in `dyce`’s core, other than straight-up Python.
     That being said, you can always “roll” your own (see what we did there?) and lean on `dyce` underneath.
     It doesn’t mind.
-    It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/).
+    <!-- TODO(posita): Figure out what we're doing with dyce.r -->
+    <!-- It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/). -->
 
 [^2]:
 
-    Okay, maybe not *literally* anywhere, but [you’d be surprised](https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/).
+    <!-- Was: https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/ -->
+    Okay, maybe not *literally* anywhere, but [you’d be surprised](https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Frd64erbk6nj41.jpg).
     Void where prohibited.
     [Certain restrictions](#requirements) apply.
     [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
 
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.distribution`](https://posita.github.io/dyce/latest/dyce/#dyce.H.distribution), [`H.distribution_xy`](https://posita.github.io/dyce/latest/dyce/#dyce.H.distribution_xy), and [`H.format`](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) methods).
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.probability_items`](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) and [`H.format`](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) methods).
 
 ## Comparison to alternatives
 
@@ -314,8 +317,8 @@ Alternately, you can download [the source](https://github.com/posita/dyce) and i
 
 `dyce` requires a relatively modern version of Python:
 
-- [CPython](https://www.python.org/) (3.10+)
-- [PyPy](http://pypy.org/) (CPython 3.10+ compatible)
+- [CPython](https://www.python.org/) (3.11+)
+- [PyPy](http://pypy.org/) (CPython 3.11+ compatible)
 
 It has the following runtime dependencies:
 

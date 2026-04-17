@@ -250,52 +250,20 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 
 [`expand`][dyce.expand] is especially useful where there are multiple independent terms.
 
-    >>> from dyce.evaluation import HResult, P, PResult
-
-    >>> class IronDramaticResult(IntEnum):
-    ...     SPECTACULAR_FAILURE = -1
-    ...     FAILURE = 0
-    ...     WEAK_SUCCESS = 1
-    ...     STRONG_SUCCESS = 2
-    ...     SPECTACULAR_SUCCESS = 3
-
-    >>> def iron_dramatic_dependent_term(
-    ...     action: HResult[int],
-    ...     challenges: PResult[int],
-    ...     *,
-    ...     mod: int = 0,
-    ... ) -> IronDramaticResult:
-    ...     modded_action = action.outcome + mod
-    ...     first_challenge_outcome, second_challenge_outcome = challenges.roll
-    ...     beats_first_challenge = modded_action > first_challenge_outcome
-    ...     beats_second_challenge = modded_action > second_challenge_outcome
-    ...     doubles = first_challenge_outcome == second_challenge_outcome
-    ...     if beats_first_challenge and beats_second_challenge:
-    ...         return (
-    ...             IronDramaticResult.SPECTACULAR_SUCCESS
-    ...             if doubles
-    ...             else IronDramaticResult.STRONG_SUCCESS
-    ...         )
-    ...     elif beats_first_challenge or beats_second_challenge:
-    ...         return IronDramaticResult.WEAK_SUCCESS
-    ...     else:
-    ...         return (
-    ...             IronDramaticResult.SPECTACULAR_FAILURE
-    ...             if doubles
-    ...             else IronDramaticResult.FAILURE
-    ...         )
-
-    >>> from pprint import pprint
-    >>> iron_dramatic = expand(iron_dramatic_dependent_term, d6, 2 @ P(d10))
-    >>> pprint(dict(iron_dramatic))
-    {<IronDramaticResult.SPECTACULAR_FAILURE: -1>: 9,
-     <IronDramaticResult.FAILURE: 0>: 62,
-     <IronDramaticResult.WEAK_SUCCESS: 1>: 38,
-     <IronDramaticResult.STRONG_SUCCESS: 2>: 8,
-     <IronDramaticResult.SPECTACULAR_SUCCESS: 3>: 3}
+```python
+--8<-- "docs/assets/plot_ironsworn.py:core"
+```
 
 By defining our dependent term function to include `#!python mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
 
+Table:
+
+```python
+--8<-- "docs/assets/plot_ironsworn.py:table"
+```
+
+<style type="text/css">
+</style>
 <table id="T_ironsworn">
   <thead>
     <tr>
@@ -307,7 +275,7 @@ By defining our dependent term function to include `#!python mod` as a keyword-o
       <th id="T_ironsworn_level0_col4" class="col_heading level0 col4" >SPECTACULAR_SUCCESS</th>
     </tr>
     <tr>
-      <th class="index_name level0" >Modifier</th>
+      <th class="index_name level0" >Action Modifier</th>
       <th class="blank col0" >&nbsp;</th>
       <th class="blank col1" >&nbsp;</th>
       <th class="blank col2" >&nbsp;</th>
@@ -317,64 +285,60 @@ By defining our dependent term function to include `#!python mod` as a keyword-o
   </thead>
   <tbody>
     <tr>
-      <th id="T_ironsworn_level0_row0" class="row_heading level0 row0" >0</th>
-      <td id="T_ironsworn_row0_col0" class="data row0 col0" >7.50%</td>
-      <td id="T_ironsworn_row0_col1" class="data row0 col1" >51.67%</td>
-      <td id="T_ironsworn_row0_col2" class="data row0 col2" >31.67%</td>
-      <td id="T_ironsworn_row0_col3" class="data row0 col3" >6.67%</td>
-      <td id="T_ironsworn_row0_col4" class="data row0 col4" >2.50%</td>
+      <th id="T_ironsworn_level0_row0" class="row_heading level0 row0" >-1</th>
+      <td id="T_ironsworn_row0_col0" class="data row0 col0" >8.33%</td>
+      <td id="T_ironsworn_row0_col1" class="data row0 col1" >63.33%</td>
+      <td id="T_ironsworn_row0_col2" class="data row0 col2" >23.33%</td>
+      <td id="T_ironsworn_row0_col3" class="data row0 col3" >3.33%</td>
+      <td id="T_ironsworn_row0_col4" class="data row0 col4" >1.67%</td>
     </tr>
     <tr>
-      <th id="T_ironsworn_level0_row1" class="row_heading level0 row1" >1</th>
-      <td id="T_ironsworn_row1_col0" class="data row1 col0" >6.50%</td>
-      <td id="T_ironsworn_row1_col1" class="data row1 col1" >38.67%</td>
-      <td id="T_ironsworn_row1_col2" class="data row1 col2" >39.67%</td>
-      <td id="T_ironsworn_row1_col3" class="data row1 col3" >11.67%</td>
-      <td id="T_ironsworn_row1_col4" class="data row1 col4" >3.50%</td>
+      <th id="T_ironsworn_level0_row1" class="row_heading level0 row1" >0</th>
+      <td id="T_ironsworn_row1_col0" class="data row1 col0" >7.50%</td>
+      <td id="T_ironsworn_row1_col1" class="data row1 col1" >51.67%</td>
+      <td id="T_ironsworn_row1_col2" class="data row1 col2" >31.67%</td>
+      <td id="T_ironsworn_row1_col3" class="data row1 col3" >6.67%</td>
+      <td id="T_ironsworn_row1_col4" class="data row1 col4" >2.50%</td>
     </tr>
     <tr>
-      <th id="T_ironsworn_level0_row2" class="row_heading level0 row2" >2</th>
-      <td id="T_ironsworn_row2_col0" class="data row2 col0" >5.50%</td>
-      <td id="T_ironsworn_row2_col1" class="data row2 col1" >27.67%</td>
-      <td id="T_ironsworn_row2_col2" class="data row2 col2" >43.67%</td>
-      <td id="T_ironsworn_row2_col3" class="data row2 col3" >18.67%</td>
-      <td id="T_ironsworn_row2_col4" class="data row2 col4" >4.50%</td>
+      <th id="T_ironsworn_level0_row2" class="row_heading level0 row2" >1</th>
+      <td id="T_ironsworn_row2_col0" class="data row2 col0" >6.50%</td>
+      <td id="T_ironsworn_row2_col1" class="data row2 col1" >38.67%</td>
+      <td id="T_ironsworn_row2_col2" class="data row2 col2" >39.67%</td>
+      <td id="T_ironsworn_row2_col3" class="data row2 col3" >11.67%</td>
+      <td id="T_ironsworn_row2_col4" class="data row2 col4" >3.50%</td>
     </tr>
     <tr>
-      <th id="T_ironsworn_level0_row3" class="row_heading level0 row3" >3</th>
-      <td id="T_ironsworn_row3_col0" class="data row3 col0" >4.50%</td>
-      <td id="T_ironsworn_row3_col1" class="data row3 col1" >18.67%</td>
+      <th id="T_ironsworn_level0_row3" class="row_heading level0 row3" >2</th>
+      <td id="T_ironsworn_row3_col0" class="data row3 col0" >5.50%</td>
+      <td id="T_ironsworn_row3_col1" class="data row3 col1" >27.67%</td>
       <td id="T_ironsworn_row3_col2" class="data row3 col2" >43.67%</td>
-      <td id="T_ironsworn_row3_col3" class="data row3 col3" >27.67%</td>
-      <td id="T_ironsworn_row3_col4" class="data row3 col4" >5.50%</td>
+      <td id="T_ironsworn_row3_col3" class="data row3 col3" >18.67%</td>
+      <td id="T_ironsworn_row3_col4" class="data row3 col4" >4.50%</td>
     </tr>
     <tr>
-      <th id="T_ironsworn_level0_row4" class="row_heading level0 row4" >4</th>
-      <td id="T_ironsworn_row4_col0" class="data row4 col0" >3.50%</td>
-      <td id="T_ironsworn_row4_col1" class="data row4 col1" >11.67%</td>
-      <td id="T_ironsworn_row4_col2" class="data row4 col2" >39.67%</td>
-      <td id="T_ironsworn_row4_col3" class="data row4 col3" >38.67%</td>
-      <td id="T_ironsworn_row4_col4" class="data row4 col4" >6.50%</td>
+      <th id="T_ironsworn_level0_row4" class="row_heading level0 row4" >3</th>
+      <td id="T_ironsworn_row4_col0" class="data row4 col0" >4.50%</td>
+      <td id="T_ironsworn_row4_col1" class="data row4 col1" >18.67%</td>
+      <td id="T_ironsworn_row4_col2" class="data row4 col2" >43.67%</td>
+      <td id="T_ironsworn_row4_col3" class="data row4 col3" >27.67%</td>
+      <td id="T_ironsworn_row4_col4" class="data row4 col4" >5.50%</td>
     </tr>
   </tbody>
 </table>
 
+Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+```python
+--8<-- "docs/assets/plot_ironsworn.py:viz"
+```
+
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_ironsworn_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_ironsworn_light.png">
-  <img alt="Plot: Ironsworn distributions" src="../assets/plot_ironsworn_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_ironsworn_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_ironsworn_light.svg">
+  <img alt="Plot: Ironsworn distributions" src="../assets/plot_ironsworn_light.svg">
 </picture>
-
-<details>
-<summary>
-Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_ironsworn.py"><code>plot_ironsworn.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_ironsworn.py"
-</details>
 
 ## Advanced topic—modeling *Risis*
 
@@ -479,11 +443,12 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 <details>
 <summary>
   Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_risus_first_round.py"><code>plot_risus_first_round.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
+  Interactive version: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 </summary>
 
-    --8<-- "docs/assets/plot_risus_first_round.py"
+```python
+--8<-- "docs/assets/plot_risus_first_round.py"
+```
 </details>
 
 ### Modeling entire multi-round combats
@@ -818,43 +783,22 @@ We can also deploy a trick using `#!python partial` to parameterize use of the G
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
-    >>> from dyce import H, P, expand
-    >>> from itertools import chain
-    >>> p_4d6 = 4 @ P(6)
-    >>> d6_reroll_first_one = expand(
-    ...     lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome, H(6)
-    ... )
-    >>> p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
-    >>> p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
-    >>> attr_results: dict[str, H] = {
-    ...     "3d6": 3 @ H(6),
-    ...     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
-    ...     "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
-    ...     "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
-    ...         slice(1, None)
-    ...     ),
-    ...     "2d6 + 6": 2 @ H(6) + 6,
-    ...     "4d4 + 2": 4 @ H(4) + 2,
-    ... }
+```python
+--8<-- "docs/assets/plot_4d6_variants.py:core"
+```
 
-Visualization:
+Visualization: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+```python
+--8<-- "docs/assets/plot_4d6_variants.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_4d6_variants_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_4d6_variants_light.png">
-  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../assets/plot_4d6_variants_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_4d6_variants_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_4d6_variants_light.svg">
+  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../assets/plot_4d6_variants_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_4d6_variants.py"><code>plot_4d6_variants.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_4d6_variants.py"
-</details>
 
 ## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 
@@ -872,35 +816,30 @@ Source:
 
 Translation:
 
-    >>> from dyce import H
-    >>> save_roll = H(20)
-    >>> burning_arch_damage = 10 @ H(6) + 10
-    >>> pass_save = save_roll.ge(10)
-    >>> damage_half_on_save = burning_arch_damage // (pass_save + 1)
+```python
+--8<-- "docs/assets/plot_burning_arch.py:core"
+```
 
-Visualization:
+Visualization: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+```python
+--8<-- "docs/assets/plot_burning_arch.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_burning_arch_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_burning_arch_light.png">
-  <img alt="Plot: Attack with saving throw for half damage" src="../assets/plot_burning_arch_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_burning_arch_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_burning_arch_light.svg">
+  <img alt="Plot: Attack with saving throw for half damage" src="../assets/plot_burning_arch_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_burning_arch.py"><code>plot_burning_arch.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_burning_arch.py"
-</details>
 
 An alternative using [`expand`][dyce.expand]:
 
-    >>> from dyce import expand
+    >>> from dyce import H, expand
     >>> import operator
+    >>> save_roll = H(20)
+    >>> burning_arch_damage = 10 @ H(6) + 10
+    >>> damage_half_on_save = burning_arch_damage // (save_roll.ge(10) + 1)
     >>> expand(
     ...     lambda h_result: (
     ...         burning_arch_damage // 2
@@ -978,38 +917,105 @@ Example 1 source:
 
 Example 1 translation:
 
-    >>> from dyce import H, HResult, expand
-    >>> single_attack = 2 @ H(6) + 5
+```python
+--8<-- "docs/assets/plot_great_weapon_fighting.py:core"
+```
 
-    >>> def gwf(dmg):
-    ...     return dmg.h if dmg.outcome in (1, 2) else dmg.outcome
-
-    >>> great_weapon_fighting = (
-    ...     2 @ (expand(gwf, H(6))) + 5
-    ... )  # reroll either die if it is a one or two
-    >>> print(single_attack.format_short())
-    {..., 7:  2.78%, 8:  5.56%, 9:  8.33%, 10: 11.11%, 11: 13.89%, 12: 16.67%, 13: 13.89%, ...}
-    >>> print(great_weapon_fighting.format_short())
-    {..., 7:  0.31%, 8:  0.62%, 9:  2.78%, 10:  4.94%, 11:  9.88%, 12: 14.81%, 13: 17.28%, ...}
-
-Example 1 visualization:
-
-<!-- Should match any title of the corresponding plot title -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_great_weapon_fighting_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_great_weapon_fighting_light.png">
-  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../assets/plot_great_weapon_fighting_light.png">
-</picture>
+Example 1 table:
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_great_weapon_fighting.py"><code>plot_great_weapon_fighting.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
+  Table source code
 </summary>
 
-    --8<-- "docs/assets/plot_great_weapon_fighting.py"
+```python
+--8<-- "docs/assets/plot_great_weapon_fighting.py:table"
+```
 </details>
+
+<style type="text/css">
+</style>
+<table id="T_gwf">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_gwf_level0_col0" class="col_heading level0 col0" >7</th>
+      <th id="T_gwf_level0_col1" class="col_heading level0 col1" >8</th>
+      <th id="T_gwf_level0_col2" class="col_heading level0 col2" >9</th>
+      <th id="T_gwf_level0_col3" class="col_heading level0 col3" >10</th>
+      <th id="T_gwf_level0_col4" class="col_heading level0 col4" >11</th>
+      <th id="T_gwf_level0_col5" class="col_heading level0 col5" >12</th>
+      <th id="T_gwf_level0_col6" class="col_heading level0 col6" >13</th>
+      <th id="T_gwf_level0_col7" class="col_heading level0 col7" >14</th>
+      <th id="T_gwf_level0_col8" class="col_heading level0 col8" >15</th>
+      <th id="T_gwf_level0_col9" class="col_heading level0 col9" >16</th>
+      <th id="T_gwf_level0_col10" class="col_heading level0 col10" >17</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_gwf_level0_row0" class="row_heading level0 row0" >Normal attack</th>
+      <td id="T_gwf_row0_col0" class="data row0 col0" >3%</td>
+      <td id="T_gwf_row0_col1" class="data row0 col1" >6%</td>
+      <td id="T_gwf_row0_col2" class="data row0 col2" >8%</td>
+      <td id="T_gwf_row0_col3" class="data row0 col3" >11%</td>
+      <td id="T_gwf_row0_col4" class="data row0 col4" >14%</td>
+      <td id="T_gwf_row0_col5" class="data row0 col5" >17%</td>
+      <td id="T_gwf_row0_col6" class="data row0 col6" >14%</td>
+      <td id="T_gwf_row0_col7" class="data row0 col7" >11%</td>
+      <td id="T_gwf_row0_col8" class="data row0 col8" >8%</td>
+      <td id="T_gwf_row0_col9" class="data row0 col9" >6%</td>
+      <td id="T_gwf_row0_col10" class="data row0 col10" >3%</td>
+    </tr>
+    <tr>
+      <th id="T_gwf_level0_row1" class="row_heading level0 row1" >“GWF” (2014)</th>
+      <td id="T_gwf_row1_col0" class="data row1 col0" >0%</td>
+      <td id="T_gwf_row1_col1" class="data row1 col1" >1%</td>
+      <td id="T_gwf_row1_col2" class="data row1 col2" >3%</td>
+      <td id="T_gwf_row1_col3" class="data row1 col3" >5%</td>
+      <td id="T_gwf_row1_col4" class="data row1 col4" >10%</td>
+      <td id="T_gwf_row1_col5" class="data row1 col5" >15%</td>
+      <td id="T_gwf_row1_col6" class="data row1 col6" >17%</td>
+      <td id="T_gwf_row1_col7" class="data row1 col7" >20%</td>
+      <td id="T_gwf_row1_col8" class="data row1 col8" >15%</td>
+      <td id="T_gwf_row1_col9" class="data row1 col9" >10%</td>
+      <td id="T_gwf_row1_col10" class="data row1 col10" >5%</td>
+    </tr>
+    <tr>
+      <th id="T_gwf_level0_row2" class="row_heading level0 row2" >“GWF” (2024)</th>
+      <td id="T_gwf_row2_col0" class="data row2 col0" >nan%</td>
+      <td id="T_gwf_row2_col1" class="data row2 col1" >nan%</td>
+      <td id="T_gwf_row2_col2" class="data row2 col2" >nan%</td>
+      <td id="T_gwf_row2_col3" class="data row2 col3" >nan%</td>
+      <td id="T_gwf_row2_col4" class="data row2 col4" >25%</td>
+      <td id="T_gwf_row2_col5" class="data row2 col5" >17%</td>
+      <td id="T_gwf_row2_col6" class="data row2 col6" >19%</td>
+      <td id="T_gwf_row2_col7" class="data row2 col7" >22%</td>
+      <td id="T_gwf_row2_col8" class="data row2 col8" >8%</td>
+      <td id="T_gwf_row2_col9" class="data row2 col9" >6%</td>
+      <td id="T_gwf_row2_col10" class="data row2 col10" >3%</td>
+    </tr>
+  </tbody>
+</table>
+
+Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+<details>
+<summary>
+  Visualization source code
+</summary>
+
+```python
+--8<-- "docs/assets/plot_great_weapon_fighting.py:viz"
+```
+</details>
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_great_weapon_fighting_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_great_weapon_fighting_light.svg">
+  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../assets/plot_great_weapon_fighting_light.svg">
+</picture>
 
 Example 2 source:
 
@@ -1031,72 +1037,56 @@ Example 2 source:
 
 Example 2 translation:
 
-    >>> from dyce import H, HResult, expand
-    >>> normal_hit = H(12) + 5
-    >>> critical_hit = 3 @ H(12) + 5
-    >>> advantage = (2 @ P(20)).h(-1)
+```python
+--8<-- "docs/assets/plot_advantage.py:core"
+```
 
-    >>> def crit(attack: HResult):
-    ...     if attack.outcome == 20:
-    ...         return critical_hit
-    ...     elif attack.outcome + 5 >= 14:
-    ...         return normal_hit
-    ...     else:
-    ...         return 0
+Example 2 visualization: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    >>> advantage_weighted = expand(crit, advantage)
-
-Example 2 visualization:
+```python
+--8<-- "docs/assets/plot_advantage.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_advantage_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_advantage_light.png">
-  <img alt="Plot: Advantage-weighted attack with critical hits" src="../assets/plot_advantage_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_advantage_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_advantage_light.svg">
+  <img alt="Plot: Advantage-weighted attack with critical hits" src="../assets/plot_advantage_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_advantage.py"><code>plot_advantage.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_advantage.py"
-</details>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
 
 Source:
 
 ```
+\ How best to model this in a way that allows testing 1k1 to 10k5? \
 output [highest 3 of 10d [explode d10]] named "10k3"
 ```
 
 Translation:
 
-    >>> from dyce import H, P, explode_n
-    >>> from fractions import Fraction
-    >>> res = (10 @ P(explode_n(H(10)))).h(slice(-3, None))
+```python
+--8<-- "docs/assets/plot_d10_explode.py:core"
+```
 
-Visualization:
-
-<!-- Should match any title of the corresponding plot title -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_d10_explode_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_d10_explode_light.png">
-  <img alt="Plot: Taking the three highest of ten exploding d10s" src="../assets/plot_d10_explode_light.png">
-</picture>
+Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
 <details>
 <summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_d10_explode.py"><code>plot_d10_explode.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
+  Visualization source code
 </summary>
 
-    --8<-- "docs/assets/plot_d10_explode.py"
+```python
+--8<-- "docs/assets/plot_d10_explode.py:viz"
+```
 </details>
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_d10_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_d10_explode_light.svg">
+  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="../assets/plot_d10_explode_light.svg">
+</picture>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
 
@@ -1114,36 +1104,22 @@ function: dupes in DICE:s {
 
 Translation:
 
-    >>> from dyce import P, PResult, expand
+```python
+--8<-- "docs/assets/plot_dupes.py:core"
+```
 
-    >>> def dupes(p_result: PResult):
-    ...     dupes = 0
-    ...     for i in range(1, len(p_result.roll)):
-    ...         if p_result.roll[i] == p_result.roll[i - 1]:
-    ...             dupes += 1
-    ...     return dupes
+Visualization: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    >>> res_15d6 = expand(dupes, 15 @ P(6))
-    >>> res_8d10 = expand(dupes, 8 @ P(10))
-
-Visualization:
+```python
+--8<-- "docs/assets/plot_dupes.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_dupes_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_dupes_light.png">
-  <img alt="Plot: Chances of rolling *n* duplicates" src="../assets/plot_dupes_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_dupes_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_dupes_light.svg">
+  <img alt="Plot: Chances of rolling *n* duplicates" src="../assets/plot_dupes_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_dupes.py"><code>plot_dupes.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_dupes.py"
-</details>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
 
@@ -1159,39 +1135,36 @@ function: helper ROLL:s SIZE:n K:n {
     if COUNT > K { result: K*SIZE - K + COUNT }
     result: {1..K}@ROLL
 }
+
+D: 6
+K: 3
+
+loop N over {K+1..K+8} {
+  output [N of D keep K extras add] named "[N]d[D] keep [K] extras add +1"
+}
+loop N over {K+1..K+8} {
+  output {1..K}@NdD named "[N]d[D] keep [K]"
+}
 ```
 
 Translation:
 
-    >>> from dyce import H, P
+```python
+--8<-- "docs/assets/plot_roll_and_keep.py:core"
+```
 
-    >>> def roll_and_keep(p: P[int], k: int):
-    ...     max_d = max(p[-1]) if p else 0
-    ...     for roll, count in p.rolls_with_counts():
-    ...         total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
-    ...         yield total, count
+Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    >>> H.from_counts(roll_and_keep(6 @ P(6), 3))
-    H({3: 1, 4: 6, 5: 21, 6: 78, 7: 207, ..., 17: 5535, 18: 2500, 19: 375, 20: 30, 21: 1})
-
-Visualization:
+```python
+--8<-- "docs/assets/plot_roll_and_keep.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_roll_and_keep_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_roll_and_keep_light.png">
-  <img alt="Plot: Roll-and-keep mechanic comparison" src="../assets/plot_roll_and_keep_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_roll_and_keep_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_roll_and_keep_light.svg">
+  <img alt="Plot: Roll-and-keep mechanic comparison" src="../assets/plot_roll_and_keep_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_roll_and_keep.py"><code>plot_roll_and_keep.py</code></a><br>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_roll_and_keep.py"
-</details>
 
 ## Translation of the accepted answer to “[Modelling opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
 
@@ -1221,7 +1194,8 @@ Translation:
 Rudimentary textual visualization using built-in methods:
 
     >>> from dyce import P, expand
-    >>> res = expand(brawl, 3 @ P(6), 3 @ P(6))
+    >>> p3d6 = 3 @ P(6)
+    >>> res = expand(brawl, p3d6, p3d6)
     >>> print(res.format(width=65))
     avg |    0.00
     std |    1.73
@@ -1275,7 +1249,7 @@ Translation:
 
 Rudimentary visualization using built-in methods:
 
-    >>> res = expand(brawl_w_optional_swap, 3 @ P(6), 3 @ P(6))
+    >>> res = expand(brawl_w_optional_swap, p3d6, p3d6)
     >>> print(res.format(width=65))
     avg |    2.36
     std |    0.88
@@ -1286,7 +1260,8 @@ Rudimentary visualization using built-in methods:
       2 |  23.19% |###########
       3 |  58.15% |#############################
 
-    >>> res = expand(brawl_w_optional_swap, 4 @ P(6), 4 @ P(6))
+    >>> p4d6 = 4 @ P(6)
+    >>> res = expand(brawl_w_optional_swap, p4d6, p4d6)
     >>> print(res.format(width=65))
     avg |    2.64
     std |    1.28

@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,91 +6,101 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from enum import IntEnum
-from pathlib import Path
 
-import pandas as pd
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
-from matplotlib import ticker
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # --8<-- [start:core]
+    from enum import IntEnum
 
-from dyce import H, HResult, P, PResult, expand
+    from dyce import HResult, PResult, expand
+    from dyce.d import d6, p2d10
 
-_LOGGER = logging.getLogger(__name__)
-
-
-class IronDramaticResult(IntEnum):
-    SPECTACULAR_FAILURE = -1
-    FAILURE = 0
-    WEAK_SUCCESS = 1
-    STRONG_SUCCESS = 2
-    SPECTACULAR_SUCCESS = 3
-
-
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
-    d6 = H(6)
-    d10 = H(10)
+    class IronDramaticResult(IntEnum):
+        SPECTACULAR_FAILURE = -1
+        FAILURE = 0
+        WEAK_SUCCESS = 1
+        STRONG_SUCCESS = 2
+        SPECTACULAR_SUCCESS = 3
 
     def iron_dramatic_dependent_term(
         action: HResult[int],
         challenges: PResult[int],
         *,
-        mod: int = 0,
+        action_mod: int = 0,
     ) -> IronDramaticResult:
-        modded_action = action.outcome + mod
+        modded_action = action.outcome + action_mod
+        assert len(challenges.roll) == 2, "pool must have exactly 2 challenge dice"
         first_challenge_outcome, second_challenge_outcome = challenges.roll
-        beats_first_challenge = modded_action > first_challenge_outcome
-        beats_second_challenge = modded_action > second_challenge_outcome
-        doubles = first_challenge_outcome == second_challenge_outcome
-        if beats_first_challenge and beats_second_challenge:
+        challenge_doubles = first_challenge_outcome == second_challenge_outcome
+        modded_action_beats_first_challenge = modded_action > first_challenge_outcome
+        modded_action_beats_second_challenge = modded_action > second_challenge_outcome
+
+        if modded_action_beats_first_challenge and modded_action_beats_second_challenge:
             return (
                 IronDramaticResult.SPECTACULAR_SUCCESS
-                if doubles
+                if challenge_doubles
                 else IronDramaticResult.STRONG_SUCCESS
             )
-        elif beats_first_challenge or beats_second_challenge:
+        elif (
+            modded_action_beats_first_challenge or modded_action_beats_second_challenge
+        ):
             return IronDramaticResult.WEAK_SUCCESS
         else:
             return (
                 IronDramaticResult.SPECTACULAR_FAILURE
-                if doubles
+                if challenge_doubles
                 else IronDramaticResult.FAILURE
             )
 
-    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
-    categories = [v.name for v in IronDramaticResult]
-    mods = list(range(5))
-    data: list[dict[str, float]] = []
-
-    for mod in mods:
-        h_for_mod = expand(
-            iron_dramatic_dependent_term,
-            d6,
-            2 @ P(d10),
-            mod=mod,
+    action_mods = list(range(-1, 4))
+    results_by_action_mods = {
+        action_mod: expand(
+            iron_dramatic_dependent_term, d6, p2d10, action_mod=action_mod
         )
-        probs = {
+        for action_mod in action_mods
+    }
+
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # --8<-- [start:table]
+    import pandas as pd
+
+    data = [
+        {
             outcome.name: float(prob)
-            for outcome, prob in h_for_mod.zero_fill(
+            for outcome, prob in result.zero_fill(
                 IronDramaticResult
             ).probability_items()
         }
-        data.append(probs)
+        for result in results_by_action_mods.values()
+    ]
 
-    df = pd.DataFrame(data, columns=categories, index=mods)
-    df.index.name = "Modifier"
-    print(df.style.format("{:.2%}").to_html())  # noqa: T201 # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+    categories = [v.name for v in IronDramaticResult]
+    df = pd.DataFrame(data, columns=categories, index=action_mods)
+    df.index.name = "Action Modifier"
+    df.style.format("{:.2%}")
+    # --8<-- [end:table]
 
-    text_color = "white" if args.style == "dark" else "black"
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # --8<-- [start:viz]
+    from matplotlib import ticker
+
     ax = df.plot(kind="barh", stacked=True)
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
-    ax.set_ylabel(ax.get_ylabel(), color=text_color)
     ax.xaxis.set_major_formatter(ticker.PercentFormatter(xmax=1))
-    ax.legend()
-    ax.set_title("Ironsworn distributions", color=text_color)
+    ax.set_title("Ironsworn distributions")
+    ax.legend(loc="center")
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.yaxis.label.set_color(line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)
