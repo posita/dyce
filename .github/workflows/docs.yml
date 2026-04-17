@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0   # required for setuptools-scm
-      - uses: astral-sh/setup-uv@v8.0.0
+      - uses: astral-sh/setup-uv@v8.1.0
       - run: uv sync --no-dev --group docs
       - run: git config user.name "github-actions[bot]"
       - run: git config user.email "github-actions[bot]@users.noreply.github.com"

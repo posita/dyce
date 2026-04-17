@@ -307,6 +307,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
     def __init__(self, init_val: Any, /) -> None:
+        r"""Constructor."""
         self._h: dict[_T_co, int]
         self._hash: int | None = None
         self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}

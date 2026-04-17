@@ -86,7 +86,6 @@ Return an empty string to suppress the label for that wedge.
 _DEFAULT_ALPHA: float = 0.75
 _DEFAULT_CMAP: str = "RdYlGn_r"
 _DEFAULT_CMAP_COMPARE: str = "RdYlBu_r"
-_DEFAULT_COLOR_TEXT: str = "black"
 _DEFAULT_MARKERS: str = "oX^v><dP"
 _LABEL_LIM: Fraction = Fraction(1, 32)  # suppress burst labels below ~3.1%
 
@@ -165,28 +164,37 @@ def plot_bar(
 
             >>> from dyce import H
             >>> from dyce.viz import plot_bar
-            >>> ax = plot_bar(2 @ H(6), H(12), labels=["2d6", "d12"])
+            >>> ax = plot_bar(
+            ...     2 @ H(6),
+            ...     H(12),
+            ...     labels=["2d6", "d12"],
+            ... )
             >>> _ = ax.set_title("2d6 vs. d12")
             >>> _ = ax.legend(loc="upper right")
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.png">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_bar_light.png">
-            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_bar_light.png">
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_bar_light.svg">
+            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_bar_light.svg">
         </picture>
 
     === "Horizontal bars (`horizontal=True`)"
 
             >>> from dyce import H
             >>> from dyce.viz import plot_bar
-            >>> ax = plot_bar(2 @ H(6), H(12), labels=["2d6", "d12"], horizontal=True)
+            >>> ax = plot_bar(
+            ...     2 @ H(6),
+            ...     H(12),
+            ...     labels=["2d6", "d12"],
+            ...     horizontal=True,
+            ... )
             >>> _ = ax.set_title("2d6 vs. d12")
             >>> _ = ax.legend(loc="upper right")
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.png">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_hbar_light.png">
-            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.png">
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_hbar_light.svg">
+            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.svg">
         </picture>
 
     <!-- BEGIN MONKEY PATCH --
@@ -244,7 +252,6 @@ def plot_burst(
     ax: Axes | None = None,
     cmap: str | Colormap = _DEFAULT_CMAP,
     compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
-    text_color: str = _DEFAULT_COLOR_TEXT,
     title: str = "",
 ) -> Axes: ...
 @overload
@@ -258,7 +265,6 @@ def plot_burst(
     ax: Axes | None = None,
     cmap: str | Colormap = _DEFAULT_CMAP,
     compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
-    text_color: str = _DEFAULT_COLOR_TEXT,
     title: str = "",
 ) -> Axes: ...
 @overload
@@ -272,7 +278,6 @@ def plot_burst(
     ax: Axes | None = None,
     cmap: str | Colormap = _DEFAULT_CMAP,
     compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
-    text_color: str = _DEFAULT_COLOR_TEXT,
     title: str = "",
 ) -> Axes: ...
 @experimental
@@ -286,7 +291,6 @@ def plot_burst(
     ax: Axes | None = None,
     cmap: str | Colormap = _DEFAULT_CMAP,
     compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
-    text_color: str = _DEFAULT_COLOR_TEXT,
     title: str = "",
 ) -> Axes:
     r"""
@@ -334,9 +338,9 @@ def plot_burst(
        -- END MONKEY PATCH -->
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.png">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.png">
-        <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.png">
+        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
+        <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.svg">
     </picture>
     """
     ax = _get_ax(ax)
@@ -365,11 +369,8 @@ def plot_burst(
     outer_colors = _graph_colors(compare_cmap, outer_probs, alpha)
 
     if title:
-        ax.set_title(
-            title, fontdict={"fontweight": "bold", "color": text_color}, pad=24.0
-        )
+        ax.set_title(title, fontweight="bold", pad=24.0)
 
-    text_props = {"color": text_color}
     ax.pie(
         outer_probs,
         labels=outer_labels,
@@ -377,8 +378,7 @@ def plot_burst(
         labeldistance=1.15,
         startangle=90,
         colors=outer_colors,
-        textprops=text_props,
-        wedgeprops={"width": 0.8, "edgecolor": text_color},
+        wedgeprops={"width": 0.8},
     )
     ax.pie(
         inner_probs,
@@ -387,8 +387,7 @@ def plot_burst(
         labeldistance=0.7,
         startangle=90,
         colors=inner_colors,
-        textprops=text_props,
-        wedgeprops={"width": 0.5, "edgecolor": text_color},
+        wedgeprops={"width": 0.5},
     )
     ax.set(aspect="equal")
 
@@ -427,7 +426,6 @@ def plot_line(
 
         >>> from dyce import H
         >>> from dyce.viz import plot_line
-        >>> ax = plot_line(H(6))
         >>> ax = plot_line(
         ...     2 @ H(6),
         ...     H(12),
@@ -443,9 +441,9 @@ def plot_line(
        -- END MONKEY PATCH -->
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.png">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.png">
-        <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.png">
+        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
+        <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.svg">
     </picture>
     """
     hs_list = _labeled_hs(hs, labels)

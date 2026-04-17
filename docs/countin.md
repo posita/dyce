@@ -45,7 +45,7 @@ So with that illuminating (or perhaps impenetrable) introduction out of the way,
 ## Basic examples
 
 `#!python H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
-A six-sided die can be modeled as:
+A normal, six-sided die (d6) can be modeled as:
 
     >>> from dyce import H
     >>> H(6)
@@ -63,7 +63,7 @@ A fudge die can be modeled as:
     H({-1: 1, 0: 1, 1: 1})
 
 Python’s matrix multiplication operator (`@`) is used to express the number of a particular die (roughly equivalent to the “`d`” operator in common notations).
-The outcomes of rolling and summing two six-sided dice (`2d6`) are:
+The outcomes of rolling and summing two six-sided dice (2d6) are:
 
     >>> 2 @ H(6)
     H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
@@ -83,7 +83,7 @@ A pool of two six-sided dice is:
     2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
 
 Where `#!python n` is an integer, `#!python P(n, ...)` is shorthand for `#!python P(H(n), ...)`.
-Python’s matrix multiplication operator (`@`) can also be used with pools.
+Python’s matrix multiplication operator (`#!python @`) can also be used with pools.
 The above can be expressed more succinctly.
 
     >>> from dyce.d import p2d6
@@ -122,7 +122,7 @@ Histograms provide rudimentary formatting for convenience.
      11 |   5.56% |##
      12 |   2.78% |#
 
-The [Miwin-Distribution](https://en.wikipedia.org/wiki/Miwin%27s_dice#Cumulative_frequency) is:
+The [Miwin-Distribution](https://en.wikipedia.org/wiki/Intransitive_dice#Miwin's_dice) is:
 
     >>> miwin_iii = H((1, 2, 5, 6, 7, 9))
     >>> from typing import reveal_type
@@ -304,6 +304,8 @@ Both histograms and pools support various comparison operations.
 The odds of observing all even faces when rolling `#!math n` six-sided dice, for `#!math n` in `#!math [1 .. 6]` is:
 
     >>> d6_even = H(6).apply(lambda outcome: outcome % 2 == 0)
+    >>> d6_even  # basically a fair coin whose sides are False and True
+    H({False: 3, True: 3})
     >>> for n in range(6, 0, -1):
     ...     number_of_evens_in_nd6 = n @ d6_even
     ...     all_even = number_of_evens_in_nd6.eq(n)
@@ -326,8 +328,8 @@ The odds of scoring at least one nine or higher for any one of `#!math n` “[ex
    -- END MONKEY PATCH -->
 
     >>> from dyce import explode_n
-    >>> # By the time we're rolling a third die, we're guaranteed a nine or
-    >>> # higher, so we only need to look that far
+    >>> # By the time we're exploding to a third die, we're guaranteed
+    >>> # a nine or higher, so we don't need to explode past that
     >>> exploding_d6 = explode_n(H(6), n=2)
     >>> for n in range(10, 0, -1):
     ...     d6e_ge_9 = exploding_d6.ge(9)
@@ -360,13 +362,14 @@ The odds of scoring at least one nine or higher for any one of `#!math n` “[ex
 
    -- END MONKEY PATCH -->
 
-Where we can identify independent terms and reduce the dependent term to a calculation solely involving independent terms, dependent probabilities can often be compactly expressed via a callback passed to [`expand`][dyce.expand].
+Probabilities involving dependent terms can be expressed via a callback passed to [`expand`][dyce.expand].
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a function that will be called once for each of the Cartesian product of the results from each independent term.
-Results are passed to the dependent function from independent histogram terms as [`HResult` objects][dyce.HResult] or from independent pool terms as [`PResult` objects][dyce.PResult].
+Outcomes from independent histogram terms are passed to the dependent function as [`HResult` objects][dyce.HResult].
+Rolls from independent pool terms are passed as [`PResult` objects][dyce.PResult].
 Finally, we pass the dependent function to [`expand`][dyce.expand], along with the independent terms.
 
-To illustrate, say we want to roll a d6 and compare whether the result is strictly greater than its distance from some constant.
+To illustrate, say we want to roll a six-sided die and compare whether the result is strictly greater than its distance from some constant.
 
     >>> from dyce.evaluation import HResult, expand
 
@@ -385,7 +388,7 @@ To illustrate, say we want to roll a d6 and compare whether the result is strict
 
 
 Instead of a constant, let’s use another die as a second independent term.
-We’ll roll a d4 and a d6 and compare whether the d6 is strictly greater than the absolute difference between dice.
+We’ll roll a four-sided die (d4) and a six-sided die and compare whether the six-sided roll is strictly greater than the absolute difference between the dice.
 
 
     >>> d4 = H(4)  # first independent term
@@ -470,7 +473,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.
    -- END MONKEY PATCH -->
 
 Explosion is a great way to illustrate use of the [`expand` interface][dyce.expand].
-One way to approximate an exploding die is to recursively re-roll and add on the highest face.
+One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
 This framing is intuitive because it maps to well to reality.
 We might start with the following implementation:
 
@@ -523,12 +526,13 @@ TruncationWarning: expand: some branches with path probability < Fraction(1, 838
 
 What just happened?
 It appears that we went no further than eight rolls (a first roll plus up to seven explosions).
-Folks familiar with this domain might recognize the distribution looks *mostly* correct, but the counts are a bit…*off*, and we’re missing the final outcome of `#!python 48`.
-If we were paying attention, we also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hint.
+Folks familiar with this domain might recognize the distribution looks *mostly* correct, but the counts are a bit…*off*.
+We’re also missing the final outcome of `#!python 48`.
+We also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hint.
 
 The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `#!python H({})` from our function.
-(See the `#!reroll_all_ones` example from [`expand`’s docstring][dyce.expand].)
-We’re not doing that in our function, but there are two scenarios where that is done automatically.
+(See the `#!always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
+We’re not explicitly returning `#!python H({})` in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:
 
@@ -550,7 +554,7 @@ TruncationWarning: expand: some branches whose recursion depth exceeded 1000 wer
 When either of those things happen, [`expand`][dyce.expand] returns `#!python H({})`.
 Let’s take a closer look at our implementation now that we know that might happen:
 
-```python linenums="6"
+```python linenums="7"
        return result.outcome + expand(naive_explode, result.h)
 ```
 
@@ -561,8 +565,8 @@ This is because adding `#!python H({})` to anything is `#!python H({})`:
     H({})
 
 
-This is why `#!python 48` is missing from our results above.
-A more illustrative case is trying to “explode” a one-sided die, where no branch is “settled” before exhaustion occurs:
+This explains why `#!python 48` is missing from our results above.
+A more illustrative case is trying to “explode” a one-sided die (d1), where no branch is “settled” before exhaustion occurs:
 
     >>> expand(naive_explode, H(1))
     H({})
@@ -573,7 +577,7 @@ Great question!
 Thanks for asking!
 
 It’s easy.
-We can check!
+We can check.
 
     >>> def guarded_explode(result: HResult[int]) -> H[int] | int:
     ...     if result.outcome == max(result.h):
@@ -586,11 +590,11 @@ We can check!
     ...     return result.outcome
 
     >>> expand(guarded_explode, d6)
-    H({1: 279936, ..., 5: 279936, ..., 43: 1, ..., 47: 1, 48: 1})
+    H({..., 19: 1296, ..., 23: 1296, 25: 216, ..., 29: 216, 31: 36, ..., 35: 36, 37: 6, ..., 41: 6, 43: 1, ..., 48: 1})
 
 
 *Much* better.
-And with counts we can recognize as powers of our maximum face.
+We can now recognize the counts as powers of our maximum face.
 
 But how can we control the number of explosions?
 Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `#!python precision` parameter.
@@ -616,8 +620,8 @@ Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass do
     ...     # Every other case returns our current outcome
     ...     return result.outcome
 
-    >>> expand(guarded_explode_n, d6, n=2)
-    H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
+    >>> expand(guarded_explode_n, d6, n=3)
+    H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
     >>> expand(guarded_explode_n, d6, n=0) == d6
     True
 
@@ -645,13 +649,13 @@ If we wanted to make that the default, we could create a simple wrapper.
     ...
     ...     return expand(_callback, source, n_left=n, precision=precision)
 
-    >>> proper_explode_n(d6, n=2)
-    H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
+    >>> proper_explode_n(d6, n=3)
+    H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
     >>> proper_explode_n(d6, n=0) == d6
     True
 
 
-The above is very nearly the implementation for [`explode_n`][dyce.explode_n], which offers an additional `#!python resolver` parameter that allows for some interesting flexibility.
+The above is very nearly the implementation for [`explode_n`][dyce.explode_n], which offers an additional `#!python resolver` parameter that allows for some additional flexibility.
 
 Let’s say we’re considering a new exploding mechanic where, to explode, one must roll the highest outcome on a given die.
 However, on the second explosion, re-explosion occurs if either the highest or second highest outcome is rolled.
@@ -771,26 +775,22 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
 
 ## Visualization
 
-[`H.probability_items`][dyce.H.probability_items] eases integration with plotting packages like [Matplotlib](https://matplotlib.org/stable/api/index.html).
-In addition, [`anydyce`](https://github.com/posita/anydyce/) provides additional visualization and interactivity conveniences.
-(Many of the figures in these docs leverage `anydyce` in their construction.)
+[`H.probability_items`][dyce.H.probability_items] eases integration with plotting packages.
+If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed [`dyce.viz`][dyce.viz] provides plotting conveniences.
+For something more sophisticated, [`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
+
+Visualization using [`dyce.viz`][dyce.viz] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+
+```python
+--8<-- "docs/assets/plot_histogram.py:viz"
+```
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_histogram_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_histogram_light.png">
-  <img alt="Plot: Distribution for 3d6" src="../assets/plot_histogram_light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_histogram_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_histogram_light.svg">
+  <img alt="Plot: Distribution for 3d6" src="../assets/plot_histogram_light.svg">
 </picture>
-
-<details>
-<summary>
-  Source: <a href="https://github.com/posita/dyce/blob/v{dyce_git_ref}/docs/assets/plot_histogram.py"><code>plot_histogram.py</code></a><BR>
-  <!-- TODO(posita): Re-enable once appropriate -->
-  <!-- Interactive version: <a href="../Jupiter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a> -->
-</summary>
-
-    --8<-- "docs/assets/plot_histogram.py"
-</details>
 
 ## Time to get meta-evil on those outcomes!
 
@@ -896,5 +896,5 @@ For deterministic outcomes.
 
 Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API](dyce.md).
 
-<!-- Anywhere you see a JupyterLite logo ![JupyterLite](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg), you can click on it to immediately start tinkering with a temporal instance of that example using [`anydyce`](https://posita.github.io/anydyce/). -->
-<!-- Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve. -->
+Anywhere you see a JupyterLite logo ![JupyterLite](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg), you can click on it to immediately start tinkering with a temporal instance of that example.
+Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.

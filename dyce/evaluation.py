@@ -302,10 +302,10 @@ def expand(
 
     Re-roll *all* 1s:
 
-        >>> def reroll_all_ones(result: HResult[int]) -> H[int] | int:
+        >>> def always_reroll_on_one(result: HResult[int]) -> H[int] | int:
         ...     return H({}) if result.outcome == 1 else result.outcome
 
-        >>> expand(reroll_all_ones, H(6))
+        >>> expand(always_reroll_on_one, H(6))
         H({2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
     **Precision and recursion limiting**

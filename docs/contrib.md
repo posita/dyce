@@ -54,8 +54,8 @@ Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type chec
 ```sh
 % cd …/path/to/dyce
 % . .venv/bin/activate
-% pytest
-% pre-commit run --all-files --hook-stage pre-push
+% uv run pytest
+% uv run pre-commit run --all-files --hook-stage pre-push
 …
 ```
 

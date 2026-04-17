@@ -1,18 +1,15 @@
 # Python-generated files
-__pycache__/
+*.egg-info
 *.py[oc]
+.cache/
+.*_cache/
+__pycache__/
 build/
-dist/
 docs/index.md
 docs/license.md
-wheels/
-*.egg-info
 
 # Virtual environments
 .venv
-
-# Ruff
-.ruff_cache/
 
 # Coverage
 .coverage
