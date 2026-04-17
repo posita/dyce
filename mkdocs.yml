@@ -44,8 +44,8 @@ markdown_extensions:
           class: arithmatex
           format: !!python/object/apply:pymdownx.arithmatex.arithmatex_inline_format {kwds: {mode: generic}}
   - pymdownx.snippets:
-      # TODO(posita): Re-enable this when visualizations work again
-      # check_paths: true
+      dedent_subsections: true
+      check_paths: true
   - pymdownx.superfences:
       custom_fences:
         # TODO(posita): This is supposed to support inline syntax like `#!math ...`, but
@@ -60,6 +60,9 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tilde
+
+exclude_docs: |
+  __pycache__/
 
 extra:
   version:

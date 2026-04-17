@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -8,36 +8,28 @@
 
 import argparse
 import logging
-import warnings
 from collections.abc import Callable
 from pathlib import Path
-from typing import Literal
-
-from matplotlib import pyplot as plt
-from matplotlib import style
-
-from dyce.lifecycle import ExperimentalWarning
 
 __all__ = ("main",)
 
-StyleT = Literal["dark", "light"]
-CallbackT = Callable[[argparse.Namespace, str, Path], None]
+FigCallbackT = Callable[[str], None]
 
-_PARSER = argparse.ArgumentParser(description="Generate PNG files for documentation")
+_PARSER = argparse.ArgumentParser(description="Generate image files for documentation")
 _PARSER.add_argument(
     "-d",
     "--output-dir",
     type=Path,
     metavar="PATH",
     default=Path.cwd(),
-    help="the directory in which to save the output PNG (default is .)",
+    help="the directory in which to save the output image (default is .)",
 )
 _PARSER.add_argument(
     "-f",
     "--output-file",
     type=Path,
     metavar="PATH",
-    help="the file to which to save the output PNG (relative to -d if not absolute) (default is constructed from name and style)",
+    help="the file to which to save the output image (relative to -d if not absolute) (default is a PNG constructed from name and style)",
 )
 _PARSER.add_argument(
     "--log-level",
@@ -53,24 +45,31 @@ def name_from_path(path: str) -> str:
     return Path(path).stem
 
 
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+def main(fig_callback: FigCallbackT) -> None:
+    import sys
+    import warnings
 
+    from matplotlib import pyplot as plt
+    from matplotlib import style
 
-def main(name: str, callback: CallbackT) -> None:
+    from dyce.lifecycle import ExperimentalWarning
+
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
     args = _PARSER.parse_args()
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(levelname)s: %(message)s",
     )
-
-    plt.figure().set_size_inches(8, 6)
-    style.use("bmh")
+    name = Path(sys.argv[0]).stem
     output_file = (
         Path(f"{name}_{args.style}.png") if not args.output_file else args.output_file
     )
     output_path = args.output_dir.joinpath(output_file)
-    _LOGGER.debug("calling %r(%r, %r, %r)", callback, args, name, output_path)
-    callback(args, name, output_path)
+    line_color = "white" if args.style == "dark" else "black"
+
+    _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
+    style.use("bmh")
+    fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
     plt.savefig(output_path, dpi=144, transparent=True)

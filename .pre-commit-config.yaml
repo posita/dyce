@@ -22,7 +22,8 @@ repos:
           (?x)^(
             docs/(
               dyce-powered\.svg|
-              assets/perf_.*\.txt
+              assets/perf_.*\.txt|
+              assets/plot_.*\.svg
             )
           )$
       - id: trailing-whitespace
@@ -31,7 +32,8 @@ repos:
           (?x)^(
             docs/(
               dyce-powered\.svg|
-              assets/perf_.*\.txt
+              assets/perf_.*\.txt|
+              assets/plot_.*\.svg
             )
           )$
 
@@ -47,8 +49,10 @@ repos:
     rev: v0.15.9
     hooks:
       - id: ruff-check
+        entry: uv run ruff check
         args: [--fix]
       - id: ruff-format
+        entry: uv run ruff format
 
   - repo: meta
     hooks:
@@ -58,8 +62,7 @@ repos:
     hooks:
       - id: ty
         name: ty
-        # entry: .venv/bin/ty
-        entry: ty
+        entry: uv run ty
         args: [check]
         language: system
         pass_filenames: false

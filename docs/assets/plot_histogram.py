@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,25 +6,24 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_histogram.py
+    # --8<-- [start:viz]
+    from dyce.d import h3d6
+    from dyce.viz import plot_bar
 
-from dyce import H
-from dyce.viz import plot_bar
+    ax = plot_bar(h3d6)
+    ax.set_title("Distribution for 3d6")
+    # --8<-- [end:viz]
 
-_LOGGER = logging.getLogger(__name__)
-
-
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
-    text_color = "white" if args.style == "dark" else "black"
-    ax = plot_bar(3 @ H(6))
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
-    ax.set_title("Distribution for 3d6", color=text_color)
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

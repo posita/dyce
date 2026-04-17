@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0   # required for setuptools-scm
-      - uses: astral-sh/setup-uv@v8.0.0
+      - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync --no-dev --group tox
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0   # required for setuptools-scm
-      - uses: astral-sh/setup-uv@v8.0.0
+      - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: "3.13"
       - run: uv sync --no-dev --group test
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0   # required for setuptools-scm
-      - uses: astral-sh/setup-uv@v8.0.0
+      - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: "3.13"
       - run: uv sync --no-dev --group lint

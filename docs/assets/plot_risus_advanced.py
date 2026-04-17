@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -7,11 +7,9 @@
 # ======================================================================================
 
 import logging
-from argparse import Namespace
 from functools import partial
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+from _plot import main  # pyrefly: ignore[missing-import]
 from _risus_advanced import (  # pyrefly: ignore[missing-import]
     deadly_combat_vs,
     evens_up_vs,
@@ -24,7 +22,7 @@ from matplotlib import pyplot as plt
 _LOGGER = logging.getLogger(__name__)
 
 
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
+def fig_callback(line_color: str) -> None:
     our_pool_rel_sizes = tuple(range(5))
     their_pool_sizes = tuple(range(2, 7))
     deadly_combat_scenarios = scenarios(
@@ -51,14 +49,14 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
         our_pool_rel_sizes=our_pool_rel_sizes,
         their_pool_sizes=their_pool_sizes,
     )
-    text_color = "white" if args.style == "dark" else "black"
+
     plt.gcf().set_size_inches(12, 10)
     axes = us_vs_them_heatmap_subplot(
         deadly_combat_scenarios,
         cmap_name="plasma",
         plt_rows=3,
         plt_row=1,
-        ax_color=text_color,
+        ax_color=line_color,
     )
     for ax in axes:
         ax.tick_params(axis="x", labelrotation=60)
@@ -67,7 +65,7 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
         cmap_name="magma",
         plt_rows=3,
         plt_row=2,
-        ax_color=text_color,
+        ax_color=line_color,
     )
     for ax in axes:
         ax.tick_params(axis="x", labelrotation=60)
@@ -76,11 +74,11 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
         cmap_name="magma",
         plt_rows=3,
         plt_row=3,
-        ax_color=text_color,
+        ax_color=line_color,
     )
     for ax in axes:
         ax.tick_params(axis="x", labelrotation=60)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    main(fig_callback)

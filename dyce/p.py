@@ -199,6 +199,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self,
         *init_vals: Any,
     ) -> None:
+        r"""Constructor."""
         super().__init__()
 
         def _gen_hs() -> Iterator[H[_T_co]]:

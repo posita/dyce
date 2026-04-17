@@ -1,4 +1,4 @@
-# noqa: INP001 # =======================================================================
+# ======================================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,19 +6,12 @@
 # software in any capacity.
 # ======================================================================================
 
-import logging
-from argparse import Namespace
-from pathlib import Path
 
-from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
+    # --8<-- [start:core]
+    from dyce import H, P, expand
 
-from dyce import H, P, expand
-from dyce.viz import plot_line
-
-_LOGGER = logging.getLogger(__name__)
-
-
-def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     p_4d6 = 4 @ P(6)
     d6_reroll_first_one = expand(
         lambda result: result.h if result.outcome == 1 else result.outcome,
@@ -39,16 +32,25 @@ def callback(args: Namespace, _name: str, _output_path: Path) -> None:
         "2d6 + 6": 2 @ H(6) + 6,
         "4d4 + 2": 4 @ H(4) + 2,
     }
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
+    # --8<-- [start:viz]
+    from dyce.viz import plot_line
 
     labels, hs = zip(*attr_results.items(), strict=True)
-
-    text_color = "white" if args.style == "dark" else "black"
     ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
+    ax.set_title("Comparing various take-three-of-4d6 methods")
     ax.legend()
-    ax.set_title("Comparing various take-three-of-4d6 methods", color=text_color)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
-    main(name_from_path(__file__), callback)
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

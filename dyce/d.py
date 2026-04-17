@@ -14,12 +14,13 @@
 # ======================================================================================
 
 r"""
-Lots of common dice and combinations: d1 through d20, d24, d30, d60, d100, and d00
-as well as two and three of d1 through d20. as both [`H`][dyce.H] and [`P`][dyce.P]
-objects. For example, a twenty-sided die in [`H`][dyce.H] form is `#!python d20`. In
-[`P`][dyce.P] form, it is `#!python pd20`. `#!python 2 @ d10` in [`H`][dyce.H] form is
-either `#!python d10_2` or `#!python h2d10`. In [`P`][dyce.P] form, it is either
-`#!python pd10_2` or `#!python p2d10`.
+Lots of common dice and combinations: d1 through d20, d24, d30, d60, d100, and d00 as well as two and three of d1 through d20 as both [`H`][dyce.H] and [`P`][dyce.P]
+objects.
+For example, a twenty-sided die in [`H`][dyce.H] form is `#!python d20`.
+In [`P`][dyce.P] form, it is `#!python pd20`.
+`#!python 2 @ d10` in [`H`][dyce.H] form is either `#!python d10_2` or `#!python h2d10`.
+In [`P`][dyce.P] form, it is either `#!python pd10_2` or `#!python p2d10`.
+`#!python d0` is the “empty” die (`#!python H({})`).
 
 For example, consider these different shorthands for expressing 3d6:
 
@@ -60,6 +61,7 @@ For example, consider these different shorthands for expressing 3d6:
 from .h import H as _H
 from .p import P as _P
 
+d0 = _H({})
 d1 = _H(1)
 d2 = _H(2)
 d3 = _H(3)
