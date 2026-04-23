@@ -85,6 +85,9 @@ def fig_callback(line_color: str) -> None:
     df.index.name = "Action Modifier"
     # --8<-- [end:table]
 
+    # Display df as table
+    import jinja2  # noqa: F401
+
     # NOTE: Translates to df.style.format("{:.2%}") in docs/assets/nb_ironsworn.py
     print(df.style.format("{:.2%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
