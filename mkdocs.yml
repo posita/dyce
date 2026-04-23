@@ -1,98 +1,102 @@
 site_name: dyce
 site_description: Simple Python tools for dice-based probabilities
-site_url: https://posita.github.io/dyce/
 site_author: Matt Bogosian
 copyright: <i>Copyright and other protections apply.
   Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
   All rights not expressly waived or licensed are reserved.
   If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
-repo_url: https://github.com/posita/dyce
+docs_dir: docs
+repo_url: https://github.com/posita/dyce/
+
+theme:
+  name: material
+  features:
+    - content.code.annotate
+    - content.tabs.link
+    - navigation.expand
+    - navigation.sections
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: green
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: light-green
+      accent: light-green
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - pycon
+  # ---- BEGIN MathJax config ----
+  - pymdownx.arithmatex:
+      generic: true
+      block_tag: 'pre'
+  # ----- END MathJax config -----
+  - pymdownx.details
+  - pymdownx.highlight:
+      default_lang: 'python'
+      linenums: true
+  - pymdownx.inlinehilite:
+      custom_inline:
+        - name: math
+          class: arithmatex
+          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_inline_format {kwds: {mode: generic}}
+  - pymdownx.snippets:
+      # TODO(posita): Re-enable this when visualizations work again
+      # check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        # TODO(posita): This is supposed to support inline syntax like `#!math ...`, but
+        # it doesn't work. See
+        # <https://facelessuser.github.io/pymdown-extensions/about/releases/9.0/#arithmatex>.
+        - name: math
+          class: arithmatex
+          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: 'generic', tag: 'pre'}}
+          #   kwds:
+          #     mode: generic
+          #     tag: pre
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tilde
+
+extra_javascript:
+  # For tracking OS-level theme changes after page load
+  - js/theme.js
+  # ---- BEGIN MathJax config ----
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  # ----- END MathJax config -----
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            extensions:
+              - griffe_warnings_deprecated
+              - _griffe_ext.py:LifecycleExtension
+            show_signature_annotations: true
+      # wheels:
+      #   - url: "https://files.pythonhosted.org/packages/23/fd/fb6ed391c66e0e2a1d8978f888258ed1215c73bd1c1931d8b53c683a2ebd/anydyce-0.4.6-py3-none-any.whl"
+      #   - url: "https://files.pythonhosted.org/packages/6b/44/dca78187415947d1bb90b2ee2a58e47d9573528331e8dc6196996b53612a/optype-0.17.0-py3-none-any.whl"
+      #   - command: "uv build --out-dir {wheels_dir}"
+hooks:
+  # For copying LICENSE -> docs/license.md and README.md -> docs/index.md
+  - mkdocs_hooks.py
+
+watch:
+  - dyce
 
 nav:
   - Introduction: index.md
   - Countin’ with histograms and pools: countin.md
-  - Rollin’ with rollers and rolls: rollin.md
   - Applications and translations: translations.md
   - Release notes: notes.md
   - Contributing: contrib.md
   - License: license.md
   - API:
-    - <tt>dyce</tt>: dyce.md
-    - <tt>dyce.evaluation</tt>: dyce.evaluation.md
-    - <tt>dyce.h</tt>: dyce.h.md
-    - <tt>dyce.r</tt>: dyce.r.md
-
-# See:
-# * <https://squidfunk.github.io/mkdocs-material/reference/admonitions/>, etc.
-# * <https://mkdocstrings.github.io/>
-# * <https://www.mkdocs.org/>
-
-extra:
-  version:
-    provider: mike
-  __vers_str__: 0.7.0
-
-extra_javascript:
-  - js/site.js
-  # ---- BEGIN MathJax config ----
-  - js/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  # ----- END MathJax config -----
-
-markdown_extensions:
-  - admonition
-  - def_list
-  - footnotes
-  # ---- BEGIN MathJax config ----
-  - pymdownx.arithmatex:
-      generic: true
-  # ----- END MathJax config -----
-  - pymdownx.emoji
-  - pymdownx.highlight:
-      linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets:
-      check_paths: true
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tilde
-
-plugins:
-  - exclude:
-      # TODO(posita): See <https://github.com/apenwarr/mkdocs-exclude/pull/9>, but
-      # mkdocs-exclude is no longer maintained
-      # gitignore: true
-      glob:
-        - "*.py"
-        - "Makefile"
-        - "notebooks/*"
-  - macros
-  - mike:
-      version_selector: true
-  - mkdocstrings:
-      default_handler: python
-      handlers:
-        python:
-          options:
-            show_if_no_docstring: true
-            show_root_full_path: false
-            show_signature_annotations: true
-  - search
-
-theme:
-  name: "material"  # required by arithmatex and mkdocstrings
-  features:
-    - content.code.annotate
-    - content.tabs.link
-    - navigation.foreach
-    - navigation.sections
-    - toc.integrate
-  palette:
-    - scheme: default
-      primary: green
-      accent: green
-
-watch:
-  - dyce
+    - Core: dyce.md
+    - Visualization (optional): dyce.viz.md

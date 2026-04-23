@@ -1,23 +1,5 @@
 all : \
 	../dyce-powered.svg \
-	graph_classes_dyce_r_dark.svg \
-	graph_classes_dyce_r_light.svg \
-	graph_filter_dark.svg \
-	graph_filter_light.svg \
-	graph_rollin_value_dark.svg \
-	graph_rollin_value_light.svg \
-	graph_rollin_expr_dark.svg \
-	graph_rollin_expr_light.svg \
-	graph_rollin_pool_dark.svg \
-	graph_rollin_pool_light.svg \
-	graph_rollin_select_1_dark.svg \
-	graph_rollin_select_1_light.svg \
-	graph_rollin_select_2_dark.svg \
-	graph_rollin_select_2_light.svg \
-	graph_substitute_append_dark.svg \
-	graph_substitute_append_light.svg \
-	graph_substitute_replace_dark.svg \
-	graph_substitute_replace_light.svg \
 	plot_2d6_lo_hi_dark.png \
 	plot_2d6_lo_hi_light.png \
 	plot_4d6_variants_dark.png \
@@ -39,27 +21,56 @@ all : \
 	plot_risus_first_round_dark.png \
 	plot_risus_first_round_light.png \
 	plot_roll_and_keep_dark.png \
-	plot_roll_and_keep_light.png
+	plot_roll_and_keep_light.png \
+	plot_viz_plot_bar_dark.png \
+	plot_viz_plot_bar_light.png \
+	plot_viz_plot_burst_dark.png \
+	plot_viz_plot_burst_light.png \
+	plot_viz_plot_hbar_dark.png \
+	plot_viz_plot_hbar_light.png \
+	plot_viz_plot_line_dark.png \
+	plot_viz_plot_line_light.png
+
+# \
+# 	graph_classes_dyce_r_dark.svg \
+# 	graph_classes_dyce_r_light.svg \
+# 	graph_filter_dark.svg \
+# 	graph_filter_light.svg \
+# 	graph_rollin_value_dark.svg \
+# 	graph_rollin_value_light.svg \
+# 	graph_rollin_expr_dark.svg \
+# 	graph_rollin_expr_light.svg \
+# 	graph_rollin_pool_dark.svg \
+# 	graph_rollin_pool_light.svg \
+# 	graph_rollin_select_1_dark.svg \
+# 	graph_rollin_select_1_light.svg \
+# 	graph_rollin_select_2_dark.svg \
+# 	graph_rollin_select_2_light.svg \
+# 	graph_substitute_append_dark.svg \
+# 	graph_substitute_append_light.svg \
+# 	graph_substitute_replace_dark.svg \
+# 	graph_substitute_replace_light.svg
 
 perf : \
-	perf_appearances_in_rolls.txt \
-	perf_foreach.txt \
-	perf_pools_vs_rollers.txt \
+	perf_expand.txt \
 	perf_rolls_with_counts.txt
 
-graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
+# \
+ # 	perf_pools_vs_rollers.txt
+
+graph_%_dark.svg : graph_%.py Makefile graph.py ../../dyce/*.py
 	"$${PYTHON:-python3}" graph.py --style=dark $*
 
-graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
+graph_%_light.svg : graph_%.py Makefile graph.py ../../dyce/*.py
 	"$${PYTHON:-python3}" graph.py --style=light $*
 
-plot_%_dark.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py
-	"$${PYTHON:-python3}" plot.py --style=dark $*
+plot_%_dark.png : plot_%.py Makefile _plot.py ../../dyce/*.py
+	"$${PYTHON:-python3}" plot_$*.py --log-level INFO --style=dark
 
-plot_%_light.png : plot_%.py Makefile plot.py ../../dyce/h.py ../../dyce/p.py
-	"$${PYTHON:-python3}" plot.py --style=light $*
+plot_%_light.png : plot_%.py Makefile _plot.py ../../dyce/*.py
+	"$${PYTHON:-python3}" plot_$*.py --log-level INFO --style=light
 
-perf_%.txt : perf_%.ipy Makefile ../../dyce/h.py ../../dyce/p.py ../../dyce/r.py
+perf_%.txt : perf_%.ipy Makefile ../../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True perf_$*.ipy | tee $@
 
 ../dyce-powered.svg : Makefile

@@ -1,103 +1,119 @@
-# ======================================================================================
-# Copyright and other protections apply. Please see the accompanying LICENSE file for
-# rights and restrictions governing use of this software. All rights not expressly
-# waived or licensed are reserved. If that file is missing or appears to be modified
-# from its original, then please contact the author before viewing or using this
-# software in any capacity.
-# ======================================================================================
-
-[project]  # ---------------------------------------------------------------------------
-
+[project]
 name = "dyce"
 dynamic = ["version"]
-description = "Simple Python tools for exploring dice outcomes and other finite discrete probabilities"
-readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
-license = "MIT"
-license-files = ["LICENSE"]
-authors = [{name = "Matt Bogosian", email = "matt@bogosian.net"}]
-requires-python = ">=3.10"
-dependencies = ["numerary~=0.4.3"]
-classifiers = [
-  "Topic :: Education",
-  "Topic :: Games/Entertainment",
-  "Topic :: Scientific/Engineering :: Mathematics",
-  "Topic :: Software Development :: Libraries :: Python Modules",
-  "Typing :: Typed",
-  "Development Status :: 4 - Beta",
-  "Intended Audience :: Developers",
-  "Intended Audience :: Education",
-  "Intended Audience :: Science/Research",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+description = "optype test"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "optype",
+    "typing_extensions>=4.5; python_version < '3.13'",  # back-port of deprecated decorator
 ]
 
-[project.optional-dependencies]  # -----------------------------------------------------
+[project.optional-dependencies]
+viz = ["matplotlib"]
 
-dev = [
-  "numpy",
-  "pandas",
-  "pre-commit",
-  "sympy",
-  "tox",
-  "tox-uv",
-  "versioningit",
-  # TODO(posita): Remove when retiring support for 3.10
-  "tomli; python_version < '3.11'",
-]
-
-[project.urls]  # ----------------------------------------------------------------------
-
-Homepage = "https://posita.github.io/dyce/"
-"Source Repository" = "https://github.com/posita/dyce/"
-
-[build-system]  # ----------------------------------------------------------------------
-
-requires = ["setuptools>=61", "versioningit", "wheel"]
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]  # -------------------------------------------------------------------
-
+[tool.setuptools]
 packages = ["dyce"]
+package-data = {"dyce" = ["py.typed"]}
 
-[tool.setuptools.package-data]  # ------------------------------------------------------
+[tool.setuptools_scm]
+fallback_version = "0.0.0+unknown"
 
-dyce = ["py.typed"]
+[dependency-groups]
+dev = [
+    "blacken-docs>=1.20.0",
+    "ipython",
+    "mypy",
+    "pre-commit",
+    "pre-commit-uv",
+    "pyrefly",
+    "pyright",
+    "ruff",
+    "ty",
+    {include-group = "viz"},
+    {include-group = "docs"},
+    {include-group = "test"},
+]
+docs = [
+    "click!=8.2.1,!=8.2.2,!=8.3.0,!=8.3.1",  # TODO(posita): Remove after 8.3.2 is released; see <https://github.com/mkdocs/mkdocs/issues/4032>
+    "griffe-warnings-deprecated",
+    "jupyterlab-widgets",
+    "jupyterlite",
+    "jupyterlite-pyodide-kernel",
+    "jupyter_server",
+    "markdown-pycon",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "numpy",
+    "pandas",
+    "pymdown-extensions",
+    "sympy",
+]
+test = [
+    "beartype",
+    "coverage[toml]",
+    "numpy",
+    "pytest",
+    "pytest-beartype",
+    "pytest-cov",
+    "pytest-gitignore",
+    "sympy",
+    "tox",
+    "tox-uv",
+    {include-group = "viz"},
+]
+viz = ["matplotlib"]
 
-[tool.mypy]  # -------------------------------------------------------------------------
+[tool.codespell]
+ignore-words-list = "CanGe,countin,rollin"
+skip = ["*.ipynb"]
 
-# See <https://mypy.readthedocs.io/en/stable/config_file.html#confval-exclude>
-exclude = """(?x)(
-  (^|/)build/
-  | (^|/)site/
-)"""
+[tool.coverage.run]
+source = ["dyce"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.mypy]
+# TODO(posita): add "docs" once there are .py files there
+files = ["dyce", "helpers", "tests", "*.py"]
+python_version = "3.11"
+exclude_gitignore = true
 warn_redundant_casts = true
-warn_unused_configs = true
 warn_unused_ignores = true
-# warn_return_any = true
 warn_unreachable = true
 
-[tool.pytest.ini_options]  # -----------------------------------------------------------
+[tool.pyrefly]
+project-includes = ["docs", "dyce", "helpers", "tests", "*.py"]
+python-version = "3.11.0"
+infer-with-first-use = false
 
-addopts = "--doctest-continue-on-failure --doctest-glob='*.md' --doctest-modules --ignore=docs/assets --pythonwarnings=ignore"
-doctest_optionflags = [
-  "ELLIPSIS",
-  "IGNORE_EXCEPTION_DETAIL",
-  "NORMALIZE_WHITESPACE",
-  "NUMBER",
-]
+[warnings]
+unused-ignore = true
 
-[tool.ruff.lint]  # --------------------------------------------------------------------
+[tool.pyright]
+include = ["docs", "dyce", "helpers", "tests", "*.py"]
+pythonVersion = "3.11"
+reportUnnecessaryTypeIgnoreComment = "warning"
+typeCheckingMode = "basic"
 
+[tool.pytest.ini_options]
+addopts = ["--doctest-glob=*.md", "--doctest-modules"]
+testpaths = ["README.md", "docs", "dyce", "helpers", "tests", "*.py"]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint]
 preview = true
 ignore = [
-  "C90",  # TODO(posita): someday...
   "CPY",
   "D",
   "DOC",
@@ -105,34 +121,27 @@ ignore = [
   "FIX",  # TODO(posita): run occasionally, or figure out how to make these warnings
   "PLC",
   "PLR",
-  "PLW",  # TODO(posita): remove this
   "COM812",  # Trailing comma missing
   "E501",  # Line too long (... > ...)
   "RET505",  # Unnecessary `else` after `return` statement
   "RET506",  # Unnecessary `else` after `raise` statement
+  "RET507",  # Unnecessary `else` after `continue` statement
   "RUF002",  # Docstring contains ambiguous ...
   "RUF067",  # `__init__` module should only contain docstrings and re-exports
   "S101",  # Use of `assert` detected
   "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
-  "TD003",  # Missing issue link for this TODO  # TODO(posita): remove this after creating issues
   "TRY003",  # Avoid specifying long messages outside the exception class
-  "UP007",  # Use `X | Y` for type annotations  # TODO(posita): remove after forward refs are properly supported
 ]
 select = [
   "ALL",
 ]
 
-[tool.versioningit.next-version]  # ----------------------------------------------------
+[tool.ty.src]
+include = ["docs", "dyce", "helpers", "tests", "*.py"]
 
-method = "smallest-release"
+[tool.check_doctests]
+# log_level = "DEBUG"
 
-[tool.versioningit.vcs]  # -------------------------------------------------------------
-
-default-tag = "0.0.0"
-
-[tool.versioningit.write]  # -----------------------------------------------------------
-
-file = "dyce/_version.py"
-template = '''__vers_str__ = "{version}"
-__version__ = {version_tuple}
-'''
+[tool.check_doctests.check]
+checkers = [["ty", "check"], ["pyrefly", "check", "--search-path", "."], ["pyright"], ["mypy"]]
+fail_fast = false

@@ -1,0 +1,48 @@
+from dyce import H, P, expand
+
+def dependent_term(
+  val_1,
+  val_2,
+  val_3,
+  val_n,
+):
+  import math ; math.gcd(456**123, 123**456)  # emulate an expensive calculation
+  return (
+    (val_1 == val_2) +
+    (val_2 == val_3) +
+    (val_1 == val_3) +
+    (
+      val_n > val_1
+      and val_n > val_2
+      and val_n > val_3
+    )
+  )
+
+def dependent_term_h_result(
+  h_result_1,
+  h_result_2,
+  h_result_3,
+  h_result_n,
+):
+  return dependent_term(h_result_1.outcome, h_result_2.outcome, h_result_3.outcome, h_result_n.outcome)
+
+def dependent_term_p_result(
+  p_result_1,
+  p_result_2,
+  p_result_3,
+  p_result_n,
+):
+  return dependent_term(sum(p_result_1.roll), sum(p_result_2.roll), sum(p_result_3.roll), sum(p_result_n.roll))
+
+src_1 = H(6)
+src_2 = H(8)
+src_3 = H(10)
+src_n = H(20)
+
+print(f"%timeit expand({dependent_term_p_result.__name__}, P({src_1}), P({src_2}), P({src_3}), P({src_n}))")
+%timeit expand(dependent_term_p_result, P(src_1), P(src_2), P(src_3), P(src_n))
+print()
+
+print(f"%timeit expand({dependent_term_h_result.__name__}, {src_1}, {src_2}, {src_3}, {src_n})")
+%timeit expand(dependent_term_h_result, src_1, src_2, src_3, src_n)
+print()
