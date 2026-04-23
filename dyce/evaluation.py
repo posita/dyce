@@ -21,7 +21,7 @@ from enum import IntEnum, auto
 from fractions import Fraction
 from itertools import product as iproduct
 from math import prod
-from typing import Any, Generic, NamedTuple, TypeVar, overload
+from typing import Any, Generic, NamedTuple, TypeVar, cast, overload
 
 from dyce.types import natural_key, nobeartype
 
@@ -568,8 +568,13 @@ def explode_n(
             return result.outcome
         next_h_or_outcome = resolver(result, n_left, n - n_left)
         if isinstance(next_h_or_outcome, H):
-            inner = expand(_callback, next_h_or_outcome, n_left=n_left - 1)
-            return inner + result.outcome if inner else result.outcome
+            # TODO(posita): # noqa: TD003 - Figure out how to get the return value of
+            # expand to be correctly narrowed in this case
+            inner: H[_T] = expand(
+                _callback, cast("H[_T]", next_h_or_outcome), n_left=n_left - 1
+            )
+            # TODO(posita): # noqa: TD003 - Figure out how to constrain _T to support addition
+            return inner + result.outcome if inner else result.outcome  # type: ignore[operator]
         return next_h_or_outcome
 
     with warnings.catch_warnings():

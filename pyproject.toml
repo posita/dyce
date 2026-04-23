@@ -137,9 +137,25 @@ docstring-code-line-length = "dynamic"
   # Cells support `await` statements
   "F704",  # `await` statement outside of a function
   "PLE1142",  # `await` should be used within an async function
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+  # Catch-all for things that are only ignored in these files
+  "RUF100",  # Unused `noqa` directive ...
 ]
-"docs/assets/plot_*.py" = ["E402"]  # Module level import not at top of file
-"docs/notebooks/*.ipynb" = ["E402"]  # Module level import not at top of file
+"docs/assets/plot_*.py" = [
+  # Allow co-mingled imports for snippets
+  "E402",  # Module level import not at top of file
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+]
+"docs/notebooks/*.ipynb" = [
+  "E402",  # Module level import not at top of file
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+]
 
 [tool.ruff.lint]
 preview = true
@@ -154,6 +170,7 @@ ignore = [
   "COM812",  # Trailing comma missing
   "E501",  # Line too long (... > ...)
   "INP001",  # File ... is part of an implicit namespace package. Add an `__init__.py`.
+  "N806",  # Variable ... in function should be lowercase
   "RET505",  # Unnecessary `else` after `return` statement
   "RET506",  # Unnecessary `else` after `raise` statement
   "RET507",  # Unnecessary `else` after `continue` statement

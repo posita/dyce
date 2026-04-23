@@ -10,9 +10,26 @@
 #     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
+#   language_info:
+#     name: python
 # ---
 
 # %% [markdown]
+# <!---
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# When updating a cell, plan to re-run the notebook locally and recommit the .ipynb
+# afterward. Otherwise, the pre-populated output for that cell will disappear or be
+# stale.
+# -->
+#
 # ## [`dyce`](https://posita.github.io/dyce/) translation of the accepted answer to "[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)"
 #
 # Select ``Run All Cells`` from the ``Run`` menu above.

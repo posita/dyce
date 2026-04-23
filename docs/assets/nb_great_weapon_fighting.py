@@ -10,9 +10,26 @@
 #     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
+#   language_info:
+#     name: python
 # ---
 
 # %% [markdown]
+# <!---
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# When updating a cell, plan to re-run the notebook locally and recommit the .ipynb
+# afterward. Otherwise, the pre-populated output for that cell will disappear or be
+# stale.
+# -->
+#
 # ## [`dyce`](https://posita.github.io/dyce/) translation of one example from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples)
 #
 # Select ``Run All Cells`` from the ``Run`` menu above.
@@ -68,7 +85,7 @@ label_sa = "Normal attack"
 label_gwf_2014 = "\u201cGWF\u201d (2014)"
 label_gwf_2024 = "\u201cGWF\u201d (2024)"
 df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
-print(df.style.format("{:.0%}").to_html())  # noqa: T201 # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
 # %%
 from matplotlib import pyplot as plt

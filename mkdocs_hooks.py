@@ -1,11 +1,14 @@
 import importlib.metadata
 import logging
+import os
 import pathlib
 import re
 import shutil
 import subprocess  # noqa: S404
+import sys
+from collections.abc import Sequence
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger("mkdocs.hooks")
 
 _RAW_VERSION = importlib.metadata.version("dyce")
 # Dev/dirty builds (e.g. "0.1.0.dev5+gabcdef") fall back to "main".
@@ -61,11 +64,14 @@ def on_pre_build(**_kwargs: object) -> None:
     # `mkdocs serve --livereload`.
     shutil.copy2("LICENSE", "docs/license.md")
 
+    _uv_run(("make", "-C", "docs"))
+
 
 def on_post_build(config: dict, **_kwargs: object) -> None:
     cmd = ["uv", "build", "--wheel"]
-    _LOGGER.debug("running %s", " ".join(cmd))
+    _LOGGER.info("running %s", " ".join(cmd))
     subprocess.run(cmd, check=True)  # noqa: S603
+
     cmd = [
         "jupyter",
         "lite",
@@ -78,5 +84,15 @@ def on_post_build(config: dict, **_kwargs: object) -> None:
     wheels.extend(pathlib.Path("dist").glob("dyce*.whl"))
     for wheel in wheels:
         cmd.extend(("--piplite-wheel", str(wheel)))
-    _LOGGER.warning("running %s", " ".join(cmd))
-    subprocess.run(cmd, check=True)  # noqa: S603
+    _uv_run(cmd)
+
+
+def _uv_run(cmd: Sequence[str]) -> None:
+    uv_cmd = ["uv", "run", "--group", "docs"]
+    venv_path = pathlib.Path(os.getenv("VIRTUAL_ENV", "")).resolve()
+    mkdocs_path = pathlib.Path(sys.argv[0]).resolve()
+    if venv_path.stem.startswith(".venv") and mkdocs_path.is_relative_to(venv_path):
+        uv_cmd.append("--active")
+    uv_cmd.extend(cmd)
+    _LOGGER.info("running %s", " ".join(uv_cmd))
+    subprocess.run(uv_cmd, check=True)  # noqa: S603

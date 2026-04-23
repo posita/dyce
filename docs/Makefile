@@ -1,12 +1,15 @@
 all : \
 	dyce-powered.svg \
+	notebooks/2d6_lo_hi.ipynb \
 	notebooks/4d6_variants.ipynb \
 	notebooks/advantage.ipynb \
 	notebooks/burning_arch.ipynb \
 	notebooks/d10_explode.ipynb \
 	notebooks/dupes.ipynb \
 	notebooks/great_weapon_fighting.ipynb \
+	notebooks/histogram.ipynb \
 	notebooks/ironsworn.ipynb \
+	notebooks/risus.ipynb \
 	notebooks/roll_and_keep.ipynb \
 	assets/plot_2d6_lo_hi_dark.svg \
 	assets/plot_2d6_lo_hi_light.svg \
@@ -26,12 +29,10 @@ all : \
 	assets/plot_histogram_light.svg \
 	assets/plot_ironsworn_dark.svg \
 	assets/plot_ironsworn_light.svg \
-	assets/plot_risus_advanced_dark.png \
-	assets/plot_risus_advanced_light.png \
-	assets/plot_risus_complete_dark.png \
-	assets/plot_risus_complete_light.png \
-	assets/plot_risus_first_round_dark.png \
-	assets/plot_risus_first_round_light.png \
+	assets/plot_risus_first_round_dark.svg \
+	assets/plot_risus_first_round_light.svg \
+	assets/plot_risus_multi_round_standard_dark.svg \
+	assets/plot_risus_multi_round_standard_light.svg \
 	assets/plot_roll_and_keep_dark.svg \
 	assets/plot_roll_and_keep_light.svg \
 	assets/plot_viz_plot_bar_dark.svg \
@@ -76,6 +77,18 @@ perf : \
 # assets/graph_%_light.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py
 # 	"$${PYTHON:-python3}" assets/graph.py --style=light $*
 
+assets/plot_risus_first_round_dark.svg \
+assets/plot_risus_multi_round_standard_dark.svg \
+assets/plot_risus_multi_round_best_of_set_dark.svg \
+assets/plot_risus_multi_round_evens_up_dark.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
+	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style dark --output-dir assets
+
+assets/plot_risus_first_round_light.svg \
+assets/plot_risus_multi_round_standard_light.svg \
+assets/plot_risus_multi_round_best_of_set_light.svg \
+assets/plot_risus_multi_round_evens_up_light.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
+	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style light --output-dir assets
+
 assets/plot_%_dark.png : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style dark --output-file $@
 
@@ -101,7 +114,7 @@ assets/plot_risus_first_round_dark.png : assets/_risus*.py
 assets/plot_risus_first_round_light.png : assets/_risus*.py
 
 notebooks/%.ipynb : assets/nb_%.py
-	uv run --group docs jupytext --to notebook --update $< --output $@
+	jupytext --to notebook --update $< --output $@
 
 assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True assets/perf_$*.ipy | tee $@

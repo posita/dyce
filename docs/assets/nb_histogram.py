@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Modeling "[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)" in [``dyce``](https://posita.github.io/dyce/)
+# ## Basic visualization in [`dyce`](https://posita.github.io/dyce/)
 #
 # Select ``Run All Cells`` from the ``Run`` menu above.
 
@@ -56,34 +56,11 @@ style.use("bmh")
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 # %%
-from dyce import H, P, expand
+from dyce.d import h3d6
+from dyce.viz import plot_bar
 
-p_4d6 = 4 @ P(6)
-d6_reroll_first_one = expand(
-    lambda result: result.h if result.outcome == 1 else result.outcome,
-    H(6),
-)
-p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
-p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
-
-attr_results: dict[str, H] = {
-    "3d6": 3 @ H(6),
-    "4d6 - discard lowest": p_4d6.h(slice(1, None)),
-    "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(slice(1, None)),
-    "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
-        slice(1, None)
-    ),
-    "2d6 + 6": 2 @ H(6) + 6,
-    "4d4 + 2": 4 @ H(4) + 2,
-}
-
-# %%
-from dyce.viz import plot_line
-
-labels, hs = zip(*attr_results.items(), strict=True)
-ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
-ax.legend()
-ax.set_title("Comparing various take-three-of-4d6 methods")
+ax = plot_bar(h3d6)
+ax.set_title("Distribution for 3d6")
 
 from matplotlib import pyplot as plt
 
