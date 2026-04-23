@@ -1,4 +1,4 @@
-# ======================================================================================
+# noqa: INP001 # =======================================================================
 # Copyright and other protections apply. Please see the accompanying LICENSE file for
 # rights and restrictions governing use of this software. All rights not expressly
 # waived or licensed are reserved. If that file is missing or appears to be modified
@@ -6,45 +6,48 @@
 # software in any capacity.
 # ======================================================================================
 
-from anydyce.viz import plot_line
+import logging
+from argparse import Namespace
+from pathlib import Path
 
-from dyce import H, P
-from dyce.evaluation import foreach
+from _plot import main, name_from_path  # pyrefly: ignore[missing-import]
+
+from dyce import H, P, expand
+from dyce.viz import plot_line
+
+_LOGGER = logging.getLogger(__name__)
 
 
-def do_it(style: str) -> None:
-    from matplotlib import pyplot as plt
-
+def callback(args: Namespace, _name: str, _output_path: Path) -> None:
     p_4d6 = 4 @ P(6)
-    d6_reroll_first_one = foreach(
-        lambda h_result: h_result.h if h_result.outcome == 1 else h_result.outcome,
-        h_result=H(6),
+    d6_reroll_first_one = expand(
+        lambda result: result.h if result.outcome == 1 else result.outcome,
+        H(6),
     )
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 
-    markers = "Ds^*xo"
     attr_results: dict[str, H] = {
-        "3d6": 3 @ H(6),  # marker="D"
-        "4d6 - discard lowest": p_4d6.h(slice(1, None)),  # marker="s"
+        "3d6": 3 @ H(6),
+        "4d6 - discard lowest": p_4d6.h(slice(1, None)),
         "4d6 - re-roll first 1, discard lowest": p_4d6_reroll_first_one.h(
             slice(1, None)
-        ),  # marker="^"
+        ),
         "4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest": p_4d6_reroll_all_ones.h(
             slice(1, None)
-        ),  # marker="*"
-        "2d6 + 6": 2 @ H(6) + 6,  # marker="x"
-        "4d4 + 2": 4 @ H(4) + 2,  # marker="o"
+        ),
+        "2d6 + 6": 2 @ H(6) + 6,
+        "4d4 + 2": 4 @ H(4) + 2,
     }
 
-    ax = plt.axes()
-    text_color = "white" if style == "dark" else "black"
+    labels, hs = zip(*attr_results.items(), strict=True)
+    text_color = "white" if args.style == "dark" else "black"
+    ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
     ax.tick_params(axis="x", colors=text_color)
     ax.tick_params(axis="y", colors=text_color)
-    plot_line(ax, tuple(attr_results.items()))
-
-    for line, marker in zip(ax.lines, markers, strict=True):
-        line.set_marker(marker)
-
     ax.legend()
     ax.set_title("Comparing various take-three-of-4d6 methods", color=text_color)
+
+
+if __name__ == "__main__":
+    main(name_from_path(__file__), callback)

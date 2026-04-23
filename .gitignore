@@ -1,32 +1,29 @@
-# ======================================================================================
-# Copyright and other protections apply. Please see the accompanying LICENSE file for
-# rights and restrictions governing use of this software. All rights not expressly
-# waived or licensed are reserved. If that file is missing or appears to be modified
-# from its original, then please contact the author before viewing or using this
-# software in any capacity.
-# ======================================================================================
-
-# Project
-/.coverage
-/.coverage.*
-/.jupyterlite.doit.db
-/build/
-/dist/
-/docs/index.md
-/docs/jupyter/
-/docs/license.md
-/dyce/_version.py
-/site/
+# Python-generated files
 __pycache__/
 *.py[oc]
+build/
+dist/
+docs/index.md
+docs/license.md
+wheels/
 *.egg-info
-.venv*/
 
-# Common OS/app generated entities
-.DS_Store
-.DS_Store?
-._*
-.~*
-Thumbs.db
-desktop.ini
-ehthumbs.db
+# Virtual environments
+.venv
+
+# Ruff
+.ruff_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# JupyterLite
+.jupyterlite.doit.db
+
+# MkDocs
+.ipynb_checkpoints/
+site/
+
+# Tox
+.tox/
