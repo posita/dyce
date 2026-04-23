@@ -20,12 +20,10 @@ from types import NotImplementedType  # noqa: TC003
 from typing import SupportsIndex, SupportsInt, TypeVar
 
 __all__ = (
-    "BeartypeCallHintViolation",
     "GetItemT",
     "getitems",
     "lossless_int",
     "natural_key",
-    "nobeartype",
 )
 
 try:
@@ -86,12 +84,24 @@ def lossless_int(candidate: SupportsInt) -> int:
           ...
         ValueError: cannot (losslessly) coerce float(3.5) to an int
     """
-    result = _lossless_int_or_not_implemented(candidate)
+    result = lossless_int_or_not_implemented(candidate)
     if result is NotImplemented:
         raise ValueError(
             f"cannot (losslessly) coerce {type(candidate).__qualname__}({candidate}) to an int"
         )
     return result
+
+
+def lossless_int_or_not_implemented(
+    candidate: SupportsInt,
+) -> "int | NotImplementedType":
+    r"""
+    Like [`lossless_int`][dyce.types.lossless_int], but returns `#!python NotImplemented` instead of raising `#!python ValueError` when the conversion is lossy.
+    """
+    int_val = int(candidate)
+    if int_val != candidate:
+        return NotImplemented
+    return int_val
 
 
 def natural_key(val: object) -> tuple[int | str, ...]:
@@ -113,15 +123,3 @@ def natural_key(val: object) -> tuple[int | str, ...]:
         ['12aone', '12b17c', '12b179']
     """
     return tuple(int(s) if s.isdigit() else s for s in re.split(r"(\d+)", str(val)))
-
-
-def _lossless_int_or_not_implemented(
-    candidate: SupportsInt,
-) -> "int | NotImplementedType":
-    r"""
-    Like [`lossless_int`][dyce.types.lossless_int], but returns `#!python NotImplemented` instead of raising `#!python ValueError` when the conversion is lossy.
-    """
-    int_val = int(candidate)
-    if int_val != candidate:
-        return NotImplemented
-    return int_val

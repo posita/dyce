@@ -242,51 +242,26 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
 
 In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.probability_items`](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) and [`H.format`](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) methods).
 
-## Comparison to alternatives
+## Other efforts
 
-The following is a best-effort[^3] summary of the differences between various available tools in this space.
+`dyce`’s goal is to provide ergonomic and idiomatic Python interfaces to reasonably efficient discrete probability computations useful for gaming with minimal dependencies.
 Consider exploring the [applications and translations](https://posita.github.io/dyce/latest/translations/) for added color.
+But `dyce` does not stand alone.
+Other works include:
 
-[^3]:
+- The OG [`dice_roll.py`](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f) by Ilmari Karonen
+- [`icepool`](https://pypi.org/project/icepool/) by Albert Julius Liu
+- [GNOLL](https://pypi.org/project/gnoll/) by Ian Hunter
+- [lea](https://pypi.org/project/lea/) by Pierre Denis
+- [dice](https://pypi.org/project/dice/) by Sam Clements
+- [ossuary](https://github.com/bszonye/ossuary) by B. Szonye
+- [dice-notation](https://pypi.org/project/dice-notation/) by Bernardo Martinez Garrido
+- Avrae’s [d20](https://pypi.org/project/d20/) by Andrew Zhu
+- [python-dice](https://pypi.org/project/python-dice/) by Mark Robson
+- [DnDice](https://github.com/LordSembor/DnDice) by “LordSembor”
+- [AnyDice](https://anydice.com/) (closed source) by Jasper Flick
 
-    I have attempted to ensure the above is reasonably accurate, but please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies.
-
-| | [`dyce`](https://pypi.org/project/dyce/)<br>*Bogosian et al.* | [`icepool`](https://pypi.org/project/icepool/)<br>*Albert Julius Liu* | [`dice_roll.py`](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f)<br>*Karonen* | [python-dice](https://pypi.org/project/python-dice/)<br>*Robson et al.* | [AnyDice](https://anydice.com/)<br>*Flick* | [d20](https://pypi.org/project/d20/)<br>*Curse LLC* | [DnDice](https://github.com/LordSembor/DnDice)<br>*“LordSembor”* | [dice](https://pypi.org/project/dice/)<br>*Clements et al.* | [dice-notation](https://pypi.org/project/dice-notation/)<br>*Garrido* |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Latest release | 2022 | 2022 | N/A | 2021 | Unknown | 2021 | 2016 | 2021 | 2022 |
-| Actively maintained and documented         | ✅ | ✅ | ⚠️[^4] | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
-| Combinatorics optimizations                | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Suitable as a dependency in other projects | ✅ | ✅ | ⚠️[^5] | ✅ | ❌ | ✅ | ⚠️[^5] | ✅ | ❌ |
-| Discrete outcome enumeration               | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Arbitrary expressions                      | ✅ | ✅ | ⚠️[^6] | ✅ | ✅ | ✅ | ⚠️[^7] | ❌ | ❌ |
-| Arbitrary dice definitions                 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Integrates with other tools                | ✅ | ✅ | ✅ | ⚠️[^8] | ❌ | ⚠️[^8] | ✅ | ⚠️[^8] | ⚠️[^8] |
-| Open source (can inspect)                  | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Permissive licensing (can use and extend)  | ✅ | ✅ | ✅ | ✅ | N/A | ✅ | ✅ | ✅ | ✅ |
-
-[^4]:
-
-    Sparsely documented.
-    The author has [expressed a desire](https://rpg.stackexchange.com/a/166663/71245) to release a more polished version.
-
-[^5]:
-
-    Source can be downloaded and incorporated directly, but there is no packaging, versioning, or dependency tracking.
-
-[^6]:
-
-    Callers must perform their own arithmetic and characterize results in terms of a lightweight die primitive, which may be less accessible to the novice.
-    That being said, the library is remarkably powerful, given its size.
-
-[^7]:
-
-    Limited arithmetic operations are available.
-    The library also provides game-specific functions.
-
-[^8]:
-
-    Results only.
-    Input is limited to specialized grammar.
+Please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies or think something should be added to the list.
 
 ## License
 

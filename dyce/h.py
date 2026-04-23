@@ -52,8 +52,8 @@ import optype as ot
 from . import rng
 from .lifecycle import deprecated, experimental
 from .types import (
-    _lossless_int_or_not_implemented,
     lossless_int,
+    lossless_int_or_not_implemented,
     natural_key,
     nobeartype,
 )
@@ -445,7 +445,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
     def __matmul__(self: "H", rhs: SupportsInt) -> "H":
-        n = _lossless_int_or_not_implemented(rhs)
+        n = lossless_int_or_not_implemented(rhs)
         if n is NotImplemented:
             return NotImplemented
         if n < 0:
@@ -1135,15 +1135,18 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         Resulting counts for duplicate outcomes are summed.
 
             >>> import operator
+            >>> H({10: 1, 20: 1}).apply(operator.sub, 10)
+            H({0: 1, 10: 1})
             >>> H({10: 1, 20: 1}).apply(operator.sub, H({1: 1, 2: 1}))
             H({8: 1, 9: 1, 18: 1, 19: 1})
-            >>> H({10: 1, 20: 1}).apply(
-            ...     # reflected operator
-            ...     lambda h_outcome, other_outcome: operator.sub(
-            ...         other_outcome, h_outcome
-            ...     ),
-            ...     H({1: 1, 2: 1}),
-            ... )
+
+            >>> # optype provides reflected operator functions as do_r*
+            >>> import optype as ot
+
+            >>> H({10: 1, 20: 1}).apply(ot.do_rsub, 10)
+            H({-10: 1, 0: 1})
+
+            >>> H({10: 1, 20: 1}).apply(ot.do_rsub, H({1: 1, 2: 1}))
             H({-19: 1, -18: 1, -9: 1, -8: 1})
 
         One way to compute how often a six-sided die “beats” an eight-sided die rolled together:
@@ -1168,21 +1171,38 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             H({<Versus.LOSS: -1>: 27, <Versus.DRAW: 0>: 6, <Versus.WIN: 1>: 15})
 
         Omitting *operand* allows examination of just the histogram.
-        One way to determine how often summing outcomes on 2d6 falls within the range `#!math \left[ 7 .. 9 \right]`:
+        One way to determine Apocalypse World outcomes with a modifier:
 
-            >>> d6_2 = 2 @ H(6)
-            >>> inside_7_9 = d6_2.apply(lambda outcome: 7 <= outcome <= 9)
-            >>> inside_7_9
-            H({False: 21, True: 15})
-            >>> outside_7_9 = d6_2.apply(lambda outcome: outcome < 7 or outcome > 9)
-            >>> inside_7_9 == outside_7_9.apply(lambda outcome: not outcome)
-            True
+            >>> class PBTA(IntEnum):
+            ...     MISS = 0
+            ...     WEAK_HIT = 1
+            ...     STRONG_HIT = 2
 
-        One way to count how often summing outcomes on 2d3 is even:
+            >>> mod = +1
+            >>> pbta_result = (2 @ H(6) + mod).apply(
+            ...     lambda outcome: (
+            ...         PBTA.MISS
+            ...         if outcome <= 6
+            ...         else PBTA.WEAK_HIT
+            ...         if 7 <= outcome <= 9
+            ...         else PBTA.STRONG_HIT
+            ...     )
+            ... )
+            >>> pbta_result
+            H({<PBTA.MISS: 0>: 10, <PBTA.WEAK_HIT: 1>: 16, <PBTA.STRONG_HIT: 2>: 10})
+
+        One way to count how often summing outcomes comes out even on 2d3:
 
             >>> d3_2 = 2 @ H(3)
-            >>> d3_2.apply(lambda outcome: outcome % 2 == 0)
+            >>> d3_2
+            H({2: 1, 3: 2, 4: 3, 5: 2, 6: 1})
+            >>> d3_2_is_even = d3_2.apply(lambda outcome: outcome % 2 == 0)
+            >>> d3_2_is_even
             H({False: 4, True: 5})
+            >>> (d3_2 % 2).eq(0) == d3_2_is_even
+            True
+            >>> ((d3_2 + 1) % 2) == d3_2_is_even
+            True
         """
         if other is None:
             result: dict[_ResultT, int] = {}

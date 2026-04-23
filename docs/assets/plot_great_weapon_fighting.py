@@ -38,7 +38,7 @@ def fig_callback(line_color: str) -> None:
     label_gwf_2014 = "\u201cGWF\u201d (2014)"
     label_gwf_2024 = "\u201cGWF\u201d (2024)"
     df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
-    print(df.style.format("{:.0%}").to_html())  # noqa: T201 # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+    print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
     # --8<-- [end:table]
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
