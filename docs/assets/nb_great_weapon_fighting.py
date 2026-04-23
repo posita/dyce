@@ -88,9 +88,9 @@ df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
 
 # %% editable=false jupyter={"source_hidden": true}
 # Display df as table
-# Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
 import jinja2  # noqa: F401
 
+# Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
 df.style.format("{:.0%}")  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
 # %%

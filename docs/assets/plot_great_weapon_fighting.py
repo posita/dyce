@@ -40,6 +40,7 @@ def fig_callback(line_color: str) -> None:
     df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
     # --8<-- [end:table]
 
+    # Display df as table
     import jinja2  # noqa: F401
 
     # NOTE: Translates to df.style.format("{:.0%}") in docs/assets/nb_great_weapon_fighting.py

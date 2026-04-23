@@ -106,7 +106,6 @@ results_by_action_mod = {
 }
 
 # %% editable=false
-import jinja2  # noqa: F401
 import pandas as pd
 
 data = [
@@ -127,6 +126,8 @@ df.index.name = "Action Modifier"
 
 # %% editable=false jupyter={"source_hidden": true}
 # Display df as table
+import jinja2  # noqa: F401
+
 # Translated from print(df.style.format("{:.2%}").to_html()) in plot_ironsworn.py
 df.style.format("{:.2%}")
 
