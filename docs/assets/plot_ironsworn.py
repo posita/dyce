@@ -53,7 +53,7 @@ def fig_callback(line_color: str) -> None:
             )
 
     action_mods = list(range(-1, 4))
-    results_by_action_mods = {
+    results_by_action_mod = {
         action_mod: expand(
             iron_dramatic_dependent_term, d6, p2d10, action_mod=action_mod
         )
@@ -73,15 +73,20 @@ def fig_callback(line_color: str) -> None:
                 IronDramaticResult
             ).probability_items()
         }
-        for result in results_by_action_mods.values()
+        for result in results_by_action_mod.values()
     ]
 
-    # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
-    categories = [v.name for v in IronDramaticResult]
-    df = pd.DataFrame(data, columns=categories, index=action_mods)
+    df = pd.DataFrame(
+        data,
+        # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+        columns=[v.name for v in IronDramaticResult],
+        index=action_mods,
+    )
     df.index.name = "Action Modifier"
-    df.style.format("{:.2%}")
     # --8<-- [end:table]
+
+    # NOTE: Translates to df.style.format("{:.2%}") in docs/assets/nb_ironsworn.py
+    print(df.style.format("{:.2%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz]

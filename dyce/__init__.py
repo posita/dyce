@@ -15,12 +15,11 @@
 
 r"""
 `#!python dyce` revolves around two core primitives.
-[`H` objects][dyce.h.H] are histograms (outcomes or individual dice).
-[`P` objects][dyce.p.P] are collections of histograms (pools).
+[`H` objects][dyce.H] are histograms (outcomes or individual dice).
+[`P` objects][dyce.P] are collections of histograms (pools).
 
 Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
 It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
-<!-- The [`dyce.r`](dyce.r.md) package provides scalars, histograms, pools, operators, etc. for assembling reusable roller trees. -->
 """
 
 from importlib.metadata import PackageNotFoundError, version

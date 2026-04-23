@@ -45,31 +45,35 @@ def name_from_path(path: str) -> str:
     return Path(path).stem
 
 
-def main(fig_callback: FigCallbackT) -> None:
+def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> None:
     import sys
     import warnings
 
+    import matplotlib as mpl
     from matplotlib import pyplot as plt
     from matplotlib import style
 
     from dyce.lifecycle import ExperimentalWarning
 
     warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    args = _PARSER.parse_args()
+    args = args or _PARSER.parse_args()
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(levelname)s: %(message)s",
     )
-    name = Path(sys.argv[0]).stem
     output_file = (
-        Path(f"{name}_{args.style}.png") if not args.output_file else args.output_file
+        Path(f"{Path(sys.argv[0]).stem}_{args.style}.png")
+        if not args.output_file
+        else args.output_file
     )
-    output_path = args.output_dir.joinpath(output_file)
+    output_path = args.output_dir.resolve().joinpath(output_file)
     line_color = "white" if args.style == "dark" else "black"
 
-    _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
+    plt.clf()
+    mpl.rcParams["svg.hashsalt"] = "42"
     style.use("bmh")
+    _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
     fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
-    plt.savefig(output_path, dpi=144, transparent=True)
+    plt.savefig(output_path, dpi=144, metadata={"Date": None}, transparent=True)
