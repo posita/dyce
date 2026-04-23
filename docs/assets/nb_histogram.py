@@ -32,7 +32,7 @@
 #
 # ## Basic visualization in [`dyce`](https://posita.github.io/dyce/)
 #
-# Select ``Run All Cells`` from the ``Run`` menu above.
+# Select `Run All Cells` from the `Run` menu above.
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary

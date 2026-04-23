@@ -32,7 +32,7 @@
 #
 # ## [`dyce`](https://posita.github.io/dyce/) translation of one example from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples)
 #
-# Select ``Run All Cells`` from the ``Run`` menu above.
+# Select `Run All Cells` from the `Run` menu above.
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary

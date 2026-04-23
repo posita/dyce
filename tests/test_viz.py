@@ -121,7 +121,7 @@ class TestPlotBar:
         assert ax is not None
 
     def test_labels_partial(self) -> None:
-        # labels shorter than hs — extra histograms get empty label
+        # Labels are shorter than hs, so extra histograms get empty an label
         ax = plot_bar(H(6), H(8), labels=["d6"])
         assert len(ax.containers) == 2
 

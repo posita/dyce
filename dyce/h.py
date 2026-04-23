@@ -1827,9 +1827,9 @@ def _convolve_fast(
     Each bit of `#!python n` corresponds to a power-of-two number of copies (1, 2, 4, 8, …), and the set bits tell us which powers to combine, exactly as binary addition works.
 
     Example: n=6 (binary 110)
-        - bit 1 (value 2): accumulate base²  into acc  →  acc = 2 copies
-        - bit 2 (value 4): accumulate base⁴  into acc  →  acc = 6 copies
-        Total: 2 squarings, 1 accumulation — vs. 5 steps linearly.
+        - bit 1 (value 2): accumulate base<sup>2</sup> into acc; acc = 2 copies
+        - bit 2 (value 4): accumulate base<sup>4</sup> into acc; acc = 6 copies
+        Total: 2 squares, 1 accumulation versus 5 steps linearly.
 
     Returns `!#python NotImplemented` if any convolution step does, so the caller can fall back to the linear approach.
     """
@@ -1893,7 +1893,7 @@ def _h_binary_callable(
     func: Callable[[Any, Any], Any],
 ) -> "dict[Any, int] | NotImplementedType":
     r"""
-    Cartesian product: for each `#!python (lhs_outcome, lhs_count)` × `#!python (rhs_outcome, rhs_count)`, compute `#!python func(lhs_outcome, rhs_outcome)` and accumulate `#!python lhs_count * rhs_count`.
+    Cartesian product: for each `#!python (lhs_outcome, lhs_count)` &times; `#!python (rhs_outcome, rhs_count)`, compute `#!python func(lhs_outcome, rhs_outcome)` and accumulate `#!python lhs_count * rhs_count`.
     Returns `#!python NotImplemented` immediately if *func* does.
     """
     result: dict[Any, int] = {}

@@ -6,11 +6,11 @@
 # software in any capacity.
 # ======================================================================================
 
-"""Notebook prerequisite installer.
+r"""
+Notebook prerequisite installer.
 
 Works in regular Jupyter (delegates to pip) and JupyterLite (delegates to piplite).
-Callers should ``await`` the result; IPython supports top-level ``await`` in both
-environments.
+Callers should `await` the result; IPython supports top-level `await` in both environments.
 """
 
 import importlib.util
@@ -23,12 +23,13 @@ get_ipython: Callable[[], Any]
 async def install_if_missing(
     *packages: "tuple[str, str] | tuple[str, str, str]",
 ) -> None:
-    """Install packages that are not already importable.
+    r"""
+    Install packages that are not already importable.
 
-    Each package is either a ``(import_name, install_spec)`` pair — the same spec is
-    used for both pip and piplite — or a ``(import_name, pip_spec, piplite_spec)``
-    triple for cases where the version specifier must differ between environments (e.g.
-    dev wheels whose local segment confuses piplite's version resolver).
+    Each package is either:
+
+    1. A `(import_name, install_spec)` pair (the same spec is used for both pip and piplite); or
+    2. A `(import_name, pip_spec, piplite_spec)` triple for cases where the version specifier must differ between environments (e.g. dev wheels whose local segment confuses piplite's version resolver).
     """
     try:
         import piplite  # type: ignore[missing-import] # pyrefly: ignore[missing-import] # ty: ignore[unresolved-import]

@@ -30,9 +30,9 @@
 # stale.
 # -->
 #
-# ## Modeling *[Risus](http://risusiverse.com/)* in [``dyce``](https://posita.github.io/dyce/)
+# ## Modeling *[Risus](http://risusiverse.com/)* in [`dyce`](https://posita.github.io/dyce/)
 #
-# Select ``Run All Cells`` from the ``Run`` menu above.
+# Select `Run All Cells` from the `Run` menu above.
 
 # %% editable=false jupyter={"source_hidden": true}
 # Install additional requirements if necessary
