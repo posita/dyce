@@ -95,7 +95,7 @@ H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 >>> from dyce.d import d6  # dyce.d contains some convenient shorthands
 >>> d6 == H(6)
 True
->>> 2 @ d6 * 3 - 4  # 2d6 × 3 - 4
+>>> 2 @ d6 * 3 - 4  # 2d6 * 3 - 4
 H({2: 1, 5: 2, 8: 3, 11: 4, 14: 5, 17: 6, 20: 5, 23: 4, 26: 3, 29: 2, 32: 1})
 >>> d6.lt(d6)  # how often a first six-sided die shows a face less than a second
 H({False: 21, True: 15})

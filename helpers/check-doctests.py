@@ -25,10 +25,10 @@ Subcommands::
 
   format [paths] [--suffixes EXT ...] [--log-level LEVEL]
 
-For ``check``, each file's ``>>>`` blocks are placed at their original line numbers in a temp buffer (blank everywhere else), so type checker errors reference correct locations without any remapping.
-The tool first attempts to parse each file with ``ast`` (text-only, no import); if that fails (e.g. for Markdown) it falls back to passing the raw content to ``DocTestParser``.
+For `check`, each file's `>>>` blocks are placed at their original line numbers in a temp buffer (blank everywhere else), so type checker errors reference correct locations without any remapping.
+The tool first attempts to parse each file with `ast` (text-only, no import); if that fails (e.g. for Markdown) it falls back to passing the raw content to `DocTestParser`.
 
-Type checker commands follow ``--`` and are separated from each other by additional ``--`` tokens.
+Type checker commands follow `--` and are separated from each other by additional `--` tokens.
 Each command receives the full list of synthesized temp files as trailing arguments.
 
 Examples::
@@ -37,14 +37,14 @@ Examples::
   helpers/check-doctests.py check dyce/ docs/ --no-fail-fast
   helpers/check-doctests.py format dyce/ docs/
 
-If no checker command is given after ``--``, the checker list is taken from ``pyproject.toml``; if absent there too, ``mypy`` is used as the default.
-If no paths are given, the file list is taken from ``git ls-files``.
+If no checker command is given after `--`, the checker list is taken from `pyproject.toml`; if absent there too, `mypy` is used as the default.
+If no paths are given, the file list is taken from `git ls-files`.
 
 When scanning directories, only files whose suffix appears in the active suffix list are processed.
-The built-in default is ``{".md", ".py", ".pyi"}``; override in ``pyproject.toml`` or via ``--suffixes`` (CLI wins).
+The built-in default is `{".md", ".py", ".pyi"}`; override in `pyproject.toml` or via `--suffixes` (CLI wins).
 Explicitly-named file arguments are never filtered by suffix.
 
-Defaults can be set in ``pyproject.toml`` under ``[tool.check_doctests]`` (shared) and ``[tool.check_doctests.check]`` (check-specific):
+Defaults can be set in `pyproject.toml` under `[tool.check_doctests]` (shared) and `[tool.check_doctests.check]` (check-specific):
 
 ```toml
 [tool.check_doctests]
@@ -58,7 +58,7 @@ fail_fast = false
 keep      = false
 ```
 
-CLI options always take precedence over ``pyproject.toml``, which takes precedence over the built-in defaults.
+CLI options always take precedence over `pyproject.toml`, which takes precedence over the built-in defaults.
 """
 
 import argparse
@@ -100,11 +100,11 @@ def _leading_blank_lines(s: str) -> int:
 
 def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.DocTest]]:
     r"""
-    Yield ``(doc_offset, dt)`` for every doctest block in *text*.
+    Yield `(doc_offset, dt)` for every doctest block in *text*.
 
-    First tries to locate docstrings via ``ast`` (text-only, no import).
-    Each docstring's ``doc_offset`` maps ``dt.examples[i].lineno`` to an absolute 0-based line number in the original file.
-    Falls back to passing the raw content to ``DocTestParser`` when ``ast.parse`` fails (e.g. for Markdown files), in which case ``doc_offset`` is always 0.
+    First tries to locate docstrings via `ast` (text-only, no import).
+    Each docstring's `doc_offset` maps `dt.examples[i].lineno` to an absolute 0-based line number in the original file.
+    Falls back to passing the raw content to `DocTestParser` when `ast.parse` fails (e.g. for Markdown files), in which case `doc_offset` is always 0.
     """
     parser = doctest.DocTestParser()
     kwargs: dict[str, Any] = {
@@ -170,8 +170,8 @@ def _synthesize_filepath(filepath: Path) -> str:
 
 
 def _synthesize_filepaths(tmp_dir: Path, filepaths: Iterable[Path]) -> dict[Path, Path]:
-    path_map: dict[Path, Path] = {}  # tmp_path → orig_path
-    seen_flat: dict[str, Path] = {}  # flat_name → first orig_path (collision detection)
+    path_map: dict[Path, Path] = {}  # tmp_path -> orig_path
+    seen_flat: dict[str, Path] = {}  # flat_name -> first orig_path (collisions)
 
     for filepath in filepaths:
         flat = _flat_name(filepath)
@@ -245,9 +245,9 @@ def _run_checkers(
 
 def _ruff_format(source: str) -> str | None:
     r"""
-    Format *source* through ``ruff format``.
+    Format *source* through `ruff format`.
 
-    Returns the formatted source, or ``None`` if ruff failed or the source is unchanged.
+    Returns the formatted source, or `None` if ruff failed or the source is unchanged.
     """
     normalized = source if source.endswith("\n") else source + "\n"
     result = subprocess.run(  # noqa: PLW1510
@@ -266,8 +266,8 @@ def _make_prefixed_lines(source: str, indent: int) -> list[str] | None:
     r"""
     Convert formatted Python *source* to doctest-prefixed lines.
 
-    Applies *indent* spaces before each ``>>>`` or ``...`` prompt.
-    Returns ``None`` if the formatted source contains blank lines between top-level statements, which would silently split the example into multiple interactions.
+    Applies *indent* spaces before each `>>>` or `...` prompt.
+    Returns `None` if the formatted source contains blank lines between top-level statements, which would silently split the example into multiple interactions.
     """
     lines = source.splitlines()
     if not lines:
@@ -299,9 +299,9 @@ def _format_filepath(filepath: Path) -> bool:
     r"""
     Format doctest examples in *filepath* in place.
 
-    Skips ``.py`` and ``.pyi`` files — use ``ruff format`` for those (it handles
-    docstring line-length adjustments natively via ``docstring-code-line-length``).
-    Returns ``True`` if the file was modified.
+    Skips `.py` and `.pyi` files.
+    Relies on `ruff format` for those, which handles docstring line-length adjustments natively via `docstring-code-line-length`.
+    Returns `True` if the file was modified.
     """
     if filepath.suffix in {".py", ".pyi"}:
         _LOGGER.debug(
@@ -420,12 +420,12 @@ def _load_toml_config(  # noqa: C901
     subcommand: str | None,
 ) -> tuple[dict[str, object], dict[str, object]]:
     r"""
-    Find and return ``[tool.check_doctests]`` from the nearest ``pyproject.toml``.
+    Find and return `[tool.check_doctests]` from the nearest `pyproject.toml`.
 
     Walks up from the current directory.
-    Returns ``({}, {})`` if no file is found or the section is absent.
+    Returns `({}, {})` if no file is found or the section is absent.
     Unknown or malformed keys are warned about and ignored.
-    The first element of the tuple contains shared keys (``paths``, ``suffixes``, ``log_level``); the second contains subcommand-specific keys (e.g. ``checkers``, ``fail_fast``, ``keep`` for ``check``).
+    The first element of the tuple contains shared keys (`paths`, `suffixes`, `log_level`); the second contains subcommand-specific keys (e.g. `checkers`, `fail_fast`, `keep` for `check`).
     """
     for parent in [Path.cwd(), *Path.cwd().parents]:
         candidate = parent / "pyproject.toml"

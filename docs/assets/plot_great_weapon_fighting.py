@@ -38,8 +38,12 @@ def fig_callback(line_color: str) -> None:
     label_gwf_2014 = "\u201cGWF\u201d (2014)"
     label_gwf_2024 = "\u201cGWF\u201d (2024)"
     df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
-    print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
     # --8<-- [end:table]
+
+    import jinja2  # noqa: F401
+
+    # NOTE: Translates to df.style.format("{:.0%}") in docs/assets/nb_great_weapon_fighting.py
+    print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
     # --8<-- [start:viz]
@@ -105,21 +109,21 @@ def fig_callback(line_color: str) -> None:
         ax_sa.legend()
     ax_sa.tick_params(axis="x", colors=line_color)
     ax_sa.tick_params(axis="y", colors=line_color)
-    ax_sa_gwf_2014.title.set_color(line_color)
     for text in ax_sa_gwf_2014.texts:
         text.set_color(line_color)
     for patch in ax_sa_gwf_2014.patches:
         patch.set_edgecolor(line_color)
-    ax_sa_gwf_2024.title.set_color(line_color)
+    ax_sa_gwf_2014.title.set_color(line_color)
     for text in ax_sa_gwf_2024.texts:
         text.set_color(line_color)
     for patch in ax_sa_gwf_2024.patches:
         patch.set_edgecolor(line_color)
-    ax_gwf_2014_2024.title.set_color(line_color)
+    ax_sa_gwf_2024.title.set_color(line_color)
     for text in ax_gwf_2014_2024.texts:
         text.set_color(line_color)
     for patch in ax_gwf_2014_2024.patches:
         patch.set_edgecolor(line_color)
+    ax_gwf_2014_2024.title.set_color(line_color)
 
 
 if __name__ == "__main__":

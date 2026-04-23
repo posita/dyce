@@ -348,7 +348,7 @@ class TestPOp:
         d3n_add_d2 = d3n + d2
         assert p_d2 + p_d3n == d2_add_d3n
         assert p_d2 + d3n == d2_add_d3n
-        assert d2 + p_d3n == d2_add_d3n  # H + P — exercises _flatten_to_h
+        assert d2 + p_d3n == d2_add_d3n  # H + P exercises _flatten_to_h
         assert p_d3n + p_d2 == d3n_add_d2
         assert p_d3n + d2 == d3n_add_d2
         assert d3n + p_d2 == d3n_add_d2  # H + P
@@ -770,11 +770,11 @@ class TestPH:
             assert from_h == from_rwc, f"mismatch for which={which}"
 
     def test_which_index_highest(self) -> None:
-        # Highest of 2d6 — known distribution
+        # Highest of 2d6 (known distribution)
         assert (2 @ P(6)).h(-1) == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
     def test_which_index_lowest(self) -> None:
-        # Lowest of 2d6 — mirror of highest
+        # Lowest of 2d6 (known distribution, mirrors highest)
         assert (2 @ P(6)).h(0) == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 
     def test_h_which_homogeneous(self) -> None:
@@ -894,7 +894,7 @@ class TestPRollsWithCounts:
         assert default == split
 
     def test_which_index_highest(self) -> None:
-        # highest of 3d6 — known distribution
+        # Highest of 3d6 (known distribution)
         highs = H.from_counts(
             (roll[0], count) for roll, count in (3 @ P(6)).rolls_with_counts(-1)
         )
@@ -979,7 +979,7 @@ class TestPRollsWithCounts:
         assert using_partial_selection.call_args_list == [
             call(4, H({-1: 1, 0: 1, 1: 1}), k=-1, fill=0)
         ]
-        # No outcomes — early-exit before _rwc_homogeneous_n_h_using_partial_selection
+        # No outcomes (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
         using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 0))
         assert using_partial_selection.call_args_list == []
         # 2 outcomes from right
@@ -992,7 +992,7 @@ class TestPRollsWithCounts:
         assert using_partial_selection.call_args_list == [
             call(4, H({-1: 1, 0: 1, 1: 1}), k=-3, fill=0)
         ]
-        # Off the deep end — early-exit before _rwc_homogeneous_n_h_using_partial_selection
+        # Off the deep end (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
         using_partial_selection = _rwc_validation_helper(p_4df, slice(5, 7))
         assert using_partial_selection.call_args_list == []
         using_partial_selection = _rwc_validation_helper(p_4df, slice(-7, -5))
@@ -1054,7 +1054,7 @@ class TestPRollsWithCounts:
             call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -1),
             call(3, H({1: 1, 2: 1, 3: 1}), -1),
         ]
-        # No outcomes — early-exit before _rwc_homogeneous_n_h_using_partial_selection
+        # No outcomes (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
         using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(0, 0))
         assert using_partial_selection.call_args_list == []
         # Non-contiguous
@@ -1074,7 +1074,7 @@ class TestPRollsWithCounts:
             call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 2),
             call(3, H({1: 1, 2: 1, 3: 1}), 2),
         ]
-        # Off the deep end — early-exit before _rwc_homogeneous_n_h_using_partial_selection
+        # Off the deep end (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
         using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(7, 9))
         assert using_partial_selection.call_args_list == []
         using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-9, -7))

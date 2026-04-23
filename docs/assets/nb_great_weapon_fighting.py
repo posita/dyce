@@ -32,7 +32,7 @@
 #
 # ## [`dyce`](https://posita.github.io/dyce/) translation of one example from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples)
 #
-# Select ``Run All Cells`` from the ``Run`` menu above.
+# Select `Run All Cells` from the `Run` menu above.
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary
@@ -85,7 +85,13 @@ label_sa = "Normal attack"
 label_gwf_2014 = "\u201cGWF\u201d (2014)"
 label_gwf_2024 = "\u201cGWF\u201d (2024)"
 df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
-print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+
+# %% editable=false jupyter={"source_hidden": true}
+# Display df as table
+# Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
+import jinja2  # noqa: F401
+
+df.style.format("{:.0%}")  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
 
 # %%
 from matplotlib import pyplot as plt

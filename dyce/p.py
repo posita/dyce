@@ -801,11 +801,11 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
 
     **Why this is fast**
 
-    Naïve enumeration visits every element of the Cartesian product of all dice faces — `#!math O\!\left(\prod_i |\text{faces}_i\right)` outcomes — and sorts each roll.
+    Naïve enumeration visits every element of the Cartesian product of all dice faces (`#!math O\!\left(\prod_i |\text{faces}_i\right)` outcomes) and sorts each roll.
     For `#!math P(d4, d6, d8, d10, d12, d20)` that is `#!math 4 \times 6 \times 8 \times 10 \times 12 \times 20 = 460{,}800` rolls.
 
     This function instead iterates over outcome *pairs* `#!math (a, b)` with `#!math a \le b` drawn from the union of all faces, and for each pair computes the count in `#!math O(n)` time using the inclusion-exclusion formula below.
-    Total work is `#!math O(|V|^2 \times n)` — roughly 190× faster for the example above (~2,400 ops).
+    Total work is `#!math O(|V|^2 \times n)`, which is roughly 190&times; faster for the example above (~2,400 ops).
 
     **Inclusion-exclusion formula**
 
@@ -826,7 +826,8 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     | `#!math N[a,b)`       | `#!math v \ge a`  | `#!math v < b`    | −    |
     | `#!math N(a,b)`       | `#!math v > a`    | `#!math v < b`    | +    |
 
-    This works because "min `#!math > a`" is equivalent to "all dice `#!math > a`", and "max `#!math < b`" is equivalent to "all dice `#!math < b`" — each constraint reduces to an "all-dice-in-interval" event, which factorises as a product over dice.
+    This works because "min `#!math > a`" is equivalent to "all dice `#!math > a`", and "max `#!math < b`" is equivalent to "all dice `#!math < b`".
+    Each constraint reduces to an "all-dice-in-interval" event, which factorises as a product over dice.
     That factorisation is what makes the formula `#!math O(n)` per pair rather than `#!math O(n^k)`.
 
     **Why this does not extend cleanly to lo > 1 or hi > 1**

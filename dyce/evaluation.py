@@ -254,9 +254,9 @@ def expand(
     For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument pe [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
     The return value controls how the branch contributes to the accumulation:
 
-    - **Scalar** — The outcome is recorded directly.
-    - **[`H`][dyce.H]** — The histogram is expanded in place, meaning its outcomes are merged into the accumulation with their counts scaled to preserve the correct proportions.
-    - **`#!python H({})` (the empty histogram)** — The branch is *eliminated*, meaning it contributes nothing to the accumulation and is silently discarded.
+    - **Scalar** - The outcome is recorded directly.
+    - **[`H`][dyce.H]** - The histogram is expanded in place, meaning its outcomes are merged into the accumulation with their counts scaled to preserve the correct proportions.
+    - **`#!python H({})` (the empty histogram)** - The branch is *eliminated*, meaning it contributes nothing to the accumulation and is silently discarded.
       This is the designated mechanism for signaling that an outcome is impossible or should be excluded from the result.
 
     This is useful for modeling mechanics where the outcome of one die affects how others are rolled
@@ -311,7 +311,7 @@ def expand(
     **Precision and recursion limiting**
 
     The *precision* parameter controls when recursive expansion is stopped automatically.
-    It represents the minimum path probability—the cumulative probability of reaching a branch—below which the callback is not invoked.
+    It represents the minimum path probability (the cumulative probability of reaching a branch) below which the callback is not invoked.
     Additionally, any branch that exceeds Python’s recursion limit is also dropped.
     In both cases, the branch is eliminated exactly as if the callback had returned `#!python H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.

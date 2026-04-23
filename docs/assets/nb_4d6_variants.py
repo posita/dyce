@@ -30,9 +30,9 @@
 # stale.
 # -->
 #
-# ## Modeling "[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)" in [``dyce``](https://posita.github.io/dyce/)
+# ## Modeling "[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)" in [`dyce`](https://posita.github.io/dyce/)
 #
-# Select ``Run All Cells`` from the ``Run`` menu above.
+# Select `Run All Cells` from the `Run` menu above.
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary
@@ -78,13 +78,22 @@ attr_results: dict[str, H] = {
 }
 
 # %%
-from dyce.viz import plot_line
+from matplotlib import pyplot as plt
+
+from dyce.viz import plot_burst, plot_line
 
 labels, hs = zip(*attr_results.items(), strict=True)
-ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
-ax.legend()
-ax.set_title("Comparing various take-three-of-4d6 methods")
 
-from matplotlib import pyplot as plt
+ax_lines = plt.subplot2grid((3, 3), (0, 0), colspan=3)
+plot_line(*hs, labels=labels, markers="Ds^*xo", ax=ax_lines)
+ax_lines.legend()
+ax_lines.set_title("Comparing various take-three-of-4d6 methods")
+
+for i, (label, h) in enumerate(attr_results.items()):
+    ax_burst = plt.subplot2grid((3, 3), (1 + i // 3, i % 3))
+    plot_burst(h, title=label, ax=ax_burst)
+    ax_burst.set_title(ax_burst.get_title(), wrap=True)
+
+plt.gcf().set_size_inches(9.6, 9.6)
 
 plt.tight_layout()

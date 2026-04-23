@@ -36,18 +36,34 @@ def fig_callback(line_color: str) -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
     # --8<-- [start:viz]
-    from dyce.viz import plot_line
+    from matplotlib import pyplot as plt
+
+    from dyce.viz import plot_burst, plot_line
 
     labels, hs = zip(*attr_results.items(), strict=True)
-    ax = plot_line(*hs, labels=labels, markers="Ds^*xo")
-    ax.set_title("Comparing various take-three-of-4d6 methods")
-    ax.legend()
+
+    ax_lines = plt.subplot2grid((3, 3), (0, 0), colspan=3)
+    plot_line(*hs, labels=labels, markers="Ds^*xo", ax=ax_lines)
+    ax_lines.legend()
+    ax_lines.set_title("Comparing various take-three-of-4d6 methods")
+
+    for i, (label, h) in enumerate(attr_results.items()):
+        ax_burst = plt.subplot2grid((3, 3), (1 + i // 3, i % 3))
+        plot_burst(h, title=label, ax=ax_burst)
+        ax_burst.set_title(ax_burst.get_title(), wrap=True)
+
+    plt.gcf().set_size_inches(9.6, 9.6)
     # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
-    ax.tick_params(axis="x", colors=line_color)
-    ax.tick_params(axis="y", colors=line_color)
-    ax.title.set_color(line_color)
+    for ax in plt.gcf().get_axes():
+        ax.tick_params(axis="x", colors=line_color)
+        ax.tick_params(axis="y", colors=line_color)
+        for text in ax.texts:
+            text.set_color(line_color)
+        for patch in ax.patches:
+            patch.set_edgecolor(line_color)
+        ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
