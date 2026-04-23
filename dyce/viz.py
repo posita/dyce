@@ -298,7 +298,8 @@ def plot_burst(
 
     The inner ring represents *h* and the outer ring represents *compare*.
     When *compare* is `#!python None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.
-    When *compare* differs from *h*, both rings default to labelling outcomes — useful for comparing two related distributions side-by-side in a single visual.
+    When *compare* differs from *h*, both rings default to labelling outcomes
+    This is useful for comparing two related distributions side-by-side in a single visual.
 
     Wedge labels are suppressed when the probability is below `#!python Fraction(1, 32)` (~3.1%) to avoid clutter.
 
@@ -390,6 +391,8 @@ def plot_burst(
         wedgeprops={"width": 0.5},
     )
     ax.set(aspect="equal")
+    for patch in ax.patches:
+        patch.set_edgecolor(mpl.rcParams["text.color"])
 
     return ax
 

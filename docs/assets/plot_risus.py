@@ -8,11 +8,15 @@
 
 # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
 # --8<-- [start:base]
+import warnings
 from collections.abc import Callable, Sequence
 from enum import IntEnum
 
 from dyce import H
 from dyce.d import d6
+from dyce.lifecycle import ExperimentalWarning
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 VersusFuncT = Callable[[int, int], H["Versus"]]
 
