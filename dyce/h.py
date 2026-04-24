@@ -14,7 +14,6 @@
 # ======================================================================================
 
 import math
-import operator
 import os
 import warnings
 from abc import abstractmethod
@@ -52,6 +51,8 @@ import optype as ot
 from . import rng
 from .lifecycle import deprecated, experimental
 from .types import (
+    Sentinel,
+    SentinelT,
     lossless_int,
     lossless_int_or_not_implemented,
     natural_key,
@@ -376,9 +377,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         for source in sources:
             if isinstance(source, Mapping):
                 # TODO(posita): # noqa: TD003 - See:
-                # * <https://github.com/astral-sh/ty/issues/3249>
-                # * <https://github.com/facebook/pyrefly/issues/3106>
-                # * <https://github.com/microsoft/pyright/issues/11377>
+                # - <https://github.com/astral-sh/ty/issues/3249>
+                # - <https://github.com/facebook/pyrefly/issues/3106>
+                # - <https://github.com/microsoft/pyright/issues/11377>
                 source = cast("ItemsView[_T, SupportsInt]", source.items())  # noqa: PLW2901
             for outcome, count in source:
                 c[outcome] += lossless_int(count)
@@ -434,7 +435,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
     @overload
-    # See: <https://github.com/jorenham/optype/discussions/574>
+    # See <https://github.com/jorenham/optype/discussions/574>
     def __matmul__(
         self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
     ) -> "H[int]": ...
@@ -476,7 +477,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __add__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__add__", "__radd__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__add__", "__radd__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -504,7 +509,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __sub__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__sub__", "__rsub__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__sub__", "__rsub__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__sub__", "__rsub__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -532,7 +541,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __mul__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__mul__", "__rmul__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__mul__", "__rmul__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__mul__", "__rmul__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -564,7 +577,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __truediv__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__truediv__", "__rtruediv__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__truediv__", "__rtruediv__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__truediv__", "__rtruediv__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -596,7 +613,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __floordiv__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__floordiv__", "__rfloordiv__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(
+                    lhs, "__floordiv__", "__rfloordiv__", rhs
+                ),
+            )
         else:
             result = _map_opname_fwd(self._h, "__floordiv__", "__rfloordiv__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -624,7 +647,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __mod__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__mod__", "__rmod__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__mod__", "__rmod__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__mod__", "__rmod__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -652,7 +679,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __pow__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__pow__", "__rpow__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__pow__", "__rpow__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__pow__", "__rpow__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -682,7 +713,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __lshift__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__lshift__", "__rlshift__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__lshift__", "__rlshift__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__lshift__", "__rlshift__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -712,7 +747,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __rshift__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__rshift__", "__rrshift__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__rshift__", "__rrshift__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__rshift__", "__rrshift__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -740,7 +779,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __and__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__and__", "__rand__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__and__", "__rand__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__and__", "__rand__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -768,7 +811,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __or__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__or__", "__ror__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__or__", "__ror__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__or__", "__ror__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -796,7 +843,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __xor__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
-            result = _h_binary_opname(self._h, rhs._h, "__xor__", "__rxor__")
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__xor__", "__rxor__", rhs),
+            )
         else:
             result = _map_opname_fwd(self._h, "__xor__", "__rxor__", rhs)
         return NotImplemented if result is NotImplemented else H(result)
@@ -808,7 +859,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
     @overload
-    # See: <https://github.com/jorenham/optype/discussions/574>
+    # See <https://github.com/jorenham/optype/discussions/574>
     def __rmatmul__(
         self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
     ) -> "H[int]": ...
@@ -955,14 +1006,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def lt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.lt, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_lt, rhs)`.
 
             >>> H(20).lt(10)
             H({False: 11, True: 9})
             >>> H(6).lt(H(10)).lowest_terms()
             H({False: 7, True: 13})
         """
-        return self.apply(operator.lt, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+        return self.apply(ot.do_lt, rhs)  # type: ignore[arg-type]
 
     @overload
     def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -970,14 +1021,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def le(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.le, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_le, rhs)`.
 
             >>> H(20).le(10)
             H({False: 10, True: 10})
             >>> H(6).le(H(10)).lowest_terms()
             H({False: 1, True: 3})
         """
-        return self.apply(operator.le, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+        return self.apply(ot.do_le, rhs)  # type: ignore[arg-type]
 
     @overload
     def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -985,14 +1036,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def eq(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.eq, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_eq, rhs)`.
 
             >>> H(20).eq(10)
             H({False: 19, True: 1})
             >>> H(6).eq(H(10)).lowest_terms()
             H({False: 9, True: 1})
         """
-        return self.apply(operator.eq, rhs)
+        return self.apply(ot.do_eq, rhs)
 
     @overload
     def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1000,14 +1051,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ne(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.ne, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_ne, rhs)`.
 
             >>> H(20).ne(10)
             H({False: 1, True: 19})
             >>> H(6).ne(H(10)).lowest_terms()
             H({False: 1, True: 9})
         """
-        return self.apply(operator.ne, rhs)
+        return self.apply(ot.do_ne, rhs)
 
     @overload
     def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1015,14 +1066,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ge(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.ge, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_ge, rhs)`.
 
             >>> H(20).ge(10)
             H({False: 9, True: 11})
             >>> H(6).ge(H(10)).lowest_terms()
             H({False: 13, True: 7})
         """
-        return self.apply(operator.ge, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+        return self.apply(ot.do_ge, rhs)  # type: ignore[arg-type]
 
     @overload
     def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1030,14 +1081,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def gt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(operator.gt, rhs)`.
+        Shorthand for `#!python self.apply(optype.do_gt, rhs)`.
 
             >>> H(20).gt(10)
             H({False: 10, True: 10})
             >>> H(6).gt(H(10)).lowest_terms()
             H({False: 3, True: 1})
         """
-        return self.apply(operator.gt, rhs)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+        return self.apply(ot.do_gt, rhs)  # type: ignore[arg-type]
 
     # ---- Unary operators -------------------------------------------------------------
 
@@ -1116,13 +1167,18 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def apply(
         self: "H[_T]",
         func: Callable[[_T, _OtherT], _ResultT],
-        other: "H[_T] | object",
+        other: "H[_OtherT]",
+    ) -> "H[_ResultT]": ...
+    @overload
+    def apply(
+        self: "H[_T]",
+        func: Callable[[_T, _OtherT], _ResultT],
+        other: _OtherT,
     ) -> "H[_ResultT]": ...
     def apply(
         self: "H[_T]",
         func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT],
-        # TODO(posita): # noqa: TD003 - Do we need a better sentinel value than None?
-        other: "H[_T] | object | None" = None,
+        other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
     ) -> "H[_ResultT]":
         r"""
         Return a new [`H`][dyce.H] by applying *func* to outcomes.
@@ -1204,7 +1260,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             >>> ((d3_2 + 1) % 2) == d3_2_is_even
             True
         """
-        if other is None:
+        if other is Sentinel:
             result: dict[_ResultT, int] = {}
             func = cast("Callable[[_T], _ResultT]", func)
             for outcome, count in self._h.items():
@@ -1546,7 +1602,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
            -- END MONKEY PATCH -->
 
-        TODO(posita): # noqa: TD003 - Complete this description.
+        Returns a new histogram with a possibly substituted outcome.
+        If *repl* is a single outcome, it will replace *existing_outcome* directly (if *existing_outcome* exists in the original histogram).
+        If *repl* is a histogram, its outcomes will be “folded in”, together making up the same proportion of the total as the replaced outcome.
 
             >>> d6 = H(6)
             >>> d6.replace(6, 1_000)
@@ -1560,6 +1618,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             >>> once_exploded_d6 = d6.replace(6, d6 + 6)
             >>> once_exploded_d6
             H({1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1})
+
+        One way to “explode” a die `#!math n` times:
 
             >>> def explode_n_by_replacement(h: H[int], n: int) -> H[int]:
             ...     max_h = max(h)
@@ -1700,7 +1760,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         return _order_stat_at_pos
 
 
-@nobeartype
+@nobeartype  # not decoratable by beartype (avoids warning)
 @runtime_checkable
 class HableT(Protocol[_T_co]):
     r"""
@@ -1840,13 +1900,21 @@ def _convolve_fast(
             if acc is None:
                 acc = dict(base)
             else:
-                new_acc = _h_binary_opname(acc, base, "__add__", "__radd__")
+                new_acc = _h_binary_callable(
+                    acc,
+                    base,
+                    lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+                )
                 if new_acc is NotImplemented:
                     return NotImplemented  # pragma: no cover
                 acc = new_acc
         n >>= 1
         if n:
-            new_base = _h_binary_opname(base, base, "__add__", "__radd__")
+            new_base = _h_binary_callable(
+                base,
+                base,
+                lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+            )
             if new_base is NotImplemented:
                 return NotImplemented
             base = new_base
@@ -1865,7 +1933,11 @@ def _convolve_linear(
     """
     result: dict[Any, int] = dict(mapping)
     for _ in range(1, n):
-        new_result = _h_binary_opname(result, mapping, "__add__", "__radd__")
+        new_result = _h_binary_callable(
+            result,
+            mapping,
+            lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+        )
         if new_result is NotImplemented:
             return NotImplemented
         result = new_result
@@ -1905,22 +1977,6 @@ def _h_binary_callable(
             return NotImplemented
         result[new_outcome] = result.get(new_outcome, 0) + lhs_count * rhs_count
     return result
-
-
-def _h_binary_opname(
-    lhs_mapping: Mapping[Any, int],
-    rhs_mapping: Mapping[Any, int],
-    op_name: str,
-    rop_name: str,
-) -> "dict[Any, int] | NotImplementedType":
-    r"""
-    Cartesian product via dunder dispatch: delegates to [`_h_binary_callable`][dyce.h._h_binary_callable] with [`_apply_opname`][dyce.h._apply_opname] as the function.
-    """
-    return _h_binary_callable(
-        lhs_mapping,
-        rhs_mapping,
-        lambda lhs, rhs: _apply_opname(lhs, op_name, rop_name, rhs),
-    )
 
 
 def _h_unary_opname(

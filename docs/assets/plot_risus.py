@@ -92,18 +92,26 @@ from matplotlib import pyplot as plt
 from pandas import Index
 
 
-def vs_scenarios_dataframes(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def vs_scenarios_dataframes(  # type: ignore[no-redef]
     us_vs_them_func: VersusFuncT,
     *,
     our_pool_rel_sizes: Sequence[int] = tuple(range(-1, 2)),
     their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
+    # The explicit type hint here is apparently needed by mypy for properly resolving
+    # the call to h_vs.merge below. ty does not issue a warning, but still incorrectly
+    # resolves the type of h_vs to H[Never] despite the explicit hint.
+    # TODO(posita): # noqa: TD003 - See:
+    # - <https://github.com/python/mypy/issues/21317>
+    # - <https://github.com/astral-sh/ty/issues/3330>
+    h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
             our_pool_size = their_pool_size + our_pool_rel_size
-            us_vs_them_results = H(Versus).merge(
+            us_vs_them_results = h_vs.merge(
                 us_vs_them_func(our_pool_size, their_pool_size)
             )
             data[f"{our_pool_size}d6"] = {
@@ -121,7 +129,8 @@ def vs_scenarios_dataframes(
     return vs_dfs
 
 
-def us_vs_them_heatmap_subplot(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
     vs_dfs: ScenariosDataframesT,
     cmap_name: str = "viridis",
     plt_total_rows: int = 1,
@@ -404,7 +413,8 @@ if TYPE_CHECKING:
 
 # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
 # --8<-- [start:viz-multi-round-goliath-helper-detail]
-def viz_multi_round_goliath_helper(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
     single_round_goliath_func: VersusFuncGoliathT,
 ) -> Sequence[Axes]:
     from functools import partial
@@ -518,7 +528,7 @@ d_evens_up_raw = H(
 )
 d_evens_up_raw_exploded = (
     explode_n(
-        d_evens_up_raw,
+        cast("H[int]", d_evens_up_raw),
         n=3,  # plenty deep for our needs
     )
     + 0  # make sure everything is an int
@@ -640,37 +650,3 @@ if __name__ == "__main__":
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
             f.write(d_evens_up.format(width=65, scaled=True) + os.linesep)
-
-
-# TODO(posita): # noqa: TD003 - Maybe eliminate the tables, since the heat maps are
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
-# --8<-- [start:table]
-import os
-from collections.abc import Iterator
-
-import jinja2  # noqa: F401
-
-if TYPE_CHECKING:
-
-    def us_vs_them_table_html(vs_dfs: ScenariosDataframesT) -> str: ...
-
-
-def us_vs_them_table_html(vs_dfs: ScenariosDataframesT) -> str:
-    def _html_gen() -> Iterator[str]:
-        for df in vs_dfs:
-            df = df.copy()  # noqa: PLW2901
-            df.index = Index(
-                data=[f"our\n {idx} …" for idx in df.index],
-                dtype=df.index.dtype,
-                name=f"… vs. their {df.index.name}",
-            )
-            yield df.style.format("{:.0%}").to_html()  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
-
-    return os.linesep.join(_html_gen())
-
-
-# basically the same thing?
-vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
-us_vs_them_table_html(vs_dfs)
-
-# --8<-- [end:table]

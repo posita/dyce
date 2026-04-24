@@ -40,7 +40,7 @@ from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: 
     install_if_missing,
 )
 
-await install_if_missing(  # pyright: ignore # pyrefly: ignore[invalid-syntax] # noqa: PGH003
+await install_if_missing(  # type: ignore[top-level-await] # noqa: PGH003
     ("dyce", "dyce~=0.7.0", "dyce"),  # piplite_spec omits version (local wheel)
 )
 
@@ -115,7 +115,7 @@ if TYPE_CHECKING:
         cmap_name: str = "viridis",
         plt_total_rows: int = 1,
         plt_cur_row: int = 0,
-    ) -> list[Axes]: ...
+    ) -> Sequence[Axes]: ...
 
 
 # %% editable=false jupyter={"source_hidden": true}
@@ -127,18 +127,26 @@ from matplotlib import pyplot as plt
 from pandas import Index
 
 
-def vs_scenarios_dataframes(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def vs_scenarios_dataframes(  # type: ignore[no-redef]
     us_vs_them_func: VersusFuncT,
     *,
     our_pool_rel_sizes: Sequence[int] = tuple(range(-1, 2)),
     their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
+    # The explicit type hint here is apparently needed by mypy for properly resolving
+    # the call to h_vs.merge below. ty does not issue a warning, but still incorrectly
+    # resolves the type of h_vs to H[Never] despite the explicit hint.
+    # TODO(posita): # noqa: TD003 - See:
+    # - <https://github.com/python/mypy/issues/21317>
+    # - <https://github.com/astral-sh/ty/issues/3330>
+    h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
             our_pool_size = their_pool_size + our_pool_rel_size
-            us_vs_them_results = H(Versus).merge(
+            us_vs_them_results = h_vs.merge(
                 us_vs_them_func(our_pool_size, their_pool_size)
             )
             data[f"{our_pool_size}d6"] = {
@@ -156,12 +164,13 @@ def vs_scenarios_dataframes(
     return vs_dfs
 
 
-def us_vs_them_heatmap_subplot(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
     vs_dfs: ScenariosDataframesT,
     cmap_name: str = "viridis",
     plt_total_rows: int = 1,
     plt_cur_row: int = 0,
-) -> list[Axes]:
+) -> Sequence[Axes]:
     axes: list[Axes] = []
     col_names = [e.name for e in Versus]
     cmap = mpl.colormaps[cmap_name]
@@ -411,7 +420,8 @@ if TYPE_CHECKING:
 
 # %% editable=false jupyter={"source_hidden": true}
 # Visualization Goliath Rule helper source code
-def viz_multi_round_goliath_helper(
+# See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
+def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
     single_round_goliath_func: VersusFuncGoliathT,
 ) -> Sequence[Axes]:
     from functools import partial
@@ -512,7 +522,7 @@ d_evens_up_raw: H[EvensUp] = H(
 )
 d_evens_up_raw_exploded = (
     explode_n(
-        d_evens_up_raw,
+        cast("H[int]", d_evens_up_raw),
         n=3,  # plenty deep for our needs
     )
     + 0  # make sure everything is an int

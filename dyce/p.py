@@ -32,7 +32,15 @@ from typing import (
 
 from .h import H, sum_h
 from .hable import HableOpsMixin
-from .types import GetItemT, getitems, lossless_int, natural_key, nobeartype
+from .types import (
+    GetItemT,
+    Sentinel,
+    SentinelT,
+    getitems,
+    lossless_int,
+    natural_key,
+    nobeartype,
+)
 
 __all__ = ("P", "RollCountT", "RollProbT", "RollT")
 
@@ -307,15 +315,22 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def apply(
         self: "P[_T]",
         func: Callable[[_T, _OtherT], _ResultT],
-        other: "P[_T] | object",
+        other: "H[_OtherT]",
+        *,
+        apply_to_each: bool = False,
+    ) -> "P[_ResultT]": ...
+    @overload
+    def apply(
+        self: "P[_T]",
+        func: Callable[[_T, _OtherT], _ResultT],
+        other: _OtherT,
         *,
         apply_to_each: bool = False,
     ) -> "P[_ResultT]": ...
     def apply(
         self: "P[_T]",
         func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT],
-        # TODO(posita): # noqa: TD003 - Do we need a better sentinel value than None?
-        other: "P[_T] | object | None" = None,
+        other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
         *,
         apply_to_each: bool = False,
     ) -> "P[_ResultT]":
@@ -337,7 +352,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         def _gen_hs() -> Iterator[H[_ResultT]]:
             for h, count in _gen_apply_to_each() if apply_to_each else _gen_by_group():
-                new_h = h.apply(func, other)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+                new_h = h.apply(func, other)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
                 yield from (new_h for _ in range(count))
 
         return P(*_gen_hs())
@@ -790,7 +805,6 @@ def _rwc_heterogeneous_h_groups(
         yield sorted_roll, total_count
 
 
-# TODO(posita): # noqa: TD003 - Maybe break this up at some point?
 def _rwc_heterogeneous_extremes(  # noqa: C901
     groups: Iterable[tuple[H[_T], int]],
     lo: int,
@@ -849,11 +863,6 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     all_outcomes = list(all_outcome_set)
     try:
         all_outcomes.sort()
-        # TODO(posita): # noqa: TD003 - Is this true? Does this need to be everywhere we do sorting?
-        # Verify comparability (sorted may silently accept non-comparable types when the
-        # set happens to be ordered by identity hash)
-        if len(all_outcomes) >= 2:
-            _ = all_outcomes[0] <= all_outcomes[1]  # pragma: no cover
         use_natural = False
     except TypeError:
         all_outcomes.sort(key=natural_key)

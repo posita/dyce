@@ -17,7 +17,7 @@ import operator
 import re
 from collections.abc import Iterable, Iterator, Sequence
 from types import NotImplementedType  # noqa: TC003
-from typing import SupportsIndex, SupportsInt, TypeVar
+from typing import Any, SupportsIndex, SupportsInt, TypeVar
 
 __all__ = (
     "GetItemT",
@@ -53,6 +53,26 @@ except ImportError:  # pragma: no cover
 
 
 GetItemT = SupportsIndex | slice
+
+
+class SentinelT:
+    r"""
+    Singleton to serve as a sentinel value where other built-in objects (e.g., `#!python None`) would not, because they represent legitimate values in the context.
+
+    >>> from dyce.types import Sentinel, SentinelT
+    >>> SentinelT() is Sentinel
+    True
+    """
+
+    _singleton: "SentinelT | None" = None
+
+    def __new__(cls, *_: Any, **__: Any) -> "SentinelT":  # noqa: ANN401, PYI034
+        if cls._singleton is None:
+            cls._singleton = super().__new__(cls)
+        return cls._singleton
+
+
+Sentinel = SentinelT()
 
 
 def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterator[_T]:

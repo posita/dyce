@@ -44,7 +44,7 @@ def fig_callback(line_color: str) -> None:
     import jinja2  # noqa: F401
 
     # NOTE: Translates to df.style.format("{:.0%}") in docs/assets/nb_great_weapon_fighting.py
-    print(df.style.format("{:.0%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+    print(df.style.format("{:.0%}").to_html())
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
     # --8<-- [start:viz]

@@ -255,6 +255,7 @@ Other works include:
 - [lea](https://pypi.org/project/lea/) by Pierre Denis
 - [dice](https://pypi.org/project/dice/) by Sam Clements
 - [ossuary](https://github.com/bszonye/ossuary) by B. Szonye
+- [PythonDice](https://github.com/Ar-Kareem/PythonDice) by Ar-Kareem
 - [dice-notation](https://pypi.org/project/dice-notation/) by Bernardo Martinez Garrido
 - Avrae’s [d20](https://pypi.org/project/d20/) by Andrew Zhu
 - [python-dice](https://pypi.org/project/python-dice/) by Mark Robson

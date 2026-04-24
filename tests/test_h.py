@@ -13,12 +13,12 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+import contextlib
 import itertools
 import math
 import operator
 import statistics
 import warnings
-from contextlib import suppress
 from decimal import Decimal
 from fractions import Fraction
 from unittest.mock import patch
@@ -43,7 +43,7 @@ _OUTCOME_TYPES: tuple[type, ...] = (
     Fraction,
 )
 
-with suppress(ImportError):
+with contextlib.suppress(ImportError):
     import numpy as np
 
     _OUTCOME_TYPES += (
@@ -51,7 +51,7 @@ with suppress(ImportError):
         np.float128,
     )
 
-with suppress(ImportError):
+with contextlib.suppress(ImportError):
     import sympy  # type: ignore[import-untyped]
 
     _OUTCOME_TYPES += (
@@ -296,7 +296,7 @@ class TestHAdd:
         assert frac_int_result == H({Fraction(3, 2): 2, Fraction(5, 2): 1})
 
         # TODO(posita): # noqa: TD003 - This should not need any ignore comments
-        frac_float_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1.5  # type: ignore[operator] # pyrefly: ignore[unsupported-operation]
+        frac_float_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1.5  # type: ignore[operator]
         assert frac_float_result == H({Fraction(2): 2, Fraction(3): 1})
 
     def test_scalar_ref(self) -> None:
