@@ -80,7 +80,6 @@ class TestRngNumpy:
             _test_randbytes_w_seed_helper(rng, seed, randbytes)
 
 
-# TODO(posita): # noqa: TD003 - Work this into our tox configuration
 @pytest.mark.skipif(
     find_spec("numpy") is not None,
     reason="requires numpy not be installed",

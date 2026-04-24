@@ -35,7 +35,7 @@ dev = [
     {include-group = "viz"},
 ]
 docs = [
-    "click>=8.3.2",  # See <https://github.com/mkdocs/mkdocs/issues/4032>
+    "click>=8.3.2",  # see <https://github.com/mkdocs/mkdocs/issues/4032>
     "griffe-warnings-deprecated",
     "jupyter-server",
     "jupyterlab-server",
@@ -50,15 +50,21 @@ docs = [
     "mkdocstrings[python]",
     "numpy",
     "pandas",
+    "pandas-stubs",
     "pymdown-extensions",
     "sympy",
+    {include-group = "viz"},
 ]
 lint = [
+    "beartype",
+    "matplotlib_inline",
     "mypy",
     "pyrefly",
     "pyright",
+    "pytest",
     "ruff",
     "ty",
+    {include-group = "docs"},
 ]
 test = [
     "beartype",
@@ -94,8 +100,10 @@ branch = true
 show_missing = true
 
 [tool.mypy]
-# TODO(posita): add "docs" once there are .py files there
-files = ["dyce", "helpers", "tests", "*.py"]
+files = ["docs", "dyce", "helpers", "tests", "*.py"]
+# exclude = """(?x)(
+#     ^docs/assets/nb_.*\\.py$
+# )"""
 python_version = "3.11"
 exclude_gitignore = true
 warn_redundant_casts = true

@@ -562,7 +562,7 @@ def explode_n(
        -- END MONKEY PATCH -->
     """
 
-    @nobeartype
+    @nobeartype  # not decoratable by beartype (avoids warning)
     def _callback(result: HResult[_T], *, n_left: int) -> H[_T] | _T:
         if n_left <= 0:
             return result.outcome

@@ -78,7 +78,7 @@ def fig_callback(line_color: str) -> None:
 
     df = pd.DataFrame(
         data,
-        # TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+        # TODO(posita): <https://github.com/pandas-dev/pandas/issues/54386>
         columns=[v.name for v in IronDramaticResult],
         index=action_mods,
     )
@@ -89,7 +89,7 @@ def fig_callback(line_color: str) -> None:
     import jinja2  # noqa: F401
 
     # NOTE: Translates to df.style.format("{:.2%}") in docs/assets/nb_ironsworn.py
-    print(df.style.format("{:.2%}").to_html())  # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+    print(df.style.format("{:.2%}").to_html())
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz]

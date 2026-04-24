@@ -76,4 +76,9 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
-    plt.savefig(output_path, dpi=144, metadata={"Date": None}, transparent=True)
+    plt.savefig(
+        output_path,
+        dpi=144,
+        metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
+        transparent=True,
+    )

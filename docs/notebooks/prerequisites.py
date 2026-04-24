@@ -32,7 +32,7 @@ async def install_if_missing(
     2. A `(import_name, pip_spec, piplite_spec)` triple for cases where the version specifier must differ between environments (e.g. dev wheels whose local segment confuses piplite's version resolver).
     """
     try:
-        import piplite  # type: ignore[missing-import] # pyrefly: ignore[missing-import] # ty: ignore[unresolved-import]
+        import piplite  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
 
         in_piplite = True
     except ImportError:
@@ -51,7 +51,7 @@ async def install_if_missing(
         for spec in to_install:
             await piplite.install(spec, keep_going=True)  # pyrefly: ignore[unbound-name]
     else:
-        get_ipython().run_line_magic(  # type: ignore[name-defined] # noqa: F821
+        get_ipython().run_line_magic(  # noqa: F821
             "pip",
             "install --quiet " + " ".join(f"'{s}'" for s in to_install),
         )
