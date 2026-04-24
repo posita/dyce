@@ -40,6 +40,7 @@ markdown_extensions:
       linenums: true
   - pymdownx.inlinehilite:
       custom_inline:
+        # Support `#!math ...` inline syntax
         - name: math
           class: arithmatex
           format: !!python/object/apply:pymdownx.arithmatex.arithmatex_inline_format {kwds: {mode: generic}}
@@ -48,15 +49,10 @@ markdown_extensions:
       check_paths: true
   - pymdownx.superfences:
       custom_fences:
-        # TODO(posita): This is supposed to support inline syntax like `#!math ...`, but
-        # it doesn't work. See
-        # <https://facelessuser.github.io/pymdown-extensions/about/releases/9.0/#arithmatex>.
+        # Support ```#!math ...``` fence syntax
         - name: math
           class: arithmatex
-          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: 'generic', tag: 'pre'}}
-          #   kwds:
-          #     mode: generic
-          #     tag: pre
+          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: generic, tag: pre}}
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tilde

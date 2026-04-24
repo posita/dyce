@@ -40,7 +40,7 @@ from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: 
     install_if_missing,
 )
 
-await install_if_missing(  # pyright: ignore # pyrefly: ignore[invalid-syntax] # noqa: PGH003
+await install_if_missing(  # type: ignore[top-level-await] # noqa: PGH003
     ("dyce", "dyce~=0.7.0", "dyce"),  # piplite_spec omits version (local wheel)
 )
 
@@ -116,7 +116,7 @@ data = [
     for result in results_by_action_mod.values()
 ]
 
-# TODO(posita): See <https://github.com/pandas-dev/pandas/issues/54386>
+# TODO(posita): <https://github.com/pandas-dev/pandas/issues/54386>
 df = pd.DataFrame(
     data,
     columns=[v.name for v in IronDramaticResult],
