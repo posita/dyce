@@ -23,6 +23,8 @@ from itertools import product as iproduct
 from math import prod
 from typing import Any, Generic, NamedTuple, TypeVar, cast, overload
 
+import optype as ot
+
 from dyce.types import natural_key, nobeartype
 
 from .h import H
@@ -35,6 +37,7 @@ _T = TypeVar("_T")
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 _T3 = TypeVar("_T3")
+_OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 
 
@@ -414,7 +417,7 @@ def expand(
     try:
         cur_ctxt = _expand_ctxt.get()
     except LookupError:
-        # TODO(posita): https://github.com/astral-sh/ty/issues/2278 - try the
+        # TODO(posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
         # @experimental decorator instead once that issue is fixed
         warnings.warn(experimental_msg % "expand", ExperimentalWarning, stacklevel=2)
         cur_ctxt = _ExpandContext(
@@ -485,18 +488,20 @@ def _explode_on_max(result: HResult[_T], _n_left: int, _n_done: int) -> H[_T] | 
 
 @experimental
 def explode_n(
-    source: H[_T],
+    source: H[ot.CanAdd[_OtherT, _ResultT]],
     *,
     n: int = 1,
     precision: Fraction = Fraction(0),
-    resolver: Callable[[HResult[_T], int, int], H[_T] | _T] = _explode_on_max,
-) -> H[_T]:
+    resolver: Callable[
+        [HResult[_ResultT], int, int], H[_ResultT] | _ResultT
+    ] = _explode_on_max,
+) -> H[_ResultT]:
     r"""
     <!-- BEGIN MONKEY PATCH --
     >>> import warnings
     >>> from dyce.lifecycle import ExperimentalWarning
     >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    >>> import sympy  # type: ignore [import-untyped]
+    >>> import sympy  # type: ignore[import-untyped]
 
        -- END MONKEY PATCH -->
 
@@ -513,9 +518,11 @@ def explode_n(
 
         >>> import sympy
         >>> x = sympy.sympify("x")
-        >>> explode_n(H({x: 1}), n=0)  # zero explosions is the starting roll
+        >>> # Zero explosions is the starting roll
+        >>> explode_n(H({x: 1}), n=0)  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
         H({x: 1})
-        >>> explode_n(H({x: 1}), n=2)  # starting roll with up to two explosions
+        >>> # Starting roll with up to two explosions
+        >>> explode_n(H({x: 1}), n=2)  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
         H({3*x: 1})
 
     *precision* is forwarded to the outermost [`expand`][dyce.expand] call.
@@ -563,18 +570,17 @@ def explode_n(
     """
 
     @nobeartype  # not decoratable by beartype (avoids warning)
-    def _callback(result: HResult[_T], *, n_left: int) -> H[_T] | _T:
+    def _callback(result: HResult[_ResultT], *, n_left: int) -> H[_ResultT] | _ResultT:
         if n_left <= 0:
             return result.outcome
         next_h_or_outcome = resolver(result, n_left, n - n_left)
         if isinstance(next_h_or_outcome, H):
-            # TODO(posita): # noqa: TD003 - Figure out how to get the return value of
-            # expand to be correctly narrowed in this case
-            inner: H[_T] = expand(
-                _callback, cast("H[_T]", next_h_or_outcome), n_left=n_left - 1
+            inner: H[_ResultT] = expand(_callback, next_h_or_outcome, n_left=n_left - 1)
+            return (
+                cast("H[_ResultT]", inner + result.outcome)  # type: ignore[operator]
+                if inner
+                else result.outcome
             )
-            # TODO(posita): # noqa: TD003 - Figure out how to constrain _T to support addition
-            return inner + result.outcome if inner else result.outcome  # type: ignore[operator]
         return next_h_or_outcome
 
     with warnings.catch_warnings():
@@ -585,8 +591,6 @@ def explode_n(
 # ---- Helpers -------------------------------------------------------------------------
 
 
-# TODO(posita): https://github.com/facebook/pyrefly/issues/3002> - weighted_sources
-# should become `Iterable[tuple[H[_T] | _T, int]]` once that issue is fixed
 @overload
 def aggregate_weighted(
     weighted_sources: Iterable[tuple[H[_T] | _T, int]], /

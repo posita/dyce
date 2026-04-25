@@ -115,6 +115,8 @@ assets/plot_risus_first_round_light.png : assets/_risus*.py
 
 notebooks/%.ipynb : assets/nb_%.py
 	jupytext --to notebook --update $< --output $@
+	ruff check --fix $@
+	ruff format $@
 
 assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True assets/perf_$*.ipy | tee $@

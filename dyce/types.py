@@ -52,9 +52,6 @@ except ImportError:  # pragma: no cover
         return arg
 
 
-GetItemT = SupportsIndex | slice
-
-
 class SentinelT:
     r"""
     Singleton to serve as a sentinel value where other built-in objects (e.g., `#!python None`) would not, because they represent legitimate values in the context.
@@ -73,6 +70,7 @@ class SentinelT:
 
 
 Sentinel = SentinelT()
+GetItemT = SupportsIndex | slice
 
 
 def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterator[_T]:
