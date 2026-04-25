@@ -14,10 +14,10 @@
 <!-- BEGIN MONKEY PATCH --
 For typing.
 
-    >>> import sympy  # type: ignore [import-untyped]
-    >>> import sympy.abc  # type: ignore [import-untyped]
-    >>> import sympy.solvers  # type: ignore [import-untyped]
-    >>> import sympy.solvers.inequalities  # type: ignore [import-untyped]
+    >>> import sympy  # type: ignore[import-untyped]
+    >>> import sympy.abc  # type: ignore[import-untyped]
+    >>> import sympy.solvers  # type: ignore[import-untyped]
+    >>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
 
   -- END MONKEY PATCH -->
 
@@ -330,7 +330,8 @@ The odds of scoring at least one nine or higher for any one of `#!math n` “[ex
     >>> from dyce import explode_n
     >>> # By the time we're exploding to a third die, we're guaranteed
     >>> # a nine or higher, so we don't need to explode past that
-    >>> exploding_d6 = explode_n(H(6), n=2)
+    >>> # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
+    >>> exploding_d6 = explode_n(H(6), n=2)  # pyrefly: ignore[no-matching-overload]
     >>> for n in range(10, 0, -1):
     ...     d6e_ge_9 = exploding_d6.ge(9)
     ...     number_of_nines_or_higher_in_nd6e = n @ d6e_ge_9

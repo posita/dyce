@@ -69,7 +69,8 @@ def keep(p: P[int], k: int) -> H[int]:
 
 
 def nkk(n: int, k: int) -> H[int]:
-    return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)
+    # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
+    return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)  # pyrefly: ignore[no-matching-overload]
 
 
 # %%

@@ -69,6 +69,7 @@ lint = [
 test = [
     "beartype",
     "coverage[toml]",
+    "ipdb",
     "numpy",
     "pandas",
     "pytest-beartype",
