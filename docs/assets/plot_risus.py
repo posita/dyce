@@ -101,11 +101,9 @@ def vs_scenarios_dataframes(  # type: ignore[no-redef]
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
     # The explicit type hint here is apparently needed by mypy for properly resolving
-    # the call to h_vs.merge below. ty does not issue a warning, but still incorrectly
-    # resolves the type of h_vs to H[Never] despite the explicit hint.
+    # the call to h_vs.merge below.
     # TODO(posita): # noqa: TD003 - See:
     # - <https://github.com/python/mypy/issues/21317>
-    # - <https://github.com/astral-sh/ty/issues/3330>
     h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
@@ -528,7 +526,7 @@ d_evens_up_raw = H(
 )
 d_evens_up_raw_exploded = (
     explode_n(
-        cast("H[int]", d_evens_up_raw),
+        d_evens_up_raw,
         n=3,  # plenty deep for our needs
     )
     + 0  # make sure everything is an int

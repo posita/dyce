@@ -887,10 +887,13 @@ class TestHVariance:
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
             warnings.filterwarnings("ignore", category=TruncationWarning)
             assert math.isclose(
-                explode_n(H(6), n=800, precision=Fraction(0)).variance(), 10.64
+                # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
+                explode_n(H(6), n=800, precision=Fraction(0)).variance(),  # pyrefly: ignore[no-matching-overload]
+                10.64,
             )
             assert math.isclose(
-                explode_n(H(20), n=400, precision=Fraction(0)).variance(),
+                # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
+                explode_n(H(20), n=400, precision=Fraction(0)).variance(),  # pyrefly: ignore[no-matching-overload]
                 52.16066481994455,
             )
 

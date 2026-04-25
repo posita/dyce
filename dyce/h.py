@@ -78,7 +78,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     <!-- BEGIN MONKEY PATCH --
     For typing.
 
-        >>> import sympy.abc  # type: ignore [import-untyped]
+        >>> import sympy.abc  # type: ignore[import-untyped]
 
       -- END MONKEY PATCH -->
 
@@ -376,10 +376,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         c: Counter[_T] = Counter()
         for source in sources:
             if isinstance(source, Mapping):
-                # TODO(posita): # noqa: TD003 - See:
-                # - <https://github.com/astral-sh/ty/issues/3249>
-                # - <https://github.com/facebook/pyrefly/issues/3106>
-                # - <https://github.com/microsoft/pyright/issues/11377>
+                # The cast is necessary because isinstance only narrows on Mapping, but
+                # Iterable[tuple[_T, SupportsInt]] > Mapping[tuple[_T, SupportsInt],
+                # Any], so type checkers rightly include that as the inferred return
+                # type for source.items()
                 source = cast("ItemsView[_T, SupportsInt]", source.items())  # noqa: PLW2901
             for outcome, count in source:
                 c[outcome] += lossless_int(count)
@@ -436,9 +436,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __matmul__(
-        self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
-    ) -> "H[int]": ...
+    def __matmul__(self: "H[ot.CanAdd[int, int]]", rhs: SupportsInt) -> "H[int]": ...
     @overload
     def __matmul__(
         self: "H[_ConvolvableT]", rhs: SupportsInt
@@ -860,9 +858,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __rmatmul__(
-        self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
-    ) -> "H[int]": ...
+    def __rmatmul__(self: "H[ot.CanAdd[int, int]]", lhs: SupportsInt) -> "H[int]": ...
     @overload
     def __rmatmul__(
         self: "H[_ConvolvableT]", lhs: SupportsInt
