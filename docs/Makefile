@@ -101,18 +101,6 @@ assets/plot_%_light.png : assets/plot_%.py assets/_plot.py ../dyce/*.py
 assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
 
-assets/plot_risus_advanced_dark.png : assets/_risus*.py
-
-assets/plot_risus_advanced_light.png : assets/_risus*.py
-
-assets/plot_risus_complete_dark.png : assets/_risus*.py
-
-assets/plot_risus_complete_light.png : assets/_risus*.py
-
-assets/plot_risus_first_round_dark.png : assets/_risus*.py
-
-assets/plot_risus_first_round_light.png : assets/_risus*.py
-
 notebooks/%.ipynb : assets/nb_%.py
 	jupytext --to notebook --update $< --output $@
 	ruff check --fix $@

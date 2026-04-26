@@ -21,7 +21,7 @@
     Some of the following changes are not backward compatible.
     Please review before upgrading.
 
-- Drops support for 3.9 and extends support to 3.14
+- Drops support for 3.9 and 3.10 and extends support to 3.14
 - Fixes embarrassingly long-running logical error in 4d6 variants example
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
 - Adds `#!python H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
