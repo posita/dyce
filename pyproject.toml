@@ -211,6 +211,9 @@ docstring-code-line-length = "dynamic"
   "B018",   # Found useless expression
   "T201",  # `print` found (eglot-check)
 ]
+"helpers/anydice_programs.py" = [
+  "T201",  # `print` found (eglot-check)
+]
 
 [tool.ruff.lint]
 preview = true
