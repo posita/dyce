@@ -37,6 +37,11 @@ repos:
             )
           )$
 
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.7
+    hooks:
+      - id: uv-lock
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
     hooks:
@@ -70,7 +75,7 @@ repos:
       - id: pyrefly
         name: pyrefly
         entry: pyrefly
-        args: [check, --warn, unused-ignore]
+        args: [check]
         language: system
         pass_filenames: false
         stages: [pre-push]
