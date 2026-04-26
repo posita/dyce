@@ -577,32 +577,34 @@ class TestPTotal:
         assert p.total is p._total  # noqa: SLF001
 
 
-class TestPApply:
+class TestPApplyEachH:
     def test_scalar_empty(self) -> None:
-        assert P().apply(operator.add, 1) == P()
-        assert P(H({})).apply(operator.add, 1) == P(H({}))
+        assert P().apply_to_each_h(operator.add, 1) == P()
+        assert P(H({})).apply_to_each_h(operator.add, 1) == P(H({}))
 
     def test_scalar_basic(self) -> None:
-        assert P(6).apply(operator.pow, 2) == P(
+        assert P(6).apply_to_each_h(operator.pow, 2) == P(
             H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1})
         )
 
     def test_scalar_collision(self) -> None:
-        assert P(H({1: 2, 2: 3, 3: 1})).apply(operator.mod, 2) == P(H({1: 3, 0: 3}))
-        assert P(6).apply(operator.ge, 3) == P(H({False: 2, True: 4}))
+        assert P(H({1: 2, 2: 3, 3: 1})).apply_to_each_h(operator.mod, 2) == P(
+            H({1: 3, 0: 3})
+        )
+        assert P(6).apply_to_each_h(operator.ge, 3) == P(H({False: 2, True: 4}))
 
     def test_h_empty(self) -> None:
-        assert P(H({})).apply(operator.add, H(1)) == P(H({}))
-        assert P(1).apply(operator.add, H({})) == P(H({}))
+        assert P(H({})).apply_to_each_h(operator.add, H(1)) == P(H({}))
+        assert P(1).apply_to_each_h(operator.add, H({})) == P(H({}))
 
     def test_h_basic(self) -> None:
-        assert P(H({10: 1, 20: 1})).apply(operator.sub, H({1: 1, 2: 1})) == P(
+        assert P(H({10: 1, 20: 1})).apply_to_each_h(operator.sub, H({1: 1, 2: 1})) == P(
             H({9: 1, 19: 1, 8: 1, 18: 1})
         )
 
     def test_h_collision(self) -> None:
         # (1+2)=3 and (2+1)=3 collide; (1+1)=2, (2+2)=4
-        assert P(2).apply(operator.add, H(2)) == P(H({2: 1, 3: 2, 4: 1}))
+        assert P(2).apply_to_each_h(operator.add, H(2)) == P(H({2: 1, 3: 2, 4: 1}))
 
     def test_group_by_application_of_func(self) -> None:
         class IncrementAndReturnEveryCall:
@@ -614,13 +616,13 @@ class TestPApply:
                 return self._count
 
         func = IncrementAndReturnEveryCall()
-        assert P(3 @ P(4), 2 @ P(6), 8).apply(func) == P(
+        assert P(3 @ P(4), 2 @ P(6), 8).apply_to_each_h(func) == P(
             3 @ P(H({1: 1, 2: 1, 3: 1, 4: 1})),
             2 @ P(H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})),
             H({11: 1, 12: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1}),
         )
         func = IncrementAndReturnEveryCall()
-        assert P(4, 4, 4, 6, 6, 8).apply(func, apply_to_each=True) == P(
+        assert P(4, 4, 4, 6, 6, 8).apply_to_each_h(func, apply_to_each=True) == P(
             H({1: 1, 2: 1, 3: 1, 4: 1}),
             H({5: 1, 6: 1, 7: 1, 8: 1}),
             H({9: 1, 10: 1, 11: 1, 12: 1}),
@@ -628,6 +630,29 @@ class TestPApply:
             H({19: 1, 20: 1, 21: 1, 22: 1, 23: 1, 24: 1}),
             H({25: 1, 26: 1, 27: 1, 28: 1, 29: 1, 30: 1, 31: 1, 32: 1}),
         )
+
+
+class TestPApplyEachRoll:
+    def test_sum(self) -> None:
+        p = 3 @ P(6)
+        assert p.h() == p.apply_to_each_roll(sum)
+
+    def test_sum_which(self) -> None:
+        p = 3 @ P(6)
+        for m in range(len(p)):
+            for n in range(m + 1, len(p) + 1):
+                which = slice(m, n)
+                assert p.h(which) == p.apply_to_each_roll(sum, which)
+
+    def test_sum_which_multi(self) -> None:
+        p = 4 @ P(6)
+        for m in range(len(p)):
+            for n in range(m + 1, len(p) + 1):
+                which = slice(m, n)
+                assert p.h(slice(None), which, slice(None)) == p.apply_to_each_roll(
+                    sum, slice(None), which, slice(None)
+                )
+        assert p.h(slice(0, 0)) == p.apply_to_each_roll(sum, slice(0, 0))
 
 
 class TestPH:

@@ -1787,6 +1787,68 @@ class HableT(Protocol[_T_co]):
 # ---- Helpers -------------------------------------------------------------------------
 
 
+@overload
+def aggregate_weighted(
+    weighted_sources: Iterable[tuple[H[_T] | _T, int]], /
+) -> H[_T]: ...
+@overload
+def aggregate_weighted(weighted_sources: Iterable[tuple[Any, int]], /) -> H[Any]: ...
+def aggregate_weighted(
+    weighted_sources: Iterable[tuple[Any, int]],
+) -> H[Any]:
+    r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
+       -- END MONKEY PATCH -->
+
+    Aggregate *weighted_sources* into an [`H`][dyce.H] object.
+
+    Each element of *weighted_sources* is a two-tuple of either an `#!python (outcome, count)` pair or an `#!python (H, count)` pair.
+    When a source is an [`H`][dyce.H], its total takes on the weight of *count*.
+    When a source is the empty histogram (`#!python H({})`), it and its count are omitted without scaling.
+
+    This function is the accumulation engine used by [`expand`][dyce.expand].
+
+        >>> from dyce import H
+        >>> from dyce.evaluation import aggregate_weighted
+        >>> aggregate_weighted(
+        ...     (
+        ...         (H({1: 1}), 1),
+        ...         (H({1: 1, 2: 2}), 2),
+        ...     )
+        ... )
+        H({1: 5, 2: 4})
+        >>> aggregate_weighted(((H(2), 1), (H({}), 20)))
+        H({1: 1, 2: 1})
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
+    """
+    aggregate_scalar = 1
+    outcome_counts: list[tuple[Any, int]] = []
+
+    for outcome_or_h, count in weighted_sources:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append(
+                        (new_outcome, count * aggregate_scalar * new_count)
+                    )
+                aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+
+    return H.from_counts(outcome_counts)
+
+
 def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     r"""
     Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
