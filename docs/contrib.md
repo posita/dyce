@@ -38,7 +38,7 @@ An easy way to bootstrap an isolated development environment is:
 % git clone --recurse-submodules https://github.com/posita/dyce.git
 …
 % cd dyce
-% uv venv --clear --relocatable
+% uv venv --clear --prompt "$( basename "${PWD}" )" --relocatable
 …
 % uv sync
 …
@@ -47,14 +47,14 @@ An easy way to bootstrap an isolated development environment is:
 
 Substitute your preferred virtual environment process for [`venv`](https://docs.python.org/3/library/venv.html).
 The `[dev]` variant includes additional dependencies necessary for development and testing.
-See the `[project.optional-dependencies]` section in [`pyproject.toml`](https://github.com/posita/dyce/blob/v{dyce_git_ref}/pyproject.toml).
 
-Unit tests are run via [pytest](https://docs.pytest.org/). Linting and type checking are run via [pre-commit](https://pre-commit.com/).
+Unit tests are run via [pytest](https://docs.pytest.org/) via [Tox](https://tox.readthedocs.org/).
+Linting and type checking are run via [pre-commit](https://pre-commit.com/).
 
 ```sh
 % cd …/path/to/dyce
-% . .venv/bin/activate
-% uv run pytest
+% uv run pytest --cov  # or uv run tox [-e ...]
+…
 % uv run pre-commit run --all-files --hook-stage pre-push
 …
 ```
