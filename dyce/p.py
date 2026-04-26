@@ -30,7 +30,7 @@ from typing import (
     overload,
 )
 
-from .h import H, sum_h
+from .h import H, aggregate_weighted, sum_h
 from .hable import HableOpsMixin
 from .types import (
     GetItemT,
@@ -130,11 +130,10 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     <!-- -->
 
         >>> p = P(4, P(6, P(8, P(10, P(12, P(20))))))
-        >>> p
-        P(H({1: 1, 2: 1, 3: 1, 4: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1, 20: 1}))
+        >>> p == P(4, 6, 8, 10, 12, 20)
+        True
 
-    This class implements the [`HableT` protocol][dyce.HableT] and derives from the [`HableOpsMixin` class][dyce.HableOpsMixin], which means it can be “flattened” into
-    a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
+    This class implements the [`HableT` protocol][dyce.HableT] and derives from the [`HableOpsMixin` class][dyce.HableOpsMixin], which means it can be “flattened” into a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
 
         >>> -p_d6
         H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
@@ -149,21 +148,20 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         >>> 2 * P(8) - 1
         H({1: 1, 3: 1, 5: 1, 7: 1, 9: 1, 11: 1, 13: 1, 15: 1})
 
-    To perform arithmetic on individual [`H` objects][dyce.H] in a pool without
-    flattening, use the [`apply`][dyce.P.apply] method.
+    To perform arithmetic on individual [`H` objects][dyce.H] in a pool without flattening, use the [`apply_to_each_h`][dyce.P.apply_to_each_h] method.
 
         >>> import operator
-        >>> P(4, 6, 8).apply(operator.neg)
+        >>> P(4, 6, 8).apply_to_each_h(operator.neg)
         P(H({-8: 1, -7: 1, -6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1}), H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1}), H({-4: 1, -3: 1, -2: 1, -1: 1}))
 
     <!-- -->
 
-        >>> P(4, 6).apply(operator.pow, 2)
+        >>> P(4, 6).apply_to_each_h(operator.pow, 2)
         P(H({1: 1, 4: 1, 9: 1, 16: 1}), H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1}))
 
     <!-- -->
 
-        >>> P(4, 6).apply(
+        >>> P(4, 6).apply_to_each_h(
         ...     lambda h_outcome, other_outcome: operator.pow(other_outcome, h_outcome),
         ...     2,
         ... )
@@ -305,14 +303,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     # ---- Methods ---------------------------------------------------------------------
 
     @overload
-    def apply(
+    def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T], _ResultT],
         *,
         apply_to_each: bool = False,
     ) -> "P[_ResultT]": ...
     @overload
-    def apply(
+    def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T, _OtherT], _ResultT],
         other: "H[_OtherT]",
@@ -320,14 +318,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         apply_to_each: bool = False,
     ) -> "P[_ResultT]": ...
     @overload
-    def apply(
+    def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T, _OtherT], _ResultT],
         other: _OtherT,
         *,
         apply_to_each: bool = False,
     ) -> "P[_ResultT]": ...
-    def apply(
+    def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT],
         other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
@@ -357,6 +355,22 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         return P(*_gen_hs())
 
+    def apply_to_each_roll(
+        self: "P[_T]",
+        func: Callable[[RollT[_T]], H[_ResultT] | _ResultT],
+        *which: GetItemT,
+    ) -> H[_ResultT]:
+        r"""
+        TODO(posita): Fill this out.
+        """
+        return cast(
+            "H[_ResultT]",
+            aggregate_weighted(
+                (func(roll), count) for roll, count in self.rolls_with_counts(*which)
+            ),
+        )
+
+    # TODO(posita): # noqa: TD003 - Use CanAdd here
     def h(self: "P[_T]", *which: GetItemT) -> H[_T]:
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
