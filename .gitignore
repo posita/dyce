@@ -12,8 +12,8 @@ docs/license.md
 .coverage
 htmlcov/
 
-# JupyterLite
-.jupyterlite.doit.db
+# Sqlite
+*.db
 
 # MkDocs
 .ipynb_checkpoints/
