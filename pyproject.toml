@@ -1,13 +1,44 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
 [project]
 name = "dyce"
 dynamic = ["version"]
-description = "optype test"
-readme = "README.md"
+description = "Simple Python tools for exploring dice outcomes and other finite discrete probabilities"
+readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Matt Bogosian", email = "matt@bogosian.net"}]
 requires-python = ">=3.11"
 dependencies = [
     "optype",
     "typing_extensions>=4.5; python_version < '3.13'",  # back-port of deprecated decorator
 ]
+classifiers = [
+  "Topic :: Education",
+  "Topic :: Games/Entertainment",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[project.urls]
+Homepage = "https://posita.github.io/dyce/"
+"Source Repository" = "https://github.com/posita/dyce/"
 
 [project.optional-dependencies]
 viz = ["matplotlib"]
@@ -26,14 +57,13 @@ fallback_version = "0.0.0+unknown"
 [dependency-groups]
 dev = [
     "ipython",
-    "pre-commit",
-    "pre-commit-uv",
     {include-group = "docs"},
     {include-group = "lint"},
     {include-group = "test"},
     {include-group = "tox"},
     {include-group = "viz"},
 ]
+# Only what's needed for uv run mkdocs build
 docs = [
     "click>=8.3.2",  # see <https://github.com/mkdocs/mkdocs/issues/4032>
     "griffe-warnings-deprecated",
@@ -43,7 +73,7 @@ docs = [
     "jupytext",
     "jupyterlite",
     "jupyterlite-pyodide-kernel",
-    "markdown-pycon",
+    "markdown-pycon",  # syntax highlighting for doctests
     "mike",
     "mkdocs",
     "mkdocs-material",
@@ -55,9 +85,12 @@ docs = [
     "sympy",
     {include-group = "viz"},
 ]
+# Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
 lint = [
     "beartype",
     "matplotlib_inline",
+    "pre-commit",
+    "pre-commit-uv",
     "mypy",
     "pyrefly",
     "pyright",
@@ -66,6 +99,7 @@ lint = [
     "ty",
     {include-group = "docs"},
 ]
+# Only what's needed for uv run pytest --cov
 test = [
     "beartype",
     "coverage[toml]",
@@ -77,16 +111,19 @@ test = [
     {include-group = "test-pypy"},
     {include-group = "viz"},
 ]
+# Only what's needed for uv run pytest specifically with PyPy (via Tox)
 test-pypy = [
     "griffe-warnings-deprecated",
     "pytest",
     "pytest-gitignore",
     "sympy",
 ]
+# Only what's needed for uv run tox [-e ...]
 tox = [
     "tox",
     "tox-uv",
 ]
+# Mirrors optional dependencies
 viz = ["matplotlib"]
 
 [tool.codespell]
@@ -105,11 +142,12 @@ files = ["docs", "dyce", "helpers", "tests", "*.py"]
 # exclude = """(?x)(
 #     ^docs/assets/nb_.*\\.py$
 # )"""
-python_version = "3.11"
 exclude_gitignore = true
+python_version = "3.11"
 warn_redundant_casts = true
-warn_unused_ignores = true
 warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
 
 [tool.pyrefly]
 project-includes = ["docs", "dyce", "helpers", "tests", "*.py"]
@@ -130,6 +168,14 @@ addopts = [
   "--doctest-glob=*.md",
   "--doctest-modules",
   "--pdbcls=IPython.terminal.debugger:TerminalPdb",
+]
+doctest_optionflags = [
+  # See <https://docs.python.org/3/library/doctest.html#option-flags>
+  "ELLIPSIS",
+  "IGNORE_EXCEPTION_DETAIL",
+  "NORMALIZE_WHITESPACE",
+  # See also <https://docs.pytest.org/en/stable/how-to/doctest.html#using-doctest-options>
+  "NUMBER",
 ]
 testpaths = ["README.md", "docs", "dyce", "helpers", "tests", "*.py"]
 
