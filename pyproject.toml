@@ -6,50 +6,249 @@
 # software in any capacity.
 # ======================================================================================
 
-[build-system]  # ----------------------------------------------------------------------
+[project]
+name = "dyce"
+dynamic = ["version"]
+description = "Simple Python tools for exploring dice outcomes and other finite discrete probabilities"
+readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Matt Bogosian", email = "matt@bogosian.net"}]
+requires-python = ">=3.11"
+dependencies = [
+    "optype",
+    "typing_extensions>=4.5; python_version < '3.13'",  # back-port of deprecated decorator
+]
+classifiers = [
+  "Topic :: Education",
+  "Topic :: Games/Entertainment",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
 
-requires = ["setuptools>=45", "versioningit~=2.0", "wheel"]
+[project.urls]
+Homepage = "https://posita.github.io/dyce/"
+"Source Repository" = "https://github.com/posita/dyce/"
+
+[project.optional-dependencies]
+viz = ["matplotlib"]
+
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-[tool.isort]  # ------------------------------------------------------------------------
+[tool.setuptools]
+packages = ["dyce"]
+package-data = {"dyce" = ["py.typed"]}
 
-# See <https://pycqa.github.io/isort/docs/configuration/profiles.html#black>
-profile = "black"
-# See <https://pycqa.github.io/isort/docs/configuration/options.html#skip-gitignore>
-skip_gitignore = true
+[tool.setuptools_scm]
+fallback_version = "0.0.0+unknown"
 
-[tool.mypy]  # -------------------------------------------------------------------------
+[dependency-groups]
+dev = [
+    "ipython",
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "test"},
+    {include-group = "tox"},
+    {include-group = "viz"},
+]
+# Only what's needed for uv run mkdocs build
+docs = [
+    "click>=8.3.2",  # see <https://github.com/mkdocs/mkdocs/issues/4032>
+    "griffe-warnings-deprecated",
+    "jupyter-server",
+    "jupyterlab-server",
+    "jupyterlab-widgets",
+    "jupytext",
+    "jupyterlite",
+    "jupyterlite-pyodide-kernel",
+    "markdown-pycon",  # syntax highlighting for doctests
+    "mike",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "numpy",
+    "pandas",
+    "pandas-stubs",
+    "pymdown-extensions",
+    "sympy",
+    {include-group = "viz"},
+]
+# Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
+lint = [
+    "beartype",
+    "matplotlib_inline",
+    "pre-commit",
+    "pre-commit-uv",
+    "mypy",
+    "pyrefly",
+    "pyright",
+    "pytest",
+    "ruff",
+    "ty",
+    {include-group = "docs"},
+]
+# Only what's needed for uv run pytest --cov
+test = [
+    "beartype",
+    "coverage[toml]",
+    "ipdb",
+    "numpy",
+    "pandas",
+    "pytest-beartype",
+    "pytest-cov",
+    {include-group = "test-pypy"},
+    {include-group = "viz"},
+]
+# Only what's needed for uv run pytest specifically with PyPy (via Tox)
+test-pypy = [
+    "griffe-warnings-deprecated",
+    "pytest",
+    "pytest-gitignore",
+    "sympy",
+]
+# Only what's needed for uv run tox [-e ...]
+tox = [
+    "tox",
+    "tox-uv",
+]
+# Mirrors optional dependencies
+viz = ["matplotlib"]
 
-check_untyped_defs = true
-# See <https://mypy.readthedocs.io/en/stable/config_file.html#confval-exclude>
-exclude = "(?x)( (^|/)build/ )"
-ignore_missing_imports = true
-strict_optional = true
-show_error_codes = true
+[tool.codespell]
+ignore-words-list = "CanGe,countin,ot,rollin"
+skip = ["*.ipynb"]
+
+[tool.coverage.run]
+source = ["dyce"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.mypy]
+files = ["docs", "dyce", "helpers", "tests", "*.py"]
+# exclude = """(?x)(
+#     ^docs/assets/nb_.*\\.py$
+# )"""
+exclude_gitignore = true
+python_version = "3.11"
 warn_redundant_casts = true
+warn_unreachable = true
 warn_unused_configs = true
+warn_unused_ignores = true
 
-[tool.pytest.ini_options]  # -----------------------------------------------------------
+[tool.pyrefly]
+project-includes = ["docs", "dyce", "helpers", "tests", "*.py"]
+python-version = "3.11.0"
+infer-with-first-use = false
 
-addopts = "--doctest-continue-on-failure --doctest-glob='*.md' --doctest-modules --pythonwarnings=ignore"
+[warnings]
+unused-ignore = true
+
+[tool.pyright]
+include = ["docs", "dyce", "helpers", "tests", "*.py"]
+pythonVersion = "3.11"
+reportUnnecessaryTypeIgnoreComment = "warning"
+typeCheckingMode = "basic"
+
+[tool.pytest.ini_options]
+addopts = [
+  "--doctest-glob=*.md",
+  "--doctest-modules",
+  "--pdbcls=IPython.terminal.debugger:TerminalPdb",
+]
 doctest_optionflags = [
+  # See <https://docs.python.org/3/library/doctest.html#option-flags>
   "ELLIPSIS",
   "IGNORE_EXCEPTION_DETAIL",
   "NORMALIZE_WHITESPACE",
+  # See also <https://docs.pytest.org/en/stable/how-to/doctest.html#using-doctest-options>
   "NUMBER",
 ]
+testpaths = ["README.md", "docs", "dyce", "helpers", "tests", "*.py"]
 
-[tool.versioningit.next-version]  # ----------------------------------------------------
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
 
-method = "smallest-release"
+[tool.ruff.lint.per-file-ignores]
+"docs/assets/nb_*.py" = [
+  # Allow co-mingled imports for snippets
+  "E402",  # Module level import not at top of file
+  # ruff is confused by jupytext comments
+  "ERA001",  # Found commented-out code
+  # Cells support `await` statements
+  "F704",  # `await` statement outside of a function
+  "PLE1142",  # `await` should be used within an async function
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+  # Catch-all for things that are only ignored in these files
+  "RUF100",  # Unused `noqa` directive ...
+]
+"docs/assets/plot_*.py" = [
+  # Allow co-mingled imports for snippets
+  "E402",  # Module level import not at top of file
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+]
+"docs/notebooks/*.ipynb" = [
+  "E402",  # Module level import not at top of file
+  # Useful for cell display
+  "B018",   # Found useless expression
+  "T201",  # `print` found (eglot-check)
+]
+"helpers/anydice_programs.py" = [
+  "T201",  # `print` found (eglot-check)
+]
 
-[tool.versioningit.vcs]  # -------------------------------------------------------------
+[tool.ruff.lint]
+preview = true
+ignore = [
+  "CPY",
+  "D",
+  "DOC",
+  "EM",
+  "FIX",  # TODO(posita): run occasionally, or figure out how to make these warnings
+  "PLC",
+  "PLR",
+  "COM812",  # Trailing comma missing
+  "E501",  # Line too long (... > ...)
+  "INP001",  # File ... is part of an implicit namespace package. Add an `__init__.py`.
+  "N806",  # Variable ... in function should be lowercase
+  "RET505",  # Unnecessary `else` after `return` statement
+  "RET506",  # Unnecessary `else` after `raise` statement
+  "RET507",  # Unnecessary `else` after `continue` statement
+  "RUF002",  # Docstring contains ambiguous ...
+  "RUF067",  # `__init__` module should only contain docstrings and re-exports
+  "S101",  # Use of `assert` detected
+  "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
+  "TRY003",  # Avoid specifying long messages outside the exception class
+]
+select = [
+  "ALL",
+]
 
-default-tag = "0.0.0"
+[tool.ty.src]
+include = ["docs", "dyce", "helpers", "tests", "*.py"]
+exclude = ["docs/assets/nb_*.py"]
 
-[tool.versioningit.write]  # -----------------------------------------------------------
+[tool.check_doctests]
+# log_level = "DEBUG"
 
-file = "dyce/_version.py"
-template = '''__vers_str__ = "{version}"
-__version__ = {version_tuple}
-'''
+[tool.check_doctests.check]
+checkers = [["ty", "check"], ["pyrefly", "check", "--search-path", "."], ["pyright"], ["mypy"]]
+fail_fast = false

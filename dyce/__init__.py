@@ -4,30 +4,47 @@
 # waived or licensed are reserved. If that file is missing or appears to be modified
 # from its original, then please contact the author before viewing or using this
 # software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Please keep each docstring sentence on its own unwrapped line. It looks like crap in a
+# text editor, but it has no effect on rendering, and it allows much more useful diffs.
+# (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-from typing import Union
+r"""
+`#!python dyce` revolves around two core primitives.
+[`H` objects][dyce.H] are histograms (outcomes or individual dice).
+[`P` objects][dyce.P] are collections of histograms (pools).
 
-from .evaluation import *  # noqa: F401,F403
-from .h import *  # noqa: F401,F403
-from .p import *  # noqa: F401,F403
-from .r import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
+It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
+"""
 
-__all__ = ()
+from importlib.metadata import PackageNotFoundError, version
 
-_VersionT = Union[
-    tuple[int, int, int],
-    tuple[int, int, int, str],
-    tuple[int, int, int, str, str],
-    tuple[int, int, int, str, str, str],
-]
+from .evaluation import HResult, PResult, TruncationWarning, expand, explode_n
+from .h import H, HableT
+from .hable import HableOpsMixin
+from .p import P, RollCountT, RollProbT, RollT
 
-__version__: _VersionT
-__vers_str__: str
+__all__ = (
+    "H",
+    "HResult",
+    "HableOpsMixin",
+    "HableT",
+    "P",
+    "PResult",
+    "RollCountT",
+    "RollProbT",
+    "RollT",
+    "TruncationWarning",
+    "expand",
+    "explode_n",
+)
 
 try:
-    from ._version import __vers_str__, __version__
-except Exception:
-    __version__ = (0, 0, 0, "post0", "unknown", "d00000000")
-    __vers_str__ = "0.0.0.post0+unknown.d00000000"
+    __version__: str = version("dyce")
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "0.0.0+unknown"

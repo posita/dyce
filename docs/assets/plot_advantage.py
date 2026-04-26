@@ -6,20 +6,17 @@
 # software in any capacity.
 # ======================================================================================
 
-from anydyce.viz import plot_line
 
-from dyce import H, P
-from dyce.evaluation import HResult, foreach
-
-
-def do_it(style: str) -> None:
-    import matplotlib.pyplot
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_advantage.py
+    # --8<-- [start:core]
+    from dyce import H, HResult, P, expand
 
     normal_hit = H(12) + 5
     critical_hit = 3 @ H(12) + 5
     advantage = (2 @ P(20)).h(-1)
 
-    def crit(result: HResult):
+    def crit(result: HResult[int]) -> H[int] | int:
         if result.outcome == 20:
             return critical_hit
         elif result.outcome + 5 >= 14:
@@ -27,19 +24,33 @@ def do_it(style: str) -> None:
         else:
             return 0
 
-    advantage_weighted = foreach(crit, result=advantage)
+    advantage_weighted = expand(crit, advantage)
+    # --8<-- [end:core]
 
-    ax = matplotlib.pyplot.axes()
-    text_color = "white" if style == "dark" else "black"
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
-    plot_line(
-        ax,
-        [
-            ("Normal hit", normal_hit),
-            ("Critical hit", critical_hit),
-            ("Advantage-weighted", advantage_weighted),
-        ],
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_advantage.py
+    # --8<-- [start:viz]
+    from matplotlib import ticker
+
+    from dyce.viz import plot_line
+
+    ax = plot_line(
+        normal_hit,
+        critical_hit,
+        advantage_weighted,
+        labels=["Normal hit", "Critical hit", "Advantage-weighted"],
     )
+    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
+    ax.set_title("Advantage-weighted attack with critical hits")
     ax.legend()
-    ax.set_title("Advantage-weighted attack with critical hits", color=text_color)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
+
+
+if __name__ == "__main__":
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

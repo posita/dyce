@@ -4,96 +4,68 @@
 # waived or licensed are reserved. If that file is missing or appears to be modified
 # from its original, then please contact the author before viewing or using this
 # software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Please keep each docstring sentence on its own unwrapped line. It looks like crap in a
+# text editor, but it has no effect on rendering, and it allows much more useful diffs.
+# (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+import math
 import os
 import warnings
 from abc import abstractmethod
 from collections import Counter
-from collections.abc import Iterable as IterableC
-from fractions import Fraction
-from itertools import chain, product, repeat
-from math import comb, gcd, sqrt
-from operator import (
-    __abs__,
-    __add__,
-    __and__,
-    __eq__,
-    __floordiv__,
-    __ge__,
-    __getitem__,
-    __gt__,
-    __invert__,
-    __le__,
-    __lt__,
-    __mod__,
-    __mul__,
-    __ne__,
-    __neg__,
-    __or__,
-    __pos__,
-    __pow__,
-    __sub__,
-    __truediv__,
-    __xor__,
-)
-from typing import (
-    Any,
+from collections.abc import (
     Callable,
     ItemsView,
     Iterable,
     Iterator,
     KeysView,
     Mapping,
-    Optional,
-    TypeVar,
-    Union,
+    Sequence,
     ValuesView,
+)
+from fractions import Fraction
+from itertools import groupby
+from itertools import product as iproduct
+from types import NotImplementedType
+from typing import (
+    Any,
+    Literal,
+    Never,
+    Protocol,
+    Self,
+    SupportsFloat,
+    SupportsInt,
+    TypeVar,
     cast,
     overload,
+    runtime_checkable,
 )
 
-from numerary import IntegralLike, RealLike
-from numerary.bt import beartype
-from numerary.protocol import CachingProtocolMeta
-from numerary.types import Protocol, RationalLikeMixedU, SupportsInt, runtime_checkable
+import optype as ot
 
 from . import rng
 from .lifecycle import deprecated, experimental
 from .types import (
-    _BinaryOperatorT,
-    _UnaryOperatorT,
-    as_int,
-    is_even,
-    is_odd,
+    Sentinel,
+    SentinelT,
+    lossless_int,
+    lossless_int_or_not_implemented,
     natural_key,
-    sorted_outcomes,
+    nobeartype,
 )
 
-__all__ = ("H",)
+__all__ = ("H", "HableT")
 
-
-# ---- Types ---------------------------------------------------------------------------
-
-
-HOrOutcomeT = Union["H", RealLike]
 _T = TypeVar("_T")
-_MappingT = Mapping[RealLike, int]
-_SourceT = Union[
-    SupportsInt,
-    Iterable[RealLike],
-    Iterable[tuple[RealLike, SupportsInt]],
-    _MappingT,
-    "HableT",
-]
-_OperandT = Union[RealLike, "H", "HableT"]
-_OutcomeCountT = tuple[RealLike, int]
-_SubstituteExpandCallbackT = Callable[["H", RealLike], HOrOutcomeT]
-_SubstituteCoalesceCallbackT = Callable[["H", RealLike], "H"]
-
-
-# ---- Data ----------------------------------------------------------------------------
-
+_T_co = TypeVar("_T_co", covariant=True)
+_OtherT = TypeVar("_OtherT")
+_ResultT = TypeVar("_ResultT")
+_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
 
 try:
     _ROW_WIDTH = int(os.environ["COLUMNS"])
@@ -101,2306 +73,2013 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-# ---- Functions -----------------------------------------------------------------------
-
-
-@deprecated
-def coalesce_replace(h: "H", outcome: RealLike) -> "H":
+class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     r"""
-    !!! warning "Deprecated"
+    <!-- BEGIN MONKEY PATCH --
+    For typing.
 
-        This function has been deprecated and will be removed in a future release. See
-        the [``expandable`` decorator][dyce.evaluation.expandable] and
-        [``foreach`` function][dyce.evaluation.foreach] for more flexible alternatives.
+        >>> import sympy.abc  # type: ignore[import-untyped]
 
-    Default behavior for [``H.substitute``][dyce.h.H.substitute]. Returns *h* unmodified
-    (*outcome* is ignored).
-    """
-    return h
+      -- END MONKEY PATCH -->
 
-
-# ---- Classes -------------------------------------------------------------------------
-
-
-class H(_MappingT):
-    r"""
     An immutable mapping for use as a histogram which supports arithmetic operations.
-    This is useful for modeling discrete outcomes, like individual dice. ``#!python H``
-    objects encode finite discrete probability distributions as integer counts without
-    any denominator.
+    This is useful for modeling discrete outcomes, like individual dice.
+    `#!python H` objects encode finite discrete probability distributions as integer counts without any denominator.
 
     !!! info
 
-        The lack of an explicit denominator is intentional and has two benefits. First,
-        a denominator is redundant. Without it, one never has to worry about
-        probabilities summing to one (e.g., via miscalculation, floating point error,
-        etc.). Second (and perhaps more importantly), sometimes one wants to have an
-        insight into non-reduced counts, not just probabilities. If needed,
-        probabilities can always be derived, as shown below.
+        The lack of an explicit denominator is intentional and has two benefits.
+        First, a denominator is redundant.
+        Without it, one never has to worry about probabilities summing to one (e.g., via miscalculation, floating point error, etc.).
+        Second (and perhaps more importantly), sometimes one wants to have an insight into non-reduced counts, not just probabilities.
+        If needed, probabilities can always be derived, as shown below.
+        While a rational abstraction (e.g., `#!python fractions.Fraction`) could have been used, `#!python int`s typically perform better under most circumstances.
 
-    The [initializer][dyce.h.H.__init__] takes a single parameter, *items*. In its most
-    explicit form, *items* maps outcome values to counts.
+    The [initializer][dyce.H.__init__] takes a single argument, *init_val*.
+    In its most explicit form, *init_val* maps outcome values to counts.
 
-    Modeling a single six-sided die (``1d6``) can be expressed as:
+    Modeling a single six-sided die (`1d6`) can be expressed as:
 
-    ``` python
-    >>> from dyce import H
-    >>> d6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
+        >>> from dyce import H
+        >>> d6 = H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
-    ```
+    Two shorthands are provided.
+    If *init_val* is an operable of numbers, counts of 1 are assumed and outcomes are sorted.
 
-    An iterable of pairs can also be used (similar to ``#!python dict``).
-
-    ``` python
-    >>> d6 == H(((1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)))
-    True
-
-    ```
-
-    Two shorthands are provided. If *items* is an iterable of numbers, counts of 1 are
-    assumed.
-
-    ``` python
-    >>> d6 == H((1, 2, 3, 4, 5, 6))
-    True
-
-    ```
+        >>> H(range(6, 0, -1))
+        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
     Repeated items are accumulated, as one would expect.
 
-    ``` python
-    >>> H((2, 3, 3, 4, 4, 5))
-    H({2: 1, 3: 2, 4: 2, 5: 1})
+        >>> lo_var_d6 = H((5, 4, 4, 3, 3, 2))
+        >>> lo_var_d6
+        H({2: 1, 3: 2, 4: 2, 5: 1})
 
-    ```
+    If *init_val* is an `#!python int` (and ***only*** an `#!python int`),it is shorthand for creating a sequential range `#!math \left[ {1} .. {init\_val} \right]` (or `#!math \left[ {init\_val} .. {-1} \right]` if *init_val* is negative).
 
-    If *items* is an integer, it is shorthand for creating a sequential range $[{1} ..
-    {items}]$ (or $[{items} .. {-1}]$ if *items* is negative).
+        >>> H(8)
+        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1})
+        >>> H(0)
+        H({})
+        >>> H(-4.0)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+        Traceback (most recent call last):
+          ...
+        TypeError: scalar init_val must be int; use explicit Mapping or Iterable for 'float' outcomes
 
-    ``` python
-    >>> d6 == H(6)
-    True
+    !!! note "A work-around"
 
-    ```
+        You can usually find a way to coerce the shorthand into the correct type, if needed:
 
-    Histograms are maps, so we can test equivalence against other maps.
+            >>> import sympy.abc
+            >>> (H(-4) + 0.0) * sympy.abc.x
+            H({-1.0*x: 1, -2.0*x: 1, -3.0*x: 1, -4.0*x: 1})
 
-    ``` python
-    >>> H(6) == {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
-    True
+    Histograms are maps, so they can interact with other map types.
 
-    ```
+        >>> lo_var_d6 == {2: 1, 3: 2, 4: 2, 5: 1}
+        True
+        >>> lo_var_d6 != {}
+        True
+        >>> from collections import Counter
+        >>> lo_var_d6 == Counter(lo_var_d6)
+        True
 
     Simple indexes can be used to look up an outcome’s count.
 
-    ``` python
-    >>> H((2, 3, 3, 4, 4, 5))[3]
-    2
+        >>> lo_var_d6[3]
+        2
 
-    ```
+    Most arithmetic operators are supported and do what one would expect.
+    If the operand is a number, the operator applies to the outcomes.
 
-    Most arithmetic operators are supported and do what one would expect. If the operand
-    is a number, the operator applies to the outcomes.
+        >>> d6 + 4
+        H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
 
-    ``` python
-    >>> d6 + 4
-    H({5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1})
+        >>> d6 * -1
+        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+        >>> d6 * -1 == -d6
+        True
+        >>> d6 * -1 == H(-6)
+        True
 
-    ```
+    If the operand is another histogram, the operator applies to the Cartesian product of the outcomes in each histogram, and respective counts are multiplied.
+    Modeling the sum of two six-sided dice (`2d6`) can be expressed as:
 
-    ``` python
-    >>> d6 * -1
-    H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
-    >>> d6 * -1 == -d6
-    True
-    >>> d6 * -1 == H(-6)
-    True
+        >>> d6 + d6
+        H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+        >>> print((d6 + d6).format(width=65))
+        avg |    7.00
+        std |    2.42
+        var |    5.83
+          2 |   2.78% |#
+          3 |   5.56% |##
+          4 |   8.33% |####
+          5 |  11.11% |#####
+          6 |  13.89% |######
+          7 |  16.67% |########
+          8 |  13.89% |######
+          9 |  11.11% |#####
+         10 |   8.33% |####
+         11 |   5.56% |##
+         12 |   2.78% |#
 
-    ```
+    To sum `#!math {n}` identical histograms, the matrix multiplication operator (`@`) provides a shorthand.
 
-    If the operand is another histogram, combinations are computed. Modeling the sum of
-    two six-sided dice (``2d6``) can be expressed as:
+        >>> 3 @ d6 == d6 + d6 + d6
+        True
 
-    ``` python
-    >>> d6 + d6
-    H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-    >>> print((d6 + d6).format(width=65))
-    avg |    7.00
-    std |    2.42
-    var |    5.83
-      2 |   2.78% |#
-      3 |   5.56% |##
-      4 |   8.33% |####
-      5 |  11.11% |#####
-      6 |  13.89% |######
-      7 |  16.67% |########
-      8 |  13.89% |######
-      9 |  11.11% |#####
-     10 |   8.33% |####
-     11 |   5.56% |##
-     12 |   2.78% |#
+    Unary operators are also supported:
 
-    ```
+        >>> ~d6
+        H({-7: 1, -6: 1, -5: 1, -4: 1, -3: 1, -2: 1})
+        >>> abs(-d6) == d6
+        True
 
-    To sum ${n}$ identical histograms, the matrix multiplication operator (``@``)
-    provides a shorthand.
+    The `#!python len` built-in function can be used to show the number of distinct outcomes.
 
-    ``` python
-    >>> 3@d6 == d6 + d6 + d6
-    True
+        >>> len(2 @ d6)
+        11
 
-    ```
+    The [`total` property][dyce.H.total] can be used to compute the total number of combinations and each outcome’s probability.
 
-    The ``#!python len`` built-in function can be used to show the number of distinct
-    outcomes.
+        >>> from fractions import Fraction
+        >>> (2 @ d6).total
+        36
+        >>> [
+        ...     (outcome, Fraction(count, (2 @ d6).total))
+        ...     for outcome, count in (2 @ d6).items()
+        ... ]
+        [(2, Fraction(1, 36)), (3, Fraction(1, 18)), (4, Fraction(1, 12)), (5, Fraction(1, 9)), (6, Fraction(5, 36)), (7, Fraction(1, 6)), ..., (12, Fraction(1, 36))]
 
-    ``` python
-    >>> len(2@d6)
-    11
+    Histograms provide common comparators (e.g., [`eq`][dyce.H.eq] [`ne`][dyce.H.ne], etc.).
+    One way to count how often a first six-sided die shows a different face than a second is:
 
-    ```
-
-    The [``total`` property][dyce.h.H.total] can be used to compute the total number of
-    combinations and each outcome’s probability.
-
-    ``` python
-    >>> from fractions import Fraction
-    >>> (2@d6).total
-    36
-    >>> [(outcome, Fraction(count, (2@d6).total)) for outcome, count in (2@d6).items()]
-    [(2, Fraction(1, 36)), (3, Fraction(1, 18)), (4, Fraction(1, 12)), (5, Fraction(1, 9)), (6, Fraction(5, 36)), (7, Fraction(1, 6)), ..., (12, Fraction(1, 36))]
-
-    ```
-
-    Histograms provide common comparators (e.g., [``eq``][dyce.h.H.eq]
-    [``ne``][dyce.h.H.ne], etc.). One way to count how often a first six-sided die
-    shows a different face than a second is:
-
-    ``` python
-    >>> d6.ne(d6)
-    H({False: 6, True: 30})
-    >>> print(d6.ne(d6).format(width=65))
-    avg |    0.83
-    std |    0.37
-    var |    0.14
-      0 |  16.67% |########
-      1 |  83.33% |#########################################
-
-    ```
+        >>> d6.ne(d6)
+        H({False: 6, True: 30})
+        >>> print(d6.ne(d6).format(width=65))
+          avg |    0.83
+          std |    0.37
+          var |    0.14
+        False |  16.67% |########
+         True |  83.33% |########################################
 
     Or, how often a first six-sided die shows a face less than a second is:
 
-    ``` python
-    >>> d6.lt(d6)
-    H({False: 21, True: 15})
-    >>> print(d6.lt(d6).format(width=65))
-    avg |    0.42
-    std |    0.49
-    var |    0.24
-      0 |  58.33% |#############################
-      1 |  41.67% |####################
+        >>> d6.lt(d6)
+        H({False: 21, True: 15})
+        >>> print(d6.lt(d6).format(width=65))
+          avg |    0.42
+          std |    0.49
+          var |    0.24
+        False |  58.33% |############################
+         True |  41.67% |####################
 
-    ```
+    Or how often at least one `#!python 2` will show when rolling four six-sided dice:
 
-    Or how often at least one ``#!python 2`` will show when rolling four six-sided dice:
-
-    ``` python
-    >>> d6_eq2 = d6.eq(2) ; d6_eq2  # how often a 2 shows on a single six-sided die
-    H({False: 5, True: 1})
-    >>> 4@d6_eq2  # count of 2s showing on 4d6
-    H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
-    >>> (4@d6_eq2).ge(1)  # how often that count is at least one
-    H({False: 625, True: 671})
-    >>> print((4@d6_eq2).ge(1).format(width=65))
-    avg |    0.52
-    std |    0.50
-    var |    0.25
-      0 |  48.23% |########################
-      1 |  51.77% |#########################
-
-    ```
+        >>> d6_eq2 = d6.eq(2)
+        >>> d6_eq2  # how often a 2 shows on a single six-sided die
+        H({False: 5, True: 1})
+        >>> 4 @ d6_eq2  # number of 2s showing among 4d6
+        H({0: 625, 1: 500, 2: 150, 3: 20, 4: 1})
+        >>> (4 @ d6_eq2).ge(1)  # how often at least one 2 shows on 4d6
+        H({False: 625, True: 671})
+        >>> print((4 @ d6_eq2).ge(1).format(width=65))
+          avg |    0.52
+          std |    0.50
+          var |    0.25
+        False |  48.23% |#######################
+         True |  51.77% |########################
 
     !!! bug "Mind your parentheses"
 
-        Parentheses are often necessary to enforce the desired order of operations. This
-        is most often an issue with the ``#!python @`` operator, because it behaves
-        differently than the ``d`` operator in most dedicated grammars. More
-        specifically, in Python, ``#!python @`` has a [lower
-        precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence)
-        than ``#!python .`` and ``#!python […]``.
+        Parentheses are often necessary to enforce the desired order of operations.
+        This is most often an issue with the `#!python @` operator, because it behaves differently than the `d` operator in most dedicated grammars.
+        More specifically, in Python, `#!python @` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `#!python .` and `#!python […]`.
 
-        ``` python
-        >>> 2@d6[7]  # type: ignore [operator]
-        Traceback (most recent call last):
-          ...
-        KeyError: 7
-        >>> 2@d6.le(7)  # probably not what was intended
-        H({2: 36})
-        >>> 2@d6.le(7) == 2@(d6.le(7))
-        True
+            >>> 2 @ d6[7]  # type: ignore
+            Traceback (most recent call last):
+              ...
+            KeyError: 7
+            >>> 2 @ d6.le(7)  # probably not what was intended
+            H({2: 36})
+            >>> 2 @ d6.le(7) == 2 @ (d6.le(7))
+            True
 
-        ```
+            >>> (2 @ d6)[7]
+            6
+            >>> (2 @ d6).le(7)
+            H({False: 15, True: 21})
+            >>> 2 @ d6.le(7) == (2 @ d6).le(7)
+            False
 
-        ``` python
-        >>> (2@d6)[7]
-        6
-        >>> (2@d6).le(7)
-        H({False: 15, True: 21})
-        >>> 2@d6.le(7) == (2@d6).le(7)
-        False
+    Counts are generally accumulated without reduction.
+    To reduce, call the [`lowest_terms` method][dyce.H.lowest_terms].
 
-        ```
-
-    Counts are generally accumulated without reduction. To reduce, call the
-    [``lowest_terms`` method][dyce.h.H.lowest_terms].
-
-    ``` python
-    >>> d6.ge(4)
-    H({False: 3, True: 3})
-    >>> d6.ge(4).lowest_terms()
-    H({False: 1, True: 1})
-
-    ```
+        >>> d6.ge(4)
+        H({False: 3, True: 3})
+        >>> d6.ge(4).lowest_terms()
+        H({False: 1, True: 1})
 
     Testing equivalence implicitly performs reductions of operands.
 
-    ``` python
-    >>> d6.ge(4) == d6.ge(4).lowest_terms()
-    True
-
-    ```
+        >>> d6.ge(4) == d6.ge(4).lowest_terms()
+        True
     """
 
-    __slots__: Any = (
+    __slots__ = (
         "_h",
         "_hash",
-        "_lowest_terms",
         "_order_stat_funcs_by_n",
         "_total",
     )
 
-    # ---- Initializer -----------------------------------------------------------------
+    @overload
+    def __init__(
+        self: "H[Never]", init_val: Mapping[Never, SupportsInt], /
+    ) -> None: ...
+    @overload
+    def __init__(self: "H[_T]", init_val: Mapping[_T, SupportsInt], /) -> None: ...
+    @overload
+    def __init__(self: "H[Never]", init_val: Iterable[Never], /) -> None: ...
+    @overload
+    def __init__(self: "H[_T]", init_val: Iterable[_T], /) -> None: ...
+    @overload
+    def __init__(self: "H[Never]", init_val: Literal[0, False], /) -> None: ...
+    @overload
+    def __init__(self: "H[int]", init_val: int, /) -> None: ...
+    def __init__(self, init_val: Any, /) -> None:
+        r"""Constructor."""
+        self._h: dict[_T_co, int]
+        self._hash: int | None = None
+        self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}
+        self._total: int | None = None
 
-    @beartype
-    def __init__(self, items: _SourceT) -> None:
-        r"Initializer."
-        super().__init__()
-        self._h: _MappingT
-
-        if isinstance(items, H):
-            self._h = items._h
-        elif isinstance(items, SupportsInt):
-            if items == 0:
-                self._h = {}
-            else:
-                simple_init = as_int(items)
-                outcome_range = range(
-                    simple_init if simple_init < 0 else 1,
-                    0 if simple_init < 0 else simple_init + 1,
-                )
-
-                # if isinstance(items, RealLike):
-                #     outcome_type = type(items)
-                #     self._h = {outcome_type(i): 1 for i in outcome_range}
-                # else:
-                #     self._h = {i: 1 for i in outcome_range}
-                assert isinstance(items, RealLike)
-                outcome_type = type(items)
-                self._h = {outcome_type(i): 1 for i in outcome_range}
-        elif isinstance(items, HableT):
-            self._h = items.h()._h
-        elif isinstance(items, IterableC):
-            if isinstance(items, Mapping):
-                items = items.items()
-
-            # items is either an Iterable[RealLike] or an Iterable[tuple[RealLike,
-            # SupportsInt]] (although this technically supports Iterable[RealLike |
-            # tuple[RealLike, SupportsInt]])
-            self._h = {}
-            sorted_items = list(items)
-
+        def _sorted_items_iter(
+            items: Sequence[tuple[Any, SupportsInt]],
+        ) -> Iterator[tuple[Any, int]]:
+            sorted_items = [(k, lossless_int(v)) for k, v in items]
             try:
                 sorted_items.sort()
             except TypeError:
-                sorted_items.sort(key=natural_key)
-
-            # As of Python 3.7, insertion order of keys is preserved
-            for item in sorted_items:
-                if isinstance(item, tuple):
-                    outcome, count = item
-                    count = as_int(count)
-                else:
-                    outcome = item
-                    count = 1
-
+                sorted_items.sort(key=lambda item: natural_key(item[0]))
+            for outcome, count in sorted_items:
                 if count < 0:
                     raise ValueError(f"count for {outcome} cannot be negative")
+                yield (outcome, count)
 
-                if outcome not in self._h:
-                    self._h[outcome] = 0
-
-                self._h[outcome] += count
+        if isinstance(init_val, Iterable):
+            if isinstance(init_val, Mapping):
+                self._h = dict(_sorted_items_iter(list(init_val.items())))  # ty: ignore[invalid-argument-type]
+            else:
+                c: Counter[_T_co] = Counter(init_val)
+                self._h = dict(_sorted_items_iter(list(c.items())))
+        elif isinstance(init_val, int):
+            n = abs(init_val)
+            if init_val > 0:
+                self._h = dict(_sorted_items_iter([(i, 1) for i in range(1, n + 1)]))
+            elif init_val < 0:
+                self._h = dict(_sorted_items_iter([(i, 1) for i in range(-n, 0)]))
+            else:
+                self._h = {}
         else:
-            raise TypeError(f"unrecognized initializer type {items!r}")
+            raise TypeError(
+                f"scalar init_val must be int; use explicit Mapping or Iterable "
+                f"for {type(init_val).__qualname__!r} outcomes"
+            )
 
-        # We can't use something like functools.lru_cache for these values because those
-        # mechanisms call this object's __hash__ method which relies on both of these
-        # and we don't want a circular dependency when computing this object's hash.
-        self._hash: Optional[int] = None
-        self._total: int = sum(self._h.values())
-        self._lowest_terms: Optional[H] = None
+    # ---- Class methods ---------------------------------------------------------------
 
-        # We don't use functools' caching mechanisms generally because they don't
-        # present a good mechanism for scoping the cache to object instances such that
-        # the cache will be purged when the object is deleted. functools.cached_property
-        # is an exception, but it requires that objects have proper __dict__ values,
-        # which Hs do not. So we basically do what functools.cached_property does, but
-        # without a __dict__.
-        self._order_stat_funcs_by_n: dict[int, Callable[[int], H]] = {}
+    @classmethod
+    def from_counts(
+        cls,
+        *sources: Mapping[_T, SupportsInt] | Iterable[tuple[_T, SupportsInt]],
+    ) -> Self:
+        r"""
+        Construct a [`H`][dyce.H] by accumulating counts from one or more *sources*.
+
+        Each source may be a mapping of outcomes to counts, or an iterable of
+        `#!python (outcome, count)` pairs.
+        Counts for the same outcome across all sources are summed.
+
+            >>> H.from_counts([(1, 3), (2, 2), (1, 1)])
+            H({1: 4, 2: 2})
+            >>> H.from_counts({1: 2, 2: 3}, [(1, 1), (3, 4)])
+            H({1: 3, 2: 3, 3: 4})
+
+        With a single mapping source this is equivalent to [`H`][dyce.H] construction,
+        but multiple sources are accumulated rather than raising on duplicate keys.
+
+            >>> H.from_counts(H(6), H(6))  # pyrefly: ignore[no-matching-overload]
+            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2})
+
+        """
+        c: Counter[_T] = Counter()
+        for source in sources:
+            if isinstance(source, Mapping):
+                # The cast is necessary because isinstance only narrows on Mapping, but
+                # Iterable[tuple[_T, SupportsInt]] > Mapping[tuple[_T, SupportsInt],
+                # Any], so type checkers rightly include that as the inferred return
+                # type for source.items()
+                source = cast("ItemsView[_T, SupportsInt]", source.items())  # noqa: PLW2901
+            for outcome, count in source:
+                c[outcome] += lossless_int(count)
+        return cls(c)  # pyright: ignore[reportArgumentType,reportCallIssue]
 
     # ---- Overrides -------------------------------------------------------------------
 
-    @beartype
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({dict.__repr__(self._h)})"
-
-    @beartype
-    def __eq__(self, other) -> bool:
-        if isinstance(other, HableT):
-            return __eq__(self, other.h())
-        elif isinstance(other, H):
-            return __eq__(self.lowest_terms()._h, other.lowest_terms()._h)
-        else:
-            return super().__eq__(other)
-
-    @beartype
-    def __ne__(self, other) -> bool:
-        if isinstance(other, HableT):
-            return __ne__(self, other.h())
-        elif isinstance(other, H):
-            return not __eq__(self, other)
-        else:
-            return super().__ne__(other)
-
-    @beartype
     def __hash__(self) -> int:
         if self._hash is None:
-            self._hash = hash(frozenset(self.lowest_terms().items()))
-
+            self._hash = hash((type(self), *self.lowest_terms().items()))
         return self._hash
 
-    @beartype
-    def __bool__(self) -> int:
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self._h!r})"
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, H):
+            return bool(self.lowest_terms()._h == other.lowest_terms()._h)
+        if isinstance(other, HableT):
+            return self.__eq__(other.h())
+        return super().__eq__(other)
+
+    # ---- Mapping abstract methods ----------------------------------------------------
+
+    def __bool__(self) -> bool:
         return bool(self.total)
 
-    @beartype
+    def __getitem__(self, key: object, /) -> int:
+        return self._h[key]  # type: ignore[index] # ty: ignore[invalid-argument-type]
+
+    def __iter__(self) -> Iterator[_T_co]:
+        return iter(self._h)
+
     def __len__(self) -> int:
         return len(self._h)
 
-    @beartype
-    def __getitem__(self, key: RealLike) -> int:
-        return __getitem__(self._h, key)
-
-    @beartype
-    def __iter__(self) -> Iterator[RealLike]:
-        yield from self._h
-
-    @beartype
-    def __reversed__(self) -> Iterator[RealLike]:
-        return reversed(self._h)
-
-    @beartype
-    def __contains__(self, key: RealLike) -> bool:  # type: ignore [override]
-        return key in self._h
-
-    @beartype
-    def __add__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__add__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __radd__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __add__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __sub__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__sub__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rsub__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __sub__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __mul__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__mul__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rmul__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __mul__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __matmul__(self, other: SupportsInt) -> "H":
-        try:
-            other = as_int(other)
-        except TypeError:
-            return NotImplemented
-
-        if other < 0:
-            raise ValueError("argument cannot be negative")
-        else:
-            return sum_h(repeat(self, other))
-
-    @beartype
-    def __rmatmul__(self, other: SupportsInt) -> "H":
-        return self.__matmul__(other)
-
-    @beartype
-    def __truediv__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__truediv__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rtruediv__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __truediv__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __floordiv__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__floordiv__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rfloordiv__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __floordiv__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __mod__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__mod__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rmod__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __mod__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __pow__(self, other: _OperandT) -> "H":
-        try:
-            return self.map(__pow__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rpow__(self, other: RealLike) -> "H":
-        try:
-            return self.rmap(other, __pow__)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __and__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
-        try:
-            if isinstance(other, SupportsInt):
-                other = as_int(other)
-
-            return self.map(__and__, other)
-        except (NotImplementedError, TypeError):
-            return NotImplemented
-
-    @beartype
-    def __rand__(self, other: SupportsInt) -> "H":
-        try:
-            return self.rmap(as_int(other), __and__)
-        except (NotImplementedError, TypeError):
-            return NotImplemented
-
-    @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __xor__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
-        try:
-            if isinstance(other, SupportsInt):
-                other = as_int(other)
-
-            return self.map(__xor__, other)
-        except NotImplementedError:
-            return NotImplemented
-
-    @beartype
-    def __rxor__(self, other: SupportsInt) -> "H":
-        try:
-            return self.rmap(as_int(other), __xor__)
-        except (NotImplementedError, TypeError):
-            return NotImplemented
-
-    @beartype
-    # TODO(posita): See <https://github.com/beartype/beartype/issues/152>
-    def __or__(self, other: Union[SupportsInt, "H", "HableT"]) -> "H":
-        try:
-            if isinstance(other, SupportsInt):
-                other = as_int(other)
-
-            return self.map(__or__, other)
-        except (NotImplementedError, TypeError):
-            return NotImplemented
-
-    @beartype
-    def __ror__(self, other: SupportsInt) -> "H":
-        try:
-            return self.rmap(as_int(other), __or__)
-        except (NotImplementedError, TypeError):
-            return NotImplemented
-
-    @beartype
-    def __neg__(self) -> "H":
-        return self.umap(__neg__)
-
-    @beartype
-    def __pos__(self) -> "H":
-        return self.umap(__pos__)
-
-    @beartype
-    def __abs__(self) -> "H":
-        return self.umap(__abs__)
-
-    @beartype
-    def __invert__(self) -> "H":
-        return self.umap(__invert__)
-
-    @beartype
     def counts(self) -> ValuesView[int]:
         r"""
-        More descriptive synonym for the [``values`` method][dyce.h.H.values].
+        More descriptive synonym for the `#!python values` mapping method.
         """
         return self._h.values()
 
-    @beartype
-    def items(self) -> ItemsView[RealLike, int]:
-        return self._h.items()
-
-    @beartype
-    def keys(self) -> KeysView[RealLike]:
-        return self.outcomes()
-
-    @beartype
-    def outcomes(self) -> KeysView[RealLike]:
+    def outcomes(self: "H[_T]") -> KeysView[_T]:
         r"""
-        More descriptive synonym for the [``keys`` method][dyce.h.H.keys].
+        More descriptive synonym for the `#!python keys` mapping method.
         """
         return self._h.keys()
 
-    @beartype
-    def reversed(self) -> Iterator[RealLike]:
-        return reversed(self)
+    # ---- Forward operators -----------------------------------------------------------
 
-    @beartype
-    def values(self) -> ValuesView[int]:
-        return self.counts()
+    @overload
+    def __matmul__(self: "H[Never]", rhs: SupportsInt) -> "H[Never]": ...
+    @overload
+    def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
+    @overload
+    # See <https://github.com/jorenham/optype/discussions/574>
+    def __matmul__(self: "H[ot.CanAdd[int, int]]", rhs: SupportsInt) -> "H[int]": ...
+    @overload
+    def __matmul__(
+        self: "H[_ConvolvableT]", rhs: SupportsInt
+    ) -> "H[_ConvolvableT]": ...
+    @overload
+    def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
+    def __matmul__(self: "H", rhs: SupportsInt) -> "H":
+        n = lossless_int_or_not_implemented(rhs)
+        if n is NotImplemented:
+            return NotImplemented
+        if n < 0:
+            return NotImplemented
+        result = _convolve(self._h, n)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __add__(
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __add__(self: "H[_T]", rhs: "H[ot.CanAdd[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "H[_T]", rhs: "HableT[ot.CanAdd[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __add__(self: "H[_T]", rhs: ot.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __add__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__add__", "__radd__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __sub__(
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __sub__(self: "H[_T]", rhs: "H[ot.CanSub[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "H[_T]", rhs: "HableT[ot.CanSub[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __sub__(self: "H[_T]", rhs: ot.CanSub[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __sub__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__sub__", "__rsub__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__sub__", "__rsub__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __mul__(
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mul__(
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mul__(
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mul__(self: "H[_T]", rhs: "H[ot.CanMul[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __mul__(
+        self: "H[_T]", rhs: "HableT[ot.CanMul[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mul__(self: "H[_T]", rhs: ot.CanMul[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __mul__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__mul__", "__rmul__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__mul__", "__rmul__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __truediv__(
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "H[_T]", rhs: "H[ot.CanTruediv[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "H[_T]", rhs: "HableT[ot.CanTruediv[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "H[_T]", rhs: ot.CanTruediv[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __truediv__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__truediv__", "__rtruediv__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__truediv__", "__rtruediv__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __floordiv__(
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __floordiv__(
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __floordiv__(
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __floordiv__(
+        self: "H[_T]", rhs: "H[ot.CanFloordiv[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __floordiv__(
+        self: "H[_T]", rhs: "HableT[ot.CanFloordiv[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __floordiv__(
+        self: "H[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __floordiv__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(
+                    lhs, "__floordiv__", "__rfloordiv__", rhs
+                ),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__floordiv__", "__rfloordiv__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __mod__(
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mod__(
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mod__(
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mod__(self: "H[_T]", rhs: "H[ot.CanMod[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __mod__(
+        self: "H[_T]", rhs: "HableT[ot.CanMod[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __mod__(self: "H[_T]", rhs: ot.CanMod[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __mod__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__mod__", "__rmod__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__mod__", "__rmod__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __pow__(
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __pow__(
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __pow__(
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __pow__(self: "H[_T]", rhs: "H[ot.CanPow2[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __pow__(
+        self: "H[_T]", rhs: "HableT[ot.CanPow2[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __pow__(self: "H[_T]", rhs: ot.CanPow2[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __pow__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__pow__", "__rpow__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__pow__", "__rpow__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __lshift__(
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __lshift__(
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __lshift__(
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __lshift__(
+        self: "H[_T]", rhs: "H[ot.CanLshift[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __lshift__(
+        self: "H[_T]", rhs: "HableT[ot.CanLshift[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __lshift__(self: "H[_T]", rhs: ot.CanLshift[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __lshift__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__lshift__", "__rlshift__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__lshift__", "__rlshift__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rshift__(
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rshift__(
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rshift__(
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rshift__(
+        self: "H[_T]", rhs: "H[ot.CanRshift[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rshift__(
+        self: "H[_T]", rhs: "HableT[ot.CanRshift[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rshift__(self: "H[_T]", rhs: ot.CanRshift[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rshift__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__rshift__", "__rrshift__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__rshift__", "__rrshift__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __and__(
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __and__(
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __and__(
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __and__(self: "H[_T]", rhs: "H[ot.CanAnd[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __and__(
+        self: "H[_T]", rhs: "HableT[ot.CanAnd[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __and__(self: "H[_T]", rhs: ot.CanAnd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __and__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__and__", "__rand__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__and__", "__rand__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __or__(
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __or__(
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __or__(
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __or__(self: "H[_T]", rhs: "H[ot.CanOr[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __or__(
+        self: "H[_T]", rhs: "HableT[ot.CanOr[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __or__(self: "H[_T]", rhs: ot.CanOr[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __or__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__or__", "__ror__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__or__", "__ror__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __xor__(
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __xor__(
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __xor__(
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __xor__(self: "H[_T]", rhs: "H[ot.CanXor[_T, _ResultT]]") -> "H[_ResultT]": ...
+    @overload
+    def __xor__(
+        self: "H[_T]", rhs: "HableT[ot.CanXor[_T, _ResultT]]"
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __xor__(self: "H[_T]", rhs: ot.CanXor[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __xor__(self, rhs: object) -> "H[object]":
+        rhs = _flatten_to_h(rhs)
+        if isinstance(rhs, H):
+            result = _h_binary_callable(
+                self._h,
+                rhs._h,
+                lambda lhs, rhs: _apply_opname(lhs, "__xor__", "__rxor__", rhs),
+            )
+        else:
+            result = _map_opname_fwd(self._h, "__xor__", "__rxor__", rhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    # ---- Reflected operators ---------------------------------------------------------
+
+    @overload
+    def __rmatmul__(self: "H[Never]", lhs: SupportsInt) -> "H[Never]": ...
+    @overload
+    def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
+    @overload
+    # See <https://github.com/jorenham/optype/discussions/574>
+    def __rmatmul__(self: "H[ot.CanAdd[int, int]]", lhs: SupportsInt) -> "H[int]": ...
+    @overload
+    def __rmatmul__(
+        self: "H[_ConvolvableT]", lhs: SupportsInt
+    ) -> "H[_ConvolvableT]": ...
+    @overload
+    def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
+    def __rmatmul__(self: "H", lhs: SupportsInt) -> "H":
+        return self.__matmul__(lhs)
+
+    @overload
+    def __radd__(
+        self: "H[ot.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __radd__(self: "H[_T]", lhs: ot.CanRAdd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __radd__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__add__", "__radd__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rsub__(
+        self: "H[ot.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rsub__(self: "H[_T]", lhs: ot.CanRSub[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rsub__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__sub__", "__rsub__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rmul__(
+        self: "H[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rmul__(self: "H[_T]", lhs: ot.CanRMul[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rmul__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__mul__", "__rmul__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rtruediv__(
+        self: "H[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rtruediv__(
+        self: "H[_T]", lhs: ot.CanRTruediv[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __rtruediv__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__truediv__", "__rtruediv__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rfloordiv__(
+        self: "H[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rfloordiv__(
+        self: "H[_T]", lhs: ot.CanRFloordiv[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __rfloordiv__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__floordiv__", "__rfloordiv__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rmod__(
+        self: "H[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rmod__(self: "H[_T]", lhs: ot.CanRMod[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rmod__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__mod__", "__rmod__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rpow__(
+        self: "H[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rpow__(self: "H[_T]", lhs: ot.CanRPow[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rpow__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__pow__", "__rpow__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rlshift__(
+        self: "H[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rlshift__(
+        self: "H[_T]", lhs: ot.CanRLshift[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __rlshift__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__lshift__", "__rlshift__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rrshift__(
+        self: "H[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rrshift__(
+        self: "H[_T]", lhs: ot.CanRRshift[_T, _ResultT]
+    ) -> "H[_ResultT]": ...
+    def __rrshift__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__rshift__", "__rrshift__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rand__(
+        self: "H[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rand__(self: "H[_T]", lhs: ot.CanRAnd[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rand__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__and__", "__rand__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __ror__(
+        self: "H[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __ror__(self: "H[_T]", lhs: ot.CanROr[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __ror__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__or__", "__ror__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def __rxor__(
+        self: "H[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> "H[_ResultT]": ...
+    @overload
+    def __rxor__(self: "H[_T]", lhs: ot.CanRXor[_T, _ResultT]) -> "H[_ResultT]": ...
+    def __rxor__(self, lhs: object) -> "H[object]":
+        result = _map_opname_ref(self._h, "__xor__", "__rxor__", lhs)
+        return NotImplemented if result is NotImplemented else H(result)
+
+    @overload
+    def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def lt(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_lt, rhs)`.
+
+            >>> H(20).lt(10)
+            H({False: 11, True: 9})
+            >>> H(6).lt(H(10)).lowest_terms()
+            H({False: 7, True: 13})
+        """
+        return self.apply(ot.do_lt, rhs)  # type: ignore[arg-type]
+
+    @overload
+    def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def le(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_le, rhs)`.
+
+            >>> H(20).le(10)
+            H({False: 10, True: 10})
+            >>> H(6).le(H(10)).lowest_terms()
+            H({False: 1, True: 3})
+        """
+        return self.apply(ot.do_le, rhs)  # type: ignore[arg-type]
+
+    @overload
+    def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def eq(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_eq, rhs)`.
+
+            >>> H(20).eq(10)
+            H({False: 19, True: 1})
+            >>> H(6).eq(H(10)).lowest_terms()
+            H({False: 9, True: 1})
+        """
+        return self.apply(ot.do_eq, rhs)
+
+    @overload
+    def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def ne(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_ne, rhs)`.
+
+            >>> H(20).ne(10)
+            H({False: 1, True: 19})
+            >>> H(6).ne(H(10)).lowest_terms()
+            H({False: 1, True: 9})
+        """
+        return self.apply(ot.do_ne, rhs)
+
+    @overload
+    def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def ge(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_ge, rhs)`.
+
+            >>> H(20).ge(10)
+            H({False: 9, True: 11})
+            >>> H(6).ge(H(10)).lowest_terms()
+            H({False: 13, True: 7})
+        """
+        return self.apply(ot.do_ge, rhs)  # type: ignore[arg-type]
+
+    @overload
+    def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
+    @overload
+    def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
+    def gt(self, rhs: "H[object] | object") -> "H[bool]":
+        r"""
+        Shorthand for `#!python self.apply(optype.do_gt, rhs)`.
+
+            >>> H(20).gt(10)
+            H({False: 10, True: 10})
+            >>> H(6).gt(H(10)).lowest_terms()
+            H({False: 3, True: 1})
+        """
+        return self.apply(ot.do_gt, rhs)  # type: ignore[arg-type]
+
+    # ---- Unary operators -------------------------------------------------------------
+
+    def __neg__(self: "H[ot.CanNeg[_ResultT]]") -> "H[_ResultT]":
+        result = _h_unary_opname(self._h, "__neg__")
+        if result is NotImplemented:
+            raise TypeError(
+                f"bad operand type for unary -: {type(next(iter(self._h))).__qualname__!r}"
+            )
+        return H(result)
+
+    def __pos__(self: "H[ot.CanPos[_ResultT]]") -> "H[_ResultT]":
+        result = _h_unary_opname(self._h, "__pos__")
+        if result is NotImplemented:
+            raise TypeError(
+                f"bad operand type for unary +: {type(next(iter(self._h))).__qualname__!r}"
+            )
+        return H(result)
+
+    def __abs__(self: "H[ot.CanAbs[_ResultT]]") -> "H[_ResultT]":
+        result = _h_unary_opname(self._h, "__abs__")
+        if result is NotImplemented:
+            raise TypeError(
+                f"bad operand type for abs(): {type(next(iter(self._h))).__qualname__!r}"
+            )
+        return H(result)
+
+    def __invert__(self: "H[ot.CanInvert[_ResultT]]") -> "H[_ResultT]":
+        result = _h_unary_opname(self._h, "__invert__")
+        if result is NotImplemented:
+            raise TypeError(
+                f"bad operand type for unary ~: {type(next(iter(self._h))).__qualname__!r}"
+            )
+        return H(result)
 
     # ---- Properties ------------------------------------------------------------------
 
     @property
     def total(self) -> int:
         r"""
-        !!! warning "Experimental"
+        Equivalent to `#!python sum(self.counts())`.
+        The result is cached to avoid redundant computation with multiple accesses.
 
-            This property should be considered experimental and may change or disappear
-            in future versions.
-
-        Equivalent to ``#!python sum(self.counts())``.
+            >>> H({4: 2, 5: 3, 6: 1}).total
+            6
+            >>> H({}).total
+            0
         """
+        if self._total is None:
+            self._total = sum(self._h.values())
         return self._total
 
     # ---- Methods ---------------------------------------------------------------------
 
-    @classmethod
-    @deprecated
-    @beartype
-    def foreach(
-        cls,
-        dependent_term: Callable[..., HOrOutcomeT],
-        **independent_sources: _SourceT,
-    ) -> "H":
+    def merge(
+        self: "H[_T]", other: "H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]"
+    ) -> "H[_T]":
         r"""
-        !!! warning "Deprecated"
+        Merges counts.
 
-            This method has been deprecated and will be removed in a future release. See
-            the [``expandable`` decorator][dyce.evaluation.expandable] and
-            [``foreach`` function][dyce.evaluation.foreach] for more flexible
-            alternatives.
-
-        Calls ``#!python dependent_term`` for each set of outcomes from the product of
-        ``independent_sources`` and accumulates the results. This is useful for
-        resolving dependent probabilities. Returned histograms are always reduced to
-        their lowest terms.
-
-        For example rolling a d20, re-rolling a ``#!python 1`` if it comes up, and
-        keeping the result might be expressed as[^1]:
-
-        [^1]:
-
-            This is primarily for illustration. [``H.substitute``][dyce.h.H.substitute]
-            is often better suited to cases involving re-rolling a single independent
-            term such as this one.
-
-        ``` python
-        >>> d20 = H(20)
-
-        >>> def reroll_one_dependent_term(d20_outcome):
-        ...   if d20_outcome == 1:
-        ...     return d20
-        ...   else:
-        ...     return d20_outcome
-
-        >>> H.foreach(reroll_one_dependent_term, d20_outcome=d20)
-        H({1: 1, 2: 21, 3: 21, ..., 19: 21, 20: 21})
-
-        ```
-
-        The ``#!python foreach`` class method merely wraps *dependent_term* and calls
-        [``P.foreach``][dyce.p.P.foreach]. In doing so, it imposes a very modest
-        overhead that is negligible in most cases.
-
-        ``` python
-        --8<-- "docs/assets/perf_foreach.txt"
-        ```
-
-        <details>
-        <summary>Source: <a href="https://github.com/posita/dyce/blob/latest/docs/assets/perf_foreach.ipy"><code>perf_foreach.ipy</code></a></summary>
-
-        ``` python
-        --8<-- "docs/assets/perf_foreach.ipy"
-        ```
-        </details>
+            >>> H(4).merge(H(6))
+            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
         """
-        from dyce import P
+        result: dict[_T, int] = dict(self)
+        other_h = other if isinstance(other, H) else H(other)
+        for outcome, count in other_h.items():
+            result[outcome] = result.get(outcome, 0) + count  # ty: ignore[invalid-assignment,no-matching-overload]
+        return H(result)
 
-        def _dependent_term(**roll_kw) -> HOrOutcomeT:
-            outcome_kw: dict[str, RealLike] = {}
-
-            for key, roll in roll_kw.items():
-                assert isinstance(roll, tuple)
-                assert len(roll) == 1
-                outcome_kw[key] = roll[0]
-
-            return dependent_term(**outcome_kw)
-
-        return P.foreach(_dependent_term, **independent_sources)
-
-    @beartype
-    def map(self, bin_op: _BinaryOperatorT, right_operand: _OperandT) -> "H":
+    @overload
+    def apply(
+        self: "H[_T]",
+        func: Callable[[_T], _ResultT],
+    ) -> "H[_ResultT]": ...
+    @overload
+    def apply(
+        self: "H[_T]",
+        func: Callable[[_T, _OtherT], _ResultT],
+        other: "H[_OtherT]",
+    ) -> "H[_ResultT]": ...
+    @overload
+    def apply(
+        self: "H[_T]",
+        func: Callable[[_T, _OtherT], _ResultT],
+        other: _OtherT,
+    ) -> "H[_ResultT]": ...
+    def apply(
+        self: "H[_T]",
+        func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT],
+        other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
+    ) -> "H[_ResultT]":
         r"""
-        Applies *bin_op* to each outcome of the histogram as the left operand and
-        *right_operand* as the right. Shorthands exist for many arithmetic operators and
-        comparators.
+        Return a new [`H`][dyce.H] by applying *func* to outcomes.
+        If *operand* is provided, *func* should have two parameters, otherwise it should have one.
 
-        ``` python
-        >>> import operator
-        >>> d6 = H(6)
-        >>> d6.map(operator.__add__, d6)
-        H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-        >>> d6.map(operator.__add__, d6) == d6 + d6
-        True
+        If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `#!python func(h_outcome, other_outcome)` for each pair and accumulate `#!python h_count * other_count`.
 
-        ```
+        If *operand* is a scalar, call `#!python func(outcome, operand)` for each outcome, passing counts through unchanged.
 
-        ``` python
-        >>> d6.map(operator.__pow__, 2)
-        H({1: 1, 4: 1, 9: 1, 16: 1, 25: 1, 36: 1})
-        >>> d6.map(operator.__pow__, 2) == d6 ** 2
-        True
+        Resulting counts for duplicate outcomes are summed.
 
-        ```
+            >>> import operator
+            >>> H({10: 1, 20: 1}).apply(operator.sub, 10)
+            H({0: 1, 10: 1})
+            >>> H({10: 1, 20: 1}).apply(operator.sub, H({1: 1, 2: 1}))
+            H({8: 1, 9: 1, 18: 1, 19: 1})
 
-        ``` python
-        >>> d6.map(operator.__gt__, 3)
-        H({False: 3, True: 3})
-        >>> d6.map(operator.__gt__, 3) == d6.gt(3)
-        True
+            >>> # optype provides reflected operator functions as do_r*
+            >>> import optype as ot
 
-        ```
+            >>> H({10: 1, 20: 1}).apply(ot.do_rsub, 10)
+            H({-10: 1, 0: 1})
+
+            >>> H({10: 1, 20: 1}).apply(ot.do_rsub, H({1: 1, 2: 1}))
+            H({-19: 1, -18: 1, -9: 1, -8: 1})
+
+        One way to compute how often a six-sided die “beats” an eight-sided die rolled together:
+
+            >>> from enum import IntEnum
+
+            >>> class Versus(IntEnum):
+            ...     LOSS = -1
+            ...     DRAW = 0
+            ...     WIN = 1
+
+            >>> d6 = H(6)
+            >>> d8 = H(8)
+            >>> vs = lambda h_outcome, other_outcome: (
+            ...     Versus.LOSS
+            ...     if h_outcome < other_outcome
+            ...     else Versus.WIN
+            ...     if h_outcome > other_outcome
+            ...     else Versus.DRAW
+            ... )
+            >>> d6.apply(vs, d8)
+            H({<Versus.LOSS: -1>: 27, <Versus.DRAW: 0>: 6, <Versus.WIN: 1>: 15})
+
+        Omitting *operand* allows examination of just the histogram.
+        One way to determine Apocalypse World outcomes with a modifier:
+
+            >>> class PBTA(IntEnum):
+            ...     MISS = 0
+            ...     WEAK_HIT = 1
+            ...     STRONG_HIT = 2
+
+            >>> mod = +1
+            >>> pbta_result = (2 @ H(6) + mod).apply(
+            ...     lambda outcome: (
+            ...         PBTA.MISS
+            ...         if outcome <= 6
+            ...         else PBTA.WEAK_HIT
+            ...         if 7 <= outcome <= 9
+            ...         else PBTA.STRONG_HIT
+            ...     )
+            ... )
+            >>> pbta_result
+            H({<PBTA.MISS: 0>: 10, <PBTA.WEAK_HIT: 1>: 16, <PBTA.STRONG_HIT: 2>: 10})
+
+        One way to count how often summing outcomes comes out even on 2d3:
+
+            >>> d3_2 = 2 @ H(3)
+            >>> d3_2
+            H({2: 1, 3: 2, 4: 3, 5: 2, 6: 1})
+            >>> d3_2_is_even = d3_2.apply(lambda outcome: outcome % 2 == 0)
+            >>> d3_2_is_even
+            H({False: 4, True: 5})
+            >>> (d3_2 % 2).eq(0) == d3_2_is_even
+            True
+            >>> ((d3_2 + 1) % 2) == d3_2_is_even
+            True
         """
-        if isinstance(right_operand, HableT):
-            right_operand = right_operand.h()
+        if other is Sentinel:
+            result: dict[_ResultT, int] = {}
+            func = cast("Callable[[_T], _ResultT]", func)
+            for outcome, count in self._h.items():
+                new_outcome = func(outcome)
+                result[new_outcome] = result.get(new_outcome, 0) + count
+            return H(result)
 
-        if isinstance(right_operand, H):
-            return type(self)(
-                (bin_op(s, o), self[s] * right_operand[o])
-                for s, o in product(self, right_operand)
+        func = cast("Callable[[_T, _OtherT], _ResultT]", func)
+        if isinstance(other, H):
+            return H(
+                cast("dict[_ResultT, int]", _h_binary_callable(self._h, other._h, func))  # noqa: SLF001
             )
         else:
-            return type(self)(
-                (bin_op(outcome, right_operand), count)
-                for outcome, count in self.items()
+            return H(
+                cast(
+                    "dict[_ResultT, int]", _h_binary_callable(self._h, {other: 1}, func)
+                )
             )
 
-    @beartype
-    def rmap(self, left_operand: RealLike, bin_op: _BinaryOperatorT) -> "H":
+    @experimental
+    def exactly_k_times_in_n(
+        self: "H[_T]",
+        outcome: _T,
+        n: SupportsInt,
+        k: SupportsInt,
+    ) -> int:
         r"""
-        Analogous to the [``map`` method][dyce.h.H.map], but where the caller supplies
-        *left_operand*.
+        <!-- BEGIN MONKEY PATCH --
+        >>> import warnings
+        >>> from dyce.lifecycle import ExperimentalWarning
+        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
-        ``` python
-        >>> import operator
-        >>> d6 = H(6)
-        >>> d6.rmap(2, operator.__pow__)
-        H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1})
-        >>> d6.rmap(2, operator.__pow__) == 2 ** d6
-        True
+           -- END MONKEY PATCH -->
 
-        ```
+        Computes and returns (in constant time) the number of ways *outcome* appears exactly *k* times among *n* like histograms.
+        Uses the binomial coefficient as a more efficient alternative to `#!python (n @ self.eq(outcome))[k]`.
 
-        !!! note
+            >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
+            150
+            >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=2, n=3, k=3)
+            1
+            >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=4, n=3, k=3)
+            8
 
-            The positions of *left_operand* and *bin_op* are different from
-            [``map`` method][dyce.h.H.map]. This is intentional and serves as a reminder
-            of operand ordering.
+        !!! note "Counts, not probabilities"
+
+            This returns a *count* of ways, not a probability, and may not be in lowest terms.
+            (See [`lowest_terms`][dyce.H.lowest_terms].)
+            Divide by `#!python self.total ** n` to get a probability.
+            (See [`total`][dyce.H.total].)
+
+                >>> from fractions import Fraction
+                >>> h = H((2, 3, 3, 4, 4, 5))
+                >>> n, k = 3, 2
+                >>> (n @ h).total == h.total**n
+                True
+                >>> Fraction(h.exactly_k_times_in_n(outcome=3, n=n, k=k), h.total**n)
+                Fraction(2, 9)
+                >>> h_not_lowest_terms = h.merge(h)
+                >>> h == h_not_lowest_terms
+                True
+                >>> h_not_lowest_terms
+                H({2: 2, 3: 4, 4: 4, 5: 2})
+                >>> h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k)
+                384
+                >>> Fraction(
+                ...     h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k),
+                ...     h_not_lowest_terms.total**n,
+                ... )
+                Fraction(2, 9)
+
+        <!-- BEGIN MONKEY PATCH --
+        >>> warnings.resetwarnings()
+
+           -- END MONKEY PATCH -->
         """
-        return type(self)(
-            (bin_op(left_operand, outcome), count) for outcome, count in self.items()
+        n = lossless_int(n)
+        k = lossless_int(k)
+
+        if k > n:
+            raise ValueError(f"k ({k!r}) must be less than or equal to n ({n!r})")
+
+        c_outcome = self.get(outcome, 0)
+        return math.comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)
+
+    def format(
+        self,
+        *,
+        width: int = _ROW_WIDTH,
+        scaled: bool = False,
+        tick: str = "#",
+    ) -> str:
+        r"""
+        Returns a formatted string representation of the histogram.
+        *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
+        *tick* is used as the bar character and defaults to `#!python "#"`.
+
+            >>> print((2 @ H(6)).zero_fill(range(1, 21)).format(width=65, tick="@"))
+            avg |    7.00
+            std |    2.42
+            var |    5.83
+              1 |   0.00% |
+              2 |   2.78% |@
+              3 |   5.56% |@@
+              4 |   8.33% |@@@@
+              5 |  11.11% |@@@@@
+              6 |  13.89% |@@@@@@
+              7 |  16.67% |@@@@@@@@
+              8 |  13.89% |@@@@@@
+              9 |  11.11% |@@@@@
+             10 |   8.33% |@@@@
+             11 |   5.56% |@@
+             12 |   2.78% |@
+             13 |   0.00% |
+             14 |   0.00% |
+             15 |   0.00% |
+             16 |   0.00% |
+             17 |   0.00% |
+             18 |   0.00% |
+             19 |   0.00% |
+             20 |   0.00% |
+
+        If *scaled* is `#!python True`, horizontal bars are scaled to *width*.
+
+            >>> h_ge = (2 @ H(6)).ge(7)
+            >>> print(f"{' 65 chars wide -->|':->65}")
+            ---------------------------------------------- 65 chars wide -->|
+            >>> print(H(1).format(width=65, scaled=False))
+            avg |    1.00
+            std |    0.00
+            var |    0.00
+              1 | 100.00% |##################################################
+            >>> print(h_ge.format(width=65, scaled=False))
+              avg |    0.58
+              std |    0.49
+              var |    0.24
+            False |  41.67% |####################
+             True |  58.33% |############################
+            >>> print(h_ge.format(width=65, scaled=True))
+              avg |    0.58
+              std |    0.49
+              var |    0.24
+            False |  41.67% |##################################
+             True |  58.33% |################################################
+        """
+        # Get the length of the fixed-width column " | {<var>:7.2%} |" for computing the
+        # available tick space
+        prob_len = len(f" | {0.0:7.2%} |")
+        try:
+            mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+            std: float | None = self.stdev()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+            var: float | None = self.variance()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        except Exception as exc:  # noqa: BLE001
+            # Broad catch is intentional: format() is a display method that should
+            # always produce output. Any failure to compute statistics (including from
+            # runtime type checkers like beartype) is treated as "stats not available"
+            # rather than an error.
+            warnings.warn(f"{exc!s}", stacklevel=2)
+            mu = None
+            std = None
+            var = None
+
+        def _lines() -> Iterator[str]:
+            # First pass: collect (outcome_str, probability) pairs and find the widest
+            # outcome representation. We need max_outcome_len before we can emit
+            # anything, because the stats header must align with it.
+            pairs: list[tuple[str, Fraction]] = []
+            max_outcome_len = 3  # minimum column width
+            for outcome, probability in self.probability_items():
+                outcome_str = repr(outcome)
+                max_outcome_len = max(max_outcome_len, len(outcome_str))
+                pairs.append((outcome_str, probability))
+
+            # Stats header (emitted before outcome rows)
+            if mu is not None:
+                yield f"{'avg': >{max_outcome_len}} | {mu:7.2f}"
+            if std is not None:
+                yield f"{'std': >{max_outcome_len}} | {std:7.2f}"
+            if var is not None:
+                yield f"{'var': >{max_outcome_len}} | {var:7.2f}"
+
+            if pairs:
+                tick_scale = max(self.counts()) / self.total if scaled else 1.0
+                max_num_ticks = (width - max_outcome_len - prob_len) // len(tick)
+                for outcome_str, probability in pairs:
+                    ticks = tick * int(max_num_ticks * float(probability) / tick_scale)
+                    yield f"{outcome_str: >{max_outcome_len}} | {float(probability):7.2%} |{ticks}"
+
+        return os.linesep.join(_lines())
+
+    def format_short(self) -> str:
+        r"""
+        Returns a short-form formatted string representation of the histogram.
+
+            >>> print(H(6).format_short())
+            {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
+        """
+        try:
+            mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        except Exception as exc:  # noqa: BLE001
+            # See format() for rationale
+            warnings.warn(f"{exc!s}", stacklevel=2)
+            mu = None
+
+        def _parts() -> Iterator[str]:
+            if mu is not None:
+                yield f"avg: {mu:.2f}"
+            yield from (
+                f"{outcome}:{float(probability):7.2%}"
+                for outcome, probability in self.probability_items()
+            )
+
+        return f"{{{', '.join(_parts())}}}"
+
+    def lowest_terms(self: "H[_T]") -> "H[_T]":
+        r"""
+        Return a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
+
+            >>> H({1: 2, 2: 4, 3: 6}).lowest_terms()
+            H({1: 1, 2: 2, 3: 3})
+            >>> H({1: 3, 2: 0, 3: 6}).lowest_terms()
+            H({1: 1, 3: 2})
+            >>> H({}).lowest_terms()
+            H({})
+        """
+        counts = tuple(count for count in self._h.values() if count)
+        if not counts:
+            return cast("H[_T]", H({}))
+        g = math.gcd(*counts)
+        return H({outcome: count // g for outcome, count in self._h.items() if count})
+
+    def mean(self: "H[SupportsFloat]") -> float:
+        r"""
+        Return the mean (expected value) of the weighted outcomes.
+        Raises `#!python ValueError` if the histogram is empty.
+
+            >>> H(6).mean()
+            3.5
+            >>> H({1: 1, 3: 1}).mean()
+            2.0
+        """
+        if not self._h:
+            raise ValueError("mean of empty histogram is undefined")
+        return float(
+            sum(outcome * count for outcome, count in self.items()) / self.total  # type: ignore[misc,operator]  # ty: ignore[unsupported-operator]
         )
 
-    @beartype
-    def umap(self, un_op: _UnaryOperatorT) -> "H":
+    @experimental
+    def order_stat_for_n_at_pos(
+        self: "H[_T]",
+        n: SupportsInt,
+        pos: SupportsInt,
+    ) -> "H[_T]":
         r"""
-        Applies *un_op* to each outcome of the histogram.
+        <!-- BEGIN MONKEY PATCH --
+        >>> import warnings
+        >>> from dyce.lifecycle import ExperimentalWarning
+        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
-        ``` python
-        >>> import operator
-        >>> H(6).umap(operator.__neg__)
-        H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
+           -- END MONKEY PATCH -->
 
-        ```
+        Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
+        *pos* is a zero-based index.
 
-        ``` python
-        >>> H(4).umap(lambda outcome: (-outcome) ** outcome)
-        H({-27: 1, -1: 1, 4: 1, 256: 1})
+            >>> d6avg = H((2, 3, 3, 4, 4, 5))
+            >>> d6avg.order_stat_for_n_at_pos(5, 3)
+            H({2: 26, 3: 1432, 4: 4792, 5: 1526})
 
-        ```
+        The results show that, when rolling five averaging dice and sorting each roll, there are 26 ways where `#!python 2` appears at the fourth (index `#!python 3`) position, 1,432 ways where `#!python 3` appears at the fourth position, etc.
+
+        Negative values for *pos* follow Python index semantics:
+
+            >>> d6 = H(6)
+            >>> d6.order_stat_for_n_at_pos(6, 0) == d6.order_stat_for_n_at_pos(6, -6)
+            True
+            >>> d6.order_stat_for_n_at_pos(6, 5) == d6.order_stat_for_n_at_pos(6, -1)
+            True
+
+        This method caches the beta values for *n* so they can be reused for varying values of *pos* in subsequent calls.
+
+        <!-- BEGIN MONKEY PATCH --
+        >>> warnings.resetwarnings()
+
+           -- END MONKEY PATCH -->
         """
-        return type(self)((un_op(outcome), count) for outcome, count in self.items())
+        n = lossless_int(n)
+        pos = lossless_int(pos)
+        if not (-n <= pos < n):
+            raise ValueError(f"pos ({pos!r}) must be in range [{-n}, {n})")
 
-    @beartype
-    def lt(self, other: _OperandT) -> "H":
+        if n not in self._order_stat_funcs_by_n:
+            self._order_stat_funcs_by_n[n] = self._order_stat_func_for_n(n)
+        if pos < 0:
+            pos = n + pos
+        return self._order_stat_funcs_by_n[n](pos)
+
+    @overload
+    def probability_items(
+        self: "H[_T]", rational_t: None = None
+    ) -> Iterator[tuple[_T, Fraction]]: ...
+    @overload
+    def probability_items(
+        self: "H[_T]", rational_t: Callable[[int, int], _OtherT]
+    ) -> Iterator[tuple[_T, _OtherT]]: ...
+    def probability_items(
+        self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
+    ) -> Iterator[tuple[_T, _OtherT]]:
         r"""
-        Shorthand for ``#!python self.map(operator.__lt__, other).umap(bool)``.
+        Yield `#!python (outcome, probability)` pairs where each probability is computed as `#!python rational_t(count, total)`.
 
-        ``` python
-        >>> H(6).lt(3)
-        H({False: 4, True: 2})
+        *rational_t* defaults to `#!python fractions.Fraction`, giving exact rational probabilities.
+        Pass any two-argument callable to get a different representation (e.g. `#!python float` division via `#!python lambda n, d: n / d`).
 
-        ```
+        Yields nothing if the histogram is empty (total is zero).
 
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
+            >>> list(H({1: 1, 2: 2, 3: 1}).probability_items())
+            [(1, Fraction(1, 4)), (2, Fraction(1, 2)), (3, Fraction(1, 4))]
+            >>> from operator import truediv
+            >>> list(H({1: 1, 2: 2, 3: 1}).probability_items(truediv))
+            [(1, 0.25), (2, 0.5), (3, 0.25)]
+            >>> list(H({}).probability_items())
+            []
         """
-        return self.map(__lt__, other).umap(bool)
+        if rational_t is None:
+            rational_t = cast("Callable[[int, int], _OtherT]", Fraction)
+        t = self.total
+        if not t:
+            return
+        for outcome, count in self._h.items():
+            yield outcome, rational_t(count, t)
 
-    @beartype
-    def le(self, other: _OperandT) -> "H":
+    @experimental
+    def replace(self: "H[_T]", existing_outcome: _T, repl: "H[_T] | _T") -> "H[_T]":
         r"""
-        Shorthand for ``#!python self.map(operator.__le__, other).umap(bool)``.
+        <!-- BEGIN MONKEY PATCH --
+        >>> import warnings
+        >>> from dyce.lifecycle import ExperimentalWarning
+        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
-        ``` python
-        >>> H(6).le(3)
-        H({False: 3, True: 3})
+           -- END MONKEY PATCH -->
 
-        ```
+        Returns a new histogram with a possibly substituted outcome.
+        If *repl* is a single outcome, it will replace *existing_outcome* directly (if *existing_outcome* exists in the original histogram).
+        If *repl* is a histogram, its outcomes will be “folded in”, together making up the same proportion of the total as the replaced outcome.
 
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
+            >>> d6 = H(6)
+            >>> d6.replace(6, 1_000)
+            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 1000: 1})
+            >>> d6.replace(7, "never used") == d6  # type: ignore[arg-type]
+            True
+
+            >>> H({1: 1, 2: 2, 3: 3}).replace(2, H({3: 1, 4: 2, 5: 3}))
+            H({1: 6, 3: 20, 4: 4, 5: 6})
+
+            >>> once_exploded_d6 = d6.replace(6, d6 + 6)
+            >>> once_exploded_d6
+            H({1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1})
+
+        One way to “explode” a die `#!math n` times:
+
+            >>> def explode_n_by_replacement(h: H[int], n: int) -> H[int]:
+            ...     max_h = max(h)
+            ...     exploded_h = h
+            ...     for _ in range(n):
+            ...         exploded_h = h.replace(max_h, exploded_h + max_h)
+            ...     return exploded_h  # ty: ignore[invalid-return-type]
+
+            >>> explode_n_by_replacement(d6, 0) == d6
+            True
+            >>> explode_n_by_replacement(d6, 1) == once_exploded_d6
+            True
+            >>> explode_n_by_replacement(d6, 2)
+            H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
+            >>> explode_n_by_replacement(d6, 15)
+            H({1: 470184984576, 2: 470184984576, 3: 470184984576, ..., 94: 1, 95: 1, 96: 1})
+
+        <!-- BEGIN MONKEY PATCH --
+        >>> warnings.resetwarnings()
+
+           -- END MONKEY PATCH -->
         """
-        return self.map(__le__, other).umap(bool)
+        if existing_outcome not in self:
+            return self
+        existing_outcome_count = self[existing_outcome]
+        d: dict[_T, int]
+        if isinstance(repl, H):
+            repl_total = repl.total
+            d = {
+                outcome: count * repl_total
+                for outcome, count in self.items()
+                if outcome != existing_outcome
+            }
+            for repl_outcome, repl_count in repl.items():
+                d[repl_outcome] = (  # ty: ignore[invalid-assignment]
+                    d.get(repl_outcome, 0)  # ty: ignore[no-matching-overload]
+                    + repl_count * existing_outcome_count
+                )
+        else:
+            d = {
+                outcome: count
+                for outcome, count in self.items()
+                if outcome != existing_outcome
+            }
+            d[repl] = d.get(repl, 0) + existing_outcome_count
+        return H(d)
 
-    @beartype
-    def eq(self, other: _OperandT) -> "H":
+    def roll(self: "H[_T]") -> _T:
         r"""
-        Shorthand for ``#!python self.map(operator.__eq__, other).umap(bool)``.
-
-        ``` python
-        >>> H(6).eq(3)
-        H({False: 5, True: 1})
-
-        ```
-
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
-        """
-        return self.map(__eq__, other).umap(bool)
-
-    @beartype
-    def ne(self, other: _OperandT) -> "H":
-        r"""
-        Shorthand for ``#!python self.map(operator.__ne__, other).umap(bool)``.
-
-        ``` python
-        >>> H(6).ne(3)
-        H({False: 1, True: 5})
-
-        ```
-
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
-        """
-        return self.map(__ne__, other).umap(bool)
-
-    @beartype
-    def gt(self, other: _OperandT) -> "H":
-        r"""
-        Shorthand for ``#!python self.map(operator.__gt__, other).umap(bool)``.
-
-        ``` python
-        >>> H(6).gt(3)
-        H({False: 3, True: 3})
-
-        ```
-
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
-        """
-        return self.map(__gt__, other).umap(bool)
-
-    @beartype
-    def ge(self, other: _OperandT) -> "H":
-        r"""
-        Shorthand for ``#!python self.map(operator.__ge__, other).umap(bool)``.
-
-        ``` python
-        >>> H(6).ge(3)
-        H({False: 2, True: 4})
-
-        ```
-
-        See the [``map``][dyce.h.H.map] and [``umap``][dyce.h.H.umap] methods.
-        """
-        return self.map(__ge__, other).umap(bool)
-
-    @beartype
-    def is_even(self) -> "H":
-        r"""
-        Equivalent to ``#!python self.umap(dyce.types.is_even)``.
-
-        ``` python
-        >>> H((-4, -2, 0, 1, 2, 3)).is_even()
-        H({False: 2, True: 4})
-
-        ```
-
-        See the [``umap`` method][dyce.h.H.umap].
-        """
-        return self.umap(is_even)
-
-    @beartype
-    def is_odd(self) -> "H":
-        r"""
-        Equivalent to ``#!python self.umap(dyce.types.is_odd)``.
-
-        ``` python
-        >>> H((-4, -2, 0, 1, 2, 3)).is_odd()
-        H({False: 4, True: 2})
-
-        ```
-
-        See the [``umap`` method][dyce.h.H.umap].
-        """
-        return self.umap(is_odd)
-
-    @beartype
-    def accumulate(self, other: _SourceT) -> "H":
-        r"""
-        Accumulates counts.
-
-        ``` python
-        >>> H(4).accumulate(H(6))
-        H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
-
-        ```
-        """
-        if not isinstance(other, H):
-            other = H(other)
-
-        return type(self)(cast(_SourceT, chain(self.items(), other.items())))
-
-    @beartype
-    def draw(
-        self,
-        outcomes: Optional[Union[RealLike, Iterable[RealLike], _MappingT]] = None,
-    ) -> "H":
-        r"""
-        !!! warning "Experimental"
-
-            This property should be considered experimental and may change or disappear
-            in future versions.
-
-        Returns a new [``H`` object][dyce.h.H] where the counts associated with
-        *outcomes* has been updated. This may be useful for using histograms to model
-        decks of cards (rather than dice). If *outcome* is ``#!python None``, this is
-        equivalent to ``#!python self.draw(self.roll())``.
-
-        If *outcomes* is a single value, that value’s count is decremented by one. If
-        *outcomes* is an iterable of values, those values’ outcomes are decremented by
-        one for each time that outcome appears. If *outcomes* is a mapping of outcomes
-        to counts, those outcomes are decremented by the respective counts.
-
-        Counts are not reduced and zero counts are preserved. To reduce, call the
-        [``lowest_terms`` method][dyce.h.H.lowest_terms].
+        Returns a (weighted) random outcome.
 
         <!-- BEGIN MONKEY PATCH --
         For deterministic outcomes.
 
         >>> import random
         >>> from dyce import rng
-        >>> rng.RNG = random.Random(1691413956)
+        >>> rng.RNG = random.Random(1774583876)
 
           -- END MONKEY PATCH -->
 
-        ``` python
-        >>> H(6).draw()
-        H({1: 1, 2: 1, 3: 1, 4: 0, 5: 1, 6: 1})
-
-        >>> H(6).draw(2)
-        H({1: 1, 2: 0, 3: 1, 4: 1, 5: 1, 6: 1})
-
-        >>> H(6).draw((2, 3, 4, 5)).lowest_terms()
-        H({1: 1, 6: 1})
-
-        >>> h = H(6).accumulate(H(4)) ; h
-        H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
-        >>> h.draw({1: 2, 4: 1, 6: 1})
-        H({1: 0, 2: 2, 3: 2, 4: 1, 5: 1, 6: 0})
-
-        ```
-
-        !!! tip "Negative counts can be used to increase counts"
-
-            Where *outcomes* is a mapping of outcomes to counts, negative counts can be
-            used to *increase* or “add” outcomes’ counts.
-
-            ``` python
-            >>> H(4).draw({5: -1})
-            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
-
-            ```
+            >>> d6 = H(6)
+            >>> [d6.roll() for _ in range(10)]
+            [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
         """
-        if outcomes is None:
-            return self.draw(self.roll())
+        if not self:
+            raise ValueError("no outcomes from which to select in empty histogram")
+        return rng.RNG.choices(
+            population=tuple(self.outcomes()),
+            weights=tuple(self.counts()),
+            k=1,
+        )[0]
 
-        if isinstance(outcomes, RealLike):
-            outcomes = (outcomes,)
-
-        to_draw_outcome_counts = Counter(outcomes)
-        self_outcome_counts = Counter(self)
-        # This approach is necessary because Counter.__sub__ does not preserve negative
-        # counts and Counter.subtract modifies the counter in-place
-        new_outcome_counts = Counter(self_outcome_counts)
-        new_outcome_counts.subtract(to_draw_outcome_counts)
-        would_go_negative = set(+to_draw_outcome_counts) - set(+self_outcome_counts)
-
-        if would_go_negative:
-            raise ValueError(f"outcomes to be drawn {would_go_negative} not in {self}")
-
-        zeros = set(self_outcome_counts) - set(new_outcome_counts)
-
-        for outcome in zeros:
-            new_outcome_counts[outcome] = 0
-
-        return type(self)(new_outcome_counts)
-
-    @experimental
-    @beartype
-    def exactly_k_times_in_n(
-        self,
-        outcome: RealLike,
-        n: SupportsInt,
-        k: SupportsInt,
-    ) -> int:
+    def stdev(self: "H[SupportsFloat]") -> float:
         r"""
-        !!! warning "Experimental"
+        Return the standard deviation of the weighted outcomes as a `#!python float`.
+        Raises `#!python ValueError` if the histogram is empty.
 
-            This method should be considered experimental and may change or disappear in
-            future versions.
-
-        Computes (in constant time) and returns the number of times *outcome* appears
-        exactly *k* times among ``#!python n@self``. This computes the binomial
-        coefficient as a more efficient alternative to ``#!python
-        (n@(self.eq(outcome)))[k]``. See [this
-        video](https://www.khanacademy.org/math/ap-statistics/random-variables-ap/binomial-random-variable/v/generalizing-k-scores-in-n-attempts)
-        for a pretty clear explanation.
-
-        ``` python
-        >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
-        150
-        >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=2, n=3, k=3)
-        1
-        >>> H((2, 3, 3, 4, 4, 5)).exactly_k_times_in_n(outcome=4, n=3, k=3)
-        8
-
-        ```
-
-        !!! note "Counts, *not* probabilities"
-
-            This computes the *number* of ways to get exactly *k* of *outcome* from *n*
-            like histograms, which may not expressed in the lowest terms. (See the
-            [``lowest_terms`` method][dyce.h.H.lowest_terms].) If we want the
-            *probability* of getting exactly *k* of *outcome* from *n* like histograms,
-            we can divide by ``#!python h.total ** n``. (See the
-            [``total`` property][dyce.h.H.total].)
-
-            ``` python
-            >>> from fractions import Fraction
-            >>> h = H((2, 3, 3, 4, 4, 5))
-            >>> n, k = 3, 2
-            >>> (n @ h).total == h.total ** n
-            True
-            >>> Fraction(
-            ...   h.exactly_k_times_in_n(outcome=3, n=n, k=k),
-            ...   h.total ** n,
-            ... )
-            Fraction(2, 9)
-            >>> h_not_lowest_terms = h.accumulate(h)
-            >>> h == h_not_lowest_terms
-            True
-            >>> h_not_lowest_terms
-            H({2: 2, 3: 4, 4: 4, 5: 2})
-            >>> h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k)
-            384
-            >>> Fraction(
-            ...   h_not_lowest_terms.exactly_k_times_in_n(outcome=3, n=n, k=k),
-            ...   h_not_lowest_terms.total ** n,
-            ... )
-            Fraction(2, 9)
-
-            ```
+            >>> H(6).stdev()
+            1.707825...
+            >>> H({1: 1, 3: 1}).stdev()
+            1.0
         """
-        n = as_int(n)
-        k = as_int(k)
-        assert k <= n
-        c_outcome = self.get(outcome, 0)
+        return math.sqrt(self.variance())
 
+    def variance(self: "H[SupportsFloat]") -> float:
+        r"""
+        Return the variance of the weighted outcomes as a `#!python float`.
+        Raises `#!python ValueError` if the histogram is empty.
+
+            >>> H(6).variance()
+            2.916666...
+            >>> H({1: 1, 3: 1}).variance()
+            1.0
+        """
         return (
-            # number of ways to choose k things from n things (k <= n)
-            comb(n, k)
-            # cumulative counts for the particular outcomes we want
-            * c_outcome**k
-            # cumulative counts for all other outcomes
-            * (self.total - c_outcome) ** (n - k)
-        )
-
-    @overload
-    def explode(
-        self,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> "H": ...
-
-    @overload
-    def explode(
-        self,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H": ...
-
-    @overload
-    def explode(
-        self,
-        max_depth: None = None,
-        *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H": ...
-
-    @overload
-    def explode(
-        self,
-        max_depth: None = None,
-        precision_limit: None = None,
-    ) -> "H": ...
-
-    @deprecated
-    @beartype
-    def explode(
-        self,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> "H":
-        r"""
-        !!! warning "Deprecated"
-
-            This method has been deprecated and will be removed in a future release. See
-            the [``explode`` function][dyce.evaluation.explode] for a more flexible
-            alternative.
-
-        Shorthand for ``#!python self.substitute(lambda h, outcome: outcome if len(h) == 1
-        else h if outcome == max(h) else outcome, operator.__add__, max_depth,
-        precision_limit)``.
-
-        ``` python
-        >>> H(6).explode(max_depth=2)
-        H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
-
-        ```
-
-        This method guards against excessive recursion by returning ``#!python outcome``
-        if the passed histogram has only one face. See the [``substitute``
-        method][dyce.h.H.substitute].
-        """
-
-        def _explode(h: H, outcome: RealLike) -> HOrOutcomeT:
-            return outcome if len(h) == 1 else h if outcome == max(h) else outcome
-
-        if max_depth is not None and precision_limit is not None:
-            raise ValueError("only one of max_depth and precision_limit is allowed")
-        elif max_depth is not None:
-            return self.substitute(_explode, __add__, max_depth)
-        elif precision_limit is not None:
-            return self.substitute(_explode, __add__, precision_limit=precision_limit)
-        else:
-            return self.substitute(_explode, __add__)
-
-    @beartype
-    def lowest_terms(self) -> "H":
-        r"""
-        Computes and returns a histogram whose nonzero counts share a greatest
-        common divisor of 1.
-
-        ``` python
-        >>> df_obscured = H({-2: 0, -1: 2, 0: 2, 1: 2, 2: 0})
-        >>> df_obscured.lowest_terms()
-        H({-1: 1, 0: 1, 1: 1})
-
-        ```
-        """
-        if self._lowest_terms is None:
-            counts_gcd = gcd(*self.counts())
-
-            if counts_gcd in (0, 1) and 0 not in self.counts():
-                self._lowest_terms = self
-            else:
-                self._lowest_terms = type(self)(
-                    (outcome, count // counts_gcd)
-                    for outcome, count in self.items()
-                    if count != 0
-                )
-
-        return self._lowest_terms
-
-    @experimental
-    @beartype
-    def order_stat_for_n_at_pos(self, n: SupportsInt, pos: SupportsInt) -> "H":
-        r"""
-        !!! warning "Experimental"
-
-            This method should be considered experimental and may change or disappear in
-            future versions.
-
-        Computes the probability distribution for each outcome appearing in at *pos* in
-        rolls of *n* histograms where rolls are ordered least-to-greatest. *pos* is a
-        zero-based index.
-
-        ``` python
-        >>> d6avg = H((2, 3, 3, 4, 4, 5))
-        >>> d6avg.order_stat_for_n_at_pos(5, 3)  # counts where outcome appears in the fourth of five positions
-        H({2: 26, 3: 1432, 4: 4792, 5: 1526})
-
-        ```
-
-        The results show that, when rolling five six-sided “averaging” dice and sorting
-        each roll, there are 26 ways where ``#!python 2`` appears at the fourth (index
-        ``#!python 3``) position, 1432 ways where ``#!python 3`` appears at the fourth
-        position, etc. This can be verified independently using the computationally
-        expensive method of enumerating rolls and counting those that meet the criteria.
-
-        ``` python
-        >>> from dyce import P
-        >>> p_5d6avg = 5@P(d6avg)
-        >>> sum(count for roll, count in p_5d6avg.rolls_with_counts() if roll[3] == 5)
-        1526
-
-        ```
-
-        Negative values for *pos* follow Python index semantics:
-
-        ``` python
-        >>> d6 = H(6)
-        >>> d6.order_stat_for_n_at_pos(6, 0) == d6.order_stat_for_n_at_pos(6, -6)
-        True
-        >>> d6.order_stat_for_n_at_pos(6, 5) == d6.order_stat_for_n_at_pos(6, -1)
-        True
-
-        ```
-
-        This method caches computing the betas for *n* so they can be reused for varying
-        values of *pos* in subsequent calls.
-        """
-        # See <https://math.stackexchange.com/q/4173084/226394> for motivation
-        n = as_int(n)
-        pos = as_int(pos)
-
-        if n not in self._order_stat_funcs_by_n:
-            self._order_stat_funcs_by_n[n] = self._order_stat_func_for_n(n)
-
-        if pos < 0:
-            pos = n + pos
-
-        return self._order_stat_funcs_by_n[n](pos)
-
-    @beartype
-    def remove(self, outcome: RealLike) -> "H":
-        if outcome not in self:
-            return self
-
-        return type(self)(
-            (orig_outcome, count)
-            for orig_outcome, count in self.items()
-            if orig_outcome != outcome
-        )
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        *,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        *,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: None = None,
-        *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> "H": ...
-
-    @overload
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: None = None,
-        precision_limit: None = None,
-    ) -> "H": ...
-
-    @deprecated
-    @beartype
-    def substitute(
-        self,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> "H":
-        r"""
-        !!! warning "Deprecated"
-
-            This method has been deprecated and will be removed in a future release. See
-            the [``expandable`` decorator][dyce.evaluation.expandable] and
-            [``foreach`` function][dyce.evaluation.foreach] for more flexible
-            alternatives.
-
-        Calls *expand* on each outcome. If *expand* returns a single outcome, it
-        replaces the existing outcome. If it returns an [``H`` object][dyce.h.H],
-        evaluation is performed again (recursively) on that object until a limit (either
-        *max_depth* or *precision_limit*) is exhausted. *coalesce* is called on the
-        original outcome and the expanded histogram or outcome and the returned
-        histogram is “folded” into result. The default behavior for *coalesce* is to
-        replace the outcome with the expanded histogram. Returned histograms are always
-        reduced to their lowest terms.
-
-        !!! note "*coalesce* is not called unless *expand* returns a histogram"
-
-            If *expand* returns a single outcome, it *always* replaces the existing
-            outcome. This is intentional. To return a single outcome, but trigger
-            *coalesce*, characterize that outcome as a single-sided die (e.g.,
-            ``#!python H({outcome: 1})``.
-
-        See the [``coalesce_replace``][dyce.h.coalesce_replace] and
-        [``lowest_terms``][dyce.h.H.lowest_terms] methods.
-
-        !!! tip "Precision limits"
-
-            The *max_depth* parameter is similar to an
-            [``expandable``][dyce.evaluation.expandable]-decorated function’s limit
-            argument when given a whole number. The *precision_limit* parameter is
-            similar to an [``expandable``][dyce.evaluation.expandable]-decorated
-            function’s limit argument being provided a fractional value. It is an error
-            to provide values for both *max_depth* and *precision_limit*.
-        """
-        from .evaluation import HResult, LimitT, expandable
-
-        if max_depth is not None and precision_limit is not None:
-            raise ValueError("only one of max_depth and precision_limit is allowed")
-
-        limit: Optional[LimitT] = (
-            max_depth if precision_limit is None else precision_limit
-        )
-
-        @expandable(sentinel=self)
-        def _expand(result: HResult) -> HOrOutcomeT:
-            res = expand(result.h, result.outcome)
-
-            return coalesce(_expand(res), result.outcome) if isinstance(res, H) else res
-
-        return _expand(self, limit=limit)
-
-    @beartype
-    def vs(self, other: _OperandT) -> "H":
-        r"""
-        Compares the histogram with *other*. -1 represents where *other* is greater. 0
-        represents where they are equal. 1 represents where *other* is less.
-
-        Shorthand for ``#!python self.within(0, 0, other)``.
-
-        ``` python
-        >>> H(6).vs(H(4))
-        H({-1: 6, 0: 4, 1: 14})
-        >>> H(6).vs(H(4)) == H(6).within(0, 0, H(4))
-        True
-
-        ```
-
-        See the [``within`` method][dyce.h.H.within].
-        """
-        return self.within(0, 0, other)
-
-    @beartype
-    def within(self, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> "H":
-        r"""
-        Computes the difference between the histogram and *other*. -1 represents where that
-        difference is less than *lo*. 0 represents where that difference between *lo*
-        and *hi* (inclusive). 1 represents where that difference is greater than *hi*.
-
-        ``` python
-        >>> d6_2 = 2@H(6)
-        >>> d6_2.within(7, 9)
-        H({-1: 15, 0: 15, 1: 6})
-        >>> print(d6_2.within(7, 9).format(width=65))
-        avg |   -0.25
-        std |    0.72
-        var |    0.52
-         -1 |  41.67% |####################
-          0 |  41.67% |####################
-          1 |  16.67% |########
-
-        ```
-
-        ``` python
-        >>> d6_3, d8_2 = 3@H(6), 2@H(8)
-        >>> d6_3.within(-1, 1, d8_2)  # 3d6 w/in 1 of 2d8
-        H({-1: 3500, 0: 3412, 1: 6912})
-        >>> print(d6_3.within(-1, 1, d8_2).format(width=65))
-        avg |    0.25
-        std |    0.83
-        var |    0.69
-         -1 |  25.32% |############
-          0 |  24.68% |############
-          1 |  50.00% |#########################
-
-        ```
-        """
-        return self.map(_within(lo, hi), other)
-
-    @beartype
-    def zero_fill(self, outcomes: Iterable[RealLike]) -> "H":
-        r"""
-        Shorthand for ``#!python self.accumulate({outcome: 0 for outcome in
-        outcomes})``.
-
-        ``` python
-        >>> H(4).zero_fill(H(8).outcomes())
-        H({1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0})
-
-        ```
-        """
-        return self.accumulate({outcome: 0 for outcome in outcomes})
-
-    @overload
-    def distribution(
-        self,
-    ) -> Iterator[tuple[RealLike, Fraction]]: ...
-
-    @overload
-    def distribution(
-        self,
-        rational_t: Callable[[int, int], _T],
-    ) -> Iterator[tuple[RealLike, _T]]: ...
-
-    @experimental
-    @beartype
-    def distribution(
-        self,
-        rational_t: Optional[Callable[[int, int], _T]] = None,
-    ) -> Iterator[tuple[RealLike, _T]]:
-        r"""
-        Presentation helper function returning an iterator for each outcome/count or
-        outcome/probability pair.
-
-        ``` python
-        >>> h = H((1, 2, 3, 3, 4, 4, 5, 6))
-        >>> list(h.distribution())
-        [(1, Fraction(1, 8)), (2, Fraction(1, 8)), (3, Fraction(1, 4)), (4, Fraction(1, 4)), (5, Fraction(1, 8)), (6, Fraction(1, 8))]
-        >>> list(h.ge(3).distribution())
-        [(False, Fraction(1, 4)), (True, Fraction(3, 4))]
-
-        ```
-
-        !!! warning "Experimental"
-
-            The *rational_t* argument to this method should be considered experimental
-            and may change or disappear in future versions.
-
-        If provided, *rational_t* must be a callable that takes two ``#!python int``s (a
-        numerator and denominator) and returns an instance of a desired (but otherwise
-        arbitrary) type.
-
-        ``` python
-        >>> list(h.distribution(rational_t=lambda n, d: f"{n}/{d}"))
-        [(1, '1/8'), (2, '1/8'), (3, '2/8'), (4, '2/8'), (5, '1/8'), (6, '1/8')]
-
-        ```
-
-        ``` python
-        >>> import sympy
-        >>> list(h.distribution(rational_t=sympy.Rational))
-        [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
-
-        ```
-
-        ``` python
-        >>> import sage.rings.rational  # doctest: +SKIP
-        >>> list(h.distribution(rational_t=lambda n, d: sage.rings.rational.Rational((n, d))))  # doctest: +SKIP
-        [(1, 1/8), (2, 1/8), (3, 1/4), (4, 1/4), (5, 1/8), (6, 1/8)]
-
-        ```
-
-        !!! note
-
-            The arguments passed to *rational_t* are not reduced to the lowest terms.
-
-        The *rational_t* argument is a convenience. Iteration or comprehension can be
-        used to accomplish something similar.
-
-        ``` python
-        >>> [(outcome, f"{probability.numerator}/{probability.denominator}") for outcome, probability in (h).distribution()]
-        [(1, '1/8'), (2, '1/8'), (3, '1/4'), (4, '1/4'), (5, '1/8'), (6, '1/8')]
-
-        ```
-
-        Many number implementations can convert directly from ``#!python
-        fractions.Fraction``s.
-
-        ``` python
-        >>> import sympy.abc
-        >>> [(outcome, sympy.Rational(probability)) for outcome, probability in (h + sympy.abc.x).distribution()]
-        [(x + 1, 1/8), (x + 2, 1/8), (x + 3, 1/4), (x + 4, 1/4), (x + 5, 1/8), (x + 6, 1/8)]
-
-        ```
-
-        ``` python
-        >>> import sage.rings.rational  # doctest: +SKIP
-        >>> [(outcome, sage.rings.rational.Rational(probability)) for outcome, probability in h.distribution()]  # doctest: +SKIP
-        [(1, 1/6), (2, 1/6), (3, 1/3), (4, 1/3), (5, 1/6), (6, 1/6)]
-
-        ```
-        """
-        if rational_t is None:
-            # TODO(posita): See <https://github.com/python/mypy/issues/10854#issuecomment-1663057450>
-            rational_t = Fraction  # type: ignore [assignment]
-            assert rational_t is not None
-
-        total = sum(self.values()) or 1
-
-        return (
-            (outcome, rational_t(self[outcome], total))
-            for outcome in sorted_outcomes(self)
-        )
-
-    @beartype
-    def distribution_xy(
-        self,
-    ) -> tuple[tuple[RealLike, ...], tuple[float, ...]]:
-        r"""
-        Presentation helper function returning an iterator for a “zipped” arrangement of the
-        output from the [``distribution`` method][dyce.h.H.distribution] and ensures the
-        values are ``#!python float``s.
-
-        ``` python
-        >>> list(H(6).distribution())
-        [(1, Fraction(1, 6)), (2, Fraction(1, 6)), (3, Fraction(1, 6)), (4, Fraction(1, 6)), (5, Fraction(1, 6)), (6, Fraction(1, 6))]
-        >>> H(6).distribution_xy()
-        ((1, 2, 3, 4, 5, 6), (0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666, 0.16666666))
-
-        ```
-        """
-        # TODO(posita): See <https://github.com/python/typing/issues/193>
-        return tuple(
-            zip(
-                *(
-                    (outcome, float(probability))
-                    for outcome, probability in self.distribution()
-                )
+            sum(
+                count / self.total * float(outcome) ** 2
+                for outcome, count in self._h.items()
             )
+            - self.mean() ** 2
         )
 
-    @beartype
-    def format(
-        self,
-        width: SupportsInt = _ROW_WIDTH,
-        scaled: bool = False,
-        tick: str = "#",
-        sep: str = os.linesep,
-    ) -> str:
+    def zero_fill(self: "H[_T]", outcomes: Iterable[_T]) -> "H[_T]":
         r"""
-        Returns a formatted string representation of the histogram. If *width* is
-        greater than zero, a horizontal bar ASCII graph is printed using *tick* and
-        *sep* (which are otherwise ignored if *width* is zero or less).
+        Shorthand for `#!python self.merge(dict.fromkeys(outcomes, 0))`.
 
-        ``` python
-        >>> print(H(6).format(width=0))
-        {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
-
-        ```
-
-        ``` python
-        >>> print((2@H(6)).zero_fill(range(1, 21)).format(width=65, tick="@"))
-        avg |    7.00
-        std |    2.42
-        var |    5.83
-          1 |   0.00% |
-          2 |   2.78% |@
-          3 |   5.56% |@@
-          4 |   8.33% |@@@@
-          5 |  11.11% |@@@@@
-          6 |  13.89% |@@@@@@
-          7 |  16.67% |@@@@@@@@
-          8 |  13.89% |@@@@@@
-          9 |  11.11% |@@@@@
-         10 |   8.33% |@@@@
-         11 |   5.56% |@@
-         12 |   2.78% |@
-         13 |   0.00% |
-         14 |   0.00% |
-         15 |   0.00% |
-         16 |   0.00% |
-         17 |   0.00% |
-         18 |   0.00% |
-         19 |   0.00% |
-         20 |   0.00% |
-
-        ```
-
-        If *scaled* is ``#!python True``, horizontal bars are scaled to *width*.
-
-        ``` python
-        >>> h = (2@H(6)).ge(7)
-        >>> print(f"{' 65 chars wide -->|':->65}")
-        ---------------------------------------------- 65 chars wide -->|
-        >>> print(H(1).format(width=65, scaled=False))
-        avg |    1.00
-        std |    0.00
-        var |    0.00
-          1 | 100.00% |##################################################
-        >>> print(h.format(width=65, scaled=False))
-        avg |    0.58
-        std |    0.49
-        var |    0.24
-          0 |  41.67% |####################
-          1 |  58.33% |#############################
-        >>> print(h.format(width=65, scaled=True))
-        avg |    0.58
-        std |    0.49
-        var |    0.24
-          0 |  41.67% |###################################
-          1 |  58.33% |##################################################
-
-        ```
+            >>> H(4).zero_fill(H(8).outcomes())
+            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0})
         """
-        width = as_int(width)
+        return self.merge(dict.fromkeys(outcomes, 0))
 
-        # We convert various values herein to native ints and floats because number
-        # tower implementations sometimes neglect to implement __format__ properly (or
-        # at all). (I'm looking at you, sage.rings.…!)
-        try:
-            mu: RealLike = float(self.mean())
-        except (OverflowError, TypeError):
-            mu = self.mean()
-
-        if width <= 0:
-
-            def _parts() -> Iterator[str]:
-                yield f"avg: {mu:.2f}"
-
-                for (
-                    outcome,
-                    probability,
-                ) in self.distribution():
-                    probability_f = float(probability)
-                    yield f"{outcome}:{probability_f:7.2%}"
-
-            return "{" + ", ".join(_parts()) + "}"
-        else:
-            w = width - 15
-
-            def _lines() -> Iterator[str]:
-                try:
-                    yield f"avg | {mu:7.2f}"
-                    std = float(self.stdev(mu))
-                    var = float(self.variance(mu))
-                    yield f"std | {std:7.2f}"
-                    yield f"var | {var:7.2f}"
-                except (OverflowError, TypeError) as exc:
-                    warnings.warn(f"{str(exc)}; mu: {mu}")
-
-                if self:
-                    outcomes, probabilities = self.distribution_xy()
-                    tick_scale = max(probabilities) if scaled else 1.0
-
-                    for outcome, probability in zip(outcomes, probabilities):
-                        try:
-                            outcome_str = f"{outcome: 3}"
-                        except (TypeError, ValueError):
-                            outcome_str = str(outcome)
-                            outcome_str = f"{outcome_str: >3}"
-
-                        ticks = tick * int(w * probability / tick_scale)
-                        probability_f = float(probability)
-                        yield f"{outcome_str} | {probability_f:7.2%} |{ticks}"
-
-            return sep.join(_lines())
-
-    @beartype
-    def mean(self) -> RealLike:
-        r"""
-        Returns the mean of the weighted outcomes (or 0.0 if there are no outcomes).
-        """
-        numerator: float
-        denominator: float
-        numerator = denominator = 0
-
+    def _order_stat_func_for_n(self: "H[_T]", n: int) -> "Callable[[int], H[_T]]":
+        cumulative = 0
+        betas: list[tuple[_T, int, int]] = []
         for outcome, count in self.items():
-            numerator += outcome * count
-            denominator += count
+            c_lt = cumulative
+            c_le = cumulative + count
+            betas.append((outcome, c_lt, c_le))
+            cumulative = c_le
 
-        return numerator / (denominator or 1)
-
-    @beartype
-    def stdev(self, mu: Optional[RealLike] = None) -> RealLike:
-        r"""
-        Shorthand for ``#!python math.sqrt(self.variance(mu))``.
-        """
-        return sqrt(self.variance(mu))
-
-    @beartype
-    def variance(self, mu: Optional[RealLike] = None) -> RealLike:
-        r"""
-        Returns the variance of the weighted outcomes. If provided, *mu* is used as the mean
-        (to avoid duplicate computation).
-        """
-        mu = mu if mu else self.mean()
-        numerator: float
-        denominator: float
-        numerator = denominator = 0
-
-        for outcome, count in self.items():
-            numerator += outcome**2 * count
-            denominator += count
-
-        # While floating point overflow is impossible to eliminate, we avoid it under
-        # some circumstances by exploiting the equivalence of E[(X - E[X])**2] and the
-        # more efficient E[X**2] - E[X]**2. See
-        # <https://dlsun.github.io/probability/variance.html>.
-        return numerator / (denominator or 1) - mu**2
-
-    @beartype
-    def roll(self) -> RealLike:
-        r"""
-        Returns a (weighted) random outcome.
-        """
-        return (
-            rng.RNG.choices(
-                population=tuple(self.outcomes()),
-                weights=tuple(self.counts()),
-                k=1,
-            )[0]
-            if self
-            else 0
-        )
-
-    def _order_stat_func_for_n(self, n: int) -> Callable[[int], "H"]:
-        betas_by_outcome: dict[RealLike, tuple[H, H]] = {}
-
-        for outcome in self.outcomes():
-            betas_by_outcome[outcome] = (
-                n @ self.le(outcome),
-                n @ self.lt(outcome),
+        def _order_stat_at_pos(pos: int) -> "H[_T]":
+            return H(
+                {
+                    outcome: (
+                        sum(
+                            math.comb(n, k) * c_le**k * (self.total - c_le) ** (n - k)
+                            for k in range(pos + 1, n + 1)
+                        )
+                        - sum(
+                            math.comb(n, k) * c_lt**k * (self.total - c_lt) ** (n - k)
+                            for k in range(pos + 1, n + 1)
+                        )
+                    )
+                    for outcome, c_lt, c_le in betas
+                }
             )
 
-        def _gen_h_items_at_pos(pos: int) -> Iterator[_OutcomeCountT]:
-            for outcome, (h_le, h_lt) in betas_by_outcome.items():
-                yield (
-                    outcome,
-                    h_le.gt(pos).get(True, 0) - h_lt.gt(pos).get(True, 0),
-                )
-
-        @beartype
-        def order_stat_for_n_at_pos(pos: int) -> "H":
-            return type(self)(_gen_h_items_at_pos(pos))
-
-        return order_stat_for_n_at_pos
+        return _order_stat_at_pos
 
 
+@nobeartype  # not decoratable by beartype (avoids warning)
 @runtime_checkable
-class HableT(Protocol, metaclass=CachingProtocolMeta):
+class HableT(Protocol[_T_co]):
     r"""
-    A protocol whose implementer can be expressed as (or reduced to) an
-    [``H`` object][dyce.h.H] by calling its [``h`` method][dyce.h.HableT.h]. Currently,
-    only the [``P`` class][dyce.p.P] implements this protocol, but this affords an
-    integration point for ``#!python dyce`` users.
+    A protocol whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
+    Currently, no class implements this protocol, but this affords an integration point for.
 
     !!! info
 
-        The intended pronunciation of ``Hable`` is *AYCH-uh-BUL*[^1] (i.e.,
-        [``H``][dyce.h.H]-able). Yes, that is a clumsy attempt at
-        [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25). (You could
-        *totally* [``H``][dyce.h.H] that, dude!) However, if you prefer something else
-        (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you. (Well, they
-        *might*, but they *shouldn’t*.) We all know what you mean.
+        The intended pronunciation of `Hable` is *AYCH-uh-BUL*[^1] (i.e., [`H`][dyce.H]-able).
+        Yes, that is a clumsy attempt at [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25).
+        (You could *totally* [`H`][dyce.H] that, dude!)
+        However, if you prefer something else (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you.
+        (Well, they *might*, but they *shouldn’t*.)
+        We all know what you mean.
 
     [^1]:
 
-        World Book Online (WBO) style [pronunciation
-        respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
+        World Book Online (WBO) style [pronunciation respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
 
-    __slots__: Any = ()
+    __slots__ = ()
 
     @abstractmethod
-    def h(self) -> H:
-        r"""
-        Express its implementer as an [``H`` object][dyce.h.H].
-        """
-        pass
+    def h(self: "HableT[_T]") -> H[_T]:
+        r"""Express its implementer as an [`H` object][dyce.H]."""
 
 
-class HableOpsMixin(HableT):
+# ---- Helpers -------------------------------------------------------------------------
+
+
+@overload
+def aggregate_weighted(
+    weighted_sources: Iterable[tuple[H[_T] | _T, int]], /
+) -> H[_T]: ...
+@overload
+def aggregate_weighted(weighted_sources: Iterable[tuple[Any, int]], /) -> H[Any]: ...
+def aggregate_weighted(
+    weighted_sources: Iterable[tuple[Any, int]],
+) -> H[Any]:
     r"""
-    A “mix-in” class providing arithmetic operations for implementers of the
-    [``HableT`` protocol][dyce.h.HableT]. The [``P`` class][dyce.p.P] derives from this
-    class.
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
-    !!! info
+       -- END MONKEY PATCH -->
 
-        See [``HableT``][dyce.h.HableT] for notes on pronunciation.
+    Aggregate *weighted_sources* into an [`H`][dyce.H] object.
+
+    Each element of *weighted_sources* is a two-tuple of either an `#!python (outcome, count)` pair or an `#!python (H, count)` pair.
+    When a source is an [`H`][dyce.H], its total takes on the weight of *count*.
+    When a source is the empty histogram (`#!python H({})`), it and its count are omitted without scaling.
+
+    This function is the accumulation engine used by [`expand`][dyce.expand].
+
+        >>> from dyce import H
+        >>> from dyce.evaluation import aggregate_weighted
+        >>> aggregate_weighted(
+        ...     (
+        ...         (H({1: 1}), 1),
+        ...         (H({1: 1, 2: 2}), 2),
+        ...     )
+        ... )
+        H({1: 5, 2: 4})
+        >>> aggregate_weighted(((H(2), 1), (H({}), 20)))
+        H({1: 1, 2: 1})
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
+    """
+    aggregate_scalar = 1
+    outcome_counts: list[tuple[Any, int]] = []
+
+    for outcome_or_h, count in weighted_sources:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append(
+                        (new_outcome, count * aggregate_scalar * new_count)
+                    )
+                aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+
+    return H.from_counts(outcome_counts)
+
+
+def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
+    r"""
+    Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
+    This ensures callers never have to special-case the empty collection.
+
+    Consecutive equal histograms are batched via `#!python @` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools like those produced by `#!python P.h()` are convolved efficiently.
+    """
+    result: H[_T] | None = None
+    for h, group in groupby(hs):
+        n = sum(1 for _ in group)
+        batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
+        result = batch if result is None else result + batch  # type: ignore[operator]
+    return cast("H[_T]", H({})) if result is None else result
+
+
+@deprecated("may be removed in future versions")
+def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
+    r"""
+    Original `#!math O\left( n \right)` implementation of `sum_h`, preserved for performance comparison.
+    Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
+    """
+    result: H[_T] | None = None
+    for h in hs:
+        result = h if result is None else result + h  # type: ignore[operator]
+    return cast("H[_T]", H({})) if result is None else result
+
+
+class _ConvolveFallbackWarning(UserWarning):
+    r"""
+    Issued when [`_convolve_fast`][dyce.h._convolve_fast] falls back to the `#!math O \left( n \right)` linear approach.
     """
 
-    __slots__: Any = ()
 
-    def __init__(self):
-        object.__init__(self)
+def _apply_opname(
+    l_val: object,
+    op_name: str,
+    rop_name: str,
+    r_val: object,
+) -> object:
+    r"""
+    Try `#!python l_val.op_name(r_val)`; if `#!python NotImplemented`, try `#!python r_val.rop_name(l_val)`.
+    """
+    op = getattr(l_val, op_name, None)
+    result = op(r_val) if op is not None else NotImplemented
+    if result is NotImplemented:
+        r_op = getattr(r_val, rop_name, None)
+        result = r_op(l_val) if r_op is not None else NotImplemented
+    return result
 
-    @beartype
-    def __add__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__add__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __add__(self.h(), other)
 
-    @beartype
-    def __radd__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__add__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __add__(other, self.h())
+def _convolve(
+    mapping: Mapping[_ConvolvableT, int],
+    n: int,
+) -> dict[_ConvolvableT, int] | NotImplementedType:
+    r"""
+    Sum *n* independent copies of *mapping* (*n*-fold additive convolution).
 
-    @beartype
-    def __sub__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__sub__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __sub__(self.h(), other)
+    Tries `#!math O\left( \log n \right)` exponentiation by squaring first, falling back to the `#!math O\left( n \right)` linear approach if squaring fails.
+    (Some outcome types may only support addition with the original outcome type, not with evolved sums.)
+    """
+    if n == 0:
+        return {}
+    result = _convolve_fast(mapping, n)
+    if result is not NotImplemented:
+        return result
 
-    @beartype
-    def __rsub__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__sub__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __sub__(other, self.h())
+    outcome_type = type(next(iter(mapping))).__qualname__
+    warnings.warn(
+        f"Falling back to O(n) linear convolution for outcome type {outcome_type!r}; fast path requires addition to be closed over evolved sums",
+        _ConvolveFallbackWarning,
+        stacklevel=3,  # [0] this function -> [1] _convolve -> [2] __matmul__ -> [3] user call site
+    )
+    return _convolve_linear(mapping, n)
 
-    @beartype
-    def __mul__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__mul__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __mul__(self.h(), other)
 
-    @beartype
-    def __rmul__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__mul__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __mul__(other, self.h())
+def _convolve_fast(
+    mapping: Mapping[_ConvolvableT, int],
+    n: int,
+) -> dict[_ConvolvableT, int] | NotImplementedType:
+    #     mapping: Mapping[Any, int],
+    #     n: int,
+    # ) -> dict[Any, int] | NotImplementedType:
+    r"""
+    Compute n-fold additive convolution in `#!math O\left( \log n \right)` steps.
 
-    @beartype
-    def __truediv__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__truediv__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __truediv__(self.h(), other)
+    This is the classic "exponentiation by squaring" algorithm, generalized from multiplication to any associative binary operation.
+    Additive convolution of histograms is associative, so it qualifies.
 
-    @beartype
-    def __rtruediv__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__truediv__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __truediv__(other, self.h())
+    The key identity is:
 
-    @beartype
-    def __floordiv__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__floordiv__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __floordiv__(self.h(), other)
+        n copies = (n//2 copies) convolved with (n//2 copies)   [+ 1 extra if n is odd]
 
-    @beartype
-    def __rfloordiv__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__floordiv__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __floordiv__(other, self.h())
+    So instead of accumulating one copy at a time (`#!math O\left( n \right)` steps), we repeatedly double `#!python base`—convolving it with itself—and accumulate it into `#!python acc` only for the bits of `#!python n` that are set.
+    Each bit of `#!python n` corresponds to a power-of-two number of copies (1, 2, 4, 8, …), and the set bits tell us which powers to combine, exactly as binary addition works.
 
-    @beartype
-    def __mod__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__mod__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __mod__(self.h(), other)
+    Example: n=6 (binary 110)
+        - bit 1 (value 2): accumulate base<sup>2</sup> into acc; acc = 2 copies
+        - bit 2 (value 4): accumulate base<sup>4</sup> into acc; acc = 6 copies
+        Total: 2 squares, 1 accumulation versus 5 steps linearly.
 
-    @beartype
-    def __rmod__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__mod__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __mod__(other, self.h())
-
-    @beartype
-    def __pow__(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__pow__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __pow__(self.h(), other)
-
-    @beartype
-    def __rpow__(self: HableT, other: RealLike) -> H:
-        r"""
-        Shorthand for ``#!python operator.__pow__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __pow__(other, self.h())
-
-    @beartype
-    def __and__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
-        r"""
-        Shorthand for ``#!python operator.__and__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __and__(self.h(), other)
-
-    @beartype
-    def __rand__(self: HableT, other: SupportsInt) -> H:
-        r"""
-        Shorthand for ``#!python operator.__and__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __and__(other, self.h())
-
-    @beartype
-    def __xor__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
-        r"""
-        Shorthand for ``#!python operator.__xor__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __xor__(self.h(), other)
-
-    @beartype
-    def __rxor__(self: HableT, other: SupportsInt) -> H:
-        r"""
-        Shorthand for ``#!python operator.__xor__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __xor__(other, self.h())
-
-    @beartype
-    def __or__(self: HableT, other: Union[SupportsInt, H, HableT]) -> H:
-        r"""
-        Shorthand for ``#!python operator.__or__(self.h(), other)``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __or__(self.h(), other)
-
-    @beartype
-    def __ror__(self: HableT, other: SupportsInt) -> H:
-        r"""
-        Shorthand for ``#!python operator.__or__(other, self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __or__(other, self.h())
-
-    @beartype
-    def __neg__(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__neg__(self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __neg__(self.h())
-
-    @beartype
-    def __pos__(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__pos__(self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __pos__(self.h())
-
-    @beartype
-    def __abs__(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__abs__(self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __abs__(self.h())
-
-    @beartype
-    def __invert__(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python operator.__invert__(self.h())``. See the
-        [``h`` method][dyce.h.HableT.h].
-        """
-        return __invert__(self.h())
-
-    @beartype
-    def lt(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().lt(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.lt``][dyce.h.H.lt].
-        """
-        return self.h().lt(other)
-
-    @beartype
-    def le(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().le(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.le``][dyce.h.H.le].
-        """
-        return self.h().le(other)
-
-    @beartype
-    def eq(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().eq(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.eq``][dyce.h.H.eq].
-        """
-        return self.h().eq(other)
-
-    @beartype
-    def ne(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().ne(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.ne``][dyce.h.H.ne].
-        """
-        return self.h().ne(other)
-
-    @beartype
-    def gt(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().gt(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.gt``][dyce.h.H.gt].
-        """
-        return self.h().gt(other)
-
-    @beartype
-    def ge(self: HableT, other: _OperandT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().ge(other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.ge``][dyce.h.H.ge].
-        """
-        return self.h().ge(other)
-
-    @beartype
-    def is_even(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().is_even()``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.is_even``][dyce.h.H.is_even].
-        """
-        return self.h().is_even()
-
-    @beartype
-    def is_odd(self: HableT) -> H:
-        r"""
-        Shorthand for ``#!python self.h().is_odd()``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.is_odd``][dyce.h.H.is_odd].
-        """
-        return self.h().is_odd()
-
-    @overload
-    def explode(
-        self: HableT,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> H: ...
-
-    @overload
-    def explode(
-        self: HableT,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H: ...
-
-    @overload
-    def explode(
-        self: HableT,
-        max_depth: None = None,
-        *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H: ...
-
-    @overload
-    def explode(
-        self: HableT,
-        max_depth: None = None,
-        precision_limit: None = None,
-    ) -> H: ...
-
-    @beartype
-    def explode(
-        self: HableT,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> H:
-        r"""
-        Shorthand for ``#!python self.h().explode(max_depth, precision_limit)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.explode``][dyce.h.H.explode].
-        """
-        if max_depth is not None and precision_limit is not None:
-            raise ValueError("only one of max_depth and precision_limit is allowed")
-        elif max_depth is not None:
-            return self.h().explode(max_depth)
-        elif precision_limit is not None:
-            return self.h().explode(precision_limit=precision_limit)
-        else:
-            return self.h().explode()
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        *,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> H: ...
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT,
-        max_depth: IntegralLike,
-        precision_limit: None = None,
-    ) -> H: ...
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        *,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H: ...
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT,
-        max_depth: None,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H: ...
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: None = None,
-        *,
-        precision_limit: Union[RationalLikeMixedU, RealLike],
-    ) -> H: ...
-
-    @overload
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: None = None,
-        precision_limit: None = None,
-    ) -> H: ...
-
-    @deprecated
-    @beartype
-    def substitute(
-        self: HableT,
-        expand: _SubstituteExpandCallbackT,
-        coalesce: _SubstituteCoalesceCallbackT = coalesce_replace,
-        max_depth: Optional[IntegralLike] = None,
-        precision_limit: Optional[Union[RationalLikeMixedU, RealLike]] = None,
-    ) -> H:
-        r"""
-        !!! warning "Deprecated"
-
-            This method has been deprecated and will be removed in a future release. See
-            the [``expandable`` decorator][dyce.evaluation.expandable] and
-            [``foreach`` function][dyce.evaluation.foreach] for more flexible
-            alternatives.
-
-        Shorthand for ``#!python self.h().substitute(expand, coalesce, max_depth)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.substitute``][dyce.h.H.substitute].
-        """
-        if max_depth is not None and precision_limit is not None:
-            raise ValueError("only one of max_depth and precision_limit is allowed")
-        elif max_depth is not None:
-            return self.h().substitute(expand, coalesce, max_depth)
-        elif precision_limit is not None:
-            return self.h().substitute(
-                expand, coalesce, precision_limit=precision_limit
+    Returns `!#python NotImplemented` if any convolution step does, so the caller can fall back to the linear approach.
+    """
+    acc: dict[Any, int] | None = None
+    base: dict[Any, int] = dict(mapping)
+    while n:
+        if n & 1:
+            if acc is None:
+                acc = dict(base)
+            else:
+                new_acc = _h_binary_callable(
+                    acc,
+                    base,
+                    lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+                )
+                if new_acc is NotImplemented:
+                    return NotImplemented  # pragma: no cover
+                acc = new_acc
+        n >>= 1
+        if n:
+            new_base = _h_binary_callable(
+                base,
+                base,
+                lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
             )
-        else:
-            return self.h().substitute(expand, coalesce)
-
-    @beartype
-    def within(self: HableT, lo: RealLike, hi: RealLike, other: _OperandT = 0) -> H:
-        r"""
-        Shorthand for ``#!python self.h().within(lo, hi, other)``. See the
-        [``h`` method][dyce.h.HableT.h] and [``H.within``][dyce.h.H.within].
-        """
-        return self.h().within(lo, hi, other)
+            if new_base is NotImplemented:
+                return NotImplemented
+            base = new_base
+    return acc if acc is not None else {}
 
 
-# ---- Functions -----------------------------------------------------------------------
-
-
-@deprecated
-def resolve_dependent_probability(
-    dependent_term: Callable[..., HOrOutcomeT],
-    **independent_sources: _SourceT,
-) -> H:
+def _convolve_linear(
+    mapping: Mapping[_ConvolvableT, int],
+    n: int,
+) -> dict[_ConvolvableT, int] | NotImplementedType:
+    #     mapping: Mapping[Any, int],
+    #     n: int,
+    # ) -> dict[Any, int] | NotImplementedType:
     r"""
-    !!! warning "Deprecated"
-
-        This function has been moved to the [``H.foreach``][dyce.h.H.foreach] class
-        method. This alias will be removed in a future release.
-
-    Shorthand for ``#!python H.foreach(dependent_term, **independent_sources)``.
+    Linear fallback: `#!math O \left( n \right)` steps, always adding the original mapping.
     """
-    return H.foreach(dependent_term, **independent_sources)
+    result: dict[Any, int] = dict(mapping)
+    for _ in range(1, n):
+        new_result = _h_binary_callable(
+            result,
+            mapping,
+            lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
+        )
+        if new_result is NotImplemented:
+            return NotImplemented
+        result = new_result
+    return result
 
 
-@beartype
-def sum_h(hs: Iterable[H]):
+def _flatten_to_h(rhs: object) -> object:
+    r"""
+    If *rhs* is an `#!python HableT` but not already an `#!python H`, coerce it to `#!python H` via `#!python .h()`.
+    Otherwise return *rhs* unchanged.
+
+    Used in forward binary operators so that `#!python H(…) + P(…)` is treated as `#!python H(…) + P(…).h()` rather than using `#!python P` as a scalar outcome.
+    Also imported by [`dyce.hable`][dyce.hable] for use in [`HableOpsMixin`][dyce.HableOpsMixin] forward operators.
     """
-    Shorthand for ``#!python H({}) if h_sum == 0 else sum(hs)``.
+    if isinstance(rhs, H):
+        return rhs
+    if isinstance(rhs, HableT):
+        return rhs.h()
+    return rhs
 
-    This is to ensure that summing zero or more histograms always returns a histogram.
+
+def _h_binary_callable(
+    lhs_mapping: Mapping[Any, int],
+    rhs_mapping: Mapping[Any, int],
+    func: Callable[[Any, Any], Any],
+) -> "dict[Any, int] | NotImplementedType":
+    r"""
+    Cartesian product: for each `#!python (lhs_outcome, lhs_count)` &times; `#!python (rhs_outcome, rhs_count)`, compute `#!python func(lhs_outcome, rhs_outcome)` and accumulate `#!python lhs_count * rhs_count`.
+    Returns `#!python NotImplemented` immediately if *func* does.
     """
-    h_sum = sum(hs)
+    result: dict[Any, int] = {}
+    for (lhs_outcome, lhs_count), (rhs_outcome, rhs_count) in iproduct(
+        lhs_mapping.items(), rhs_mapping.items()
+    ):
+        new_outcome = func(lhs_outcome, rhs_outcome)
+        if new_outcome is NotImplemented:
+            return NotImplemented
+        result[new_outcome] = result.get(new_outcome, 0) + lhs_count * rhs_count
+    return result
 
-    return H({}) if h_sum == 0 else h_sum
+
+def _h_unary_opname(
+    mapping: Mapping[Any, int],
+    op_name: str,
+) -> dict[Any, int] | NotImplementedType:
+    r"""Apply a unary op to each outcome key, preserving counts."""
+    result: dict[Any, int] = {}
+    for outcome, count in mapping.items():
+        op_fn = getattr(outcome, op_name, None)
+        new_outcome = op_fn() if op_fn is not None else NotImplemented
+        if new_outcome is NotImplemented:
+            return NotImplemented
+        result[new_outcome] = result.get(new_outcome, 0) + count
+    return result
 
 
-@beartype
-def _within(lo: RealLike, hi: RealLike) -> _BinaryOperatorT:
-    if __gt__(lo, hi):
-        raise ValueError(f"lower bound ({lo}) is greater than upper bound ({hi})")
+def _map_opname_fwd(
+    mapping: Mapping[Any, int], op_name: str, rop_name: str, scalar: object
+) -> dict[Any, int] | NotImplementedType:
+    r"""
+    Forward op with scalar rhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    """
+    result: dict[Any, int] = {}
+    for outcome, count in mapping.items():
+        new_outcome = _apply_opname(outcome, op_name, rop_name, scalar)
+        if new_outcome is NotImplemented:
+            return NotImplemented
+        result[new_outcome] = result.get(new_outcome, 0) + count
+    return result
 
-    def _cmp(a: RealLike, b: RealLike) -> int:
-        # This approach will probably not work with most symbolic outcomes
-        diff = a - b
 
-        return bool(__gt__(diff, hi)) - bool(__lt__(diff, lo))
-
-    return _cmp
+def _map_opname_ref(
+    mapping: Mapping[Any, int],
+    op_name: str,
+    rop_name: str,
+    scalar: object,
+) -> dict[Any, int] | NotImplementedType:
+    r"""
+    Reflected op with scalar lhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    """
+    result: dict[Any, int] = {}
+    for outcome, count in mapping.items():
+        new_outcome = _apply_opname(scalar, op_name, rop_name, outcome)
+        if new_outcome is NotImplemented:
+            return NotImplemented
+        result[new_outcome] = result.get(new_outcome, 0) + count
+    return result

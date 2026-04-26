@@ -6,53 +6,60 @@
 # software in any capacity.
 # ======================================================================================
 
-from typing import Iterator
 
-from anydyce.viz import plot_line
+def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # --8<-- [start:core]
+    from collections.abc import Iterator
 
-from dyce import H, P
+    from dyce import H, P
 
-
-def do_it(style: str) -> None:
-    import matplotlib.pyplot
-
-    def roll_and_keep(p: P, k: int):
-        assert p.is_homogeneous()
+    def roll_and_keep(p: P[int], k: int) -> H[int]:
+        assert all(h == p[0] for h in p), "pool must be homogeneous"
         max_d = max(p[-1]) if p else 0
-
-        for roll, count in p.rolls_with_counts():
-            total = sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d)
-            yield total, count
+        return H.from_counts(
+            (
+                sum(roll[-k:]) + sum(1 for outcome in roll[:-k] if outcome == max_d),
+                count,
+            )
+            for roll, count in p.rolls_with_counts()
+        )
 
     d, k = 6, 3
 
-    ax = matplotlib.pyplot.axes()
-    text_color = "white" if style == "dark" else "black"
-    ax.tick_params(axis="x", colors=text_color)
-    ax.tick_params(axis="y", colors=text_color)
-    marker_start = 0
-
-    def _roll_and_keep_hs() -> Iterator[tuple[str, H]]:
+    def roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
-            yield f"{n}d{d} keep {k} add +1", H(roll_and_keep(p, k))
+            yield f"{n}d{d} keep {k} add +1", roll_and_keep(p, k)
 
-    plot_line(ax, tuple(_roll_and_keep_hs()), alpha=0.75)
-
-    for i in range(marker_start, len(ax.lines)):
-        ax.lines[i].set_marker(".")
-
-    marker_start = len(ax.lines)
-
-    def _normal() -> Iterator[tuple[str, H]]:
+    def normal() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
 
-    plot_line(ax, tuple(_normal()), alpha=0.25)
+    # --8<-- [end:core]
 
-    for i in range(marker_start, len(ax.lines)):
-        ax.lines[i].set_marker("o")
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # --8<-- [start:viz]
+    from dyce.viz import plot_line
 
+    labels1, hs1 = zip(*tuple(normal()), strict=True)
+    ax = plot_line(*hs1, labels=labels1, markers=".", alpha=0.75)
+
+    labels2, hs2 = zip(*tuple(roll_and_keep_hs()), strict=True)
+    plot_line(*hs2, labels=labels2, markers="o", alpha=0.25, ax=ax)
+
+    ax.set_title("Roll-and-keep mechanic comparison")
     ax.legend(loc="upper left")
-    ax.set_title("Roll-and-keep mechanic comparison", color=text_color)
+    # --8<-- [end:viz]
+
+    # Style (dark/light) tweaks
+    ax.tick_params(axis="x", colors=line_color)
+    ax.tick_params(axis="y", colors=line_color)
+    ax.title.set_color(line_color)
+
+
+if __name__ == "__main__":
+    from _plot import main  # pyrefly: ignore[missing-import]
+
+    main(fig_callback)

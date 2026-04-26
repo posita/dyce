@@ -4,398 +4,221 @@
 # waived or licensed are reserved. If that file is missing or appears to be modified
 # from its original, then please contact the author before viewing or using this
 # software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Please keep each docstring sentence on its own unwrapped line. It looks like crap in a
+# text editor, but it has no effect on rendering, and it allows much more useful diffs.
+# (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-from collections import Counter
+import sys
+import warnings
+from collections import Counter, UserString
 from enum import IntEnum, auto
+from fractions import Fraction
+from typing import Any, Never
 
-from dyce import H, P
-from dyce.evaluation import (
-    HResult,
-    PResult,
-    PWithSelection,
-    expandable,
-    explode,
-    foreach,
-)
-from dyce.h import HOrOutcomeT
+import pytest
+
+from dyce import H, HResult, P, PResult, expand, explode_n
+from dyce.evaluation import TruncationWarning
+from dyce.lifecycle import ExperimentalWarning
+from dyce.types import BeartypeCallHintViolation
 
 __all__ = ()
 
 
-# ---- Tests ---------------------------------------------------------------------------
+class TestExpand:
+    def test_h_and_p_sources(self) -> None:
+        d6 = H(6)
+        d8 = H(8)
+        d10 = H(10)
+        p_2d8 = 2 @ P(d8)
+
+        def _fn(
+            d6_result: HResult[int],
+            p_2d8_result: PResult[int],
+            d10_result: HResult[int],
+        ) -> int:
+            assert d6_result.outcome in d6
+            for d8_outcome in p_2d8_result.roll:
+                assert d8_outcome in d8
+            assert d10_result.outcome in d10
+            return d6_result.outcome + sum(p_2d8_result.roll) + d10_result.outcome
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            assert expand(_fn, d6, p_2d8, d10) == d6 + p_2d8 + d10
+
+    def test_source_neither_h_nor_p_raises(self) -> None:
+        class TotalStr(UserString):
+            __slots__ = ()
+
+            @property
+            def total(self) -> int:
+                return len(self)
+
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+            return H({})
+
+        with (  # noqa: PT012
+            pytest.raises(
+                (TypeError, BeartypeCallHintViolation),
+                match=r"\b(unrecognized source type|violates type hint)\b",
+            ),
+            warnings.catch_warnings(),
+        ):
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            expand(_fn, TotalStr("I'm an imposter!"))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+
+    def test_callback_returns_h_with_zero_count_outcomes(self) -> None:
+        class Result(IntEnum):
+            ONES = auto()
+            FIVES_OR_SIXES = auto()
+
+        def _fn(p_result: PResult[int]) -> H[Result]:
+            c = Counter(p_result.roll)
+            return H({Result.ONES: c[1], Result.FIVES_OR_SIXES: c[5] + c[6]})
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            assert expand(_fn, 4 @ P(6)) == H(
+                {Result.ONES: 1, Result.FIVES_OR_SIXES: 2}
+            )
+
+    def test_no_sources_raises(self) -> None:
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+            return H({})
+
+        with (  # noqa: PT012
+            warnings.catch_warnings(),
+            pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"),
+        ):
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            expand(_fn)
 
 
-def test_expandable_equivalence_heterogeneous_pool() -> None:
-    d4 = H(4)
-    d6 = H(6) + 4
-    p_3d42d6 = P(d4, d4, d4, d6, d6)
-
-    @expandable
-    def roll_sum(result: PResult):
-        return sum(result.roll)
-
-    assert roll_sum(p_3d42d6) == H(
-        (sum(roll), count) for roll, count in p_3d42d6.rolls_with_counts()
+class TestExpandTruncation:
+    _D6X_TRUNCATED_AT_3RD_ROLL = H(
+        {
+            1: 30,
+            2: 30,
+            3: 30,
+            4: 30,
+            5: 30,
+            7: 5,
+            8: 5,
+            9: 5,
+            10: 5,
+            11: 5,
+            13: 1,
+            14: 1,
+            15: 1,
+            16: 1,
+            17: 1,
+        }
     )
 
-    head_sum = H((sum(roll[:3]), count) for roll, count in p_3d42d6.rolls_with_counts())
+    def test_callback_truncates_itself(self) -> None:
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            with pytest.warns(TruncationWarning, match=r"\bpath probability\b"):
+                assert (
+                    expand(
+                        _explode_with_truncation,
+                        H(6),
+                        precision=Fraction(1, 6**4 - 1),
+                    )
+                    == self._D6X_TRUNCATED_AT_3RD_ROLL
+                )
 
-    assert head_sum == H(
-        (sum(roll), count) for roll, count in p_3d42d6.rolls_with_counts(slice(None, 3))
-    )
+    def test_precision_limit_truncation(self) -> None:
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error")
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            assert (
+                expand(
+                    _explode_with_truncation,
+                    H(6),
+                    truncate_countdown=3,
+                )
+                == self._D6X_TRUNCATED_AT_3RD_ROLL
+            )
 
-    assert head_sum == H(
-        (sum(roll), count)
-        for roll, count in p_3d42d6.rolls_with_counts(slice(None, -2))
-    )
+    def test_recursion_depth_truncation(self) -> None:
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
+                assert (
+                    expand(
+                        _explode_with_truncation,
+                        H(6),
+                        rcrs_err_countdown=3,
+                    )
+                    == self._D6X_TRUNCATED_AT_3RD_ROLL
+                )
 
-    @expandable
-    def roll_sum_head_p(result: PResult):
-        return sum(result.roll[:3])
+    def test_recursion_eventually_truncates(self) -> None:
+        # Always_recurses has no base case: every branch hits RecursionError and
+        # is dropped, leaving an empty histogram. A TruncationWarning is emitted
+        # by the innermost expand that catches the RecursionError.
+        d1 = H(1)
 
-    assert roll_sum_head_p(p_3d42d6) == head_sum
+        def _always_recurses(result: HResult[int]) -> H[int] | int:
+            return expand(_always_recurses, result.h) + 1
 
-    @expandable
-    def roll_sum_head_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_head_p_with_selection(PWithSelection(p_3d42d6, (0, 1, 2)))
-        == roll_sum_head_p_with_selection(PWithSelection(p_3d42d6, (-5, -4, -3)))
-        == head_sum
-    )
-
-    tail_sum = H(
-        (sum(roll[-3:]), count) for roll, count in p_3d42d6.rolls_with_counts()
-    )
-
-    assert tail_sum == H(
-        (sum(roll), count)
-        for roll, count in p_3d42d6.rolls_with_counts(slice(-3, None))
-    )
-
-    assert tail_sum == H(
-        (sum(roll), count) for roll, count in p_3d42d6.rolls_with_counts(slice(2, None))
-    )
-
-    @expandable
-    def roll_sum_tail_p(result: PResult):
-        return sum(result.roll[-3:])
-
-    assert roll_sum_tail_p(p_3d42d6) == tail_sum
-
-    @expandable
-    def roll_sum_tail_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_tail_p_with_selection(PWithSelection(p_3d42d6, (-3, -2, -1)))
-        == roll_sum_tail_p_with_selection(PWithSelection(p_3d42d6, (2, 3, 4)))
-        == tail_sum
-    )
-
-    mid_sum = H(
-        (sum(roll[1:-1]), count) for roll, count in p_3d42d6.rolls_with_counts()
-    )
-
-    assert mid_sum == H(
-        (sum(roll), count) for roll, count in p_3d42d6.rolls_with_counts(slice(1, -1))
-    )
-
-    @expandable
-    def roll_sum_mid_p(result: PResult):
-        return sum(result.roll[1:-1])
-
-    assert roll_sum_mid_p(p_3d42d6) == mid_sum
-
-    @expandable
-    def roll_sum_mid_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_mid_p_with_selection(PWithSelection(p_3d42d6, (slice(1, -1),)))
-        == mid_sum
-    )
-
-    window_sum = H(
-        (sum(roll[1::2]), count) for roll, count in p_3d42d6.rolls_with_counts()
-    )
-
-    assert window_sum == H(
-        (sum(roll), count)
-        for roll, count in p_3d42d6.rolls_with_counts(slice(1, None, 2))
-    )
-
-    @expandable
-    def roll_sum_skip_p(result: PResult):
-        return sum(result.roll[1::2])
-
-    assert roll_sum_skip_p(p_3d42d6) == window_sum
-
-    @expandable
-    def roll_sum_skip_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_skip_p_with_selection(PWithSelection(p_3d42d6, (slice(1, None, 2),)))
-        == window_sum
-    )
-
-    window_sum = H(
-        (roll[2] + roll[4], count) for roll, count in p_3d42d6.rolls_with_counts()
-    )
-
-    assert window_sum == H(
-        (roll[0] + roll[2], count)
-        for roll, count in p_3d42d6.rolls_with_counts(slice(2, 6))
-    )
-
-    @expandable
-    def roll_sum_window_p(result: PResult):
-        return result.roll[2] + result.roll[4]
-
-    assert roll_sum_window_p(p_3d42d6) == window_sum
-
-    @expandable
-    def roll_sum_window_p_with_selection(result: PResult):
-        return result.roll[0] + result.roll[2]
-
-    assert (
-        roll_sum_window_p_with_selection(PWithSelection(p_3d42d6, (slice(2, 6),)))
-        == window_sum
-    )
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
+                result = expand(_always_recurses, d1)
+        assert result == H({})
 
 
-def test_expandable_equivalence_homogeneous_pool() -> None:
-    d4 = H(4)
-    d4_6 = 6 @ d4
-    p_6d4 = 6 @ P(d4)
+class TestExplodeN:
+    def test_explode_n_natural_order(self) -> None:
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d6x = H(6) + x
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            assert explode_n(d6x, n=1) == H(
+                {
+                    2 * x + 7: 1,
+                    2 * x + 8: 1,
+                    2 * x + 9: 1,
+                    2 * x + 10: 1,
+                    2 * x + 11: 1,
+                    2 * x + 12: 1,
+                    x + 1: 6,
+                    x + 2: 6,
+                    x + 3: 6,
+                    x + 4: 6,
+                    x + 5: 6,
+                }
+            )
 
-    assert H((sum(roll), count) for roll, count in p_6d4.rolls_with_counts()) == d4_6
 
-    @expandable
-    def roll_sum(result: PResult):
-        return sum(result.roll)
-
-    assert roll_sum(p_6d4) == d4_6
-
-    head_sum = p_6d4.h(0, 1, 2)
-    assert (
-        H((sum(roll[:3]), count) for roll, count in p_6d4.rolls_with_counts())
-        == head_sum
-    )
-    assert (
-        H((sum(roll), count) for roll, count in p_6d4.rolls_with_counts(slice(None, 3)))
-        == head_sum
-    )
-
-    @expandable
-    def roll_sum_head_p(result: PResult):
-        return sum(result.roll[:3])
-
-    assert roll_sum_head_p(p_6d4) == head_sum
-
-    @expandable
-    def roll_sum_head_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert roll_sum_head_p_with_selection(PWithSelection(p_6d4, (0, 1, 2))) == head_sum
-
-    tail_sum = p_6d4.h(-3, -2, -1)
-    assert (
-        H((sum(roll[-3:]), count) for roll, count in p_6d4.rolls_with_counts())
-        == tail_sum
-    )
-    assert (
-        H(
-            (sum(roll), count)
-            for roll, count in p_6d4.rolls_with_counts(slice(-3, None))
+def _explode_with_truncation(
+    result: HResult[int],
+    *,
+    rcrs_err_countdown: int = sys.getrecursionlimit(),
+    truncate_countdown: int = sys.getrecursionlimit(),
+) -> H[int] | int:
+    if rcrs_err_countdown <= 0:
+        raise RecursionError("artificial recursion limit")
+    elif truncate_countdown <= 0:
+        return H({})
+    elif result.outcome < max(result.h):
+        return result.outcome
+    else:
+        return (
+            expand(
+                _explode_with_truncation,
+                result.h,
+                rcrs_err_countdown=rcrs_err_countdown - 1,
+                truncate_countdown=truncate_countdown - 1,
+            )
+            + result.outcome
         )
-        == tail_sum
-    )
-
-    @expandable
-    def roll_sum_tail_p(result: PResult):
-        return sum(result.roll[-3:])
-
-    assert roll_sum_tail_p(p_6d4) == tail_sum
-
-    @expandable
-    def roll_sum_tail_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_tail_p_with_selection(PWithSelection(p_6d4, (-3, -2, -1))) == tail_sum
-    )
-
-    mid_sum = p_6d4.h(slice(1, -1))
-    assert (
-        H((sum(roll[1:-1]), count) for roll, count in p_6d4.rolls_with_counts())
-        == mid_sum
-    )
-    assert (
-        H((sum(roll), count) for roll, count in p_6d4.rolls_with_counts(slice(1, -1)))
-        == mid_sum
-    )
-
-    @expandable
-    def roll_sum_mid_p(result: PResult):
-        return sum(result.roll[1:-1])
-
-    assert roll_sum_mid_p(p_6d4) == mid_sum
-
-    @expandable
-    def roll_sum_mid_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_mid_p_with_selection(PWithSelection(p_6d4, (slice(1, -1),))) == mid_sum
-    )
-
-    skip_sum = p_6d4.h(slice(1, None, 2))
-    assert (
-        H((sum(roll[1::2]), count) for roll, count in p_6d4.rolls_with_counts())
-        == skip_sum
-    )
-    assert (
-        H(
-            (sum(roll), count)
-            for roll, count in p_6d4.rolls_with_counts(slice(1, None, 2))
-        )
-        == skip_sum
-    )
-
-    @expandable
-    def roll_sum_skip_p(result: PResult):
-        return sum(result.roll[1::2])
-
-    assert roll_sum_skip_p(p_6d4) == skip_sum
-
-    @expandable
-    def roll_sum_skip_p_with_selection(result: PResult):
-        return sum(result.roll)
-
-    assert (
-        roll_sum_skip_p_with_selection(PWithSelection(p_6d4, (slice(1, None, 2),)))
-        == skip_sum
-    )
-
-    window_sum = p_6d4.h(2, 4)
-    assert (
-        H((roll[2] + roll[4], count) for roll, count in p_6d4.rolls_with_counts())
-        == window_sum
-    )
-    assert (
-        H(
-            (roll[0] + roll[2], count)
-            for roll, count in p_6d4.rolls_with_counts(slice(2, 5))
-        )
-        == window_sum
-    )
-
-    @expandable
-    def roll_sum_window_p(result: PResult):
-        return result.roll[2] + result.roll[4]
-
-    assert roll_sum_window_p(p_6d4) == window_sum
-
-    @expandable
-    def roll_sum_window_p_with_selection(result: PResult):
-        return result.roll[0] + result.roll[2]
-
-    assert (
-        roll_sum_window_p_with_selection(PWithSelection(p_6d4, (slice(2, 5),)))
-        == window_sum
-    )
-
-
-def test_expandable_sentinel_default() -> None:
-    default_sentinel = H({0: 1})
-    d6 = H(6)
-
-    @expandable
-    def func(result: HResult) -> HOrOutcomeT:
-        return result.outcome * 2 + func(result.h)
-
-    assert func(d6, limit=0) == default_sentinel
-    assert func(d6, limit=1) == d6 * 2 + default_sentinel
-    assert func(d6, limit=2) == d6 * 2 + d6 * 2 + default_sentinel
-
-
-def test_expandable_sentinel_h() -> None:
-    sentinel = H({-2: 1})
-    d6 = H(6)
-
-    @expandable(sentinel=sentinel)
-    def func(result: HResult) -> HOrOutcomeT:
-        return result.outcome * func(result.h)
-
-    assert func(d6, limit=0) == sentinel
-    assert func(d6, limit=1) == d6 * sentinel
-    assert func(d6, limit=2) == d6 * d6 * sentinel
-
-
-def test_expandable_sentinel_with_recursion_error() -> None:
-    d1 = H(1)
-
-    @expandable(sentinel=H({0: 1}))
-    def func(result: HResult) -> HOrOutcomeT:
-        return func(result.h) + 1
-
-    # Sentinel raises a RecursionError
-    assert func(d1, limit=1) == H({1: 1})
-
-    # 50 is meant to capture the depth beyond which func hits its RecursionError. This
-    # is probably more like 200-500, depending on the environment.
-    assert func(d1, limit=-1).gt(H({50: 1})) == H({True: 1})
-
-
-def test_expandable_multiple_args_kw() -> None:
-    d6 = H(6)
-    d8 = H(8)
-    d10 = H(10)
-    p_2d8 = 2 @ P(d8)
-
-    @expandable
-    def func(d6: HResult, p_2d8: PResult, d10: HResult) -> HOrOutcomeT:
-        assert d6.outcome in d6
-
-        for d8_outcome in p_2d8.roll:
-            assert d8_outcome in d8
-
-        assert d10.outcome in d10
-
-        return d6.outcome + sum(p_2d8.roll) + d10.outcome
-
-    res = d6 + p_2d8 + d10
-    assert func(d6, p_2d8, d10) == res
-    assert func(d6, p_2d8, d10=d10) == res
-    assert func(d6, p_2d8=p_2d8, d10=d10) == res
-    assert func(d6=d6, p_2d8=p_2d8, d10=d10) == res
-
-
-def test_expandable_accommodates_h_with_zero_total() -> None:
-    class Result(IntEnum):
-        ONES = auto()
-        FIVES_OR_SIXES = auto()
-
-    def func(p_result: PResult) -> H:
-        c = Counter(p_result.roll)
-
-        return H({Result.ONES: c[1], Result.FIVES_OR_SIXES: c[5] + c[6]})
-
-    assert foreach(func, p_result=4 @ P(6)) == H(
-        {Result.ONES: 1, Result.FIVES_OR_SIXES: 2}
-    )
-
-
-def test_explode_single_sided_die_integral_limit() -> None:
-    def is_even_predicate(h_result: HResult):
-        return h_result.outcome % 2 == 0
-
-    assert explode(H({3: 1}), is_even_predicate, limit=5) == H({3: 1})
-    assert explode(H({2: 1}), is_even_predicate, limit=5) == H({12: 1})
-    assert explode(H({0: 1}), is_even_predicate, limit=5) == H({0: 1})
-    assert explode(H({-2: 1}), is_even_predicate, limit=5) == H({-12: 1})
-    assert explode(H({-3: 1}), is_even_predicate, limit=5) == H({-3: 1})
