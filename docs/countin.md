@@ -884,12 +884,12 @@ For deterministic outcomes.
     (2*x/3, 2*x/3 + 2/3, x + 1/3)
 
 
-[`P.apply`][dyce.P.apply] can help pave the way back to concrete outcomes.
+[`P.apply_to_each_h`][dyce.P.apply_to_each_h] can help pave the way back to concrete outcomes.
 
     >>> f = lambda outcome: outcome.subs({sympy.abc.x: sympy.Rational(1, 3)})
-    >>> p.apply(f)
+    >>> p.apply_to_each_h(f)
     P(H({1/9: 1, 2/9: 1, 1/3: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
-    >>> p.apply(f).h(-1)
+    >>> p.apply_to_each_h(f).h(-1)
     H({7/9: 9, 8/9: 9, 1: 9})
 
 
