@@ -33,7 +33,7 @@ Now you’re playing with …
 
 <img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/main/docs/dyce.svg" alt="dyce logo">
 
-# `dyce` – simple Python tools for exploring dice outcomes and other finite discrete probabilities
+# `dyce` – Simple Python tools for exploring dice outcomes and other finite discrete probabilities
 
 **💥 *Now 100% [Bear-ified™](https://beartype.rtfd.io/)!* 👌🏾🐻**
 ([Details](#requirements) below.)
