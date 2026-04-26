@@ -57,11 +57,5 @@ jobs:
         with:
           python-version: "3.13"
       - run: uv sync --no-dev --group lint
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      - run: uv run mypy
-      - run: uv run pyright
-      - run: uv run pyrefly check --warn unused-ignore
-      - run: uv run ty check
-      - run: uv run ./helpers/check-doctests.py check
-      - run: uv run ./helpers/check-doctests.py format
+      - run: uv run pre-commit run --all-files --hook-stage pre-push
+      - run: git diff --quiet HEAD --  # fails if any tracked files have changed

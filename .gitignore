@@ -8,9 +8,6 @@ build/
 docs/index.md
 docs/license.md
 
-# Virtual environments
-.venv
-
 # Coverage
 .coverage
 htmlcov/
