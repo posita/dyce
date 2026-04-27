@@ -200,6 +200,9 @@ class TestExplodeN:
             )
 
 
+# ---- Helpers -------------------------------------------------------------------------
+
+
 def _explode_with_truncation(
     result: HResult[int],
     *,

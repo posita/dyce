@@ -420,6 +420,7 @@ def expand(
         # TODO(posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
         # @experimental decorator instead once that issue is fixed
         warnings.warn(experimental_msg % "expand", ExperimentalWarning, stacklevel=2)
+        # We're at the top level, so create a new context
         cur_ctxt = _ExpandContext(
             path_probability=Fraction(1),
             precision=precision,
