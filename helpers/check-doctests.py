@@ -85,7 +85,7 @@ from typing import Any
 _LOGGER = logging.getLogger(__name__)
 _DEFAULT_SUFFIXES: frozenset[str] = frozenset({".md", ".py", ".pyi"})
 
-# ── synthesis ──────────────────────────────────────────────────────────────────
+# ---- Synthesis -----------------------------------------------------------------------
 
 
 def _leading_blank_lines(s: str) -> int:
@@ -132,9 +132,9 @@ def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.Doc
             ):
                 continue
             const = first.value
-            # const.lineno is 1-based; subtract 1 for 0-based, then add the number
-            # of leading blank lines that inspect.cleandoc will strip, so that
-            # doc_offset points at the first non-blank content line in the file.
+            # const.lineno is 1-based; subtract 1 for 0-based, then add the number of
+            # leading blank lines that inspect.cleandoc will strip, so that doc_offset
+            # points at the first non-blank content line in the file.
             doc_offset = const.lineno - 1 + _leading_blank_lines(str(const.value))
             yield (
                 doc_offset,
@@ -276,7 +276,7 @@ def _make_prefixed_lines(source: str, indent: int) -> list[str] | None:
         tree = ast.parse(source)
     except SyntaxError:
         return None
-    # Blank lines between top-level statements would split the doctest example.
+    # Blank lines between top-level statements would split the doctest example
     if len(tree.body) > 1:
         for i in range(len(tree.body) - 1):
             gap_start = tree.body[i].end_lineno  # 1-based, inclusive
@@ -325,16 +325,16 @@ def _format_filepath(filepath: Path) -> bool:
 
     file_lines = text.splitlines()
 
-    # Collect (start, end, new_lines) replacements; apply bottom-to-top so earlier
-    # line numbers are not invalidated by changes to later ones.
+    # Collect (start, end, new_lines) replacements. Apply bottom-to-top so earlier line
+    # numbers are not invalidated by changes to later ones
     replacements: list[tuple[int, int, list[str]]] = []
     for abs_lineno, ex in examples:
         formatted = _ruff_format(ex.source)
         if formatted is None:
             continue
         # ex.indent is unreliable for Python files: inspect.cleandoc strips indentation
-        # before DocTestParser runs, so ex.indent is always 0 in that path.
-        # Derive the actual indentation from the original file line instead.
+        # before DocTestParser runs, so ex.indent is always 0 in that path. Derive the
+        # actual indentation from the original file line instead.
         actual_indent = len(file_lines[abs_lineno]) - len(
             file_lines[abs_lineno].lstrip()
         )
@@ -629,7 +629,7 @@ def _enum_src_files(paths: Iterable[Path], suffixes: frozenset[str]) -> list[Pat
             if path.is_dir():
                 dirs.append(path)
             else:
-                # Explicitly named files are never filtered by suffix.
+                # Explicitly named files are never filtered by suffix
                 files.append(path)
     else:
         result = subprocess.run(  # noqa: PLW1510
@@ -684,15 +684,15 @@ def main() -> int:  # noqa: C901
     pre_argv, checker_commands = _split_argv(sys.argv[1:])
     exit_code = 0
 
-    # Peek at subcommand before parsing so we can load the right toml section.
+    # Peek at subcommand before parsing so we can load the right toml section
     subcommand = pre_argv[0] if pre_argv and pre_argv[0] in _SUBCOMMANDS else None
 
-    # Load pyproject.toml config; CLI args override these via set_defaults below.
+    # Load pyproject.toml config. CLI args override these via set_defaults below.
     shared_config, sub_config = _load_toml_config(subcommand)
 
     parser, subparsers = _build_parser()
 
-    # Apply shared toml defaults to all subparsers (paths needs Path conversion).
+    # Apply shared toml defaults to all subparsers. (Paths needs Path conversion.)
     shared_defaults: dict[str, object] = {}
     for k, v in shared_config.items():
         if k == "paths":
@@ -703,7 +703,7 @@ def main() -> int:  # noqa: C901
     for sub_p in subparsers.values():
         sub_p.set_defaults(**shared_defaults)
 
-    # Apply subcommand-specific toml defaults; pull checkers out separately.
+    # Apply subcommand-specific toml defaults. Pull checkers out separately.
     toml_checkers: list[list[str]] | None = None
     if subcommand in subparsers:
         sub_defaults: dict[str, object] = {}
@@ -722,7 +722,8 @@ def main() -> int:  # noqa: C901
         format="%(levelname)s: %(message)s",
     )
 
-    # Suffix precedence: CLI > pyproject.toml (already in args.suffixes via set_defaults) > built-in.
+    # Suffix precedence: CLI > pyproject.toml (already in args.suffixes via
+    # set_defaults) > built-in
     suffixes = (
         frozenset(args.suffixes) if args.suffixes is not None else _DEFAULT_SUFFIXES
     )
@@ -737,7 +738,7 @@ def main() -> int:  # noqa: C901
 
     assert args.subcommand == "check"
 
-    # Checker precedence: CLI > pyproject.toml > built-in default.
+    # Checker precedence: CLI > pyproject.toml > built-in default
     if not checker_commands:
         if toml_checkers:
             checker_commands = toml_checkers
@@ -764,7 +765,7 @@ def main() -> int:  # noqa: C901
             partial(_signal_handler, cleanup_tmp_dir=cleanup_tmp_dir),
         )
 
-    # Synthesize files into the temp directory.
+    # Synthesize files into the temp directory
     path_map = _synthesize_filepaths(tmp_dir, files)
 
     if not path_map:
