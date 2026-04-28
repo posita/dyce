@@ -14,51 +14,9 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-r"""
-Synthesize type-checkable files from doctests and run type checkers, or reformat doctest examples in place.
+r"""Synthesize type-checkable files from doctests and run type checkers, or reformat doctest examples in place.
 
-Subcommands::
-
-  check  [paths] [--suffixes EXT ...] [--log-level LEVEL]
-         [--fail-fast | --no-fail-fast] [--keep | --no-keep]
-         [-- checker ... [-- checker ...]]
-
-  format [paths] [--suffixes EXT ...] [--log-level LEVEL]
-
-For `check`, each file's `>>>` blocks are placed at their original line numbers in a temp buffer (blank everywhere else), so type checker errors reference correct locations without any remapping.
-The tool first attempts to parse each file with `ast` (text-only, no import); if that fails (e.g. for Markdown) it falls back to passing the raw content to `DocTestParser`.
-
-Type checker commands follow `--` and are separated from each other by additional `--` tokens.
-Each command receives the full list of synthesized temp files as trailing arguments.
-
-Examples::
-
-  helpers/check-doctests.py check dyce/h.py dyce/types.py -- ty check -- mypy
-  helpers/check-doctests.py check dyce/ docs/ --no-fail-fast
-  helpers/check-doctests.py format dyce/ docs/
-
-If no checker command is given after `--`, the checker list is taken from `pyproject.toml`; if absent there too, `mypy` is used as the default.
-If no paths are given, the file list is taken from `git ls-files`.
-
-When scanning directories, only files whose suffix appears in the active suffix list are processed.
-The built-in default is `{".md", ".py", ".pyi"}`; override in `pyproject.toml` or via `--suffixes` (CLI wins).
-Explicitly-named file arguments are never filtered by suffix.
-
-Defaults can be set in `pyproject.toml` under `[tool.check_doctests]` (shared) and `[tool.check_doctests.check]` (check-specific):
-
-```toml
-[tool.check_doctests]
-paths     = ["app", "docs", "tests"]
-suffixes  = [".md", ".py", ".pyi"]
-log_level = "WARNING"
-
-[tool.check_doctests.check]
-checkers  = [["ty", "check"], ["mypy"]]
-fail_fast = false
-keep      = false
-```
-
-CLI options always take precedence over `pyproject.toml`, which takes precedence over the built-in defaults.
+Run "check --help" or "format --help" for subcommand-specific usage.
 """
 
 import argparse
@@ -561,23 +519,26 @@ def _build_parser() -> tuple[
         "paths",
         nargs="*",
         type=Path,
-        help="source paths to process (default: git repo root; honors .gitignore)",
+        help="Source files or directories to process. "
+        "When scanning a directory, only files whose suffix matches --suffixes are included; "
+        "explicitly named files are never filtered. "
+        "Defaults to all git-tracked files under the repository root when omitted.",
     )
     shared.add_argument(
         "--suffixes",
         nargs="+",
         default=None,
         metavar="EXT",
-        help="file suffixes to include when scanning directories"
-        f" (default: {' '.join(sorted(_DEFAULT_SUFFIXES))};"
-        " explicitly named files are never filtered)",
+        help="File suffixes to include when scanning directories. "
+        f"Defaults to {' '.join(sorted(_DEFAULT_SUFFIXES))} if not set here or in pyproject.toml.",
     )
     shared.add_argument(
         "--log-level",
         default="WARNING",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         metavar="LEVEL",
-        help="logging verbosity: DEBUG|INFO|WARNING|ERROR|CRITICAL (default: WARNING)",
+        help="Logging verbosity. "
+        "One of DEBUG, INFO, WARNING, ERROR, CRITICAL (default: WARNING).",
     )
 
     # Main parser.
@@ -593,21 +554,61 @@ def _build_parser() -> tuple[
         "check",
         parents=[shared],
         help="synthesize temp files from doctests and run type checkers",
+        description=(
+            "Synthesize each file's doctest code blocks into a temporary buffer\n"
+            "preserving original line numbers, then run type checkers on the result.\n"
+            "Type checker errors reference the original file and line without remapping.\n"
+            "\n"
+            "Each file is first parsed with ast to locate docstrings precisely.\n"
+            "Non-Python files such as Markdown fall back to DocTestParser on the raw\n"
+            "content.\n"
+            "\n"
+            "Type checker commands follow -- after the regular arguments and are\n"
+            "separated from each other by additional -- tokens:\n"
+            "\n"
+            "  check [options] [paths] -- checker [args] [-- checker [args] ...]\n"
+            "\n"
+            "Each command receives the synthesized temp files as trailing arguments.\n"
+            "If no checker is given on the command line, the checkers list from\n"
+            "[tool.check_doctests.check] in the nearest pyproject.toml is used.\n"
+            "The built-in fallback is mypy.\n"
+        ),
+        epilog=(
+            "Examples:\n"
+            "  check dyce/h.py dyce/types.py -- ty check -- mypy\n"
+            "  check dyce/ docs/ --no-fail-fast\n"
+            "  check -- pyright\n"
+            "\n"
+            "pyproject.toml defaults (all keys optional):\n"
+            "\n"
+            "  [tool.check_doctests]\n"
+            '  paths     = ["app", "docs", "tests"]\n'
+            '  suffixes  = [".md", ".py", ".pyi"]\n'
+            '  log_level = "WARNING"\n'
+            "\n"
+            "  [tool.check_doctests.check]\n"
+            '  checkers  = [["ty", "check"], ["mypy"]]\n'
+            "  fail_fast = false\n"
+            "  keep      = false\n"
+            "\n"
+            "CLI options take precedence over pyproject.toml, which takes precedence\n"
+            "over the built-in defaults.\n"
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     check_p.add_argument(
         "--keep",
         action=argparse.BooleanOptionalAction,
         default=False,
-        help="keep the temporary directory after completion, logging its path at WARNING"
-        " (--no-keep cleans up on exit; default: --no-keep)",
+        help="Keep the temporary directory after completion, logging its path at WARNING. "
+        "--no-keep (the default) removes it automatically on exit.",
     )
     check_p.add_argument(
         "--fail-fast",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="stop at the first type checker failure and exit with its return code"
-        " (--no-fail-fast runs all checkers regardless; default: --fail-fast)",
+        help="Exit with the first failing checker's return code (default). "
+        "--no-fail-fast runs all checkers regardless and ORs their return codes.",
     )
 
     # format subparser.
@@ -615,6 +616,12 @@ def _build_parser() -> tuple[
         "format",
         parents=[shared],
         help="reformat doctest examples in place using ruff (skips .py/.pyi files)",
+        description=(
+            "Reformat >>> doctest examples in place using ruff format.\n"
+            "\n"
+            "Skips .py and .pyi files; use ruff format directly for those, which\n"
+            "handles docstring code line length natively via docstring-code-line-length."
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
