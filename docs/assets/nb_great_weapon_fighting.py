@@ -71,8 +71,8 @@ def gwf_2024(result: HResult[int]) -> H[int] | int:
     return 3 if result.outcome in (1, 2) else result.outcome
 
 
-h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5
-h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5
+h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5  # ty: ignore[unsupported-operator]
+h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5  # ty: ignore[unsupported-operator]
 
 # %%
 import pandas as pd

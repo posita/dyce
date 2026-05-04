@@ -408,12 +408,12 @@ def _load_toml_config(  # noqa: C901
                 continue  # sub-table; handled below
             elif key in _TOML_SHARED_STR_KEYS:
                 if isinstance(val, str):
-                    shared[key] = val
+                    shared[key] = val  # ty: ignore[invalid-assignment]
                 else:
                     _LOGGER.warning("%s: %s must be a string; ignoring", candidate, key)
             elif key in _TOML_SHARED_STR_LIST_KEYS:
                 if isinstance(val, list) and all(isinstance(s, str) for s in val):
-                    shared[key] = val
+                    shared[key] = val  # ty: ignore[invalid-assignment]
                 else:
                     _LOGGER.warning(
                         "%s: %s must be a list of strings; ignoring", candidate, key
@@ -424,7 +424,7 @@ def _load_toml_config(  # noqa: C901
         # Parse subcommand-specific keys.
         sub: dict[str, object] = {}
         if subcommand in _SUBCOMMANDS:
-            raw_sub = raw.get(subcommand, {})
+            raw_sub = raw.get(subcommand, {})  # ty: ignore[no-matching-overload]
             if not isinstance(raw_sub, dict):
                 _LOGGER.warning(
                     "%s: [tool.check_doctests.%s] is not a table",
