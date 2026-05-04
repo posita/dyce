@@ -437,7 +437,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             try:
                 # This optimization assumes outcomes support multiplication with native
                 # ints while retaining their type ...
-                return sum_h(self) * i.times  # type: ignore[operator] # ty: ignore[unsupported-operator]
+                return sum_h(self) * i.times  # type: ignore[operator]
             except TypeError:
                 # ... but if we get into trouble, fall through to enumerating via rolls_with_counts
                 pass

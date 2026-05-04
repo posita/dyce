@@ -18,7 +18,7 @@ import warnings
 from collections import Counter, UserString
 from enum import IntEnum, auto
 from fractions import Fraction
-from typing import Any, Never
+from typing import Any, Never, cast
 
 import pytest
 
@@ -167,7 +167,7 @@ class TestExpandTruncation:
         d1 = H(1)
 
         def _always_recurses(result: HResult[int]) -> H[int] | int:
-            return expand(_always_recurses, result.h) + 1
+            return expand(_always_recurses, result.h) + 1  # ty: ignore[unsupported-operator]
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
@@ -217,11 +217,14 @@ def _explode_with_truncation(
         return result.outcome
     else:
         return (
-            expand(
-                _explode_with_truncation,
-                result.h,
-                rcrs_err_countdown=rcrs_err_countdown - 1,
-                truncate_countdown=truncate_countdown - 1,
+            cast(
+                "H[int]",
+                expand(
+                    _explode_with_truncation,
+                    result.h,
+                    rcrs_err_countdown=rcrs_err_countdown - 1,
+                    truncate_countdown=truncate_countdown - 1,
+                ),
             )
             + result.outcome
         )

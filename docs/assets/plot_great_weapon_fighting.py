@@ -29,8 +29,8 @@ def fig_callback(line_color: str) -> None:
         # Ones and twos are promoted to 3s
         return 3 if result.outcome in (1, 2) else result.outcome
 
-    h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5
-    h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5
+    h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5  # ty: ignore[unsupported-operator]
+    h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5  # ty: ignore[unsupported-operator]
     # --8<-- [end:core]
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
