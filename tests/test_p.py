@@ -1321,7 +1321,7 @@ def _rwc_heterogeneous_brute_force_combinations(
         try:
             roll: RollT[_T] = tuple(sorted(outcomes))
         except TypeError:
-            roll = tuple(sorted(outcomes, key=natural_key))  # pyrefly: ignore[bad-argument-type]
+            roll = tuple(sorted(outcomes, key=natural_key))  # pyrefly: ignore[bad-assignment]
         count = prod(counts)
         roll_selection = _roll_which(roll, *keys)
         if roll_selection:

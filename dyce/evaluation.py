@@ -578,7 +578,7 @@ def explode_n(
         if isinstance(next_h_or_outcome, H):
             inner: H[_ResultT] = expand(_callback, next_h_or_outcome, n_left=n_left - 1)
             return (
-                cast("H[_ResultT]", inner + result.outcome)  # type: ignore[operator]
+                cast("H[_ResultT]", inner + result.outcome)  # type: ignore[operator] # ty: ignore[unsupported-operator]
                 if inner
                 else result.outcome
             )
