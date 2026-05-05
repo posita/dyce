@@ -1345,57 +1345,63 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def format(
         self,
         *,
-        width: int = _ROW_WIDTH,
+        precision: int = 2,
         scaled: bool = False,
         tick: str = "#",
+        width: int = _ROW_WIDTH,
     ) -> str:
         r"""
         Returns a formatted string representation of the histogram.
-        *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
+        *precision* is the number of decimal places to use and defaults to `#!python 2`.
         *tick* is used as the bar character and defaults to `#!python "#"`.
+        *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
 
-            >>> print((2 @ H(6)).zero_fill(range(1, 21)).format(width=65, tick="@"))
-            avg |    7.00
-            std |    2.42
-            var |    5.83
-              1 |   0.00% |
-              2 |   2.78% |@
-              3 |   5.56% |@@
-              4 |   8.33% |@@@@
-              5 |  11.11% |@@@@@
-              6 |  13.89% |@@@@@@
-              7 |  16.67% |@@@@@@@@
-              8 |  13.89% |@@@@@@
-              9 |  11.11% |@@@@@
-             10 |   8.33% |@@@@
-             11 |   5.56% |@@
-             12 |   2.78% |@
-             13 |   0.00% |
-             14 |   0.00% |
-             15 |   0.00% |
-             16 |   0.00% |
-             17 |   0.00% |
-             18 |   0.00% |
-             19 |   0.00% |
-             20 |   0.00% |
+            >>> print(
+            ...     (2 @ H(6))
+            ...     .zero_fill(range(1, 21))
+            ...     .format(precision=4, tick="@", width=65)
+            ... )
+            avg |    7.0000
+            std |    2.4152
+            var |    5.8333
+              1 |   0.0000% |
+              2 |   2.7778% |@
+              3 |   5.5556% |@@
+              4 |   8.3333% |@@@@
+              5 |  11.1111% |@@@@@
+              6 |  13.8889% |@@@@@@
+              7 |  16.6667% |@@@@@@@@
+              8 |  13.8889% |@@@@@@
+              9 |  11.1111% |@@@@@
+             10 |   8.3333% |@@@@
+             11 |   5.5556% |@@
+             12 |   2.7778% |@
+             13 |   0.0000% |
+             14 |   0.0000% |
+             15 |   0.0000% |
+             16 |   0.0000% |
+             17 |   0.0000% |
+             18 |   0.0000% |
+             19 |   0.0000% |
+             20 |   0.0000% |
 
         If *scaled* is `#!python True`, horizontal bars are scaled to *width*.
 
             >>> h_ge = (2 @ H(6)).ge(7)
             >>> print(f"{' 65 chars wide -->|':->65}")
             ---------------------------------------------- 65 chars wide -->|
-            >>> print(H(1).format(width=65, scaled=False))
+            >>> print(H(1).format(scaled=False, width=65))
             avg |    1.00
             std |    0.00
             var |    0.00
               1 | 100.00% |##################################################
-            >>> print(h_ge.format(width=65, scaled=False))
+            >>> print(h_ge.format(scaled=False, width=65))
               avg |    0.58
               std |    0.49
               var |    0.24
             False |  41.67% |####################
              True |  58.33% |############################
-            >>> print(h_ge.format(width=65, scaled=True))
+            >>> print(h_ge.format(scaled=True, width=65))
               avg |    0.58
               std |    0.49
               var |    0.24
@@ -1404,7 +1410,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         """
         # Get the length of the fixed-width column " | {<var>:7.2%} |" for computing the
         # available tick space
-        prob_len = len(f" | {0.0:7.2%} |")
+        prob_width = 5 + precision
+        prob_len = len(f" | {0.0:{prob_width}.{precision}%} |")
         try:
             mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
             std: float | None = self.stdev()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
@@ -1432,28 +1439,35 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
             # Stats header (emitted before outcome rows)
             if mu is not None:
-                yield f"{'avg': >{max_outcome_len}} | {mu:7.2f}"
+                yield f"{'avg': >{max_outcome_len}} | {mu:{prob_width}.{precision}f}"
             if std is not None:
-                yield f"{'std': >{max_outcome_len}} | {std:7.2f}"
+                yield f"{'std': >{max_outcome_len}} | {std:{prob_width}.{precision}f}"
             if var is not None:
-                yield f"{'var': >{max_outcome_len}} | {var:7.2f}"
+                yield f"{'var': >{max_outcome_len}} | {var:{prob_width}.{precision}f}"
 
             if pairs:
                 tick_scale = max(self.counts()) / self.total if scaled else 1.0
                 max_num_ticks = (width - max_outcome_len - prob_len) // len(tick)
                 for outcome_str, probability in pairs:
                     ticks = tick * int(max_num_ticks * float(probability) / tick_scale)
-                    yield f"{outcome_str: >{max_outcome_len}} | {float(probability):7.2%} |{ticks}"
+                    yield f"{outcome_str: >{max_outcome_len}} | {float(probability):{prob_width}.{precision}%} |{ticks}"
 
         return os.linesep.join(_lines())
 
-    def format_short(self) -> str:
+    def format_short(
+        self,
+        *,
+        precision: int = 2,
+    ) -> str:
         r"""
         Returns a short-form formatted string representation of the histogram.
 
             >>> print(H(6).format_short())
             {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
+            >>> print(H(6).format_short(precision=3))  # decimal places
+            {avg: 3.500, 1: 16.667%, 2: 16.667%, 3: 16.667%, 4: 16.667%, 5: 16.667%, 6: 16.667%}
         """
+        prob_width = 5 + precision
         try:
             mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         except Exception as exc:  # noqa: BLE001
@@ -1465,7 +1479,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             if mu is not None:
                 yield f"avg: {mu:.2f}"
             yield from (
-                f"{outcome}:{float(probability):7.2%}"
+                f"{outcome}:{float(probability):{prob_width}.{precision}%}"
                 for outcome, probability in self.probability_items()
             )
 

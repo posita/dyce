@@ -429,7 +429,13 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             True
         """
         if not which:
-            return sum_h(self)
+            return (
+                H({})
+                if len(self) == 0
+                else self._hs[0]
+                if len(self) == 1
+                else sum_h(self)
+            )
         n = len(self)
         i = _analyze_selection(n, which)
         # Optimization for when each and every position is selected the same number of times
