@@ -1827,7 +1827,7 @@ def aggregate_weighted(
     This function is the accumulation engine used by [`expand`][dyce.expand].
 
         >>> from dyce import H
-        >>> from dyce.evaluation import aggregate_weighted
+        >>> from dyce.h import aggregate_weighted
         >>> aggregate_weighted(
         ...     (
         ...         (H({1: 1}), 1),
@@ -1857,6 +1857,77 @@ def aggregate_weighted(
                         (new_outcome, count * aggregate_scalar * new_count)
                     )
                 aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+
+    return H.from_counts(outcome_counts)
+
+
+@overload
+def aggregate_weighted_lcm(
+    weighted_sources: Iterable[tuple[H[_T] | _T, int]], /
+) -> H[_T]: ...
+@overload
+def aggregate_weighted_lcm(
+    weighted_sources: Iterable[tuple[Any, int]], /
+) -> H[Any]: ...
+def aggregate_weighted_lcm(
+    weighted_sources: Iterable[tuple[Any, int]],
+) -> H[Any]:
+    r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
+       -- END MONKEY PATCH -->
+
+    LCM-based variant of [`aggregate_weighted`][dyce.evaluation.aggregate_weighted].
+    Produces a histogram with the same probability distribution but with counts scaled by the least common multiple of contributing totals rather than their product.
+    For sources whose totals share common factors, the resulting integer counts are smaller, which reduces big-int arithmetic cost in downstream operations.
+
+    The two functions return equivalent histograms (`#!python H.__eq__` reduces both sides to lowest terms before comparing):
+
+        >>> from dyce import H
+        >>> from dyce.h import aggregate_weighted, aggregate_weighted_lcm
+
+        >>> sources = ((H(6), 1), (H(8), 1))
+        >>> aggregate_weighted(sources) == aggregate_weighted_lcm(sources)
+        True
+
+    LCM never exceeds product, and is strictly smaller when totals share factors:
+
+        >>> aggregate_weighted_lcm(sources).total < aggregate_weighted(sources).total
+        True
+
+    For sources whose totals are coprime (or only one H source), LCM and product agree, and the raw counts coincide:
+
+        >>> dict(aggregate_weighted_lcm(((H({1: 1}), 1), (H({1: 1, 2: 2}), 2))))
+        {1: 5, 2: 4}
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
+    """
+    aggregate_scalar = 1
+    outcome_counts: list[tuple[Any, int]] = []
+
+    for outcome_or_h, count in weighted_sources:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+                new_scalar = math.lcm(aggregate_scalar, h_scalar)
+                # Scale prior counts by lcm/old_scalar (typically smaller than h_scalar).
+                prior_factor = new_scalar // aggregate_scalar
+                if prior_factor != 1:
+                    for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                        outcome_counts[i] = (prior_outcome, prior_count * prior_factor)
+                # Scale new outcomes by lcm/h_scalar.
+                new_factor = new_scalar // h_scalar
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append((new_outcome, count * new_factor * new_count))
+                aggregate_scalar = new_scalar
         else:
             outcome_counts.append((outcome_or_h, count * aggregate_scalar))
 
