@@ -107,6 +107,7 @@ test = [
     "numpy",
     "pandas",
     "pytest-beartype",
+    "pytest-benchmark",
     "pytest-cov",
     {include-group = "test-pypy"},
     {include-group = "viz"},

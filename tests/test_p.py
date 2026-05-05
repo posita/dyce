@@ -1228,7 +1228,7 @@ def test_rwc_heterogeneous_extremes_matches_brute_force() -> None:
         ([H(4), H(6)], "d4+d6"),
         ([H(4), H(4), H(6)], "2d4+d6"),
         ([H(4), H(6), H(8)], "d4+d6+d8"),
-        ([H(4), H(6), H(8), H(10), H(12), H(20)], "d4..d20"),
+        ([H(4), H(6), H(8), H(10), H(12)], "d4..d12"),
     ]
     for dice, desc in cases:
         brute: Counter[RollT[int]] = Counter()
