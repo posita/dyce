@@ -19,8 +19,11 @@ import math
 import operator
 import statistics
 import warnings
+from collections.abc import Callable, Iterable
 from decimal import Decimal
 from fractions import Fraction
+from importlib.util import find_spec
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -31,10 +34,36 @@ from dyce.h import (
     _convolve_linear,
     _ConvolveFallbackWarning,
     aggregate_weighted,
-    aggregate_weighted_lcm,
 )
 from dyce.lifecycle import ExperimentalWarning
 from dyce.types import BeartypeCallHintViolation
+
+
+def _aggregate_weighted_prod(
+    weighted_sources: Iterable[tuple[Any, int]],
+) -> H[Any]:
+    r"""Reference implementation of `aggregate_weighted` using product-of-totals as the
+    running scalar. Retained as a regression check against the production LCM-based
+    `aggregate_weighted`: the two should always produce H-equal (i.e. distribution-
+    equivalent) results, with the LCM version's totals being <= the product version's.
+    """
+    aggregate_scalar = 1
+    outcome_counts: list[tuple[Any, int]] = []
+    for outcome_or_h, count in weighted_sources:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append(
+                        (new_outcome, count * aggregate_scalar * new_count)
+                    )
+                aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+    return H.from_counts(outcome_counts)
+
 
 __all__ = ()
 
@@ -898,74 +927,88 @@ class TestHVariance:
             )
 
 
-class TestAggregateWeightedLcm:
-    r"""Tests for `aggregate_weighted_lcm` and its equivalence to `aggregate_weighted`."""
+@pytest.mark.benchmark
+@pytest.mark.skipif(
+    find_spec("pytest_benchmark") is None,
+    reason="requires benchmark fixture",
+)
+class TestAggregateWeightedBenchmark:
+    def test_aggregate_weighted(self, benchmark: Callable) -> None:
+        benchmark(aggregate_weighted, ((H(4), 3), (5, 2), (H(6), 2)))
+
+    def test_aggregate_weighted_prod(self, benchmark: Callable) -> None:
+        benchmark(_aggregate_weighted_prod, ((H(4), 3), (5, 2), (H(6), 2)))
+
+
+class TestAggregateWeighted:
+    r"""Tests for `aggregate_weighted` and its equivalence to a product-of-totals
+    reference implementation (`_aggregate_weighted_prod`)."""
 
     def test_pure_scalars(self) -> None:
         # No H source means aggregate_scalar stays at 1; LCM and product agree.
         sources = [(1, 7), (2, 11), (3, 13), (1, 2), (3, 5)]
-        assert aggregate_weighted_lcm(sources) == aggregate_weighted(sources)
+        assert aggregate_weighted(sources) == _aggregate_weighted_prod(sources)
 
     def test_single_h(self) -> None:
         sources = [(H(6), 1)]
-        assert aggregate_weighted_lcm(sources) == aggregate_weighted(sources)
+        assert aggregate_weighted(sources) == _aggregate_weighted_prod(sources)
 
     def test_single_h_with_nontrivial_weight(self) -> None:
         sources = [(H(6), 5)]
-        assert aggregate_weighted_lcm(sources) == aggregate_weighted(sources)
+        assert aggregate_weighted(sources) == _aggregate_weighted_prod(sources)
 
     def test_coprime_totals(self) -> None:
         # Totals 6 and 7 share no factors -> LCM = product
         sources = [(H(6), 1), (H(7), 1)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert dict(lcm_h) == dict(prod_h)
         assert lcm_h.total == prod_h.total
 
     def test_same_totals_lcm_smaller(self) -> None:
         # Two H(6) sources: product=36, LCM=6. LCM version is strictly smaller.
         sources = [(H(6), 1), (H(6), 1)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         assert lcm_h.total < prod_h.total
 
     def test_shared_factor_totals_lcm_smaller(self) -> None:
         # Totals 6 and 8: LCM=24, product=48
         sources = [(H(6), 1), (H(8), 1)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         assert lcm_h.total < prod_h.total
 
     def test_three_hs_with_shared_factors(self) -> None:
         # Totals 4, 6, 8 -> LCM=24, product=192
         sources = [(H(4), 1), (H(6), 1), (H(8), 1)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         assert lcm_h.total < prod_h.total
 
     def test_mixed_weights_with_hs(self) -> None:
         # Non-unit counts on H sources
         sources = [(H(6), 3), (H(8), 7), (H(4), 2)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         assert lcm_h.total <= prod_h.total
 
     def test_mixed_scalars_and_hs(self) -> None:
         sources = [(5, 2), (H(6), 3), (3, 1), (H(8), 4), (7, 5)]
-        lcm_h = aggregate_weighted_lcm(sources)
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted(sources)
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         assert lcm_h.total <= prod_h.total
 
     def test_empty_h_skipped(self) -> None:
         # Empty H source contributes nothing and doesn't scale priors
         sources = [(H(2), 1), (H(6), 1)]
-        lcm_h = aggregate_weighted_lcm([*sources[:1], (H({}), 20), *sources[1:]])
-        prod_h = aggregate_weighted(sources)
+        lcm_h = aggregate_weighted([*sources[:1], (H({}), 20), *sources[1:]])
+        prod_h = _aggregate_weighted_prod(sources)
         assert lcm_h == prod_h
         # H(2) and H(6): LCM=6, product=12.
         assert lcm_h.total < prod_h.total
@@ -983,8 +1026,8 @@ class TestAggregateWeightedLcm:
             for h1 in h_options:
                 for h2 in h_options:
                     sources = [x for x in (s1, h1, h2) if x is not None]
-                    lcm_h = aggregate_weighted_lcm(sources)
-                    prod_h = aggregate_weighted(sources)
+                    lcm_h = aggregate_weighted(sources)
+                    prod_h = _aggregate_weighted_prod(sources)
                     assert lcm_h == prod_h, f"distribution mismatch for {sources!r}"
                     assert lcm_h.total <= prod_h.total, (
                         f"LCM total > product total for {sources!r}"
@@ -994,12 +1037,12 @@ class TestAggregateWeightedLcm:
         # Specifically exercises the prior_factor path. Scalar(s) accumulated, then
         # H(s).
         sources = [(5, 2), (3, 1), (H(6), 1), (H(8), 1)]
-        assert aggregate_weighted_lcm(sources) == aggregate_weighted(sources)
+        assert aggregate_weighted(sources) == _aggregate_weighted_prod(sources)
 
     def test_overlapping_outcomes_with_h(self) -> None:
         # Outcome 5 appears as scalar AND in an H. Counts must combine correctly.
         sources = [(5, 2), (H({5: 3, 7: 1}), 4)]
-        assert aggregate_weighted_lcm(sources) == aggregate_weighted(sources)
+        assert aggregate_weighted(sources) == _aggregate_weighted_prod(sources)
 
 
 class TestConvolveFast:
