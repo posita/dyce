@@ -25,11 +25,10 @@ from typing import Any, Generic, NamedTuple, TypeVar, cast, overload
 
 import optype as ot
 
-from dyce.types import natural_key, nobeartype
-
 from .h import H, aggregate_weighted
 from .lifecycle import ExperimentalWarning, experimental, experimental_msg
 from .p import P
+from .types import natural_key, nobeartype
 
 __all__ = ("HResult", "PResult", "TruncationWarning", "expand", "explode_n")
 

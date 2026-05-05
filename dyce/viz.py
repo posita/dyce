@@ -47,9 +47,9 @@ except ImportError as exc:  # pragma: no cover
         "dyce[viz] requires matplotlib; install with: pip install 'dyce[viz]'"
     ) from exc
 
-from dyce import H
-from dyce.lifecycle import experimental
-from dyce.types import natural_key
+from .h import H
+from .lifecycle import experimental
+from .types import natural_key
 
 __all__ = (
     "BurstFormatterT",
