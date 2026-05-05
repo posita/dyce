@@ -1,51 +1,107 @@
 repos:
-  - repo: meta
-    hooks:
-    - id: check-useless-excludes
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-    - id: end-of-file-fixer
-      # See <https://docs.python.org/3/library/re.html#re.X>
-      exclude: |
-        (?x)^(
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-yaml
+        args: [--unsafe]
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        # See <https://docs.python.org/3/library/re.html#re.X>
+        exclude: |
+          (?x)^(
             docs/(
-                dyce-powered\.svg|
-                assets/perf_.*\.txt
+              dyce-powered\.svg|
+              assets/perf_.*\.txt|
+              assets/plot_.*\.svg
             )
-        )$
-    - id: mixed-line-ending
-    - id: trailing-whitespace
-      # See <https://docs.python.org/3/library/re.html#re.X>
-      exclude: |
-        (?x)^(
+          )$
+      - id: trailing-whitespace
+        # See <https://docs.python.org/3/library/re.html#re.X>
+        exclude: |
+          (?x)^(
             docs/(
-                dyce-powered\.svg|
-                assets/perf_.*\.txt
+              dyce-powered\.svg|
+              assets/perf_.*\.txt|
+              assets/plot_.*\.svg
             )
-        )$
-    - id: check-added-large-files
-    - id: check-case-conflict
-    - id: check-executables-have-shebangs
-    - id: check-merge-conflict
-    - id: check-shebang-scripts-are-executable
-    - id: check-symlinks
-    - id: check-vcs-permalinks
-    - id: destroyed-symlinks
-    - id: detect-private-key
-    - id: check-json
-    - id: check-toml
-    - id: check-xml
-    - id: check-yaml
-  - repo: https://github.com/psf/black
-    rev: 26.1.0
+          )$
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.7
     hooks:
-    - id: black
-  - repo: https://github.com/pycqa/isort
-    rev: 8.0.1
+      - id: uv-lock
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.2
     hooks:
-    - id: isort
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
+      - id: codespell
+        args: [--toml, pyproject.toml]
+        additional_dependencies:
+          - tomli
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.11
     hooks:
-    - id: flake8
+      - id: ruff-check
+        entry: ruff check
+        args: [--fix]
+      - id: ruff-format
+        entry: ruff format
+
+  - repo: meta
+    hooks:
+    - id: check-useless-excludes
+
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty
+        entry: ty
+        args: [check]
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: pyrefly
+        name: pyrefly
+        entry: pyrefly
+        args: [check]
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: check-doctests-check
+        name: check-doctests-check
+        entry: ./helpers/check-doctests.py
+        args: [check]
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: check-doctests-format
+        name: check-doctests-format
+        entry: ./helpers/check-doctests.py
+        args: [format]
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

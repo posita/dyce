@@ -1,71 +1,23 @@
-# ======================================================================================
-# Copyright and other protections apply. Please see the accompanying LICENSE file for
-# rights and restrictions governing use of this software. All rights not expressly
-# waived or licensed are reserved. If that file is missing or appears to be modified
-# from its original, then please contact the author before viewing or using this
-# software in any capacity.
-# ======================================================================================
-
-# Project
-/.coverage
-/.coverage.*
-/.tox/
-/build/
-/dist/
-/docs/jupyter/
-/dyce/_version.py
-/site/
-/htmlcov/
-.dmypy.json
-.ipynb_checkpoints/
-.jupyterlite.doit.db
-
-# Objects and packages
-*.7z
-*.bz2
-*.class
-*.com
-*.dll
-*.dmg
-*.egg
-*.egg-info/
-*.exe
-*.gz
-*.iso
-*.jar
-*.o
-*.py[cdo]
-*.rar
-*.so
-*.tar
-*.xz
-*.zip
-.mypy_cache/
-.pytest_cache/
-/.cache/
-/.eggs/
+# Python-generated files
+*.egg-info
+*.py[oc]
+.cache/
+.*_cache/
 __pycache__/
-dropin.cache
-node_modules/
+build/
+docs/index.md
+docs/license.md
 
-# Logs, databases, etc.
-*.err
-*.log
-*.log.[0-9]*
-*.out
-*.pid
-*.sqlite
-nohup.out
+# Coverage
+.coverage
+htmlcov/
 
-# OS/app generated entities
-.DS_Store
-.DS_Store?
-.Spotlight-V100/
-.Trashes/
-._*
-.~*
-Thumbs.db
-desktop.ini
-ehthumbs.db
+# Sqlite
+*.db
 
-# Exceptions
+# MkDocs
+.ipynb_checkpoints/
+site/
+
+# Tox
+.tox/
