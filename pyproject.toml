@@ -168,6 +168,7 @@ typeCheckingMode = "basic"
 addopts = [
   "--doctest-glob=*.md",
   "--doctest-modules",
+  "--durations=4",
   "--pdbcls=IPython.terminal.debugger:TerminalPdb",
 ]
 doctest_optionflags = [
@@ -251,5 +252,12 @@ exclude = ["docs/assets/nb_*.py"]
 # log_level = "DEBUG"
 
 [tool.check_doctests.check]
-checkers = [["ty", "check"], ["pyrefly", "check", "--search-path", "."], ["pyright"], ["mypy"]]
+checkers = [
+  # TODO(posita): See:
+  # - <https://github.com/facebook/pyrefly/issues/3313>
+  # - <https://github.com/astral-sh/ty/issues/3415>
+  # ["ty", "check"],
+  ["pyrefly", "check", "--search-path", "."],
+  ["pyright"], ["mypy"],
+]
 fail_fast = false

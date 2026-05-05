@@ -178,11 +178,12 @@ class TestExpandTruncation:
         assert result == H({})
 
 
+@pytest.mark.benchmark
+@pytest.mark.skipif(
+    find_spec("pytest_benchmark") is None,
+    reason="requires benchmark fixture",
+)
 class TestExpandTruncationBenchmark:
-    @pytest.mark.skipif(
-        find_spec("pytest_benchmark") is None,
-        reason="requires benchmark fixture",
-    )
     def test_default(self, benchmark: Callable) -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
@@ -192,10 +193,6 @@ class TestExpandTruncationBenchmark:
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
             benchmark(expand, _callback, h)
 
-    @pytest.mark.skipif(
-        find_spec("pytest_benchmark") is None,
-        reason="requires benchmark fixture",
-    )
     def test_skip_truncation(self, benchmark: Callable) -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
