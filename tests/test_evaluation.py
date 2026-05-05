@@ -16,8 +16,10 @@
 import sys
 import warnings
 from collections import Counter, UserString
+from collections.abc import Callable
 from enum import IntEnum, auto
 from fractions import Fraction
+from importlib.util import find_spec
 from typing import Any, Never, cast
 
 import pytest
@@ -174,6 +176,34 @@ class TestExpandTruncation:
             with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
                 result = expand(_always_recurses, d1)
         assert result == H({})
+
+
+class TestExpandTruncationBenchmark:
+    @pytest.mark.skipif(
+        find_spec("pytest_benchmark") is None,
+        reason="requires benchmark fixture",
+    )
+    def test_default(self, benchmark: Callable) -> None:
+        def _callback(r: HResult[int]) -> int:
+            return r.outcome * 2
+
+        h = H(6)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            benchmark(expand, _callback, h)
+
+    @pytest.mark.skipif(
+        find_spec("pytest_benchmark") is None,
+        reason="requires benchmark fixture",
+    )
+    def test_skip_truncation(self, benchmark: Callable) -> None:
+        def _callback(r: HResult[int]) -> int:
+            return r.outcome * 2
+
+        h = H(6)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            benchmark(expand, _callback, h, precision=Fraction(0))
 
 
 class TestExplodeN:

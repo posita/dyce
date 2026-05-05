@@ -234,7 +234,7 @@ def expand(
     precision: Fraction = ...,
     **state: Any,  # noqa: ANN401
 ) -> H[Any]: ...
-def expand(
+def expand(  # noqa: C901
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
     precision: Fraction = _DEFAULT_PRECISION,
@@ -457,7 +457,41 @@ def expand(
                 _expand_ctxt.reset(token)
             yield result, combined_count
 
-    h = aggregate_weighted(_gen())
+    def _gen_no_truncate() -> Iterator[tuple[Any, int]]:
+        # When precision is 0, the truncation check can never fire, and branch_path_prob
+        # would otherwise only feed nested expand's same dead computation since
+        # precision is fixed at outermost. Skip the per-branch Fraction construction.
+        # The ContextVar still has to be set (so nested calls suppress the
+        # outermost-only ExperimentalWarning and inherit precision), but the value is
+        # constant across iterations. It is set once around the loop instead of
+        # per-iteration.
+        shared_ctxt = _ExpandContext(
+            path_probability=current_path_prob,
+            precision=effective_precision,
+        )
+        token = _expand_ctxt.set(shared_ctxt)
+        try:
+            for result_counts in iproduct(
+                *(_source_to_result_iterable(s) for s in sources)
+            ):
+                results, counts = zip(*result_counts, strict=True)
+                combined_count = prod(counts)
+                try:
+                    result = callback(*results, **state)
+                except RecursionError:
+                    truncation_reasons.add(_TruncationReason.RCRS_LMT_EXCEEDED)
+                    continue
+                yield result, combined_count
+        finally:
+            _expand_ctxt.reset(token)
+
+    # Warning: _ExpandContext.path_probability is only maintained accurately on the
+    # truncating path (precision > 0). The no-truncate fast path skips the per-branch
+    # Fraction multiplication, so path_probability stays at its initial value (typically
+    # Fraction(1)) at every recursion level. Don't treat it as a meaningful cumulative
+    # probability indicator for diagnostics or any other purpose outside the truncation
+    # check itself when precision is 0.
+    h = aggregate_weighted(_gen() if effective_precision > 0 else _gen_no_truncate())
     if _TruncationReason.PROB_BDGT_EXHAUSTED in truncation_reasons:
         warnings.warn(
             f"expand: some branches with path probability < {effective_precision!r} "
