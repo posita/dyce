@@ -132,7 +132,7 @@ class TestHInit:
             h_module, "natural_key", side_effect=h_module.natural_key
         ) as mock:
             # TODO(posita): # noqa: TD003 - This should not need any ignore comments
-            h_of_hs = H((H(1), H(2), H(3), H(4))) ** 2  # type: ignore[operator] # pyrefly: ignore[unsupported-operation]
+            h_of_hs = H((H(1), H(2), H(3), H(4))) ** 2  # type: ignore[operator]
             mock.assert_called()
         assert list(h_of_hs) == [
             H({1: 1, 4: 1, 9: 1, 16: 1}),
@@ -166,7 +166,7 @@ class TestHFromCounts:
         assert H.from_counts({1: 2, 2: 3}, [(1, 1), (3, 4)]) == H({1: 3, 2: 3, 3: 4})
 
     def test_accumulates_h_objects(self) -> None:
-        assert H.from_counts(H(6), H(6)) == H({1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2})  # pyrefly: ignore[no-matching-overload]
+        assert H.from_counts(H(6), H(6)) == H({1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2})
 
     def test_non_int_outcomes(self) -> None:
         assert H.from_counts([("a", 2), ("b", 1), ("a", 3)]) == H({"a": 5, "b": 1})
@@ -584,7 +584,7 @@ class TestHUnsupportedOperations:
         with pytest.raises((TypeError, BeartypeCallHintViolation)):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         with pytest.raises((TypeError, BeartypeCallHintViolation)):
-            abs(H({"hello": 1}))  # pyrefly: ignore[no-matching-overload] # pyright: ignore[reportArgumentType]
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType]
 
     def test_invert_unsupported(self) -> None:
         with pytest.raises((TypeError, BeartypeCallHintViolation)):
@@ -887,13 +887,11 @@ class TestHVariance:
             warnings.filterwarnings("ignore", category=ExperimentalWarning)
             warnings.filterwarnings("ignore", category=TruncationWarning)
             assert math.isclose(
-                # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
-                explode_n(H(6), n=800, precision=Fraction(0)).variance(),  # pyrefly: ignore[no-matching-overload]
+                explode_n(H(6), n=800, precision=Fraction(0)).variance(),
                 10.64,
             )
             assert math.isclose(
-                # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
-                explode_n(H(20), n=400, precision=Fraction(0)).variance(),  # pyrefly: ignore[no-matching-overload]
+                explode_n(H(20), n=400, precision=Fraction(0)).variance(),
                 52.16066481994455,
             )
 

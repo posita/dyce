@@ -369,7 +369,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         With a single mapping source this is equivalent to [`H`][dyce.H] construction,
         but multiple sources are accumulated rather than raising on duplicate keys.
 
-            >>> H.from_counts(H(6), H(6))  # pyrefly: ignore[no-matching-overload]
+            >>> H.from_counts(H(6), H(6))
             H({1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2})
 
         """

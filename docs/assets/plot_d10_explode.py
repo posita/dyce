@@ -28,8 +28,7 @@ def fig_callback(line_color: str) -> None:
         return p.h(slice(-k, None) if k > 0 else slice(-k))
 
     def nkk(n: int, k: int) -> H[int]:
-        # TODO(posita): <https://github.com/facebook/pyrefly/issues/3236>
-        return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)  # pyrefly: ignore[no-matching-overload]
+        return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)
 
     # --8<-- [end:core]
 
