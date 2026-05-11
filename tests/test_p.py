@@ -306,17 +306,11 @@ class TestPMatmul:
     def test_rmatmul(self) -> None:
         assert 2 @ P(6) == P(6, 6)
 
-    def test_matmul_negative_returns_not_implemented(self) -> None:
-        result = P(6).__matmul__(-1)
-        assert result is NotImplemented
-
     def test_matmul_composition(self) -> None:
         assert 2 @ (2 @ P(6)) == 4 @ P(6)
 
     def test_matmul_negative_rhs(self) -> None:
-        result = P(6).__matmul__(-1)
-        assert result is NotImplemented
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
             _ = -1 @ P(6)
 
     def test_rmatmul_non_int_rhs(self) -> None:
