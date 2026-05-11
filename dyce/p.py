@@ -281,7 +281,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         except (TypeError, ValueError):
             return NotImplemented
         if n < 0:
-            return NotImplemented
+            raise ValueError(
+                f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
+            )
         return P(*chain.from_iterable(repeat(self, n)))
 
     def __rmatmul__(self: "P[_T]", other: SupportsInt) -> "P[_T]":
@@ -756,7 +758,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
 ) -> Iterator[RollCountT[_T]]:
     r"""
     Yields `#!python (roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
-    If *fill* is not _NoVal `#!python None` and `#!python abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
+    If *fill* is not `#!python None` and `#!python abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
     """
     from_right = k < 0
     k = abs(k)

@@ -448,7 +448,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         if n is NotImplemented:
             return NotImplemented
         if n < 0:
-            return NotImplemented
+            raise ValueError(
+                f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
+            )
         result = _convolve(self._h, n)
         return NotImplemented if result is NotImplemented else H(result)
 

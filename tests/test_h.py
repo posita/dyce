@@ -316,6 +316,16 @@ class TestHMatmul:
         assert H({1: 1, 2: 1}) @ 3.0 == H({1: 1, 2: 1}) @ 3  # noqa: RUF069
         assert 3.0 @ H({1: 1, 2: 1}) == 3 @ H({1: 1, 2: 1})  # noqa: RUF069
 
+    def test_matmul_negative_rhs(self) -> None:
+        with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
+            _ = -1 @ H({1: 1})
+
+    def test_rmatmul_non_int_rhs(self) -> None:
+        result = H({1: 1}).__rmatmul__(1.5)
+        assert result is NotImplemented
+        with pytest.raises(TypeError):
+            _ = 1.5 @ H({1: 1})
+
 
 class TestHAdd:
     def test_scalar_fwd(self) -> None:
@@ -546,20 +556,6 @@ class TestHUnary:
         result = ~H({1: 1, 2: 1})
         # ~1=-2, ~2=-3
         assert result == H({-2: 1, -3: 1})
-
-
-class TestHUnsupportedOperations:
-    def test_matmul_negative_rhs(self) -> None:
-        result = H({1: 1}).__matmul__(-1)
-        assert result is NotImplemented
-        with pytest.raises(TypeError):
-            _ = -1 @ H({1: 1})
-
-    def test_rmatmul_non_int_rhs(self) -> None:
-        result = H({1: 1}).__rmatmul__(1.5)
-        assert result is NotImplemented
-        with pytest.raises(TypeError):
-            _ = 1.5 @ H({1: 1})
 
     @pytest.mark.filterwarnings(r"ignore")  # constrain warnings to test
     def test_matmul_on_non_addable_outcomes(self) -> None:
