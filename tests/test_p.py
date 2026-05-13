@@ -40,6 +40,7 @@ from dyce.p import (
     _SelectionEmpty,
     _SelectionExtremes,
     _SelectionPrefix,
+    _SelectionSinglePos,
     _SelectionSuffix,
     _SelectionUniform,
 )
@@ -51,6 +52,10 @@ from .test_types import _NoCompare
 __all__ = ()
 
 _T = TypeVar("_T")
+
+
+class _MockableP(P):
+    pass
 
 
 class TestPInit:
@@ -687,10 +692,7 @@ class TestPH:
             p_weird.h()
 
     def test_which_selects_all_shortcuts(self) -> None:
-        class MockableP(P):
-            pass
-
-        p = MockableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
+        p = _MockableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
         ) as mock:
@@ -698,10 +700,7 @@ class TestPH:
             mock.assert_not_called()
 
     def test_which_selects_all_exactly_n_times_still_shortcuts(self) -> None:
-        class MockableP(P):
-            pass
-
-        p = MockableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
+        p = _MockableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
         ) as mock:
@@ -711,13 +710,10 @@ class TestPH:
     def test_which_selects_all_exactly_n_times_still_shortcuts_with_operation_aware_outcomes(
         self,
     ) -> None:
-        class MockableP(P):
-            pass
-
         for p in (
-            MockableP(2 @ P(H({"one": 1, "two": 2}), H({"three": 1, "four": 1}))),
+            _MockableP(2 @ P(H({"one": 1, "two": 2}), H({"three": 1, "four": 1}))),
             *(
-                MockableP(2 @ H(o_type(i) for i in range(10)))
+                _MockableP(2 @ H(o_type(i) for i in range(10)))
                 for o_type in _OUTCOME_TYPES
             ),
         ):
@@ -755,10 +751,7 @@ class TestPH:
     def test_which_selects_all_exactly_n_times_falls_back_with_weird_outcomes(
         self,
     ) -> None:
-        class MockableP(P):
-            pass
-
-        p = MockableP(
+        p = _MockableP(
             2
             @ P(
                 H({_NoCompareCanOnlyAdd("one"): 1, _NoCompareCanOnlyAdd("two"): 2}),
@@ -860,6 +853,215 @@ class TestPH:
         # Slice that selects nothing yields no rolls (analogous to [][0:1])
         assert P().h(slice(0, 1)) == H({})
         assert P().h(slice(-2, -1)) == H({})
+
+
+class TestPHSinglePosFastPath:
+    # For single-position selection on a HOMOGENEOUS pool, `P.h` should
+    # short-circuit to `H.order_stat_for_n_at_pos` and skip
+    # `rolls_with_counts` entirely. The fast path applies for any of the
+    # three single-position selection variants:
+    #   - `_SelectionSinglePos(pos)` (true-middle, e.g. `p.h(2)` on a 5-pool)
+    #   - `_SelectionPrefix(max_index=1)` (lowest, e.g. `p.h(0)`)
+    #   - `_SelectionSuffix(min_index=-1)` (highest, e.g. `p.h(-1)`)
+    # For heterogeneous pools and for multi-position selections, the
+    # existing `rolls_with_counts` path remains in use (hetero composition
+    # is a separate later step).
+
+    # ---- Homogeneous: fast path taken (rolls_with_counts NOT called) ----
+
+    def test_homogeneous_highest_via_suffix_minus1_shortcuts(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # order_stat is @experimental
+            p = _MockableP(2 @ P(H(6)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                result = p.h(-1)
+                mock.assert_not_called()
+                # Verify correctness: max of 2d6 has counts 1, 3, 5, 7, 9, 11.
+                assert result == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
+
+    def test_homogeneous_lowest_via_prefix_1_shortcuts(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(2 @ P(H(6)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                result = p.h(0)
+                mock.assert_not_called()
+                # Verify correctness: min of 2d6 has counts 11, 9, 7, 5, 3, 1.
+                assert result == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
+
+    def test_homogeneous_middle_via_single_pos_shortcuts(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(5 @ P(H(6)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                result = p.h(2)  # 3rd-lowest of 5d6
+                mock.assert_not_called()
+                # Cross-check against the same H produced via order_stat directly.
+                assert result == H(6).order_stat_for_n_at_pos(5, 2)
+
+    def test_homogeneous_via_slice_form_shortcuts(self) -> None:
+        # `p.h(slice(2, 3))` should also route through the fast path.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(5 @ P(H(6)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                result = p.h(slice(2, 3))
+                mock.assert_not_called()
+                assert result == H(6).order_stat_for_n_at_pos(5, 2)
+
+    def test_homogeneous_via_negative_int_shortcuts(self) -> None:
+        # `p.h(-2)` selects second-from-top on a 5-pool, which is the
+        # middle position 3.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(5 @ P(H(6)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                result = p.h(-2)
+                mock.assert_not_called()
+                assert result == H(6).order_stat_for_n_at_pos(5, 3)
+
+    # ---- Heterogeneous: fast path NOT taken (rolls_with_counts called) ----
+
+    def test_heterogeneous_single_pos_falls_through(self) -> None:
+        # Hetero composition is deferred; for now hetero pools take the
+        # existing path.
+        p = _MockableP(P(H(4), H(6), H(8)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(-1)
+            mock.assert_called()
+
+    # ---- Multi-position: fast path NOT taken (rolls_with_counts called) ----
+
+    def test_homogeneous_multi_position_falls_through(self) -> None:
+        # `p.h(slice(0, 2))` selects two positions; no closed-form fast
+        # path -- existing partial-selection logic in `rolls_with_counts`
+        # is still the right tool.
+        p = _MockableP(5 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(slice(0, 2))
+            mock.assert_called()
+
+    def test_homogeneous_multi_position_with_multiplicity_falls_through(self) -> None:
+        # `p.h(2, 2)` selects position 2 twice. Multi-call so NOT a
+        # single-position selection -- falls through.
+        p = _MockableP(5 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(2, 2)
+            mock.assert_called()
+
+    # ---- Sanity: single-die pool short-circuits trivially ----
+
+    def test_single_die_pool_via_h_returns_self_for_minus_1(self) -> None:
+        # A 1-die pool's "highest 1" is just the underlying H itself.
+        # This case currently flows through the `len(self) == 1` branch
+        # at the top of `P.h(no args)`, but `P.h(-1)` and `P.h(0)` should
+        # also work via the new fast path.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(P(H(6)))
+            assert p.h(-1) == H(6)
+            assert p.h(0) == H(6)
+
+    # ---- Heterogeneous: per-group decomposition for single-END positions ----
+    #
+    # For `pos == 0` or `pos == n - 1` on a heterogeneous pool with at
+    # least one group of size > 1, compute the per-group min/max via
+    # `order_stat_for_n_at_pos`, then recurse on the (smaller) reduced
+    # pool. Recursion terminates because each pass strictly decreases
+    # `sum(n_g for groups)` -- a group of size k > 1 becomes a single H.
+    #
+    # The recursion uses a FRESH P object, so mocking
+    # `rolls_with_counts` on the *original* pool should still see zero
+    # calls. The recursive call may or may not exercise
+    # `rolls_with_counts` internally (separate object), and that's fine.
+
+    def test_heterogeneous_max_with_multi_die_group_decomposes(self) -> None:
+        # P(d6 x 2, d8 x 3).h(-1) -- d8 group has n_g == 3.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(P(H(6), H(6), H(8), H(8), H(8)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                _ = p.h(-1)
+                mock.assert_not_called()
+
+    def test_heterogeneous_min_with_multi_die_group_decomposes(self) -> None:
+        # Same shape, lowest 1.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = _MockableP(P(H(6), H(6), H(8), H(8), H(8)))
+            with patch.object(
+                p, "rolls_with_counts", side_effect=p.rolls_with_counts
+            ) as mock:
+                _ = p.h(0)
+                mock.assert_not_called()
+
+    def test_heterogeneous_all_size_1_groups_falls_through(self) -> None:
+        # P(d6, d8).h(-1) -- both groups size 1. No decomposition
+        # would change anything; existing path handles 2-die hetero pool.
+        p = _MockableP(P(H(6), H(8)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(-1)
+            mock.assert_called()
+
+    def test_heterogeneous_middle_pos_falls_through(self) -> None:
+        # No closed form for middle-pos on heterogeneous pool. Falls
+        # through even if a group has n_g > 1.
+        p = _MockableP(P(H(6), H(6), H(6), H(8), H(8)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(2)
+            mock.assert_called()
+
+    def test_heterogeneous_max_matches_brute_force(self) -> None:
+        # Cross-check the decomposed result against brute-force
+        # enumeration on a small-enough pool to enumerate fully.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = P(H(4), H(4), H(6), H(6), H(6))  # 2d4 + 3d6
+            via_decomp = p.h(-1)
+            brute: Counter[int] = Counter()
+            for r1 in range(1, 5):
+                for r2 in range(1, 5):
+                    for r3 in range(1, 7):
+                        for r4 in range(1, 7):
+                            for r5 in range(1, 7):
+                                brute[max(r1, r2, r3, r4, r5)] += 1
+            assert dict(via_decomp) == dict(brute)
+
+    def test_heterogeneous_min_matches_brute_force(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            p = P(H(4), H(4), H(6), H(6), H(6))
+            via_decomp = p.h(0)
+            brute: Counter[int] = Counter()
+            for r1 in range(1, 5):
+                for r2 in range(1, 5):
+                    for r3 in range(1, 7):
+                        for r4 in range(1, 7):
+                            for r5 in range(1, 7):
+                                brute[min(r1, r2, r3, r4, r5)] += 1
+            assert dict(via_decomp) == dict(brute)
 
 
 class TestPRoll:
@@ -1162,17 +1364,18 @@ def test_analyze_selection() -> None:
     assert _analyze_selection(6, (0,)) == _SelectionPrefix(max_index=1)
     assert _analyze_selection(6, (0, 1, 0, 0, 1)) == _SelectionPrefix(max_index=2)
     assert _analyze_selection(6, (0, 1, 0, 0, 1, 4)) == _SelectionPrefix(max_index=5)
-    assert _analyze_selection(6, (2,)) == _SelectionPrefix(max_index=3)
+    # Single-position selections at a true-middle index return _SelectionSinglePos
+    # rather than Prefix/Suffix. End-position single-position selections (pos == 0, pos
+    # == n-1) still return _SelectionPrefix(1) / _SelectionSuffix(-1) for compatibility
+    # with P.rolls_with_counts's `k`-based partial-selection optimization.
     assert _analyze_selection(6, (2, 3)) == _SelectionPrefix(max_index=4)
     assert _analyze_selection(6, (1, 2, 3)) == _SelectionPrefix(max_index=4)
     assert _analyze_selection(6, (1, 3)) == _SelectionPrefix(max_index=4)
-    assert _analyze_selection(5, (2,)) == _SelectionPrefix(max_index=3)
     assert _analyze_selection(5, (1, 2)) == _SelectionPrefix(max_index=3)
 
     # Suffix: only the last hi positions selected
     assert _analyze_selection(6, (-1,)) == _SelectionSuffix(min_index=-1)
     assert _analyze_selection(6, (5, 1, 5, 5, 1, 4)) == _SelectionSuffix(min_index=-5)
-    assert _analyze_selection(6, (3,)) == _SelectionSuffix(min_index=-3)
     assert _analyze_selection(6, (2, 3, 4)) == _SelectionSuffix(min_index=-4)
     assert _analyze_selection(6, (2, 4)) == _SelectionSuffix(min_index=-4)
     assert _analyze_selection(5, (2, 3)) == _SelectionSuffix(min_index=-3)
@@ -1213,6 +1416,42 @@ def test_analyze_selection() -> None:
 
     with pytest.raises(IndexError):
         _ = _analyze_selection(0, (1,))
+
+
+def test_analyze_selection_single_pos() -> None:
+    # _SelectionSinglePos(pos) is returned for selections that pick exactly one distinct
+    # position with multiplicity 1, except at the two ends (pos == 0 and pos == n - 1),
+    # which remain _SelectionPrefix(max_index=1) and _SelectionSuffix(min_index=-1) so
+    # that P.rolls_with_counts's existing partial-selection optimization (driven off
+    # _SelectionPrefix/_SelectionSuffix's k) keeps working unchanged.
+
+    # True-middle single-position selections via bare int.
+    assert _analyze_selection(6, (1,)) == _SelectionSinglePos(pos=1)
+    assert _analyze_selection(6, (2,)) == _SelectionSinglePos(pos=2)
+    assert _analyze_selection(6, (3,)) == _SelectionSinglePos(pos=3)
+    assert _analyze_selection(6, (4,)) == _SelectionSinglePos(pos=4)
+    assert _analyze_selection(5, (2,)) == _SelectionSinglePos(pos=2)
+
+    # Negative-index single positions normalize to the absolute position.
+    assert _analyze_selection(6, (-2,)) == _SelectionSinglePos(pos=4)
+    assert _analyze_selection(6, (-3,)) == _SelectionSinglePos(pos=3)
+    assert _analyze_selection(6, (-5,)) == _SelectionSinglePos(pos=1)
+
+    # Slice forms selecting exactly one position.
+    assert _analyze_selection(6, (slice(2, 3),)) == _SelectionSinglePos(pos=2)
+    assert _analyze_selection(6, (slice(-2, -1),)) == _SelectionSinglePos(pos=4)
+
+    # End-position single selections: backward-compat with Prefix/Suffix.
+    assert _analyze_selection(6, (0,)) == _SelectionPrefix(max_index=1)
+    assert _analyze_selection(6, (-6,)) == _SelectionPrefix(max_index=1)
+    assert _analyze_selection(6, (5,)) == _SelectionSuffix(min_index=-1)
+    assert _analyze_selection(6, (-1,)) == _SelectionSuffix(min_index=-1)
+
+    # Multiplicity > 1: not a single-position selection in the
+    # P.h(*which) sense (`P.h(2, 2)` sums position 2 twice). Falls
+    # through to the existing classification.
+    assert _analyze_selection(6, (2, 2)) == _SelectionPrefix(max_index=3)
+    assert _analyze_selection(6, (3, 3)) == _SelectionSuffix(min_index=-3)
 
 
 def test_rwc_heterogeneous_extremes_matches_brute_force() -> None:
