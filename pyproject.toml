@@ -89,9 +89,9 @@ docs = [
 lint = [
     "beartype",
     "matplotlib_inline",
+    "mypy",
     "pre-commit",
     "pre-commit-uv",
-    "mypy",
     "pyrefly",
     "pyright",
     "pytest",
@@ -258,6 +258,7 @@ checkers = [
   # - <https://github.com/astral-sh/ty/issues/3415>
   # ["ty", "check"],
   ["pyrefly", "check", "--search-path", "."],
-  ["pyright"], ["mypy"],
+  ["pyright"],
+  ["mypy"],
 ]
 fail_fast = false
