@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
         with:
-          fetch-depth: 0   # required for setuptools-scm
+          fetch-depth: 0  # required for setuptools-scm
       - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ matrix.python }}
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
         with:
-          fetch-depth: 0   # required for setuptools-scm
+          fetch-depth: 0  # required for setuptools-scm
       - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: "3.13"
@@ -52,10 +52,25 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
         with:
-          fetch-depth: 0   # required for setuptools-scm
+          fetch-depth: 0  # required for setuptools-scm
       - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: "3.13"
       - run: uv sync --no-dev --group lint
       - run: uv run pre-commit run --all-files --hook-stage pre-push
       - run: git diff --quiet HEAD --  # fails if any tracked files have changed
+
+  docs-idempotent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0  # required for setuptools-scm
+      - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: "3.13"
+      - run: uv sync --no-dev --group docs
+      - run: uv run mkdocs build
+        # Files can be excluded by adding, e.g.
+        # ':(exclude)docs/assets/perf_*.txt' to the pathspecs
+      - run: git diff --exit-code -- docs/notebooks docs/assets
