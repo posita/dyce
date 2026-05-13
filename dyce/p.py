@@ -71,6 +71,27 @@ class _SelectionUniform:
 
 
 @dataclass(frozen=True, slots=True)
+class _SelectionExtremes:
+    r"""
+    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly the *lo* lowest and *hi* highest sorted positions and nothing else.
+    Both values are positive; together they are strictly fewer than the pool size (so there is at least one unselected interior position).
+    """
+
+    lo: int  # positions [0..lo)
+    hi: int  # positions [n-hi..n)
+
+
+@dataclass(frozen=True, slots=True)
+class _SelectionSinglePos:
+    r"""
+    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly one distinct position with multiplicity 1, and that position is strictly between the two ends (`#!python 0 < pos < n - 1`).
+    The two end-position cases (`#!python pos == 0` and `#!python pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]'s existing partial-selection optimization (driven off Prefix/Suffix's `#!python k`) keeps working unchanged.
+    """
+
+    pos: int  # absolute position, normalized to [1, n-2]
+
+
+@dataclass(frozen=True, slots=True)
 class _SelectionPrefix:
     r"""
     Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects only contiguous positions from the low (left) end to *max_index* positions `#!math \left[ 0 .. max\_index \right)`.
@@ -88,23 +109,13 @@ class _SelectionSuffix:
     min_index: int  # negative; positions [min_index..n)
 
 
-@dataclass(frozen=True, slots=True)
-class _SelectionExtremes:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly the *lo* lowest and *hi* highest sorted positions and nothing else.
-    Both values are positive; together they are strictly fewer than the pool size (so there is at least one unselected interior position).
-    """
-
-    lo: int  # positions [0..lo)
-    hi: int  # positions [n-hi..n)
-
-
 _SelectionResult = (
     _SelectionEmpty
     | _SelectionUniform
+    | _SelectionExtremes
+    | _SelectionSinglePos
     | _SelectionPrefix
     | _SelectionSuffix
-    | _SelectionExtremes
     | None
 )
 
@@ -373,7 +384,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         )
 
     # TODO(posita): # noqa: TD003 - Use CanAdd here
-    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:
+    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:  # noqa: C901
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
 
@@ -449,6 +460,65 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             except TypeError:
                 # ... but if we get into trouble, fall through to enumerating via rolls_with_counts
                 pass
+        # Single-position selection on a homogeneous pool: dispatch directly to
+        # `H.order_stat_for_n_at_pos` instead of enumerating rolls. The selection
+        # variants that flag this case are:
+        #   - `_SelectionSinglePos(pos)` for true-middle positions.
+        #   - `_SelectionPrefix(max_index=1)` for the lowest (pos == 0).
+        #   - `_SelectionSuffix(min_index=-1)` for the highest (pos == n - 1).
+        # Heterogeneous pools and multi-position selections fall through to the existing
+        # `rolls_with_counts` path.
+        if n:
+            pos: int | None = None
+            if isinstance(i, _SelectionSinglePos):
+                pos = i.pos
+            elif isinstance(i, _SelectionPrefix) and i.max_index == 1:
+                pos = 0
+            elif isinstance(i, _SelectionSuffix) and i.min_index == -1:
+                pos = n - 1
+            if pos is not None:
+                # Test for homogeneous: all of `self._hs` are equal. `P`
+                # sorts at construction so the test is just first-vs-last.
+                if self._hs[0] == self._hs[-1]:
+                    h = self._hs[0]
+                    # Bypass `order_stat_for_n_at_pos`'s `@experimental` warning
+                    # emission by going through the cached internal helper directly.
+                    # Both produce the same result.
+                    if n not in h._order_stat_funcs_by_n:  # noqa: SLF001
+                        h._order_stat_funcs_by_n[n] = h._order_stat_func_for_n(n)  # noqa: SLF001
+                    return cast(
+                        "H[_T]",
+                        h._order_stat_funcs_by_n[n](pos),  # noqa: SLF001
+                    )
+                # Heterogeneous + single-END decomposition. The identity `max(X_1..X_n,
+                # Y_1..Y_m) == max(max(X_1..X_n), max(Y_1..Y_m))` (and min
+                # symmetrically) lets us reduce each homogeneous sub-group via
+                # `order_stat_for_n_at_pos`, then recurse on the smaller reduced pool.
+                # Termination: a group of size `n_g > 1` becomes a single H, so each
+                # pass strictly decreases `sum(n_g for groups)`. Skip when all groups
+                # are size 1 -- decomposition would be a no-op and could otherwise loop.
+                if pos == 0 or pos == n - 1:
+                    groups_list = [
+                        (h_g, sum(1 for _ in g)) for h_g, g in groupby(self._hs)
+                    ]
+                    if any(n_g > 1 for _, n_g in groups_list):
+                        reduced_hs: list[H[_T]] = []
+                        for h_g, n_g in groups_list:
+                            if n_g == 1:
+                                reduced_hs.append(h_g)
+                                continue
+                            per_group_pos = n_g - 1 if pos == n - 1 else 0
+                            if n_g not in h_g._order_stat_funcs_by_n:  # noqa: SLF001
+                                h_g._order_stat_funcs_by_n[n_g] = (  # noqa: SLF001
+                                    h_g._order_stat_func_for_n(n_g)  # noqa: SLF001
+                                )
+                            reduced_hs.append(
+                                cast(
+                                    "H[_T]",
+                                    h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # noqa: SLF001
+                                )
+                            )
+                        return P(*reduced_hs).h(0 if pos == 0 else -1)
         return H.from_counts(
             # This slightly esoteric use of sum() is to avoid an attempt to 0 to
             # outcomes, which is sum()'s default behavior. At worst, this results in
@@ -473,7 +543,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # noqa: C901
         r"""
         Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -559,10 +629,16 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         ):
             yield from _rwc_heterogeneous_extremes(groups, sel.lo, sel.hi)
             return
-        elif isinstance(sel, _SelectionPrefix):
+
+        if isinstance(sel, _SelectionPrefix):
             k: int | None = sel.max_index if sel.max_index >= 0 else n + sel.max_index
         elif isinstance(sel, _SelectionSuffix):
             k = sel.min_index if sel.min_index < 0 else sel.min_index - n
+        elif isinstance(sel, _SelectionSinglePos):
+            # Pick the side that yields the smaller partial-selection similar to
+            # _SelectionPrefix/_SelectionSuffix
+            pos = sel.pos
+            k = pos + 1 if pos + 1 <= n - pos else pos - n
         else:
             k = None
         if len(groups) == 1:
@@ -660,6 +736,7 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
 
     - [`_SelectionEmpty`][dyce.p._SelectionEmpty]: *which* selects zero positions
     - [`_SelectionUniform(times)`][dyce.p._SelectionUniform]: *which* selects every position exactly *times* times
+    - [`_SelectionSinglePos(pos)`][dyce.p._SelectionSinglePos]: *which* selects exactly one distinct true-middle position with multiplicity 1 (`#!python 0 < pos < n - 1`)
     - [`_SelectionPrefix(max_index)`][dyce.p._SelectionPrefix]: *which* selects positions `#!python [0..max_index)` only
     - [`_SelectionSuffix(min_index)`][dyce.p._SelectionSuffix]: *which* selects positions `#!python [min_index..n)` only
     - [`_SelectionExtremes(lo, hi)`][dyce.p._SelectionExtremes]: *which* selects exactly the *lo* lowest and *hi* highest positions with at least one unselected interior position
@@ -675,6 +752,11 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     distinct_counts = set(counts_by_index.values())
     min_index = min(found_indexes)
     max_index = max(found_indexes) + 1
+    # Single-position selection at a true-middle index (i.e. not 0 or n-1) with
+    # multiplicity 1. End positions deliberately fall through to _SelectionPrefix(1) /
+    # _SelectionSuffix(-1) for backward compatibility with `rolls_with_counts`.
+    if len(found_indexes) == 1 and distinct_counts == {1} and 0 < min_index < n - 1:
+        return _SelectionSinglePos(pos=min_index)
     if max_index - min_index == n:
         if not missing_indexes and len(distinct_counts) == 1:
             return _SelectionUniform(times=distinct_counts.pop())
@@ -683,12 +765,16 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
             # Because max_index - min_index == n we know min_index == 0 and max_index ==
             # n, so positions 0 and n-1 are both selected.
             sorted_found = sorted(found_indexes)
+            # Walk the left side until we find a gap
             lo = 0
             while lo < len(sorted_found) and sorted_found[lo] == lo:
                 lo += 1
+            # Walk the right side until we find a gap
             hi = 0
             while hi < len(sorted_found) and sorted_found[-(hi + 1)] == n - 1 - hi:
                 hi += 1
+            # If we can account for everything by walking in from both sides, we know
+            # any remaining gap is contiguous
             if lo + hi == len(sorted_found):
                 return _SelectionExtremes(lo=lo, hi=hi)
         return None
@@ -837,7 +923,7 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
 
     **Why this is fast**
 
-    Naïve enumeration visits every element of the Cartesian product of all dice faces (`#!math O\!\left(\prod_i |\text{faces}_i\right)` outcomes) and sorts each roll.
+    Naive enumeration visits every element of the Cartesian product of all dice faces (`#!math O\!\left(\prod_i |\text{faces}_i\right)` outcomes) and sorts each roll.
     For `#!math P(d4, d6, d8, d10, d12, d20)` that is `#!math 4 \times 6 \times 8 \times 10 \times 12 \times 20 = 460{,}800` rolls.
 
     This function instead iterates over outcome *pairs* `#!math (a, b)` with `#!math a \le b` drawn from the union of all faces, and for each pair computes the count in `#!math O(n)` time using the inclusion-exclusion formula below.
@@ -863,23 +949,22 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     | `#!math N(a,b)`       | `#!math v > a`    | `#!math v < b`    | +    |
 
     This works because "min `#!math > a`" is equivalent to "all dice `#!math > a`", and "max `#!math < b`" is equivalent to "all dice `#!math < b`".
-    Each constraint reduces to an "all-dice-in-interval" event, which factorises as a product over dice.
-    That factorisation is what makes the formula `#!math O(n)` per pair rather than `#!math O(n^k)`.
+    Each constraint reduces to an "all-dice-in-interval" event, which factorizes as a product over dice.
+    That factorization is what makes the formula `#!math O(n)` per pair rather than `#!math O(n^k)`.
 
     **Why this does not extend cleanly to lo > 1 or hi > 1**
 
     For `#!math (lo, hi) = (2, 1)`, the analogous formula would need to handle the constraint "2nd-minimum `#!math > a_1`", which means "at most 1 die `#!math \le a_1`".
-    That event does *not* factorise as a product over dice (it is a sum of `#!math n+1` product terms via a generating-function expansion), so the `#!math O(n)`-per-tuple structure breaks down.
+    That event does *not* factorize as a product over dice (it is a sum of `#!math n+1` product terms via a generating-function expansion), so the `#!math O(n)`-per-tuple structure breaks down.
     Extension to larger `#!math (lo, hi)` is theoretically possible using polynomial coefficient extraction, but requires substantially more complex machinery.
 
     **Why interior (arbitrary non-extremes) heterogeneous selections have no fast path**
 
     For selections that are neither a prefix, a suffix, nor the min+max extremes (e.g. the 2nd and 4th positions out of 5), the constraint on the selected positions involves interior order statistics ("exactly `#!math k` dice fall in region `#!math R`"), which cannot be expressed as an "all-dice-in-interval" product event for heterogeneous dice.
-    The multinomial partition formula that works for homogeneous dice (see e.g. [math.stackexchange.com/q/4173084](https://math.stackexchange.com/questions/4173084)) does not factorise per-die when faces differ, so those cases fall back to full Cartesian-product enumeration.
+    The multinomial partition formula that works for homogeneous dice (see e.g. [math.stackexchange.com/q/4173084](https://math.stackexchange.com/questions/4173084)) does not factorize per-die when faces differ, so those cases fall back to full Cartesian-product enumeration.
     For homogeneous pools the existing `_rwc_homogeneous_n_h_using_partial_selection` path (Ilmari Karonen’s DP) already handles all selection patterns efficiently.
     """
     assert lo == 1 and hi == 1, "only (lo=1, hi=1) is currently supported"  # noqa: PT018
-
     all_dice: list[H[_T]] = [h for h, n in groups for _ in range(n)]
     all_outcome_set: set[Any] = {v for h in all_dice for v in h}
     all_outcomes = list(all_outcome_set)
