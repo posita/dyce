@@ -1,0 +1,87 @@
+name: publish
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0  # required for setuptools-scm
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          cache-python: true
+      - run: uv build
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write  # required for trusted publishing (OIDC)
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  verify-testpypi:
+    # Deliberately uses setup-python + pip (not setup-uv + uv pip) so
+    # the verification path mirrors what downstream users actually run
+    # when they `pip install dyce`. uv pip install is highly
+    # compatible but not identical. Resolver behavior, pre-release
+    # semantics, and sdist build paths can diverge. This is the one
+    # place where matching the canonical end-user install path matters
+    # more than tooling consistency with the rest of CI.
+    needs: publish-testpypi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0  # required for setuptools-scm
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version-file: ".python-version"
+      - name: install from TestPyPI (retry for index propagation)
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          for i in {1..45}; do
+            if pip install \
+                --index-url 'https://test.pypi.org/simple/' \
+                --extra-index-url 'https://pypi.org/simple/' \
+                "dyce==${VERSION}" ; then
+              break
+            fi
+            sleep 2
+          done
+      - name: verify installed version matches tag
+        run: |
+          INSTALLED=$(python -c "import importlib.metadata; print(importlib.metadata.version('dyce'))")
+          EXPECTED="${GITHUB_REF_NAME#v}"
+          test "$INSTALLED" = "$EXPECTED" || {
+            echo "installed=$INSTALLED expected=$EXPECTED"
+            exit 1
+          }
+
+  publish-pypi:
+    needs: verify-testpypi
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # required for trusted publishing (OIDC)
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
