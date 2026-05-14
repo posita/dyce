@@ -906,7 +906,7 @@ class TestPHSinglePosFastPath:
                 assert result == H(6).order_stat_for_n_at_pos(5, 2)
 
     def test_homogeneous_via_slice_form_shortcuts(self) -> None:
-        # `p.h(slice(2, 3))` should also route through the fast path.
+        # `p.h(slice(2, 3))` should also route through the fast path
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             p = _MockableP(5 @ P(H(6)))
@@ -918,8 +918,7 @@ class TestPHSinglePosFastPath:
                 assert result == H(6).order_stat_for_n_at_pos(5, 2)
 
     def test_homogeneous_via_negative_int_shortcuts(self) -> None:
-        # `p.h(-2)` selects second-from-top on a 5-pool, which is the
-        # middle position 3.
+        # `p.h(-2)` selects second-from-top on a 5-pool, which is the middle position 3
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             p = _MockableP(5 @ P(H(6)))
@@ -933,8 +932,7 @@ class TestPHSinglePosFastPath:
     # ---- Heterogeneous: fast path NOT taken (rolls_with_counts called) ----
 
     def test_heterogeneous_single_pos_falls_through(self) -> None:
-        # Hetero composition is deferred; for now hetero pools take the
-        # existing path.
+        # Hetero composition is deferred. For now hetero pools take the existing path.
         p = _MockableP(P(H(4), H(6), H(8)))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
@@ -945,9 +943,8 @@ class TestPHSinglePosFastPath:
     # ---- Multi-position: fast path NOT taken (rolls_with_counts called) ----
 
     def test_homogeneous_multi_position_falls_through(self) -> None:
-        # `p.h(slice(0, 2))` selects two positions; no closed-form fast
-        # path -- existing partial-selection logic in `rolls_with_counts`
-        # is still the right tool.
+        # `p.h(slice(0, 2))` selects two positions; no closed-form fast path. Existing
+        # partial-selection logic in `rolls_with_counts` is still the right tool.
         p = _MockableP(5 @ P(H(6)))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
@@ -956,8 +953,8 @@ class TestPHSinglePosFastPath:
             mock.assert_called()
 
     def test_homogeneous_multi_position_with_multiplicity_falls_through(self) -> None:
-        # `p.h(2, 2)` selects position 2 twice. Multi-call so NOT a
-        # single-position selection -- falls through.
+        # `p.h(2, 2)` selects position 2 twice. Multi-call so NOT a single-position
+        # selection. Falls through.
         p = _MockableP(5 @ P(H(6)))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
@@ -968,10 +965,9 @@ class TestPHSinglePosFastPath:
     # ---- Sanity: single-die pool short-circuits trivially ----
 
     def test_single_die_pool_via_h_returns_self_for_minus_1(self) -> None:
-        # A 1-die pool's "highest 1" is just the underlying H itself.
-        # This case currently flows through the `len(self) == 1` branch
-        # at the top of `P.h(no args)`, but `P.h(-1)` and `P.h(0)` should
-        # also work via the new fast path.
+        # A 1-die pool's "highest 1" is just the underlying H itself. This case
+        # currently flows through the `len(self) == 1` branch at the top of `P.h(no
+        # args)`, but `P.h(-1)` and `P.h(0)` should also work via the new fast path.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             p = _MockableP(P(H(6)))
@@ -992,10 +988,9 @@ class TestPHSinglePosFastPath:
     # `rolls_with_counts` internally (separate object), and that's fine.
 
     def test_heterogeneous_max_with_multi_die_group_decomposes(self) -> None:
-        # P(d6 x 2, d8 x 3).h(-1) -- d8 group has n_g == 3.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            p = _MockableP(P(H(6), H(6), H(8), H(8), H(8)))
+            p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
             with patch.object(
                 p, "rolls_with_counts", side_effect=p.rolls_with_counts
             ) as mock:
@@ -1003,10 +998,9 @@ class TestPHSinglePosFastPath:
                 mock.assert_not_called()
 
     def test_heterogeneous_min_with_multi_die_group_decomposes(self) -> None:
-        # Same shape, lowest 1.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            p = _MockableP(P(H(6), H(6), H(8), H(8), H(8)))
+            p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
             with patch.object(
                 p, "rolls_with_counts", side_effect=p.rolls_with_counts
             ) as mock:
@@ -1014,9 +1008,9 @@ class TestPHSinglePosFastPath:
                 mock.assert_not_called()
 
     def test_heterogeneous_all_size_1_groups_falls_through(self) -> None:
-        # P(d6, d8).h(-1) -- both groups size 1. No decomposition
-        # would change anything; existing path handles 2-die hetero pool.
-        p = _MockableP(P(H(6), H(8)))
+        # P(d6, d8).h(-1) -- both groups size 1. No decomposition would change anything.
+        # Existing path handles 2-die hetero pool.
+        p = _MockableP(H(6), H(8))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
         ) as mock:
@@ -1024,9 +1018,9 @@ class TestPHSinglePosFastPath:
             mock.assert_called()
 
     def test_heterogeneous_middle_pos_falls_through(self) -> None:
-        # No closed form for middle-pos on heterogeneous pool. Falls
-        # through even if a group has n_g > 1.
-        p = _MockableP(P(H(6), H(6), H(6), H(8), H(8)))
+        # No closed form for middle-pos on heterogeneous pool. Falls through even if a
+        # group has n_g > 1.
+        p = _MockableP(3 @ P(6), 2 @ P(8))
         with patch.object(
             p, "rolls_with_counts", side_effect=p.rolls_with_counts
         ) as mock:
@@ -1034,11 +1028,11 @@ class TestPHSinglePosFastPath:
             mock.assert_called()
 
     def test_heterogeneous_max_matches_brute_force(self) -> None:
-        # Cross-check the decomposed result against brute-force
-        # enumeration on a small-enough pool to enumerate fully.
+        # Cross-check the decomposed result against brute-force enumeration on a
+        # small-enough pool to enumerate fully
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            p = P(H(4), H(4), H(6), H(6), H(6))  # 2d4 + 3d6
+            p = P(2 @ P(4), 3 @ P(6))
             via_decomp = p.h(-1)
             brute: Counter[int] = Counter()
             for r1 in range(1, 5):
@@ -1052,7 +1046,7 @@ class TestPHSinglePosFastPath:
     def test_heterogeneous_min_matches_brute_force(self) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            p = P(H(4), H(4), H(6), H(6), H(6))
+            p = P(2 @ P(4), 3 @ P(6))
             via_decomp = p.h(0)
             brute: Counter[int] = Counter()
             for r1 in range(1, 5):
