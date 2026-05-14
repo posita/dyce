@@ -1,0 +1,28 @@
+{
+  "dyce": {
+    "releases": {
+      "0.7.0rc1": [
+        {
+          "comment_text": "",
+          "digests": {
+            "md5": "bbe590b9c5ea63bd8730aee0f285e63d",
+            "sha256": "eaa9c13dacc84771986a309723c186d0e6e412a50b514962bd7ec8738ee4f327"
+          },
+          "downloads": -1,
+          "filename": "dyce-0.7.0rc1-py3-none-any.whl",
+          "has_sig": false,
+          "md5_digest": "bbe590b9c5ea63bd8730aee0f285e63d",
+          "packagetype": "bdist_wheel",
+          "python_version": "py3",
+          "requires_python": ">=3.11",
+          "size": 60357,
+          "upload_time": "2026-05-14T18:18:46.633600Z",
+          "upload_time_iso_8601": "2026-05-14T18:18:46.633600Z",
+          "url": "./dyce-0.7.0rc1-py3-none-any.whl",
+          "yanked": false,
+          "yanked_reason": null
+        }
+      ]
+    }
+  }
+}

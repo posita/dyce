@@ -1,0 +1,1351 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for exploring dice outcomes and other finite discrete probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      
+        <link rel="prev" href="../translations/">
+      
+      
+        <link rel="next" href="../contrib/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Release notes - dyce</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dyce-release-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Release notes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="light-green"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../countin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Countin’ with histograms and pools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications and translations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.7.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#062" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#045" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.5
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#044" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#043" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#042" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.4.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#032" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conveniences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization (optional)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.7.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#062" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#045" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.5
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#044" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#043" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#042" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.4.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#032" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+-->
+
+<h1 id="dyce-release-notes"><code>dyce</code> release notes</h1>
+<h2 id="070"><a href="https://github.com/posita/dyce/releases/tag/v0.7.0">0.7.0</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Breaking changes</p>
+<p>Some of the following changes are not backward compatible.
+Please review before upgrading.</p>
+</div>
+<ul>
+<li>Drops support for 3.9 and 3.10 and extends support to 3.14</li>
+<li>Fixes embarrassingly long-running logical error in 4d6 variants example</li>
+<li>Removes <code>dyce.r</code> altogether (pending rewrite of an alternative).</li>
+<li>Adds <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">from_counts</span></code> class method constructs an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
+<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">umap</span></code> in favor of <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
+<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code>, whose functionality can be trivially reintroduced using <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
+<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="fm">__reversed__</span></code>.</li>
+<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">vs</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">within</span></code>.</li>
+<li>Renames <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">accumulate</span></code> to <a class="autorefs autorefs-internal" title="merge(other: H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]) -> H[_T]" href="../dyce/#dyce.H.merge"><code>H.merge</code></a>.</li>
+<li>Renames <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">distribution</span></code> to <a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">distribution_xy</span></code>.</li>
+<li>Removes <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">umap</span></code> in favor of [<code>P.apply</code>][dyce.P.apply].</li>
+<li>Removes <code>P.is_homogeneous</code>.</li>
+<li>Adds experimental and somewhat inefficient <a class="autorefs autorefs-internal" title="replace(existing_outcome: _T, repl: H[_T] | _T) -> H[_T]" href="../dyce/#dyce.H.replace"><code>H.replace</code></a> method.</li>
+<li>Simplifies and consolidates <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">expandable</span></code> and <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">foreach</span></code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
+<li>Renames <code class="highlight"><span class="n">explode</span></code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
+<li>Moves <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a> to its own module.</li>
+<li><em>(Finally!)</em> removes deprecated interfaces<ul>
+<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">explode</span></code></li>
+<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code></li>
+<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code></li>
+<li><code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code></li>
+<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">coalesce_replace</span></code></li>
+<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">resolve_dependent_probability</span></code></li>
+<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">sum_h</span></code> (not previously deprecated, but to-date unused)</li>
+</ul>
+</li>
+<li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a></li>
+<li>Completely eliminates dependency on <a href="https://github.com/beartype/numerary/"><code>numerary</code></a> (which was flawed since conception), and instead relies on <a href="https://jorenham.github.io/optype/"><code>optype</code></a> for mathematical operator typing.
+  (<a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code></a> still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)</li>
+<li>Stabilizes Jupyter Lite installation</li>
+<li>Defaults to collapsed installation cells in notebooks</li>
+<li>Modernizes <code>setup.cfg</code> -&gt; <code>pyproject.toml</code> (and <code>tox.ini</code>)</li>
+<li>Updates CI workflow</li>
+<li>Who let the dogs out? <em>We</em> let dogs out.</li>
+<li>Migrates to <code>ruff</code> for linting</li>
+</ul>
+<h2 id="062"><a href="https://github.com/posita/dyce/releases/tag/v0.6.2">0.6.2</a></h2>
+<ul>
+<li>Adds the <code>H.draw</code> convenience method for treating a histogram as a deck rather than a die.</li>
+</ul>
+<h2 id="061"><a href="https://github.com/posita/dyce/releases/tag/v0.6.1">0.6.1</a></h2>
+<ul>
+<li>Fixes <a class="autorefs autorefs-internal" title="total: int
+
+  
+      property
+  " href="../dyce/#dyce.P.total"><code>P.total</code></a> to return <code class="highlight"><span class="mi">1</span></code> for empty pools, consistent with the empty product.
+  (See <a href="https://www.johndcook.com/blog/2015/04/14/empty-sum-product/">this explanation</a>).</li>
+<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">_LimitT</span></code> to <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">LimitT</span></code>.</li>
+<li>Fixes issues pertaining to histograms with zero totals after allowing outcomes with zero counts in non-normalized <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a>.</li>
+<li>Fixes issue that would lead to incorrect results when making certain arbitrary selections with heterogeneous pools (e.g., with <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code></a>).</li>
+</ul>
+<h2 id="060"><a href="https://github.com/posita/dyce/releases/tag/v0.6.0">0.6.0</a></h2>
+<ul>
+<li>Now requires <code>numerary~=0.4.3</code>.</li>
+<li>Adds the <code>expandable</code> decorator as well as the <code>foreach</code> and <code>explode</code> convenience functions.</li>
+<li>Deprecates <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code>.</li>
+<li>Allows outcomes with zero counts in non-normalized <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a>.
+  Outcomes with zero counts are dropped when calling <a class="autorefs autorefs-internal" title="lowest_terms() -> H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.
+  Adds the <a class="autorefs autorefs-internal" title="zero_fill(outcomes: Iterable[_T]) -> H[_T]" href="../dyce/#dyce.H.zero_fill"><code>H.zero_fill</code></a> convenience method.</li>
+<li>Fixes memoization in <a href="../translations/#modeling-entire-multi-round-combats">Risus multi-round combat translation</a>.</li>
+<li>Migrates from <a href="https://pypi.org/project/setuptools-scm/"><code>setuptools_scm</code></a> to <a href="https://pypi.org/project/versioningit/"><code>versioningit</code></a> for more flexible version number formatting.</li>
+<li>Allows deployments to PyPI from CI based on tags.</li>
+<li>Uses JupyterLite instead of Binder for examples.</li>
+<li>Refactors <code>P.is_homogeneous</code> property into a similarly-named method and adds the <a class="autorefs autorefs-internal" title="total: int
+
+  
+      property
+  " href="../dyce/#dyce.P.total"><code>P.total</code> method</a> property.</li>
+<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">order_stat_func_for_n</span></code> and instead caches order stat functions for <code class="highlight"><span class="n">n</span></code> inside <a class="autorefs autorefs-internal" title="order_stat_for_n_at_pos(n: SupportsInt, pos: SupportsInt) -> H[_T]" href="../dyce/#dyce.H.order_stat_for_n_at_pos"><code>H.order_stat_for_n_at_pos</code></a>.</li>
+</ul>
+<h2 id="052"><a href="https://github.com/posita/dyce/releases/tag/v0.5.2">0.5.2</a></h2>
+<ul>
+<li>Updates binder links that fix requirements ranges.</li>
+</ul>
+<h2 id="051"><a href="https://github.com/posita/dyce/releases/tag/v0.5.1">0.5.1</a></h2>
+<ul>
+<li>Fixes broken binder links in docs.</li>
+<li>Adds the <code class="highlight"><span class="n">precision_limit</span></code> argument to <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">explode</span></code>.</li>
+</ul>
+<h2 id="050"><a href="https://github.com/posita/dyce/releases/tag/v0.5.0">0.5.0</a></h2>
+<ul>
+<li>Breaks <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> out into <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.</li>
+<li>Removes use of <code class="highlight"><span class="n">numerary</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="err">…</span><span class="n">SCU</span></code> types.</li>
+<li>Adds the <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code> class methods.</li>
+<li>Migrates <code class="highlight"><span class="n">resolve_dependent_probability</span></code> to the <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code> class method.</li>
+</ul>
+<h2 id="045"><a href="https://github.com/posita/dyce/releases/tag/v0.4.5">0.4.5</a></h2>
+<ul>
+<li>Fixes <a href="https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981/87">this bullshit</a> (no, really, I’m serious this time).</li>
+<li>Adds <code>dyce.r.FilterRoller</code>.</li>
+<li>Adds <code>dyce.r.SubstitutionRoller</code>.</li>
+</ul>
+<h2 id="044"><a href="https://github.com/posita/dyce/releases/tag/v0.4.4">0.4.4</a></h2>
+<ul>
+<li>Removes <code>…_gh.png</code> hack now that <a href="https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mode/147981">this dumpster fire</a> is at least partially resolved.</li>
+<li>Refines Tension Pool example.</li>
+<li>Adds <em>Ironsworn</em> example.</li>
+<li>Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example.</li>
+<li>Adds detail around dependent probabilities.</li>
+<li>Adds experimental <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">resolve_dependent_probability</span></code> function.</li>
+</ul>
+<h2 id="043"><a href="https://github.com/posita/dyce/releases/tag/v0.4.3">0.4.3</a></h2>
+<ul>
+<li>Removes dependencies on deprecated <code class="highlight"><span class="n">numerary</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="err">…</span><span class="n">SCT</span></code> tuples</li>
+<li>Adds <a href="https://theangrygm.com/definitive-tension-pool/">Angry GM Tension Pool mechanic</a> translation.</li>
+</ul>
+<h2 id="042"><a href="https://github.com/posita/dyce/releases/tag/v0.4.2">0.4.2</a></h2>
+<ul>
+<li>Removes calls to <code class="highlight"><span class="n">os</span><span class="o">.</span><span class="n">get_terminal_size</span></code> to retain utility in environments without terminals.
+  Fixes <a href="https://github.com/posita/dyce/issues/5">#5</a>.
+  Thanks <a href="https://github.com/sudo-simon">@sudo-simon!</a>!</li>
+</ul>
+<h2 id="041"><a href="https://github.com/posita/dyce/releases/tag/v0.4.1">0.4.1</a></h2>
+<ul>
+<li>Splits out protocol checking into its own fancy library: <a href="https://github.com/beartype/numerary/"><code>numerary</code></a>!</li>
+<li>Is now <a href="https://pypi.org/project/dyce/">available on PyPI as <code>dyce</code>_</a>, thanks to the generosity of <a href="https://eykd.net/about/">David Eyk</a>!</li>
+<li>Introduces experimental generic <code>dyce.r.walk</code> function and supporting visitor data structures.</li>
+<li>Uses <code class="highlight"><span class="n">pygraphviz</span></code> to automate class diagram generation.
+  (See the note on special considerations for regenerating class diagrams in the <a href="../contrib/#hacking-quick-start">hacking quick start</a>.)</li>
+<li>Introduces experimental use of <code class="highlight"><span class="n">numpy</span></code> for RNG, if present.</li>
+<li>Migrates to using <code>pyproject.toml</code> and <code>setup.cfg</code>.</li>
+<li>Adds missing <a href="https://www.python.org/dev/peps/pep-0561/"><code>py.typed</code> to ensure clients get type checking</a>.
+  (Whoops.)</li>
+</ul>
+<h2 id="040"><a href="https://github.com/posita/dyce/releases/tag/v0.4.0">0.4.0</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Breaking changes</p>
+<p>The following changes are not backward compatible.
+Please review before upgrading.</p>
+</div>
+<ul>
+<li>Renames <code class="highlight"><span class="n">HAbleT</span></code> and <code class="highlight"><span class="n">HAbleOpsMixin</span></code> to <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a>.
+    Uses alternate spellings.</li>
+<li>Removes deprecated non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.
+    Uses, e.g., <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="fm">__neg__</span><span class="p">)</span></code> or <code class="highlight"><span class="n">P</span><span class="p">(</span><span class="o">-</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)</span></code> instead.</li>
+<li>Removes deprecated synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.
+    Uses <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code> instead.</li>
+<li>Removes deprecated synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.
+    Uses <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> instead.</li>
+<li>
+<p>Removes special case handling of <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for addition and subtraction.
+    Check for code that relied on, e.g., <code class="highlight"><span class="n">h</span> <span class="o">+</span> <span class="n">H</span><span class="p">({})</span></code> resolving to <code class="highlight"><span class="n">h</span></code>.
+    It is probably not correct.
+    If the behavior is desired, consider eliminating empty histograms before performing calculations.
+    E.G., <code class="highlight"><span class="n">h1</span> <span class="o">+</span> <span class="n">h2</span> <span class="k">if</span> <span class="n">h2</span> <span class="k">else</span> <span class="n">h1</span></code>.</p>
+<p>See also the <del><code>sum_h</code> function</del>, which ensures the result is always a histogram:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.h</span><span class="w"> </span><span class="kn">import</span> <span class="n">sum_h</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">sum</span><span class="p">(())</span>
+<span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sum_h</span><span class="p">(())</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="n">H</span><span class="p">({})</span>
+</code></pre></div></td></tr></table></div>
+<p>Note, however, that sums including empty histograms will be always result in empty histograms:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">hs</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">H</span><span class="p">({})]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sum_h</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="n">H</span><span class="p">({})</span>
+</code></pre></div></td></tr></table></div>
+<p>If a different result was desired, adapting our advice from above would yield something like:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">sum_h</span><span class="p">(</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hs</span> <span class="k">if</span> <span class="n">h</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+</li>
+</ul>
+<h3 id="other-changes">Other changes</h3>
+<ul>
+<li>Documentation overhaul including augmented examples and reorganized images and JavaScript.</li>
+<li>Fixes <code class="highlight"><span class="n">H</span><span class="p">({})</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">)</span></code> bug.</li>
+<li>Adds <a href="https://github.com/beartype/beartype"><code>beartype</code></a> runtime type checking.</li>
+<li><em>Maintains</em> support for Python 3.7 (for now).</li>
+</ul>
+<h2 id="032"><a href="https://github.com/posita/dyce/releases/tag/v0.3.2">0.3.2</a></h2>
+<ul>
+<li>Emergency release to <del>cover up</del> <em>address</em> <a href="https://github.com/borntyping/python-dice/issues/16#issuecomment-900249398">this <del>embarrassment</del> <em>typo</em></a>. 😬😅</li>
+</ul>
+<h2 id="031"><a href="https://github.com/posita/dyce/releases/tag/v0.3.1">0.3.1</a></h2>
+<ul>
+<li>Adds these release notes.</li>
+<li>Boosts <code class="highlight"><span class="nb">isinstance</span></code> performance with <code class="highlight"><span class="n">dyce</span></code>’s proprietary numeric <code class="highlight"><span class="n">Protocol</span></code>s.</li>
+<li>Reinstates support for Python 3.7 <del>(for now)</del>.</li>
+<li>Adds <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code>.</li>
+<li>Deprecates synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.</li>
+<li>Introduces experimental <a class="autorefs autorefs-internal" title="total: int
+
+  
+      property
+  " href="../dyce/#dyce.H.total"><code>H.total</code></a> property.</li>
+<li>Removes incorrectly non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__abs__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__invert__</span></code>.</li>
+<li>Deprecates non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.</li>
+<li>Renames experimental <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">homogeneous</span></code> property to <code>P.is_homogeneous</code>.</li>
+<li>Introduces experimental <code>dyce.r.R</code> and <code>dyce.r.Roll</code> primitives.</li>
+<li>Removes <code class="highlight"><span class="n">coerce</span></code> parameter from <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">umap</span></code>.</li>
+<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code> to <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code>.</li>
+<li>Deprecates synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.</li>
+</ul>
+<h2 id="030"><a href="https://github.com/posita/dyce/releases/tag/v0.3.0">0.3.0</a></h2>
+<p><code>dyce</code> goes beta!
+Non-experimental features should be considered stable.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
