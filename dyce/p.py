@@ -482,8 +482,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 if self._hs[0] == self._hs[-1]:
                     h = self._hs[0]
                     # Bypass `order_stat_for_n_at_pos`'s `@experimental` warning
-                    # emission by going through the cached internal helper directly.
-                    # Both produce the same result.
+                    # emission by going through the cached internal helper directly,
+                    # since both produce the same result
                     if n not in h._order_stat_funcs_by_n:  # noqa: SLF001
                         h._order_stat_funcs_by_n[n] = h._order_stat_func_for_n(n)  # noqa: SLF001
                     return cast(
