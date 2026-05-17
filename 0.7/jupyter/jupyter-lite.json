@@ -414,9 +414,14 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=0970f20f4d7d1d26d872384f96d65669e980b4b799f42e8f833d0041db53ac09",
+          "./pypi/all.json?sha256=b7cfc834fef8686013070a26ede888f50cd12ca6ac84b38728b599ab104ff90e",
           "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=d4147101a35e1f311a860b1b8976d601b6afcad0e777ffb7946bd9ca3fdefbd6"
         ]
+      }
+    },
+    "settingsOverrides": {
+      "@jupyterlab/apputils-extension:themes": {
+        "adaptive-theme": true
       }
     },
     "settingsStorageDrivers": [
