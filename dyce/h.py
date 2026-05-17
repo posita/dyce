@@ -1487,22 +1487,33 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
         return f"{{{', '.join(_parts())}}}"
 
-    def lowest_terms(self: "H[_T]") -> "H[_T]":
+    def lowest_terms(self: "H[_T]", *, preserve_zero_counts: bool = False) -> "H[_T]":
         r"""
         Return a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
 
-            >>> H({1: 2, 2: 4, 3: 6}).lowest_terms()
+            >>> H({1: 2, 2: 4, 3: 6, 4: 0}).lowest_terms()
             H({1: 1, 2: 2, 3: 3})
             >>> H({1: 3, 2: 0, 3: 6}).lowest_terms()
             H({1: 1, 3: 2})
             >>> H({}).lowest_terms()
             H({})
+
+        If *preserve_zero_counts* is `#!python True`, counts are reduced, but zero counts are kept.
+
+            >>> H({1: 2, 2: 4, 3: 6, 4: 0}).lowest_terms(preserve_zero_counts=True)
+            H({1: 1, 2: 2, 3: 3, 4: 0})
         """
         counts = tuple(count for count in self._h.values() if count)
         if not counts:
             return cast("H[_T]", H({}))
         g = math.gcd(*counts)
-        return H({outcome: count // g for outcome, count in self._h.items() if count})
+        return H(
+            {
+                outcome: count // g
+                for outcome, count in self._h.items()
+                if count or preserve_zero_counts
+            }
+        )
 
     def mean(self: "H[SupportsFloat]") -> float:
         r"""
@@ -1900,6 +1911,11 @@ def aggregate_weighted(
         H({1: 5, 2: 4})
         >>> aggregate_weighted(((H(2), 1), (H({}), 20)))
         H({1: 1, 2: 1})
+
+    Outcomes with zero counts are preserved.
+
+        >>> aggregate_weighted(((1, 1), (2, 0), (3, 3), (4, 0), (5, 5)))
+        H({1: 1, 2: 0, 3: 3, 4: 0, 5: 5})
 
     <!-- BEGIN MONKEY PATCH --
     >>> warnings.resetwarnings()
