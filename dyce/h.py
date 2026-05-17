@@ -316,7 +316,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
         def _sorted_items_iter(
             items: Sequence[tuple[Any, SupportsInt]],
-        ) -> Iterator[tuple[Any, int]]:
+        ) -> Iterable[tuple[Any, int]]:
             sorted_items = [(k, lossless_int(v)) for k, v in items]
             try:
                 sorted_items.sort()
@@ -1428,7 +1428,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             std = None
             var = None
 
-        def _lines() -> Iterator[str]:
+        def _lines() -> Iterable[str]:
             # First pass: collect (outcome_str, probability) pairs and find the widest
             # outcome representation. We need max_outcome_len before we can emit
             # anything, because the stats header must align with it.
@@ -1477,7 +1477,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             warnings.warn(f"{exc!s}", stacklevel=2)
             mu = None
 
-        def _parts() -> Iterator[str]:
+        def _parts() -> Iterable[str]:
             if mu is not None:
                 yield f"avg: {mu:.2f}"
             yield from (
@@ -1572,14 +1572,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def probability_items(
         self: "H[_T]", rational_t: None = None
-    ) -> Iterator[tuple[_T, Fraction]]: ...
+    ) -> Iterable[tuple[_T, Fraction]]: ...
     @overload
     def probability_items(
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT]
-    ) -> Iterator[tuple[_T, _OtherT]]: ...
+    ) -> Iterable[tuple[_T, _OtherT]]: ...
     def probability_items(
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
-    ) -> Iterator[tuple[_T, _OtherT]]:
+    ) -> Iterable[tuple[_T, _OtherT]]:
         r"""
         Yield `#!python (outcome, probability)` pairs where each probability is computed as `#!python rational_t(count, total)`.
 

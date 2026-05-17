@@ -3,6 +3,11 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        # See <https://docs.python.org/3/library/re.html#re.X>
+        exclude: |
+          (?x)^(
+            uv\.lock
+          )$
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-json

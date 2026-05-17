@@ -31,9 +31,10 @@
 - Removes `#!python H.vs` and `#!python H.within`.
 - Renames `#!python H.accumulate` to [`H.merge`][dyce.H.merge].
 - Renames `#!python H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `#!python H.distribution_xy`.
-- Removes `#!python P.map`, `#!python P.rmap`, and `#!python P.umap` in favor of [`P.apply`][dyce.P.apply].
+- Removes `#!python P.map`, `#!python P.rmap`, and `#!python P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
 - Adds experimental and somewhat inefficient [`H.replace`][dyce.H.replace] method.
+- Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Simplifies and consolidates `#!python dyce.evaluation.expandable` and `#!python dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `#!python explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
 - Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
@@ -48,6 +49,7 @@
 - Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype)
 - Completely eliminates dependency on [`numerary`](https://github.com/beartype/numerary/) (which was flawed since conception), and instead relies on [`optype`](https://jorenham.github.io/optype/) for mathematical operator typing.
   ([`H`][dyce.H] and [`P`][dyce.P] still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)
+- Re-introduces low-level [Matplotlib](https://matplotlib.org/) plotting functions in [`dyce.viz`][dyce.viz]. (High-level, interactive visualization functionality still lives in [`anydyce`](https://github.com/posita/anydyce/).)
 - Stabilizes Jupyter Lite installation
 - Defaults to collapsed installation cells in notebooks
 - Modernizes `setup.cfg` -> `pyproject.toml` (and `tox.ini`)

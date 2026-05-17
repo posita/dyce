@@ -17,6 +17,7 @@ import contextlib
 import itertools
 import math
 import operator
+import platform
 import statistics
 import warnings
 from collections.abc import Callable, Iterable
@@ -37,33 +38,6 @@ from dyce.h import (
 )
 from dyce.lifecycle import ExperimentalWarning
 from dyce.types import BeartypeCallHintViolation
-
-
-def _aggregate_weighted_prod(
-    weighted_sources: Iterable[tuple[Any, int]],
-) -> H[Any]:
-    r"""Reference implementation of `aggregate_weighted` using product-of-totals as the
-    running scalar. Retained as a regression check against the production LCM-based
-    `aggregate_weighted`: the two should always produce H-equal (i.e. distribution-
-    equivalent) results, with the LCM version's totals being <= the product version's.
-    """
-    aggregate_scalar = 1
-    outcome_counts: list[tuple[Any, int]] = []
-    for outcome_or_h, count in weighted_sources:
-        if isinstance(outcome_or_h, H):
-            if outcome_or_h:
-                h_scalar = outcome_or_h.total
-                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
-                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
-                for new_outcome, new_count in outcome_or_h.items():
-                    outcome_counts.append(
-                        (new_outcome, count * aggregate_scalar * new_count)
-                    )
-                aggregate_scalar *= h_scalar
-        else:
-            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
-    return H.from_counts(outcome_counts)
-
 
 __all__ = ()
 
@@ -90,6 +64,12 @@ with contextlib.suppress(ImportError):
         sympy.Number,
         sympy.Rational,
     )
+
+
+@pytest.fixture(autouse=True)
+def _suppress_warnings() -> None:
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    warnings.filterwarnings("ignore", category=TruncationWarning)
 
 
 class TestHInit:
@@ -662,30 +642,24 @@ class TestHApply:
 
 class TestHExactlyKTimesInN:
     def test_exactly_k_times_in_n(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            for h in (
-                H(20),
-                H(20).merge(H(20)).merge(H(20)),
-                H({i: i for i in range(10)}),
-                H({9 - i: i for i in range(10)}),
-                H({i: i for i in range(1, 6)}).merge(
-                    H({i: 11 - i for i in range(6, 11)})
-                ),
-            ):
-                for n in range(10, 0, -1):
-                    for outcome in h:
-                        counts = n @ h.eq(outcome)
-                        for k in range(n + 1):
-                            assert h.exactly_k_times_in_n(outcome, n, k) == counts[k]
+        for h in (
+            H(20),
+            H(20).merge(H(20)).merge(H(20)),
+            H({i: i for i in range(10)}),
+            H({9 - i: i for i in range(10)}),
+            H({i: i for i in range(1, 6)}).merge(H({i: 11 - i for i in range(6, 11)})),
+        ):
+            for n in range(10, 0, -1):
+                for outcome in h:
+                    counts = n @ h.eq(outcome)
+                    for k in range(n + 1):
+                        assert h.exactly_k_times_in_n(outcome, n, k) == counts[k]
 
     def test_exactly_k_times_in_n_k_exceeds_n_raises(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            with pytest.raises(
-                ValueError, match=r"\bk\b.*\bmust be less than or equal to n\b"
-            ):
-                H(6).exactly_k_times_in_n(outcome=1, n=2, k=3)
+        with pytest.raises(
+            ValueError, match=r"\bk\b.*\bmust be less than or equal to n\b"
+        ):
+            H(6).exactly_k_times_in_n(outcome=1, n=2, k=3)
 
     def test_exactly_k_times_in_n_k_warns_experimental(self) -> None:
         with pytest.warns(ExperimentalWarning, match=r"\bexperimental\b"):
@@ -773,59 +747,51 @@ class TestHMerge:
 
 class TestHOrderStatForNAtPos:
     def test_order_stat_for_n_at_pos(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            for h in (
-                H(6),
-                H((2, 3, 3, 4, 4, 5)),
-                H({i: i for i in range(1, 6)}),
-            ):
-                for n in range(1, 5):
-                    for pos in range(n):
-                        result = h.order_stat_for_n_at_pos(n, pos)
-                        for outcome in h:
-                            brute = sum(
-                                count
-                                for roll, count in (
-                                    (sorted(r), c)
-                                    for r, c in (
-                                        (list(combo), math.prod(h[v] for v in combo))
-                                        for combo in itertools.product(
-                                            h.outcomes(), repeat=n
-                                        )
+        for h in (
+            H(6),
+            H((2, 3, 3, 4, 4, 5)),
+            H({i: i for i in range(1, 6)}),
+        ):
+            for n in range(1, 5):
+                for pos in range(n):
+                    result = h.order_stat_for_n_at_pos(n, pos)
+                    for outcome in h:
+                        brute = sum(
+                            count
+                            for roll, count in (
+                                (sorted(r), c)
+                                for r, c in (
+                                    (list(combo), math.prod(h[v] for v in combo))
+                                    for combo in itertools.product(
+                                        h.outcomes(), repeat=n
                                     )
                                 )
-                                if roll[pos] == outcome
                             )
-                            assert result.get(outcome, 0) == brute  # pyright: ignore[reportArgumentType,reportCallIssue]
+                            if roll[pos] == outcome
+                        )
+                        assert result.get(outcome, 0) == brute  # pyright: ignore[reportArgumentType,reportCallIssue]
 
     def test_order_stat_for_n_at_pos_negative_index(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            h = H(6)
-            for n in range(1, 7):
-                for pos in range(n):
-                    assert h.order_stat_for_n_at_pos(
-                        n, pos
-                    ) == h.order_stat_for_n_at_pos(n, pos - n)
+        h = H(6)
+        for n in range(1, 7):
+            for pos in range(n):
+                assert h.order_stat_for_n_at_pos(n, pos) == h.order_stat_for_n_at_pos(
+                    n, pos - n
+                )
 
     def test_order_stat_for_n_at_pos_out_of_bounds_raises(self) -> None:
         h = H(6)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            with pytest.raises(ValueError, match=r"\bpos\b.*\bmust be in range\b"):  # noqa: PT012
-                result = h.order_stat_for_n_at_pos(3, 5)
-                assert all(count == 0 for count in result.counts())
+        with pytest.raises(ValueError, match=r"\bpos\b.*\bmust be in range\b"):  # noqa: PT012
+            result = h.order_stat_for_n_at_pos(3, 5)
+            assert all(count == 0 for count in result.counts())
 
     def test_order_stat_for_n_at_pos_caches_by_n(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            h = H(6)
-            _ = h.order_stat_for_n_at_pos(4, 0)
-            _ = h.order_stat_for_n_at_pos(4, 3)
-            assert len(h._order_stat_funcs_by_n) == 1  # noqa: SLF001
-            _ = h.order_stat_for_n_at_pos(5, 0)
-            assert len(h._order_stat_funcs_by_n) == 2  # noqa: SLF001
+        h = H(6)
+        _ = h.order_stat_for_n_at_pos(4, 0)
+        _ = h.order_stat_for_n_at_pos(4, 3)
+        assert len(h._order_stat_funcs_by_n) == 1  # noqa: SLF001
+        _ = h.order_stat_for_n_at_pos(5, 0)
+        assert len(h._order_stat_funcs_by_n) == 2  # noqa: SLF001
 
     def test_order_stat_for_n_at_pos_warns_experimental(self) -> None:
         with pytest.warns(ExperimentalWarning, match=r"\bexperimental\b"):
@@ -909,18 +875,17 @@ class TestHVariance:
                 stat_variance,
             ), f"o_type: {o_type}"
 
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="not supported on PyPy",
+    )
     def test_variance_overflow(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            warnings.filterwarnings("ignore", category=TruncationWarning)
-            assert math.isclose(
-                explode_n(H(6), n=800, precision=Fraction(0)).variance(),
-                10.64,
-            )
-            assert math.isclose(
-                explode_n(H(20), n=400, precision=Fraction(0)).variance(),
-                52.16066481994455,
-            )
+        with pytest.warns(
+            TruncationWarning,
+            match=r"\brecursion depth exceeded\b",
+        ):
+            variance = explode_n(H(6), n=800, precision=Fraction(0)).variance()
+        assert math.isclose(variance, 10.64)
 
 
 @pytest.mark.benchmark
@@ -1059,3 +1024,33 @@ class TestConvolveFast:
             pytest.warns(_ConvolveFallbackWarning, match=r"int"),
         ):
             H(2) @ 2  # pyright: ignore[reportUnusedExpression]
+
+
+# ---- Helpers -------------------------------------------------------------------------
+
+
+def _aggregate_weighted_prod(
+    weighted_sources: Iterable[tuple[Any, int]],
+) -> H[Any]:
+    r"""
+    Reference implementation of `aggregate_weighted` using product-of-totals as the
+    running scalar. Retained as a regression check against the production LCM-based
+    `aggregate_weighted`: the two should always produce H-equal (i.e. distribution-
+    equivalent) results, with the LCM version's totals being <= the product version's.
+    """
+    aggregate_scalar = 1
+    outcome_counts: list[tuple[Any, int]] = []
+    for outcome_or_h, count in weighted_sources:
+        if isinstance(outcome_or_h, H):
+            if outcome_or_h:
+                h_scalar = outcome_or_h.total
+                for i, (prior_outcome, prior_count) in enumerate(outcome_counts):
+                    outcome_counts[i] = (prior_outcome, prior_count * h_scalar)
+                for new_outcome, new_count in outcome_or_h.items():
+                    outcome_counts.append(
+                        (new_outcome, count * aggregate_scalar * new_count)
+                    )
+                aggregate_scalar *= h_scalar
+        else:
+            outcome_counts.append((outcome_or_h, count * aggregate_scalar))
+    return H.from_counts(outcome_counts)

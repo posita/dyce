@@ -15,7 +15,7 @@
 
 import operator
 import re
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterable, Sequence
 from types import NotImplementedType  # noqa: TC003
 from typing import Any, SupportsIndex, SupportsInt, TypeVar
 
@@ -73,7 +73,7 @@ Sentinel = SentinelT()
 GetItemT = SupportsIndex | slice
 
 
-def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterator[_T]:
+def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterable[_T]:
     r"""
     Yield items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `#!python slice`.
 

@@ -32,6 +32,8 @@ def fig_callback(line_color: str) -> None:
         2 @ H(6),
         H(12),
         ax=ax_2d6_vs_d12,
+        cmap="RdYlGn",
+        compare_cmap="RdYlBu",
     )
     ax_2d6_vs_d12.set_title("2d6 vs. d12")
 

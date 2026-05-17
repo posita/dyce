@@ -1,3 +1,18 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Please keep each docstring sentence on its own unwrapped line. It looks like crap in a
+# text editor, but it has no effect on rendering, and it allows much more useful diffs.
+# (This does not apply to code comments.) Thank you!
+# ======================================================================================
+
 import importlib.metadata
 import logging
 import os
@@ -11,10 +26,10 @@ from collections.abc import Sequence
 _LOGGER = logging.getLogger("mkdocs.hooks")
 
 _RAW_VERSION = importlib.metadata.version("dyce")
-# Dev/dirty builds (e.g. "0.1.0.dev5+gabcdef") fall back to "main".
+# Dev/dirty builds (e.g. "0.1.0.dev5+gabcdef") fall back to "main"
 _IS_RELEASE = "+" not in _RAW_VERSION and ".dev" not in _RAW_VERSION
 _GIT_REF = f"v{_RAW_VERSION}" if _IS_RELEASE else "main"
-# mike deploys under "major.minor"; dev builds link to "latest".
+# mike deploys under "major.minor"; dev builds link to "latest"
 _parts = _RAW_VERSION.split(".")
 _DOCS_VERSION = f"{_parts[0]}.{_parts[1]}" if _IS_RELEASE else "latest"
 
@@ -32,18 +47,18 @@ def on_page_markdown(markdown: str, **_kwargs: object) -> str:
 def on_pre_build(**_kwargs: object) -> None:
     readme = pathlib.Path("README.md").read_text("utf_8")
     index = readme
-    # Replace 'main' with the version-specific git ref in GitHub source URLs.
+    # Replace 'main' with the version-specific git ref in GitHub source URLs
     index = re.sub(
         r"(https?://(?:raw\.githubusercontent\.com|github\.com)/posita/dyce/(?:blob/|tree/)?)main\b",
         rf"\g<1>{_GIT_REF}",
         index,
     )
-    # Replace 'latest' with the docs version in docs site URLs.
+    # Replace 'latest' with the docs version in docs site URLs
     index = index.replace(
         "https://posita.github.io/dyce/latest/",
         f"https://posita.github.io/dyce/{_DOCS_VERSION}/",
     )
-    # For release builds, restore version-specific shields.io badge URLs and PyPI link.
+    # For release builds, restore version-specific shields.io badge URLs and PyPI link
     if _IS_RELEASE:
         index = re.sub(
             r"(https://img\.shields\.io/pypi/[^/]+/dyce)(\.svg)",
@@ -56,12 +71,12 @@ def on_pre_build(**_kwargs: object) -> None:
             index,
         )
     index_path = pathlib.Path("docs/index.md")
-    # Only write if changed to avoid a feedback loop with `mkdocs serve --livereload`.
+    # Only write if changed to avoid a feedback loop with `mkdocs serve --livereload`
     if not index_path.exists() or index_path.read_text("utf_8") != index:
         index_path.write_text(index, "utf_8")
 
-    # Use copy2 to preserve modification times to avoid a feedback loop with
-    # `mkdocs serve --livereload`.
+    # Use copy2 to preserve modification times to avoid a feedback loop with `mkdocs
+    # serve --livereload`
     shutil.copy2("LICENSE", "docs/license.md")
 
     _uv_run(("make", "-C", "docs"))
@@ -81,9 +96,18 @@ def on_post_build(config: dict, **_kwargs: object) -> None:
         f"{config['site_dir']}/jupyter",
     ]
     wheels: list[pathlib.Path] = []
-    wheels.extend(pathlib.Path("dist").glob("dyce*.whl"))
+    dist_dir_path = pathlib.Path("dist")
+    for pattern in ("dyce*.whl",):
+        try:
+            latest = max(dist_dir_path.glob(pattern), key=os.path.getmtime)
+        except ValueError:
+            pass
+        else:
+            wheels.append(latest)  # ty: ignore[invalid-argument-type]
+    # Fuck you, Jupyter Lite, for costing me hours to work through your lies. (See
+    # <https://github.com/jupyterlite/jupyterlite/issues/1563>.)
     for wheel in wheels:
-        cmd.extend(("--piplite-wheel", str(wheel)))
+        cmd.extend(("--piplite-wheels", str(wheel)))
     _uv_run(cmd)
 
 

@@ -38,8 +38,8 @@ from typing import Literal, TypeVar, cast, overload
 
 try:
     import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    from matplotlib import ticker
+    from matplotlib import pyplot as plt
+    from matplotlib import ticker as mticker
     from matplotlib.axes import Axes
     from matplotlib.colors import Colormap
 except ImportError as exc:  # pragma: no cover
@@ -84,10 +84,10 @@ Return an empty string to suppress the label for that wedge.
 """
 
 _DEFAULT_ALPHA: float = 0.75
-_DEFAULT_CMAP: str = "RdYlGn_r"
-_DEFAULT_CMAP_COMPARE: str = "RdYlBu_r"
 _DEFAULT_MARKERS: str = "oX^v><dP"
-_LABEL_LIM: Fraction = Fraction(1, 32)  # suppress burst labels below ~3.1%
+_LABEL_LIM: Fraction = Fraction(1, 2**5)  # suppress burst labels below ~3.1%
+
+_formatter: BurstFormatterT
 
 
 @experimental
@@ -101,6 +101,9 @@ def format_outcome_name(
     If *outcome* has a `#!python .name` attribute (e.g. an `#!python Enum`), that is used; otherwise `#!python str(outcome)` is used.
     """
     return str(outcome.name) if hasattr(outcome, "name") else str(outcome)  # pyright: ignore[reportAttributeAccessIssue]
+
+
+_formatter = format_outcome_name
 
 
 @experimental
@@ -117,6 +120,9 @@ def format_outcome_name_probability(
     return f"{name}\n{format_probability(outcome, prob, h)}"
 
 
+_formatter = format_outcome_name_probability
+
+
 @experimental
 def format_probability(
     _outcome: _T,
@@ -127,6 +133,10 @@ def format_probability(
     Burst-plot formatter that labels each wedge with its probability as a percentage.
     """
     return f"{float(prob):.2%}"
+
+
+_formatter = format_probability
+del _formatter
 
 
 @experimental
@@ -205,7 +215,7 @@ def plot_bar(
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
 
-    pct_formatter = ticker.PercentFormatter(xmax=1)
+    pct_formatter = mticker.PercentFormatter(xmax=1)
     if horizontal:
         ax.xaxis.set_major_formatter(pct_formatter)
     else:
@@ -247,12 +257,13 @@ def plot_burst(
     compare: None = None,
     *,
     formatter: BurstFormatterT[_T1] = format_outcome_name,
-    compare_formatter: None = None,
+    compare_formatter: BurstFormatterT[_T1] | None = None,
     alpha: float = _DEFAULT_ALPHA,
     ax: Axes | None = None,
-    cmap: str | Colormap = _DEFAULT_CMAP,
-    compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
+    cmap: str | Colormap | None = None,
+    compare_cmap: str | Colormap | None = None,
     title: str = "",
+    use_midpoints_for_colors: bool = True,
 ) -> Axes: ...
 @overload
 def plot_burst(
@@ -263,9 +274,10 @@ def plot_burst(
     compare_formatter: BurstFormatterT[_T2],
     alpha: float = _DEFAULT_ALPHA,
     ax: Axes | None = None,
-    cmap: str | Colormap = _DEFAULT_CMAP,
-    compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
+    cmap: str | Colormap | None = None,
+    compare_cmap: str | Colormap | None = None,
     title: str = "",
+    use_midpoints_for_colors: bool = True,
 ) -> Axes: ...
 @overload
 def plot_burst(
@@ -276,9 +288,24 @@ def plot_burst(
     compare_formatter: None = None,
     alpha: float = _DEFAULT_ALPHA,
     ax: Axes | None = None,
-    cmap: str | Colormap = _DEFAULT_CMAP,
-    compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
+    cmap: str | Colormap | None = None,
+    compare_cmap: str | Colormap | None = None,
     title: str = "",
+    use_midpoints_for_colors: bool = True,
+) -> Axes: ...
+@overload
+def plot_burst(
+    h: H[_T1],
+    compare: H[_T2],
+    *,
+    formatter: BurstFormatterT[_T1] = format_outcome_name,
+    compare_formatter: BurstFormatterT[_T2] | None = None,
+    alpha: float = _DEFAULT_ALPHA,
+    ax: Axes | None = None,
+    cmap: str | Colormap | None = None,
+    compare_cmap: str | Colormap | None = None,
+    title: str = "",
+    use_midpoints_for_colors: bool = True,
 ) -> Axes: ...
 @experimental
 def plot_burst(
@@ -289,9 +316,10 @@ def plot_burst(
     compare_formatter: BurstFormatterT[_T2] | None = None,
     alpha: float = _DEFAULT_ALPHA,
     ax: Axes | None = None,
-    cmap: str | Colormap = _DEFAULT_CMAP,
-    compare_cmap: str | Colormap = _DEFAULT_CMAP_COMPARE,
+    cmap: str | Colormap | None = None,
+    compare_cmap: str | Colormap | None = None,
     title: str = "",
+    use_midpoints_for_colors: bool = True,
 ) -> Axes:
     r"""
     Plots a dual concentric pie chart for one or two histograms.
@@ -306,6 +334,7 @@ def plot_burst(
     *formatter* and *compare_formatter* are `BurstFormatterT` callables (see `format_outcome_name`, `format_probability`, `format_outcome_name_probability`).
 
     *cmap* / *compare_cmap* accept any matplotlib colormap name or instance.
+    If `#!python None`, the `#!python "image.cmap"` associated with the current style is used.
 
     If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
@@ -366,8 +395,16 @@ def plot_burst(
     inner_labels, inner_probs = _wedges(h, formatter)
     outer_labels, outer_probs = _wedges(h_compare, compare_formatter)
 
-    inner_colors = _graph_colors(cmap, inner_probs, alpha)
-    outer_colors = _graph_colors(compare_cmap, outer_probs, alpha)
+    cmap = mpl.rcParams["image.cmap"] if cmap is None else cmap
+    assert cmap is not None
+    compare_cmap = mpl.rcParams["image.cmap"] if compare_cmap is None else compare_cmap
+    assert compare_cmap is not None
+    inner_colors = _burst_colors(
+        cmap, inner_probs, alpha, use_midpoints=use_midpoints_for_colors
+    )
+    outer_colors = _burst_colors(
+        compare_cmap, outer_probs, alpha, use_midpoints=use_midpoints_for_colors
+    )
 
     if title:
         ax.set_title(title, fontweight="bold", pad=24.0)
@@ -391,8 +428,6 @@ def plot_burst(
         wedgeprops={"width": 0.5},
     )
     ax.set(aspect="equal")
-    for patch in ax.patches:
-        patch.set_edgecolor(mpl.rcParams["text.color"])
 
     return ax
 
@@ -451,7 +486,7 @@ def plot_line(
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
-    ax.yaxis.set_major_formatter(ticker.PercentFormatter(xmax=1))
+    ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
 
     if not hs_list:
         return ax
@@ -503,19 +538,26 @@ def _values_for_graph_type(
     return outcomes, probs
 
 
-def _graph_colors(
+def _burst_colors(
     cmap: str | Colormap,
     probs: tuple[float, ...],
     alpha: float,
+    *,
+    use_midpoints: bool = True,
 ) -> list[tuple[float, float, float, float]]:
-    cm: Colormap = mpl.colormaps[cmap] if isinstance(cmap, str) else cmap
+    cm: Colormap = plt.colormaps.get_cmap(cmap) if isinstance(cmap, str) else cmap
     total = sum(probs)
     if not total:
         return []
 
     cumul = list(accumulate(probs, initial=0.0))
-    midpoints = [(cumul[i] + cumul[i + 1]) / (2.0 * total) for i in range(len(probs))]
-    return [(r, g, b, alpha) for r, g, b, _ in (cm(m) for m in midpoints)]
+    points = (
+        [(cumul[i] + cumul[i + 1]) / (2.0 * total) for i in range(len(probs))]
+        if use_midpoints
+        else [i / (len(probs) - 1) for i in range(len(probs))]
+    )
+
+    return [(r, g, b, alpha) for r, g, b, _ in (cm(p) for p in points)]
 
 
 def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
