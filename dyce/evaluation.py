@@ -509,7 +509,7 @@ def expand(  # noqa: C901
         )
 
     if current_path_prob == Fraction(1):
-        return h.lowest_terms()
+        return h.lowest_terms(preserve_zero_counts=True)
     return h
 
 

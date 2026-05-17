@@ -33,7 +33,8 @@
 - Renames `#!python H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `#!python H.distribution_xy`.
 - Removes `#!python P.map`, `#!python P.rmap`, and `#!python P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
-- Adds experimental and somewhat inefficient [`H.replace`][dyce.H.replace] method.
+- Adds optional `#!python preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
+- Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Simplifies and consolidates `#!python dyce.evaluation.expandable` and `#!python dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `#!python explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
