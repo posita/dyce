@@ -18,5 +18,5 @@ ignore:
   - "docs/"
   - "helpers/"
   - "_griffe_ext.py"
+  - "_mkdocs_hooks.py"
   - "conftest.py"
-  - "mkdocs_hooks.py"

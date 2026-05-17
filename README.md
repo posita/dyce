@@ -38,7 +38,6 @@ Now you’re playing with …
 **💥 *Now 100% [Bear-ified™](https://beartype.rtfd.io/)!* 👌🏾🐻**
 ([Details](#requirements) below.)
 
-
 `dyce` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
 Its primary applications are:
@@ -67,14 +66,79 @@ Source code is [available on GitHub](https://github.com/posita/dyce).
 
 If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://posita.github.io/dyce/latest/contrib/).
 
-## Donors
+## Installation
 
-When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.
+Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
 
-- [David Eyk](https://eykd.net/about/) not only [inspires others to explore creative writing](https://eykd.net/blog/), but has graciously ceded his PyPI project dedicated to [his own prior work under a similar name](https://code.google.com/archive/p/dyce/).
-  As such, `dyce` is now [available as ~~`dycelib`~~ *`dyce`*](https://pypi.org/project/dyce/)!
-  Thanks to his generosity, ~~millions~~ *dozens* of future `dyce` users will be spared from typing superfluous characters.
-  On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡
+```sh
+% pip install dyce
+...
+```
+
+Alternately, you can download [the source](https://github.com/posita/dyce) and install manually.
+
+```sh
+% git clone https://github.com/posita/dyce.git
+...
+% cd dyce
+% python3 -m pip install .  # -or- python3 -c 'from setuptools import setup ; setup()' install .
+...
+```
+
+### Requirements
+
+`dyce` requires a relatively modern version of Python:
+
+- [CPython](https://www.python.org/) (3.11+)
+- [PyPy](http://pypy.org/) (CPython 3.11+ compatible)
+
+It has the following runtime dependencies:
+
+- [`optype`](https://jorenham.github.io/optype/) for *proper* static and runtime numeric type-checking
+
+`dyce` will opportunistically use the following, if available at runtime:
+
+- [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
+- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz`
+
+See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
+
+## Design philosophy
+
+`dyce` is fairly low-level by design, prioritizing ergonomics and composability.
+It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
+That’s a highfalutin way of saying it doesn’t guess.
+It *knows*, even if knowing is harder or more limiting.
+Which, if we possess a modicum of humility, it often is.
+
+!!! quote
+
+    “It’s frightening to think that you might not know something, but more frightening to think that, by and large, the world is run by people who have faith that they know exactly what is going on.”
+
+    —Amos Tversky
+
+Because `dyce` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
+It can be installed and run anywhere[^2], and modified as desired.
+On its own, `dyce` is completely adequate for casual tinkering.
+However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
+
+[^1]:
+
+    You won’t find any lexers, parsers, or tokenizers in `dyce`’s core, other than straight-up Python.
+    That being said, you can always “roll” your own (see what we did there?) and lean on `dyce` underneath.
+    It doesn’t mind.
+    <!-- TODO(posita): Figure out what we're doing with dyce.r -->
+    <!-- It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/). -->
+
+[^2]:
+
+    <!-- Was: https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/ -->
+    Okay, maybe not *literally* anywhere, but [you’d be surprised](https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Frd64erbk6nj41.jpg).
+    Void where prohibited.
+    [Certain restrictions](#requirements) apply.
+    [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
+
+In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.probability_items`](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) and [`H.format`](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) methods).
 
 ## A taste
 
@@ -170,7 +234,6 @@ Visualization: <a href="https://posita.github.io/dyce/latest/jupyter/lab/?path=2
 ```
 
 <!-- Should match any title of the corresponding plot title -->
-<!-- See https://github.blog/developer-skills/github/how-to-make-your-images-in-markdown-on-github-adjust-for-dark-mode-and-light-mode/ -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
@@ -205,43 +268,6 @@ For deterministic outcomes.
 
 See the tutorials on [counting](https://posita.github.io/dyce/latest/countin/) <!-- and [rolling](https://posita.github.io/dyce/latest/rollin/), --> as well as the [API guide](https://posita.github.io/dyce/latest/dyce/) for much more thorough treatments, including detailed examples.
 
-## Design philosophy
-
-`dyce` is fairly low-level by design, prioritizing ergonomics and composability.
-It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
-That’s a highfalutin way of saying it doesn’t guess.
-It *knows*, even if knowing is harder or more limiting.
-Which, if we possess a modicum of humility, it often is.
-
-!!! quote
-
-    “It’s frightening to think that you might not know something, but more frightening to think that, by and large, the world is run by people who have faith that they know exactly what is going on.”
-
-    —Amos Tversky
-
-Because `dyce` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
-It can be installed and run anywhere[^2], and modified as desired.
-On its own, `dyce` is completely adequate for casual tinkering.
-However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
-
-[^1]:
-
-    You won’t find any lexers, parsers, or tokenizers in `dyce`’s core, other than straight-up Python.
-    That being said, you can always “roll” your own (see what we did there?) and lean on `dyce` underneath.
-    It doesn’t mind.
-    <!-- TODO(posita): Figure out what we're doing with dyce.r -->
-    <!-- It actually [kind of *likes* it](https://posita.github.io/dyce/latest/rollin/). -->
-
-[^2]:
-
-    <!-- Was: https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/ -->
-    Okay, maybe not *literally* anywhere, but [you’d be surprised](https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Frd64erbk6nj41.jpg).
-    Void where prohibited.
-    [Certain restrictions](#requirements) apply.
-    [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
-
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.probability_items`](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) and [`H.format`](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) methods).
-
 ## Other efforts
 
 `dyce`’s goal is to provide ergonomic and idiomatic Python interfaces to reasonably efficient discrete probability computations useful for gaming with minimal dependencies.
@@ -264,48 +290,14 @@ Other works include:
 
 Please consider [contributing an issue](https://posita.github.io/dyce/latest/contrib/) if you observe discrepancies or think something should be added to the list.
 
-## License
+## Donors
 
-`dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the included [`LICENSE`](https://posita.github.io/dyce/latest/license/) file for details.
-Source code is [available on GitHub](https://github.com/posita/dyce).
+When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.
 
-## Installation
-
-Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
-
-```sh
-% pip install dyce
-...
-```
-
-Alternately, you can download [the source](https://github.com/posita/dyce) and install manually.
-
-```sh
-% git clone https://github.com/posita/dyce.git
-...
-% cd dyce
-% python3 -m pip install .  # -or- python3 -c 'from setuptools import setup ; setup()' install .
-...
-```
-
-### Requirements
-
-`dyce` requires a relatively modern version of Python:
-
-- [CPython](https://www.python.org/) (3.11+)
-- [PyPy](http://pypy.org/) (CPython 3.11+ compatible)
-
-It has the following runtime dependencies:
-
-- [`optype`](https://jorenham.github.io/optype/) for *proper* static and runtime numeric type-checking
-
-`dyce` will opportunistically use the following, if available at runtime:
-
-- [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
-- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz`
-
-See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
+- [David Eyk](https://eykd.net/about/) not only [inspires others to explore creative writing](https://eykd.net/blog/), but has graciously ceded his PyPI project dedicated to [his own prior work under a similar name](https://code.google.com/archive/p/dyce/).
+  As such, `dyce` is now [available as ~~`dycelib`~~ *`dyce`*](https://pypi.org/project/dyce/)!
+  Thanks to his generosity, ~~millions~~ *dozens* of future `dyce` users will be spared from typing superfluous characters.
+  On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡
 
 ## Customers [![`dyce`-powered!](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)](https://posita.github.io/dyce/)
 
@@ -342,3 +334,9 @@ As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
   alt="dyce-powered"
   style="vertical-align: middle;"></a>!
 ```
+
+## License
+
+`dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+See the included [`LICENSE`](https://posita.github.io/dyce/latest/license/) file for details.
+Source code is [available on GitHub](https://github.com/posita/dyce).

@@ -24,12 +24,16 @@ from typing import Any, Never, cast
 
 import pytest
 
-from dyce import H, HResult, P, PResult, expand, explode_n
-from dyce.evaluation import TruncationWarning
+from dyce import H, HResult, P, PResult, TruncationWarning, expand, explode_n
 from dyce.lifecycle import ExperimentalWarning
 from dyce.types import BeartypeCallHintViolation
 
 __all__ = ()
+
+
+@pytest.fixture(autouse=True)
+def _suppress_warnings() -> None:
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 class TestExpand:
@@ -50,9 +54,7 @@ class TestExpand:
             assert d10_result.outcome in d10
             return d6_result.outcome + sum(p_2d8_result.roll) + d10_result.outcome
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            assert expand(_fn, d6, p_2d8, d10) == d6 + p_2d8 + d10
+        assert expand(_fn, d6, p_2d8, d10) == d6 + p_2d8 + d10
 
     def test_source_neither_h_nor_p_raises(self) -> None:
         class TotalStr(UserString):
@@ -65,14 +67,10 @@ class TestExpand:
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
             return H({})
 
-        with (  # noqa: PT012
-            pytest.raises(
-                (TypeError, BeartypeCallHintViolation),
-                match=r"\b(unrecognized source type|violates type hint)\b",
-            ),
-            warnings.catch_warnings(),
+        with pytest.raises(
+            (TypeError, BeartypeCallHintViolation),
+            match=r"\b(unrecognized source type|violates type hint)\b",
         ):
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
             expand(_fn, TotalStr("I'm an imposter!"))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
 
     def test_callback_returns_h_with_zero_count_outcomes(self) -> None:
@@ -84,21 +82,13 @@ class TestExpand:
             c = Counter(p_result.roll)
             return H({Result.ONES: c[1], Result.FIVES_OR_SIXES: c[5] + c[6]})
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            assert expand(_fn, 4 @ P(6)) == H(
-                {Result.ONES: 1, Result.FIVES_OR_SIXES: 2}
-            )
+        assert expand(_fn, 4 @ P(6)) == H({Result.ONES: 1, Result.FIVES_OR_SIXES: 2})
 
     def test_no_sources_raises(self) -> None:
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
             return H({})
 
-        with (  # noqa: PT012
-            warnings.catch_warnings(),
-            pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"),
-        ):
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+        with pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"):
             expand(_fn)
 
 
@@ -124,43 +114,36 @@ class TestExpandTruncation:
     )
 
     def test_callback_truncates_itself(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            with pytest.warns(TruncationWarning, match=r"\bpath probability\b"):
-                assert (
-                    expand(
-                        _explode_with_truncation,
-                        H(6),
-                        precision=Fraction(1, 6**4 - 1),
-                    )
-                    == self._D6X_TRUNCATED_AT_3RD_ROLL
-                )
-
-    def test_precision_limit_truncation(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("error")
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+        with pytest.warns(TruncationWarning, match=r"\bpath probability\b"):
             assert (
                 expand(
                     _explode_with_truncation,
                     H(6),
-                    truncate_countdown=3,
+                    precision=Fraction(1, 6**4 - 1),
                 )
                 == self._D6X_TRUNCATED_AT_3RD_ROLL
             )
 
+    def test_precision_limit_truncation(self) -> None:
+        assert (
+            expand(
+                _explode_with_truncation,
+                H(6),
+                truncate_countdown=3,
+            )
+            == self._D6X_TRUNCATED_AT_3RD_ROLL
+        )
+
     def test_recursion_depth_truncation(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
-                assert (
-                    expand(
-                        _explode_with_truncation,
-                        H(6),
-                        rcrs_err_countdown=3,
-                    )
-                    == self._D6X_TRUNCATED_AT_3RD_ROLL
+        with pytest.warns(TruncationWarning, match=r"\brecursion depth exceeded\b"):
+            assert (
+                expand(
+                    _explode_with_truncation,
+                    H(6),
+                    rcrs_err_countdown=3,
                 )
+                == self._D6X_TRUNCATED_AT_3RD_ROLL
+            )
 
     def test_recursion_eventually_truncates(self) -> None:
         # Always_recurses has no base case: every branch hits RecursionError and
@@ -171,10 +154,8 @@ class TestExpandTruncation:
         def _always_recurses(result: HResult[int]) -> H[int] | int:
             return expand(_always_recurses, result.h) + 1  # ty: ignore[unsupported-operator]
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
-                result = expand(_always_recurses, d1)
+        with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
+            result = expand(_always_recurses, d1)
         assert result == H({})
 
 
@@ -189,18 +170,14 @@ class TestExpandTruncationBenchmark:
             return r.outcome * 2
 
         h = H(6)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            benchmark(expand, _callback, h)
+        benchmark(expand, _callback, h)
 
     def test_skip_truncation(self, benchmark: Callable) -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
 
         h = H(6)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            benchmark(expand, _callback, h, precision=Fraction(0))
+        benchmark(expand, _callback, h, precision=Fraction(0))
 
 
 class TestExplodeN:
@@ -208,23 +185,21 @@ class TestExplodeN:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
         x = sympy.symbols("x")
         d6x = H(6) + x
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            assert explode_n(d6x, n=1) == H(
-                {
-                    2 * x + 7: 1,
-                    2 * x + 8: 1,
-                    2 * x + 9: 1,
-                    2 * x + 10: 1,
-                    2 * x + 11: 1,
-                    2 * x + 12: 1,
-                    x + 1: 6,
-                    x + 2: 6,
-                    x + 3: 6,
-                    x + 4: 6,
-                    x + 5: 6,
-                }
-            )
+        assert explode_n(d6x, n=1) == H(
+            {
+                2 * x + 7: 1,
+                2 * x + 8: 1,
+                2 * x + 9: 1,
+                2 * x + 10: 1,
+                2 * x + 11: 1,
+                2 * x + 12: 1,
+                x + 1: 6,
+                x + 2: 6,
+                x + 3: 6,
+                x + 4: 6,
+                x + 5: 6,
+            }
+        )
 
 
 # ---- Helpers -------------------------------------------------------------------------

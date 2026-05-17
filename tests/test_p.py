@@ -16,7 +16,7 @@
 import operator
 import warnings
 from collections import Counter
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Sequence
 from decimal import Decimal
 from fractions import Fraction
 from itertools import chain, combinations_with_replacement, groupby
@@ -29,6 +29,7 @@ import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
+from dyce.lifecycle import ExperimentalWarning
 from dyce.p import (
     _MAX_FILL,
     _MIN_FILL,
@@ -56,6 +57,11 @@ _T = TypeVar("_T")
 
 class _MockableP(P):
     pass
+
+
+@pytest.fixture(autouse=True)
+def _suppress_warnings() -> None:
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 class TestPInit:
@@ -685,11 +691,18 @@ class TestPH:
             pytest.raises(
                 (TypeError, BeartypeCallHintViolation),
                 match=r"\b(unsupported operand type|violates type hint)\b",
-            ),
-            warnings.catch_warnings(record=True),
+            ) as exc_info,
+            warnings.catch_warnings(record=True) as w,
         ):
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             p_weird.h()
+
+        # TODO(posita): # noqa: TD003 - Is this really the right logic? It "works", but
+        # beartype kills the transgression before the warning is emitted (i.e., the
+        # fallback path is taken).
+        if exc_info.type is TypeError:
+            assert len(w) == 1
+            assert issubclass(w[0].category, _ConvolveFallbackWarning)
 
     def test_which_selects_all_shortcuts(self) -> None:
         p = _MockableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
@@ -870,64 +883,54 @@ class TestPHSinglePosFastPath:
     # ---- Homogeneous: fast path taken (rolls_with_counts NOT called) ----
 
     def test_homogeneous_highest_via_suffix_minus1_shortcuts(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")  # order_stat is @experimental
-            p = _MockableP(2 @ P(H(6)))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(-1)
-                mock.assert_not_called()
-                # Verify correctness: max of 2d6 has counts 1, 3, 5, 7, 9, 11.
-                assert result == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
+        p = _MockableP(2 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            result = p.h(-1)
+            mock.assert_not_called()
+            # Verify correctness: max of 2d6 has counts 1, 3, 5, 7, 9, 11.
+            assert result == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
     def test_homogeneous_lowest_via_prefix_1_shortcuts(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(2 @ P(H(6)))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(0)
-                mock.assert_not_called()
-                # Verify correctness: min of 2d6 has counts 11, 9, 7, 5, 3, 1.
-                assert result == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
+        p = _MockableP(2 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            result = p.h(0)
+            mock.assert_not_called()
+            # Verify correctness: min of 2d6 has counts 11, 9, 7, 5, 3, 1.
+            assert result == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 
     def test_homogeneous_middle_via_single_pos_shortcuts(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(5 @ P(H(6)))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(2)  # 3rd-lowest of 5d6
-                mock.assert_not_called()
-                # Cross-check against the same H produced via order_stat directly.
-                assert result == H(6).order_stat_for_n_at_pos(5, 2)
+        p = _MockableP(5 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            result = p.h(2)  # 3rd-lowest of 5d6
+            mock.assert_not_called()
+            # Cross-check against the same H produced via order_stat directly.
+            assert result == H(6).order_stat_for_n_at_pos(5, 2)
 
     def test_homogeneous_via_slice_form_shortcuts(self) -> None:
         # `p.h(slice(2, 3))` should also route through the fast path
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(5 @ P(H(6)))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(slice(2, 3))
-                mock.assert_not_called()
-                assert result == H(6).order_stat_for_n_at_pos(5, 2)
+        p = _MockableP(5 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            result = p.h(slice(2, 3))
+            mock.assert_not_called()
+            assert result == H(6).order_stat_for_n_at_pos(5, 2)
 
     def test_homogeneous_via_negative_int_shortcuts(self) -> None:
         # `p.h(-2)` selects second-from-top on a 5-pool, which is the middle position 3
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(5 @ P(H(6)))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(-2)
-                mock.assert_not_called()
-                assert result == H(6).order_stat_for_n_at_pos(5, 3)
+        p = _MockableP(5 @ P(H(6)))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            result = p.h(-2)
+            mock.assert_not_called()
+            assert result == H(6).order_stat_for_n_at_pos(5, 3)
 
     # ---- Heterogeneous: fast path NOT taken (rolls_with_counts called) ----
 
@@ -968,11 +971,9 @@ class TestPHSinglePosFastPath:
         # A 1-die pool's "highest 1" is just the underlying H itself. This case
         # currently flows through the `len(self) == 1` branch at the top of `P.h(no
         # args)`, but `P.h(-1)` and `P.h(0)` should also work via the new fast path.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(P(H(6)))
-            assert p.h(-1) == H(6)
-            assert p.h(0) == H(6)
+        p = _MockableP(P(H(6)))
+        assert p.h(-1) == H(6)
+        assert p.h(0) == H(6)
 
     # ---- Heterogeneous: per-group decomposition for single-END positions ----
     #
@@ -988,24 +989,20 @@ class TestPHSinglePosFastPath:
     # `rolls_with_counts` internally (separate object), and that's fine.
 
     def test_heterogeneous_max_with_multi_die_group_decomposes(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                _ = p.h(-1)
-                mock.assert_not_called()
+        p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(-1)
+            mock.assert_not_called()
 
     def test_heterogeneous_min_with_multi_die_group_decomposes(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                _ = p.h(0)
-                mock.assert_not_called()
+        p = _MockableP(H(4), 2 @ P(6), 3 @ P(8))
+        with patch.object(
+            p, "rolls_with_counts", side_effect=p.rolls_with_counts
+        ) as mock:
+            _ = p.h(0)
+            mock.assert_not_called()
 
     def test_heterogeneous_all_size_1_groups_falls_through(self) -> None:
         # P(d6, d8).h(-1) -- both groups size 1. No decomposition would change anything.
@@ -1030,32 +1027,28 @@ class TestPHSinglePosFastPath:
     def test_heterogeneous_max_matches_brute_force(self) -> None:
         # Cross-check the decomposed result against brute-force enumeration on a
         # small-enough pool to enumerate fully
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = P(2 @ P(4), 3 @ P(6))
-            via_decomp = p.h(-1)
-            brute: Counter[int] = Counter()
-            for r1 in range(1, 5):
-                for r2 in range(1, 5):
-                    for r3 in range(1, 7):
-                        for r4 in range(1, 7):
-                            for r5 in range(1, 7):
-                                brute[max(r1, r2, r3, r4, r5)] += 1
-            assert dict(via_decomp) == dict(brute)
+        p = P(2 @ P(4), 3 @ P(6))
+        via_decomp = p.h(-1)
+        brute: Counter[int] = Counter()
+        for r1 in range(1, 5):
+            for r2 in range(1, 5):
+                for r3 in range(1, 7):
+                    for r4 in range(1, 7):
+                        for r5 in range(1, 7):
+                            brute[max(r1, r2, r3, r4, r5)] += 1
+        assert dict(via_decomp) == dict(brute)
 
     def test_heterogeneous_min_matches_brute_force(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            p = P(2 @ P(4), 3 @ P(6))
-            via_decomp = p.h(0)
-            brute: Counter[int] = Counter()
-            for r1 in range(1, 5):
-                for r2 in range(1, 5):
-                    for r3 in range(1, 7):
-                        for r4 in range(1, 7):
-                            for r5 in range(1, 7):
-                                brute[min(r1, r2, r3, r4, r5)] += 1
-            assert dict(via_decomp) == dict(brute)
+        p = P(2 @ P(4), 3 @ P(6))
+        via_decomp = p.h(0)
+        brute: Counter[int] = Counter()
+        for r1 in range(1, 5):
+            for r2 in range(1, 5):
+                for r3 in range(1, 7):
+                    for r4 in range(1, 7):
+                        for r5 in range(1, 7):
+                            brute[min(r1, r2, r3, r4, r5)] += 1
+        assert dict(via_decomp) == dict(brute)
 
 
 class TestPRoll:
@@ -1350,7 +1343,28 @@ class TestFillSentinels:
         assert not (_MAX_FILL > _MAX_FILL)
 
 
-# ---- Helpers -------------------------------------------------------------------------
+def test_first_principles() -> None:
+    for n, h, which in (
+        (3, H(6), ()),
+        (3, H((2, 3, 3, 4, 4, 5)), ()),
+        (6, H(4), ()),
+        (3, H({i: i for i in range(1, 11)}), ()),
+        (3, H({i: 11 - i for i in range(1, 11)}), ()),
+        (3, H(6), (0,)),
+        (3, H(6), (1,)),
+        (3, H(6), (-1,)),
+        (4, H((-1, 0, 1)), (0, 2)),
+        (4, H((-1, 0, 1)), (1, 3)),
+    ):
+        brute_force: Counter[RollT[int]] = Counter()
+        multinomial: Counter[RollT[int]] = Counter()
+        for roll, count in _rwc_heterogeneous_brute_force_combinations([h] * n, *which):
+            brute_force[roll] += count
+        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(
+            n, h, *which
+        ):
+            multinomial[roll] += count
+        assert brute_force == multinomial
 
 
 def test_analyze_selection() -> None:
@@ -1493,30 +1507,6 @@ def test_rwc_heterogeneous_extremes_natural_order() -> None:
     assert p.h(0, -1) == from_brute
 
 
-def test_first_principles() -> None:
-    for n, h, which in (
-        (3, H(6), ()),
-        (3, H((2, 3, 3, 4, 4, 5)), ()),
-        (6, H(4), ()),
-        (3, H({i: i for i in range(1, 11)}), ()),
-        (3, H({i: 11 - i for i in range(1, 11)}), ()),
-        (3, H(6), (0,)),
-        (3, H(6), (1,)),
-        (3, H(6), (-1,)),
-        (4, H((-1, 0, 1)), (0, 2)),
-        (4, H((-1, 0, 1)), (1, 3)),
-    ):
-        brute_force: Counter[RollT[int]] = Counter()
-        multinomial: Counter[RollT[int]] = Counter()
-        for roll, count in _rwc_heterogeneous_brute_force_combinations([h] * n, *which):
-            brute_force[roll] += count
-        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(
-            n, h, *which
-        ):
-            multinomial[roll] += count
-        assert brute_force == multinomial
-
-
 # ---- Helpers -------------------------------------------------------------------------
 
 
@@ -1541,7 +1531,7 @@ def _roll_which(roll: RollT[_T], *keys: GetItemT) -> RollT[_T]:
 def _rwc_heterogeneous_brute_force_combinations(
     hs: Sequence[H[_T]],
     *keys: GetItemT,
-) -> Iterator[RollCountT[_T]]:
+) -> Iterable[RollCountT[_T]]:
     r"""Naive Cartesian-product enumeration correct for any count magnitude."""
     for rolls in iproduct(*(h.items() for h in hs)):
         outcomes, counts = tuple(zip(*rolls, strict=True))
@@ -1559,7 +1549,7 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     n: int,
     h: H[_T],
     *keys: GetItemT,
-) -> Iterator[RollCountT[_T]]:
+) -> Iterable[RollCountT[_T]]:
     r"""Independent reference implementation using multinomial coefficients."""
     multinomial_coefficient_numerator = factorial(n)
     for sorted_outcomes_for_roll in combinations_with_replacement(h, n):

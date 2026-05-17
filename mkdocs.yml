@@ -95,10 +95,18 @@ plugins:
             show_signature_annotations: true
 hooks:
   # For copying LICENSE -> docs/license.md and README.md -> docs/index.md
-  - mkdocs_hooks.py
+  - _mkdocs_hooks.py
 
 watch:
+  - LICENSE
+  - README.md
+  - _griffe_ext.py
+  - _mkdocs_hooks.py
+  - docs
   - dyce
+  - jupyter-lite.json
+  - jupyter_lite_config.json
+  - mkdocs.yml
 
 nav:
   - Introduction: index.md

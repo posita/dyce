@@ -15,7 +15,7 @@
 
 import sys
 import warnings
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable
 from contextvars import ContextVar
 from enum import IntEnum, auto
 from fractions import Fraction
@@ -234,11 +234,11 @@ def expand(
     **state: Any,  # noqa: ANN401
 ) -> H[Any]: ...
 def expand(  # noqa: C901
-    callback: Callable[..., Any],
-    *sources: H[Any] | P[Any],
+    callback: Callable,
+    *sources: H | P,
     precision: Fraction = _DEFAULT_PRECISION,
     **state: Any,
-) -> H[Any]:
+) -> H:
     r"""
     !!! warning "Experimental"
 
@@ -430,7 +430,7 @@ def expand(  # noqa: C901
     total_product = prod(s.total for s in sources)
     truncation_reasons: set[_TruncationReason] = set()
 
-    def _gen() -> Iterator[tuple[Any, int]]:
+    def _result_counts() -> Iterable[tuple[Any, int]]:
         for result_counts in iproduct(
             *(_source_to_result_iterable(s) for s in sources)
         ):
@@ -456,7 +456,7 @@ def expand(  # noqa: C901
                 _expand_ctxt.reset(token)
             yield result, combined_count
 
-    def _gen_no_truncate() -> Iterator[tuple[Any, int]]:
+    def _result_counts_no_truncate() -> Iterable[tuple[Any, int]]:
         # When precision is 0, the truncation check can never fire, and branch_path_prob
         # would otherwise only feed nested expand's same dead computation since
         # precision is fixed at outermost. Skip the per-branch Fraction construction.
@@ -490,7 +490,9 @@ def expand(  # noqa: C901
     # Fraction(1)) at every recursion level. Don't treat it as a meaningful cumulative
     # probability indicator for diagnostics or any other purpose outside the truncation
     # check itself when precision is 0.
-    h = aggregate_weighted(_gen() if effective_precision > 0 else _gen_no_truncate())
+    h = aggregate_weighted(
+        _result_counts() if effective_precision > 0 else _result_counts_no_truncate()
+    )
     if _TruncationReason.PROB_BDGT_EXHAUSTED in truncation_reasons:
         warnings.warn(
             f"expand: some branches with path probability < {effective_precision!r} "
@@ -625,9 +627,10 @@ def explode_n(
 # ---- Helpers -------------------------------------------------------------------------
 
 
+@nobeartype
 def _source_to_result_iterable(
-    source: H[Any] | P[Any],
-) -> Iterator[tuple[HResult[Any] | PResult[Any], int]]:
+    source: H | P,
+) -> Iterable[tuple[HResult | PResult, int]]:
     if isinstance(source, H):
         for outcome, count in source.items():
             yield HResult(source, outcome), count

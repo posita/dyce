@@ -18,12 +18,15 @@ from collections.abc import Generator
 
 import pytest
 
-matplotlib = pytest.importorskip("matplotlib")
-matplotlib.use("Agg")
+from dyce import H
+from dyce.lifecycle import ExperimentalWarning
+
+mpl = pytest.importorskip("matplotlib")
+mpl.use("Agg")
 
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.patches import Wedge  # noqa: E402
 
-from dyce import H  # noqa: E402
 from dyce.viz import (  # noqa: E402
     format_outcome_name,
     format_outcome_name_probability,
@@ -37,12 +40,12 @@ __all__ = ()
 
 
 @pytest.fixture(autouse=True)
-def _suppress_experimental() -> None:
-    warnings.filterwarnings("ignore", category=UserWarning)
+def _suppress_warnings() -> None:
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 @pytest.fixture(autouse=True)
-def _close_figures() -> Generator[None, None, None]:
+def _close_figures() -> Generator[None]:
     yield
     plt.close("all")
 
@@ -69,11 +72,24 @@ class TestFormatters:
         assert "16.67%" in result
 
     def test_format_outcome_name_probability(self) -> None:
-        from fractions import Fraction
-
-        result = format_outcome_name_probability(3, Fraction(1, 6), H(6))
-        assert "3" in result
-        assert "16.67%" in result
+        h = 2 @ H(6)
+        labels = tuple(
+            format_outcome_name_probability(outcome, probability, h)
+            for outcome, probability in h.probability_items()
+        )
+        assert labels == (
+            "2\n2.78%",
+            "3\n5.56%",
+            "4\n8.33%",
+            "5\n11.11%",
+            "6\n13.89%",
+            "7\n16.67%",
+            "8\n13.89%",
+            "9\n11.11%",
+            "10\n8.33%",
+            "11\n5.56%",
+            "12\n2.78%",
+        )
 
 
 class TestPlotBar:
@@ -156,6 +172,74 @@ class TestPlotBurst:
 
         returned = plot_burst(H(6), ax=supplied)
         assert returned is supplied
+
+    def test_plot_burst(self) -> None:
+        mpl.use("agg")
+        _, ax = plt.subplots()
+        d6_2 = 2 @ H(6)
+        plot_burst(d6_2, ax=ax)
+        wedge_labels = [
+            w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
+        ]
+        assert len(wedge_labels) == 22
+        assert wedge_labels == [
+            "",  # 2 is hidden
+            "5.56%",
+            "8.33%",
+            "11.11%",
+            "13.89%",
+            "16.67%",
+            "13.89%",
+            "11.11%",
+            "8.33%",
+            "5.56%",
+            "",  # 12 is hidden
+            "",  # 2 is hidden
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "",  # 12 is hidden
+        ]
+
+    def test_plot_burst_outer(self) -> None:
+        mpl.use("agg")
+        _, ax = plt.subplots()
+        d6_2 = 2 @ H(6)
+        plot_burst(d6_2, ax=ax, compare_formatter=format_outcome_name_probability)
+        wedge_labels = [
+            w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
+        ]
+        assert len(wedge_labels) == 22
+        assert wedge_labels == [
+            "",  # 2 is hidden
+            "3\n5.56%",
+            "4\n8.33%",
+            "5\n11.11%",
+            "6\n13.89%",
+            "7\n16.67%",
+            "8\n13.89%",
+            "9\n11.11%",
+            "10\n8.33%",
+            "11\n5.56%",
+            "",  # 12 is hidden
+            "",  # 2 is hidden
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "",  # 12 is hidden
+        ]
 
 
 class TestPlotLine:

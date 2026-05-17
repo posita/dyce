@@ -32,6 +32,7 @@ from typing import (
 
 from .h import H, aggregate_weighted, sum_h
 from .hable import HableOpsMixin
+from .lifecycle import experimental
 from .types import (
     GetItemT,
     Sentinel,
@@ -219,7 +220,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         r"""Constructor."""
         super().__init__()
 
-        def _gen_hs() -> Iterator[H[_T_co]]:
+        def _hs_from_init_vals() -> Iterable[H[_T_co]]:
             for init_val in init_vals:
                 if isinstance(init_val, H):
                     yield init_val
@@ -228,7 +229,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 else:
                     yield H(init_val)
 
-        hs = [h for h in _gen_hs() if h]
+        hs = [h for h in _hs_from_init_vals() if h]
         try:
             hs.sort(key=lambda h: tuple(h.items()))
         except TypeError:
@@ -354,20 +355,23 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         If this is not desired, provide `#!python True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.
         """
 
-        def _gen_by_group() -> Iterator[tuple[H[_T], int]]:
+        def _h_counts_by_group() -> Iterable[tuple[H[_T], int]]:
             for h, hs in groupby(self):
                 yield h, sum(1 for _ in hs)
 
-        def _gen_apply_to_each() -> Iterator[tuple[H[_T], int]]:
+        def _each_h_count_in_self() -> Iterable[tuple[H[_T], int]]:
             yield from ((h, 1) for h in self)
 
-        def _gen_hs() -> Iterator[H[_ResultT]]:
-            for h, count in _gen_apply_to_each() if apply_to_each else _gen_by_group():
+        def _applied_hs() -> Iterable[H[_ResultT]]:
+            for h, count in (
+                _each_h_count_in_self() if apply_to_each else _h_counts_by_group()
+            ):
                 new_h = h.apply(func, other)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
                 yield from (new_h for _ in range(count))
 
-        return P(*_gen_hs())
+        return P(*_applied_hs())
 
+    @experimental
     def apply_to_each_roll(
         self: "P[_T]",
         func: Callable[[RollT[_T]], H[_ResultT] | _ResultT],
@@ -543,7 +547,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # noqa: C901
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterable[RollCountT[_T]]:  # noqa: C901
         r"""
         Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -799,7 +803,7 @@ def _selected_distros_memoized(
     Uses integer arithmetic throughout to avoid `#!python Fraction` overhead.
     """
 
-    def _gen() -> Iterator[RollProbT]:
+    def _roll_probs() -> Iterable[RollProbT]:
         if len(h) <= 1:
             yield tuple(h) * k, 1, 1
         else:
@@ -833,7 +837,7 @@ def _selected_distros_memoized(
                     g = gcd(nmr8r, this_total)
                     yield head, nmr8r // g, this_total // g
 
-    return tuple(_gen())
+    return tuple(_roll_probs())
 
 
 def _rwc_homogeneous_n_h_using_partial_selection(
@@ -841,7 +845,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     h: H[_T],
     k: int,
     fill: _T | None = None,
-) -> Iterator[RollCountT[_T]]:
+) -> Iterable[RollCountT[_T]]:
     r"""
     Yields `#!python (roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
     If *fill* is not `#!python None` and `#!python abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
@@ -868,16 +872,16 @@ def _rwc_homogeneous_n_h_using_partial_selection(
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: None,
-) -> Iterator[RollCountT[_T]]: ...
+) -> Iterable[RollCountT[_T]]: ...
 @overload
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: int,
-) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]: ...
+) -> Iterable[RollCountT[_T | _MinFill | _MaxFill]]: ...
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: int | None,
-) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]:
+) -> Iterable[RollCountT[_T | _MinFill | _MaxFill]]:
     r"""
     Given an iterable of `#!python (histogram, count)` pairs, yields `#!python (roll, count)` pairs for the Cartesian product of all groups.
     When *k* is not `#!python None`, it signals which outcomes are selected, enabling the homogeneous partial-selection optimization within each group.
@@ -917,7 +921,7 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     groups: Iterable[tuple[H[_T], int]],
     lo: int,
     hi: int,
-) -> Iterator[RollCountT[_T]]:
+) -> Iterable[RollCountT[_T]]:
     r"""
     Yields `#!python ((min_val, max_val), count)` pairs for a heterogeneous pool where exactly the single lowest (*lo* = 1) and single highest (*hi* = 1) sorted outcomes are selected.
 
