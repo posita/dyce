@@ -62,7 +62,7 @@ markdown_extensions:
       check_paths: true
   - pymdownx.superfences:
       custom_fences:
-        # Support ```#!math ...``` fence syntax
+        # Support ```math ...``` fence syntax
         - name: math
           class: arithmatex
           format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: generic, tag: pre}}
