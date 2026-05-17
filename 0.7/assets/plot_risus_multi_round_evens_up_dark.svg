@@ -51,17 +51,17 @@ L 64.221667 96.573423
      </g>
      <g id="line2d_2">
       <defs>
-       <path id="me7b566c983" d="M 0 0 
+       <path id="mfbdbcccea6" d="M 0 0 
 L 0 -3.5 
-" style="stroke: #ffffff; stroke-width: 0.8"/>
+" style="stroke: #d9d9d9; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#me7b566c983" x="64.221667" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="64.221667" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(60.174246 269.88811) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(60.174246 269.88811) rotate(-60) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-4c" d="M 628 4666 
 L 1259 4666 
@@ -155,12 +155,12 @@ L 92.965 96.573423
      </g>
      <g id="line2d_4">
       <g>
-       <use xlink:href="#me7b566c983" x="92.965" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="92.965" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(87.748048 273.939485) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(87.748048 273.939485) rotate(-60) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-44" d="M 1259 4147 
 L 1259 519 
@@ -257,12 +257,12 @@ L 121.708333 96.573423
      </g>
      <g id="line2d_6">
       <g>
-       <use xlink:href="#me7b566c983" x="121.708333" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="121.708333" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(119.018335 265.185862) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(119.018335 265.185862) rotate(-60) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-49" d="M 628 4666 
 L 1259 4666 
@@ -301,17 +301,17 @@ L 136.08 110.94509
      </g>
      <g id="line2d_8">
       <defs>
-       <path id="m08e0ffcb65" d="M 0 0 
+       <path id="m9e5c36b75b" d="M 0 0 
 L 3.5 0 
-" style="stroke: #ffffff; stroke-width: 0.8"/>
+" style="stroke: #d9d9d9; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="110.94509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="110.94509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 109.905246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 109.905246) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-6f" d="M 1959 3097 
 Q 1497 3097 1228 2736 
@@ -379,7 +379,7 @@ z
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  1d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 121.103059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 121.103059) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-20" transform="scale(0.015625)"/>
         <path id="DejaVuSans-31" d="M 794 531 
@@ -489,18 +489,18 @@ L 136.08 139.688423
      </g>
      <g id="line2d_10">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="139.688423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="139.688423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 138.64858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 138.64858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 149.846392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 149.846392) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-32" d="M 1228 531 
 L 3431 531 
@@ -544,18 +544,18 @@ L 136.08 168.431757
      </g>
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="168.431757" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="168.431757" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 167.391913) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 167.391913) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 178.589725) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 178.589725) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-33" d="M 2597 2516 
 Q 3050 2419 3304 2112 
@@ -607,18 +607,18 @@ L 136.08 197.17509
      </g>
      <g id="line2d_14">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="197.17509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="197.17509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 196.135246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 196.135246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 207.333059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 207.333059) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-34" d="M 2419 4116 
 L 825 1625 
@@ -657,18 +657,18 @@ L 136.08 225.918423
      </g>
      <g id="line2d_16">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="225.918423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="225.918423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_8">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 224.87858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 224.87858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 236.076392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 236.076392) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-35" d="M 691 4666 
 L 3169 4666 
@@ -985,7 +985,7 @@ z
    </g>
    <g id="text_24">
     <!-- … vs. their 2d6 -->
-    <g style="fill: #ffffff" transform="translate(38.090875 90.573423) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(38.090875 90.573423) scale(0.144 -0.144)">
      <defs>
       <path id="DejaVuSans-76" d="M 191 3500 
 L 800 3500 
@@ -1155,12 +1155,12 @@ L 200.301667 96.573423
      </g>
      <g id="line2d_18">
       <g>
-       <use xlink:href="#me7b566c983" x="200.301667" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="200.301667" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_25">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(196.254246 269.88811) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(196.254246 269.88811) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -1176,12 +1176,12 @@ L 229.045 96.573423
      </g>
      <g id="line2d_20">
       <g>
-       <use xlink:href="#me7b566c983" x="229.045" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="229.045" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_26">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(223.828048 273.939485) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(223.828048 273.939485) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -1197,12 +1197,12 @@ L 257.788333 96.573423
      </g>
      <g id="line2d_22">
       <g>
-       <use xlink:href="#me7b566c983" x="257.788333" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="257.788333" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_27">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(255.098335 265.185862) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(255.098335 265.185862) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -1219,18 +1219,18 @@ L 272.16 110.94509
      </g>
      <g id="line2d_24">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="110.94509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="110.94509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_28">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 109.905246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 109.905246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 121.103059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 121.103059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-32" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1248,18 +1248,18 @@ L 272.16 139.688423
      </g>
      <g id="line2d_26">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="139.688423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="139.688423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_29">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 138.64858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 138.64858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 149.846392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 149.846392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1277,18 +1277,18 @@ L 272.16 168.431757
      </g>
      <g id="line2d_28">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="168.431757" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="168.431757" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_30">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 167.391913) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 167.391913) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 178.589725) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 178.589725) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1306,18 +1306,18 @@ L 272.16 197.17509
      </g>
      <g id="line2d_30">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="197.17509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="197.17509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_31">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 196.135246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 196.135246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 207.333059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 207.333059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1335,18 +1335,18 @@ L 272.16 225.918423
      </g>
      <g id="line2d_32">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="225.918423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="225.918423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_32">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 224.87858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 224.87858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 236.076392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 236.076392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1493,7 +1493,7 @@ L 272.16 96.573423
    </g>
    <g id="text_48">
     <!-- … vs. their 3d6 -->
-    <g style="fill: #ffffff" transform="translate(174.170875 90.573423) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(174.170875 90.573423) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -1535,12 +1535,12 @@ L 336.381667 96.573423
      </g>
      <g id="line2d_34">
       <g>
-       <use xlink:href="#me7b566c983" x="336.381667" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="336.381667" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_49">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(332.334246 269.88811) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(332.334246 269.88811) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -1556,12 +1556,12 @@ L 365.125 96.573423
      </g>
      <g id="line2d_36">
       <g>
-       <use xlink:href="#me7b566c983" x="365.125" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="365.125" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_50">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(359.908048 273.939485) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(359.908048 273.939485) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -1577,12 +1577,12 @@ L 393.868333 96.573423
      </g>
      <g id="line2d_38">
       <g>
-       <use xlink:href="#me7b566c983" x="393.868333" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="393.868333" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_51">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(391.178335 265.185862) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(391.178335 265.185862) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -1599,18 +1599,18 @@ L 408.24 110.94509
      </g>
      <g id="line2d_40">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="110.94509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="110.94509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_52">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 109.905246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 109.905246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 121.103059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 121.103059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1628,18 +1628,18 @@ L 408.24 139.688423
      </g>
      <g id="line2d_42">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="139.688423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="139.688423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_53">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 138.64858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 138.64858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 149.846392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 149.846392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1657,18 +1657,18 @@ L 408.24 168.431757
      </g>
      <g id="line2d_44">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="168.431757" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="168.431757" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_54">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 167.391913) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 167.391913) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 178.589725) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 178.589725) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1686,18 +1686,18 @@ L 408.24 197.17509
      </g>
      <g id="line2d_46">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="197.17509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="197.17509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_55">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 196.135246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 196.135246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 207.333059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 207.333059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -1715,18 +1715,18 @@ L 408.24 225.918423
      </g>
      <g id="line2d_48">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="225.918423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="225.918423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_56">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 224.87858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 224.87858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 236.076392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 236.076392) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-37" d="M 525 4666 
 L 3525 4666 
@@ -1886,7 +1886,7 @@ L 408.24 96.573423
    </g>
    <g id="text_72">
     <!-- … vs. their 4d6 -->
-    <g style="fill: #ffffff" transform="translate(310.250875 90.573423) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(310.250875 90.573423) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -1928,12 +1928,12 @@ L 472.461667 96.573423
      </g>
      <g id="line2d_50">
       <g>
-       <use xlink:href="#me7b566c983" x="472.461667" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="472.461667" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_73">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(468.414246 269.88811) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(468.414246 269.88811) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -1949,12 +1949,12 @@ L 501.205 96.573423
      </g>
      <g id="line2d_52">
       <g>
-       <use xlink:href="#me7b566c983" x="501.205" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="501.205" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_74">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(495.988048 273.939485) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(495.988048 273.939485) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -1970,12 +1970,12 @@ L 529.948333 96.573423
      </g>
      <g id="line2d_54">
       <g>
-       <use xlink:href="#me7b566c983" x="529.948333" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="529.948333" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_75">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(527.258335 265.185862) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(527.258335 265.185862) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -1992,18 +1992,18 @@ L 544.32 110.94509
      </g>
      <g id="line2d_56">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="110.94509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="110.94509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_76">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 109.905246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 109.905246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 121.103059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 121.103059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2021,18 +2021,18 @@ L 544.32 139.688423
      </g>
      <g id="line2d_58">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="139.688423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="139.688423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_77">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 138.64858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 138.64858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 149.846392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 149.846392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2050,18 +2050,18 @@ L 544.32 168.431757
      </g>
      <g id="line2d_60">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="168.431757" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="168.431757" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_78">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 167.391913) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 167.391913) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 178.589725) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 178.589725) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2079,18 +2079,18 @@ L 544.32 197.17509
      </g>
      <g id="line2d_62">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="197.17509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="197.17509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_79">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 196.135246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 196.135246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 207.333059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 207.333059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2108,18 +2108,18 @@ L 544.32 225.918423
      </g>
      <g id="line2d_64">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="225.918423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="225.918423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_80">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 224.87858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 224.87858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 236.076392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 236.076392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2266,7 +2266,7 @@ L 544.32 96.573423
    </g>
    <g id="text_96">
     <!-- … vs. their 5d6 -->
-    <g style="fill: #ffffff" transform="translate(446.330875 90.573423) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(446.330875 90.573423) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -2308,12 +2308,12 @@ L 608.541667 96.573423
      </g>
      <g id="line2d_66">
       <g>
-       <use xlink:href="#me7b566c983" x="608.541667" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="608.541667" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_97">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(604.494246 269.88811) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(604.494246 269.88811) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -2329,12 +2329,12 @@ L 637.285 96.573423
      </g>
      <g id="line2d_68">
       <g>
-       <use xlink:href="#me7b566c983" x="637.285" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="637.285" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_98">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(632.068048 273.939485) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(632.068048 273.939485) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -2350,12 +2350,12 @@ L 666.028333 96.573423
      </g>
      <g id="line2d_70">
       <g>
-       <use xlink:href="#me7b566c983" x="666.028333" y="240.29009" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="666.028333" y="240.29009" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_99">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(663.338335 265.185862) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(663.338335 265.185862) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -2372,18 +2372,18 @@ L 680.4 110.94509
      </g>
      <g id="line2d_72">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="110.94509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="110.94509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_100">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 109.905246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 109.905246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 121.103059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 121.103059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2401,18 +2401,18 @@ L 680.4 139.688423
      </g>
      <g id="line2d_74">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="139.688423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="139.688423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_101">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 138.64858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 138.64858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 149.846392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 149.846392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2430,18 +2430,18 @@ L 680.4 168.431757
      </g>
      <g id="line2d_76">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="168.431757" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="168.431757" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_102">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 167.391913) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 167.391913) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 178.589725) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 178.589725) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2459,18 +2459,18 @@ L 680.4 197.17509
      </g>
      <g id="line2d_78">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="197.17509" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="197.17509" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_103">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 196.135246) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 196.135246) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 207.333059) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 207.333059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2488,18 +2488,18 @@ L 680.4 225.918423
      </g>
      <g id="line2d_80">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="225.918423" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="225.918423" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_104">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 224.87858) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 224.87858) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  9d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 236.076392) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 236.076392) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-39" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2647,7 +2647,7 @@ L 680.4 96.573423
    </g>
    <g id="text_120">
     <!-- … vs. their 6d6 -->
-    <g style="fill: #ffffff" transform="translate(582.410875 90.573423) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(582.410875 90.573423) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -2689,12 +2689,12 @@ L 64.221667 299.888234
      </g>
      <g id="line2d_82">
       <g>
-       <use xlink:href="#me7b566c983" x="64.221667" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="64.221667" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_121">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(60.174246 473.20292) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(60.174246 473.20292) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -2710,12 +2710,12 @@ L 92.965 299.888234
      </g>
      <g id="line2d_84">
       <g>
-       <use xlink:href="#me7b566c983" x="92.965" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="92.965" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_122">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(87.748048 477.254295) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(87.748048 477.254295) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -2731,12 +2731,12 @@ L 121.708333 299.888234
      </g>
      <g id="line2d_86">
       <g>
-       <use xlink:href="#me7b566c983" x="121.708333" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="121.708333" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_123">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(119.018335 468.500673) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(119.018335 468.500673) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -2753,18 +2753,18 @@ L 136.08 314.2599
      </g>
      <g id="line2d_88">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="314.2599" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="314.2599" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_124">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 313.220057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 313.220057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  1d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 324.417869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 324.417869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-31" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2782,18 +2782,18 @@ L 136.08 343.003234
      </g>
      <g id="line2d_90">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="343.003234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="343.003234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_125">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 341.96339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 341.96339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 353.161202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 353.161202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-32" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2811,18 +2811,18 @@ L 136.08 371.746567
      </g>
      <g id="line2d_92">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="371.746567" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="371.746567" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_126">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 370.706723) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 370.706723) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 381.904536) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 381.904536) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2840,18 +2840,18 @@ L 136.08 400.4899
      </g>
      <g id="line2d_94">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="400.4899" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="400.4899" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_127">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 399.450057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 399.450057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 410.647869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 410.647869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -2869,18 +2869,18 @@ L 136.08 429.233234
      </g>
      <g id="line2d_96">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="429.233234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="429.233234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_128">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 428.19339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 428.19339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 439.391202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 439.391202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3028,7 +3028,7 @@ L 136.08 299.888234
    </g>
    <g id="text_144">
     <!-- … vs. their 2d6 -->
-    <g style="fill: #ffffff" transform="translate(38.090875 293.888234) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(38.090875 293.888234) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -3070,12 +3070,12 @@ L 200.301667 299.888234
      </g>
      <g id="line2d_98">
       <g>
-       <use xlink:href="#me7b566c983" x="200.301667" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="200.301667" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_145">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(196.254246 473.20292) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(196.254246 473.20292) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -3091,12 +3091,12 @@ L 229.045 299.888234
      </g>
      <g id="line2d_100">
       <g>
-       <use xlink:href="#me7b566c983" x="229.045" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="229.045" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_146">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(223.828048 477.254295) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(223.828048 477.254295) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -3112,12 +3112,12 @@ L 257.788333 299.888234
      </g>
      <g id="line2d_102">
       <g>
-       <use xlink:href="#me7b566c983" x="257.788333" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="257.788333" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_147">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(255.098335 468.500673) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(255.098335 468.500673) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -3134,18 +3134,18 @@ L 272.16 314.2599
      </g>
      <g id="line2d_104">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="314.2599" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="314.2599" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_148">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 313.220057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 313.220057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 324.417869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 324.417869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-32" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3163,18 +3163,18 @@ L 272.16 343.003234
      </g>
      <g id="line2d_106">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="343.003234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="343.003234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_149">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 341.96339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 341.96339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 353.161202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 353.161202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3192,18 +3192,18 @@ L 272.16 371.746567
      </g>
      <g id="line2d_108">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="371.746567" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="371.746567" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_150">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 370.706723) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 370.706723) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 381.904536) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 381.904536) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3221,18 +3221,18 @@ L 272.16 400.4899
      </g>
      <g id="line2d_110">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="400.4899" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="400.4899" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_151">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 399.450057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 399.450057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 410.647869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 410.647869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3250,18 +3250,18 @@ L 272.16 429.233234
      </g>
      <g id="line2d_112">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="429.233234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="429.233234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_152">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 428.19339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 428.19339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 439.391202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 439.391202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3408,7 +3408,7 @@ L 272.16 299.888234
    </g>
    <g id="text_168">
     <!-- … vs. their 3d6 -->
-    <g style="fill: #ffffff" transform="translate(174.170875 293.888234) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(174.170875 293.888234) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -3450,12 +3450,12 @@ L 336.381667 299.888234
      </g>
      <g id="line2d_114">
       <g>
-       <use xlink:href="#me7b566c983" x="336.381667" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="336.381667" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_169">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(332.334246 473.20292) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(332.334246 473.20292) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -3471,12 +3471,12 @@ L 365.125 299.888234
      </g>
      <g id="line2d_116">
       <g>
-       <use xlink:href="#me7b566c983" x="365.125" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="365.125" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_170">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(359.908048 477.254295) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(359.908048 477.254295) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -3492,12 +3492,12 @@ L 393.868333 299.888234
      </g>
      <g id="line2d_118">
       <g>
-       <use xlink:href="#me7b566c983" x="393.868333" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="393.868333" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_171">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(391.178335 468.500673) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(391.178335 468.500673) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -3514,18 +3514,18 @@ L 408.24 314.2599
      </g>
      <g id="line2d_120">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="314.2599" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="314.2599" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_172">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 313.220057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 313.220057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 324.417869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 324.417869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3543,18 +3543,18 @@ L 408.24 343.003234
      </g>
      <g id="line2d_122">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="343.003234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="343.003234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_173">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 341.96339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 341.96339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 353.161202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 353.161202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3572,18 +3572,18 @@ L 408.24 371.746567
      </g>
      <g id="line2d_124">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="371.746567" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="371.746567" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_174">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 370.706723) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 370.706723) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 381.904536) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 381.904536) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3601,18 +3601,18 @@ L 408.24 400.4899
      </g>
      <g id="line2d_126">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="400.4899" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="400.4899" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_175">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 399.450057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 399.450057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 410.647869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 410.647869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3630,18 +3630,18 @@ L 408.24 429.233234
      </g>
      <g id="line2d_128">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="429.233234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="429.233234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_176">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 428.19339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 428.19339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 439.391202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 439.391202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3788,7 +3788,7 @@ L 408.24 299.888234
    </g>
    <g id="text_192">
     <!-- … vs. their 4d6 -->
-    <g style="fill: #ffffff" transform="translate(310.250875 293.888234) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(310.250875 293.888234) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -3830,12 +3830,12 @@ L 472.461667 299.888234
      </g>
      <g id="line2d_130">
       <g>
-       <use xlink:href="#me7b566c983" x="472.461667" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="472.461667" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_193">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(468.414246 473.20292) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(468.414246 473.20292) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -3851,12 +3851,12 @@ L 501.205 299.888234
      </g>
      <g id="line2d_132">
       <g>
-       <use xlink:href="#me7b566c983" x="501.205" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="501.205" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_194">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(495.988048 477.254295) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(495.988048 477.254295) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -3872,12 +3872,12 @@ L 529.948333 299.888234
      </g>
      <g id="line2d_134">
       <g>
-       <use xlink:href="#me7b566c983" x="529.948333" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="529.948333" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_195">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(527.258335 468.500673) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(527.258335 468.500673) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -3894,18 +3894,18 @@ L 544.32 314.2599
      </g>
      <g id="line2d_136">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="314.2599" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="314.2599" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_196">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 313.220057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 313.220057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 324.417869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 324.417869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3923,18 +3923,18 @@ L 544.32 343.003234
      </g>
      <g id="line2d_138">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="343.003234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="343.003234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_197">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 341.96339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 341.96339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 353.161202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 353.161202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3952,18 +3952,18 @@ L 544.32 371.746567
      </g>
      <g id="line2d_140">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="371.746567" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="371.746567" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_198">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 370.706723) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 370.706723) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 381.904536) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 381.904536) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -3981,18 +3981,18 @@ L 544.32 400.4899
      </g>
      <g id="line2d_142">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="400.4899" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="400.4899" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_199">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 399.450057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 399.450057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 410.647869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 410.647869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4010,18 +4010,18 @@ L 544.32 429.233234
      </g>
      <g id="line2d_144">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="429.233234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="429.233234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_200">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 428.19339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 428.19339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 439.391202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 439.391202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4168,7 +4168,7 @@ L 544.32 299.888234
    </g>
    <g id="text_216">
     <!-- … vs. their 5d6 -->
-    <g style="fill: #ffffff" transform="translate(446.330875 293.888234) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(446.330875 293.888234) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -4210,12 +4210,12 @@ L 608.541667 299.888234
      </g>
      <g id="line2d_146">
       <g>
-       <use xlink:href="#me7b566c983" x="608.541667" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="608.541667" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_217">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(604.494246 473.20292) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(604.494246 473.20292) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -4231,12 +4231,12 @@ L 637.285 299.888234
      </g>
      <g id="line2d_148">
       <g>
-       <use xlink:href="#me7b566c983" x="637.285" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="637.285" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_218">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(632.068048 477.254295) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(632.068048 477.254295) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -4252,12 +4252,12 @@ L 666.028333 299.888234
      </g>
      <g id="line2d_150">
       <g>
-       <use xlink:href="#me7b566c983" x="666.028333" y="443.6049" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="666.028333" y="443.6049" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_219">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(663.338335 468.500673) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(663.338335 468.500673) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -4274,18 +4274,18 @@ L 680.4 314.2599
      </g>
      <g id="line2d_152">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="314.2599" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="314.2599" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_220">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 313.220057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 313.220057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 324.417869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 324.417869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4303,18 +4303,18 @@ L 680.4 343.003234
      </g>
      <g id="line2d_154">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="343.003234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="343.003234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_221">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 341.96339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 341.96339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 353.161202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 353.161202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4332,18 +4332,18 @@ L 680.4 371.746567
      </g>
      <g id="line2d_156">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="371.746567" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="371.746567" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_222">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 370.706723) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 370.706723) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 381.904536) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 381.904536) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4361,18 +4361,18 @@ L 680.4 400.4899
      </g>
      <g id="line2d_158">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="400.4899" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="400.4899" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_223">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 399.450057) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 399.450057) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 410.647869) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 410.647869) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4390,18 +4390,18 @@ L 680.4 429.233234
      </g>
      <g id="line2d_160">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="429.233234" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="429.233234" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_224">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 428.19339) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 428.19339) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  9d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 439.391202) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 439.391202) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-39" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4548,7 +4548,7 @@ L 680.4 299.888234
    </g>
    <g id="text_240">
     <!-- … vs. their 6d6 -->
-    <g style="fill: #ffffff" transform="translate(582.410875 293.888234) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(582.410875 293.888234) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -4590,12 +4590,12 @@ L 64.221667 503.203044
      </g>
      <g id="line2d_162">
       <g>
-       <use xlink:href="#me7b566c983" x="64.221667" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="64.221667" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_241">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(60.174246 676.51773) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(60.174246 676.51773) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -4611,12 +4611,12 @@ L 92.965 503.203044
      </g>
      <g id="line2d_164">
       <g>
-       <use xlink:href="#me7b566c983" x="92.965" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="92.965" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_242">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(87.748048 680.569105) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(87.748048 680.569105) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -4632,12 +4632,12 @@ L 121.708333 503.203044
      </g>
      <g id="line2d_166">
       <g>
-       <use xlink:href="#me7b566c983" x="121.708333" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="121.708333" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_243">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(119.018335 671.815483) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(119.018335 671.815483) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -4654,18 +4654,18 @@ L 136.08 517.574711
      </g>
      <g id="line2d_168">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="517.574711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="517.574711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_244">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 516.534867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 516.534867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  1d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 527.732679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 527.732679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-31" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4683,18 +4683,18 @@ L 136.08 546.318044
      </g>
      <g id="line2d_170">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="546.318044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="546.318044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_245">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 545.2782) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 545.2782) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 556.476013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 556.476013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-32" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4712,18 +4712,18 @@ L 136.08 575.061377
      </g>
      <g id="line2d_172">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="575.061377" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="575.061377" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_246">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 574.021534) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 574.021534) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 585.219346) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 585.219346) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4741,18 +4741,18 @@ L 136.08 603.804711
      </g>
      <g id="line2d_174">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="603.804711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="603.804711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_247">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 602.764867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 602.764867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 613.962679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 613.962679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4770,18 +4770,18 @@ L 136.08 632.548044
      </g>
      <g id="line2d_176">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="49.85" y="632.548044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="49.85" y="632.548044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_248">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(29.782813 631.5082) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(29.782813 631.5082) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(10.920313 642.706013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(10.920313 642.706013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -4929,7 +4929,7 @@ L 136.08 503.203044
    </g>
    <g id="text_264">
     <!-- … vs. their 2d6 -->
-    <g style="fill: #ffffff" transform="translate(38.090875 497.203044) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(38.090875 497.203044) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -4971,12 +4971,12 @@ L 200.301667 503.203044
      </g>
      <g id="line2d_178">
       <g>
-       <use xlink:href="#me7b566c983" x="200.301667" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="200.301667" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_265">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(196.254246 676.51773) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(196.254246 676.51773) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -4992,12 +4992,12 @@ L 229.045 503.203044
      </g>
      <g id="line2d_180">
       <g>
-       <use xlink:href="#me7b566c983" x="229.045" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="229.045" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_266">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(223.828048 680.569105) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(223.828048 680.569105) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -5013,12 +5013,12 @@ L 257.788333 503.203044
      </g>
      <g id="line2d_182">
       <g>
-       <use xlink:href="#me7b566c983" x="257.788333" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="257.788333" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_267">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(255.098335 671.815483) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(255.098335 671.815483) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -5035,18 +5035,18 @@ L 272.16 517.574711
      </g>
      <g id="line2d_184">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="517.574711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="517.574711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_268">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 516.534867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 516.534867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  2d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 527.732679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 527.732679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-32" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5064,18 +5064,18 @@ L 272.16 546.318044
      </g>
      <g id="line2d_186">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="546.318044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="546.318044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_269">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 545.2782) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 545.2782) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 556.476013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 556.476013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5093,18 +5093,18 @@ L 272.16 575.061377
      </g>
      <g id="line2d_188">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="575.061377" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="575.061377" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_270">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 574.021534) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 574.021534) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 585.219346) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 585.219346) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5122,18 +5122,18 @@ L 272.16 603.804711
      </g>
      <g id="line2d_190">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="603.804711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="603.804711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_271">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 602.764867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 602.764867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 613.962679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 613.962679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5151,18 +5151,18 @@ L 272.16 632.548044
      </g>
      <g id="line2d_192">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="185.93" y="632.548044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="185.93" y="632.548044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_272">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(165.862813 631.5082) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(165.862813 631.5082) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(147.000313 642.706013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(147.000313 642.706013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5310,7 +5310,7 @@ L 272.16 503.203044
    </g>
    <g id="text_288">
     <!-- … vs. their 3d6 -->
-    <g style="fill: #ffffff" transform="translate(174.170875 497.203044) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(174.170875 497.203044) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -5352,12 +5352,12 @@ L 336.381667 503.203044
      </g>
      <g id="line2d_194">
       <g>
-       <use xlink:href="#me7b566c983" x="336.381667" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="336.381667" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_289">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(332.334246 676.51773) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(332.334246 676.51773) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -5373,12 +5373,12 @@ L 365.125 503.203044
      </g>
      <g id="line2d_196">
       <g>
-       <use xlink:href="#me7b566c983" x="365.125" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="365.125" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_290">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(359.908048 680.569105) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(359.908048 680.569105) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -5394,12 +5394,12 @@ L 393.868333 503.203044
      </g>
      <g id="line2d_198">
       <g>
-       <use xlink:href="#me7b566c983" x="393.868333" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="393.868333" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_291">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(391.178335 671.815483) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(391.178335 671.815483) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -5416,18 +5416,18 @@ L 408.24 517.574711
      </g>
      <g id="line2d_200">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="517.574711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="517.574711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_292">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 516.534867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 516.534867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  3d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 527.732679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 527.732679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-33" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5445,18 +5445,18 @@ L 408.24 546.318044
      </g>
      <g id="line2d_202">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="546.318044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="546.318044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_293">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 545.2782) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 545.2782) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 556.476013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 556.476013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5474,18 +5474,18 @@ L 408.24 575.061377
      </g>
      <g id="line2d_204">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="575.061377" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="575.061377" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_294">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 574.021534) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 574.021534) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 585.219346) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 585.219346) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5503,18 +5503,18 @@ L 408.24 603.804711
      </g>
      <g id="line2d_206">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="603.804711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="603.804711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_295">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 602.764867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 602.764867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 613.962679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 613.962679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5532,18 +5532,18 @@ L 408.24 632.548044
      </g>
      <g id="line2d_208">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="322.01" y="632.548044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="322.01" y="632.548044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_296">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(301.942813 631.5082) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(301.942813 631.5082) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(283.080312 642.706013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(283.080312 642.706013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5691,7 +5691,7 @@ L 408.24 503.203044
    </g>
    <g id="text_312">
     <!-- … vs. their 4d6 -->
-    <g style="fill: #ffffff" transform="translate(310.250875 497.203044) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(310.250875 497.203044) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -5733,12 +5733,12 @@ L 472.461667 503.203044
      </g>
      <g id="line2d_210">
       <g>
-       <use xlink:href="#me7b566c983" x="472.461667" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="472.461667" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_313">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(468.414246 676.51773) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(468.414246 676.51773) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -5754,12 +5754,12 @@ L 501.205 503.203044
      </g>
      <g id="line2d_212">
       <g>
-       <use xlink:href="#me7b566c983" x="501.205" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="501.205" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_314">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(495.988048 680.569105) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(495.988048 680.569105) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -5775,12 +5775,12 @@ L 529.948333 503.203044
      </g>
      <g id="line2d_214">
       <g>
-       <use xlink:href="#me7b566c983" x="529.948333" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="529.948333" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_315">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(527.258335 671.815483) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(527.258335 671.815483) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -5797,18 +5797,18 @@ L 544.32 517.574711
      </g>
      <g id="line2d_216">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="517.574711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="517.574711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_316">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 516.534867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 516.534867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  4d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 527.732679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 527.732679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-34" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5826,18 +5826,18 @@ L 544.32 546.318044
      </g>
      <g id="line2d_218">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="546.318044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="546.318044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_317">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 545.2782) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 545.2782) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 556.476013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 556.476013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5855,18 +5855,18 @@ L 544.32 575.061377
      </g>
      <g id="line2d_220">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="575.061377" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="575.061377" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_318">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 574.021534) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 574.021534) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 585.219346) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 585.219346) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5884,18 +5884,18 @@ L 544.32 603.804711
      </g>
      <g id="line2d_222">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="603.804711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="603.804711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_319">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 602.764867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 602.764867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 613.962679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 613.962679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -5913,18 +5913,18 @@ L 544.32 632.548044
      </g>
      <g id="line2d_224">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="458.09" y="632.548044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="458.09" y="632.548044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_320">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(438.022812 631.5082) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(438.022812 631.5082) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(419.160312 642.706013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(419.160312 642.706013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6072,7 +6072,7 @@ L 544.32 503.203044
    </g>
    <g id="text_336">
     <!-- … vs. their 5d6 -->
-    <g style="fill: #ffffff" transform="translate(446.330875 497.203044) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(446.330875 497.203044) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -6114,12 +6114,12 @@ L 608.541667 503.203044
      </g>
      <g id="line2d_226">
       <g>
-       <use xlink:href="#me7b566c983" x="608.541667" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="608.541667" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_337">
       <!-- LOSE -->
-      <g style="fill: #ffffff" transform="translate(604.494246 676.51773) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(604.494246 676.51773) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-4c"/>
        <use xlink:href="#DejaVuSans-4f" transform="translate(52.087891 0)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(130.798828 0)"/>
@@ -6135,12 +6135,12 @@ L 637.285 503.203044
      </g>
      <g id="line2d_228">
       <g>
-       <use xlink:href="#me7b566c983" x="637.285" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="637.285" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_338">
       <!-- DRAW -->
-      <g style="fill: #ffffff" transform="translate(632.068048 680.569105) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(632.068048 680.569105) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-44"/>
        <use xlink:href="#DejaVuSans-52" transform="translate(77.001953 0)"/>
        <use xlink:href="#DejaVuSans-41" transform="translate(142.484375 0)"/>
@@ -6156,12 +6156,12 @@ L 666.028333 503.203044
      </g>
      <g id="line2d_230">
       <g>
-       <use xlink:href="#me7b566c983" x="666.028333" y="646.919711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#mfbdbcccea6" x="666.028333" y="646.919711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_339">
       <!-- WIN -->
-      <g style="fill: #ffffff" transform="translate(663.338335 671.815483) rotate(-60) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(663.338335 671.815483) rotate(-60) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-57"/>
        <use xlink:href="#DejaVuSans-49" transform="translate(98.876953 0)"/>
        <use xlink:href="#DejaVuSans-4e" transform="translate(128.369141 0)"/>
@@ -6178,18 +6178,18 @@ L 680.4 517.574711
      </g>
      <g id="line2d_232">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="517.574711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="517.574711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_340">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 516.534867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 516.534867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  5d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 527.732679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 527.732679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-35" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6207,18 +6207,18 @@ L 680.4 546.318044
      </g>
      <g id="line2d_234">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="546.318044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="546.318044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_341">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 545.2782) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 545.2782) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  6d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 556.476013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 556.476013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-36" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6236,18 +6236,18 @@ L 680.4 575.061377
      </g>
      <g id="line2d_236">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="575.061377" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="575.061377" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_342">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 574.021534) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 574.021534) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  7d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 585.219346) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 585.219346) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-37" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6265,18 +6265,18 @@ L 680.4 603.804711
      </g>
      <g id="line2d_238">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="603.804711" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="603.804711" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_343">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 602.764867) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 602.764867) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  8d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 613.962679) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 613.962679) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6294,18 +6294,18 @@ L 680.4 632.548044
      </g>
      <g id="line2d_240">
       <g>
-       <use xlink:href="#m08e0ffcb65" x="594.17" y="632.548044" style="fill: #ffffff; stroke: #ffffff; stroke-width: 0.8"/>
+       <use xlink:href="#m9e5c36b75b" x="594.17" y="632.548044" style="fill: #d9d9d9; stroke: #d9d9d9; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_344">
       <!-- our -->
-      <g style="fill: #ffffff" transform="translate(574.102812 631.5082) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(574.102812 631.5082) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-6f"/>
        <use xlink:href="#DejaVuSans-75" transform="translate(61.181641 0)"/>
        <use xlink:href="#DejaVuSans-72" transform="translate(124.560547 0)"/>
       </g>
       <!--  9d6 … -->
-      <g style="fill: #ffffff" transform="translate(555.240312 642.706013) scale(0.1 -0.1)">
+      <g style="fill: #d9d9d9" transform="translate(555.240312 642.706013) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-20"/>
        <use xlink:href="#DejaVuSans-39" transform="translate(31.787109 0)"/>
        <use xlink:href="#DejaVuSans-64" transform="translate(95.410156 0)"/>
@@ -6453,7 +6453,7 @@ L 680.4 503.203044
    </g>
    <g id="text_360">
     <!-- … vs. their 6d6 -->
-    <g style="fill: #ffffff" transform="translate(582.410875 497.203044) scale(0.144 -0.144)">
+    <g style="fill: #d9d9d9" transform="translate(582.410875 497.203044) scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-2026"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(100 0)"/>
      <use xlink:href="#DejaVuSans-76" transform="translate(131.787109 0)"/>
@@ -6474,7 +6474,7 @@ L 680.4 503.203044
   </g>
   <g id="text_361">
    <!-- Full combat results based on starting pool sizes -->
-   <g style="fill: #ffffff" transform="translate(202.83 22.942125) scale(0.12 -0.12)">
+   <g style="fill: #d9d9d9" transform="translate(202.83 22.942125) scale(0.12 -0.12)">
     <defs>
      <path id="DejaVuSans-46" d="M 628 4666 
 L 3309 4666 
@@ -6749,7 +6749,7 @@ z
     <use xlink:href="#DejaVuSans-73" transform="translate(2327.455078 0)"/>
    </g>
    <!-- Standard (top row) -->
-   <g style="fill: #ffffff" transform="translate(289.065 36.3795) scale(0.12 -0.12)">
+   <g style="fill: #d9d9d9" transform="translate(289.065 36.3795) scale(0.12 -0.12)">
     <defs>
      <path id="DejaVuSans-28" d="M 1984 4856 
 Q 1566 4138 1362 3434 
@@ -6814,7 +6814,7 @@ z
     <use xlink:href="#DejaVuSans-29" transform="translate(903.226562 0)"/>
    </g>
    <!-- Evens Up w/o the Goliath Rule (middle row) -->
-   <g style="fill: #ffffff" transform="translate(215.0175 49.816875) scale(0.12 -0.12)">
+   <g style="fill: #d9d9d9" transform="translate(215.0175 49.816875) scale(0.12 -0.12)">
     <defs>
      <path id="DejaVuSans-55" d="M 556 4666 
 L 1191 4666 
@@ -6910,7 +6910,7 @@ z
     <use xlink:href="#DejaVuSans-29" transform="translate(2137.390625 0)"/>
    </g>
    <!-- Evens Up w/ the Goliath Rule (bottom row) -->
-   <g style="fill: #ffffff" transform="translate(217.476562 63.25425) scale(0.12 -0.12)">
+   <g style="fill: #d9d9d9" transform="translate(217.476562 63.25425) scale(0.12 -0.12)">
     <use xlink:href="#DejaVuSans-45"/>
     <use xlink:href="#DejaVuSans-76" transform="translate(63.183594 0)"/>
     <use xlink:href="#DejaVuSans-65" transform="translate(122.363281 0)"/>

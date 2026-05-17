@@ -1322,7 +1322,7 @@ If the modified value from the action die is strictly greater than both challeng
 If it is strictly greater than only one challenge die, the result is a weak success.
 If it is equal to or less than both challenge dice, it’s a failure.</p>
 <p>A verbose way to model this is to enumerate the product of the three dice and then perform logical comparisons.
-However, if we recognize that our problem involves a <a href="../countin/#dependent-probabilities">dependent probability</a>, we can craft a solution in terms of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.
+However, if we recognize that our problem involves a <a href="../countin/#dependent-probabilities">dependent probability</a>, we can craft a solution in terms of <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>.
 We can also deploy a counting trick with the two d10s.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1428,7 +1428,7 @@ This isn’t quite what we want, since the mechanic calls for rolling a single s
 <p>Now for a <em>twist</em>.
 A failure or success is particularly spectacular when the d10s come up doubles.
 The key to mapping that to <code>dyce</code> internals is recognizing that we have a dependent probability that involves <em>three</em> independent variables: the (modded) d6, a first d10, and a second d10.</p>
-<p><a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> is especially useful where there are multiple independent terms.</p>
+<p><a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> is especially useful where there are multiple independent terms.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1527,7 +1527,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
     <span class="k">for</span> <span class="n">action_mod</span> <span class="ow">in</span> <span class="n">action_mods</span>
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-<p>By defining our dependent term function to include <code class="highlight"><span class="n">mod</span></code> as a keyword-only parameter, we can pass values to it via <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>, which is helpful for visualization.</p>
+<p>By defining our dependent term function to include <code class="highlight"><span class="n">mod</span></code> as a keyword-only parameter, we can pass values to it via <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>, which is helpful for visualization.</p>
 <p>Table:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1791,7 +1791,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
   <source media="(prefers-color-scheme: light)" srcset="../assets/plot_burning_arch_light.svg">
   <img alt="Plot: Attack with saving throw for half damage" src="../assets/plot_burning_arch_light.svg">
 </picture></p>
-<p>An alternative using <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>:</p>
+<p>An alternative using <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -2495,7 +2495,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
-<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
 
@@ -2512,12 +2512,12 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 
 <span class="n">d</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">roll_and_keep_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">roll_and_keep_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> add +1&quot;</span><span class="p">,</span> <span class="n">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">normal</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normal</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -3255,7 +3255,7 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
 </code></pre></div></td></tr></table></div>
 <p>There’s lot going on there.
 Thankfully, it’s heavily annotated.
-It’s worth going back and dissecting as a fairly nuanced application of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.</p>
+It’s worth going back and dissecting as a fairly nuanced application of <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is a complicated example that involves some fairly sophisticated programming techniques (recursion, memoization, nested functions, etc.).

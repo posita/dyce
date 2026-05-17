@@ -1037,7 +1037,7 @@ The above can be expressed more succinctly.</p>
 </code></pre></div></td></tr></table></div>
 <p>Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
-This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="h(*which: GetItemT) -> H[_T]" href="../dyce/#dyce.P.h"><code>P.h</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
+This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="h(*which: GetItemT) -> H[_T]" href="../dyce/#dyce.P.h"><code>P.h</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterable[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
 Indexes can be integers, slices, or a mix thereof.
 Outcome indexes in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., <code class="highlight"><span class="p">[</span><span class="mi">0</span><span class="p">]</span></code>, <code class="highlight"><span class="p">[</span><span class="mi">1</span><span class="p">]</span></code>, …, <code class="highlight"><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span></code>, <code class="highlight"><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></code>).
 Summing the least two faces when rolling three six-sided dice would be:</p>
@@ -1321,12 +1321,12 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 
    -- END MONKEY PATCH -->
 
-<p>Probabilities involving dependent terms can be expressed via a callback passed to <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.
+<p>Probabilities involving dependent terms can be expressed via a callback passed to <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>.
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a function that will be called once for each of the Cartesian product of the results from each independent term.
 Outcomes from independent histogram terms are passed to the dependent function as <a class="autorefs autorefs-internal" href="../dyce/#dyce.HResult"><code>HResult</code> objects</a>.
 Rolls from independent pool terms are passed as <a class="autorefs autorefs-internal" href="../dyce/#dyce.PResult"><code>PResult</code> objects</a>.
-Finally, we pass the dependent function to <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>, along with the independent terms.</p>
+Finally, we pass the dependent function to <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>, along with the independent terms.</p>
 <p>To illustrate, say we want to roll a six-sided die and compare whether the result is strictly greater than its distance from some constant.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1388,7 +1388,7 @@ We’ll roll a four-sided die (d4) and a six-sided die and compare whether the s
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">83.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################################</span>
 </code></pre></div></td></tr></table></div>
-<p>In the alternative, one could nest the <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> call, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
+<p>In the alternative, one could nest the <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> call, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
 However, this isn’t very readable, and is often less efficient than using a single function.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1479,7 +1479,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.</p>
 
    -- END MONKEY PATCH -->
 
-<p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
+<p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
 One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
 This framing is intuitive because it maps to well to reality.
 We might start with the following implementation:</p>
@@ -1572,8 +1572,8 @@ It appears that we went no further than eight rolls (a first roll plus up to sev
 Folks familiar with this domain might recognize the distribution looks <em>mostly</em> correct, but the counts are a bit…<em>off</em>.
 We’re also missing the final outcome of <code class="highlight"><span class="mi">48</span></code>.
 We also got a <a class="autorefs autorefs-internal" href="../dyce/#dyce.TruncationWarning"><code>TruncationWarning</code></a>, which provides a hint.</p>
-<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> from our function.
-(See the <code>#!always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
+<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> from our function.
+(See the <code>#!always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
 We’re not explicitly returning <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:</p>
@@ -1597,11 +1597,11 @@ And the second is when we’ve exhausted the call stack:</p>
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="n">whose</span> <span class="n">recursion</span> <span class="n">depth</span> <span class="n">exceeded</span> <span class="mi">1000</span> <span class="n">were</span> <span class="n">truncated</span>
 </code></pre></div>
-<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>.
+<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>.
 Let’s take a closer look at our implementation now that we know that might happen:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code>       <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>, our function will also return <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for that branch.
+<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>, our function will also return <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for that branch.
 This is because adding <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> to anything is <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">({})</span> <span class="o">+</span> <span class="mi">1024</span>
@@ -1645,7 +1645,7 @@ We can check.</p>
 <p><em>Much</em> better.
 We can now recognize the counts as powers of our maximum face.</p>
 <p>But how can we control the number of explosions?
-Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code class="highlight"><span class="n">precision</span></code> parameter.</p>
+Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code class="highlight"><span class="n">precision</span></code> parameter.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1663,7 +1663,7 @@ Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <p>But that’s fragile and highly domain-specific.
-Instead, we can take advantage of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s ability to pass down arbitrary keyword arguments to make our depth counting explicit.</p>
+Instead, we can take advantage of <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s ability to pass down arbitrary keyword arguments to make our depth counting explicit.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1950,7 +1950,7 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
    -- END MONKEY PATCH -->
 
 <h2 id="visualization">Visualization</h2>
-<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
+<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterable[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
 If <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a> is installed <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> provides plotting conveniences.
 For something more sophisticated, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
 <p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>

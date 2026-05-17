@@ -50,8 +50,9 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     import warnings
 
     import matplotlib as mpl
+    from matplotlib import colors as mcolors
     from matplotlib import pyplot as plt
-    from matplotlib import style
+    from matplotlib import style as mstyle
 
     from dyce.lifecycle import ExperimentalWarning
 
@@ -67,11 +68,12 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
         else args.output_file
     )
     output_path = args.output_dir.resolve().joinpath(output_file)
-    line_color = "white" if args.style == "dark" else "black"
+    line_color = "0.85" if args.style == "dark" else "0.15"
+    bg_color = "0.15" if args.style == "dark" else "0.85"
 
     plt.clf()
     mpl.rcParams["svg.hashsalt"] = "42"
-    style.use("bmh")
+    mstyle.use("bmh")
     _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
     fig_callback(line_color)
     plt.tight_layout()
@@ -79,6 +81,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     plt.savefig(
         output_path,
         dpi=144,
+        facecolor=mcolors.to_rgba(bg_color, alpha=0.0),
         metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
         transparent=True,
     )

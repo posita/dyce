@@ -1678,7 +1678,7 @@
         <p><code class="highlight"><span class="n">dyce</span></code> revolves around two core primitives.
 <a class="autorefs autorefs-internal" href="#dyce.H"><code>H</code> objects</a> are histograms (outcomes or individual dice).
 <a class="autorefs autorefs-internal" href="#dyce.P"><code>P</code> objects</a> are collections of histograms (pools).</p>
-<p>Additionally, <code>dyce</code> provides <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a>, which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
+<p>Additionally, <code>dyce</code> provides <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a>, which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
 It also provides <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="#dyce.explode_n"><code>explode_n</code></a> as a convenient shorthand.</p>
 
 
@@ -4019,7 +4019,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms() 
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_sorted_items_iter</span><span class="p">(</span>
             <span class="n">items</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">]],</span>
-        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
             <span class="n">sorted_items</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">lossless_int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sorted_items</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
@@ -5131,7 +5131,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms() 
             <span class="n">std</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
             <span class="c1"># First pass: collect (outcome_str, probability) pairs and find the widest</span>
             <span class="c1"># outcome representation. We need max_outcome_len before we can emit</span>
             <span class="c1"># anything, because the stats header must align with it.</span>
@@ -5180,7 +5180,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms() 
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">mu</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_parts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_parts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg: </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">yield from</span> <span class="p">(</span>
@@ -5275,14 +5275,14 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms() 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">rational_t</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">]]:</span> <span class="o">...</span>
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span> <span class="o">...</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yield `#!python (outcome, probability)` pairs where each probability is computed as `#!python rational_t(count, total)`.</span>
 
@@ -5649,7 +5649,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_sorted_items_iter</span><span class="p">(</span>
         <span class="n">items</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="n">sorted_items</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">lossless_int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">sorted_items</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
@@ -6672,7 +6672,7 @@ Divide by <code class="highlight"><span class="bp">self</span><span class="o">.<
         <span class="n">std</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># First pass: collect (outcome_str, probability) pairs and find the widest</span>
         <span class="c1"># outcome representation. We need max_outcome_len before we can emit</span>
         <span class="c1"># anything, because the stats header must align with it.</span>
@@ -6779,7 +6779,7 @@ Divide by <code class="highlight"><span class="bp">self</span><span class="o">.<
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_parts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;avg: </span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">yield from</span> <span class="p">(</span>
@@ -7536,16 +7536,16 @@ Raises <code class="highlight"><span class="ne">ValueError</span></code> if the 
 
 
 <h3 id="dyce.H.probability_items" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">probability_items</span><span class="p">(</span><span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">probability_items</span><span class="p">(</span><span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]</span></code>
 
 </h3>
           <div class="doc-overloads">
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">probability_items</span><span class="p">(</span>
     <span class="n">rational_t</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">]]</span>
 </code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">probability_items</span><span class="p">(</span>
     <span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]</span>
 </code></pre></div>          </div>
 
 
@@ -7600,7 +7600,7 @@ Pass any two-argument callable to get a different representation (e.g. <code cla
 <span class="normal">1604</span>
 <span class="normal">1605</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Yield `#!python (outcome, probability)` pairs where each probability is computed as `#!python rational_t(count, total)`.</span>
 
@@ -8137,7 +8137,7 @@ Raises <code class="highlight"><span class="ne">ValueError</span></code> if the 
 
 
 
-        <p>Container passed to an <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a> callback when the corresponding source is an <a class="autorefs autorefs-internal" href="#dyce.H"><code>H</code></a> object.</p>
+        <p>Container passed to an <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a> callback when the corresponding source is an <a class="autorefs autorefs-internal" href="#dyce.H"><code>H</code></a> object.</p>
 
 
 
@@ -9106,8 +9106,7 @@ We all know what you mean.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>dyce/p.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
-<span class="normal">124</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
@@ -9648,7 +9647,11 @@ We all know what you mean.</p>
 <span class="normal">662</span>
 <span class="normal">663</span>
 <span class="normal">664</span>
-<span class="normal">665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An immutable pool (ordered sequence) supporting group operations for zero or more [`H` objects][dyce.H] (provided or created from the [initializer][dyce.P.__init__]’s *args* parameter).</span>
 
@@ -9747,7 +9750,7 @@ We all know what you mean.</p>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constructor.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_gen_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_hs_from_init_vals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]]:</span>
             <span class="k">for</span> <span class="n">init_val</span> <span class="ow">in</span> <span class="n">init_vals</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
                     <span class="k">yield</span> <span class="n">init_val</span>
@@ -9756,7 +9759,7 @@ We all know what you mean.</p>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">H</span><span class="p">(</span><span class="n">init_val</span><span class="p">)</span>
 
-        <span class="n">hs</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">_gen_hs</span><span class="p">()</span> <span class="k">if</span> <span class="n">h</span><span class="p">]</span>
+        <span class="n">hs</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">_hs_from_init_vals</span><span class="p">()</span> <span class="k">if</span> <span class="n">h</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">hs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
@@ -9882,20 +9885,23 @@ We all know what you mean.</p>
 <span class="sd">        If this is not desired, provide `#!python True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_gen_by_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_h_counts_by_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
             <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">hs</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">yield</span> <span class="n">h</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">hs</span><span class="p">)</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_gen_apply_to_each</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_each_h_count_in_self</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
             <span class="k">yield from</span> <span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_gen_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]]:</span>
-            <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">_gen_apply_to_each</span><span class="p">()</span> <span class="k">if</span> <span class="n">apply_to_each</span> <span class="k">else</span> <span class="n">_gen_by_group</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_applied_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]]:</span>
+            <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">_each_h_count_in_self</span><span class="p">()</span> <span class="k">if</span> <span class="n">apply_to_each</span> <span class="k">else</span> <span class="n">_h_counts_by_group</span><span class="p">()</span>
+            <span class="p">):</span>
                 <span class="n">new_h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
                 <span class="k">yield from</span> <span class="p">(</span><span class="n">new_h</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="n">_gen_hs</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="n">_applied_hs</span><span class="p">())</span>
 
+    <span class="nd">@experimental</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_roll</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
         <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ResultT</span><span class="p">],</span>
@@ -10071,7 +10077,7 @@ We all know what you mean.</p>
             <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natural_key</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">roll</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.</span>
 <span class="sd">        Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.</span>
@@ -10253,8 +10259,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">215</span>
-<span class="normal">216</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
@@ -10278,14 +10283,15 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
-<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">240</span>
+<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="n">init_vals</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constructor.&quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_hs_from_init_vals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">init_val</span> <span class="ow">in</span> <span class="n">init_vals</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
                 <span class="k">yield</span> <span class="n">init_val</span>
@@ -10294,7 +10300,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">H</span><span class="p">(</span><span class="n">init_val</span><span class="p">)</span>
 
-    <span class="n">hs</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">_gen_hs</span><span class="p">()</span> <span class="k">if</span> <span class="n">h</span><span class="p">]</span>
+    <span class="n">hs</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">_hs_from_init_vals</span><span class="p">()</span> <span class="k">if</span> <span class="n">h</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">hs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
@@ -10349,8 +10355,7 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
-<span class="normal">342</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">342</span>
 <span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
@@ -10377,7 +10382,10 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 <span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
-<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_h</span><span class="p">(</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_h</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">],</span>
     <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;H[_OtherT] | _OtherT | SentinelT&quot;</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="p">,</span>
@@ -10393,19 +10401,21 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 <span class="sd">    If this is not desired, provide `#!python True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_by_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_h_counts_by_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">hs</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">h</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">hs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_apply_to_each</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_each_h_count_in_self</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">yield from</span> <span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]]:</span>
-        <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">_gen_apply_to_each</span><span class="p">()</span> <span class="k">if</span> <span class="n">apply_to_each</span> <span class="k">else</span> <span class="n">_gen_by_group</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_applied_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]]:</span>
+        <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">_each_h_count_in_self</span><span class="p">()</span> <span class="k">if</span> <span class="n">apply_to_each</span> <span class="k">else</span> <span class="n">_h_counts_by_group</span><span class="p">()</span>
+        <span class="p">):</span>
             <span class="n">new_h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
             <span class="k">yield from</span> <span class="p">(</span><span class="n">new_h</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="n">_gen_hs</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="o">*</span><span class="n">_applied_hs</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -10423,15 +10433,16 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 
     <div class="doc doc-contents ">
 
-        <p>TODO(posita): Fill this out.</p>
+        <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p><code>dyce.p.P.apply_to_each_roll</code> is experimental; its interface may change or it may be removed in a future release.</p>
+</div>
+<p>TODO(posita): Fill this out.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span>
@@ -10441,7 +10452,12 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 <span class="normal">381</span>
 <span class="normal">382</span>
 <span class="normal">383</span>
-<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_roll</span><span class="p">(</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_roll</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ResultT</span><span class="p">],</span>
     <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">,</span>
@@ -10562,11 +10578,7 @@ Identifiers can be <code class="highlight"><span class="nb">int</span></code>s o
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
 <span class="normal">394</span>
@@ -10703,7 +10715,11 @@ Identifiers can be <code class="highlight"><span class="nb">int</span></code>s o
 <span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span>
-<span class="normal">528</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].</span>
 
@@ -10872,11 +10888,7 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">534</span>
 <span class="normal">535</span>
 <span class="normal">536</span>
 <span class="normal">537</span>
@@ -10886,7 +10898,11 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 <span class="normal">541</span>
 <span class="normal">542</span>
 <span class="normal">543</span>
-<span class="normal">544</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns (weighted) random outcomes from contained histograms.</span>
 
@@ -10911,7 +10927,7 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 
 
 <h3 id="dyce.P.rolls_with_counts" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">rolls_with_counts</span><span class="p">(</span><span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">rolls_with_counts</span><span class="p">(</span><span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]</span></code>
 
 </h3>
 
@@ -11006,11 +11022,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
 <span class="normal">553</span>
@@ -11125,7 +11137,11 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 <span class="normal">662</span>
 <span class="normal">663</span>
 <span class="normal">664</span>
-<span class="normal">665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.</span>
 <span class="sd">    Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.</span>
@@ -11276,7 +11292,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
 
 
-        <p>Container passed to an <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a> callback when the corresponding source is a <a class="autorefs autorefs-internal" href="#dyce.P"><code>P</code></a> object.</p>
+        <p>Container passed to an <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a> callback when the corresponding source is a <a class="autorefs autorefs-internal" href="#dyce.P"><code>P</code></a> object.</p>
 
 
 
@@ -11341,7 +11357,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
 
 
-        <p>Issued when results are truncated from <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a> for whatever reason.</p>
+        <p>Issued when results are truncated from <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a> for whatever reason.</p>
 
 
 
@@ -11371,7 +11387,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
 
 <h2 id="dyce.expand" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">expand</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">P</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span> <span class="o">**</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">expand</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">H</span> <span class="o">|</span> <span class="n">P</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span> <span class="o">**</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span></code>
 
 </h2>
           <div class="doc-overloads">
@@ -12063,12 +12079,14 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
 <span class="normal">508</span>
 <span class="normal">509</span>
 <span class="normal">510</span>
-<span class="normal">511</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
-    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">P</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">H</span> <span class="o">|</span> <span class="n">P</span><span class="p">,</span>
     <span class="n">precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span>
     <span class="o">**</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    !!! warning &quot;Experimental&quot;</span>
 
@@ -12260,7 +12278,7 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
     <span class="n">total_product</span> <span class="o">=</span> <span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">total</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">)</span>
     <span class="n">truncation_reasons</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">_TruncationReason</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_result_counts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">result_counts</span> <span class="ow">in</span> <span class="n">iproduct</span><span class="p">(</span>
             <span class="o">*</span><span class="p">(</span><span class="n">_source_to_result_iterable</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">)</span>
         <span class="p">):</span>
@@ -12286,7 +12304,7 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
                 <span class="n">_expand_ctxt</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">result</span><span class="p">,</span> <span class="n">combined_count</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_no_truncate</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_result_counts_no_truncate</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="c1"># When precision is 0, the truncation check can never fire, and branch_path_prob</span>
         <span class="c1"># would otherwise only feed nested expand&#39;s same dead computation since</span>
         <span class="c1"># precision is fixed at outermost. Skip the per-branch Fraction construction.</span>
@@ -12320,7 +12338,9 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
     <span class="c1"># Fraction(1)) at every recursion level. Don&#39;t treat it as a meaningful cumulative</span>
     <span class="c1"># probability indicator for diagnostics or any other purpose outside the truncation</span>
     <span class="c1"># check itself when precision is 0.</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="n">aggregate_weighted</span><span class="p">(</span><span class="n">_gen</span><span class="p">()</span> <span class="k">if</span> <span class="n">effective_precision</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">_gen_no_truncate</span><span class="p">())</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">aggregate_weighted</span><span class="p">(</span>
+        <span class="n">_result_counts</span><span class="p">()</span> <span class="k">if</span> <span class="n">effective_precision</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">_result_counts_no_truncate</span><span class="p">()</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">_TruncationReason</span><span class="o">.</span><span class="n">PROB_BDGT_EXHAUSTED</span> <span class="ow">in</span> <span class="n">truncation_reasons</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;expand: some branches with path probability &lt; </span><span class="si">{</span><span class="n">effective_precision</span><span class="si">!r}</span><span class="s2"> &quot;</span>
@@ -12368,7 +12388,7 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
 
    -- END MONKEY PATCH -->
 
-<p>Convenience wrapper around <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a> for exploding dice.
+<p>Convenience wrapper around <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a> for exploding dice.
 <em>resolver</em> can return either a histogram to indicate the next die to be rolled and accumulated (up to <em>n</em> times) or an outcome.
 The default <em>resolver</em> explodes on the maximum face.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -12397,7 +12417,7 @@ The default <em>resolver</em> explodes on the maximum face.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">explode_n</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-<p><em>precision</em> is forwarded to the outermost <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H[Any]" href="#dyce.expand"><code>expand</code></a> call.
+<p><em>precision</em> is forwarded to the outermost <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="#dyce.expand"><code>expand</code></a> call.
 (See that function for details.)
 With sufficient large values for <em>n</em>, a <a class="autorefs autorefs-internal" href="#dyce.TruncationWarning"><code>TruncationWarning</code></a> will be emitted for branches dropped by exhausting any precision budget.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -12474,9 +12494,7 @@ With sufficient large values for <em>n</em>, a <a class="autorefs autorefs-inter
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/evaluation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span>
 <span class="normal">528</span>
@@ -12573,7 +12591,9 @@ With sufficient large values for <em>n</em>, a <a class="autorefs autorefs-inter
 <span class="normal">619</span>
 <span class="normal">620</span>
 <span class="normal">621</span>
-<span class="normal">622</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">explode_n</span><span class="p">(</span>
     <span class="n">source</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanAdd</span><span class="p">[</span><span class="n">_OtherT</span><span class="p">,</span> <span class="n">_ResultT</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
