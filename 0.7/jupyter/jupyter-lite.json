@@ -25,7 +25,7 @@
       },
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.94495aac41d2fef6ad41.js",
+        "load": "static/remoteEntry.3cd7db059862f41b8c06.js",
         "name": "jupyterlab-jupytext"
       },
       {
@@ -414,7 +414,7 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=b7cfc834fef8686013070a26ede888f50cd12ca6ac84b38728b599ab104ff90e",
+          "./pypi/all.json?sha256=125ea18a31b4fcf6a77045d40a97fd4f5e5fcd6fc1512726fb7f09a28c17c2c6",
           "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=d4147101a35e1f311a860b1b8976d601b6afcad0e777ffb7946bd9ca3fdefbd6"
         ]
       }

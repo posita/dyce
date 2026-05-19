@@ -9155,9 +9155,7 @@ We all know what you mean.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>dyce/p.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
@@ -9700,7 +9698,24 @@ We all know what you mean.</p>
 <span class="normal">666</span>
 <span class="normal">667</span>
 <span class="normal">668</span>
-<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An immutable pool (ordered sequence) supporting group operations for zero or more [`H` objects][dyce.H] (provided or created from the [initializer][dyce.P.__init__]’s *args* parameter).</span>
 
@@ -10051,13 +10066,28 @@ We all know what you mean.</p>
         <span class="c1">#   - `_SelectionSuffix(min_index=-1)` for the highest (pos == n - 1).</span>
         <span class="c1"># Heterogeneous pools and multi-position selections fall through to the existing</span>
         <span class="c1"># `rolls_with_counts` path.</span>
+        <span class="c1">#</span>
+        <span class="c1"># TODO(posita): # noqa: TD003 - As of *right now*, we prevent selection of the</span>
+        <span class="c1"># single-prefix or single-suffix fast path with repeated single selections. The</span>
+        <span class="c1"># fast path can likely support those, but it requires rethinking how we perform</span>
+        <span class="c1"># and communicate selection analysis. The current approach opts for correctness</span>
+        <span class="c1"># over a smaller surface. We&#39;ll likely revisit with a later deep dive into</span>
+        <span class="c1"># performance.</span>
         <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
             <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSinglePos</span><span class="p">):</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionPrefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">max_index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionPrefix</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">max_index</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">is_single_non_repeated</span>
+            <span class="p">):</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSuffix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">min_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSuffix</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">min_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">is_single_non_repeated</span>
+            <span class="p">):</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">pos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Test for homogeneous: all of `self._hs` are equal. `P`</span>
@@ -10308,9 +10338,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
@@ -10333,7 +10361,9 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 <span class="normal">238</span>
 <span class="normal">239</span>
 <span class="normal">240</span>
-<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="n">init_vals</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -10404,9 +10434,7 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">344</span>
 <span class="normal">345</span>
 <span class="normal">346</span>
 <span class="normal">347</span>
@@ -10434,7 +10462,9 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 <span class="normal">369</span>
 <span class="normal">370</span>
 <span class="normal">371</span>
-<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_h</span><span class="p">(</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_h</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">],</span>
     <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;H[_OtherT] | _OtherT | SentinelT&quot;</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="p">,</span>
@@ -10491,9 +10521,7 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">376</span>
 <span class="normal">377</span>
 <span class="normal">378</span>
 <span class="normal">379</span>
@@ -10505,7 +10533,9 @@ If this is not desired, provide <code class="highlight"><span class="kc">True</s
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
-<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_roll</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ResultT</span><span class="p">],</span>
@@ -10627,9 +10657,7 @@ Identifiers can be <code class="highlight"><span class="nb">int</span></code>s o
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">393</span>
 <span class="normal">394</span>
 <span class="normal">395</span>
 <span class="normal">396</span>
@@ -10768,7 +10796,24 @@ Identifiers can be <code class="highlight"><span class="nb">int</span></code>s o
 <span class="normal">529</span>
 <span class="normal">530</span>
 <span class="normal">531</span>
-<span class="normal">532</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].</span>
 
@@ -10852,13 +10897,28 @@ Identifiers can be <code class="highlight"><span class="nb">int</span></code>s o
     <span class="c1">#   - `_SelectionSuffix(min_index=-1)` for the highest (pos == n - 1).</span>
     <span class="c1"># Heterogeneous pools and multi-position selections fall through to the existing</span>
     <span class="c1"># `rolls_with_counts` path.</span>
+    <span class="c1">#</span>
+    <span class="c1"># TODO(posita): # noqa: TD003 - As of *right now*, we prevent selection of the</span>
+    <span class="c1"># single-prefix or single-suffix fast path with repeated single selections. The</span>
+    <span class="c1"># fast path can likely support those, but it requires rethinking how we perform</span>
+    <span class="c1"># and communicate selection analysis. The current approach opts for correctness</span>
+    <span class="c1"># over a smaller surface. We&#39;ll likely revisit with a later deep dive into</span>
+    <span class="c1"># performance.</span>
     <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
         <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSinglePos</span><span class="p">):</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionPrefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">max_index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionPrefix</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">max_index</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">is_single_non_repeated</span>
+        <span class="p">):</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSuffix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">min_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">_SelectionSuffix</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">min_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">is_single_non_repeated</span>
+        <span class="p">):</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">pos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Test for homogeneous: all of `self._hs` are equal. `P`</span>
@@ -10937,21 +10997,21 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns (weighted) random outcomes from contained histograms.</span>
 
@@ -11071,24 +11131,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">567</span>
 <span class="normal">568</span>
 <span class="normal">569</span>
 <span class="normal">570</span>
@@ -11190,7 +11233,24 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 <span class="normal">666</span>
 <span class="normal">667</span>
 <span class="normal">668</span>
-<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.</span>
 <span class="sd">    Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.</span>
