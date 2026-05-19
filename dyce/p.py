@@ -99,6 +99,7 @@ class _SelectionPrefix:
     """
 
     max_index: int  # positive; positions [0..max_index)
+    is_single_non_repeated: bool  # True if it is a single selection at max_index
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,6 +109,7 @@ class _SelectionSuffix:
     """
 
     min_index: int  # negative; positions [min_index..n)
+    is_single_non_repeated: bool  # True if it is a single selection at min_index
 
 
 _SelectionResult = (
@@ -472,13 +474,28 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         #   - `_SelectionSuffix(min_index=-1)` for the highest (pos == n - 1).
         # Heterogeneous pools and multi-position selections fall through to the existing
         # `rolls_with_counts` path.
+        #
+        # TODO(posita): # noqa: TD003 - As of *right now*, we prevent selection of the
+        # single-prefix or single-suffix fast path with repeated single selections. The
+        # fast path can likely support those, but it requires rethinking how we perform
+        # and communicate selection analysis. The current approach opts for correctness
+        # over a smaller surface. We'll likely revisit with a later deep dive into
+        # performance.
         if n:
             pos: int | None = None
             if isinstance(i, _SelectionSinglePos):
                 pos = i.pos
-            elif isinstance(i, _SelectionPrefix) and i.max_index == 1:
+            elif (
+                isinstance(i, _SelectionPrefix)
+                and i.max_index == 1
+                and i.is_single_non_repeated
+            ):
                 pos = 0
-            elif isinstance(i, _SelectionSuffix) and i.min_index == -1:
+            elif (
+                isinstance(i, _SelectionSuffix)
+                and i.min_index == -1
+                and i.is_single_non_repeated
+            ):
                 pos = n - 1
             if pos is not None:
                 # Test for homogeneous: all of `self._hs` are equal. `P`
@@ -741,10 +758,12 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     - [`_SelectionEmpty`][dyce.p._SelectionEmpty]: *which* selects zero positions
     - [`_SelectionUniform(times)`][dyce.p._SelectionUniform]: *which* selects every position exactly *times* times
     - [`_SelectionSinglePos(pos)`][dyce.p._SelectionSinglePos]: *which* selects exactly one distinct true-middle position with multiplicity 1 (`#!python 0 < pos < n - 1`)
-    - [`_SelectionPrefix(max_index)`][dyce.p._SelectionPrefix]: *which* selects positions `#!python [0..max_index)` only
-    - [`_SelectionSuffix(min_index)`][dyce.p._SelectionSuffix]: *which* selects positions `#!python [min_index..n)` only
+    - [`_SelectionPrefix(max_index, is_single_non_repeated=...)`][dyce.p._SelectionPrefix]: *which* selects positions `#!python [0..max_index)` only
+    - [`_SelectionSuffix(min_index, is_single_non_repeated=...)`][dyce.p._SelectionSuffix]: *which* selects positions `#!python [min_index..n)` only
     - [`_SelectionExtremes(lo, hi)`][dyce.p._SelectionExtremes]: *which* selects exactly the *lo* lowest and *hi* highest positions with at least one unselected interior position
     - `#!python None`: any other (arbitrary) selection
+
+    For `#!python _SelectionPrefix` and `#!python _SelectionSuffix`, *single* is `#!python True` iff a single selection has been made and `#! max_index==1` (Prefix) or `#! min_index==1` (Suffix).
     """
     indexes = tuple(range(n))
     counts_by_index: Counter[int] = Counter(getitems(indexes, which))
@@ -756,36 +775,40 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     distinct_counts = set(counts_by_index.values())
     min_index = min(found_indexes)
     max_index = max(found_indexes) + 1
+    is_single_non_repeated = len(found_indexes) == 1 and distinct_counts == {1}
     # Single-position selection at a true-middle index (i.e. not 0 or n-1) with
     # multiplicity 1. End positions deliberately fall through to _SelectionPrefix(1) /
     # _SelectionSuffix(-1) for backward compatibility with `rolls_with_counts`.
-    if len(found_indexes) == 1 and distinct_counts == {1} and 0 < min_index < n - 1:
+    if is_single_non_repeated and 0 < min_index < n - 1:
         return _SelectionSinglePos(pos=min_index)
-    if max_index - min_index == n:
-        if not missing_indexes and len(distinct_counts) == 1:
-            return _SelectionUniform(times=distinct_counts.pop())
-        elif len(distinct_counts) == 1:
-            # Check for lo-from-left + hi-from-right pattern with a gap in the middle.
-            # Because max_index - min_index == n we know min_index == 0 and max_index ==
-            # n, so positions 0 and n-1 are both selected.
-            sorted_found = sorted(found_indexes)
-            # Walk the left side until we find a gap
-            lo = 0
-            while lo < len(sorted_found) and sorted_found[lo] == lo:
-                lo += 1
-            # Walk the right side until we find a gap
-            hi = 0
-            while hi < len(sorted_found) and sorted_found[-(hi + 1)] == n - 1 - hi:
-                hi += 1
-            # If we can account for everything by walking in from both sides, we know
-            # any remaining gap is contiguous
-            if lo + hi == len(sorted_found):
-                return _SelectionExtremes(lo=lo, hi=hi)
-        return None
-    elif min_index > n - max_index:
-        return _SelectionSuffix(min_index=min_index - n)
-    else:
-        return _SelectionPrefix(max_index=max_index)
+    if min_index > n - max_index:
+        return _SelectionSuffix(
+            min_index=min_index - n, is_single_non_repeated=is_single_non_repeated
+        )
+    elif max_index - min_index < n:
+        return _SelectionPrefix(
+            max_index=max_index, is_single_non_repeated=is_single_non_repeated
+        )
+    elif not missing_indexes and len(distinct_counts) == 1:
+        return _SelectionUniform(times=distinct_counts.pop())
+    elif len(distinct_counts) == 1:
+        # Check for lo-from-left + hi-from-right pattern with a gap in the middle.
+        # Because max_index - min_index == n we know min_index == 0 and max_index ==
+        # n, so positions 0 and n-1 are both selected.
+        sorted_found = sorted(found_indexes)
+        # Walk the left side until we find a gap
+        lo = 0
+        while lo < len(sorted_found) and sorted_found[lo] == lo:
+            lo += 1
+        # Walk the right side until we find a gap
+        hi = 0
+        while hi < len(sorted_found) and sorted_found[-(hi + 1)] == n - 1 - hi:
+            hi += 1
+        # If we can account for everything by walking in from both sides, we know
+        # any remaining gap is contiguous
+        if lo + hi == len(sorted_found):
+            return _SelectionExtremes(lo=lo, hi=hi)
+    return None
 
 
 @lru_cache(maxsize=2048)
