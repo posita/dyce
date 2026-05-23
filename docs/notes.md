@@ -47,6 +47,7 @@
     - `#!python dyce.h.coalesce_replace`
     - `#!python dyce.h.resolve_dependent_probability`
     - `#!python dyce.h.sum_h` (not previously deprecated, but to-date unused)
+- Adds [`dyce.d`][dyce.d] convenience aliases.
 - Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype)
 - Completely eliminates dependency on [`numerary`](https://github.com/beartype/numerary/) (which was flawed since conception), and instead relies on [`optype`](https://jorenham.github.io/optype/) for mathematical operator typing.
   ([`H`][dyce.H] and [`P`][dyce.P] still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)
