@@ -72,16 +72,16 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     bg_color = "0.15" if args.style == "dark" else "0.85"
 
     plt.clf()
-    mpl.rcParams["svg.hashsalt"] = "42"
     mstyle.use("bmh")
     _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
     fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
-    plt.savefig(
-        output_path,
-        dpi=144,
-        facecolor=mcolors.to_rgba(bg_color, alpha=0.0),
-        metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
-        transparent=True,
-    )
+    with mpl.rc_context({"svg.hashsalt": "dyce"}):
+        plt.savefig(
+            output_path,
+            dpi=144,
+            facecolor=mcolors.to_rgba(bg_color, alpha=0.0),
+            metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
+            transparent=True,
+        )
