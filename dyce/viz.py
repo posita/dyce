@@ -84,7 +84,7 @@ Return an empty string to suppress the label for that wedge.
 """
 
 _DEFAULT_ALPHA: float = 0.75
-_DEFAULT_MARKERS: str = "oX^v><dP"
+_DEFAULT_MARKERS: str = "oX^v><dsP"
 _LABEL_LIM: Fraction = Fraction(1, 2**5)  # suppress burst labels below ~3.1%
 
 _formatter: BurstFormatterT
