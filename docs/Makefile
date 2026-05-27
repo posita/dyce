@@ -89,14 +89,8 @@ assets/plot_risus_multi_round_best_of_set_light.svg \
 assets/plot_risus_multi_round_evens_up_light.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style light --output-dir assets
 
-assets/plot_%_dark.png : assets/plot_%.py assets/_plot.py ../dyce/*.py
-	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style dark --output-file $@
-
 assets/plot_%_dark.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style dark --output-file $@
-
-assets/plot_%_light.png : assets/plot_%.py assets/_plot.py ../dyce/*.py
-	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
 
 assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
