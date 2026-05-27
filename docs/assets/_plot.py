@@ -29,7 +29,7 @@ _PARSER.add_argument(
     "--output-file",
     type=Path,
     metavar="PATH",
-    help="the file to which to save the output image (relative to -d if not absolute) (default is a PNG constructed from name and style)",
+    help="the file to which to save the output image (relative to -d if not absolute) (default is an SVG constructed from name and style)",
 )
 _PARSER.add_argument(
     "--log-level",
@@ -63,7 +63,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
         format="%(levelname)s: %(message)s",
     )
     output_file = (
-        Path(f"{Path(sys.argv[0]).stem}_{args.style}.png")
+        Path(f"{Path(sys.argv[0]).stem}_{args.style}.svg")
         if not args.output_file
         else args.output_file
     )
