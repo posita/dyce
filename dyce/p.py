@@ -831,12 +831,7 @@ def _selected_distros_memoized(
             yield tuple(h) * k, 1, 1
         else:
             this_total = h.total**n
-            try:
-                this_outcome = max(h) if from_right else min(h)  # type: ignore[type-var]
-            except TypeError:
-                this_outcome = (
-                    max(h, key=natural_key) if from_right else min(h, key=natural_key)
-                )
+            this_outcome = next(reversed(tuple(h))) if from_right else next(iter(h))
             c_outcome = h[this_outcome]
             rest_total = h.total - c_outcome
             next_h: H[_T] = H({o: c for o, c in h.items() if o != this_outcome})
