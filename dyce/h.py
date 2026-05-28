@@ -1690,11 +1690,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             d[repl] = d.get(repl, 0) + existing_outcome_count
         return H(d)
 
+    @experimental
     def roll(self: "H[_T]") -> _T:
         r"""
         Returns a (weighted) random outcome.
 
         <!-- BEGIN MONKEY PATCH --
+        >>> import warnings
+        >>> from dyce.lifecycle import ExperimentalWarning
+        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
         For deterministic outcomes.
 
         >>> import random
@@ -1706,6 +1711,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> d6 = H(6)
             >>> [d6.roll() for _ in range(10)]
             [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
+
+        <!-- BEGIN MONKEY PATCH --
+        >>> warnings.resetwarnings()
         """
         if not self:
             raise ValueError("no outcomes from which to select in empty histogram")
