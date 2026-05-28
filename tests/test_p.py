@@ -266,7 +266,7 @@ class TestPSequence:
     def test_ordering_invariant(self) -> None:
         assert P(8, 6, 4)[0] == P(8, 4, 6)[0] == H(4)
 
-    def test_getitem_complex(self) -> None:
+    def test_getitem(self) -> None:
         d4n = H(-4)
         d8 = H(8)
         p = 3 @ P(d4n, d8)
@@ -278,6 +278,78 @@ class TestPSequence:
         assert p[:0] == P()
         assert p[6:] == P()
         assert p[2:4] == P(d4n, d8)
+
+    def test_getitem_heterogeneous_index_negative(self) -> None:
+        p = P(7 @ P(4), 11 @ P(6), 13 @ P(8), 17 @ P(10))
+        for i in range(-1, -1 - 17, -1):
+            assert p[i] == H(10)
+        for i in range(-1 - 17, -1 - 17 - 13, -1):
+            assert p[i] == H(8)
+        for i in range(-1 - 17 - 13, -1 - 17 - 13 - 11, -1):
+            assert p[i] == H(6)
+        for i in range(-1 - 17 - 13 - 11, -1 - 17 - 13 - 11 - 7, -1):
+            assert p[i] == H(4)
+        with pytest.raises(IndexError):
+            p[-1 - 17 - 13 - 11 - 7]
+
+    def test_getitem_heterogeneous_index_positive(self) -> None:
+        p = P(7 @ P(4), 11 @ P(6), 13 @ P(8), 17 @ P(10))
+        for i in range(7):
+            assert p[i] == H(4)
+        for i in range(7, 7 + 11):
+            assert p[i] == H(6)
+        for i in range(7 + 11, 7 + 11 + 13):
+            assert p[i] == H(8)
+        for i in range(7 + 11 + 13, 7 + 11 + 13 + 17):
+            assert p[i] == H(10)
+        with pytest.raises(IndexError):
+            p[7 + 11 + 13 + 17]
+
+    def test_getitem_heterogeneous_slice_negative(self) -> None:
+        p = P(7 @ P(4), 11 @ P(6), 13 @ P(8), 17 @ P(10))
+        assert p[-17:] == 17 @ P(10)
+        assert p[: -1 - 17 : -1] == 17 @ P(10)
+        assert p[-17 - 3 : -17 + 3] == P(3 @ P(8), 3 @ P(10))
+        assert p[-17 - 3 : -17 + 3 : 2] == P(2 @ P(8), P(10))
+        assert p[-17 + 2 : -17 - 4 : -1] == P(3 @ P(8), 3 @ P(10))
+        assert p[-17 + 2 : -17 - 4 : -2] == P(P(8), 2 @ P(10))
+        assert p[-17 - 13 : -17] == 13 @ P(8)
+        assert p[-1 - 17 : -1 - 17 - 13 : -1] == 13 @ P(8)
+        assert p[-17 - 13 - 3 : -17 - 13 + 3] == P(3 @ P(6), 3 @ P(8))
+        assert p[-17 - 13 - 3 : -17 - 13 + 3 : 2] == P(2 @ P(6), P(8))
+        assert p[-17 - 13 + 2 : -17 - 13 - 4 : -1] == P(3 @ P(6), 3 @ P(8))
+        assert p[-17 - 13 + 2 : -17 - 13 - 4 : -2] == P(P(6), 2 @ P(8))
+        assert p[-17 - 13 - 11 : -17 - 13] == 11 @ P(6)
+        assert p[-1 - 17 - 13 : -1 - 17 - 13 - 11 : -1] == 11 @ P(6)
+        assert p[-17 - 13 - 11 - 3 : -17 - 13 - 11 + 3] == P(3 @ P(4), 3 @ P(6))
+        assert p[-17 - 13 - 11 - 3 : -17 - 13 - 11 + 3 : 2] == P(2 @ P(4), P(6))
+        assert p[-17 - 13 - 11 + 2 : -17 - 13 - 11 - 4 : -1] == P(3 @ P(4), 3 @ P(6))
+        assert p[-17 - 13 - 11 + 2 : -17 - 13 - 11 - 4 : -2] == P(P(4), 2 @ P(6))
+        assert p[: -17 - 13 - 11] == 7 @ P(4)
+        assert p[-1 - 17 - 13 - 11 :: -1] == 7 @ P(4)
+
+    def test_getitem_heterogeneous_slice_positive(self) -> None:
+        p = P(7 @ P(4), 11 @ P(6), 13 @ P(8), 17 @ P(10))
+        assert p[:7] == 7 @ P(4)
+        assert p[7 - 1 :: -1] == 7 @ P(4)
+        assert p[7 - 3 : 7 + 3] == P(3 @ P(4), 3 @ P(6))
+        assert p[7 - 3 : 7 + 3 : 2] == P(2 @ P(4), P(6))
+        assert p[7 + 2 : 7 - 4 : -1] == P(3 @ P(4), 3 @ P(6))
+        assert p[7 + 2 : 7 - 4 : -2] == P(P(4), 2 @ P(6))
+        assert p[7 : 7 + 11] == 11 @ P(6)
+        assert p[7 + 11 - 1 : 7 - 1 : -1] == 11 @ P(6)
+        assert p[7 + 11 - 3 : 7 + 11 + 3] == P(3 @ P(6), 3 @ P(8))
+        assert p[7 + 11 - 3 : 7 + 11 + 3 : 2] == P(2 @ P(6), P(8))
+        assert p[7 + 11 + 2 : 7 + 11 - 4 : -1] == P(3 @ P(6), 3 @ P(8))
+        assert p[7 + 11 + 2 : 7 + 11 - 4 : -2] == P(P(6), 2 @ P(8))
+        assert p[7 + 11 : 7 + 11 + 13] == 13 @ P(8)
+        assert p[7 + 11 + 13 - 1 : 7 + 11 - 1 : -1] == 13 @ P(8)
+        assert p[7 + 11 + 13 - 3 : 7 + 11 + 13 + 3] == P(3 @ P(8), 3 @ P(10))
+        assert p[7 + 11 + 13 - 3 : 7 + 11 + 13 + 3 : 2] == P(2 @ P(8), P(10))
+        assert p[7 + 11 + 13 + 2 : 7 + 11 + 13 - 4 : -1] == P(3 @ P(8), 3 @ P(10))
+        assert p[7 + 11 + 13 + 2 : 7 + 11 + 13 - 4 : -2] == P(P(8), 2 @ P(10))
+        assert p[7 + 11 + 13 :] == 17 @ P(10)
+        assert p[: 7 + 11 + 13 - 1 : -1] == 17 @ P(10)
 
     def test_iter_empty(self) -> None:
         assert list(P()) == []

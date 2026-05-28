@@ -14,14 +14,16 @@
 # ======================================================================================
 
 import operator
+from bisect import bisect_right
 from collections import Counter
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
-from itertools import chain, groupby, product, repeat, starmap
+from itertools import chain, product, starmap
 from math import comb, gcd, prod
 from typing import (
     Any,
+    Literal,
     Never,
     SupportsIndex,
     SupportsInt,
@@ -200,8 +202,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     """
 
     __slots__ = (
+        "_h_groups",
         "_hash",
-        "_hs",
+        "_len",
         "_total",
     )
 
@@ -221,52 +224,56 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     ) -> None:
         r"""Constructor."""
         super().__init__()
+        self._h_groups: dict[H[_T_co], int]
+        h_counts: Counter[H[_T_co]] = Counter()
 
-        def _hs_from_init_vals() -> Iterator[H[_T_co]]:
-            for init_val in init_vals:
-                if isinstance(init_val, H):
-                    yield init_val
-                elif isinstance(init_val, P):
-                    yield from init_val._hs  # noqa: SLF001
-                else:
-                    yield H(init_val)
+        for init_val in init_vals:
+            if isinstance(init_val, H):
+                h_counts[init_val] += 1
+            elif isinstance(init_val, P):
+                h_counts.update(dict(init_val._h_groups.items()))  # noqa: SLF001
+            else:
+                h_counts[H(init_val)] += 1
 
-        hs = [h for h in _hs_from_init_vals() if h]
         try:
-            hs.sort(key=lambda h: tuple(h.items()))
+            self._h_groups = {
+                h: h_counts[h]
+                for h in sorted(h_counts, key=lambda h: tuple(h.items()))
+                if h
+            }
         except TypeError:
             # For Hs whose outcomes don't support direct comparisons (e.g. symbolic
             # types)
-            hs.sort(key=lambda h: natural_key(h.items()))
-        self._hs: tuple[H[_T_co], ...] = tuple(hs)
+            self._h_groups = {
+                h: h_counts[h]
+                for h in sorted(h_counts, key=lambda h: natural_key(h.items()))
+                if h
+            }
         self._hash: int | None = None
+        self._len = sum(self._h_groups.values())
         self._total: int | None = None
 
     # ---- Overrides -------------------------------------------------------------------
 
     def __hash__(self) -> int:
         if self._hash is None:
-            self._hash = hash((type(self), *self._hs))
+            self._hash = hash((type(self), *self._h_groups.items()))
         return self._hash
 
     def __repr__(self) -> str:
-        group_counters: dict[H[_T_co], int] = {}
-        for h, hs in groupby(self):
-            group_counters[h] = sum(1 for _ in hs)
-
         def _n_at(h: H[_T_co], n: int) -> str:
             return repr(h) if n == 1 else f"{n}@{type(self).__name__}({h!r})"
 
-        if len(group_counters) == 1:
-            h, n = next(iter(group_counters.items()))
-            return f"{type(self).__name__}({_n_at(h, 1)})" if n == 1 else _n_at(h, n)
+        if len(self._h_groups) == 1:
+            h, hn = next(iter(self._h_groups.items()))
+            return f"{type(self).__name__}({_n_at(h, 1)})" if hn == 1 else _n_at(h, hn)
         else:
-            inner = ", ".join(starmap(_n_at, group_counters.items()))
+            inner = ", ".join(starmap(_n_at, self._h_groups.items()))
             return f"{type(self).__name__}({inner})"
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, P):
-            return self._hs == other._hs
+            return self._h_groups == other._h_groups
         return NotImplemented
 
     # ---- Sequence abstract methods ---------------------------------------------------
@@ -277,31 +284,68 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def __getitem__(self: "P[_T]", key: slice) -> "P[_T]": ...
     @nobeartype  # TODO(posita): <https://github.com/beartype/beartype/issues/636>
     def __getitem__(self: "P[_T]", key: SupportsIndex | slice) -> "P[_T] | H[_T]":
+
+        def _selected_hs(*indices: int) -> Iterator[H[_T]]:
+            offsets: list[int] = []
+            hs: list[H[_T]] = []
+            cum = 0
+            for h, n in self._h_groups.items():
+                offsets.append(cum)
+                hs.append(h)
+                cum += n
+            for i in indices:
+                g = bisect_right(offsets, i) - 1
+                yield hs[g]
+
         if isinstance(key, slice):
-            return P(*self._hs[key])
-        return self._hs[operator.index(key)]
+            return P(*_selected_hs(*range(*key.indices(len(self)))))
+        i = operator.index(key)
+        if i >= len(self) or i < -len(self):
+            raise IndexError("P index out of range")
+        return next(_selected_hs(len(self) + i if i < 0 else i))
 
     def __iter__(self: "P[_T]") -> Iterator[H[_T]]:
-        yield from self._hs
+        for h, hn in self._h_groups.items():
+            yield from (h for _ in range(hn))
 
     def __len__(self) -> int:
-        return len(self._hs)
+        return self._len
 
     # ---- Operators -------------------------------------------------------------------
 
-    def __matmul__(self: "P[_T]", other: SupportsInt) -> "P[_T]":
+    @overload
+    def __matmul__(self: "P[Any]", lhs: Literal[0]) -> "P[Never]": ...
+    @overload
+    def __matmul__(self: "P[_T]", lhs: SupportsInt) -> "P[_T]": ...
+    def __matmul__(self: "P", lhs: SupportsInt) -> "P":
         try:
-            n = lossless_int(other)
+            n = lossless_int(lhs)
         except (TypeError, ValueError):
             return NotImplemented
         if n < 0:
             raise ValueError(
                 f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
             )
-        return P(*chain.from_iterable(repeat(self, n)))
+        # TODO(posita): # noqa: TD003 - Put initialization logic in an _init helper
+        # method and have both this and __init__ use that helper method
+        # The slow and safe way
+        # return P(*chain.from_iterable(repeat(self, n)))  # noqa: ERA001
+        # The dangerous and fast way (needs to know about __init__, __slots__,
+        # initialization, etc.)
+        p = P()
+        if n:
+            p._h_groups = {h: hn * n for h, hn in self._h_groups.items()}
+            p._len = len(self) * n
+            assert p._hash is None
+            assert p._total is None
+        return p
 
-    def __rmatmul__(self: "P[_T]", other: SupportsInt) -> "P[_T]":
-        return self.__matmul__(other)
+    @overload
+    def __rmatmul__(self: "P[Any]", rhs: Literal[0]) -> "P[Never]": ...
+    @overload
+    def __rmatmul__(self: "P[_T]", rhs: SupportsInt) -> "P[_T]": ...
+    def __rmatmul__(self: "P", rhs: SupportsInt) -> "P":
+        return self.__matmul__(rhs)
 
     # ---- Properties ------------------------------------------------------------------
 
@@ -313,7 +357,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         The result is cached to avoid redundant computation with multiple accesses.
         """
         if self._total is None:
-            self._total = prod(h.total for h in self._hs)
+            self._total = prod(h.total**hn for h, hn in self._h_groups.items())
         return self._total
 
     # ---- Methods ---------------------------------------------------------------------
@@ -358,8 +402,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         """
 
         def _h_counts_by_group() -> Iterator[tuple[H[_T], int]]:
-            for h, hs in groupby(self):
-                yield h, sum(1 for _ in hs)
+            yield from self._h_groups.items()
 
         def _each_h_count_in_self() -> Iterator[tuple[H[_T], int]]:
             yield from ((h, 1) for h in self)
@@ -448,23 +491,19 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             True
         """
         if not which:
-            return (
-                H({})
-                if len(self) == 0
-                else self._hs[0]
-                if len(self) == 1
-                else sum_h(self)
-            )
+            return H({}) if len(self._h_groups) == 0 else sum_h(self)
         n = len(self)
         i = _analyze_selection(n, which)
-        # Optimization for when each and every position is selected the same number of times
+        # Optimization for when each and every position is selected the same number of
+        # times
         if n and isinstance(i, _SelectionUniform):
             try:
                 # This optimization assumes outcomes support multiplication with native
                 # ints while retaining their type ...
                 return sum_h(self) * i.times  # type: ignore[operator]
             except TypeError:
-                # ... but if we get into trouble, fall through to enumerating via rolls_with_counts
+                # ... but if we get into trouble, fall through to enumerating via
+                # rolls_with_counts
                 pass
         # Single-position selection on a homogeneous pool: dispatch directly to
         # `H.order_stat_for_n_at_pos` instead of enumerating rolls. The selection
@@ -498,10 +537,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ):
                 pos = n - 1
             if pos is not None:
-                # Test for homogeneous: all of `self._hs` are equal. `P`
-                # sorts at construction so the test is just first-vs-last.
-                if self._hs[0] == self._hs[-1]:
-                    h = self._hs[0]
+                if len(self._h_groups) == 1:
+                    h = next(iter(self._h_groups))
                     # Bypass `order_stat_for_n_at_pos`'s `@experimental` warning
                     # emission by going through the cached internal helper directly,
                     # since both produce the same result
@@ -518,28 +555,26 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 # Termination: a group of size `n_g > 1` becomes a single H, so each
                 # pass strictly decreases `sum(n_g for groups)`. Skip when all groups
                 # are size 1 -- decomposition would be a no-op and could otherwise loop.
-                if pos == 0 or pos == n - 1:
-                    groups_list = [
-                        (h_g, sum(1 for _ in g)) for h_g, g in groupby(self._hs)
-                    ]
-                    if any(n_g > 1 for _, n_g in groups_list):
-                        reduced_hs: list[H[_T]] = []
-                        for h_g, n_g in groups_list:
-                            if n_g == 1:
-                                reduced_hs.append(h_g)
-                                continue
-                            per_group_pos = n_g - 1 if pos == n - 1 else 0
-                            if n_g not in h_g._order_stat_funcs_by_n:  # noqa: SLF001
-                                h_g._order_stat_funcs_by_n[n_g] = (  # noqa: SLF001
-                                    h_g._order_stat_func_for_n(n_g)  # noqa: SLF001
-                                )
-                            reduced_hs.append(
-                                cast(
-                                    "H[_T]",
-                                    h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # noqa: SLF001
-                                )
+                if (pos == 0 or pos == n - 1) and any(
+                    n_g > 1 for n_g in self._h_groups.values()
+                ):
+                    reduced_hs: list[H[_T]] = []
+                    for h_g, n_g in self._h_groups.items():
+                        if n_g == 1:
+                            reduced_hs.append(h_g)
+                            continue
+                        per_group_pos = n_g - 1 if pos == n - 1 else 0
+                        if n_g not in h_g._order_stat_funcs_by_n:  # noqa: SLF001
+                            h_g._order_stat_funcs_by_n[n_g] = (  # noqa: SLF001
+                                h_g._order_stat_func_for_n(n_g)  # noqa: SLF001
                             )
-                        return P(*reduced_hs).h(0 if pos == 0 else -1)
+                        reduced_hs.append(
+                            cast(
+                                "H[_T]",
+                                h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # noqa: SLF001
+                            )
+                        )
+                    return P(*reduced_hs).h(0 if pos == 0 else -1)
         return H.from_counts(
             # This slightly esoteric use of sum() is to avoid an attempt to 0 to
             # outcomes, which is sum()'s default behavior. At worst, this results in
@@ -548,6 +583,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             for roll, count in self.rolls_with_counts(*which)
         )
 
+    @experimental
     def roll(self: "P[_T]") -> RollT[_T]:
         r"""
         Returns (weighted) random outcomes from contained histograms.
@@ -634,7 +670,6 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         # Short-circuit: empty selection or empty pool
         if isinstance(sel, _SelectionEmpty) or n == 0:
             return
-        groups = tuple((h, sum(1 for _ in hs)) for h, hs in groupby(self))
         # The fast path inclusion-exclusion algorithm in _rwc_heterogeneous_extremes
         # only supports (lo=1, hi=1). Otherwise, fall through and convert selection to
         # the integer k hint consumed by other lower-level functions:
@@ -644,11 +679,13 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         # * None - full enumeration (uniform, extremes fallback, or arbitrary)
         if (
             isinstance(sel, _SelectionExtremes)
-            and len(groups) > 1
+            and len(self._h_groups) > 1
             and sel.lo == 1
             and sel.hi == 1
         ):
-            yield from _rwc_heterogeneous_extremes(groups, sel.lo, sel.hi)
+            yield from _rwc_heterogeneous_extremes(
+                self._h_groups.items(), sel.lo, sel.hi
+            )
             return
 
         if isinstance(sel, _SelectionPrefix):
@@ -662,8 +699,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             k = pos + 1 if pos + 1 <= n - pos else pos - n
         else:
             k = None
-        if len(groups) == 1:
-            h, hn = groups[0]
+        if len(self._h_groups) == 1:
+            h, hn = next(iter(self._h_groups.items()))
             assert hn == n
             if k is not None and abs(k) < n:
                 rolls_with_counts_iter = _rwc_homogeneous_n_h_using_partial_selection(
@@ -674,7 +711,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                     n, h, k=n
                 )
         else:
-            rolls_with_counts_iter = _rwc_heterogeneous_h_groups(groups, k)
+            rolls_with_counts_iter = _rwc_heterogeneous_h_groups(
+                self._h_groups.items(), k
+            )
 
         for sorted_outcomes_for_roll, roll_count in rolls_with_counts_iter:
             if which:
