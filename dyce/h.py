@@ -61,6 +61,7 @@ from .types import (
 
 __all__ = ("H", "HableT")
 
+DEFAULT_PRECISION = 2
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
@@ -1347,7 +1348,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def format(
         self,
         *,
-        precision: int = 2,
+        precision: int = DEFAULT_PRECISION,
         scaled: bool = False,
         tick: str = "#",
         width: int = _ROW_WIDTH,
@@ -1459,7 +1460,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def format_short(
         self,
         *,
-        precision: int = 2,
+        precision: int = DEFAULT_PRECISION,
     ) -> str:
         r"""
         Returns a short-form formatted string representation of the histogram.
