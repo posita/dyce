@@ -210,15 +210,15 @@ We can also deploy a counting trick with the two d10s.
     +2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
     +3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
 
-!!! question "What’s with that `#!python 2 @ d10.lt(action.outcome)`?"
+!!! question "What’s with that `2 @ d10.lt(action.outcome)`?"
 
     Let’s break it down.
-    `#!python H(10).lt(value)` will tell us how often a single d10 is less than `#!python value`.
+    `H(10).lt(value)` will tell us how often a single d10 is less than `value`.
 
             >>> H(10).lt(5)  # how often a d10 is strictly less than 5
             H({False: 6, True: 4})
 
-    By taking advantage of the fact that, in Python, `#!python bool`s act like `#!python int`s when it comes to arithmetic operators, we can count how often that happens with more than one interchangeable d10 by “summing” them.
+    By taking advantage of the fact that, in Python, `bool`s act like `int`s when it comes to arithmetic operators, we can count how often that happens with more than one interchangeable d10 by “summing” them.
 
             >>> d10_lt5 = H(10).lt(5)
             >>> d10_lt5 + d10_lt5
@@ -232,15 +232,15 @@ We can also deploy a counting trick with the two d10s.
     48 times out of a hundred, exactly one of the d10s will be strictly less than five.
     16 times out of a hundred, both d10s will be strictly less than five.
 
-    [`H`][dyce.H]’s `#!python @` operator provides a shorthand.
+    [`H`][dyce.H]’s `@` operator provides a shorthand.
 
             >>> 2 @ d10_lt5 == d10_lt5 + d10_lt5
             True
 
-!!! question "Why doesn’t `#!python 2 @ H(6).gt(H(10)` work?"
+!!! question "Why doesn’t `2 @ H(6).gt(H(10)` work?"
 
-    `#!python H(6).gt(H(10))` will compute how often a six-sided die is strictly greater than a ten-sided die.
-    `#!python 2 @ H(6).gt(H(10))` will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
+    `H(6).gt(H(10))` will compute how often a six-sided die is strictly greater than a ten-sided die.
+    `2 @ H(6).gt(H(10))` will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
     This isn’t quite what we want, since the mechanic calls for rolling a single six-sided die and comparing that result to each of two ten-sided dice.
 
 Now for a *twist*.
@@ -253,7 +253,7 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 --8<-- "docs/assets/plot_ironsworn.py:core"
 ```
 
-By defining our dependent term function to include `#!python mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
+By defining our dependent term function to include `mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
 
 Table:
 
@@ -922,8 +922,8 @@ It’s worth going back and dissecting as a fairly nuanced application of [`expa
     However, it is useful to show that `dyce` is flexible enough to model these types of outcomes in a couple dozen lines of code.
     It is high-level enough to lean on for nuanced number crunching without a lot of detailed knowledge, while still being low-level enough that authors knowledgeable of advanced programming techniques are not precluded from using them.
 
-When called with its default arguments, `#!python risus_combat_driver` satisfies the `#!python VersusFuncT` interface.
-This means we can use it directly with our `#!python vs_scenarios_dataframes` helper to enumerate resolution outcomes from various starting positions.
+When called with its default arguments, `risus_combat_driver` satisfies the `VersusFuncT` interface.
+This means we can use it directly with our `vs_scenarios_dataframes` helper to enumerate resolution outcomes from various starting positions.
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
@@ -940,7 +940,7 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 
 ### Modeling different combat resolution methods
 
-Using our `#!python risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://i.4pcdn.org/tg/1366392953060.pdf)* (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
+Using our `risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://i.4pcdn.org/tg/1366392953060.pdf)* (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
 
 
 ```python
@@ -951,7 +951,7 @@ Using our `#!python risus_combat_driver` from above, we can craft a alternative 
 --8<-- "docs/assets/plot_risus.py:vs-best-of-set"
 ```
 
-Python’s [`#!python functools.partial`](https://docs.python.org/3/library/functools.html#functools.partial) allows us to override individual function details, but still leverage our current callback machinery.
+Python’s [`functools.partial`](https://docs.python.org/3/library/functools.html#functools.partial) allows us to override individual function details, but still leverage our current callback machinery.
 This pattern will come up again below, so we’ll capture it in a helper function.
 
 ```python
@@ -1019,7 +1019,7 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 --8<-- "docs/assets/plot_risus_evens_up_decode_hits.txt"
 ```
 
-Now we can craft an “Evens Up” implementation suitable for passing to our `#!python risus_combat_driver`.
+Now we can craft an “Evens Up” implementation suitable for passing to our `risus_combat_driver`.
 
 ```python
 --8<-- "docs/assets/plot_risus.py:evens-up"

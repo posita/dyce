@@ -14,7 +14,7 @@
 # ======================================================================================
 
 r"""
-`#!python dyce` revolves around two core primitives.
+`dyce` revolves around two core primitives.
 [`H` objects][dyce.H] are histograms (outcomes or individual dice).
 [`P` objects][dyce.P] are collections of histograms (pools).
 

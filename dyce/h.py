@@ -84,7 +84,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     An immutable mapping for use as a histogram which supports arithmetic operations.
     This is useful for modeling discrete outcomes, like individual dice.
-    `#!python H` objects encode finite discrete probability distributions as integer counts without any denominator.
+    `H` objects encode finite discrete probability distributions as integer counts without any denominator.
 
     !!! info
 
@@ -93,7 +93,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         Without it, one never has to worry about probabilities summing to one (e.g., via miscalculation, floating point error, etc.).
         Second (and perhaps more importantly), sometimes one wants to have an insight into non-reduced counts, not just probabilities.
         If needed, probabilities can always be derived, as shown below.
-        While a rational abstraction (e.g., `#!python fractions.Fraction`) could have been used, `#!python int`s typically perform better under most circumstances.
+        While a rational abstraction (e.g., `fractions.Fraction`) could have been used, `int`s typically perform better under most circumstances.
 
     The [initializer][dyce.H.__init__] takes a single argument, *init_val*.
     In its most explicit form, *init_val* maps outcome values to counts.
@@ -115,7 +115,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         >>> lo_var_d6
         H({2: 1, 3: 2, 4: 2, 5: 1})
 
-    If *init_val* is an `#!python int` (and ***only*** an `#!python int`),it is shorthand for creating a sequential range `#!math \left[ {1} .. {init\_val} \right]` (or `#!math \left[ {init\_val} .. {-1} \right]` if *init_val* is negative).
+    If *init_val* is an `int` (and ***only*** an `int`),it is shorthand for creating a sequential range `#!math \left[ {1} .. {init\_val} \right]` (or `#!math \left[ {init\_val} .. {-1} \right]` if *init_val* is negative).
 
         >>> H(8)
         H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1})
@@ -195,7 +195,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         >>> abs(-d6) == d6
         True
 
-    The `#!python len` built-in function can be used to show the number of distinct outcomes.
+    The `len` built-in function can be used to show the number of distinct outcomes.
 
         >>> len(2 @ d6)
         11
@@ -234,7 +234,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         False |  58.33% |############################
          True |  41.67% |####################
 
-    Or how often at least one `#!python 2` will show when rolling four six-sided dice:
+    Or how often at least one `2` will show when rolling four six-sided dice:
 
         >>> d6_eq2 = d6.eq(2)
         >>> d6_eq2  # how often a 2 shows on a single six-sided die
@@ -253,8 +253,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     !!! bug "Mind your parentheses"
 
         Parentheses are often necessary to enforce the desired order of operations.
-        This is most often an issue with the `#!python @` operator, because it behaves differently than the `d` operator in most dedicated grammars.
-        More specifically, in Python, `#!python @` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `#!python .` and `#!python […]`.
+        This is most often an issue with the `@` operator, because it behaves differently than the `d` operator in most dedicated grammars.
+        More specifically, in Python, `@` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `.` and `[…]`.
 
             >>> 2 @ d6[7]  # type: ignore
             Traceback (most recent call last):
@@ -358,7 +358,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         Construct a [`H`][dyce.H] by accumulating counts from one or more *sources*.
 
         Each source may be a mapping of outcomes to counts, or an iterable of
-        `#!python (outcome, count)` pairs.
+        `(outcome, count)` pairs.
         Counts for the same outcome across all sources are summed.
 
             >>> H.from_counts([(1, 3), (2, 2), (1, 1)])
@@ -418,13 +418,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     def counts(self) -> ValuesView[int]:
         r"""
-        More descriptive synonym for the `#!python values` mapping method.
+        More descriptive synonym for the `values` mapping method.
         """
         return self._h.values()
 
     def outcomes(self: "H[_T]") -> KeysView[_T]:
         r"""
-        More descriptive synonym for the `#!python keys` mapping method.
+        More descriptive synonym for the `keys` mapping method.
         """
         return self._h.keys()
 
@@ -1004,7 +1004,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def lt(self: "H[ot.CanLt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def lt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_lt, rhs)`.
+        Shorthand for `self.apply(optype.do_lt, rhs)`.
 
             >>> H(20).lt(10)
             H({False: 11, True: 9})
@@ -1019,7 +1019,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def le(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_le, rhs)`.
+        Shorthand for `self.apply(optype.do_le, rhs)`.
 
             >>> H(20).le(10)
             H({False: 10, True: 10})
@@ -1034,7 +1034,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def eq(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_eq, rhs)`.
+        Shorthand for `self.apply(optype.do_eq, rhs)`.
 
             >>> H(20).eq(10)
             H({False: 19, True: 1})
@@ -1049,7 +1049,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ne(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_ne, rhs)`.
+        Shorthand for `self.apply(optype.do_ne, rhs)`.
 
             >>> H(20).ne(10)
             H({False: 1, True: 19})
@@ -1064,7 +1064,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def ge(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_ge, rhs)`.
+        Shorthand for `self.apply(optype.do_ge, rhs)`.
 
             >>> H(20).ge(10)
             H({False: 9, True: 11})
@@ -1079,7 +1079,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: _OtherT) -> "H[bool]": ...
     def gt(self, rhs: "H[object] | object") -> "H[bool]":
         r"""
-        Shorthand for `#!python self.apply(optype.do_gt, rhs)`.
+        Shorthand for `self.apply(optype.do_gt, rhs)`.
 
             >>> H(20).gt(10)
             H({False: 10, True: 10})
@@ -1127,7 +1127,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @property
     def total(self) -> int:
         r"""
-        Equivalent to `#!python sum(self.counts())`.
+        Equivalent to `sum(self.counts())`.
         The result is cached to avoid redundant computation with multiple accesses.
 
             >>> H({4: 2, 5: 3, 6: 1}).total
@@ -1182,9 +1182,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         Return a new [`H`][dyce.H] by applying *func* to outcomes.
         If *operand* is provided, *func* should have two parameters, otherwise it should have one.
 
-        If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `#!python func(h_outcome, other_outcome)` for each pair and accumulate `#!python h_count * other_count`.
+        If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
 
-        If *operand* is a scalar, call `#!python func(outcome, operand)` for each outcome, passing counts through unchanged.
+        If *operand* is a scalar, call `func(outcome, operand)` for each outcome, passing counts through unchanged.
 
         Resulting counts for duplicate outcomes are summed.
 
@@ -1294,7 +1294,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
            -- END MONKEY PATCH -->
 
         Computes and returns (in constant time) the number of ways *outcome* appears exactly *k* times among *n* like histograms.
-        Uses the binomial coefficient as a more efficient alternative to `#!python (n @ self.eq(outcome))[k]`.
+        Uses the binomial coefficient as a more efficient alternative to `(n @ self.eq(outcome))[k]`.
 
             >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
             150
@@ -1307,7 +1307,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
             This returns a *count* of ways, not a probability, and may not be in lowest terms.
             (See [`lowest_terms`][dyce.H.lowest_terms].)
-            Divide by `#!python self.total ** n` to get a probability.
+            Divide by `self.total ** n` to get a probability.
             (See [`total`][dyce.H.total].)
 
                 >>> from fractions import Fraction
@@ -1354,8 +1354,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     ) -> str:
         r"""
         Returns a formatted string representation of the histogram.
-        *precision* is the number of decimal places to use and defaults to `#!python 2`.
-        *tick* is used as the bar character and defaults to `#!python "#"`.
+        *precision* is the number of decimal places to use and defaults to `2`.
+        *tick* is used as the bar character and defaults to `"#"`.
         *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
 
             >>> print(
@@ -1387,7 +1387,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
              19 |   0.0000% |
              20 |   0.0000% |
 
-        If *scaled* is `#!python True`, horizontal bars are scaled to *width*.
+        If *scaled* is `True`, horizontal bars are scaled to *width*.
 
             >>> h_ge = (2 @ H(6)).ge(7)
             >>> print(f"{' 65 chars wide -->|':->65}")
@@ -1498,7 +1498,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             >>> H({}).lowest_terms()
             H({})
 
-        If *preserve_zero_counts* is `#!python True`, counts are reduced, but zero counts are kept.
+        If *preserve_zero_counts* is `True`, counts are reduced, but zero counts are kept.
 
             >>> H({1: 2, 2: 4, 3: 6, 4: 0}).lowest_terms(preserve_zero_counts=True)
             H({1: 1, 2: 2, 3: 3, 4: 0})
@@ -1518,7 +1518,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     def mean(self: "H[SupportsFloat]") -> float:
         r"""
         Return the mean (expected value) of the weighted outcomes.
-        Raises `#!python ValueError` if the histogram is empty.
+        Raises `ValueError` if the histogram is empty.
 
             >>> H(6).mean()
             3.5
@@ -1546,13 +1546,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
            -- END MONKEY PATCH -->
 
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
-        *pos* is a zero-based index.
+        *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
 
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
             >>> d6avg.order_stat_for_n_at_pos(5, 3)
             H({2: 26, 3: 1432, 4: 4792, 5: 1526})
 
-        The results show that, when rolling five averaging dice and sorting each roll, there are 26 ways where `#!python 2` appears at the fourth (index `#!python 3`) position, 1,432 ways where `#!python 3` appears at the fourth position, etc.
+        The results show that, when rolling five averaging dice and sorting each roll, there are 26 ways where `2` appears at the fourth (index `3`) position, 1,432 ways where `3` appears at the fourth position, etc.
 
         Negative values for *pos* follow Python index semantics:
 
@@ -1592,10 +1592,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
     ) -> Iterable[tuple[_T, _OtherT]]:
         r"""
-        Yield `#!python (outcome, probability)` pairs where each probability is computed as `#!python rational_t(count, total)`.
+        Yield `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
 
-        *rational_t* defaults to `#!python fractions.Fraction`, giving exact rational probabilities.
-        Pass any two-argument callable to get a different representation (e.g. `#!python float` division via `#!python lambda n, d: n / d`).
+        *rational_t* defaults to `fractions.Fraction`, giving exact rational probabilities.
+        Pass any two-argument callable to get a different representation (e.g. `float` division via `lambda n, d: n / d`).
 
         Yields nothing if the histogram is empty (total is zero).
 
@@ -1717,8 +1717,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     def stdev(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the standard deviation of the weighted outcomes as a `#!python float`.
-        Raises `#!python ValueError` if the histogram is empty.
+        Return the standard deviation of the weighted outcomes as a `float`.
+        Raises `ValueError` if the histogram is empty.
 
             >>> H(6).stdev()
             1.707825...
@@ -1729,8 +1729,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     def variance(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the variance of the weighted outcomes as a `#!python float`.
-        Raises `#!python ValueError` if the histogram is empty.
+        Return the variance of the weighted outcomes as a `float`.
+        Raises `ValueError` if the histogram is empty.
 
             >>> H(6).variance()
             2.916666...
@@ -1747,7 +1747,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
     def zero_fill(self: "H[_T]", outcomes: Iterable[_T]) -> "H[_T]":
         r"""
-        Shorthand for `#!python self.merge(dict.fromkeys(outcomes, 0))`.
+        Shorthand for `self.merge(dict.fromkeys(outcomes, 0))`.
 
             >>> H(4).zero_fill(H(8).outcomes())
             H({1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0})
@@ -1778,6 +1778,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             # (T-c_le)^n`. Empirically this is ~280x faster than the general path for `n
             # == 100`, `num_outcomes == 100`.
             if pos == n - 1:
+                # k_range -> range(n, n+1) -> (n,)
+                # math.comb(n, n)  # -> 1  # noqa: ERA001
+                # * c_le**n
+                # * (total - c_le) ** (n-n)  # -> 1  # noqa: ERA001
                 counts: dict[_T, int] = {}
                 prev_term = 0  # 0^n == 0 for n >= 1
                 for outcome, _c_lt, c_le in betas:
@@ -1786,8 +1790,12 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
                     prev_term = cur_term
                 return H(counts)
             elif pos == 0:
+                # k_range -> range(1) -> (0,)
+                # math.comb(n, 0)  # -> 1  # noqa: ERA001
+                # * c_le**0  # -> 1
+                # * (total - c_le) ** (n-0)  # noqa: ERA001
                 counts = {}
-                prev_term = total**n  # (T - 0)^n
+                prev_term = total**n  # (T-0)^n
                 for outcome, _c_lt, c_le in betas:
                     cur_term = (total - c_le) ** n
                     counts[outcome] = prev_term - cur_term
@@ -1807,15 +1815,62 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
                 k_range = range(pos + 1)
                 return H(
                     {
+                        # For each outcome-beta
                         outcome: (
+                            # This first sum (with c_lt^k * (T-c_lt)^(n-k)): counts the
+                            # n-tuples where AT MOST pos of the n rolls are strictly
+                            # less than outcome x.
+                            #
+                            # Each term C(n,k) * c_lt^k * (T-c_lt)^(n-k) is: "choose
+                            # which k positions hold a roll < x (there are c_lt ways per
+                            # position), and the remaining n-k positions hold rolls ≥ x
+                            # (there are T - c_lt ways per position)." Sum over k from 0
+                            # to pos.
                             sum(
-                                math.comb(n, k) * c_lt**k * (total - c_lt) ** (n - k)
+                                # The number of ways to choose k items from a set of n
+                                # items (n choose k)
+                                math.comb(n, k)
+                                # The cumulative count of outcomes less than this one to
+                                # the kth power
+                                * c_lt**k
+                                # The remaining counts taken to the power of the
+                                # remaining positions
+                                * (total - c_lt) ** (n - k)
+                                # Summed for all positions [0, k]
                                 for k in k_range
                             )
-                            - sum(
-                                math.comb(n, k) * c_le**k * (total - c_le) ** (n - k)
+                            -
+                            # This second sum (with c_le^k * (total - c_le)^(n-k)):
+                            # counts n-tuples where AT MOST pos of the rolls are less
+                            # than or equal to x.
+                            sum(
+                                # n choose k (computed again)
+                                math.comb(n, k)
+                                # The cumulative count of outcomes including this one to
+                                # the kth power
+                                * c_le**k
+                                # The remaining counts taken to the power of the
+                                # remaining positions
+                                * (total - c_le) ** (n - k)
+                                # Summed for all positions [0, k]
                                 for k in k_range
                             )
+                            # This difference captures "x is at position pos" precisely
+                            # because:
+                            #
+                            # - "x is at position pos in the sorted list" is the joint
+                            #   event:
+                            #   - At MOST pos rolls are strictly less than x (otherwise
+                            #     something < x would push x to a later position), AND
+                            #   - At LEAST pos + 1 rolls are less than or equal to x
+                            #     (otherwise x couldn't even be present at position
+                            #     pos).
+                            # - "At most pos rolls < x" MINUS "at most pos rolls ≤ x" =
+                            #   "at most pos rolls < x AND more than pos rolls ≤ x" =
+                            #   exactly the joint event above. The rolls that are ≤ x
+                            #   but not < x are rolls equal to x — so the difference
+                            #   counts configurations where enough rolls equal x to push
+                            #   x into position pos.
                         )
                         for outcome, c_lt, c_le in betas
                     }
@@ -1891,9 +1946,9 @@ def aggregate_weighted(
 
     Aggregate *weighted_sources* into an [`H`][dyce.H] object.
 
-    Each element of *weighted_sources* is a two-tuple of either an `#!python (outcome, count)` pair or an `#!python (H, count)` pair.
+    Each element of *weighted_sources* is a two-tuple of either an `(outcome, count)` pair or an `(H, count)` pair.
     When a source is an [`H`][dyce.H], its total takes on the weight of *count*.
-    When a source is the empty histogram (`#!python H({})`), it and its count are omitted without scaling.
+    When a source is the empty histogram (`H({})`), it and its count are omitted without scaling.
 
     Internally, contributions are scaled by the least common multiple of contributing totals rather than their product, which keeps integer counts small when totals share factors.
     The returned distribution is independent of this choice; equality of [`H`][dyce.H] is invariant under common-factor scaling.
@@ -1948,10 +2003,10 @@ def aggregate_weighted(
 
 def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     r"""
-    Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
+    Sums zero or more histograms, returning `H({})` for an empty iterable.
     This ensures callers never have to special-case the empty collection.
 
-    Consecutive equal histograms are batched via `#!python @` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools like those produced by `#!python P.h()` are convolved efficiently.
+    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools like those produced by `P.h()` are convolved efficiently.
     """
     result: H[_T] | None = None
     for h, group in groupby(hs):
@@ -1965,7 +2020,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
 def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
     r"""
     Original `#!math O\left( n \right)` implementation of `sum_h`, preserved for performance comparison.
-    Sums zero or more histograms, returning `#!python H({})` for an empty iterable.
+    Sums zero or more histograms, returning `H({})` for an empty iterable.
     """
     result: H[_T] | None = None
     for h in hs:
@@ -1986,7 +2041,7 @@ def _apply_opname(
     r_val: object,
 ) -> object:
     r"""
-    Try `#!python l_val.op_name(r_val)`; if `#!python NotImplemented`, try `#!python r_val.rop_name(l_val)`.
+    Try `l_val.op_name(r_val)`; if `NotImplemented`, try `r_val.rop_name(l_val)`.
     """
     op = getattr(l_val, op_name, None)
     result = op(r_val) if op is not None else NotImplemented
@@ -2038,15 +2093,15 @@ def _convolve_fast(
 
         n copies = (n//2 copies) convolved with (n//2 copies)   [+ 1 extra if n is odd]
 
-    So instead of accumulating one copy at a time (`#!math O\left( n \right)` steps), we repeatedly double `#!python base`—convolving it with itself—and accumulate it into `#!python acc` only for the bits of `#!python n` that are set.
-    Each bit of `#!python n` corresponds to a power-of-two number of copies (1, 2, 4, 8, …), and the set bits tell us which powers to combine, exactly as binary addition works.
+    So instead of accumulating one copy at a time (`#!math O\left( n \right)` steps), we repeatedly double `base`—convolving it with itself—and accumulate it into `acc` only for the bits of `n` that are set.
+    Each bit of `n` corresponds to a power-of-two number of copies (1, 2, 4, 8, …), and the set bits tell us which powers to combine, exactly as binary addition works.
 
     Example: n=6 (binary 110)
         - bit 1 (value 2): accumulate base<sup>2</sup> into acc; acc = 2 copies
         - bit 2 (value 4): accumulate base<sup>4</sup> into acc; acc = 6 copies
         Total: 2 squares, 1 accumulation versus 5 steps linearly.
 
-    Returns `!#python NotImplemented` if any convolution step does, so the caller can fall back to the linear approach.
+    Returns `NotImplemented` if any convolution step does, so the caller can fall back to the linear approach.
     """
     acc: dict[Any, int] | None = None
     base: dict[Any, int] = dict(mapping)
@@ -2101,10 +2156,10 @@ def _convolve_linear(
 
 def _flatten_to_h(rhs: object) -> object:
     r"""
-    If *rhs* is an `#!python HableT` but not already an `#!python H`, coerce it to `#!python H` via `#!python .h()`.
+    If *rhs* is an `HableT` but not already an `H`, coerce it to `H` via `.h()`.
     Otherwise return *rhs* unchanged.
 
-    Used in forward binary operators so that `#!python H(…) + P(…)` is treated as `#!python H(…) + P(…).h()` rather than using `#!python P` as a scalar outcome.
+    Used in forward binary operators so that `H(…) + P(…)` is treated as `H(…) + P(…).h()` rather than using `P` as a scalar outcome.
     Also imported by [`dyce.hable`][dyce.hable] for use in [`HableOpsMixin`][dyce.HableOpsMixin] forward operators.
     """
     if isinstance(rhs, H):
@@ -2120,8 +2175,8 @@ def _h_binary_callable(
     func: Callable[[Any, Any], Any],
 ) -> "dict[Any, int] | NotImplementedType":
     r"""
-    Cartesian product: for each `#!python (lhs_outcome, lhs_count)` &times; `#!python (rhs_outcome, rhs_count)`, compute `#!python func(lhs_outcome, rhs_outcome)` and accumulate `#!python lhs_count * rhs_count`.
-    Returns `#!python NotImplemented` immediately if *func* does.
+    Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulate `lhs_count * rhs_count`.
+    Returns `NotImplemented` immediately if *func* does.
     """
     result: dict[Any, int] = {}
     for (lhs_outcome, lhs_count), (rhs_outcome, rhs_count) in iproduct(

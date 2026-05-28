@@ -24,29 +24,29 @@
 - Drops support for 3.9 and 3.10 and extends support to 3.14
 - Fixes embarrassingly long-running logical error in 4d6 variants example
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
-- Adds `#!python H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
-- Removes `#!python H.map`, `#!python H.rmap`, and `#!python H.umap` in favor of [`H.apply`][dyce.H.apply].
-- Removes `#!python H.is_even` and `#!python H.is_odd`, whose functionality can be trivially reintroduced using [`H.apply`][dyce.H.apply].
-- Removes `#!python H.__reversed__`.
-- Removes `#!python H.vs` and `#!python H.within`.
-- Renames `#!python H.accumulate` to [`H.merge`][dyce.H.merge].
-- Renames `#!python H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `#!python H.distribution_xy`.
-- Removes `#!python P.map`, `#!python P.rmap`, and `#!python P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
+- Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
+- Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`H.apply`][dyce.H.apply].
+- Removes `H.is_even` and `H.is_odd`, whose functionality can be trivially reintroduced using [`H.apply`][dyce.H.apply].
+- Removes `H.__reversed__`.
+- Removes `H.vs` and `H.within`.
+- Renames `H.accumulate` to [`H.merge`][dyce.H.merge].
+- Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
+- Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
-- Adds optional `#!python preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
+- Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
 - Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
-- Simplifies and consolidates `#!python dyce.evaluation.expandable` and `#!python dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
-- Renames `#!python explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
+- Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
+- Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
 - Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
 - *(Finally!)* removes deprecated interfaces
-    - `#!python H.explode`
-    - `#!python H.foreach`
-    - `#!python H.substitute`
-    - `#!python P.foreach`
-    - `#!python dyce.h.coalesce_replace`
-    - `#!python dyce.h.resolve_dependent_probability`
-    - `#!python dyce.h.sum_h` (not previously deprecated, but to-date unused)
+    - `H.explode`
+    - `H.foreach`
+    - `H.substitute`
+    - `P.foreach`
+    - `dyce.h.coalesce_replace`
+    - `dyce.h.resolve_dependent_probability`
+    - `dyce.h.sum_h` (not previously deprecated, but to-date unused)
 - Adds [`dyce.d`][dyce.d] convenience aliases.
 - Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype)
 - Completely eliminates dependency on [`numerary`](https://github.com/beartype/numerary/) (which was flawed since conception), and instead relies on [`optype`](https://jorenham.github.io/optype/) for mathematical operator typing.
@@ -65,9 +65,9 @@
 
 ## [0.6.1](https://github.com/posita/dyce/releases/tag/v0.6.1)
 
-- Fixes [`P.total`][dyce.P.total] to return `#!python 1` for empty pools, consistent with the empty product.
+- Fixes [`P.total`][dyce.P.total] to return `1` for empty pools, consistent with the empty product.
   (See [this explanation](https://www.johndcook.com/blog/2015/04/14/empty-sum-product/)).
-- Renames `#!python dyce.evaluation._LimitT` to `#!python dyce.evaluation.LimitT`.
+- Renames `dyce.evaluation._LimitT` to `dyce.evaluation.LimitT`.
 - Fixes issues pertaining to histograms with zero totals after allowing outcomes with zero counts in non-normalized [`H` objects][dyce.H].
 - Fixes issue that would lead to incorrect results when making certain arbitrary selections with heterogeneous pools (e.g., with [`P.rolls_with_counts`][dyce.P.rolls_with_counts]).
 
@@ -75,7 +75,7 @@
 
 - Now requires `numerary~=0.4.3`.
 - Adds the `expandable` decorator as well as the `foreach` and `explode` convenience functions.
-- Deprecates `#!python P.foreach`, `#!python H.foreach`, and `#!python H.substitute`.
+- Deprecates `P.foreach`, `H.foreach`, and `H.substitute`.
 - Allows outcomes with zero counts in non-normalized [`H` objects][dyce.H].
   Outcomes with zero counts are dropped when calling [`H.lowest_terms`][dyce.H.lowest_terms].
   Adds the [`H.zero_fill`][dyce.H.zero_fill] convenience method.
@@ -84,7 +84,7 @@
 - Allows deployments to PyPI from CI based on tags.
 - Uses JupyterLite instead of Binder for examples.
 - Refactors `P.is_homogeneous` property into a similarly-named method and adds the [`P.total` method][dyce.P.total] property.
-- Removes `#!python H.order_stat_func_for_n` and instead caches order stat functions for `#!python n` inside [`H.order_stat_for_n_at_pos`][dyce.H.order_stat_for_n_at_pos].
+- Removes `H.order_stat_func_for_n` and instead caches order stat functions for `n` inside [`H.order_stat_for_n_at_pos`][dyce.H.order_stat_for_n_at_pos].
 
 ## [0.5.2](https://github.com/posita/dyce/releases/tag/v0.5.2)
 
@@ -93,14 +93,14 @@
 ## [0.5.1](https://github.com/posita/dyce/releases/tag/v0.5.1)
 
 - Fixes broken binder links in docs.
-- Adds the `#!python precision_limit` argument to `#!python H.substitute` and `#!python H.explode`.
+- Adds the `precision_limit` argument to `H.substitute` and `H.explode`.
 
 ## [0.5.0](https://github.com/posita/dyce/releases/tag/v0.5.0)
 
-- Breaks `#!python dyce.viz` out into [`anydyce`](https://github.com/posita/anydyce/).
-- Removes use of `#!python numerary.types.…SCU` types.
-- Adds the `#!python H.foreach` and `#!python P.foreach` class methods.
-- Migrates `#!python resolve_dependent_probability` to the `#!python H.foreach` class method.
+- Breaks `dyce.viz` out into [`anydyce`](https://github.com/posita/anydyce/).
+- Removes use of `numerary.types.…SCU` types.
+- Adds the `H.foreach` and `P.foreach` class methods.
+- Migrates `resolve_dependent_probability` to the `H.foreach` class method.
 
 ## [0.4.5](https://github.com/posita/dyce/releases/tag/v0.4.5)
 
@@ -115,16 +115,16 @@
 - Adds *Ironsworn* example.
 - Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example.
 - Adds detail around dependent probabilities.
-- Adds experimental `#!python dyce.h.resolve_dependent_probability` function.
+- Adds experimental `dyce.h.resolve_dependent_probability` function.
 
 ## [0.4.3](https://github.com/posita/dyce/releases/tag/v0.4.3)
 
-- Removes dependencies on deprecated `#!python numerary.types.…SCT` tuples
+- Removes dependencies on deprecated `numerary.types.…SCT` tuples
 - Adds [Angry GM Tension Pool mechanic](https://theangrygm.com/definitive-tension-pool/) translation.
 
 ## [0.4.2](https://github.com/posita/dyce/releases/tag/v0.4.2)
 
-- Removes calls to `#!python os.get_terminal_size` to retain utility in environments without terminals.
+- Removes calls to `os.get_terminal_size` to retain utility in environments without terminals.
   Fixes [#5](https://github.com/posita/dyce/issues/5).
   Thanks [@sudo-simon!](https://github.com/sudo-simon)!
 
@@ -133,9 +133,9 @@
 - Splits out protocol checking into its own fancy library: [`numerary`](https://github.com/beartype/numerary/)!
 - Is now [available on PyPI as `dyce`_](https://pypi.org/project/dyce/), thanks to the generosity of [David Eyk](https://eykd.net/about/)!
 - Introduces experimental generic `dyce.r.walk` function and supporting visitor data structures.
-- Uses `#!python pygraphviz` to automate class diagram generation.
+- Uses `pygraphviz` to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the [hacking quick start](contrib.md#hacking-quick-start).)
-- Introduces experimental use of `#!python numpy` for RNG, if present.
+- Introduces experimental use of `numpy` for RNG, if present.
 - Migrates to using `pyproject.toml` and `setup.cfg`.
 - Adds missing [`py.typed` to ensure clients get type checking](https://www.python.org/dev/peps/pep-0561/).
   (Whoops.)
@@ -147,19 +147,19 @@
     The following changes are not backward compatible.
     Please review before upgrading.
 
-- Renames `#!python HAbleT` and `#!python HAbleOpsMixin` to [`HableT`][dyce.HableT] and [`HableOpsMixin`][dyce.HableOpsMixin].
+- Renames `HAbleT` and `HAbleOpsMixin` to [`HableT`][dyce.HableT] and [`HableOpsMixin`][dyce.HableOpsMixin].
     Uses alternate spellings.
-- Removes deprecated non-flattening unary operation methods `#!python P.__neg__` and `#!python P.__pos__`.
-    Uses, e.g., `#!python P.umap(operator.__neg__)` or `#!python P(-h for h in p)` instead.
-- Removes deprecated synonym methods `#!python H.even` and `#!python H.odd`.
-    Uses `#!python H.is_even` and `#!python H.is_odd` instead.
-- Removes deprecated synonym package `#!python dyce.plt`.
-    Uses `#!python dyce.viz` instead.
-- Removes special case handling of `#!python H({})` for addition and subtraction.
-    Check for code that relied on, e.g., `#!python h + H({})` resolving to `#!python h`.
+- Removes deprecated non-flattening unary operation methods `P.__neg__` and `P.__pos__`.
+    Uses, e.g., `P.umap(operator.__neg__)` or `P(-h for h in p)` instead.
+- Removes deprecated synonym methods `H.even` and `H.odd`.
+    Uses `H.is_even` and `H.is_odd` instead.
+- Removes deprecated synonym package `dyce.plt`.
+    Uses `dyce.viz` instead.
+- Removes special case handling of `H({})` for addition and subtraction.
+    Check for code that relied on, e.g., `h + H({})` resolving to `h`.
     It is probably not correct.
     If the behavior is desired, consider eliminating empty histograms before performing calculations.
-    E.G., `#!python h1 + h2 if h2 else h1`.
+    E.G., `h1 + h2 if h2 else h1`.
 
     See also the ~~`sum_h` function~~, which ensures the result is always a histogram:
 
@@ -184,7 +184,7 @@
 ### Other changes
 
 - Documentation overhaul including augmented examples and reorganized images and JavaScript.
-- Fixes `#!python H({}).format(width=65)` bug.
+- Fixes `H({}).format(width=65)` bug.
 - Adds [`beartype`](https://github.com/beartype/beartype) runtime type checking.
 - *Maintains* support for Python 3.7 (for now).
 
@@ -195,18 +195,18 @@
 ## [0.3.1](https://github.com/posita/dyce/releases/tag/v0.3.1)
 
 - Adds these release notes.
-- Boosts `#!python isinstance` performance with `#!python dyce`’s proprietary numeric `#!python Protocol`s.
+- Boosts `isinstance` performance with `dyce`’s proprietary numeric `Protocol`s.
 - Reinstates support for Python 3.7 ~~(for now)~~.
-- Adds `#!python H.is_even` and `#!python H.is_odd`.
-- Deprecates synonym methods `#!python H.even` and `#!python H.odd`.
+- Adds `H.is_even` and `H.is_odd`.
+- Deprecates synonym methods `H.even` and `H.odd`.
 - Introduces experimental [`H.total`][dyce.H.total] property.
-- Removes incorrectly non-flattening unary operation methods `#!python P.__abs__` and `#!python P.__invert__`.
-- Deprecates non-flattening unary operation methods `#!python P.__neg__` and `#!python P.__pos__`.
-- Renames experimental `#!python P.homogeneous` property to `P.is_homogeneous`.
+- Removes incorrectly non-flattening unary operation methods `P.__abs__` and `P.__invert__`.
+- Deprecates non-flattening unary operation methods `P.__neg__` and `P.__pos__`.
+- Renames experimental `P.homogeneous` property to `P.is_homogeneous`.
 - Introduces experimental `dyce.r.R` and `dyce.r.Roll` primitives.
-- Removes `#!python coerce` parameter from `#!python H.map`, `#!python H.rmap`, and `#!python H.umap`.
-- Renames `#!python dyce.plt` to `#!python dyce.viz`.
-- Deprecates synonym package `#!python dyce.plt`.
+- Removes `coerce` parameter from `H.map`, `H.rmap`, and `H.umap`.
+- Renames `dyce.plt` to `dyce.viz`.
+- Deprecates synonym package `dyce.plt`.
 
 ## [0.3.0](https://github.com/posita/dyce/releases/tag/v0.3.0)
 

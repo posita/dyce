@@ -12,6 +12,6 @@
   Thank you!
 -->
 
-# `#!python dyce` package reference
+# `dyce` package reference
 
 ::: dyce

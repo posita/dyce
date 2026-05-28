@@ -14,7 +14,7 @@
 # ======================================================================================
 
 r"""
-`#!python dyce.viz` provides optional, basic [Matplotlib](https://matplotlib.org/)-based visualization utilities.
+`dyce.viz` provides optional, basic [Matplotlib](https://matplotlib.org/)-based visualization utilities.
 Its requirements can be installed via the `viz` optional dependency group.
 
 ```sh
@@ -70,16 +70,16 @@ GraphTypeT = Literal["normal", "at_most", "at_least"]
 r"""
 Controls which variant of the distribution is plotted.
 
-- `#!python "normal"`: raw probability for each outcome
-- `#!python "at_most"`: cumulative probability `#!math P(X \le k)`
-- `#!python "at_least"`: survival probability `#!math P(X \ge k)`
+- `"normal"`: raw probability for each outcome
+- `"at_most"`: cumulative probability `#!math P(X \le k)`
+- `"at_least"`: survival probability `#!math P(X \ge k)`
 """
 
 BurstFormatterT = Callable[[_T, Fraction, H[_T]], str]
 r"""
 Callable type for burst-plot wedge labels.
 
-Called as `#!python formatter(outcome, probability, histogram)`.
+Called as `formatter(outcome, probability, histogram)`.
 Return an empty string to suppress the label for that wedge.
 """
 
@@ -98,7 +98,7 @@ def format_outcome_name(
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with its outcome.
-    If *outcome* has a `#!python .name` attribute (e.g. an `#!python Enum`), that is used; otherwise `#!python str(outcome)` is used.
+    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.
     """
     return str(outcome.name) if hasattr(outcome, "name") else str(outcome)  # pyright: ignore[reportAttributeAccessIssue]
 
@@ -114,7 +114,7 @@ def format_outcome_name_probability(
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with both its outcome and probability.
-    If *outcome* has a `#!python .name` attribute (e.g. an `#!python Enum`), that is used; otherwise `#!python str(outcome)` is used.
+    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.
     """
     name = format_outcome_name(outcome, prob, h)
     return f"{name}\n{format_probability(outcome, prob, h)}"
@@ -156,9 +156,9 @@ def plot_bar(
     When multiple histograms are provided, bars are interleaved side-by-side.
 
     *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).
-    When *horizontal* is `#!python True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.
+    When *horizontal* is `True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.
 
-    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.
+    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
     <!-- BEGIN MONKEY PATCH --
@@ -325,18 +325,18 @@ def plot_burst(
     Plots a dual concentric pie chart for one or two histograms.
 
     The inner ring represents *h* and the outer ring represents *compare*.
-    When *compare* is `#!python None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.
+    When *compare* is `None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.
     When *compare* differs from *h*, both rings default to labelling outcomes
     This is useful for comparing two related distributions side-by-side in a single visual.
 
-    Wedge labels are suppressed when the probability is below `#!python Fraction(1, 32)` (~3.1%) to avoid clutter.
+    Wedge labels are suppressed when the probability is below `Fraction(1, 32)` (~3.1%) to avoid clutter.
 
     *formatter* and *compare_formatter* are `BurstFormatterT` callables (see `format_outcome_name`, `format_probability`, `format_outcome_name_probability`).
 
     *cmap* / *compare_cmap* accept any matplotlib colormap name or instance.
-    If `#!python None`, the `#!python "image.cmap"` associated with the current style is used.
+    If `None`, the `"image.cmap"` associated with the current style is used.
 
-    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.
+    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
     <!-- BEGIN MONKEY PATCH --
@@ -446,11 +446,11 @@ def plot_line(
 
     Pass one or more [`H`][dyce.H] instances as positional arguments.
     Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.
-    *markers* is a string whose characters are cycled across histograms (e.g. `#!python "oX^"` produces circle, cross, triangle, circle, …).
+    *markers* is a string whose characters are cycled across histograms (e.g. `"oX^"` produces circle, cross, triangle, circle, …).
 
     *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).
 
-    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.
+    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
     <!-- BEGIN MONKEY PATCH --
