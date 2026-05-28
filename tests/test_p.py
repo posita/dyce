@@ -16,7 +16,7 @@
 import operator
 import warnings
 from collections import Counter
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterator, Sequence
 from decimal import Decimal
 from fractions import Fraction
 from itertools import chain, combinations_with_replacement, groupby
@@ -1627,7 +1627,7 @@ def _roll_which(roll: RollT[_T], *keys: GetItemT) -> RollT[_T]:
 def _rwc_heterogeneous_brute_force_combinations(
     hs: Sequence[H[_T]],
     *keys: GetItemT,
-) -> Iterable[RollCountT[_T]]:
+) -> Iterator[RollCountT[_T]]:
     r"""Naive Cartesian-product enumeration correct for any count magnitude."""
     for rolls in iproduct(*(h.items() for h in hs)):
         outcomes, counts = tuple(zip(*rolls, strict=True))
@@ -1645,7 +1645,7 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
     n: int,
     h: H[_T],
     *keys: GetItemT,
-) -> Iterable[RollCountT[_T]]:
+) -> Iterator[RollCountT[_T]]:
     r"""Independent reference implementation using multinomial coefficients."""
     multinomial_coefficient_numerator = factorial(n)
     for sorted_outcomes_for_roll in combinations_with_replacement(h, n):

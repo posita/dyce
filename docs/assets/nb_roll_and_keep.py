@@ -56,7 +56,7 @@ style.use("bmh")
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 # %%
-from collections.abc import Iterable
+from collections.abc import Iterator
 
 from dyce import H, P
 
@@ -76,13 +76,13 @@ def roll_and_keep(p: P[int], k: int) -> H[int]:
 d, k = 6, 3
 
 
-def roll_and_keep_hs() -> Iterable[tuple[str, H[int]]]:
+def roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
     for n in range(k + 1, k + 9):
         p = n @ P(d)
         yield f"{n}d{d} keep {k} add +1", roll_and_keep(p, k)
 
 
-def normal() -> Iterable[tuple[str, H[int]]]:
+def normal() -> Iterator[tuple[str, H[int]]]:
     for n in range(k + 1, k + 9):
         p = n @ P(d)
         yield f"{n}d{d} keep {k}", p.h(slice(-k, None))

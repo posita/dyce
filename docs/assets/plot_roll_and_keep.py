@@ -17,7 +17,7 @@
 def fig_callback(line_color: str) -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
     # --8<-- [start:core]
-    from collections.abc import Iterable
+    from collections.abc import Iterator
 
     from dyce import H, P
 
@@ -34,12 +34,12 @@ def fig_callback(line_color: str) -> None:
 
     d, k = 6, 3
 
-    def roll_and_keep_hs() -> Iterable[tuple[str, H[int]]]:
+    def roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k} add +1", roll_and_keep(p, k)
 
-    def normal() -> Iterable[tuple[str, H[int]]]:
+    def normal() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
             yield f"{n}d{d} keep {k}", p.h(slice(-k, None))

@@ -176,8 +176,8 @@ Arithmetic operations implicitly “flatten” pools into histograms.
 Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
 This is done by providing one or more index arguments to the [`P.h` method][dyce.P.h] or the [`P.rolls_with_counts` method][dyce.P.rolls_with_counts].
-Indexes can be integers, slices, or a mix thereof.
-Outcome indexes in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., `[0]`, `[1]`, …, `[-2]`, `[-1]`).
+Indices can be integers, slices, or a mix thereof.
+Outcome indices in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., `[0]`, `[1]`, …, `[-2]`, `[-1]`).
 Summing the least two faces when rolling three six-sided dice would be:
 
     >>> 3 @ P(6)
