@@ -12,12 +12,18 @@
   Thank you!
 -->
 <!-- BEGIN MONKEY PATCH --
-For typing.
+>>> import warnings
+>>> from dyce import TruncationWarning
+>>> from dyce.lifecycle import ExperimentalWarning
+>>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+>>> warnings.filterwarnings("ignore", category=TruncationWarning)
 
-    >>> import sympy  # type: ignore[import-untyped]
-    >>> import sympy.abc  # type: ignore[import-untyped]
-    >>> import sympy.solvers  # type: ignore[import-untyped]
-    >>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
+For typing:
+
+>>> import sympy  # type: ignore[import-untyped]
+>>> import sympy.abc  # type: ignore[import-untyped]
+>>> import sympy.solvers  # type: ignore[import-untyped]
+>>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
 
   -- END MONKEY PATCH -->
 
@@ -320,13 +326,6 @@ The odds of observing all even faces when rolling `#!math n` six-sided dice, for
 
 The odds of scoring at least one nine or higher for any one of `#!math n` “[exploding][dyce.explode_n]” six-sided dice, for `#!math n` in `#!math [1 .. 10]` is:
 
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-   -- END MONKEY PATCH -->
-
     >>> from dyce import explode_n
     >>> # By the time we're exploding to a third die, we're guaranteed
     >>> # a nine or higher, so we don't need to explode past that
@@ -347,20 +346,7 @@ The odds of scoring at least one nine or higher for any one of `#!math n` “[ex
      2d6-exploding: 20.99%
      1d6-exploding: 11.11%
 
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 ## Dependent probabilities
-
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-   -- END MONKEY PATCH -->
 
 Probabilities involving dependent terms can be expressed via a callback passed to [`expand`][dyce.expand].
 First, we express independent terms as histograms or pools.
@@ -455,22 +441,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.
             <DupeVs.DRAW: 0> |  52.78% |###############
       <DupeVs.FIRST_WINS: 1> |  13.89% |####
 
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 ### Expansion and recursion
-
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
-   -- END MONKEY PATCH -->
 
 Explosion is a great way to illustrate use of the [`expand` interface][dyce.expand].
 One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
@@ -767,12 +738,6 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
     H({1: 1920, ..., 11: 1920, 13: 192, ..., 21: 192, 23: 24, ..., 29: 24, 31: 4, ..., 34: 4, 35: 4, 37: 1, ..., 40: 1})
     H({1: 23040, ..., 19: 23040, 21: 1920, ..., 31: 1920, 33: 192, ..., 41: 192, 43: 24, ..., 49: 24, 51: 4, ..., 55: 4, 57: 1, ..., 60: 1})
 
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 ## Visualization
 
 [`H.probability_items`][dyce.H.probability_items] eases integration with plotting packages.
@@ -898,3 +863,8 @@ Consider delving into some [applications and translations](translations.md) for 
 
 Anywhere you see a JupyterLite logo ![JupyterLite](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg), you can click on it to immediately start tinkering with a temporal instance of that example.
 Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.
+
+<!-- BEGIN MONKEY PATCH --
+>>> warnings.resetwarnings()
+
+   -- END MONKEY PATCH -->
