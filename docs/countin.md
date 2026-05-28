@@ -44,7 +44,7 @@ So with that illuminating (or perhaps impenetrable) introduction out of the way,
 
 ## Basic examples
 
-`#!python H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
+`H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
 A normal, six-sided die (d6) can be modeled as:
 
     >>> from dyce import H
@@ -82,8 +82,8 @@ A pool of two six-sided dice is:
     >>> P(d6, d6)
     2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
 
-Where `#!python n` is an integer, `#!python P(n, ...)` is shorthand for `#!python P(H(n), ...)`.
-Python’s matrix multiplication operator (`#!python @`) can also be used with pools.
+Where `n` is an integer, `P(n, ...)` is shorthand for `P(H(n), ...)`.
+Python’s matrix multiplication operator (`@`) can also be used with pools.
 The above can be expressed more succinctly.
 
     >>> from dyce.d import p2d6
@@ -102,7 +102,7 @@ Both histograms and pools support arithmetic operations.
     >>> 3 * (2 @ H(6) + 4)
     H({18: 1, 21: 2, 24: 3, 27: 4, 30: 5, 33: 6, 36: 5, 39: 4, 42: 3, 45: 2, 48: 1})
 
-The results show there is one way to make `#!python 18`, two ways to make `#!python 21`, three ways to make `#!python 24`, etc.
+The results show there is one way to make `18`, two ways to make `21`, three ways to make `24`, etc.
 
 Histograms provide rudimentary formatting for convenience.
 
@@ -177,7 +177,7 @@ Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
 This is done by providing one or more index arguments to the [`P.h` method][dyce.P.h] or the [`P.rolls_with_counts` method][dyce.P.rolls_with_counts].
 Indexes can be integers, slices, or a mix thereof.
-Outcome indexes in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., `#!python [0]`, `#!python [1]`, …, `#!python [-2]`, `#!python [-1]`).
+Outcome indexes in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., `[0]`, `[1]`, …, `[-2]`, `[-1]`).
 Summing the least two faces when rolling three six-sided dice would be:
 
     >>> 3 @ P(6)
@@ -187,7 +187,7 @@ Summing the least two faces when rolling three six-sided dice would be:
 
 !!! bug "Mind your parentheses"
 
-    Parentheses are needed in the above example because `#!python @` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `#!python .` and `#!python […]`.
+    Parentheses are needed in the above example because `@` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `.` and `[…]`.
 
             >>> 2 @ P(6).h(1)  # equivalent to 2@(P(6).h(1))
             Traceback (most recent call last):
@@ -527,12 +527,12 @@ TruncationWarning: expand: some branches with path probability < Fraction(1, 838
 What just happened?
 It appears that we went no further than eight rolls (a first roll plus up to seven explosions).
 Folks familiar with this domain might recognize the distribution looks *mostly* correct, but the counts are a bit…*off*.
-We’re also missing the final outcome of `#!python 48`.
+We’re also missing the final outcome of `48`.
 We also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hint.
 
-The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `#!python H({})` from our function.
+The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `H({})` from our function.
 (See the `#!always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
-We’re not explicitly returning `#!python H({})` in our function, but there are two scenarios where that is done automatically.
+We’re not explicitly returning `H({})` in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:
 
@@ -551,21 +551,21 @@ And the second is when we’ve exhausted the call stack:
 TruncationWarning: expand: some branches whose recursion depth exceeded 1000 were truncated
 ```
 
-When either of those things happen, [`expand`][dyce.expand] returns `#!python H({})`.
+When either of those things happen, [`expand`][dyce.expand] returns `H({})`.
 Let’s take a closer look at our implementation now that we know that might happen:
 
 ```python linenums="7"
        return result.outcome + expand(naive_explode, result.h)
 ```
 
-For the above line, if [`expand`][dyce.expand] returns `#!python H({})`, our function will also return `#!python H({})` for that branch.
-This is because adding `#!python H({})` to anything is `#!python H({})`:
+For the above line, if [`expand`][dyce.expand] returns `H({})`, our function will also return `H({})` for that branch.
+This is because adding `H({})` to anything is `H({})`:
 
     >>> H({}) + 1024
     H({})
 
 
-This explains why `#!python 48` is missing from our results above.
+This explains why `48` is missing from our results above.
 A more illustrative case is trying to “explode” a one-sided die (d1), where no branch is “settled” before exhaustion occurs:
 
     >>> expand(naive_explode, H(1))
@@ -597,7 +597,7 @@ We can check.
 We can now recognize the counts as powers of our maximum face.
 
 But how can we control the number of explosions?
-Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `#!python precision` parameter.
+Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `precision` parameter.
 
     >>> num_faces = 6
     >>> explosions = 3
@@ -626,7 +626,7 @@ Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass do
     True
 
 
-Our function is still implicitly limited by the `#!python precision` parameter, but we can make that go away by setting it to `#!python Fraction(0)` as we did in our recursion exhaustion illustration above.
+Our function is still implicitly limited by the `precision` parameter, but we can make that go away by setting it to `Fraction(0)` as we did in our recursion exhaustion illustration above.
 If we wanted to make that the default, we could create a simple wrapper.
 
     >>> from collections.abc import Callable
@@ -655,7 +655,7 @@ If we wanted to make that the default, we could create a simple wrapper.
     True
 
 
-The above is very nearly the implementation for [`explode_n`][dyce.explode_n], which offers an additional `#!python resolver` parameter that allows for some additional flexibility.
+The above is very nearly the implementation for [`explode_n`][dyce.explode_n], which offers an additional `resolver` parameter that allows for some additional flexibility.
 
 Let’s say we’re considering a new exploding mechanic where, to explode, one must roll the highest outcome on a given die.
 However, on the second explosion, re-explosion occurs if either the highest or second highest outcome is rolled.

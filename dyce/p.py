@@ -85,8 +85,8 @@ class _SelectionExtremes:
 @dataclass(frozen=True, slots=True)
 class _SelectionSinglePos:
     r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly one distinct position with multiplicity 1, and that position is strictly between the two ends (`#!python 0 < pos < n - 1`).
-    The two end-position cases (`#!python pos == 0` and `#!python pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]'s existing partial-selection optimization (driven off Prefix/Suffix's `#!python k`) keeps working unchanged.
+    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly one distinct position with multiplicity 1, and that position is strictly between the two ends (`0 < pos < n - 1`).
+    The two end-position cases (`pos == 0` and `pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]'s existing partial-selection optimization (driven off Prefix/Suffix's `k`) keeps working unchanged.
     """
 
     pos: int  # absolute position, normalized to [1, n-2]
@@ -308,8 +308,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     @property
     def total(self) -> int:
         r"""
-        Equivalent to `#!python prod(h.total for h in self)`.
-        Consistent with the empty product, this is `#!python 1` for an empty pool.
+        Equivalent to `prod(h.total for h in self)`.
+        Consistent with the empty product, this is `1` for an empty pool.
         The result is cached to avoid redundant computation with multiple accesses.
         """
         if self._total is None:
@@ -352,9 +352,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         Return a new [`P`][dyce.P] by applying *func* to each histogram via its [`H.apply`][dyce.H.apply] method.
         If *other* is provided, *func* should have two parameters, otherwise it should have one.
 
-        *func* is assumed to be idempotent, meaning that for each distinct histogram `#!python h`, calling `#!python h.apply(func, other)` should return the same result regardless of context.
-        This allows for *func* to be applied only once for each distinct `#!python H` in `#!python P`, and the result reused.
-        If this is not desired, provide `#!python True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.
+        *func* is assumed to be idempotent, meaning that for each distinct histogram `h`, calling `h.apply(func, other)` should return the same result regardless of context.
+        This allows for *func* to be applied only once for each distinct `H` in `P`, and the result reused.
+        If this is not desired, provide `True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.
         """
 
         def _h_counts_by_group() -> Iterable[tuple[H[_T], int]]:
@@ -397,8 +397,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> (2 @ P(6)).h()
             H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 
-        When on or more optional *which* identifiers is provided, this is roughly equivalent to `#!python H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with some short-circuit optimizations.
-        Identifiers can be `#!python int`s or `#!python slice`s, and can be mixed.
+        When on or more optional *which* identifiers is provided, this is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with some short-circuit optimizations.
+        Identifiers can be `int`s or `slice`s, and can be mixed.
 
         Taking the greatest of two six-sided dice can be modeled as:
 
@@ -566,10 +566,10 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
     def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterable[RollCountT[_T]]:  # noqa: C901
         r"""
-        Returns an iterator yielding `#!python (roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
+        Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
 
-        If one or more *which* arguments are provided (as `#!python SupportsIndex` or `#!python slice` values), each roll is filtered to the selected positions before yielding.
+        If one or more *which* arguments are provided (as `SupportsIndex` or `slice` values), each roll is filtered to the selected positions before yielding.
 
             >>> from dyce import H, P
             >>> p_2d6 = 2 @ P(6)
@@ -618,7 +618,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> sorted(P(H(2), H(3)).rolls_with_counts())
             [((1, 1), 1), ((1, 2), 1), ((1, 2), 1), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
 
-        No rolls will be produced with empty `#!python P` objects or where *which* selects no positions.
+        No rolls will be produced with empty `P` objects or where *which* selects no positions.
 
             >>> sorted(P(6).rolls_with_counts(slice(6, 7)))
             []
@@ -753,17 +753,17 @@ _MAX_FILL = _MaxFill()
 
 def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     r"""
-    Examines the selection *which* as applied to the values `#!python range(n)` and returns one of:
+    Examines the selection *which* as applied to the values `range(n)` and returns one of:
 
     - [`_SelectionEmpty`][dyce.p._SelectionEmpty]: *which* selects zero positions
     - [`_SelectionUniform(times)`][dyce.p._SelectionUniform]: *which* selects every position exactly *times* times
-    - [`_SelectionSinglePos(pos)`][dyce.p._SelectionSinglePos]: *which* selects exactly one distinct true-middle position with multiplicity 1 (`#!python 0 < pos < n - 1`)
-    - [`_SelectionPrefix(max_index, is_single_non_repeated=...)`][dyce.p._SelectionPrefix]: *which* selects positions `#!python [0..max_index)` only
-    - [`_SelectionSuffix(min_index, is_single_non_repeated=...)`][dyce.p._SelectionSuffix]: *which* selects positions `#!python [min_index..n)` only
+    - [`_SelectionSinglePos(pos)`][dyce.p._SelectionSinglePos]: *which* selects exactly one distinct true-middle position with multiplicity 1 (`0 < pos < n - 1`)
+    - [`_SelectionPrefix(max_index, is_single_non_repeated=...)`][dyce.p._SelectionPrefix]: *which* selects positions `[0..max_index)` only
+    - [`_SelectionSuffix(min_index, is_single_non_repeated=...)`][dyce.p._SelectionSuffix]: *which* selects positions `[min_index..n)` only
     - [`_SelectionExtremes(lo, hi)`][dyce.p._SelectionExtremes]: *which* selects exactly the *lo* lowest and *hi* highest positions with at least one unselected interior position
-    - `#!python None`: any other (arbitrary) selection
+    - `None`: any other (arbitrary) selection
 
-    For `#!python _SelectionPrefix` and `#!python _SelectionSuffix`, *single* is `#!python True` iff a single selection has been made and `#! max_index==1` (Prefix) or `#! min_index==1` (Suffix).
+    For `_SelectionPrefix` and `_SelectionSuffix`, *single* is `True` iff a single selection has been made and `#! max_index==1` (Prefix) or `#! min_index==1` (Suffix).
     """
     indexes = tuple(range(n))
     counts_by_index: Counter[int] = Counter(getitems(indexes, which))
@@ -820,10 +820,10 @@ def _selected_distros_memoized(
     from_right: bool,
 ) -> tuple[RollProbT[_T], ...]:
     r"""
-    Memoized adaptation of `Ilmari Karonen’s optimization <https://rpg.stackexchange.com/a/166663/71245>`_ that yields three-tuples of `#!python (outcomes, numerator, denominator)` for selecting *k* outcomes from *n* rolls of *h*.
-    `#!python numerator / denominator` is the probability of that specific outcome selection.
+    Memoized adaptation of `Ilmari Karonen’s optimization <https://rpg.stackexchange.com/a/166663/71245>`_ that yields three-tuples of `(outcomes, numerator, denominator)` for selecting *k* outcomes from *n* rolls of *h*.
+    `numerator / denominator` is the probability of that specific outcome selection.
 
-    Uses integer arithmetic throughout to avoid `#!python Fraction` overhead.
+    Uses integer arithmetic throughout to avoid `Fraction` overhead.
     """
 
     def _roll_probs() -> Iterable[RollProbT]:
@@ -865,8 +865,8 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     fill: _T | None = None,
 ) -> Iterable[RollCountT[_T]]:
     r"""
-    Yields `#!python (roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
-    If *fill* is not `#!python None` and `#!python abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
+    Yields `(roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
+    If *fill* is not `None` and `abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
     """
     from_right = k < 0
     k = abs(k)
@@ -901,8 +901,8 @@ def _rwc_heterogeneous_h_groups(
     k: int | None,
 ) -> Iterable[RollCountT[_T | _MinFill | _MaxFill]]:
     r"""
-    Given an iterable of `#!python (histogram, count)` pairs, yields `#!python (roll, count)` pairs for the Cartesian product of all groups.
-    When *k* is not `#!python None`, it signals which outcomes are selected, enabling the homogeneous partial-selection optimization within each group.
+    Given an iterable of `(histogram, count)` pairs, yields `(roll, count)` pairs for the Cartesian product of all groups.
+    When *k* is not `None`, it signals which outcomes are selected, enabling the homogeneous partial-selection optimization within each group.
     """
     groups = list(h_groups)
     total_n = sum(gn for _, gn in groups)
@@ -941,7 +941,7 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     hi: int,
 ) -> Iterable[RollCountT[_T]]:
     r"""
-    Yields `#!python ((min_val, max_val), count)` pairs for a heterogeneous pool where exactly the single lowest (*lo* = 1) and single highest (*hi* = 1) sorted outcomes are selected.
+    Yields `((min_val, max_val), count)` pairs for a heterogeneous pool where exactly the single lowest (*lo* = 1) and single highest (*hi* = 1) sorted outcomes are selected.
 
     **Why this is fast**
 

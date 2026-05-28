@@ -32,7 +32,7 @@ try:
 
     class NumPyRandomBase(Random, ABC):
         r"""
-        Base class for a [`#!python random.Random`](https://docs.python.org/3/library/random.html#random.Random) implementation that uses a [`#!python numpy.random.BitGenerator`](https://numpy.org/doc/stable/reference/random/bit_generators/index.html) under the covers.
+        Base class for a [`random.Random`](https://docs.python.org/3/library/random.html#random.Random) implementation that uses a [`numpy.random.BitGenerator`](https://numpy.org/doc/stable/reference/random/bit_generators/index.html) under the covers.
         Motivated by [avrae/d20#7](https://github.com/avrae/d20/issues/7).
 
         The [initializer][rng.NumPyRandomBase.__init__] takes an optional *seed*, which is passed to [`NumPyRandomBase.bit_generator`][dyce.rng.NumPyRandomBase.bit_generator] via [`NumPyRandomBase.seed`][dyce.rng.NumPyRandomBase.seed] during construction.

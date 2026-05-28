@@ -54,7 +54,7 @@ except ImportError:  # pragma: no cover
 
 class SentinelT:
     r"""
-    Singleton to serve as a sentinel value where other built-in objects (e.g., `#!python None`) would not, because they represent legitimate values in the context.
+    Singleton to serve as a sentinel value where other built-in objects (e.g., `None`) would not, because they represent legitimate values in the context.
 
     >>> from dyce.types import Sentinel, SentinelT
     >>> SentinelT() is Sentinel
@@ -75,7 +75,7 @@ GetItemT = SupportsIndex | slice
 
 def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterable[_T]:
     r"""
-    Yield items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `#!python slice`.
+    Yield items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `slice`.
 
         >>> from dyce.types import getitems
         >>> list(getitems([10, 20, 30, 40], [0, -1, slice(1, 3)]))
@@ -90,7 +90,7 @@ def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterable[_T]:
 
 def lossless_int(candidate: SupportsInt) -> int:
     r"""
-    Calls `#!python int(candidate)`, but raises a `#!python ValueError` if the result does not compare equally to the original value.
+    Calls `int(candidate)`, but raises a `ValueError` if the result does not compare equally to the original value.
 
         >>> from dyce.types import lossless_int
         >>> lossless_int(3)
@@ -114,7 +114,7 @@ def lossless_int_or_not_implemented(
     candidate: SupportsInt,
 ) -> "int | NotImplementedType":
     r"""
-    Like [`lossless_int`][dyce.types.lossless_int], but returns `#!python NotImplemented` instead of raising `#!python ValueError` when the conversion is lossy.
+    Like [`lossless_int`][dyce.types.lossless_int], but returns `NotImplemented` instead of raising `ValueError` when the conversion is lossy.
     """
     int_val = int(candidate)
     if int_val != candidate:
@@ -126,7 +126,7 @@ def natural_key(val: object) -> tuple[int | str, ...]:
     r"""
     Return a sort key for *val* that orders embedded digit runs numerically.
 
-    Splits `#!python str(val)` on digit boundaries and converts each run of digits to an `#!python int`, so that `#!python "a10"` sorts after `#!python "a2"`.
+    Splits `str(val)` on digit boundaries and converts each run of digits to an `int`, so that `"a10"` sorts after `"a2"`.
 
         >>> from dyce.types import natural_key
         >>> natural_key("abc10def")

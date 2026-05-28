@@ -258,7 +258,7 @@ def expand(  # noqa: C901
 
     - **Scalar** - The outcome is recorded directly.
     - **[`H`][dyce.H]** - The histogram is expanded in place, meaning its outcomes are merged into the accumulation with their counts scaled to preserve the correct proportions.
-    - **`#!python H({})` (the empty histogram)** - The branch is *eliminated*, meaning it contributes nothing to the accumulation and is silently discarded.
+    - **`H({})` (the empty histogram)** - The branch is *eliminated*, meaning it contributes nothing to the accumulation and is silently discarded.
       This is the designated mechanism for signaling that an outcome is impossible or should be excluded from the result.
 
     This is useful for modeling mechanics where the outcome of one die affects how others are rolled
@@ -300,7 +300,7 @@ def expand(  # noqa: C901
         >>> Fraction(H(6)[1], H(6).total)
         Fraction(1, 6)
 
-    When the intent is that a whole path be *eliminated* (not merely approximated), returning `#!python H({})` from a recursive call propagates naturally through arithmetic (`#!python H({}) + outcome` is `#!python H({})`), and no special check is needed.
+    When the intent is that a whole path be *eliminated* (not merely approximated), returning `H({})` from a recursive call propagates naturally through arithmetic (`H({}) + outcome` is `H({})`), and no special check is needed.
 
     Re-roll *all* 1s:
 
@@ -315,7 +315,7 @@ def expand(  # noqa: C901
     The *precision* parameter controls when recursive expansion is stopped automatically.
     It represents the minimum path probability (the cumulative probability of reaching a branch) below which the callback is not invoked.
     Additionally, any branch that exceeds Python’s recursion limit is also dropped.
-    In both cases, the branch is eliminated exactly as if the callback had returned `#!python H({})`.
+    In both cases, the branch is eliminated exactly as if the callback had returned `H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.
 
     *precision* is set by the outermost `expand` call and propagated automatically to all recursive calls via a context variable.
