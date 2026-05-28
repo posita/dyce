@@ -73,7 +73,7 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
+class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
     r"""
     <!-- BEGIN MONKEY PATCH --
     For typing.
@@ -144,7 +144,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
         >>> lo_var_d6 == Counter(lo_var_d6)
         True
 
-    Simple indexes can be used to look up an outcome’s count.
+    Simple indices can be used to look up an outcome’s count.
 
         >>> lo_var_d6[3]
         2
@@ -316,7 +316,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
 
         def _sorted_items_iter(
             items: Sequence[tuple[Any, SupportsInt]],
-        ) -> Iterable[tuple[Any, int]]:
+        ) -> Iterator[tuple[Any, int]]:
             sorted_items = [(k, lossless_int(v)) for k, v in items]
             try:
                 sorted_items.sort()
@@ -1428,7 +1428,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             std = None
             var = None
 
-        def _lines() -> Iterable[str]:
+        def _lines() -> Iterator[str]:
             # First pass: collect (outcome_str, probability) pairs and find the widest
             # outcome representation. We need max_outcome_len before we can emit
             # anything, because the stats header must align with it.
@@ -1477,7 +1477,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
             warnings.warn(f"{exc!s}", stacklevel=2)
             mu = None
 
-        def _parts() -> Iterable[str]:
+        def _parts() -> Iterator[str]:
             if mu is not None:
                 yield f"avg: {mu:.2f}"
             yield from (
@@ -1583,14 +1583,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var]
     @overload
     def probability_items(
         self: "H[_T]", rational_t: None = None
-    ) -> Iterable[tuple[_T, Fraction]]: ...
+    ) -> Iterator[tuple[_T, Fraction]]: ...
     @overload
     def probability_items(
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT]
-    ) -> Iterable[tuple[_T, _OtherT]]: ...
+    ) -> Iterator[tuple[_T, _OtherT]]: ...
     def probability_items(
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
-    ) -> Iterable[tuple[_T, _OtherT]]:
+    ) -> Iterator[tuple[_T, _OtherT]]:
         r"""
         Yield `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
 

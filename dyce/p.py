@@ -222,7 +222,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         r"""Constructor."""
         super().__init__()
 
-        def _hs_from_init_vals() -> Iterable[H[_T_co]]:
+        def _hs_from_init_vals() -> Iterator[H[_T_co]]:
             for init_val in init_vals:
                 if isinstance(init_val, H):
                     yield init_val
@@ -357,14 +357,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         If this is not desired, provide `True` for *apply_to_each* to ensure that *func* is actually run on each individual histogram.
         """
 
-        def _h_counts_by_group() -> Iterable[tuple[H[_T], int]]:
+        def _h_counts_by_group() -> Iterator[tuple[H[_T], int]]:
             for h, hs in groupby(self):
                 yield h, sum(1 for _ in hs)
 
-        def _each_h_count_in_self() -> Iterable[tuple[H[_T], int]]:
+        def _each_h_count_in_self() -> Iterator[tuple[H[_T], int]]:
             yield from ((h, 1) for h in self)
 
-        def _applied_hs() -> Iterable[H[_ResultT]]:
+        def _applied_hs() -> Iterator[H[_ResultT]]:
             for h, count in (
                 _each_h_count_in_self() if apply_to_each else _h_counts_by_group()
             ):
@@ -564,7 +564,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterable[RollCountT[_T]]:  # noqa: C901
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # noqa: C901
         r"""
         Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -630,7 +630,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             sel: _SelectionResult = _SelectionUniform(times=1)
         else:
             sel = _analyze_selection(n, which)
-        rolls_with_counts_iter: Iterable[RollCountT[_T | _MinFill | _MaxFill]]
+        rolls_with_counts_iter: Iterator[RollCountT[_T | _MinFill | _MaxFill]]
         # Short-circuit: empty selection or empty pool
         if isinstance(sel, _SelectionEmpty) or n == 0:
             return
@@ -765,17 +765,17 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
 
     For `_SelectionPrefix` and `_SelectionSuffix`, *single* is `True` iff a single selection has been made and `#! max_index==1` (Prefix) or `#! min_index==1` (Suffix).
     """
-    indexes = tuple(range(n))
-    counts_by_index: Counter[int] = Counter(getitems(indexes, which))
-    found_indexes = set(counts_by_index)
-    if not found_indexes:
+    indices = tuple(range(n))
+    counts_by_index: Counter[int] = Counter(getitems(indices, which))
+    found_indices = set(counts_by_index)
+    if not found_indices:
         return _SelectionEmpty()
 
-    missing_indexes = set(indexes) - found_indexes
+    missing_indices = set(indices) - found_indices
     distinct_counts = set(counts_by_index.values())
-    min_index = min(found_indexes)
-    max_index = max(found_indexes) + 1
-    is_single_non_repeated = len(found_indexes) == 1 and distinct_counts == {1}
+    min_index = min(found_indices)
+    max_index = max(found_indices) + 1
+    is_single_non_repeated = len(found_indices) == 1 and distinct_counts == {1}
     # Single-position selection at a true-middle index (i.e. not 0 or n-1) with
     # multiplicity 1. End positions deliberately fall through to _SelectionPrefix(1) /
     # _SelectionSuffix(-1) for backward compatibility with `rolls_with_counts`.
@@ -789,13 +789,13 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
         return _SelectionPrefix(
             max_index=max_index, is_single_non_repeated=is_single_non_repeated
         )
-    elif not missing_indexes and len(distinct_counts) == 1:
+    elif not missing_indices and len(distinct_counts) == 1:
         return _SelectionUniform(times=distinct_counts.pop())
     elif len(distinct_counts) == 1:
         # Check for lo-from-left + hi-from-right pattern with a gap in the middle.
         # Because max_index - min_index == n we know min_index == 0 and max_index ==
         # n, so positions 0 and n-1 are both selected.
-        sorted_found = sorted(found_indexes)
+        sorted_found = sorted(found_indices)
         # Walk the left side until we find a gap
         lo = 0
         while lo < len(sorted_found) and sorted_found[lo] == lo:
@@ -826,7 +826,7 @@ def _selected_distros_memoized(
     Uses integer arithmetic throughout to avoid `Fraction` overhead.
     """
 
-    def _roll_probs() -> Iterable[RollProbT]:
+    def _roll_probs() -> Iterator[RollProbT]:
         if len(h) <= 1:
             yield tuple(h) * k, 1, 1
         else:
@@ -863,7 +863,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     h: H[_T],
     k: int,
     fill: _T | None = None,
-) -> Iterable[RollCountT[_T]]:
+) -> Iterator[RollCountT[_T]]:
     r"""
     Yields `(roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
     If *fill* is not `None` and `abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
@@ -890,16 +890,16 @@ def _rwc_homogeneous_n_h_using_partial_selection(
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: None,
-) -> Iterable[RollCountT[_T]]: ...
+) -> Iterator[RollCountT[_T]]: ...
 @overload
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: int,
-) -> Iterable[RollCountT[_T | _MinFill | _MaxFill]]: ...
+) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]: ...
 def _rwc_heterogeneous_h_groups(
     h_groups: Iterable[tuple[H[_T], int]],
     k: int | None,
-) -> Iterable[RollCountT[_T | _MinFill | _MaxFill]]:
+) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]:
     r"""
     Given an iterable of `(histogram, count)` pairs, yields `(roll, count)` pairs for the Cartesian product of all groups.
     When *k* is not `None`, it signals which outcomes are selected, enabling the homogeneous partial-selection optimization within each group.
@@ -939,7 +939,7 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     groups: Iterable[tuple[H[_T], int]],
     lo: int,
     hi: int,
-) -> Iterable[RollCountT[_T]]:
+) -> Iterator[RollCountT[_T]]:
     r"""
     Yields `((min_val, max_val), count)` pairs for a heterogeneous pool where exactly the single lowest (*lo* = 1) and single highest (*hi* = 1) sorted outcomes are selected.
 

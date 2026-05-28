@@ -34,7 +34,7 @@ import subprocess  # noqa: S404
 import sys
 import tempfile
 import tomllib
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from functools import partial
 from pathlib import Path
 from types import FrameType
@@ -56,7 +56,7 @@ def _leading_blank_lines(s: str) -> int:
     return count
 
 
-def _iter_doctests(text: str, filepath: Path) -> Iterable[tuple[int, doctest.DocTest]]:
+def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.DocTest]]:
     r"""
     Yield `(doc_offset, dt)` for every doctest block in *text*.
 

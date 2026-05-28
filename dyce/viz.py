@@ -231,14 +231,15 @@ def plot_bar(
     if unique_outcomes:
         try:
             lo, hi = min(unique_outcomes), max(unique_outcomes)
+        except TypeError:  # pragma: no cover
+            pass  # non-comparable outcomes: matplotlib handles categorical axes
+        else:
             if horizontal:
                 ax.set_yticks(unique_outcomes)
                 ax.set_ylim(lo - 1.0, hi + 1.0)
             else:
                 ax.set_xticks(unique_outcomes)
                 ax.set_xlim(lo - 1.0, hi + 1.0)
-        except TypeError:  # pragma: no cover
-            pass  # non-comparable outcomes: matplotlib handles categorical axes
 
     for i, (label, h) in enumerate(hs_list):
         outcomes, probs = _values_for_graph_type(h, graph_type)

@@ -15,7 +15,7 @@
 
 import sys
 import warnings
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterator
 from contextvars import ContextVar
 from enum import IntEnum, auto
 from fractions import Fraction
@@ -430,7 +430,7 @@ def expand(  # noqa: C901
     total_product = prod(s.total for s in sources)
     truncation_reasons: set[_TruncationReason] = set()
 
-    def _result_counts() -> Iterable[tuple[Any, int]]:
+    def _result_counts() -> Iterator[tuple[Any, int]]:
         for result_counts in iproduct(
             *(_source_to_result_iterable(s) for s in sources)
         ):
@@ -456,7 +456,7 @@ def expand(  # noqa: C901
                 _expand_ctxt.reset(token)
             yield result, combined_count
 
-    def _result_counts_no_truncate() -> Iterable[tuple[Any, int]]:
+    def _result_counts_no_truncate() -> Iterator[tuple[Any, int]]:
         # When precision is 0, the truncation check can never fire, and branch_path_prob
         # would otherwise only feed nested expand's same dead computation since
         # precision is fixed at outermost. Skip the per-branch Fraction construction.
@@ -630,7 +630,7 @@ def explode_n(
 @nobeartype
 def _source_to_result_iterable(
     source: H | P,
-) -> Iterable[tuple[HResult | PResult, int]]:
+) -> Iterator[tuple[HResult | PResult, int]]:
     if isinstance(source, H):
         for outcome, count in source.items():
             yield HResult(source, outcome), count
