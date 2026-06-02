@@ -34,6 +34,7 @@
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
+- Adds experimental [`H.quantize`][dyce.H.quantize] method.
 - Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).

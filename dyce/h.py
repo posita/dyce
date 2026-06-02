@@ -62,6 +62,7 @@ from .types import (
 __all__ = ("H", "HableT")
 
 DEFAULT_PRECISION = 2
+DEFAULT_QUANTIZATION_BIT_WIDTH = 1024
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
@@ -354,12 +355,12 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def from_counts(
         cls,
         *sources: Mapping[_T, SupportsInt] | Iterable[tuple[_T, SupportsInt]],
+        preserve_zero_counts: bool = False,
     ) -> Self:
         r"""
-        Construct a [`H`][dyce.H] by accumulating counts from one or more *sources*.
+        Construct an [`H`][dyce.H] by accumulating counts from one or more *sources*.
 
-        Each source may be a mapping of outcomes to counts, or an iterable of
-        `(outcome, count)` pairs.
+        Each source may be a mapping of outcomes to counts, or an iterable of `(outcome, count)` pairs.
         Counts for the same outcome across all sources are summed.
 
             >>> H.from_counts([(1, 3), (2, 2), (1, 1)])
@@ -367,12 +368,20 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H.from_counts({1: 2, 2: 3}, [(1, 1), (3, 4)])
             H({1: 3, 2: 3, 3: 4})
 
-        With a single mapping source this is equivalent to [`H`][dyce.H] construction,
-        but multiple sources are accumulated rather than raising on duplicate keys.
+        With a single mapping source this is equivalent to [`H`][dyce.H] construction, but multiple sources are accumulated rather than raising on duplicate keys.
 
             >>> H.from_counts(H(6), H(6))
             H({1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2})
 
+        If *preserve_zero_counts* is `True`, entries with zero counts make it into the final `H` object.
+        Otherwise, they are omitted.
+
+            >>> H.from_counts([(1, 0), (2, 2), (1, 1), (64, 0)])
+            H({1: 1, 2: 2})
+            >>> H.from_counts(
+            ...     [(1, 0), (2, 2), (1, 1), (64, 0)], preserve_zero_counts=True
+            ... )
+            H({1: 1, 2: 2, 64: 0})
         """
         c: Counter[_T] = Counter()
         for source in sources:
@@ -383,7 +392,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 # type for source.items()
                 source = cast("ItemsView[_T, SupportsInt]", source.items())  # noqa: PLW2901
             for outcome, count in source:
-                c[outcome] += lossless_int(count)
+                if count or preserve_zero_counts:
+                    c[outcome] += lossless_int(count)
         return cls(c)  # pyright: ignore[reportArgumentType,reportCallIssue]
 
     # ---- Overrides -------------------------------------------------------------------
@@ -1616,6 +1626,74 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         for outcome, count in self._h.items():
             yield outcome, rational_t(count, t)
 
+    @overload
+    def quantize(
+        self: "H[Never]",
+        bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+        *,
+        preserve_zero_counts: bool = False,
+    ) -> "H[Never]": ...
+    @overload
+    def quantize(
+        self: "H[_T]",
+        bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+        *,
+        preserve_zero_counts: bool = False,
+    ) -> "H[_T]": ...
+    @experimental
+    def quantize(
+        self,
+        bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+        *,
+        preserve_zero_counts: bool = False,
+    ) -> "H":
+        r"""
+        <!-- BEGIN MONKEY PATCH --
+        >>> import warnings
+        >>> from dyce.lifecycle import ExperimentalWarning
+        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
+           -- END MONKEY PATCH -->
+
+        Construct an [`H`][dyce.H] by “quantizing” counts such that none are occupy more bits than *bit_width* and proportions are retained.
+        If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
+
+            >>> H.quantize(
+            ...     H({1: 0x100, 2: 0x400, 3: 0x200, 4: 0x80, 5: 0xFFFF, 6: 0x7F}),
+            ...     bit_width=8,
+            ... )
+            H({1: 1, 2: 4, 3: 2, 4: 1, 5: 255})
+            >>> H.quantize(
+            ...     H({1: 0x400, 2: 0x1000, 3: 0xF, 4: 0x10, 5: 0}),
+            ...     bit_width=8,
+            ...     preserve_zero_counts=True,
+            ... )
+            H({1: 32, 2: 128, 3: 0, 4: 1, 5: 0})
+
+        <!-- BEGIN MONKEY PATCH --
+        >>> warnings.resetwarnings()
+
+           -- END MONKEY PATCH -->
+        """
+        if not self:
+            return self
+        max_count = max(self.counts())
+        if max_count < 1 << bit_width:
+            return self
+        ancillary_bits = (max_count // (1 << bit_width)).bit_length()
+        return type(self)(
+            {
+                outcome: new_count
+                for outcome, count in self.items()
+                if (
+                    new_count := count >> ancillary_bits
+                    # "round up" if the highest ancillary bit is set
+                    | ((count >> ancillary_bits - 1) & 1)
+                )
+                or preserve_zero_counts
+            }
+        )
+
     @experimental
     def replace(self: "H[_T]", existing_outcome: _T, repl: "H[_T] | _T") -> "H[_T]":
         r"""
@@ -1694,8 +1772,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     @experimental
     def roll(self: "H[_T]") -> _T:
         r"""
-        Returns a (weighted) random outcome.
-
         <!-- BEGIN MONKEY PATCH --
         >>> import warnings
         >>> from dyce.lifecycle import ExperimentalWarning
@@ -1709,12 +1785,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
           -- END MONKEY PATCH -->
 
+        Returns a (weighted) random outcome.
+
             >>> d6 = H(6)
             >>> [d6.roll() for _ in range(10)]
             [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
 
         <!-- BEGIN MONKEY PATCH --
         >>> warnings.resetwarnings()
+
+          -- END MONKEY PATCH -->
         """
         if not self:
             raise ValueError("no outcomes from which to select in empty histogram")
@@ -2007,7 +2087,7 @@ def aggregate_weighted(
         else:
             outcome_counts.append((outcome_or_h, count * aggregate_scalar))
 
-    return H.from_counts(outcome_counts)
+    return H.from_counts(outcome_counts, preserve_zero_counts=True)
 
 
 def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
