@@ -18,7 +18,7 @@ from collections.abc import Generator
 
 import pytest
 
-from dyce import H
+from dyce.d import d0, d1, d6, d8, d12, h2d6
 from dyce.lifecycle import ExperimentalWarning
 
 mpl = pytest.importorskip("matplotlib")
@@ -54,7 +54,7 @@ class TestFormatters:
     def test_format_outcome_name_int(self) -> None:
         from fractions import Fraction
 
-        assert format_outcome_name(3, Fraction(1, 6), H(6)) == "3"
+        assert format_outcome_name(3, Fraction(1, 6), d6) == "3"
 
     def test_format_outcome_name_enum(self) -> None:
         from enum import Enum
@@ -63,19 +63,18 @@ class TestFormatters:
         class Face(Enum):
             HEADS = 1
 
-        assert format_outcome_name(Face.HEADS, Fraction(1, 2), H({1: 1})) == "HEADS"
+        assert format_outcome_name(Face.HEADS, Fraction(1, 2), d1) == "HEADS"
 
     def test_format_probability(self) -> None:
         from fractions import Fraction
 
-        result = format_probability(3, Fraction(1, 6), H(6))
+        result = format_probability(3, Fraction(1, 6), d6)
         assert "16.67%" in result
 
     def test_format_outcome_name_probability(self) -> None:
-        h = 2 @ H(6)
         labels = tuple(
-            format_outcome_name_probability(outcome, probability, h)
-            for outcome, probability in h.probability_items()
+            format_outcome_name_probability(outcome, probability, h2d6)
+            for outcome, probability in h2d6.probability_items()
         )
         assert labels == (
             "2\n2.78%",
@@ -94,16 +93,16 @@ class TestFormatters:
 
 class TestPlotBar:
     def test_single_h_returns_axes(self) -> None:
-        ax = plot_bar(H(6))
+        ax = plot_bar(d6)
         assert ax is not None
 
     def test_labeled_hs(self) -> None:
-        ax = plot_bar(2 @ H(6), H(12), labels=["2d6", "d12"])
+        ax = plot_bar(h2d6, d12, labels=["2d6", "d12"])
         # one container (bar group) per histogram
         assert len(ax.containers) == 2
 
     def test_empty_h(self) -> None:
-        ax = plot_bar(H({}))
+        ax = plot_bar(d0)
         assert ax is not None
 
     def test_no_args(self) -> None:
@@ -111,73 +110,72 @@ class TestPlotBar:
         assert ax is not None
 
     def test_graph_type_at_most(self) -> None:
-        ax = plot_bar(H(6), graph_type="at_most")
+        ax = plot_bar(d6, graph_type="at_most")
         assert ax is not None
 
     def test_graph_type_at_least(self) -> None:
-        ax = plot_bar(H(6), graph_type="at_least")
+        ax = plot_bar(d6, graph_type="at_least")
         assert ax is not None
 
     def test_horizontal(self) -> None:
-        ax = plot_bar(H(6), horizontal=True)
+        ax = plot_bar(d6, horizontal=True)
         assert ax is not None
 
     def test_horizontal_labeled(self) -> None:
-        ax = plot_bar(H(6), H(8), labels=["d6", "d8"], horizontal=True)
+        ax = plot_bar(d6, d8, labels=["d6", "d8"], horizontal=True)
         assert ax is not None
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
 
-        returned = plot_bar(H(6), ax=supplied)
+        returned = plot_bar(d6, ax=supplied)
         assert returned is supplied
 
     def test_bool_outcomes(self) -> None:
-        ax = plot_bar(H(6).ge(4))
+        ax = plot_bar(d6.ge(4))
         assert ax is not None
 
     def test_labels_partial(self) -> None:
         # Labels are shorter than hs, so extra histograms get empty an label
-        ax = plot_bar(H(6), H(8), labels=["d6"])
+        ax = plot_bar(d6, d8, labels=["d6"])
         assert len(ax.containers) == 2
 
 
 class TestPlotBurst:
     def test_single_h_returns_axes(self) -> None:
-        ax = plot_burst(H(6))
+        ax = plot_burst(d6)
         assert ax is not None
 
     def test_with_compare(self) -> None:
-        ax = plot_burst(2 @ H(6), H(6))
+        ax = plot_burst(h2d6, d6)
         assert ax is not None
 
     def test_empty_h(self) -> None:
-        ax = plot_burst(H({}))
+        ax = plot_burst(d0)
         assert ax is not None
 
     def test_title(self) -> None:
-        ax = plot_burst(H(6), title="d6")
+        ax = plot_burst(d6, title="d6")
         assert ax.get_title() == "d6"
 
     def test_custom_formatter(self) -> None:
-        ax = plot_burst(H(6), formatter=format_probability)
+        ax = plot_burst(d6, formatter=format_probability)
         assert ax is not None
 
     def test_custom_compare_formatter(self) -> None:
-        ax = plot_burst(H(6), H(6), compare_formatter=format_outcome_name_probability)
+        ax = plot_burst(d6, d6, compare_formatter=format_outcome_name_probability)
         assert ax is not None
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
 
-        returned = plot_burst(H(6), ax=supplied)
+        returned = plot_burst(d6, ax=supplied)
         assert returned is supplied
 
     def test_plot_burst(self) -> None:
         mpl.use("agg")
         _, ax = plt.subplots()
-        d6_2 = 2 @ H(6)
-        plot_burst(d6_2, ax=ax)
+        plot_burst(h2d6, ax=ax)
         wedge_labels = [
             w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
         ]
@@ -210,8 +208,7 @@ class TestPlotBurst:
     def test_plot_burst_outer(self) -> None:
         mpl.use("agg")
         _, ax = plt.subplots()
-        d6_2 = 2 @ H(6)
-        plot_burst(d6_2, ax=ax, compare_formatter=format_outcome_name_probability)
+        plot_burst(h2d6, ax=ax, compare_formatter=format_outcome_name_probability)
         wedge_labels = [
             w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
         ]
@@ -244,15 +241,15 @@ class TestPlotBurst:
 
 class TestPlotLine:
     def test_single_h_returns_axes(self) -> None:
-        ax = plot_line(H(6))
+        ax = plot_line(d6)
         assert ax is not None
 
     def test_labeled_hs(self) -> None:
-        ax = plot_line(2 @ H(6), H(12), labels=["2d6", "d12"])
+        ax = plot_line(h2d6, d12, labels=["2d6", "d12"])
         assert len(ax.lines) == 2
 
     def test_empty_h(self) -> None:
-        ax = plot_line(H({}))
+        ax = plot_line(d0)
         assert ax is not None
 
     def test_no_args(self) -> None:
@@ -260,16 +257,16 @@ class TestPlotLine:
         assert ax is not None
 
     def test_graph_type_at_most(self) -> None:
-        ax = plot_line(H(6), graph_type="at_most")
+        ax = plot_line(d6, graph_type="at_most")
         assert ax is not None
 
     def test_markers_cycled(self) -> None:
-        ax = plot_line(H(6), H(6), H(6), markers="ox")
+        ax = plot_line(d6, d6, d6, markers="ox")
         markers_used = [line.get_marker() for line in ax.lines]
         assert markers_used == ["o", "x", "o"]
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
 
-        returned = plot_line(H(6), ax=supplied)
+        returned = plot_line(d6, ax=supplied)
         assert returned is supplied

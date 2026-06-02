@@ -25,6 +25,7 @@ from typing import Any, Never, cast
 import pytest
 
 from dyce import H, HResult, P, PResult, TruncationWarning, expand, explode_n
+from dyce.d import d0, d1, d6, d8, d10, p2d8
 from dyce.lifecycle import ExperimentalWarning
 from dyce.types import BeartypeCallHintViolation
 
@@ -38,11 +39,6 @@ def _suppress_warnings() -> None:
 
 class TestExpand:
     def test_h_and_p_sources(self) -> None:
-        d6 = H(6)
-        d8 = H(8)
-        d10 = H(10)
-        p_2d8 = 2 @ P(d8)
-
         def _fn(
             d6_result: HResult[int],
             p_2d8_result: PResult[int],
@@ -54,7 +50,7 @@ class TestExpand:
             assert d10_result.outcome in d10
             return d6_result.outcome + sum(p_2d8_result.roll) + d10_result.outcome
 
-        assert expand(_fn, d6, p_2d8, d10) == d6 + p_2d8 + d10
+        assert expand(_fn, d6, p2d8, d10) == d6 + p2d8 + d10
 
     def test_source_neither_h_nor_p_raises(self) -> None:
         class TotalStr(UserString):
@@ -65,7 +61,7 @@ class TestExpand:
                 return len(self)
 
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
-            return H({})
+            return d0
 
         with pytest.raises(
             (TypeError, BeartypeCallHintViolation),
@@ -86,7 +82,7 @@ class TestExpand:
 
     def test_no_sources_raises(self) -> None:
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
-            return H({})
+            return d0
 
         with pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"):
             expand(_fn)
@@ -118,7 +114,7 @@ class TestExpandTruncation:
             assert (
                 expand(
                     _explode_with_truncation,
-                    H(6),
+                    d6,
                     precision=Fraction(1, 6**4 - 1),
                 )
                 == self._D6X_TRUNCATED_AT_3RD_ROLL
@@ -128,7 +124,7 @@ class TestExpandTruncation:
         assert (
             expand(
                 _explode_with_truncation,
-                H(6),
+                d6,
                 truncate_countdown=3,
             )
             == self._D6X_TRUNCATED_AT_3RD_ROLL
@@ -139,7 +135,7 @@ class TestExpandTruncation:
             assert (
                 expand(
                     _explode_with_truncation,
-                    H(6),
+                    d6,
                     rcrs_err_countdown=3,
                 )
                 == self._D6X_TRUNCATED_AT_3RD_ROLL
@@ -149,14 +145,12 @@ class TestExpandTruncation:
         # Always_recurses has no base case: every branch hits RecursionError and
         # is dropped, leaving an empty histogram. A TruncationWarning is emitted
         # by the innermost expand that catches the RecursionError.
-        d1 = H(1)
-
         def _always_recurses(result: HResult[int]) -> H[int] | int:
             return expand(_always_recurses, result.h) + 1  # ty: ignore[unsupported-operator]
 
         with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
             result = expand(_always_recurses, d1)
-        assert result == H({})
+        assert result == d0
 
 
 @pytest.mark.benchmark
@@ -169,14 +163,14 @@ class TestExpandTruncationBenchmark:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
 
-        h = H(6)
+        h = d6
         benchmark(expand, _callback, h)
 
     def test_skip_truncation(self, benchmark: Callable) -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
 
-        h = H(6)
+        h = d6
         benchmark(expand, _callback, h, precision=Fraction(0))
 
 
@@ -184,7 +178,7 @@ class TestExplodeN:
     def test_explode_n_natural_order(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
         x = sympy.symbols("x")
-        d6x = H(6) + x
+        d6x = d6 + x
         assert explode_n(d6x, n=1) == H(
             {
                 2 * x + 7: 1,
@@ -214,7 +208,7 @@ def _explode_with_truncation(
     if rcrs_err_countdown <= 0:
         raise RecursionError("artificial recursion limit")
     elif truncate_countdown <= 0:
-        return H({})
+        return d0
     elif result.outcome < max(result.h):
         return result.outcome
     else:
