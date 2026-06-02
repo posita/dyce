@@ -149,6 +149,15 @@ def plot_bar(
     labels: Sequence[str] = (),
 ) -> Axes:
     r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    >>> import matplotlib as mpl
+    >>> mpl.use("Agg")
+
+      -- END MONKEY PATCH -->
+
     Plots a grouped bar chart of one or more histograms.
 
     Pass one or more [`H`][dyce.H] instances as positional arguments.
@@ -160,15 +169,6 @@ def plot_bar(
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    >>> import matplotlib as mpl
-    >>> mpl.use("Agg")
-
-      -- END MONKEY PATCH -->
 
     === "Vertical bars (default)"
 
@@ -323,6 +323,15 @@ def plot_burst(
     use_midpoints_for_colors: bool = True,
 ) -> Axes:
     r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    >>> import matplotlib as mpl
+    >>> mpl.use("Agg")
+
+      -- END MONKEY PATCH -->
+
     Plots a dual concentric pie chart for one or two histograms.
 
     The inner ring represents *h* and the outer ring represents *compare*.
@@ -340,15 +349,6 @@ def plot_burst(
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    >>> import matplotlib as mpl
-    >>> mpl.use("Agg")
-
-      -- END MONKEY PATCH -->
-
         >>> from dyce import H
         >>> from dyce.viz import plot_burst
         >>> from matplotlib import pyplot as plt
@@ -363,16 +363,16 @@ def plot_burst(
         ... )
         >>> _ = ax_2d6_vs_d12.set_title("2d6 vs. d12")
 
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
-
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
         <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.svg">
     </picture>
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
     """
     ax = _get_ax(ax)
 
@@ -443,6 +443,15 @@ def plot_line(
     markers: str = _DEFAULT_MARKERS,
 ) -> Axes:
     r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    >>> import matplotlib as mpl
+    >>> mpl.use("Agg")
+
+      -- END MONKEY PATCH -->
+
     Plots a line graph of one or more histograms.
 
     Pass one or more [`H`][dyce.H] instances as positional arguments.
@@ -453,15 +462,6 @@ def plot_line(
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    >>> import matplotlib as mpl
-    >>> mpl.use("Agg")
-
-      -- END MONKEY PATCH -->
 
         >>> from dyce import H
         >>> from dyce.viz import plot_line
@@ -474,16 +474,16 @@ def plot_line(
         >>> _ = ax.set_title("2d6 vs. d12")
         >>> _ = ax.legend(loc="upper left")
 
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
-
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
         <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.svg">
     </picture>
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
