@@ -814,6 +814,16 @@ class TestHProbabilityItems:
         assert total == Fraction(1)
 
 
+class TestHQuantize:
+    def test_quantize_empty(self) -> None:
+        h = H({})
+        assert h.quantize() is h
+
+    def test_quantize_nothing_to_do(self) -> None:
+        h = H(20)
+        assert h.quantize() is h
+
+
 class TestHRoll:
     def test_roll_empty_raises(self) -> None:
         with pytest.raises(
