@@ -976,9 +976,6 @@
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
 -->
-
-<p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
-If you have exposure to another tool, they may also help with transition.</p>
 <!-- BEGIN MONKEY PATCH --
 >>> import warnings
 >>> from dyce import TruncationWarning
@@ -986,8 +983,10 @@ If you have exposure to another tool, they may also help with transition.</p>
 >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
 >>> warnings.filterwarnings("ignore", category=TruncationWarning)
 
-   -- END MONKEY PATCH -->
+  -- END MONKEY PATCH -->
 
+<p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
+If you have exposure to another tool, they may also help with transition.</p>
 <h2 id="checking-angrys-math-on-the-tension-pool">Checking Angry’s math on the <a href="https://theangrygm.com/definitive-tension-pool/">Tension Pool</a></h2>
 <p>In the <a href="https://theangrygm.com/">Angry GM</a>’s publication of the <a href="https://theangrygm.com/wp-content/uploads/The-Tension-Pool.pdf">PDF version of his Tension Pool mechanic</a>, he includes some probabilities.
 Can <code>dyce</code> check his work?
@@ -1391,14 +1390,14 @@ We can also deploy a counting trick with the two d10s.</p>
 <span class="o">+</span><span class="mi">3</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;FAILURE&#39;</span><span class="p">:</span> <span class="s1">&#39;23.17%&#39;</span><span class="p">,</span> <span class="s1">&#39;WEAK_SUCCESS&#39;</span><span class="p">:</span> <span class="s1">&#39;43.67%&#39;</span><span class="p">,</span> <span class="s1">&#39;STRONG_SUCCESS&#39;</span><span class="p">:</span> <span class="s1">&#39;33.17%&#39;</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <div class="admonition question">
-<p class="admonition-title">What’s with that <code class="highlight"><span class="mi">2</span> <span class="o">@</span> <span class="n">d10</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">outcome</span><span class="p">)</span></code>?</p>
+<p class="admonition-title">What’s with that <code>2 @ d10.lt(action.outcome)</code>?</p>
 <p>Let’s break it down.
-<code class="highlight"><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code> will tell us how often a single d10 is less than <code class="highlight"><span class="n">value</span></code>.</p>
+<code>H(10).lt(value)</code> will tell us how often a single d10 is less than <code>value</code>.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># how often a d10 is strictly less than 5</span>
     <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-<p>By taking advantage of the fact that, in Python, <code class="highlight"><span class="nb">bool</span></code>s act like <code class="highlight"><span class="nb">int</span></code>s when it comes to arithmetic operators, we can count how often that happens with more than one interchangeable d10 by “summing” them.</p>
+<p>By taking advantage of the fact that, in Python, <code>bool</code>s act like <code>int</code>s when it comes to arithmetic operators, we can count how often that happens with more than one interchangeable d10 by “summing” them.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1413,16 +1412,16 @@ We can also deploy a counting trick with the two d10s.</p>
 36 times out of a hundred, neither d10 will be strictly less than five.
 48 times out of a hundred, exactly one of the d10s will be strictly less than five.
 16 times out of a hundred, both d10s will be strictly less than five.</p>
-<p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a>’s <code class="highlight"><span class="o">@</span></code> operator provides a shorthand.</p>
+<p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a>’s <code>@</code> operator provides a shorthand.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">d10_lt5</span> <span class="o">==</span> <span class="n">d10_lt5</span> <span class="o">+</span> <span class="n">d10_lt5</span>
     <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
 </div>
 <div class="admonition question">
-<p class="admonition-title">Why doesn’t <code class="highlight"><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></code> work?</p>
-<p><code class="highlight"><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span></code> will compute how often a six-sided die is strictly greater than a ten-sided die.
-<code class="highlight"><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span></code> will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
+<p class="admonition-title">Why doesn’t <code>2 @ H(6).gt(H(10)</code> work?</p>
+<p><code>H(6).gt(H(10))</code> will compute how often a six-sided die is strictly greater than a ten-sided die.
+<code>2 @ H(6).gt(H(10))</code> will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
 This isn’t quite what we want, since the mechanic calls for rolling a single six-sided die and comparing that result to each of two ten-sided dice.</p>
 </div>
 <p>Now for a <em>twist</em>.
@@ -1527,7 +1526,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
     <span class="k">for</span> <span class="n">action_mod</span> <span class="ow">in</span> <span class="n">action_mods</span>
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-<p>By defining our dependent term function to include <code class="highlight"><span class="n">mod</span></code> as a keyword-only parameter, we can pass values to it via <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>, which is helpful for visualization.</p>
+<p>By defining our dependent term function to include <code>mod</code> as a keyword-only parameter, we can pass values to it via <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>, which is helpful for visualization.</p>
 <p>Table:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -2495,7 +2494,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
-<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span>
 
@@ -2512,12 +2511,12 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 
 <span class="n">d</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">roll_and_keep_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">roll_and_keep_hs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> add +1&quot;</span><span class="p">,</span> <span class="n">roll_and_keep</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">normal</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normal</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">9</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -3263,8 +3262,8 @@ The point is not to suggest that such techniques are required to be productive.
 However, it is useful to show that <code>dyce</code> is flexible enough to model these types of outcomes in a couple dozen lines of code.
 It is high-level enough to lean on for nuanced number crunching without a lot of detailed knowledge, while still being low-level enough that authors knowledgeable of advanced programming techniques are not precluded from using them.</p>
 </div>
-<p>When called with its default arguments, <code class="highlight"><span class="n">risus_combat_driver</span></code> satisfies the <code class="highlight"><span class="n">VersusFuncT</span></code> interface.
-This means we can use it directly with our <code class="highlight"><span class="n">vs_scenarios_dataframes</span></code> helper to enumerate resolution outcomes from various starting positions.</p>
+<p>When called with its default arguments, <code>risus_combat_driver</code> satisfies the <code>VersusFuncT</code> interface.
+This means we can use it directly with our <code>vs_scenarios_dataframes</code> helper to enumerate resolution outcomes from various starting positions.</p>
 <p>Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -3287,7 +3286,7 @@ This means we can use it directly with our <code class="highlight"><span class="
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../assets/plot_risus_multi_round_standard_light.svg">
 </picture></p>
 <h3 id="modeling-different-combat-resolution-methods">Modeling different combat resolution methods</h3>
-<p>Using our <code class="highlight"><span class="n">risus_combat_driver</span></code> from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from <em><a href="https://i.4pcdn.org/tg/1366392953060.pdf">The Risus Companion</a></em> (free with membership to the <a href="https://www.risusiverse.com/home/ior-charter">IOR</a>) with the optional “Goliath Rule” for resolving ties.</p>
+<p>Using our <code>risus_combat_driver</code> from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from <em><a href="https://i.4pcdn.org/tg/1366392953060.pdf">The Risus Companion</a></em> (free with membership to the <a href="https://www.risusiverse.com/home/ior-charter">IOR</a>) with the optional “Goliath Rule” for resolving ties.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -3418,7 +3417,7 @@ This means we can use it directly with our <code class="highlight"><span class="
         <span class="k">else</span> <span class="n">raw_result</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>Python’s <a href="https://docs.python.org/3/library/functools.html#functools.partial"><code class="highlight"><span class="n">functools</span><span class="o">.</span><span class="n">partial</span></code></a> allows us to override individual function details, but still leverage our current callback machinery.
+<p>Python’s <a href="https://docs.python.org/3/library/functools.html#functools.partial"><code>functools.partial</code></a> allows us to override individual function details, but still leverage our current callback machinery.
 This pattern will come up again below, so we’ll capture it in a helper function.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -3716,7 +3715,7 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">1.16</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">4</span> <span class="o">|</span>   <span class="mf">0.23</span><span class="o">%</span> <span class="o">|</span>
 </code></pre></div>
-<p>Now we can craft an “Evens Up” implementation suitable for passing to our <code class="highlight"><span class="n">risus_combat_driver</span></code>.</p>
+<p>Now we can craft an “Evens Up” implementation suitable for passing to our <code>risus_combat_driver</code>.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -3817,6 +3816,46 @@ If you’d like help using <code>dyce</code> with modeling your own complicated 
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../countin/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Countin’ with histograms and pools">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Countin’ with histograms and pools
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../notes/" class="md-footer__link md-footer__link--next" aria-label="Next: Release notes">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Release notes
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -3846,7 +3885,7 @@ If you’d like help using <code>dyce</code> with modeling your own complicated 
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

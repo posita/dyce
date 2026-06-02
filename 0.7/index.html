@@ -868,18 +868,26 @@
   This file is used on GitHub and PyPi (via pyproject.toml).
   There is no guarantee that other docs/resources will be available where this content is displayed.
 -->
+<!-- BEGIN MONKEY PATCH --
+>>> import warnings
+>>> from dyce import TruncationWarning
+>>> from dyce.lifecycle import ExperimentalWarning
+>>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+>>> warnings.filterwarnings("ignore", category=TruncationWarning)
+
+  -- END MONKEY PATCH -->
 
 <p><a href="https://github.com/posita/dyce/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg" /></a>
 <a href="https://app.codecov.io/gh/posita/dyce"><img alt="Coverage" src="https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg" /></a>
-<a href="https://pypi.org/project/dyce/0.7.0rc4/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc4.svg" /></a>
-<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc4.svg" />
-<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc4.svg" /></a>
-<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc4.svg" />
-<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc4.svg" />
+<a href="https://pypi.org/project/dyce/0.7.0rc5/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc5.svg" /></a>
+<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc5.svg" />
+<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc5.svg" /></a>
+<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc5.svg" />
+<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc5.svg" />
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
 <a href="https://beartype.rtfd.io/"><img alt="Bear-ified™" src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a></p>
 <p>Now you’re playing with …</p>
-<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc4/docs/dyce.svg" alt="dyce logo"></p>
+<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc5/docs/dyce.svg" alt="dyce logo"></p>
 <h1 id="dyce-simple-python-tools-for-exploring-dice-outcomes-and-other-finite-discrete-probabilities"><code>dyce</code> – Simple Python tools for exploring dice outcomes and other finite discrete probabilities</h1>
 <p><strong>💥 <em>Now 100% <a href="https://beartype.rtfd.io/">Bear-ified™</a>!</em> 👌🏾🐻</strong>
 (<a href="#requirements">Details</a> below.)</p>
@@ -1098,9 +1106,9 @@ All support a variety of operations.
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc4/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc4/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc4/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc5/docs/assets/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc5/docs/assets/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc5/docs/assets/plot_2d6_lo_hi_light.svg">
 </picture></p>
 <p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P"><code>P</code> objects</a> can generate random rolls.</p>
 <!-- BEGIN MONKEY PATCH --
@@ -1151,7 +1159,7 @@ Other works include:</p>
 <p>When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.</p>
 <ul>
 <li><a href="https://eykd.net/about/">David Eyk</a> not only <a href="https://eykd.net/blog/">inspires others to explore creative writing</a>, but has graciously ceded his PyPI project dedicated to <a href="https://code.google.com/archive/p/dyce/">his own prior work under a similar name</a>.
-  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc4/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
+  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc5/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
   Thanks to his generosity, <del>millions</del> <em>dozens</em> of future <code>dyce</code> users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡</li>
 </ul>
@@ -1202,6 +1210,11 @@ As of version 1.1, HighRollin is <span class="p">&lt;</span><span class="nt">a</
 <p><code>dyce</code> is licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.
 See the included <a href="https://posita.github.io/dyce/0.7/license/"><code>LICENSE</code></a> file for details.
 Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.</p>
+<!-- BEGIN MONKEY PATCH --
+>>> warnings.resetwarnings()
+
+   -- END MONKEY PATCH -->
+
 <div class="footnote">
 <hr />
 <ol>
@@ -1247,6 +1260,30 @@ Void where prohibited.
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="countin/" class="md-footer__link md-footer__link--next" aria-label="Next: Countin’ with histograms and pools">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Countin’ with histograms and pools
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -1276,7 +1313,7 @@ Void where prohibited.
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>

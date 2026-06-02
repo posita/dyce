@@ -1080,31 +1080,33 @@ Please review before upgrading.</p>
 <li>Drops support for 3.9 and 3.10 and extends support to 3.14</li>
 <li>Fixes embarrassingly long-running logical error in 4d6 variants example</li>
 <li>Removes <code>dyce.r</code> altogether (pending rewrite of an alternative).</li>
-<li>Adds <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">from_counts</span></code> class method constructs an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
-<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">umap</span></code> in favor of <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
-<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code>, whose functionality can be trivially reintroduced using <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
-<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="fm">__reversed__</span></code>.</li>
-<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">vs</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">within</span></code>.</li>
-<li>Renames <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">accumulate</span></code> to <a class="autorefs autorefs-internal" title="merge(other: H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]) -> H[_T]" href="../dyce/#dyce.H.merge"><code>H.merge</code></a>.</li>
-<li>Renames <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">distribution</span></code> to <a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterable[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">distribution_xy</span></code>.</li>
-<li>Removes <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">umap</span></code> in favor of <a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -> P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a>.</li>
+<li>Adds <code>H.from_counts</code> class method constructs an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
+<li>Removes <code>H.map</code>, <code>H.rmap</code>, and <code>H.umap</code> in favor of <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
+<li>Removes <code>H.is_even</code> and <code>H.is_odd</code>, whose functionality can be trivially reintroduced using <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
+<li>Removes <code>H.__reversed__</code>.</li>
+<li>Removes <code>H.vs</code> and <code>H.within</code>.</li>
+<li>Renames <code>H.accumulate</code> to <a class="autorefs autorefs-internal" title="merge(other: H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]) -> H[_T]" href="../dyce/#dyce.H.merge"><code>H.merge</code></a>.</li>
+<li>Renames <code>H.distribution</code> to <a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and removes <code>H.distribution_xy</code>.</li>
+<li>Removes <code>P.map</code>, <code>P.rmap</code>, and <code>P.umap</code> in favor of <a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -> P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a>.</li>
 <li>Removes <code>P.is_homogeneous</code>.</li>
-<li>Adds optional <code class="highlight"><span class="n">preserve_zero_counts</span></code> parameter to <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -> H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.</li>
+<li>Adds optional <code>preserve_zero_counts</code> parameter to <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -> H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.</li>
+<li>Adds experimental <a class="autorefs autorefs-internal" title="quantize(bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, *, preserve_zero_counts: bool = False) -> H" href="../dyce/#dyce.H.quantize"><code>H.quantize</code></a> method.</li>
 <li>Adds experimental (and somewhat inefficient) <a class="autorefs autorefs-internal" title="replace(existing_outcome: _T, repl: H[_T] | _T) -> H[_T]" href="../dyce/#dyce.H.replace"><code>H.replace</code></a> method.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="apply_to_each_roll(func: Callable[[RollT[_T]], H[_ResultT] | _ResultT], *which: GetItemT) -> H[_ResultT]" href="../dyce/#dyce.P.apply_to_each_roll"><code>P.apply_to_each_roll</code></a> method.</li>
-<li>Simplifies and consolidates <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">expandable</span></code> and <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">foreach</span></code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
-<li>Renames <code class="highlight"><span class="n">explode</span></code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
+<li>Simplifies and consolidates <code>dyce.evaluation.expandable</code> and <code>dyce.evaluation.foreach</code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
+<li>Renames <code>explode</code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
 <li>Moves <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a> to its own module.</li>
 <li><em>(Finally!)</em> removes deprecated interfaces<ul>
-<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">explode</span></code></li>
-<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code></li>
-<li><code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code></li>
-<li><code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code></li>
-<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">coalesce_replace</span></code></li>
-<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">resolve_dependent_probability</span></code></li>
-<li><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">sum_h</span></code> (not previously deprecated, but to-date unused)</li>
+<li><code>H.explode</code></li>
+<li><code>H.foreach</code></li>
+<li><code>H.substitute</code></li>
+<li><code>P.foreach</code></li>
+<li><code>dyce.h.coalesce_replace</code></li>
+<li><code>dyce.h.resolve_dependent_probability</code></li>
+<li><code>dyce.h.sum_h</code> (not previously deprecated, but to-date unused)</li>
 </ul>
 </li>
+<li>Adds <a class="autorefs autorefs-internal" href="../dyce.d/#dyce.d"><code>dyce.d</code></a> convenience aliases.</li>
 <li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a></li>
 <li>Completely eliminates dependency on <a href="https://github.com/beartype/numerary/"><code>numerary</code></a> (which was flawed since conception), and instead relies on <a href="https://jorenham.github.io/optype/"><code>optype</code></a> for mathematical operator typing.
   (<a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code></a> still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)</li>
@@ -1126,17 +1128,17 @@ Please review before upgrading.</p>
 
   
       property
-  " href="../dyce/#dyce.P.total"><code>P.total</code></a> to return <code class="highlight"><span class="mi">1</span></code> for empty pools, consistent with the empty product.
+  " href="../dyce/#dyce.P.total"><code>P.total</code></a> to return <code>1</code> for empty pools, consistent with the empty product.
   (See <a href="https://www.johndcook.com/blog/2015/04/14/empty-sum-product/">this explanation</a>).</li>
-<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">_LimitT</span></code> to <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">LimitT</span></code>.</li>
+<li>Renames <code>dyce.evaluation._LimitT</code> to <code>dyce.evaluation.LimitT</code>.</li>
 <li>Fixes issues pertaining to histograms with zero totals after allowing outcomes with zero counts in non-normalized <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a>.</li>
-<li>Fixes issue that would lead to incorrect results when making certain arbitrary selections with heterogeneous pools (e.g., with <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterable[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code></a>).</li>
+<li>Fixes issue that would lead to incorrect results when making certain arbitrary selections with heterogeneous pools (e.g., with <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code></a>).</li>
 </ul>
 <h2 id="060"><a href="https://github.com/posita/dyce/releases/tag/v0.6.0">0.6.0</a></h2>
 <ul>
 <li>Now requires <code>numerary~=0.4.3</code>.</li>
 <li>Adds the <code>expandable</code> decorator as well as the <code>foreach</code> and <code>explode</code> convenience functions.</li>
-<li>Deprecates <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code>.</li>
+<li>Deprecates <code>P.foreach</code>, <code>H.foreach</code>, and <code>H.substitute</code>.</li>
 <li>Allows outcomes with zero counts in non-normalized <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a>.
   Outcomes with zero counts are dropped when calling <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -> H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.
   Adds the <a class="autorefs autorefs-internal" title="zero_fill(outcomes: Iterable[_T]) -> H[_T]" href="../dyce/#dyce.H.zero_fill"><code>H.zero_fill</code></a> convenience method.</li>
@@ -1149,7 +1151,7 @@ Please review before upgrading.</p>
   
       property
   " href="../dyce/#dyce.P.total"><code>P.total</code> method</a> property.</li>
-<li>Removes <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">order_stat_func_for_n</span></code> and instead caches order stat functions for <code class="highlight"><span class="n">n</span></code> inside <a class="autorefs autorefs-internal" title="order_stat_for_n_at_pos(n: SupportsInt, pos: SupportsInt) -> H[_T]" href="../dyce/#dyce.H.order_stat_for_n_at_pos"><code>H.order_stat_for_n_at_pos</code></a>.</li>
+<li>Removes <code>H.order_stat_func_for_n</code> and instead caches order stat functions for <code>n</code> inside <a class="autorefs autorefs-internal" title="order_stat_for_n_at_pos(n: SupportsInt, pos: SupportsInt) -> H[_T]" href="../dyce/#dyce.H.order_stat_for_n_at_pos"><code>H.order_stat_for_n_at_pos</code></a>.</li>
 </ul>
 <h2 id="052"><a href="https://github.com/posita/dyce/releases/tag/v0.5.2">0.5.2</a></h2>
 <ul>
@@ -1158,14 +1160,14 @@ Please review before upgrading.</p>
 <h2 id="051"><a href="https://github.com/posita/dyce/releases/tag/v0.5.1">0.5.1</a></h2>
 <ul>
 <li>Fixes broken binder links in docs.</li>
-<li>Adds the <code class="highlight"><span class="n">precision_limit</span></code> argument to <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">substitute</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">explode</span></code>.</li>
+<li>Adds the <code>precision_limit</code> argument to <code>H.substitute</code> and <code>H.explode</code>.</li>
 </ul>
 <h2 id="050"><a href="https://github.com/posita/dyce/releases/tag/v0.5.0">0.5.0</a></h2>
 <ul>
-<li>Breaks <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> out into <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.</li>
-<li>Removes use of <code class="highlight"><span class="n">numerary</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="err">…</span><span class="n">SCU</span></code> types.</li>
-<li>Adds the <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">foreach</span></code> class methods.</li>
-<li>Migrates <code class="highlight"><span class="n">resolve_dependent_probability</span></code> to the <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">foreach</span></code> class method.</li>
+<li>Breaks <code>dyce.viz</code> out into <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.</li>
+<li>Removes use of <code>numerary.types.…SCU</code> types.</li>
+<li>Adds the <code>H.foreach</code> and <code>P.foreach</code> class methods.</li>
+<li>Migrates <code>resolve_dependent_probability</code> to the <code>H.foreach</code> class method.</li>
 </ul>
 <h2 id="045"><a href="https://github.com/posita/dyce/releases/tag/v0.4.5">0.4.5</a></h2>
 <ul>
@@ -1180,16 +1182,16 @@ Please review before upgrading.</p>
 <li>Adds <em>Ironsworn</em> example.</li>
 <li>Removes faulty (correctly-derived, but misapplied) math in Risus “Evens Up” example.</li>
 <li>Adds detail around dependent probabilities.</li>
-<li>Adds experimental <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">resolve_dependent_probability</span></code> function.</li>
+<li>Adds experimental <code>dyce.h.resolve_dependent_probability</code> function.</li>
 </ul>
 <h2 id="043"><a href="https://github.com/posita/dyce/releases/tag/v0.4.3">0.4.3</a></h2>
 <ul>
-<li>Removes dependencies on deprecated <code class="highlight"><span class="n">numerary</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="err">…</span><span class="n">SCT</span></code> tuples</li>
+<li>Removes dependencies on deprecated <code>numerary.types.…SCT</code> tuples</li>
 <li>Adds <a href="https://theangrygm.com/definitive-tension-pool/">Angry GM Tension Pool mechanic</a> translation.</li>
 </ul>
 <h2 id="042"><a href="https://github.com/posita/dyce/releases/tag/v0.4.2">0.4.2</a></h2>
 <ul>
-<li>Removes calls to <code class="highlight"><span class="n">os</span><span class="o">.</span><span class="n">get_terminal_size</span></code> to retain utility in environments without terminals.
+<li>Removes calls to <code>os.get_terminal_size</code> to retain utility in environments without terminals.
   Fixes <a href="https://github.com/posita/dyce/issues/5">#5</a>.
   Thanks <a href="https://github.com/sudo-simon">@sudo-simon!</a>!</li>
 </ul>
@@ -1198,9 +1200,9 @@ Please review before upgrading.</p>
 <li>Splits out protocol checking into its own fancy library: <a href="https://github.com/beartype/numerary/"><code>numerary</code></a>!</li>
 <li>Is now <a href="https://pypi.org/project/dyce/">available on PyPI as <code>dyce</code>_</a>, thanks to the generosity of <a href="https://eykd.net/about/">David Eyk</a>!</li>
 <li>Introduces experimental generic <code>dyce.r.walk</code> function and supporting visitor data structures.</li>
-<li>Uses <code class="highlight"><span class="n">pygraphviz</span></code> to automate class diagram generation.
+<li>Uses <code>pygraphviz</code> to automate class diagram generation.
   (See the note on special considerations for regenerating class diagrams in the <a href="../contrib/#hacking-quick-start">hacking quick start</a>.)</li>
-<li>Introduces experimental use of <code class="highlight"><span class="n">numpy</span></code> for RNG, if present.</li>
+<li>Introduces experimental use of <code>numpy</code> for RNG, if present.</li>
 <li>Migrates to using <code>pyproject.toml</code> and <code>setup.cfg</code>.</li>
 <li>Adds missing <a href="https://www.python.org/dev/peps/pep-0561/"><code>py.typed</code> to ensure clients get type checking</a>.
   (Whoops.)</li>
@@ -1212,20 +1214,20 @@ Please review before upgrading.</p>
 Please review before upgrading.</p>
 </div>
 <ul>
-<li>Renames <code class="highlight"><span class="n">HAbleT</span></code> and <code class="highlight"><span class="n">HAbleOpsMixin</span></code> to <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a>.
+<li>Renames <code>HAbleT</code> and <code>HAbleOpsMixin</code> to <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a>.
     Uses alternate spellings.</li>
-<li>Removes deprecated non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.
-    Uses, e.g., <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="fm">__neg__</span><span class="p">)</span></code> or <code class="highlight"><span class="n">P</span><span class="p">(</span><span class="o">-</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)</span></code> instead.</li>
-<li>Removes deprecated synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.
-    Uses <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code> instead.</li>
-<li>Removes deprecated synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.
-    Uses <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> instead.</li>
+<li>Removes deprecated non-flattening unary operation methods <code>P.__neg__</code> and <code>P.__pos__</code>.
+    Uses, e.g., <code>P.umap(operator.__neg__)</code> or <code>P(-h for h in p)</code> instead.</li>
+<li>Removes deprecated synonym methods <code>H.even</code> and <code>H.odd</code>.
+    Uses <code>H.is_even</code> and <code>H.is_odd</code> instead.</li>
+<li>Removes deprecated synonym package <code>dyce.plt</code>.
+    Uses <code>dyce.viz</code> instead.</li>
 <li>
-<p>Removes special case handling of <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for addition and subtraction.
-    Check for code that relied on, e.g., <code class="highlight"><span class="n">h</span> <span class="o">+</span> <span class="n">H</span><span class="p">({})</span></code> resolving to <code class="highlight"><span class="n">h</span></code>.
+<p>Removes special case handling of <code>H({})</code> for addition and subtraction.
+    Check for code that relied on, e.g., <code>h + H({})</code> resolving to <code>h</code>.
     It is probably not correct.
     If the behavior is desired, consider eliminating empty histograms before performing calculations.
-    E.G., <code class="highlight"><span class="n">h1</span> <span class="o">+</span> <span class="n">h2</span> <span class="k">if</span> <span class="n">h2</span> <span class="k">else</span> <span class="n">h1</span></code>.</p>
+    E.G., <code>h1 + h2 if h2 else h1</code>.</p>
 <p>See also the <del><code>sum_h</code> function</del>, which ensures the result is always a histogram:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -1256,7 +1258,7 @@ Please review before upgrading.</p>
 <h3 id="other-changes">Other changes</h3>
 <ul>
 <li>Documentation overhaul including augmented examples and reorganized images and JavaScript.</li>
-<li>Fixes <code class="highlight"><span class="n">H</span><span class="p">({})</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">)</span></code> bug.</li>
+<li>Fixes <code>H({}).format(width=65)</code> bug.</li>
 <li>Adds <a href="https://github.com/beartype/beartype"><code>beartype</code></a> runtime type checking.</li>
 <li><em>Maintains</em> support for Python 3.7 (for now).</li>
 </ul>
@@ -1267,22 +1269,22 @@ Please review before upgrading.</p>
 <h2 id="031"><a href="https://github.com/posita/dyce/releases/tag/v0.3.1">0.3.1</a></h2>
 <ul>
 <li>Adds these release notes.</li>
-<li>Boosts <code class="highlight"><span class="nb">isinstance</span></code> performance with <code class="highlight"><span class="n">dyce</span></code>’s proprietary numeric <code class="highlight"><span class="n">Protocol</span></code>s.</li>
+<li>Boosts <code>isinstance</code> performance with <code>dyce</code>’s proprietary numeric <code>Protocol</code>s.</li>
 <li>Reinstates support for Python 3.7 <del>(for now)</del>.</li>
-<li>Adds <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">is_odd</span></code>.</li>
-<li>Deprecates synonym methods <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">even</span></code> and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">odd</span></code>.</li>
+<li>Adds <code>H.is_even</code> and <code>H.is_odd</code>.</li>
+<li>Deprecates synonym methods <code>H.even</code> and <code>H.odd</code>.</li>
 <li>Introduces experimental <a class="autorefs autorefs-internal" title="total: int
 
   
       property
   " href="../dyce/#dyce.H.total"><code>H.total</code></a> property.</li>
-<li>Removes incorrectly non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__abs__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__invert__</span></code>.</li>
-<li>Deprecates non-flattening unary operation methods <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__neg__</span></code> and <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="fm">__pos__</span></code>.</li>
-<li>Renames experimental <code class="highlight"><span class="n">P</span><span class="o">.</span><span class="n">homogeneous</span></code> property to <code>P.is_homogeneous</code>.</li>
+<li>Removes incorrectly non-flattening unary operation methods <code>P.__abs__</code> and <code>P.__invert__</code>.</li>
+<li>Deprecates non-flattening unary operation methods <code>P.__neg__</code> and <code>P.__pos__</code>.</li>
+<li>Renames experimental <code>P.homogeneous</code> property to <code>P.is_homogeneous</code>.</li>
 <li>Introduces experimental <code>dyce.r.R</code> and <code>dyce.r.Roll</code> primitives.</li>
-<li>Removes <code class="highlight"><span class="n">coerce</span></code> parameter from <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">map</span></code>, <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">rmap</span></code>, and <code class="highlight"><span class="n">H</span><span class="o">.</span><span class="n">umap</span></code>.</li>
-<li>Renames <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code> to <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code>.</li>
-<li>Deprecates synonym package <code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">plt</span></code>.</li>
+<li>Removes <code>coerce</code> parameter from <code>H.map</code>, <code>H.rmap</code>, and <code>H.umap</code>.</li>
+<li>Renames <code>dyce.plt</code> to <code>dyce.viz</code>.</li>
+<li>Deprecates synonym package <code>dyce.plt</code>.</li>
 </ul>
 <h2 id="030"><a href="https://github.com/posita/dyce/releases/tag/v0.3.0">0.3.0</a></h2>
 <p><code>dyce</code> goes beta!
@@ -1313,6 +1315,46 @@ Non-experimental features should be considered stable.</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../translations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Applications and translations">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Applications and translations
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../contrib/" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Contributing
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -1342,7 +1384,7 @@ Non-experimental features should be considered stable.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

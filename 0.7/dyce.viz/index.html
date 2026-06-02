@@ -879,7 +879,7 @@
   Thank you!
 -->
 
-<h1 id="dyceviz-package-reference"><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> package reference</h1>
+<h1 id="dyceviz-package-reference"><code>dyce.viz</code> package reference</h1>
 
 
 <div class="doc doc-object doc-module">
@@ -889,7 +889,7 @@
 <a id="dyce.viz"></a>
     <div class="doc doc-contents first">
 
-        <p><code class="highlight"><span class="n">dyce</span><span class="o">.</span><span class="n">viz</span></code> provides optional, basic <a href="https://matplotlib.org/">Matplotlib</a>-based visualization utilities.
+        <p><code>dyce.viz</code> provides optional, basic <a href="https://matplotlib.org/">Matplotlib</a>-based visualization utilities.
 Its requirements can be installed via the <code>viz</code> optional dependency group.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -942,7 +942,7 @@ uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </
     <div class="doc doc-contents ">
 
         <p>Callable type for burst-plot wedge labels.</p>
-<p>Called as <code class="highlight"><span class="n">formatter</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">histogram</span><span class="p">)</span></code>.
+<p>Called as <code>formatter(outcome, probability, histogram)</code>.
 Return an empty string to suppress the label for that wedge.</p>
 
     </div>
@@ -967,9 +967,9 @@ Return an empty string to suppress the label for that wedge.</p>
 
         <p>Controls which variant of the distribution is plotted.</p>
 <ul>
-<li><code class="highlight"><span class="s2">&quot;normal&quot;</span></code>: raw probability for each outcome</li>
-<li><code class="highlight"><span class="s2">&quot;at_most&quot;</span></code>: cumulative probability <span class="arithmatex">\(P(X \le k)\)</span></li>
-<li><code class="highlight"><span class="s2">&quot;at_least&quot;</span></code>: survival probability <span class="arithmatex">\(P(X \ge k)\)</span></li>
+<li><code>"normal"</code>: raw probability for each outcome</li>
+<li><code>"at_most"</code>: cumulative probability <span class="arithmatex">\(P(X \le k)\)</span></li>
+<li><code>"at_least"</code>: survival probability <span class="arithmatex">\(P(X \ge k)\)</span></li>
 </ul>
 
     </div>
@@ -995,7 +995,7 @@ Return an empty string to suppress the label for that wedge.</p>
 <p><code>dyce.viz.format_outcome_name</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
 <p>Burst-plot formatter that labels each wedge with its outcome.
-If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span class="n">name</span></code> attribute (e.g. an <code class="highlight"><span class="n">Enum</span></code>), that is used; otherwise <code class="highlight"><span class="nb">str</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span></code> is used.</p>
+If <em>outcome</em> has a <code>.name</code> attribute (e.g. an <code>Enum</code>), that is used; otherwise <code>str(outcome)</code> is used.</p>
 
 
             <details class="mkdocstrings-source">
@@ -1018,7 +1018,7 @@ If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span 
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Burst-plot formatter that labels each wedge with its outcome.</span>
-<span class="sd">    If *outcome* has a `#!python .name` attribute (e.g. an `#!python Enum`), that is used; otherwise `#!python str(outcome)` is used.</span>
+<span class="sd">    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
 </code></pre></div></td></tr></table></div>
@@ -1043,7 +1043,7 @@ If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span 
 <p><code>dyce.viz.format_outcome_name_probability</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
 <p>Burst-plot formatter that labels each wedge with both its outcome and probability.
-If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span class="n">name</span></code> attribute (e.g. an <code class="highlight"><span class="n">Enum</span></code>), that is used; otherwise <code class="highlight"><span class="nb">str</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span></code> is used.</p>
+If <em>outcome</em> has a <code>.name</code> attribute (e.g. an <code>Enum</code>), that is used; otherwise <code>str(outcome)</code> is used.</p>
 
 
             <details class="mkdocstrings-source">
@@ -1067,7 +1067,7 @@ If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span 
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Burst-plot formatter that labels each wedge with both its outcome and probability.</span>
-<span class="sd">    If *outcome* has a `#!python .name` attribute (e.g. an `#!python Enum`), that is used; otherwise `#!python str(outcome)` is used.</span>
+<span class="sd">    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">format_outcome_name</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">format_probability</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span><span class="w"> </span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1137,14 +1137,6 @@ If <em>outcome</em> has a <code class="highlight"><span class="o">.</span><span 
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plot_bar</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Plots a grouped bar chart of one or more histograms.</p>
-<p>Pass one or more <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> instances as positional arguments.
-Use <em>labels</em> to assign names to each histogram; unmatched histograms receive an empty label.
-When multiple histograms are provided, bars are interleaved side-by-side.</p>
-<p><em>graph_type</em> controls which variant of the distribution is plotted (see <code>GraphTypeT</code>).
-When <em>horizontal</em> is <code class="highlight"><span class="kc">True</span></code>, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.</p>
-<p>If <em>ax</em> is <code class="highlight"><span class="kc">None</span></code>, <code class="highlight"><span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span></code> is used.
-Returns the axes so the caller can further customise the plot.</p>
 <!-- BEGIN MONKEY PATCH --
 >>> import warnings
 >>> from dyce.lifecycle import ExperimentalWarning
@@ -1154,6 +1146,14 @@ Returns the axes so the caller can further customise the plot.</p>
 
   -- END MONKEY PATCH -->
 
+<p>Plots a grouped bar chart of one or more histograms.</p>
+<p>Pass one or more <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> instances as positional arguments.
+Use <em>labels</em> to assign names to each histogram; unmatched histograms receive an empty label.
+When multiple histograms are provided, bars are interleaved side-by-side.</p>
+<p><em>graph_type</em> controls which variant of the distribution is plotted (see <code>GraphTypeT</code>).
+When <em>horizontal</em> is <code>True</code>, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.</p>
+<p>If <em>ax</em> is <code>None</code>, <code>matplotlib.pyplot.gca()</code> is used.
+Returns the axes so the caller can further customise the plot.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="dyce.viz.plot_bar--__tabbed_1_1" name="dyce.viz.plot_bar--__tabbed_1" type="radio" /><input id="dyce.viz.plot_bar--__tabbed_1_2" name="dyce.viz.plot_bar--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="dyce.viz.plot_bar--__tabbed_1_1">Vertical bars (default)</label><label for="dyce.viz.plot_bar--__tabbed_1_2">Horizontal bars (<code>horizontal=True</code>)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1327,7 +1327,8 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
-<span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">251</span>
+<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_bar</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_ALPHA</span><span class="p">,</span>
@@ -1337,18 +1338,6 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plots a grouped bar chart of one or more histograms.</span>
-
-<span class="sd">    Pass one or more [`H`][dyce.H] instances as positional arguments.</span>
-<span class="sd">    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.</span>
-<span class="sd">    When multiple histograms are provided, bars are interleaved side-by-side.</span>
-
-<span class="sd">    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).</span>
-<span class="sd">    When *horizontal* is `#!python True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.</span>
-
-<span class="sd">    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.</span>
-<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
-
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
 <span class="sd">    &gt;&gt;&gt; import warnings</span>
 <span class="sd">    &gt;&gt;&gt; from dyce.lifecycle import ExperimentalWarning</span>
@@ -1357,6 +1346,18 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="sd">    &gt;&gt;&gt; mpl.use(&quot;Agg&quot;)</span>
 
 <span class="sd">      -- END MONKEY PATCH --&gt;</span>
+
+<span class="sd">    Plots a grouped bar chart of one or more histograms.</span>
+
+<span class="sd">    Pass one or more [`H`][dyce.H] instances as positional arguments.</span>
+<span class="sd">    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.</span>
+<span class="sd">    When multiple histograms are provided, bars are interleaved side-by-side.</span>
+
+<span class="sd">    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).</span>
+<span class="sd">    When *horizontal* is `True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.</span>
+
+<span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
+<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
 
 <span class="sd">    === &quot;Vertical bars (default)&quot;</span>
 
@@ -1419,14 +1420,15 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="k">if</span> <span class="n">unique_outcomes</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">unique_outcomes</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">unique_outcomes</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">pass</span>  <span class="c1"># non-comparable outcomes: matplotlib handles categorical axes</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">horizontal</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">unique_outcomes</span><span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">lo</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">hi</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">unique_outcomes</span><span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">lo</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">hi</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">pass</span>  <span class="c1"># non-comparable outcomes: matplotlib handles categorical axes</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hs_list</span><span class="p">):</span>
         <span class="n">outcomes</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="n">_values_for_graph_type</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
@@ -1514,17 +1516,6 @@ Returns the axes so the caller can further customise the plot.</p>
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plot_burst</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Plots a dual concentric pie chart for one or two histograms.</p>
-<p>The inner ring represents <em>h</em> and the outer ring represents <em>compare</em>.
-When <em>compare</em> is <code class="highlight"><span class="kc">None</span></code> (the default), both rings show the same histogram: the inner ring labels outcomes (via <em>formatter</em>) and the outer ring labels probabilities.
-When <em>compare</em> differs from <em>h</em>, both rings default to labelling outcomes
-This is useful for comparing two related distributions side-by-side in a single visual.</p>
-<p>Wedge labels are suppressed when the probability is below <code class="highlight"><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span></code> (~3.1%) to avoid clutter.</p>
-<p><em>formatter</em> and <em>compare_formatter</em> are <code>BurstFormatterT</code> callables (see <code>format_outcome_name</code>, <code>format_probability</code>, <code>format_outcome_name_probability</code>).</p>
-<p><em>cmap</em> / <em>compare_cmap</em> accept any matplotlib colormap name or instance.
-If <code class="highlight"><span class="kc">None</span></code>, the <code class="highlight"><span class="s2">&quot;image.cmap&quot;</span></code> associated with the current style is used.</p>
-<p>If <em>ax</em> is <code class="highlight"><span class="kc">None</span></code>, <code class="highlight"><span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span></code> is used.
-Returns the axes so the caller can further customise the plot.</p>
 <!-- BEGIN MONKEY PATCH --
 >>> import warnings
 >>> from dyce.lifecycle import ExperimentalWarning
@@ -1534,6 +1525,17 @@ Returns the axes so the caller can further customise the plot.</p>
 
   -- END MONKEY PATCH -->
 
+<p>Plots a dual concentric pie chart for one or two histograms.</p>
+<p>The inner ring represents <em>h</em> and the outer ring represents <em>compare</em>.
+When <em>compare</em> is <code>None</code> (the default), both rings show the same histogram: the inner ring labels outcomes (via <em>formatter</em>) and the outer ring labels probabilities.
+When <em>compare</em> differs from <em>h</em>, both rings default to labelling outcomes
+This is useful for comparing two related distributions side-by-side in a single visual.</p>
+<p>Wedge labels are suppressed when the probability is below <code>Fraction(1, 32)</code> (~3.1%) to avoid clutter.</p>
+<p><em>formatter</em> and <em>compare_formatter</em> are <code>BurstFormatterT</code> callables (see <code>format_outcome_name</code>, <code>format_probability</code>, <code>format_outcome_name_probability</code>).</p>
+<p><em>cmap</em> / <em>compare_cmap</em> accept any matplotlib colormap name or instance.
+If <code>None</code>, the <code>"image.cmap"</code> associated with the current style is used.</p>
+<p>If <em>ax</em> is <code>None</code>, <code>matplotlib.pyplot.gca()</code> is used.
+Returns the axes so the caller can further customise the plot.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1560,22 +1562,20 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="o">...</span> <span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax_2d6_vs_d12</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;2d6 vs. d12&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 <p><picture>
     <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
     <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.svg">
 </picture></p>
+<!-- BEGIN MONKEY PATCH --
+>>> warnings.resetwarnings()
+
+   -- END MONKEY PATCH -->
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">310</span>
-<span class="normal">311</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
 <span class="normal">314</span>
@@ -1696,7 +1696,8 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">429</span>
 <span class="normal">430</span>
 <span class="normal">431</span>
-<span class="normal">432</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">432</span>
+<span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_burst</span><span class="p">(</span>
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T1</span><span class="p">],</span>
     <span class="n">compare</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T2</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1711,23 +1712,6 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="n">use_midpoints_for_colors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plots a dual concentric pie chart for one or two histograms.</span>
-
-<span class="sd">    The inner ring represents *h* and the outer ring represents *compare*.</span>
-<span class="sd">    When *compare* is `#!python None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.</span>
-<span class="sd">    When *compare* differs from *h*, both rings default to labelling outcomes</span>
-<span class="sd">    This is useful for comparing two related distributions side-by-side in a single visual.</span>
-
-<span class="sd">    Wedge labels are suppressed when the probability is below `#!python Fraction(1, 32)` (~3.1%) to avoid clutter.</span>
-
-<span class="sd">    *formatter* and *compare_formatter* are `BurstFormatterT` callables (see `format_outcome_name`, `format_probability`, `format_outcome_name_probability`).</span>
-
-<span class="sd">    *cmap* / *compare_cmap* accept any matplotlib colormap name or instance.</span>
-<span class="sd">    If `#!python None`, the `#!python &quot;image.cmap&quot;` associated with the current style is used.</span>
-
-<span class="sd">    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.</span>
-<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
-
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
 <span class="sd">    &gt;&gt;&gt; import warnings</span>
 <span class="sd">    &gt;&gt;&gt; from dyce.lifecycle import ExperimentalWarning</span>
@@ -1736,6 +1720,23 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="sd">    &gt;&gt;&gt; mpl.use(&quot;Agg&quot;)</span>
 
 <span class="sd">      -- END MONKEY PATCH --&gt;</span>
+
+<span class="sd">    Plots a dual concentric pie chart for one or two histograms.</span>
+
+<span class="sd">    The inner ring represents *h* and the outer ring represents *compare*.</span>
+<span class="sd">    When *compare* is `None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.</span>
+<span class="sd">    When *compare* differs from *h*, both rings default to labelling outcomes</span>
+<span class="sd">    This is useful for comparing two related distributions side-by-side in a single visual.</span>
+
+<span class="sd">    Wedge labels are suppressed when the probability is below `Fraction(1, 32)` (~3.1%) to avoid clutter.</span>
+
+<span class="sd">    *formatter* and *compare_formatter* are `BurstFormatterT` callables (see `format_outcome_name`, `format_probability`, `format_outcome_name_probability`).</span>
+
+<span class="sd">    *cmap* / *compare_cmap* accept any matplotlib colormap name or instance.</span>
+<span class="sd">    If `None`, the `&quot;image.cmap&quot;` associated with the current style is used.</span>
+
+<span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
+<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
 
 <span class="sd">        &gt;&gt;&gt; from dyce import H</span>
 <span class="sd">        &gt;&gt;&gt; from dyce.viz import plot_burst</span>
@@ -1751,16 +1752,16 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; _ = ax_2d6_vs_d12.set_title(&quot;2d6 vs. d12&quot;)</span>
 
-<span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
-<span class="sd">    &gt;&gt;&gt; warnings.resetwarnings()</span>
-
-<span class="sd">       -- END MONKEY PATCH --&gt;</span>
-
 <span class="sd">    &lt;picture&gt;</span>
 <span class="sd">        &lt;source media=&quot;(prefers-color-scheme: dark)&quot; srcset=&quot;../assets/plot_viz_plot_burst_dark.svg&quot;&gt;</span>
 <span class="sd">        &lt;source media=&quot;(prefers-color-scheme: light)&quot; srcset=&quot;../assets/plot_viz_plot_burst_light.svg&quot;&gt;</span>
 <span class="sd">        &lt;img alt=&quot;Plot: 2d6 vs. d12&quot; src=&quot;../assets/plot_viz_plot_burst_light.svg&quot;&gt;</span>
 <span class="sd">    &lt;/picture&gt;</span>
+
+<span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
+<span class="sd">    &gt;&gt;&gt; warnings.resetwarnings()</span>
+
+<span class="sd">       -- END MONKEY PATCH --&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">_get_ax</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
 
@@ -1840,13 +1841,6 @@ Returns the axes so the caller can further customise the plot.</p>
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plot_line</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Plots a line graph of one or more histograms.</p>
-<p>Pass one or more <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> instances as positional arguments.
-Use <em>labels</em> to assign names to each histogram; unmatched histograms receive an empty label.
-<em>markers</em> is a string whose characters are cycled across histograms (e.g. <code class="highlight"><span class="s2">&quot;oX^&quot;</span></code> produces circle, cross, triangle, circle, …).</p>
-<p><em>graph_type</em> controls which variant of the distribution is plotted (see <code>GraphTypeT</code>).</p>
-<p>If <em>ax</em> is <code class="highlight"><span class="kc">None</span></code>, <code class="highlight"><span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span></code> is used.
-Returns the axes so the caller can further customise the plot.</p>
 <!-- BEGIN MONKEY PATCH --
 >>> import warnings
 >>> from dyce.lifecycle import ExperimentalWarning
@@ -1856,6 +1850,13 @@ Returns the axes so the caller can further customise the plot.</p>
 
   -- END MONKEY PATCH -->
 
+<p>Plots a line graph of one or more histograms.</p>
+<p>Pass one or more <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> instances as positional arguments.
+Use <em>labels</em> to assign names to each histogram; unmatched histograms receive an empty label.
+<em>markers</em> is a string whose characters are cycled across histograms (e.g. <code>"oX^"</code> produces circle, cross, triangle, circle, …).</p>
+<p><em>graph_type</em> controls which variant of the distribution is plotted (see <code>GraphTypeT</code>).</p>
+<p>If <em>ax</em> is <code>None</code>, <code>matplotlib.pyplot.gca()</code> is used.
+Returns the axes so the caller can further customise the plot.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1876,22 +1877,20 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;2d6 vs. d12&quot;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 <p><picture>
     <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
     <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.svg">
 </picture></p>
+<!-- BEGIN MONKEY PATCH --
+>>> warnings.resetwarnings()
+
+   -- END MONKEY PATCH -->
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">435</span>
-<span class="normal">436</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">436</span>
 <span class="normal">437</span>
 <span class="normal">438</span>
 <span class="normal">439</span>
@@ -1964,7 +1963,8 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">506</span>
 <span class="normal">507</span>
 <span class="normal">508</span>
-<span class="normal">509</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">509</span>
+<span class="normal">510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_line</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_ALPHA</span><span class="p">,</span>
@@ -1974,17 +1974,6 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="n">markers</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_MARKERS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plots a line graph of one or more histograms.</span>
-
-<span class="sd">    Pass one or more [`H`][dyce.H] instances as positional arguments.</span>
-<span class="sd">    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.</span>
-<span class="sd">    *markers* is a string whose characters are cycled across histograms (e.g. `#!python &quot;oX^&quot;` produces circle, cross, triangle, circle, …).</span>
-
-<span class="sd">    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).</span>
-
-<span class="sd">    If *ax* is `#!python None`, `#!python matplotlib.pyplot.gca()` is used.</span>
-<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
-
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
 <span class="sd">    &gt;&gt;&gt; import warnings</span>
 <span class="sd">    &gt;&gt;&gt; from dyce.lifecycle import ExperimentalWarning</span>
@@ -1993,6 +1982,17 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="sd">    &gt;&gt;&gt; mpl.use(&quot;Agg&quot;)</span>
 
 <span class="sd">      -- END MONKEY PATCH --&gt;</span>
+
+<span class="sd">    Plots a line graph of one or more histograms.</span>
+
+<span class="sd">    Pass one or more [`H`][dyce.H] instances as positional arguments.</span>
+<span class="sd">    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.</span>
+<span class="sd">    *markers* is a string whose characters are cycled across histograms (e.g. `&quot;oX^&quot;` produces circle, cross, triangle, circle, …).</span>
+
+<span class="sd">    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).</span>
+
+<span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
+<span class="sd">    Returns the axes so the caller can further customise the plot.</span>
 
 <span class="sd">        &gt;&gt;&gt; from dyce import H</span>
 <span class="sd">        &gt;&gt;&gt; from dyce.viz import plot_line</span>
@@ -2005,16 +2005,16 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="sd">        &gt;&gt;&gt; _ = ax.set_title(&quot;2d6 vs. d12&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; _ = ax.legend(loc=&quot;upper left&quot;)</span>
 
-<span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
-<span class="sd">    &gt;&gt;&gt; warnings.resetwarnings()</span>
-
-<span class="sd">       -- END MONKEY PATCH --&gt;</span>
-
 <span class="sd">    &lt;picture&gt;</span>
 <span class="sd">        &lt;source media=&quot;(prefers-color-scheme: dark)&quot; srcset=&quot;../assets/plot_viz_plot_line_dark.svg&quot;&gt;</span>
 <span class="sd">        &lt;source media=&quot;(prefers-color-scheme: light)&quot; srcset=&quot;../assets/plot_viz_plot_line_light.svg&quot;&gt;</span>
 <span class="sd">        &lt;img alt=&quot;Plot: d6 and 2d6 vs. d12&quot; src=&quot;../assets/plot_viz_plot_line_light.svg&quot;&gt;</span>
 <span class="sd">    &lt;/picture&gt;</span>
+
+<span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
+<span class="sd">    &gt;&gt;&gt; warnings.resetwarnings()</span>
+
+<span class="sd">       -- END MONKEY PATCH --&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hs_list</span> <span class="o">=</span> <span class="n">_labeled_hs</span><span class="p">(</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">_get_ax</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
@@ -2078,6 +2078,30 @@ Returns the axes so the caller can further customise the plot.</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../dyce.d/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Conveniences">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Conveniences
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -2107,7 +2131,7 @@ Returns the axes so the caller can further customise the plot.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

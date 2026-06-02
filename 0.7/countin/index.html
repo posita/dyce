@@ -823,12 +823,18 @@
   Thank you!
 -->
 <!-- BEGIN MONKEY PATCH --
-For typing.
+>>> import warnings
+>>> from dyce import TruncationWarning
+>>> from dyce.lifecycle import ExperimentalWarning
+>>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+>>> warnings.filterwarnings("ignore", category=TruncationWarning)
 
-    >>> import sympy  # type: ignore[import-untyped]
-    >>> import sympy.abc  # type: ignore[import-untyped]
-    >>> import sympy.solvers  # type: ignore[import-untyped]
-    >>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
+For typing:
+
+>>> import sympy  # type: ignore[import-untyped]
+>>> import sympy.abc  # type: ignore[import-untyped]
+>>> import sympy.solvers  # type: ignore[import-untyped]
+>>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
 
   -- END MONKEY PATCH -->
 
@@ -851,7 +857,7 @@ If you need to <em>select</em> certain histograms from a group prior to computin
 <p>As a wise person whose name has been lost to history once said: “Language is imperfect. If at all possible, shut up and point.”
 So with that illuminating (or perhaps impenetrable) introduction out of the way, let’s dive into some examples!</p>
 <h2 id="basic-examples">Basic examples</h2>
-<p><code class="highlight"><span class="n">H</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></code> is shorthand for explicitly enumerating outcomes <span class="arithmatex">\([{ {1} .. {n} }]\)</span>, each with a frequency of 1.
+<p><code>H(n)</code> is shorthand for explicitly enumerating outcomes <span class="arithmatex">\([{ {1} .. {n} }]\)</span>, each with a frequency of 1.
 A normal, six-sided die (d6) can be modeled as:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -894,8 +900,8 @@ The outcomes of rolling and summing two six-sided dice (2d6) are:</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">P</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">d6</span><span class="p">)</span>
 <span class="mi">2</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
 </code></pre></div></td></tr></table></div>
-<p>Where <code class="highlight"><span class="n">n</span></code> is an integer, <code class="highlight"><span class="n">P</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span></code> is shorthand for <code class="highlight"><span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span></code>.
-Python’s matrix multiplication operator (<code class="highlight"><span class="o">@</span></code>) can also be used with pools.
+<p>Where <code>n</code> is an integer, <code>P(n, ...)</code> is shorthand for <code>P(H(n), ...)</code>.
+Python’s matrix multiplication operator (<code>@</code>) can also be used with pools.
 The above can be expressed more succinctly.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -916,7 +922,7 @@ The above can be expressed more succinctly.</p>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">18</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-<p>The results show there is one way to make <code class="highlight"><span class="mi">18</span></code>, two ways to make <code class="highlight"><span class="mi">21</span></code>, three ways to make <code class="highlight"><span class="mi">24</span></code>, etc.</p>
+<p>The results show there is one way to make <code>18</code>, two ways to make <code>21</code>, three ways to make <code>24</code>, etc.</p>
 <p>Histograms provide rudimentary formatting for convenience.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1037,9 +1043,9 @@ The above can be expressed more succinctly.</p>
 </code></pre></div></td></tr></table></div>
 <p>Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
-This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="h(*which: GetItemT) -> H[_T]" href="../dyce/#dyce.P.h"><code>P.h</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterable[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
-Indexes can be integers, slices, or a mix thereof.
-Outcome indexes in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., <code class="highlight"><span class="p">[</span><span class="mi">0</span><span class="p">]</span></code>, <code class="highlight"><span class="p">[</span><span class="mi">1</span><span class="p">]</span></code>, …, <code class="highlight"><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span></code>, <code class="highlight"><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></code>).
+This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="h(*which: GetItemT) -> H[_T]" href="../dyce/#dyce.P.h"><code>P.h</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
+Indices can be integers, slices, or a mix thereof.
+Outcome indices in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., <code>[0]</code>, <code>[1]</code>, …, <code>[-2]</code>, <code>[-1]</code>).
 Summing the least two faces when rolling three six-sided dice would be:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -1051,7 +1057,7 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 </code></pre></div></td></tr></table></div>
 <div class="admonition bug">
 <p class="admonition-title">Mind your parentheses</p>
-<p>Parentheses are needed in the above example because <code class="highlight"><span class="o">@</span></code> has a <a href="https://docs.python.org/3/reference/expressions.html#operator-precedence">lower precedence</a> than <code class="highlight"><span class="o">.</span></code> and <code class="highlight"><span class="p">[</span><span class="err">…</span><span class="p">]</span></code>.</p>
+<p>Parentheses are needed in the above example because <code>@</code> has a <a href="https://docs.python.org/3/reference/expressions.html#operator-precedence">lower precedence</a> than <code>.</code> and <code>[…]</code>.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1263,13 +1269,6 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
  <span class="mi">1</span><span class="n">d6</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span>
 </code></pre></div></td></tr></table></div>
 <p>The odds of scoring at least one nine or higher for any one of <span class="arithmatex">\(n\)</span> “<a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n">exploding</a>” six-sided dice, for <span class="arithmatex">\(n\)</span> in <span class="arithmatex">\([1 .. 10]\)</span> is:</p>
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-   -- END MONKEY PATCH -->
-
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1308,19 +1307,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
  <span class="mi">2</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">20.99</span><span class="o">%</span>
  <span class="mi">1</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">11.11</span><span class="o">%</span>
 </code></pre></div></td></tr></table></div>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 <h2 id="dependent-probabilities">Dependent probabilities</h2>
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-   -- END MONKEY PATCH -->
-
 <p>Probabilities involving dependent terms can be expressed via a callback passed to <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>.
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a function that will be called once for each of the Cartesian product of the results from each independent term.
@@ -1464,21 +1451,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.</p>
         <span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">DRAW</span><span class="p">:</span> <span class="mi">0</span><span class="o">&gt;</span> <span class="o">|</span>  <span class="mf">52.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############</span>
   <span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">FIRST_WINS</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
 </code></pre></div></td></tr></table></div>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 <h3 id="expansion-and-recursion">Expansion and recursion</h3>
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
-   -- END MONKEY PATCH -->
-
 <p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
 One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
 This framing is intuitive because it maps to well to reality.
@@ -1570,11 +1543,11 @@ We might start with the following implementation:</p>
 <p>What just happened?
 It appears that we went no further than eight rolls (a first roll plus up to seven explosions).
 Folks familiar with this domain might recognize the distribution looks <em>mostly</em> correct, but the counts are a bit…<em>off</em>.
-We’re also missing the final outcome of <code class="highlight"><span class="mi">48</span></code>.
+We’re also missing the final outcome of <code>48</code>.
 We also got a <a class="autorefs autorefs-internal" href="../dyce/#dyce.TruncationWarning"><code>TruncationWarning</code></a>, which provides a hint.</p>
-<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> from our function.
+<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code>H({})</code> from our function.
 (See the <code>#!always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
-We’re not explicitly returning <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> in our function, but there are two scenarios where that is done automatically.
+We’re not explicitly returning <code>H({})</code> in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -1597,17 +1570,17 @@ And the second is when we’ve exhausted the call stack:</p>
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="n">whose</span> <span class="n">recursion</span> <span class="n">depth</span> <span class="n">exceeded</span> <span class="mi">1000</span> <span class="n">were</span> <span class="n">truncated</span>
 </code></pre></div>
-<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>.
+<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>.
 Let’s take a closer look at our implementation now that we know that might happen:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code>       <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>, our function will also return <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> for that branch.
-This is because adding <code class="highlight"><span class="n">H</span><span class="p">({})</span></code> to anything is <code class="highlight"><span class="n">H</span><span class="p">({})</span></code>:</p>
+<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>, our function will also return <code>H({})</code> for that branch.
+This is because adding <code>H({})</code> to anything is <code>H({})</code>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">({})</span> <span class="o">+</span> <span class="mi">1024</span>
 <span class="n">H</span><span class="p">({})</span>
 </code></pre></div></td></tr></table></div>
-<p>This explains why <code class="highlight"><span class="mi">48</span></code> is missing from our results above.
+<p>This explains why <code>48</code> is missing from our results above.
 A more illustrative case is trying to “explode” a one-sided die (d1), where no branch is “settled” before exhaustion occurs:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
@@ -1645,7 +1618,7 @@ We can check.</p>
 <p><em>Much</em> better.
 We can now recognize the counts as powers of our maximum face.</p>
 <p>But how can we control the number of explosions?
-Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code class="highlight"><span class="n">precision</span></code> parameter.</p>
+Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code>precision</code> parameter.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1688,7 +1661,7 @@ Instead, we can take advantage of <a class="autorefs autorefs-internal" title="e
 <span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode_n</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
 <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
-<p>Our function is still implicitly limited by the <code class="highlight"><span class="n">precision</span></code> parameter, but we can make that go away by setting it to <code class="highlight"><span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></code> as we did in our recursion exhaustion illustration above.
+<p>Our function is still implicitly limited by the <code>precision</code> parameter, but we can make that go away by setting it to <code>Fraction(0)</code> as we did in our recursion exhaustion illustration above.
 If we wanted to make that the default, we could create a simple wrapper.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1738,7 +1711,7 @@ If we wanted to make that the default, we could create a simple wrapper.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">proper_explode_n</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
 <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
-<p>The above is very nearly the implementation for <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a>, which offers an additional <code class="highlight"><span class="n">resolver</span></code> parameter that allows for some additional flexibility.</p>
+<p>The above is very nearly the implementation for <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a>, which offers an additional <code>resolver</code> parameter that allows for some additional flexibility.</p>
 <p>Let’s say we’re considering a new exploding mechanic where, to explode, one must roll the highest outcome on a given die.
 However, on the second explosion, re-explosion occurs if either the highest or second highest outcome is rolled.
 On the third explosion, anything greater than or equal to the third highest outcome will re-explode, etc.
@@ -1944,13 +1917,8 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">29</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">31</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">34</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">35</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">37</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">23040</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">23040</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">31</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">43</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">49</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">51</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">55</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">57</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">60</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
-
 <h2 id="visualization">Visualization</h2>
-<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterable[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
+<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
 If <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a> is installed <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> provides plotting conveniences.
 For something more sophisticated, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
 <p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
@@ -2084,6 +2052,10 @@ For deterministic outcomes.
 <p>Consider delving into some <a href="../translations/">applications and translations</a> for more sophisticated examples, or jump right into the <a href="../dyce/">API</a>.</p>
 <p>Anywhere you see a JupyterLite logo <img alt="JupyterLite" src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" />, you can click on it to immediately start tinkering with a temporal instance of that example.
 Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.</p>
+<!-- BEGIN MONKEY PATCH --
+>>> warnings.resetwarnings()
+
+   -- END MONKEY PATCH -->
 
 
 
@@ -2109,6 +2081,46 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
       </main>
       
         <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Introduction
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../translations/" class="md-footer__link md-footer__link--next" aria-label="Next: Applications and translations">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Applications and translations
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -2139,7 +2151,7 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

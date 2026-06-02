@@ -29,7 +29,7 @@ _PARSER.add_argument(
     "--output-file",
     type=Path,
     metavar="PATH",
-    help="the file to which to save the output image (relative to -d if not absolute) (default is a PNG constructed from name and style)",
+    help="the file to which to save the output image (relative to -d if not absolute) (default is an SVG constructed from name and style)",
 )
 _PARSER.add_argument(
     "--log-level",
@@ -63,7 +63,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
         format="%(levelname)s: %(message)s",
     )
     output_file = (
-        Path(f"{Path(sys.argv[0]).stem}_{args.style}.png")
+        Path(f"{Path(sys.argv[0]).stem}_{args.style}.svg")
         if not args.output_file
         else args.output_file
     )
@@ -72,16 +72,16 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     bg_color = "0.15" if args.style == "dark" else "0.85"
 
     plt.clf()
-    mpl.rcParams["svg.hashsalt"] = "42"
     mstyle.use("bmh")
     _LOGGER.debug("calling %r(%r)", fig_callback, line_color)
     fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
-    plt.savefig(
-        output_path,
-        dpi=144,
-        facecolor=mcolors.to_rgba(bg_color, alpha=0.0),
-        metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
-        transparent=True,
-    )
+    with mpl.rc_context({"svg.hashsalt": "dyce"}):
+        plt.savefig(
+            output_path,
+            dpi=144,
+            facecolor=mcolors.to_rgba(bg_color, alpha=0.0),
+            metadata={"Creator": "Matplotlib, https://matplotlib.org/", "Date": None},
+            transparent=True,
+        )
