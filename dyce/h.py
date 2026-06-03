@@ -20,6 +20,7 @@ from abc import abstractmethod
 from collections import Counter
 from collections.abc import (
     Callable,
+    Generator,
     ItemsView,
     Iterable,
     Iterator,
@@ -28,6 +29,8 @@ from collections.abc import (
     Sequence,
     ValuesView,
 )
+from contextlib import contextmanager
+from contextvars import ContextVar
 from fractions import Fraction
 from itertools import groupby
 from itertools import product as iproduct
@@ -35,6 +38,7 @@ from types import NotImplementedType
 from typing import (
     Any,
     Literal,
+    NamedTuple,
     Never,
     Protocol,
     Self,
@@ -59,7 +63,7 @@ from .types import (
     nobeartype,
 )
 
-__all__ = ("H", "HableT")
+__all__ = ("H", "HableT", "quantize_hs")
 
 DEFAULT_PRECISION = 2
 DEFAULT_QUANTIZATION_BIT_WIDTH = 1024
@@ -69,10 +73,75 @@ _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
 
+
+class _QuantizeContext(NamedTuple):
+    # Don't quantize
+    bit_width: int = 0
+    # Matches the default behavior H.__init__ without quantization
+    preserve_zero_counts: bool = True
+
+
+_quantize_ctxt: ContextVar[_QuantizeContext] = ContextVar(
+    "_DYCE_QUANTIZE_CONTEXT",
+    # TODO(posita): <https://github.com/astral-sh/ruff/issues/16536> - NamedTuples are
+    # not mutable
+    default=_QuantizeContext(),  # noqa: B039
+)
+
 try:
     _ROW_WIDTH = int(os.environ["COLUMNS"])
 except (KeyError, ValueError):
     _ROW_WIDTH = 65
+
+
+@experimental
+@contextmanager
+def quantize_hs(
+    *,
+    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+    preserve_zero_counts: bool = True,
+) -> Generator[None, None, None]:
+    r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import warnings
+    >>> from dyce.lifecycle import ExperimentalWarning
+    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
+       -- END MONKEY PATCH -->
+
+    Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
+    If nested, the innermost context controls.
+
+        >>> from dyce import H, quantize_hs
+        >>> from dyce.d import d20
+        >>> h20d20_full = 20 @ d20
+        >>> h20d20_full
+        H({20: 1, 21: 20, 22: 210, ..., 200: 1496580006525694242666523, ..., 398: 210, 399: 20, 400: 1})
+        >>> with quantize_hs(bit_width=16):
+        ...     h20d20_16bit = 20 @ d20
+        >>> h20d20_16bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 39947, 200: 40565, 201: 41131, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     h20d20_8bit = 20 @ d20
+        >>> h20d20_8bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 156, 200: 158, 201: 161, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     with quantize_hs(bit_width=16):
+        ...         assert 20 @ d20 == h20d20_16bit
+        ...     assert 20 @ d20 == h20d20_8bit
+
+    <!-- BEGIN MONKEY PATCH --
+    >>> warnings.resetwarnings()
+
+       -- END MONKEY PATCH -->
+    """
+    token = _quantize_ctxt.set(
+        _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
+    )
+    try:
+        yield
+    finally:
+        _quantize_ctxt.reset(token)
 
 
 class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
@@ -309,7 +378,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __init__(self: "H[Never]", init_val: Literal[0, False], /) -> None: ...
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
-    def __init__(self, init_val: Any, /) -> None:
+    def __init__(self, init_val: Any, /) -> None:  # noqa: C901
         r"""Constructor."""
         self._h: dict[_T_co, int]
         self._hash: int | None = None
@@ -347,6 +416,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             raise TypeError(
                 f"scalar init_val must be int; use explicit Mapping or Iterable "
                 f"for {type(init_val).__qualname__!r} outcomes"
+            )
+        cur_ctxt = _quantize_ctxt.get()
+        if cur_ctxt.bit_width:
+            self._h = cast(
+                "dict[_T_co, int]",
+                _quantize_counts(
+                    self._h,
+                    cur_ctxt.bit_width,
+                    preserve_zero_counts=cur_ctxt.preserve_zero_counts,
+                ),
             )
 
     # ---- Class methods ---------------------------------------------------------------
@@ -1675,24 +1754,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
            -- END MONKEY PATCH -->
         """
-        if not self:
-            return self
-        max_count = max(self.counts())
-        if max_count < 1 << bit_width:
-            return self
-        ancillary_bits = (max_count // (1 << bit_width)).bit_length()
-        return type(self)(
-            {
-                outcome: new_count
-                for outcome, count in self.items()
-                if (
-                    new_count := count >> ancillary_bits
-                    # "round up" if the highest ancillary bit is set
-                    | ((count >> ancillary_bits - 1) & 1)
-                )
-                or preserve_zero_counts
-            }
+        quantized = _quantize_counts(
+            self, bit_width, preserve_zero_counts=preserve_zero_counts
         )
+        return self if quantized is self else type(self)(quantized)
 
     @experimental
     def replace(self: "H[_T]", existing_outcome: _T, repl: "H[_T] | _T") -> "H[_T]":
@@ -2324,3 +2389,27 @@ def _map_opname_ref(
             return NotImplemented
         result[new_outcome] = result.get(new_outcome, 0) + count
     return result
+
+
+def _quantize_counts(
+    outcome_counts: Mapping[_T, int],
+    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+    *,
+    preserve_zero_counts: bool = False,
+) -> Mapping[_T, int]:
+    if not outcome_counts:
+        return outcome_counts
+    max_count = max(outcome_counts.values())
+    if max_count < 1 << bit_width:
+        return outcome_counts
+    ancillary_bits = (max_count // (1 << bit_width)).bit_length()
+    return {
+        outcome: new_count
+        for outcome, count in outcome_counts.items()
+        if (
+            new_count := count >> ancillary_bits
+            # "round up" if the highest ancillary bit is set
+            | ((count >> ancillary_bits - 1) & 1)
+        )
+        or preserve_zero_counts
+    }
