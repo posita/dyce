@@ -976,14 +976,6 @@
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
 -->
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
-  -- END MONKEY PATCH -->
 
 <p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
 If you have exposure to another tool, they may also help with transition.</p>
@@ -3786,10 +3778,6 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 What a journey!
 Hopefully this highlights some of <code>dyce</code>’s flexibility and capabilities.
 If you’d like help using <code>dyce</code> with modeling your own complicated mechanics, <a href="https://posita.github.io/dyce/latest/contrib/#starting-discussions-and-filing-issues">drop me a line</a>!</p>
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->
 
 
 
