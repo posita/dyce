@@ -4,6 +4,20 @@ from pathlib import Path
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def suppress_dyce_warnings() -> None:
+    import warnings
+
+    from dyce import TruncationWarning
+
+    # Lazy imports are necessary so that we don't inadvertently import library code
+    # before plugins (e.g,. coverage) can work their magic
+    from dyce.lifecycle import ExperimentalWarning
+
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    warnings.filterwarnings("ignore", category=TruncationWarning)
+
+
 def pytest_ignore_collect(
     collection_path: Path,
     config: pytest.Config,  # noqa: ARG001

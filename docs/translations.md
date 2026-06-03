@@ -11,14 +11,6 @@
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
 -->
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
-  -- END MONKEY PATCH -->
 
 The following examples and translations are intended to showcase `dyce`’s flexibility.
 If you have exposure to another tool, they may also help with transition.
@@ -1043,8 +1035,3 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 What a journey!
 Hopefully this highlights some of `dyce`’s flexibility and capabilities.
 If you’d like help using `dyce` with modeling your own complicated mechanics, [drop me a line](https://posita.github.io/dyce/latest/contrib/#starting-discussions-and-filing-issues)!
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->

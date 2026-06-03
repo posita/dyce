@@ -13,13 +13,11 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-import warnings
 from collections.abc import Generator
 
 import pytest
 
 from dyce.d import d0, d1, d6, d8, d12, h2d6
-from dyce.lifecycle import ExperimentalWarning
 
 mpl = pytest.importorskip("matplotlib")
 mpl.use("Agg")
@@ -37,11 +35,6 @@ from dyce.viz import (  # noqa: E402
 )
 
 __all__ = ()
-
-
-@pytest.fixture(autouse=True)
-def _suppress_warnings() -> None:
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 @pytest.fixture(autouse=True)

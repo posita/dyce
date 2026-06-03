@@ -29,7 +29,6 @@ import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
-from dyce.lifecycle import ExperimentalWarning
 from dyce.p import (
     _MAX_FILL,
     _MIN_FILL,
@@ -57,11 +56,6 @@ _T = TypeVar("_T")
 
 class _PatchableP(P):
     pass
-
-
-@pytest.fixture(autouse=True)
-def _suppress_warnings() -> None:
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 class TestPInit:

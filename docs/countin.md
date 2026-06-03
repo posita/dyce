@@ -12,12 +12,6 @@
   Thank you!
 -->
 <!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
 For typing:
 
 >>> import sympy  # type: ignore[import-untyped]
@@ -863,8 +857,3 @@ Consider delving into some [applications and translations](translations.md) for 
 
 Anywhere you see a JupyterLite logo ![JupyterLite](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg), you can click on it to immediately start tinkering with a temporal instance of that example.
 Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->

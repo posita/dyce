@@ -11,14 +11,6 @@
   This file is used on GitHub and PyPi (via pyproject.toml).
   There is no guarantee that other docs/resources will be available where this content is displayed.
 -->
-<!-- BEGIN MONKEY PATCH --
->>> import warnings
->>> from dyce import TruncationWarning
->>> from dyce.lifecycle import ExperimentalWarning
->>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
->>> warnings.filterwarnings("ignore", category=TruncationWarning)
-
-  -- END MONKEY PATCH -->
 
 <!-- mkdocs:hide:start -->
 *Copyright and other protections apply.
@@ -348,8 +340,3 @@ As of version 1.1, HighRollin is <a href="https://posita.github.io/dyce/"><img
 `dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the included [`LICENSE`](https://posita.github.io/dyce/latest/license/) file for details.
 Source code is [available on GitHub](https://github.com/posita/dyce).
-
-<!-- BEGIN MONKEY PATCH --
->>> warnings.resetwarnings()
-
-   -- END MONKEY PATCH -->

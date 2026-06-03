@@ -244,13 +244,6 @@ def expand(  # noqa: C901
 
         `expand` is experimental; its interface may change or it may be removed in a future release.
 
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-       -- END MONKEY PATCH -->
-
     Evaluate *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
 
     For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument pe [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
@@ -329,6 +322,7 @@ def expand(  # noqa: C901
     A heavier exploding face keeps branches above the threshold longer:
 
         >>> from dyce import TruncationWarning
+        >>> import warnings
 
         >>> def explode_on_max(result: HResult[int]) -> H[int] | int:
         ...     if result.outcome == max(result.h):
@@ -405,11 +399,6 @@ def expand(  # noqa: C901
 
         >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
         H({0: 71, 1: 38, 2: 11})
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     if not sources:
         raise ValueError("expand requires at least one source")
@@ -534,9 +523,6 @@ def explode_n(
 ) -> H[_ResultT]:
     r"""
     <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
     >>> import sympy  # type: ignore[import-untyped]
 
        -- END MONKEY PATCH -->
@@ -566,7 +552,7 @@ def explode_n(
     With sufficient large values for *n*, a [`TruncationWarning`][dyce.TruncationWarning] will be emitted for branches dropped by exhausting any precision budget.
 
         >>> from dyce import TruncationWarning
-        >>> import sys
+        >>> import sys, warnings
         >>> from fractions import Fraction
         >>> with warnings.catch_warnings(record=True) as caught:
         ...     warnings.simplefilter("always", TruncationWarning)
@@ -598,11 +584,6 @@ def explode_n(
         H({1: 36, 3: 42, 5: 49, 6: 1, 7: 21, 8: 3, 9: 18, 10: 6, 11: 13, 12: 7, 13: 6, 14: 6, 15: 3, 16: 3, 17: 1, 18: 1})
         >>> caught and all(w.category is TruncationWarning for w in caught)
         True
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
 
     @nobeartype  # not decoratable by beartype (avoids warning)
