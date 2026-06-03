@@ -62,7 +62,7 @@ For example, consider these different shorthands for expressing 3d6:
 from .h import H as _H
 from .p import P as _P
 
-dempty = d0 = _H(0)
+dempty = d0 = _H({})
 d1 = _H(1)
 d2 = _H(2)
 d3 = _H(3)
