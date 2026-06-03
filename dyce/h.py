@@ -2166,7 +2166,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
         batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
-        result = batch if result is None else result + batch  # type: ignore[operator]
+        result = batch if result is None else result + batch  # type: ignore[operator] # ty: ignore[unsupported-operator]
     return cast("H[_T]", H({})) if result is None else result
 
 
@@ -2178,7 +2178,7 @@ def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
     """
     result: H[_T] | None = None
     for h in hs:
-        result = h if result is None else result + h  # type: ignore[operator]
+        result = h if result is None else result + h  # type: ignore[operator] # ty: ignore[unsupported-operator]
     return cast("H[_T]", H({})) if result is None else result
 
 
