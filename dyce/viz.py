@@ -23,11 +23,11 @@ pip install 'dyce[viz]'
 uv sync --group viz
 ```
 
-    <!-- BEGIN MONKEY PATCH --
-    >>> from typing import Any
-    >>> _: Any
+<!-- BEGIN MONKEY PATCH --
+>>> from typing import Any
+>>> _: Any
 
-      -- END MONKEY PATCH -->
+  -- END MONKEY PATCH -->
 """
 
 import operator
@@ -150,9 +150,6 @@ def plot_bar(
 ) -> Axes:
     r"""
     <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
     >>> import matplotlib as mpl
     >>> mpl.use("Agg")
 
@@ -206,11 +203,6 @@ def plot_bar(
             <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_hbar_light.svg">
             <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.svg">
         </picture>
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
@@ -324,9 +316,6 @@ def plot_burst(
 ) -> Axes:
     r"""
     <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
     >>> import matplotlib as mpl
     >>> mpl.use("Agg")
 
@@ -368,11 +357,6 @@ def plot_burst(
         <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
         <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.svg">
     </picture>
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     ax = _get_ax(ax)
 
@@ -444,9 +428,6 @@ def plot_line(
 ) -> Axes:
     r"""
     <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
     >>> import matplotlib as mpl
     >>> mpl.use("Agg")
 
@@ -479,11 +460,6 @@ def plot_line(
         <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
         <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.svg">
     </picture>
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)

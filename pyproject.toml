@@ -241,6 +241,13 @@ select = [
   "ALL",
 ]
 
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+  # TODO(posita): <https://github.com/astral-sh/ruff/issues/16536> -
+  # NamedTuples are not mutable
+  "dyce.h._QuantizeContext",
+]
+
 [tool.ty.src]
 include = ["docs", "dyce", "helpers", "tests", "*.py"]
 exclude = ["docs/assets/nb_*.py"]

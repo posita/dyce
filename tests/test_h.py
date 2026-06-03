@@ -37,7 +37,7 @@ from dyce.h import (
     aggregate_weighted,
 )
 from dyce.lifecycle import ExperimentalWarning
-from dyce.types import BeartypeCallHintViolation
+from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
 
 __all__ = ()
 
@@ -64,12 +64,6 @@ with contextlib.suppress(ImportError):
         sympy.Number,
         sympy.Rational,
     )
-
-
-@pytest.fixture(autouse=True)
-def _suppress_warnings() -> None:
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    warnings.filterwarnings("ignore", category=TruncationWarning)
 
 
 class TestHInit:
@@ -537,7 +531,6 @@ class TestHUnary:
         # ~1=-2, ~2=-3
         assert result == H({-2: 1, -3: 1})
 
-    @pytest.mark.filterwarnings(r"ignore")  # constrain warnings to test
     def test_matmul_on_non_addable_outcomes(self) -> None:
         # Use catch_warnings directly because pytest.warns will fail if short-circuited
         # by call to __matmul__ raising BeartypeCallHintViolation when beartype is
@@ -575,28 +568,58 @@ class TestHUnary:
         with pytest.raises(TypeError):
             H({3.0: 1}) * Decimal("3.0")  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
+
+@pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+class TestHUnaryWithoutBeartype:
     def test_pos_unsupported(self) -> None:
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             H({"hello": 1}).__pos__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             +H({"hello": 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
 
     def test_neg_unsupported(self) -> None:
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             H({"hello": 1}).__neg__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             -H({"hello": 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
 
     def test_abs_unsupported(self) -> None:
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType]
 
     def test_invert_unsupported(self) -> None:
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
             H({1.5: 1}).__invert__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
+        with pytest.raises(TypeError):
+            ~H({1.5: 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
+
+
+@pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+class TestHUnaryWithBeartype:
+    def test_pos_unsupported_beartype(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            H({"hello": 1}).__pos__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        with pytest.raises(BeartypeCallHintViolation):
+            +H({"hello": 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
+
+    def test_neg_unsupported_beartype(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            H({"hello": 1}).__neg__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        with pytest.raises(BeartypeCallHintViolation):
+            -H({"hello": 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
+
+    def test_abs_unsupported_beartype(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        with pytest.raises(BeartypeCallHintViolation):
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType]
+
+    def test_invert_unsupported_beartype(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            H({1.5: 1}).__invert__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+        with pytest.raises(BeartypeCallHintViolation):
             ~H({1.5: 1})  # type: ignore[misc] # ty: ignore[unsupported-operator]
 
 

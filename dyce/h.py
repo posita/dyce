@@ -20,7 +20,6 @@ from abc import abstractmethod
 from collections import Counter
 from collections.abc import (
     Callable,
-    Generator,
     ItemsView,
     Iterable,
     Iterator,
@@ -82,10 +81,7 @@ class _QuantizeContext(NamedTuple):
 
 
 _quantize_ctxt: ContextVar[_QuantizeContext] = ContextVar(
-    "_DYCE_QUANTIZE_CONTEXT",
-    # TODO(posita): <https://github.com/astral-sh/ruff/issues/16536> - NamedTuples are
-    # not mutable
-    default=_QuantizeContext(),  # noqa: B039
+    "_DYCE_QUANTIZE_CONTEXT", default=_QuantizeContext()
 )
 
 try:
@@ -96,19 +92,20 @@ except (KeyError, ValueError):
 
 @experimental
 @contextmanager
+# The type of the return of the undecorated function is Generator, but after the
+# @contextmanager decorator is applied, it's AbstractContextManager. By refusing to
+# commit, we don't confuse beartype who will otherwise complain because
+# issubclass(AbstractContextManager, Generator) is False. I'm not quite sure why
+# beartype is confused because
+# https://github.com/python/typeshed/blob/main/stdlib/contextlib.pyi provides a hint
+# that the contextmanager-wrapped function should return a Callable[_P,
+# _GeneratorContextManager[_T_co]].
 def quantize_hs(
     *,
     bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
     preserve_zero_counts: bool = True,
-) -> Generator[None, None, None]:
+) -> Any:  # noqa: ANN401
     r"""
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-       -- END MONKEY PATCH -->
-
     Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
     If nested, the innermost context controls.
 
@@ -129,11 +126,6 @@ def quantize_hs(
         ...     with quantize_hs(bit_width=16):
         ...         assert 20 @ d20 == h20d20_16bit
         ...     assert 20 @ d20 == h20d20_8bit
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     token = _quantize_ctxt.set(
         _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
@@ -1376,13 +1368,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         k: SupportsInt,
     ) -> int:
         r"""
-        <!-- BEGIN MONKEY PATCH --
-        >>> import warnings
-        >>> from dyce.lifecycle import ExperimentalWarning
-        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-           -- END MONKEY PATCH -->
-
         Computes and returns (in constant time) the number of ways *outcome* appears exactly *k* times among *n* like histograms.
         Uses the binomial coefficient as a more efficient alternative to `(n @ self.eq(outcome))[k]`.
 
@@ -1419,11 +1404,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 ...     h_not_lowest_terms.total**n,
                 ... )
                 Fraction(2, 9)
-
-        <!-- BEGIN MONKEY PATCH --
-        >>> warnings.resetwarnings()
-
-           -- END MONKEY PATCH -->
         """
         n = lossless_int(n)
         k = lossless_int(k)
@@ -1628,13 +1608,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         pos: SupportsInt,
     ) -> "H[_T]":
         r"""
-        <!-- BEGIN MONKEY PATCH --
-        >>> import warnings
-        >>> from dyce.lifecycle import ExperimentalWarning
-        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-           -- END MONKEY PATCH -->
-
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
         *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
 
@@ -1653,11 +1626,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             True
 
         This method caches the beta values for *n* so they can be reused for varying values of *pos* in subsequent calls.
-
-        <!-- BEGIN MONKEY PATCH --
-        >>> warnings.resetwarnings()
-
-           -- END MONKEY PATCH -->
         """
         n = lossless_int(n)
         pos = lossless_int(pos)
@@ -1727,13 +1695,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         preserve_zero_counts: bool = False,
     ) -> "H":
         r"""
-        <!-- BEGIN MONKEY PATCH --
-        >>> import warnings
-        >>> from dyce.lifecycle import ExperimentalWarning
-        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-           -- END MONKEY PATCH -->
-
         Construct an [`H`][dyce.H] by “quantizing” counts such that none are occupy more bits than *bit_width* and proportions are retained.
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
 
@@ -1748,11 +1709,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             ...     preserve_zero_counts=True,
             ... )
             H({1: 32, 2: 128, 3: 0, 4: 1, 5: 0})
-
-        <!-- BEGIN MONKEY PATCH --
-        >>> warnings.resetwarnings()
-
-           -- END MONKEY PATCH -->
         """
         quantized = _quantize_counts(
             self, bit_width, preserve_zero_counts=preserve_zero_counts
@@ -1762,13 +1718,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     @experimental
     def replace(self: "H[_T]", existing_outcome: _T, repl: "H[_T] | _T") -> "H[_T]":
         r"""
-        <!-- BEGIN MONKEY PATCH --
-        >>> import warnings
-        >>> from dyce.lifecycle import ExperimentalWarning
-        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-           -- END MONKEY PATCH -->
-
         Returns a new histogram with a possibly substituted outcome.
         If *repl* is a single outcome, it will replace *existing_outcome* directly (if *existing_outcome* exists in the original histogram).
         If *repl* is a histogram, its outcomes will be “folded in”, together making up the same proportion of the total as the replaced outcome.
@@ -1803,11 +1752,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
             >>> explode_n_by_replacement(d6, 15)
             H({1: 470184984576, 2: 470184984576, 3: 470184984576, ..., 94: 1, 95: 1, 96: 1})
-
-        <!-- BEGIN MONKEY PATCH --
-        >>> warnings.resetwarnings()
-
-           -- END MONKEY PATCH -->
         """
         if existing_outcome not in self:
             return self
@@ -1838,10 +1782,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def roll(self: "H[_T]") -> _T:
         r"""
         <!-- BEGIN MONKEY PATCH --
-        >>> import warnings
-        >>> from dyce.lifecycle import ExperimentalWarning
-        >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
         For deterministic outcomes.
 
         >>> import random
@@ -1855,11 +1795,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> d6 = H(6)
             >>> [d6.roll() for _ in range(10)]
             [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
-
-        <!-- BEGIN MONKEY PATCH --
-        >>> warnings.resetwarnings()
-
-          -- END MONKEY PATCH -->
         """
         if not self:
             raise ValueError("no outcomes from which to select in empty histogram")
@@ -2091,13 +2026,6 @@ def aggregate_weighted(
     weighted_sources: Iterable[tuple[Any, int]],
 ) -> H[Any]:
     r"""
-    <!-- BEGIN MONKEY PATCH --
-    >>> import warnings
-    >>> from dyce.lifecycle import ExperimentalWarning
-    >>> warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
-       -- END MONKEY PATCH -->
-
     Aggregate *weighted_sources* into an [`H`][dyce.H] object.
 
     Each element of *weighted_sources* is a two-tuple of either an `(outcome, count)` pair or an `(H, count)` pair.
@@ -2125,11 +2053,6 @@ def aggregate_weighted(
 
         >>> aggregate_weighted(((1, 1), (2, 0), (3, 3), (4, 0), (5, 5)))
         H({1: 1, 2: 0, 3: 3, 4: 0, 5: 5})
-
-    <!-- BEGIN MONKEY PATCH --
-    >>> warnings.resetwarnings()
-
-       -- END MONKEY PATCH -->
     """
     aggregate_scalar = 1
     outcome_counts: list[tuple[Any, int]] = []

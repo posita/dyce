@@ -52,6 +52,18 @@ except ImportError:  # pragma: no cover
         return arg
 
 
+def _bearified_canary() -> None:
+    return False  # type: ignore[return-value]  # ty: ignore[invalid-return-type]
+
+
+try:
+    _bearified_canary()
+except BeartypeCallHintViolation:  # pragma: no cover
+    DYCE_IS_BEARIFIED = True
+else:  # pragma: no cover
+    DYCE_IS_BEARIFIED = False
+
+
 class SentinelT:
     r"""
     Singleton to serve as a sentinel value where other built-in objects (e.g., `None`) would not, because they represent legitimate values in the context.

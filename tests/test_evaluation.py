@@ -14,7 +14,6 @@
 # ======================================================================================
 
 import sys
-import warnings
 from collections import Counter, UserString
 from collections.abc import Callable
 from enum import IntEnum, auto
@@ -26,15 +25,9 @@ import pytest
 
 from dyce import H, HResult, P, PResult, TruncationWarning, expand, explode_n
 from dyce.d import d0, d1, d6, d8, d10, p2d8
-from dyce.lifecycle import ExperimentalWarning
-from dyce.types import BeartypeCallHintViolation
+from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
 
 __all__ = ()
-
-
-@pytest.fixture(autouse=True)
-def _suppress_warnings() -> None:
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 class TestExpand:
@@ -52,7 +45,8 @@ class TestExpand:
 
         assert expand(_fn, d6, p2d8, d10) == d6 + p2d8 + d10
 
-    def test_source_neither_h_nor_p_raises(self) -> None:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_source_neither_h_nor_p_raises_type_error_without_beartype(self) -> None:
         class TotalStr(UserString):
             __slots__ = ()
 
@@ -63,10 +57,22 @@ class TestExpand:
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
             return d0
 
-        with pytest.raises(
-            (TypeError, BeartypeCallHintViolation),
-            match=r"\b(unrecognized source type|violates type hint)\b",
-        ):
+        with pytest.raises(TypeError, match=r"\bunrecognized source type\b"):
+            expand(_fn, TotalStr("I'm an imposter!"))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+
+    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+    def test_source_neither_h_nor_p_raises_hint_violation_with_beartype(self) -> None:
+        class TotalStr(UserString):
+            __slots__ = ()
+
+            @property
+            def total(self) -> int:
+                return len(self)
+
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+            return d0
+
+        with pytest.raises(BeartypeCallHintViolation, match=r"\bviolates type hint\b"):
             expand(_fn, TotalStr("I'm an imposter!"))  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
 
     def test_callback_returns_h_with_zero_count_outcomes(self) -> None:
