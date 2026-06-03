@@ -25,7 +25,7 @@ It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
 from importlib.metadata import PackageNotFoundError, version
 
 from .evaluation import HResult, PResult, TruncationWarning, expand, explode_n
-from .h import H, HableT
+from .h import H, HableT, quantize_hs
 from .hable import HableOpsMixin
 from .p import P, RollCountT, RollProbT, RollT
 
@@ -42,6 +42,7 @@ __all__ = (
     "TruncationWarning",
     "expand",
     "explode_n",
+    "quantize_hs",
 )
 
 try:
