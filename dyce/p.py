@@ -423,7 +423,38 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         *which: GetItemT,
     ) -> H[_ResultT]:
         r"""
-        TODO(posita): Fill this out.
+        Return a new [`H`][dyce.H] by applying *func* to each roll.
+        Shorthand for:
+
+        ```python
+        aggregate_weighted(
+            (func(roll), count) for roll, count in self.rolls_with_counts(*which)
+        )
+        ```
+
+        Note that there are often other, much more efficient ways to arrive at desired computations, but for a handful of small dice, this can be a more expressive way to get the job done.
+        For example:
+
+            >>> from dyce import P, H, RollT
+            >>> d6 = H(6)
+            >>> h3d6 = 3 @ d6
+            >>> p3d6 = 3 @ P(d6)
+            >>> p3d6.apply_to_each_roll(sum) == h3d6
+            True
+
+        <!-- -- >
+
+            >>> best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))
+            >>> (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6
+            True
+
+        <!-- -- >
+
+            >>> ones_rolled_in_3d6 = 3 @ (d6.eq(1))
+            >>> def count_ones_in_roll(roll: RollT[int]) -> int:
+            ...     return sum(1 for outcome in roll if outcome == 1)
+            >>> p3d6.apply_to_each_roll(count_ones_in_roll) == ones_rolled_in_3d6
+            True
         """
         return cast(
             "H[_ResultT]",
@@ -451,7 +482,6 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> print(p_2d6.h(-1).format(width=65))
             avg |    4.47
             std |    1.40
-            var |    1.97
               1 |   2.78% |#
               2 |   8.33% |####
               3 |  13.89% |######
@@ -467,7 +497,6 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))
             avg |   10.00
             std |    0.91
-            var |    0.84
               4 |   0.00% |
               5 |   0.00% |
               6 |   0.10% |
