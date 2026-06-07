@@ -65,7 +65,7 @@ from .types import (
 __all__ = ("H", "HableT", "quantize_hs")
 
 DEFAULT_PRECISION = 2
-DEFAULT_QUANTIZATION_BIT_WIDTH = 1024
+DEFAULT_QUANTIZATION_BIT_WIDTH = 256
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
@@ -233,7 +233,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         >>> print((d6 + d6).format(width=65))
         avg |    7.00
         std |    2.42
-        var |    5.83
           2 |   2.78% |#
           3 |   5.56% |##
           4 |   8.33% |####
@@ -282,7 +281,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         >>> print(d6.ne(d6).format(width=65))
           avg |    0.83
           std |    0.37
-          var |    0.14
         False |  16.67% |########
          True |  83.33% |########################################
 
@@ -293,7 +291,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         >>> print(d6.lt(d6).format(width=65))
           avg |    0.42
           std |    0.49
-          var |    0.24
         False |  58.33% |############################
          True |  41.67% |####################
 
@@ -309,7 +306,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         >>> print((4 @ d6_eq2).ge(1).format(width=65))
           avg |    0.52
           std |    0.50
-          var |    0.25
         False |  48.23% |#######################
          True |  51.77% |########################
 
@@ -1435,7 +1431,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             ... )
             avg |    7.0000
             std |    2.4152
-            var |    5.8333
               1 |   0.0000% |
               2 |   2.7778% |@
               3 |   5.5556% |@@
@@ -1465,18 +1460,15 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> print(H(1).format(scaled=False, width=65))
             avg |    1.00
             std |    0.00
-            var |    0.00
               1 | 100.00% |##################################################
             >>> print(h_ge.format(scaled=False, width=65))
               avg |    0.58
               std |    0.49
-              var |    0.24
             False |  41.67% |####################
              True |  58.33% |############################
             >>> print(h_ge.format(scaled=True, width=65))
               avg |    0.58
               std |    0.49
-              var |    0.24
             False |  41.67% |##################################
              True |  58.33% |################################################
         """
@@ -1487,7 +1479,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         try:
             mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
             std: float | None = self.stdev()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-            var: float | None = self.variance()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         except Exception as exc:  # noqa: BLE001
             # Broad catch is intentional: format() is a display method that should
             # always produce output. Any failure to compute statistics (including from
@@ -1496,7 +1487,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             warnings.warn(f"{exc!s}", stacklevel=2)
             mu = None
             std = None
-            var = None
 
         def _lines() -> Iterator[str]:
             # First pass: collect (outcome_str, probability) pairs and find the widest
@@ -1514,8 +1504,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 yield f"{'avg': >{max_outcome_len}} | {mu:{prob_width}.{precision}f}"
             if std is not None:
                 yield f"{'std': >{max_outcome_len}} | {std:{prob_width}.{precision}f}"
-            if var is not None:
-                yield f"{'var': >{max_outcome_len}} | {var:{prob_width}.{precision}f}"
 
             if pairs:
                 tick_scale = max(self.counts()) / self.total if scaled else 1.0
