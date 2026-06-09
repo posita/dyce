@@ -51,7 +51,6 @@ from typing import (
 
 import optype as ot
 
-from . import rng
 from .lifecycle import deprecated, experimental
 from .types import (
     Sentinel,
@@ -1784,8 +1783,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> [d6.roll() for _ in range(10)]
             [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
         """
+        from . import rng
+
         if not self:
-            raise ValueError("no outcomes from which to select in empty histogram")
+            raise ValueError("no outcomes in an empty histogram")
         return rng.RNG.choices(
             population=tuple(self.outcomes()),
             weights=tuple(self.counts()),
