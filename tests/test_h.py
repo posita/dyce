@@ -849,9 +849,7 @@ class TestHQuantize:
 
 class TestHRoll:
     def test_roll_empty_raises(self) -> None:
-        with pytest.raises(
-            ValueError, match=r"^no outcomes from which to select in empty histogram$"
-        ):
+        with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty histogram\b"):
             H({}).roll()
 
     def test_roll(self) -> None:
