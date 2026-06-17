@@ -109,7 +109,6 @@ Histograms provide rudimentary formatting for convenience.
     >>> print(h2d6.format(width=65))
     avg |    7.00
     std |    2.42
-    var |    5.83
       2 |   2.78% |#
       3 |   5.56% |##
       4 |   8.33% |####
@@ -136,7 +135,6 @@ The [Miwin-Distribution](https://en.wikipedia.org/wiki/Intransitive_dice#Miwin's
     >>> print((miwin_dist).format(width=65, scaled=True))
     avg |   15.00
     std |    4.47
-    var |   20.00
       4 |   0.46% |##
       5 |   0.93% |#####
       6 |   1.39% |#######
@@ -204,7 +202,6 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
     >>> print(p3d6.h(0).format(width=65))
     avg |    2.04
     std |    1.14
-    var |    1.31
       1 |  42.13% |#####################
       2 |  28.24% |##############
       3 |  17.13% |########
@@ -219,7 +216,6 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
     >>> print(p3d6.h(1).format(width=65))
     avg |    3.50
     std |    1.37
-    var |    1.88
       1 |   7.41% |###
       2 |  18.52% |#########
       3 |  24.07% |############
@@ -234,7 +230,6 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
     >>> print(p3d6.h(-1).format(width=65))
     avg |    4.96
     std |    1.14
-    var |    1.31
       1 |   0.46% |
       2 |   3.24% |#
       3 |   8.80% |####
@@ -251,7 +246,6 @@ Summing the greatest and the least faces when rolling a typical six-die polygona
     >>> print(h.format(width=65, scaled=True))
     avg |   13.48
     std |    4.40
-    var |   19.39
       1 |   0.00% |
       2 |   0.01% |
       3 |   0.06% |
@@ -362,7 +356,6 @@ To illustrate, say we want to roll a six-sided die and compare whether the resul
     >>> print(expand(outcome_strictly_greater_than_constant, d6).format(width=65))
       avg |    0.67
       std |    0.47
-      var |    0.22
     False |  33.33% |################
      True |  66.67% |################################
 
@@ -383,7 +376,6 @@ We’ll roll a four-sided die (d4) and a six-sided die and compare whether the s
     >>> print(second_gt_first_h.format(width=65))
       avg |    0.83
       std |    0.37
-      var |    0.14
     False |  16.67% |########
      True |  83.33% |########################################
 
@@ -430,7 +422,6 @@ Let’s compare how three six-sided dice fair against two four-sided dice.
     >>> print(dupe_vs_h.format(width=65))
                          avg |   -0.19
                          std |    0.66
-                         var |    0.43
     <DupeVs.SECOND_WINS: -1> |  33.33% |#########
             <DupeVs.DRAW: 0> |  52.78% |###############
       <DupeVs.FIRST_WINS: 1> |  13.89% |####
@@ -456,7 +447,6 @@ We might start with the following implementation:
     >>> print(h.format(width=65, scaled=True))
     avg |    4.20
     std |    3.26
-    var |   10.64
       1 |  16.67% |#################################################
       2 |  16.67% |#################################################
       3 |  16.67% |#################################################
@@ -656,7 +646,6 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
     >>> print(h.format(width=65, scaled=True))
     avg |    6.19
     std |    4.71
-    var |   22.17
       1 |  10.00% |##################################################
       2 |  10.00% |##################################################
       3 |  10.00% |##################################################

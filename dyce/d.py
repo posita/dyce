@@ -40,7 +40,6 @@ For example, consider these different shorthands for expressing 3d6:
     >>> print(h3d6.format(width=65, scaled=True))
     avg |   10.50
     std |    2.96
-    var |    8.75
       3 |   0.46% |#
       4 |   1.39% |#####
       5 |   2.78% |###########
