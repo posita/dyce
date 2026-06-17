@@ -25,8 +25,7 @@ def fig_callback(line_color: str) -> None:
     # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
-    ax.tick_params(axis="x", colors=line_color)
-    ax.tick_params(axis="y", colors=line_color)
+    ax.tick_params(colors=line_color)
     ax.title.set_color(line_color)
 
 

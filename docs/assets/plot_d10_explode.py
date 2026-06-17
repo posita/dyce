@@ -69,8 +69,7 @@ def fig_callback(line_color: str) -> None:
 
     # Style (dark/light) tweaks
     for ax in plt.gcf().get_axes():
-        ax.tick_params(axis="x", colors=line_color)
-        ax.tick_params(axis="y", colors=line_color)
+        ax.tick_params(colors=line_color)
         ax.title.set_color(line_color)
 
 
