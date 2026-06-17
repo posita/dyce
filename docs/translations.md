@@ -758,7 +758,6 @@ Rudimentary textual visualization using built-in methods:
     >>> print(res.format(width=65))
     avg |    0.00
     std |    1.73
-    var |    2.99
      -3 |   7.86% |###
      -2 |  15.52% |#######
      -1 |  16.64% |########
@@ -812,7 +811,6 @@ Rudimentary visualization using built-in methods:
     >>> print(res.format(width=65))
     avg |    2.36
     std |    0.88
-    var |    0.77
      -1 |   1.42% |
       0 |   0.59% |
       1 |  16.65% |########
@@ -824,7 +822,6 @@ Rudimentary visualization using built-in methods:
     >>> print(res.format(width=65))
     avg |    2.64
     std |    1.28
-    var |    1.64
      -2 |   0.06% |
      -1 |   2.94% |#
       0 |   0.31% |

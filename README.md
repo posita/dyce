@@ -35,9 +35,6 @@ Now you’re playing with …
 
 # `dyce` – Simple Python tools for exploring dice outcomes and other finite discrete probabilities
 
-**💥 *Now 100% [Bear-ified™](https://beartype.rtfd.io/)!* 👌🏾🐻**
-([Details](#requirements) below.)
-
 `dyce` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
 Its primary applications are:
@@ -102,6 +99,8 @@ It has the following runtime dependencies:
 - [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz`
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
+
+`dyce` is proudly 100% [Bear-ified™](https://beartype.rtfd.io/)! 👌🏾🐻
 
 ## Design philosophy
 
@@ -192,7 +191,6 @@ H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 >>> print(p2d6.h(0).format(width=65))
 avg |    2.53
 std |    1.40
-var |    1.97
   1 |  30.56% |###############
   2 |  25.00% |############
   3 |  19.44% |#########
@@ -208,7 +206,6 @@ H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 >>> print(p2d6.h(-1).format(width=65))
 avg |    4.47
 std |    1.40
-var |    1.97
   1 |   2.78% |#
   2 |   8.33% |####
   3 |  13.89% |######
