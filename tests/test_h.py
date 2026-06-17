@@ -922,7 +922,7 @@ class TestHVariance:
 @pytest.mark.benchmark
 @pytest.mark.skipif(
     find_spec("pytest_benchmark") is None,
-    reason="requires benchmark fixture",
+    reason="pytest_benchmark not available",
 )
 class TestAggregateWeightedBenchmark:
     def test_aggregate_weighted(self, benchmark: Callable) -> None:

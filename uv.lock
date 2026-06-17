@@ -760,6 +760,7 @@ test = [
 ]
 test-pypy = [
     { name = "griffe-warnings-deprecated" },
+    { name = "ipdb" },
     { name = "pytest" },
     { name = "sympy" },
 ]
@@ -887,6 +888,7 @@ test = [
 ]
 test-pypy = [
     { name = "griffe-warnings-deprecated" },
+    { name = "ipdb" },
     { name = "pytest" },
     { name = "sympy" },
 ]
