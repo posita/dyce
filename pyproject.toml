@@ -103,7 +103,6 @@ lint = [
 test = [
     "beartype",
     "coverage[toml]",
-    "ipdb",
     "numpy",
     "pandas",
     "pytest-beartype",
@@ -115,6 +114,7 @@ test = [
 # Only what's needed for uv run pytest specifically with PyPy (via Tox)
 test-pypy = [
     "griffe-warnings-deprecated",
+    "ipdb",
     "pytest",
     "sympy",
 ]
