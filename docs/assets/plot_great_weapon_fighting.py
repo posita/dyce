@@ -115,8 +115,7 @@ def fig_callback(line_color: str) -> None:
         ax_sa.lines[1].set_color(plt.get_cmap(cmap_gwf_2014)(0.5))
         ax_sa.lines[2].set_color(plt.get_cmap(cmap_gwf_2024)(0.5))
         ax_sa.legend()
-    ax_sa.tick_params(axis="x", colors=line_color)
-    ax_sa.tick_params(axis="y", colors=line_color)
+    ax_sa.tick_params(colors=line_color)
     for text in ax_sa_gwf_2014.texts:
         text.set_color(line_color)
     for patch in ax_sa_gwf_2014.patches:
