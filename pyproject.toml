@@ -116,7 +116,6 @@ test = [
 test-pypy = [
     "griffe-warnings-deprecated",
     "pytest",
-    "pytest-gitignore",
     "sympy",
 ]
 # Only what's needed for uv run tox [-e ...]
