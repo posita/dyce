@@ -1,7 +1,12 @@
 import platform
+from os import environ
 from pathlib import Path
 
 import pytest
+
+# Pin because without width argument, H.format bars scale to COLUMNS, and tox overrides
+# COLUMNS for some reason.
+environ["COLUMNS"] = ""
 
 
 @pytest.fixture(autouse=True)
