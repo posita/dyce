@@ -21,7 +21,7 @@ import shutil
 import subprocess  # noqa: S404
 import sys
 import tomllib
-from collections.abc import Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
 
 _LOGGER = logging.getLogger("mkdocs.hooks")
@@ -33,6 +33,8 @@ _GIT_REF = f"v{_RAW_VERSION}" if _IS_RELEASE else "main"
 # mike deploys under "major.minor"; dev builds link to "latest"
 _parts = _RAW_VERSION.split(".")
 _DOCS_VERSION = f"{_parts[0]}.{_parts[1]}" if _IS_RELEASE else "latest"
+del _parts
+_BUNDLED_PKG_NAMES = ("optype",)
 
 
 def on_page_markdown(markdown: str, **_kwargs: object) -> str:
@@ -96,17 +98,8 @@ def on_post_build(config: dict, **_kwargs: object) -> None:
         "--output-dir",
         f"{config['site_dir']}/jupyter",
     ]
-    wheels: list[Path | str] = []
-    _, optype_urls = _version_wheel_urls(Path("uv.lock"), "optype")
-    wheels.extend(optype_urls)
-    dist_dir_path = Path("dist")
-    for pattern in ("dyce*.whl",):
-        try:
-            latest = max(dist_dir_path.glob(pattern), key=os.path.getmtime)
-        except ValueError:
-            pass
-        else:
-            wheels.append(latest)  # ty: ignore[invalid-argument-type]
+    wheels: list[Path | str] = [_get_latest_pkg_wheel_from_dist()]
+    wheels.extend(_bundled_wheel_urls(_BUNDLED_PKG_NAMES))
     # Fuck you, Jupyter Lite, for costing me hours to work through your lies. (See
     # <https://github.com/jupyterlite/jupyterlite/issues/1563>.)
     for wheel in wheels:
@@ -114,14 +107,26 @@ def on_post_build(config: dict, **_kwargs: object) -> None:
     _uv_run(cmd)
 
 
-def _version_wheel_urls(
-    uv_lock_path: Path, name: str, url_contains: str = r"\bnone-any\b"
-) -> tuple[str, list[str]]:
-    with uv_lock_path.open("rb") as f:
-        uv_lock = tomllib.load(f)
-    pkg = next(p for p in uv_lock["package"] if p["name"] == name)
-    wheels = [w for w in pkg.get("wheels", []) if re.search(url_contains, w["url"])]
-    return pkg["version"], [wheel["url"] for wheel in wheels]
+def _bundled_wheel_urls(pkg_names: Iterable[str]) -> Iterator[str]:
+    uv_lock_path = Path("uv.lock")
+    for pkg_name in pkg_names:
+        with uv_lock_path.open("rb") as f:
+            uv_lock = tomllib.load(f)
+        pkg = next(p for p in uv_lock["package"] if p["name"] == pkg_name)
+        try:
+            yield next(
+                w["url"]
+                for w in pkg.get("wheels", [])
+                if re.search(r"\bnone-any\b", w["url"])
+            )
+        except StopIteration:
+            raise RuntimeError(
+                f"no none-any wheel for {pkg!r} found in {uv_lock_path}"
+            ) from None
+
+
+def _get_latest_pkg_wheel_from_dist() -> Path:
+    return max(Path("dist").glob("dyce*-none-any.whl"), key=os.path.getmtime)
 
 
 def _uv_run(cmd: Sequence[str]) -> None:
