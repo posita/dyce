@@ -1230,7 +1230,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         result: dict[_T, int] = dict(self)
         other_h = other if isinstance(other, H) else H(other)
         for outcome, count in other_h.items():
-            result[outcome] = result.get(outcome, 0) + count  # ty: ignore[invalid-assignment,no-matching-overload]
+            result[outcome] = result.get(outcome, 0) + count  # ty: ignore[invalid-assignment]
         return H(result)
 
     @overload
@@ -1753,8 +1753,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             }
             for repl_outcome, repl_count in repl.items():
                 d[repl_outcome] = (  # ty: ignore[invalid-assignment]
-                    d.get(repl_outcome, 0)  # ty: ignore[no-matching-overload]
-                    + repl_count * existing_outcome_count
+                    d.get(repl_outcome, 0) + repl_count * existing_outcome_count
                 )
         else:
             d = {

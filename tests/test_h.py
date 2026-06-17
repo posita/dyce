@@ -547,10 +547,10 @@ class TestHUnary:
                 # beartype pre-check preempts __matmul__ before it can warn or return
                 # NotImplemented
                 pass
-        # Call to __rmatmul__ raises one of BeartypeCallHintViolation and TypeError
-        # (from NotImplemented), depending on whether beartype is enabled
-        with pytest.raises((TypeError, BeartypeCallHintViolation)):
-            _ = 2 @ H({frozenset({"incompatible"}): 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
+            # Call to __rmatmul__ raises one of BeartypeCallHintViolation and TypeError
+            # (from NotImplemented), depending on whether beartype is enabled
+            with pytest.raises((TypeError, BeartypeCallHintViolation)):
+                _ = 2 @ H({frozenset({"incompatible"}): 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_add_unsupported(self) -> None:
         assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]

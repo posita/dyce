@@ -9,7 +9,7 @@ import pytest
 environ["COLUMNS"] = ""
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # noqa: RUF076
 def suppress_dyce_warnings() -> None:
     import warnings
 
