@@ -37,7 +37,7 @@ from dyce.viz import (  # noqa: E402
 __all__ = ()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # noqa: RUF076
 def _close_figures() -> Generator[None]:
     yield
     plt.close("all")

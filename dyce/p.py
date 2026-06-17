@@ -624,7 +624,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         """
         roll = [h.roll() for h in self]
         try:
-            roll.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+            roll.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue]
         except TypeError:
             roll.sort(key=natural_key)
         return tuple(roll)

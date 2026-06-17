@@ -73,6 +73,10 @@ def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.Doc
     }
     try:
         tree = ast.parse(text, filename=str(filepath))
+    except SyntaxError:
+        _LOGGER.debug("%s: ast parse failed, falling back to text mode", filepath)
+        yield 0, parser.get_doctest(string=text, **kwargs)
+    else:
         _LOGGER.debug("%s: parsed via ast", filepath)
         for node in ast.walk(tree):
             if not isinstance(
@@ -98,9 +102,6 @@ def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.Doc
                 doc_offset,
                 parser.get_doctest(string=inspect.cleandoc(str(const.value)), **kwargs),
             )
-    except SyntaxError:
-        _LOGGER.debug("%s: ast parse failed, falling back to text mode", filepath)
-        yield 0, parser.get_doctest(string=text, **kwargs)
 
 
 def _synthesize_filepath(filepath: Path) -> str:
@@ -424,7 +425,7 @@ def _load_toml_config(  # noqa: C901
         # Parse subcommand-specific keys.
         sub: dict[str, object] = {}
         if subcommand in _SUBCOMMANDS:
-            raw_sub = raw.get(subcommand, {})  # ty: ignore[no-matching-overload]
+            raw_sub = raw.get(subcommand, {})
             if not isinstance(raw_sub, dict):
                 _LOGGER.warning(
                     "%s: [tool.check_doctests.%s] is not a table",
@@ -440,7 +441,7 @@ def _load_toml_config(  # noqa: C901
                                 and all(isinstance(t, str) for t in cmd)
                                 for cmd in val
                             ):
-                                sub[key] = val
+                                sub[key] = val  # ty: ignore[invalid-assignment]
                             else:
                                 _LOGGER.warning(
                                     "%s: checkers must be a list of string lists; ignoring",
@@ -448,7 +449,7 @@ def _load_toml_config(  # noqa: C901
                                 )
                         elif key in _TOML_CHECK_BOOL_KEYS:
                             if isinstance(val, bool):
-                                sub[key] = val
+                                sub[key] = val  # ty: ignore[invalid-assignment]
                             else:
                                 _LOGGER.warning(
                                     "%s: %s must be a boolean; ignoring",

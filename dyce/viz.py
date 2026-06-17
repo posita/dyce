@@ -394,24 +394,26 @@ def plot_burst(
     if title:
         ax.set_title(title, fontweight="bold", pad=24.0)
 
-    ax.pie(
-        outer_probs,
-        labels=outer_labels,
-        radius=1.0,
-        labeldistance=1.15,
-        startangle=90,
-        colors=outer_colors,
-        wedgeprops={"width": 0.8},
-    )
-    ax.pie(
-        inner_probs,
-        labels=inner_labels,
-        radius=0.85,
-        labeldistance=0.7,
-        startangle=90,
-        colors=inner_colors,
-        wedgeprops={"width": 0.5},
-    )
+    if outer_probs:
+        ax.pie(
+            outer_probs,
+            labels=outer_labels,
+            radius=1.0,
+            labeldistance=1.15,
+            startangle=90,
+            colors=outer_colors,
+            wedgeprops={"width": 0.8},
+        )
+    if inner_probs:
+        ax.pie(
+            inner_probs,
+            labels=inner_labels,
+            radius=0.85,
+            labeldistance=0.7,
+            startangle=90,
+            colors=inner_colors,
+            wedgeprops={"width": 0.5},
+        )
     ax.set(aspect="equal")
 
     return ax

@@ -400,6 +400,8 @@ def expand(  # noqa: C901
         >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
         H({0: 71, 1: 38, 2: 11})
     """
+    # TODO(posita): # noqa: TD003 - Put some guardrails on precision and document them
+    # above
     if not sources:
         raise ValueError("expand requires at least one source")
     try:
