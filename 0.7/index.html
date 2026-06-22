@@ -871,18 +871,16 @@
 
 <p><a href="https://github.com/posita/dyce/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg" /></a>
 <a href="https://app.codecov.io/gh/posita/dyce"><img alt="Coverage" src="https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg" /></a>
-<a href="https://pypi.org/project/dyce/0.7.0rc6/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc6.svg" /></a>
-<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc6.svg" />
-<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc6.svg" /></a>
-<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc6.svg" />
-<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc6.svg" />
+<a href="https://pypi.org/project/dyce/0.7.0rc7/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc7.svg" /></a>
+<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc7.svg" />
+<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc7.svg" /></a>
+<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc7.svg" />
+<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc7.svg" />
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
 <a href="https://beartype.rtfd.io/"><img alt="Bear-ified™" src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a></p>
 <p>Now you’re playing with …</p>
-<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc6/docs/dyce.svg" alt="dyce logo"></p>
+<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc7/docs/dyce.svg" alt="dyce logo"></p>
 <h1 id="dyce-simple-python-tools-for-exploring-dice-outcomes-and-other-finite-discrete-probabilities"><code>dyce</code> – Simple Python tools for exploring dice outcomes and other finite discrete probabilities</h1>
-<p><strong>💥 <em>Now 100% <a href="https://beartype.rtfd.io/">Bear-ified™</a>!</em> 👌🏾🐻</strong>
-(<a href="#requirements">Details</a> below.)</p>
 <p><code>dyce</code> is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for <strong><em>compact expression</em></strong> and <strong><em>efficient computation</em></strong>, especially for the most common cases.
 Its primary applications are:</p>
@@ -943,6 +941,7 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 <li><a href="https://matplotlib.org/">Matplotlib</a> for basic visualization helpers via <code>dyce.viz</code></li>
 </ul>
 <p>See the <a href="https://posita.github.io/dyce/0.7/contrib/#hacking-quick-start">hacking quick-start</a> for additional development and testing dependencies.</p>
+<p><code>dyce</code> is proudly 100% <a href="https://beartype.rtfd.io/">Bear-ified™</a>! 👌🏾🐻</p>
 <h2 id="design-philosophy">Design philosophy</h2>
 <p><code>dyce</code> is fairly low-level by design, prioritizing ergonomics and composability.
 It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
@@ -1028,13 +1027,11 @@ All support a variety of operations.
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># take the lowest die of 2d6</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># take the lowest die of 2d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.53</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.97</span>
   <span class="mi">1</span> <span class="o">|</span>  <span class="mf">30.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############</span>
   <span class="mi">2</span> <span class="o">|</span>  <span class="mf">25.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">19.44</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
@@ -1052,13 +1049,11 @@ All support a variety of operations.
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># take the highest die of 2d6</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># take the highest die of 2d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.47</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.97</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
@@ -1098,9 +1093,9 @@ All support a variety of operations.
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc6/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc6/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc6/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc7/docs/assets/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc7/docs/assets/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc7/docs/assets/plot_2d6_lo_hi_light.svg">
 </picture></p>
 <p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P"><code>P</code> objects</a> can generate random rolls.</p>
 <!-- BEGIN MONKEY PATCH --
@@ -1151,7 +1146,7 @@ Other works include:</p>
 <p>When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.</p>
 <ul>
 <li><a href="https://eykd.net/about/">David Eyk</a> not only <a href="https://eykd.net/blog/">inspires others to explore creative writing</a>, but has graciously ceded his PyPI project dedicated to <a href="https://code.google.com/archive/p/dyce/">his own prior work under a similar name</a>.
-  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc6/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
+  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc7/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
   Thanks to his generosity, <del>millions</del> <em>dozens</em> of future <code>dyce</code> users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡</li>
 </ul>

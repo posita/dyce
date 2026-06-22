@@ -1884,13 +1884,11 @@ Modeling the sum of two six-sided dice (<code>2d6</code>) can be expressed as:</
 <span class="normal">13</span>
 <span class="normal">14</span>
 <span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="n">d6</span> <span class="o">+</span> <span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">2.42</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">5.83</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">5.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">##</span>
   <span class="mi">4</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
@@ -1951,13 +1949,11 @@ One way to count how often a first six-sided die shows a different face than a s
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">30</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
   <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.83</span>
   <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.37</span>
-  <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.14</span>
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">83.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################################</span>
 </code></pre></div></td></tr></table></div>
@@ -1968,13 +1964,11 @@ One way to count how often a first six-sided die shows a different face than a s
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">15</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
   <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.42</span>
   <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
-  <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">58.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">41.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################</span>
 </code></pre></div></td></tr></table></div>
@@ -1990,8 +1984,7 @@ One way to count how often a first six-sided die shows a different face than a s
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_eq2</span> <span class="o">=</span> <span class="n">d6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6_eq2</span> <span class="o">=</span> <span class="n">d6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">d6_eq2</span>  <span class="c1"># how often a 2 shows on a single six-sided die</span>
 <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">d6_eq2</span>  <span class="c1"># number of 2s showing among 4d6</span>
@@ -2001,7 +1994,6 @@ One way to count how often a first six-sided die shows a different face than a s
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">((</span><span class="mi">4</span> <span class="o">@</span> <span class="n">d6_eq2</span><span class="p">)</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
   <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.52</span>
   <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.50</span>
-  <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.25</span>
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">48.23</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######################</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">51.77</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################</span>
 </code></pre></div></td></tr></table></div>
@@ -2066,7 +2058,8 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>dyce/h.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 139</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 138</span>
+<span class="normal"> 139</span>
 <span class="normal"> 140</span>
 <span class="normal"> 141</span>
 <span class="normal"> 142</span>
@@ -3900,19 +3893,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="normal">1970</span>
 <span class="normal">1971</span>
 <span class="normal">1972</span>
-<span class="normal">1973</span>
-<span class="normal">1974</span>
-<span class="normal">1975</span>
-<span class="normal">1976</span>
-<span class="normal">1977</span>
-<span class="normal">1978</span>
-<span class="normal">1979</span>
-<span class="normal">1980</span>
-<span class="normal">1981</span>
-<span class="normal">1982</span>
-<span class="normal">1983</span>
-<span class="normal">1984</span>
-<span class="normal">1985</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">H</span><span class="p">(</span><span class="n">Mapping</span><span class="p">[</span><span class="n">_T_co</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>  <span class="c1"># type: ignore[type-var] # ty: ignore[invalid-generic-class]</span>
+<span class="normal">1973</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">H</span><span class="p">(</span><span class="n">Mapping</span><span class="p">[</span><span class="n">_T_co</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>  <span class="c1"># type: ignore[type-var] # ty: ignore[invalid-generic-class]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
 <span class="sd">    For typing.</span>
@@ -4009,7 +3990,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">        &gt;&gt;&gt; print((d6 + d6).format(width=65))</span>
 <span class="sd">        avg |    7.00</span>
 <span class="sd">        std |    2.42</span>
-<span class="sd">        var |    5.83</span>
 <span class="sd">          2 |   2.78% |#</span>
 <span class="sd">          3 |   5.56% |##</span>
 <span class="sd">          4 |   8.33% |####</span>
@@ -4058,7 +4038,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">        &gt;&gt;&gt; print(d6.ne(d6).format(width=65))</span>
 <span class="sd">          avg |    0.83</span>
 <span class="sd">          std |    0.37</span>
-<span class="sd">          var |    0.14</span>
 <span class="sd">        False |  16.67% |########</span>
 <span class="sd">         True |  83.33% |########################################</span>
 
@@ -4069,7 +4048,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">        &gt;&gt;&gt; print(d6.lt(d6).format(width=65))</span>
 <span class="sd">          avg |    0.42</span>
 <span class="sd">          std |    0.49</span>
-<span class="sd">          var |    0.24</span>
 <span class="sd">        False |  58.33% |############################</span>
 <span class="sd">         True |  41.67% |####################</span>
 
@@ -4085,7 +4063,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">        &gt;&gt;&gt; print((4 @ d6_eq2).ge(1).format(width=65))</span>
 <span class="sd">          avg |    0.52</span>
 <span class="sd">          std |    0.50</span>
-<span class="sd">          var |    0.25</span>
 <span class="sd">        False |  48.23% |#######################</span>
 <span class="sd">         True |  51.77% |########################</span>
 
@@ -5011,7 +4988,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
         <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">other_h</span> <span class="o">=</span> <span class="n">other</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="k">else</span> <span class="n">H</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">other_h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment,no-matching-overload]</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
         <span class="k">return</span> <span class="n">H</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
     <span class="nd">@overload</span>
@@ -5211,7 +5188,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            ... )</span>
 <span class="sd">            avg |    7.0000</span>
 <span class="sd">            std |    2.4152</span>
-<span class="sd">            var |    5.8333</span>
 <span class="sd">              1 |   0.0000% |</span>
 <span class="sd">              2 |   2.7778% |@</span>
 <span class="sd">              3 |   5.5556% |@@</span>
@@ -5241,18 +5217,15 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; print(H(1).format(scaled=False, width=65))</span>
 <span class="sd">            avg |    1.00</span>
 <span class="sd">            std |    0.00</span>
-<span class="sd">            var |    0.00</span>
 <span class="sd">              1 | 100.00% |##################################################</span>
 <span class="sd">            &gt;&gt;&gt; print(h_ge.format(scaled=False, width=65))</span>
 <span class="sd">              avg |    0.58</span>
 <span class="sd">              std |    0.49</span>
-<span class="sd">              var |    0.24</span>
 <span class="sd">            False |  41.67% |####################</span>
 <span class="sd">             True |  58.33% |############################</span>
 <span class="sd">            &gt;&gt;&gt; print(h_ge.format(scaled=True, width=65))</span>
 <span class="sd">              avg |    0.58</span>
 <span class="sd">              std |    0.49</span>
-<span class="sd">              var |    0.24</span>
 <span class="sd">            False |  41.67% |##################################</span>
 <span class="sd">             True |  58.33% |################################################</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -5263,7 +5236,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
             <span class="n">std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
-            <span class="n">var</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
             <span class="c1"># Broad catch is intentional: format() is a display method that should</span>
             <span class="c1"># always produce output. Any failure to compute statistics (including from</span>
@@ -5272,7 +5244,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">mu</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">std</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
             <span class="c1"># First pass: collect (outcome_str, probability) pairs and find the widest</span>
@@ -5290,8 +5261,6 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
                 <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;avg&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">mu</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="n">std</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;std&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">std</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;var&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">var</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">if</span> <span class="n">pairs</span><span class="p">:</span>
                 <span class="n">tick_scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">())</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="k">if</span> <span class="n">scaled</span> <span class="k">else</span> <span class="mf">1.0</span>
@@ -5542,8 +5511,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
             <span class="p">}</span>
             <span class="k">for</span> <span class="n">repl_outcome</span><span class="p">,</span> <span class="n">repl_count</span> <span class="ow">in</span> <span class="n">repl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
-                    <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
-                    <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
@@ -5572,8 +5540,10 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; [d6.roll() for _ in range(10)]</span>
 <span class="sd">            [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">rng</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no outcomes from which to select in empty histogram&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no outcomes in an empty histogram&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rng</span><span class="o">.</span><span class="n">RNG</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span>
             <span class="n">population</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">()),</span>
             <span class="n">weights</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">()),</span>
@@ -5830,7 +5800,12 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">373</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
 <span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
@@ -5873,12 +5848,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 <span class="normal">413</span>
 <span class="normal">414</span>
 <span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">416</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constructor.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">_T_co</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -6085,7 +6055,12 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1258</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1253</span>
+<span class="normal">1254</span>
+<span class="normal">1255</span>
+<span class="normal">1256</span>
+<span class="normal">1257</span>
+<span class="normal">1258</span>
 <span class="normal">1259</span>
 <span class="normal">1260</span>
 <span class="normal">1261</span>
@@ -6183,12 +6158,7 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 <span class="normal">1353</span>
 <span class="normal">1354</span>
 <span class="normal">1355</span>
-<span class="normal">1356</span>
-<span class="normal">1357</span>
-<span class="normal">1358</span>
-<span class="normal">1359</span>
-<span class="normal">1360</span>
-<span class="normal">1361</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span>
+<span class="normal">1356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">],</span> <span class="n">_ResultT</span><span class="p">],</span>
     <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;H[_OtherT] | _OtherT | SentinelT&quot;</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="p">,</span>
@@ -6314,11 +6284,11 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">501</span>
-<span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValuesView</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValuesView</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    More descriptive synonym for the `values` mapping method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -6357,16 +6327,16 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1117</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1112</span>
+<span class="normal">1113</span>
+<span class="normal">1114</span>
+<span class="normal">1115</span>
+<span class="normal">1116</span>
+<span class="normal">1117</span>
 <span class="normal">1118</span>
 <span class="normal">1119</span>
 <span class="normal">1120</span>
-<span class="normal">1121</span>
-<span class="normal">1122</span>
-<span class="normal">1123</span>
-<span class="normal">1124</span>
-<span class="normal">1125</span>
-<span class="normal">1126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_eq, rhs)`.</span>
 
@@ -6464,7 +6434,12 @@ Divide by <code>self.total ** n</code> to get a probability.
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1363</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1358</span>
+<span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span>
+<span class="normal">1363</span>
 <span class="normal">1364</span>
 <span class="normal">1365</span>
 <span class="normal">1366</span>
@@ -6511,12 +6486,7 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="normal">1407</span>
 <span class="normal">1408</span>
 <span class="normal">1409</span>
-<span class="normal">1410</span>
-<span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span>
-<span class="normal">1415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">1410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">exactly_k_times_in_n</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
@@ -6616,15 +6586,13 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span>
 <span class="o">...</span>     <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
 <span class="o">...</span>     <span class="o">.</span><span class="n">zero_fill</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span>
 <span class="o">...</span>     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">tick</span><span class="o">=</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">)</span>
 <span class="o">...</span> <span class="p">)</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">7.0000</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">2.4152</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">5.8333</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.0000</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">2.7778</span><span class="o">%</span> <span class="o">|@</span>
   <span class="mi">3</span> <span class="o">|</span>   <span class="mf">5.5556</span><span class="o">%</span> <span class="o">|@@</span>
@@ -6663,27 +6631,21 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="normal">14</span>
 <span class="normal">15</span>
 <span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">h_ge</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">h_ge</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39; 65 chars wide --&gt;|&#39;</span><span class="si">:</span><span class="s2">-&gt;65</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="o">----------------------------------------------</span> <span class="mi">65</span> <span class="n">chars</span> <span class="n">wide</span> <span class="o">--&gt;|</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">1.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.00</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">0.00</span>
   <span class="mi">1</span> <span class="o">|</span> <span class="mf">100.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h_ge</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
   <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.58</span>
   <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
-  <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">41.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">58.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">############################</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h_ge</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
   <span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.58</span>
   <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.49</span>
-  <span class="n">var</span> <span class="o">|</span>    <span class="mf">0.24</span>
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">41.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">58.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">################################################</span>
 </code></pre></div></td></tr></table></div>
@@ -6691,7 +6653,12 @@ Divide by <code>self.total ** n</code> to get a probability.
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1417</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
 <span class="normal">1418</span>
 <span class="normal">1419</span>
 <span class="normal">1420</span>
@@ -6788,20 +6755,7 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="normal">1511</span>
 <span class="normal">1512</span>
 <span class="normal">1513</span>
-<span class="normal">1514</span>
-<span class="normal">1515</span>
-<span class="normal">1516</span>
-<span class="normal">1517</span>
-<span class="normal">1518</span>
-<span class="normal">1519</span>
-<span class="normal">1520</span>
-<span class="normal">1521</span>
-<span class="normal">1522</span>
-<span class="normal">1523</span>
-<span class="normal">1524</span>
-<span class="normal">1525</span>
-<span class="normal">1526</span>
-<span class="normal">1527</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span>
+<span class="normal">1514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_PRECISION</span><span class="p">,</span>
@@ -6822,7 +6776,6 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="sd">        ... )</span>
 <span class="sd">        avg |    7.0000</span>
 <span class="sd">        std |    2.4152</span>
-<span class="sd">        var |    5.8333</span>
 <span class="sd">          1 |   0.0000% |</span>
 <span class="sd">          2 |   2.7778% |@</span>
 <span class="sd">          3 |   5.5556% |@@</span>
@@ -6852,18 +6805,15 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="sd">        &gt;&gt;&gt; print(H(1).format(scaled=False, width=65))</span>
 <span class="sd">        avg |    1.00</span>
 <span class="sd">        std |    0.00</span>
-<span class="sd">        var |    0.00</span>
 <span class="sd">          1 | 100.00% |##################################################</span>
 <span class="sd">        &gt;&gt;&gt; print(h_ge.format(scaled=False, width=65))</span>
 <span class="sd">          avg |    0.58</span>
 <span class="sd">          std |    0.49</span>
-<span class="sd">          var |    0.24</span>
 <span class="sd">        False |  41.67% |####################</span>
 <span class="sd">         True |  58.33% |############################</span>
 <span class="sd">        &gt;&gt;&gt; print(h_ge.format(scaled=True, width=65))</span>
 <span class="sd">          avg |    0.58</span>
 <span class="sd">          std |    0.49</span>
-<span class="sd">          var |    0.24</span>
 <span class="sd">        False |  41.67% |##################################</span>
 <span class="sd">         True |  58.33% |################################################</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -6874,7 +6824,6 @@ Divide by <code>self.total ** n</code> to get a probability.
     <span class="k">try</span><span class="p">:</span>
         <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
         <span class="n">std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
-        <span class="n">var</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span><span class="p">()</span>  <span class="c1"># type: ignore[misc] # ty: ignore[invalid-argument-type]</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
         <span class="c1"># Broad catch is intentional: format() is a display method that should</span>
         <span class="c1"># always produce output. Any failure to compute statistics (including from</span>
@@ -6883,7 +6832,6 @@ Divide by <code>self.total ** n</code> to get a probability.
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">std</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_lines</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># First pass: collect (outcome_str, probability) pairs and find the widest</span>
@@ -6901,8 +6849,6 @@ Divide by <code>self.total ** n</code> to get a probability.
             <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;avg&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">mu</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="n">std</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;std&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">std</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;var&#39;</span><span class="si">:</span><span class="s2"> &gt;</span><span class="si">{</span><span class="n">max_outcome_len</span><span class="si">}}</span><span class="s2"> | </span><span class="si">{</span><span class="n">var</span><span class="si">:{</span><span class="n">prob_width</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="k">if</span> <span class="n">pairs</span><span class="p">:</span>
             <span class="n">tick_scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">())</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="k">if</span> <span class="n">scaled</span> <span class="k">else</span> <span class="mf">1.0</span>
@@ -6942,7 +6888,20 @@ Divide by <code>self.total ** n</code> to get a probability.
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1529</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1516</span>
+<span class="normal">1517</span>
+<span class="normal">1518</span>
+<span class="normal">1519</span>
+<span class="normal">1520</span>
+<span class="normal">1521</span>
+<span class="normal">1522</span>
+<span class="normal">1523</span>
+<span class="normal">1524</span>
+<span class="normal">1525</span>
+<span class="normal">1526</span>
+<span class="normal">1527</span>
+<span class="normal">1528</span>
+<span class="normal">1529</span>
 <span class="normal">1530</span>
 <span class="normal">1531</span>
 <span class="normal">1532</span>
@@ -6958,20 +6917,7 @@ Divide by <code>self.total ** n</code> to get a probability.
 <span class="normal">1542</span>
 <span class="normal">1543</span>
 <span class="normal">1544</span>
-<span class="normal">1545</span>
-<span class="normal">1546</span>
-<span class="normal">1547</span>
-<span class="normal">1548</span>
-<span class="normal">1549</span>
-<span class="normal">1550</span>
-<span class="normal">1551</span>
-<span class="normal">1552</span>
-<span class="normal">1553</span>
-<span class="normal">1554</span>
-<span class="normal">1555</span>
-<span class="normal">1556</span>
-<span class="normal">1557</span>
-<span class="normal">1558</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_short</span><span class="p">(</span>
+<span class="normal">1545</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_short</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_PRECISION</span><span class="p">,</span>
@@ -7056,7 +7002,12 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
@@ -7094,12 +7045,7 @@ Otherwise, they are omitted.</p>
 <span class="normal">460</span>
 <span class="normal">461</span>
 <span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">463</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_counts</span><span class="p">(</span>
     <span class="bp">cls</span><span class="p">,</span>
     <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">]</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">SupportsInt</span><span class="p">]],</span>
@@ -7177,16 +7123,16 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1147</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1142</span>
+<span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span>
+<span class="normal">1147</span>
 <span class="normal">1148</span>
 <span class="normal">1149</span>
 <span class="normal">1150</span>
-<span class="normal">1151</span>
-<span class="normal">1152</span>
-<span class="normal">1153</span>
-<span class="normal">1154</span>
-<span class="normal">1155</span>
-<span class="normal">1156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_ge, rhs)`.</span>
 
@@ -7230,16 +7176,16 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1162</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
 <span class="normal">1163</span>
 <span class="normal">1164</span>
 <span class="normal">1165</span>
-<span class="normal">1166</span>
-<span class="normal">1167</span>
-<span class="normal">1168</span>
-<span class="normal">1169</span>
-<span class="normal">1170</span>
-<span class="normal">1171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_gt, rhs)`.</span>
 
@@ -7283,16 +7229,16 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1102</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1097</span>
+<span class="normal">1098</span>
+<span class="normal">1099</span>
+<span class="normal">1100</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
 <span class="normal">1103</span>
 <span class="normal">1104</span>
 <span class="normal">1105</span>
-<span class="normal">1106</span>
-<span class="normal">1107</span>
-<span class="normal">1108</span>
-<span class="normal">1109</span>
-<span class="normal">1110</span>
-<span class="normal">1111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_le, rhs)`.</span>
 
@@ -7341,7 +7287,20 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1560</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1547</span>
+<span class="normal">1548</span>
+<span class="normal">1549</span>
+<span class="normal">1550</span>
+<span class="normal">1551</span>
+<span class="normal">1552</span>
+<span class="normal">1553</span>
+<span class="normal">1554</span>
+<span class="normal">1555</span>
+<span class="normal">1556</span>
+<span class="normal">1557</span>
+<span class="normal">1558</span>
+<span class="normal">1559</span>
+<span class="normal">1560</span>
 <span class="normal">1561</span>
 <span class="normal">1562</span>
 <span class="normal">1563</span>
@@ -7354,20 +7313,7 @@ Otherwise, they are omitted.</p>
 <span class="normal">1570</span>
 <span class="normal">1571</span>
 <span class="normal">1572</span>
-<span class="normal">1573</span>
-<span class="normal">1574</span>
-<span class="normal">1575</span>
-<span class="normal">1576</span>
-<span class="normal">1577</span>
-<span class="normal">1578</span>
-<span class="normal">1579</span>
-<span class="normal">1580</span>
-<span class="normal">1581</span>
-<span class="normal">1582</span>
-<span class="normal">1583</span>
-<span class="normal">1584</span>
-<span class="normal">1585</span>
-<span class="normal">1586</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lowest_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">preserve_zero_counts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
+<span class="normal">1573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lowest_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">preserve_zero_counts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.</span>
 
@@ -7428,16 +7374,16 @@ Otherwise, they are omitted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1087</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span>
 <span class="normal">1088</span>
 <span class="normal">1089</span>
 <span class="normal">1090</span>
-<span class="normal">1091</span>
-<span class="normal">1092</span>
-<span class="normal">1093</span>
-<span class="normal">1094</span>
-<span class="normal">1095</span>
-<span class="normal">1096</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1091</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_lt, rhs)`.</span>
 
@@ -7478,21 +7424,21 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1588</span>
-<span class="normal">1589</span>
-<span class="normal">1590</span>
-<span class="normal">1591</span>
-<span class="normal">1592</span>
-<span class="normal">1593</span>
-<span class="normal">1594</span>
-<span class="normal">1595</span>
-<span class="normal">1596</span>
-<span class="normal">1597</span>
-<span class="normal">1598</span>
-<span class="normal">1599</span>
-<span class="normal">1600</span>
-<span class="normal">1601</span>
-<span class="normal">1602</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1575</span>
+<span class="normal">1576</span>
+<span class="normal">1577</span>
+<span class="normal">1578</span>
+<span class="normal">1579</span>
+<span class="normal">1580</span>
+<span class="normal">1581</span>
+<span class="normal">1582</span>
+<span class="normal">1583</span>
+<span class="normal">1584</span>
+<span class="normal">1585</span>
+<span class="normal">1586</span>
+<span class="normal">1587</span>
+<span class="normal">1588</span>
+<span class="normal">1589</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the mean (expected value) of the weighted outcomes.</span>
 <span class="sd">    Raises `ValueError` if the histogram is empty.</span>
@@ -7533,7 +7479,12 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1226</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1221</span>
+<span class="normal">1222</span>
+<span class="normal">1223</span>
+<span class="normal">1224</span>
+<span class="normal">1225</span>
+<span class="normal">1226</span>
 <span class="normal">1227</span>
 <span class="normal">1228</span>
 <span class="normal">1229</span>
@@ -7541,12 +7492,7 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 <span class="normal">1231</span>
 <span class="normal">1232</span>
 <span class="normal">1233</span>
-<span class="normal">1234</span>
-<span class="normal">1235</span>
-<span class="normal">1236</span>
-<span class="normal">1237</span>
-<span class="normal">1238</span>
-<span class="normal">1239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
+<span class="normal">1234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -7558,7 +7504,7 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
     <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">other_h</span> <span class="o">=</span> <span class="n">other</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="k">else</span> <span class="n">H</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">other_h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment,no-matching-overload]</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
     <span class="k">return</span> <span class="n">H</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -7594,16 +7540,16 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1132</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1127</span>
+<span class="normal">1128</span>
+<span class="normal">1129</span>
+<span class="normal">1130</span>
+<span class="normal">1131</span>
+<span class="normal">1132</span>
 <span class="normal">1133</span>
 <span class="normal">1134</span>
 <span class="normal">1135</span>
-<span class="normal">1136</span>
-<span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
-<span class="normal">1141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
+<span class="normal">1136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[object] | object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.apply(optype.do_ne, rhs)`.</span>
 
@@ -7659,7 +7605,20 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1604</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1591</span>
+<span class="normal">1592</span>
+<span class="normal">1593</span>
+<span class="normal">1594</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
+<span class="normal">1597</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
 <span class="normal">1605</span>
 <span class="normal">1606</span>
 <span class="normal">1607</span>
@@ -7681,20 +7640,7 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 <span class="normal">1623</span>
 <span class="normal">1624</span>
 <span class="normal">1625</span>
-<span class="normal">1626</span>
-<span class="normal">1627</span>
-<span class="normal">1628</span>
-<span class="normal">1629</span>
-<span class="normal">1630</span>
-<span class="normal">1631</span>
-<span class="normal">1632</span>
-<span class="normal">1633</span>
-<span class="normal">1634</span>
-<span class="normal">1635</span>
-<span class="normal">1636</span>
-<span class="normal">1637</span>
-<span class="normal">1638</span>
-<span class="normal">1639</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">1626</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">order_stat_for_n_at_pos</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span>
     <span class="n">n</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">,</span>
@@ -7752,11 +7698,11 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outcomes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeysView</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outcomes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeysView</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    More descriptive synonym for the `keys` mapping method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -7808,7 +7754,20 @@ Pass any two-argument callable to get a different representation (e.g. <code>flo
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1649</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1636</span>
+<span class="normal">1637</span>
+<span class="normal">1638</span>
+<span class="normal">1639</span>
+<span class="normal">1640</span>
+<span class="normal">1641</span>
+<span class="normal">1642</span>
+<span class="normal">1643</span>
+<span class="normal">1644</span>
+<span class="normal">1645</span>
+<span class="normal">1646</span>
+<span class="normal">1647</span>
+<span class="normal">1648</span>
+<span class="normal">1649</span>
 <span class="normal">1650</span>
 <span class="normal">1651</span>
 <span class="normal">1652</span>
@@ -7820,20 +7779,7 @@ Pass any two-argument callable to get a different representation (e.g. <code>flo
 <span class="normal">1658</span>
 <span class="normal">1659</span>
 <span class="normal">1660</span>
-<span class="normal">1661</span>
-<span class="normal">1662</span>
-<span class="normal">1663</span>
-<span class="normal">1664</span>
-<span class="normal">1665</span>
-<span class="normal">1666</span>
-<span class="normal">1667</span>
-<span class="normal">1668</span>
-<span class="normal">1669</span>
-<span class="normal">1670</span>
-<span class="normal">1671</span>
-<span class="normal">1672</span>
-<span class="normal">1673</span>
-<span class="normal">1674</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
+<span class="normal">1661</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">probability_items</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">rational_t</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">_OtherT</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_OtherT</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -7920,7 +7866,20 @@ If <em>preserve_zero_counts</em> is <code>True</code>, outcomes are retained eve
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1690</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1677</span>
+<span class="normal">1678</span>
+<span class="normal">1679</span>
+<span class="normal">1680</span>
+<span class="normal">1681</span>
+<span class="normal">1682</span>
+<span class="normal">1683</span>
+<span class="normal">1684</span>
+<span class="normal">1685</span>
+<span class="normal">1686</span>
+<span class="normal">1687</span>
+<span class="normal">1688</span>
+<span class="normal">1689</span>
+<span class="normal">1690</span>
 <span class="normal">1691</span>
 <span class="normal">1692</span>
 <span class="normal">1693</span>
@@ -7933,20 +7892,7 @@ If <em>preserve_zero_counts</em> is <code>True</code>, outcomes are retained eve
 <span class="normal">1700</span>
 <span class="normal">1701</span>
 <span class="normal">1702</span>
-<span class="normal">1703</span>
-<span class="normal">1704</span>
-<span class="normal">1705</span>
-<span class="normal">1706</span>
-<span class="normal">1707</span>
-<span class="normal">1708</span>
-<span class="normal">1709</span>
-<span class="normal">1710</span>
-<span class="normal">1711</span>
-<span class="normal">1712</span>
-<span class="normal">1713</span>
-<span class="normal">1714</span>
-<span class="normal">1715</span>
-<span class="normal">1716</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">1703</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">quantize</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">bit_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_QUANTIZATION_BIT_WIDTH</span><span class="p">,</span>
@@ -8056,7 +8002,20 @@ If <em>repl</em> is a histogram, its outcomes will be “folded in”, together 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1718</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1705</span>
+<span class="normal">1706</span>
+<span class="normal">1707</span>
+<span class="normal">1708</span>
+<span class="normal">1709</span>
+<span class="normal">1710</span>
+<span class="normal">1711</span>
+<span class="normal">1712</span>
+<span class="normal">1713</span>
+<span class="normal">1714</span>
+<span class="normal">1715</span>
+<span class="normal">1716</span>
+<span class="normal">1717</span>
+<span class="normal">1718</span>
 <span class="normal">1719</span>
 <span class="normal">1720</span>
 <span class="normal">1721</span>
@@ -8103,21 +8062,7 @@ If <em>repl</em> is a histogram, its outcomes will be “folded in”, together 
 <span class="normal">1762</span>
 <span class="normal">1763</span>
 <span class="normal">1764</span>
-<span class="normal">1765</span>
-<span class="normal">1766</span>
-<span class="normal">1767</span>
-<span class="normal">1768</span>
-<span class="normal">1769</span>
-<span class="normal">1770</span>
-<span class="normal">1771</span>
-<span class="normal">1772</span>
-<span class="normal">1773</span>
-<span class="normal">1774</span>
-<span class="normal">1775</span>
-<span class="normal">1776</span>
-<span class="normal">1777</span>
-<span class="normal">1778</span>
-<span class="normal">1779</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">1765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">existing_outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">repl</span><span class="p">:</span> <span class="s2">&quot;H[_T] | _T&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a new histogram with a possibly substituted outcome.</span>
@@ -8168,8 +8113,7 @@ If <em>repl</em> is a histogram, its outcomes will be “folded in”, together 
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">repl_outcome</span><span class="p">,</span> <span class="n">repl_count</span> <span class="ow">in</span> <span class="n">repl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
-                <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
-                <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
@@ -8220,7 +8164,21 @@ For deterministic outcomes.
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1781</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1767</span>
+<span class="normal">1768</span>
+<span class="normal">1769</span>
+<span class="normal">1770</span>
+<span class="normal">1771</span>
+<span class="normal">1772</span>
+<span class="normal">1773</span>
+<span class="normal">1774</span>
+<span class="normal">1775</span>
+<span class="normal">1776</span>
+<span class="normal">1777</span>
+<span class="normal">1778</span>
+<span class="normal">1779</span>
+<span class="normal">1780</span>
+<span class="normal">1781</span>
 <span class="normal">1782</span>
 <span class="normal">1783</span>
 <span class="normal">1784</span>
@@ -8232,19 +8190,7 @@ For deterministic outcomes.
 <span class="normal">1790</span>
 <span class="normal">1791</span>
 <span class="normal">1792</span>
-<span class="normal">1793</span>
-<span class="normal">1794</span>
-<span class="normal">1795</span>
-<span class="normal">1796</span>
-<span class="normal">1797</span>
-<span class="normal">1798</span>
-<span class="normal">1799</span>
-<span class="normal">1800</span>
-<span class="normal">1801</span>
-<span class="normal">1802</span>
-<span class="normal">1803</span>
-<span class="normal">1804</span>
-<span class="normal">1805</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">1793</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
@@ -8262,8 +8208,10 @@ For deterministic outcomes.
 <span class="sd">        &gt;&gt;&gt; [d6.roll() for _ in range(10)]</span>
 <span class="sd">        [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">rng</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no outcomes from which to select in empty histogram&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no outcomes in an empty histogram&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rng</span><span class="o">.</span><span class="n">RNG</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span>
         <span class="n">population</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">()),</span>
         <span class="n">weights</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">()),</span>
@@ -8300,17 +8248,17 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1807</span>
-<span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span>
-<span class="normal">1817</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stdev</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1795</span>
+<span class="normal">1796</span>
+<span class="normal">1797</span>
+<span class="normal">1798</span>
+<span class="normal">1799</span>
+<span class="normal">1800</span>
+<span class="normal">1801</span>
+<span class="normal">1802</span>
+<span class="normal">1803</span>
+<span class="normal">1804</span>
+<span class="normal">1805</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stdev</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the standard deviation of the weighted outcomes as a `float`.</span>
 <span class="sd">    Raises `ValueError` if the histogram is empty.</span>
@@ -8352,23 +8300,23 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1819</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1807</span>
+<span class="normal">1808</span>
+<span class="normal">1809</span>
+<span class="normal">1810</span>
+<span class="normal">1811</span>
+<span class="normal">1812</span>
+<span class="normal">1813</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span>
+<span class="normal">1817</span>
+<span class="normal">1818</span>
+<span class="normal">1819</span>
 <span class="normal">1820</span>
 <span class="normal">1821</span>
 <span class="normal">1822</span>
-<span class="normal">1823</span>
-<span class="normal">1824</span>
-<span class="normal">1825</span>
-<span class="normal">1826</span>
-<span class="normal">1827</span>
-<span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span>
-<span class="normal">1831</span>
-<span class="normal">1832</span>
-<span class="normal">1833</span>
-<span class="normal">1834</span>
-<span class="normal">1835</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">1823</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[SupportsFloat]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the variance of the weighted outcomes as a `float`.</span>
 <span class="sd">    Raises `ValueError` if the histogram is empty.</span>
@@ -8411,14 +8359,14 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1837</span>
-<span class="normal">1838</span>
-<span class="normal">1839</span>
-<span class="normal">1840</span>
-<span class="normal">1841</span>
-<span class="normal">1842</span>
-<span class="normal">1843</span>
-<span class="normal">1844</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">zero_fill</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1825</span>
+<span class="normal">1826</span>
+<span class="normal">1827</span>
+<span class="normal">1828</span>
+<span class="normal">1829</span>
+<span class="normal">1830</span>
+<span class="normal">1831</span>
+<span class="normal">1832</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">zero_fill</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shorthand for `self.merge(dict.fromkeys(outcomes, 0))`.</span>
 
@@ -9201,7 +9149,19 @@ We all know what you mean.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>dyce/h.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1988</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1976</span>
+<span class="normal">1977</span>
+<span class="normal">1978</span>
+<span class="normal">1979</span>
+<span class="normal">1980</span>
+<span class="normal">1981</span>
+<span class="normal">1982</span>
+<span class="normal">1983</span>
+<span class="normal">1984</span>
+<span class="normal">1985</span>
+<span class="normal">1986</span>
+<span class="normal">1987</span>
+<span class="normal">1988</span>
 <span class="normal">1989</span>
 <span class="normal">1990</span>
 <span class="normal">1991</span>
@@ -9214,19 +9174,7 @@ We all know what you mean.</p>
 <span class="normal">1998</span>
 <span class="normal">1999</span>
 <span class="normal">2000</span>
-<span class="normal">2001</span>
-<span class="normal">2002</span>
-<span class="normal">2003</span>
-<span class="normal">2004</span>
-<span class="normal">2005</span>
-<span class="normal">2006</span>
-<span class="normal">2007</span>
-<span class="normal">2008</span>
-<span class="normal">2009</span>
-<span class="normal">2010</span>
-<span class="normal">2011</span>
-<span class="normal">2012</span>
-<span class="normal">2013</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@nobeartype</span>  <span class="c1"># not decoratable by beartype (avoids warning)</span>
+<span class="normal">2001</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@nobeartype</span>  <span class="c1"># not decoratable by beartype (avoids warning)</span>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">HableT</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -9288,9 +9236,9 @@ We all know what you mean.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2011</span>
-<span class="normal">2012</span>
-<span class="normal">2013</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1999</span>
+<span class="normal">2000</span>
+<span class="normal">2001</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;HableT[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Express its implementer as an [`H` object][dyce.H].&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -10023,7 +9971,36 @@ We all know what you mean.</p>
 <span class="normal">722</span>
 <span class="normal">723</span>
 <span class="normal">724</span>
-<span class="normal">725</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">P</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]],</span> <span class="n">HableOpsMixin</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An immutable pool (ordered sequence) supporting group operations for zero or more [`H` objects][dyce.H] (provided or created from the [initializer][dyce.P.__init__]’s *args* parameter).</span>
 
@@ -10321,7 +10298,38 @@ We all know what you mean.</p>
         <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO(posita): Fill this out.</span>
+<span class="sd">        Return a new [`H`][dyce.H] by applying *func* to each roll.</span>
+<span class="sd">        Shorthand for:</span>
+
+<span class="sd">        ```python</span>
+<span class="sd">        aggregate_weighted(</span>
+<span class="sd">            (func(roll), count) for roll, count in self.rolls_with_counts(*which)</span>
+<span class="sd">        )</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        Note that there are often other, much more efficient ways to arrive at desired computations, but for a handful of small dice, this can be a more expressive way to get the job done.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">            &gt;&gt;&gt; from dyce import P, H, RollT</span>
+<span class="sd">            &gt;&gt;&gt; d6 = H(6)</span>
+<span class="sd">            &gt;&gt;&gt; h3d6 = 3 @ d6</span>
+<span class="sd">            &gt;&gt;&gt; p3d6 = 3 @ P(d6)</span>
+<span class="sd">            &gt;&gt;&gt; p3d6.apply_to_each_roll(sum) == h3d6</span>
+<span class="sd">            True</span>
+
+<span class="sd">        &lt;!-- -- &gt;</span>
+
+<span class="sd">            &gt;&gt;&gt; best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))</span>
+<span class="sd">            &gt;&gt;&gt; (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6</span>
+<span class="sd">            True</span>
+
+<span class="sd">        &lt;!-- -- &gt;</span>
+
+<span class="sd">            &gt;&gt;&gt; ones_rolled_in_3d6 = 3 @ (d6.eq(1))</span>
+<span class="sd">            &gt;&gt;&gt; def count_ones_in_roll(roll: RollT[int]) -&gt; int:</span>
+<span class="sd">            ...     return sum(1 for outcome in roll if outcome == 1)</span>
+<span class="sd">            &gt;&gt;&gt; p3d6.apply_to_each_roll(count_ones_in_roll) == ones_rolled_in_3d6</span>
+<span class="sd">            True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">&quot;H[_ResultT]&quot;</span><span class="p">,</span>
@@ -10349,7 +10357,6 @@ We all know what you mean.</p>
 <span class="sd">            &gt;&gt;&gt; print(p_2d6.h(-1).format(width=65))</span>
 <span class="sd">            avg |    4.47</span>
 <span class="sd">            std |    1.40</span>
-<span class="sd">            var |    1.97</span>
 <span class="sd">              1 |   2.78% |#</span>
 <span class="sd">              2 |   8.33% |####</span>
 <span class="sd">              3 |  13.89% |######</span>
@@ -10365,7 +10372,6 @@ We all know what you mean.</p>
 <span class="sd">            &gt;&gt;&gt; print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))</span>
 <span class="sd">            avg |   10.00</span>
 <span class="sd">            std |    0.91</span>
-<span class="sd">            var |    0.84</span>
 <span class="sd">              4 |   0.00% |</span>
 <span class="sd">              5 |   0.00% |</span>
 <span class="sd">              6 |   0.10% |</span>
@@ -10493,7 +10499,7 @@ We all know what you mean.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">roll</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]</span>
+            <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue]</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natural_key</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">roll</span><span class="p">)</span>
@@ -10875,7 +10881,46 @@ If this is not desired, provide <code>True</code> for <em>apply_to_each</em> to 
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.p.P.apply_to_each_roll</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>TODO(posita): Fill this out.</p>
+<p>Return a new <a class="autorefs autorefs-internal" href="#dyce.H"><code>H</code></a> by applying <em>func</em> to each roll.
+Shorthand for:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">aggregate_weighted</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">roll</span><span class="p">),</span> <span class="n">count</span><span class="p">)</span> <span class="k">for</span> <span class="n">roll</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">(</span><span class="o">*</span><span class="n">which</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Note that there are often other, much more efficient ways to arrive at desired computations, but for a handful of small dice, this can be a more expressive way to get the job done.
+For example:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">P</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">RollT</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h3d6</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">d6</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">apply_to_each_roll</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span> <span class="o">==</span> <span class="n">h3d6</span>
+<span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+<p>&lt;!-- -- &gt;</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">best_three_of_4d6</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">apply_to_each_roll</span><span class="p">(</span><span class="nb">sum</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="o">==</span> <span class="n">best_three_of_4d6</span>
+<span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+<p>&lt;!-- -- &gt;</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">ones_rolled_in_3d6</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="p">(</span><span class="n">d6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">count_ones_in_roll</span><span class="p">(</span><span class="n">roll</span><span class="p">:</span> <span class="n">RollT</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">roll</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">apply_to_each_roll</span><span class="p">(</span><span class="n">count_ones_in_roll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ones_rolled_in_3d6</span>
+<span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
 
 
             <details class="mkdocstrings-source">
@@ -10894,14 +10939,76 @@ If this is not desired, provide <code>True</code> for <em>apply_to_each</em> to 
 <span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
-<span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each_roll</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]</span> <span class="o">|</span> <span class="n">_ResultT</span><span class="p">],</span>
     <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_ResultT</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    TODO(posita): Fill this out.</span>
+<span class="sd">    Return a new [`H`][dyce.H] by applying *func* to each roll.</span>
+<span class="sd">    Shorthand for:</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    aggregate_weighted(</span>
+<span class="sd">        (func(roll), count) for roll, count in self.rolls_with_counts(*which)</span>
+<span class="sd">    )</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Note that there are often other, much more efficient ways to arrive at desired computations, but for a handful of small dice, this can be a more expressive way to get the job done.</span>
+<span class="sd">    For example:</span>
+
+<span class="sd">        &gt;&gt;&gt; from dyce import P, H, RollT</span>
+<span class="sd">        &gt;&gt;&gt; d6 = H(6)</span>
+<span class="sd">        &gt;&gt;&gt; h3d6 = 3 @ d6</span>
+<span class="sd">        &gt;&gt;&gt; p3d6 = 3 @ P(d6)</span>
+<span class="sd">        &gt;&gt;&gt; p3d6.apply_to_each_roll(sum) == h3d6</span>
+<span class="sd">        True</span>
+
+<span class="sd">    &lt;!-- -- &gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))</span>
+<span class="sd">        &gt;&gt;&gt; (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6</span>
+<span class="sd">        True</span>
+
+<span class="sd">    &lt;!-- -- &gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; ones_rolled_in_3d6 = 3 @ (d6.eq(1))</span>
+<span class="sd">        &gt;&gt;&gt; def count_ones_in_roll(roll: RollT[int]) -&gt; int:</span>
+<span class="sd">        ...     return sum(1 for outcome in roll if outcome == 1)</span>
+<span class="sd">        &gt;&gt;&gt; p3d6.apply_to_each_roll(count_ones_in_roll) == ones_rolled_in_3d6</span>
+<span class="sd">        True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
         <span class="s2">&quot;H[_ResultT]&quot;</span><span class="p">,</span>
@@ -10945,14 +11052,12 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_2d6</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_2d6</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p_2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.47</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">1.97</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
   <span class="mi">2</span> <span class="o">|</span>   <span class="mf">8.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
   <span class="mi">3</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
@@ -10979,14 +11084,12 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 <span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_10d4</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p_10d4</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p_10d4</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1012</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">5030</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">51973</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">168760</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">595004</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">168760</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">51973</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="mi">5030</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="mi">1012</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p_10d4</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>   <span class="mf">10.00</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.91</span>
-<span class="n">var</span> <span class="o">|</span>    <span class="mf">0.84</span>
   <span class="mi">4</span> <span class="o">|</span>   <span class="mf">0.00</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">5</span> <span class="o">|</span>   <span class="mf">0.00</span><span class="o">%</span> <span class="o">|</span>
   <span class="mi">6</span> <span class="o">|</span>   <span class="mf">0.10</span><span class="o">%</span> <span class="o">|</span>
@@ -11016,38 +11119,7 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span>
-<span class="normal">454</span>
-<span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">467</span>
 <span class="normal">468</span>
 <span class="normal">469</span>
 <span class="normal">470</span>
@@ -11164,7 +11236,36 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 <span class="normal">581</span>
 <span class="normal">582</span>
 <span class="normal">583</span>
-<span class="normal">584</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].</span>
 
@@ -11182,7 +11283,6 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 <span class="sd">        &gt;&gt;&gt; print(p_2d6.h(-1).format(width=65))</span>
 <span class="sd">        avg |    4.47</span>
 <span class="sd">        std |    1.40</span>
-<span class="sd">        var |    1.97</span>
 <span class="sd">          1 |   2.78% |#</span>
 <span class="sd">          2 |   8.33% |####</span>
 <span class="sd">          3 |  13.89% |######</span>
@@ -11198,7 +11298,6 @@ Identifiers can be <code>int</code>s or <code>slice</code>s, and can be mixed.</
 <span class="sd">        &gt;&gt;&gt; print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))</span>
 <span class="sd">        avg |   10.00</span>
 <span class="sd">        std |    0.91</span>
-<span class="sd">        var |    0.84</span>
 <span class="sd">          4 |   0.00% |</span>
 <span class="sd">          5 |   0.00% |</span>
 <span class="sd">          6 |   0.10% |</span>
@@ -11344,22 +11443,22 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
-<span class="normal">601</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollT</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns (weighted) random outcomes from contained histograms.</span>
@@ -11371,7 +11470,7 @@ This is deliberate to allow random roll functionality where symbolic resolution 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">roll</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]</span>
+        <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue]</span>
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
         <span class="n">roll</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natural_key</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">roll</span><span class="p">)</span>
@@ -11480,36 +11579,7 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/p.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
-<span class="normal">614</span>
-<span class="normal">615</span>
-<span class="normal">616</span>
-<span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">632</span>
 <span class="normal">633</span>
 <span class="normal">634</span>
 <span class="normal">635</span>
@@ -11602,7 +11672,36 @@ Each <em>roll</em> is a sorted tuple of outcomes (least to greatest); <em>count<
 <span class="normal">722</span>
 <span class="normal">723</span>
 <span class="normal">724</span>
-<span class="normal">725</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rolls_with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;P[_T]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">which</span><span class="p">:</span> <span class="n">GetItemT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RollCountT</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.</span>
 <span class="sd">    Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.</span>
@@ -12525,7 +12624,9 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
 <span class="normal">499</span>
 <span class="normal">500</span>
 <span class="normal">501</span>
-<span class="normal">502</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">sources</span><span class="p">:</span> <span class="n">H</span> <span class="o">|</span> <span class="n">P</span><span class="p">,</span>
     <span class="n">precision</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span>
@@ -12692,6 +12793,8 @@ Counting how often a d6 beats each outcome of a 2d10 pool:</p>
 <span class="sd">        &gt;&gt;&gt; expand(times_d6_beats_two_d10s, H(6), p_2d10)</span>
 <span class="sd">        H({0: 71, 1: 38, 2: 11})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO(posita): # noqa: TD003 - Put some guardrails on precision and document them</span>
+    <span class="c1"># above</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sources</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;expand requires at least one source&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -12920,9 +13023,7 @@ With sufficient large values for <em>n</em>, a <a class="autorefs autorefs-inter
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/evaluation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">516</span>
 <span class="normal">517</span>
 <span class="normal">518</span>
 <span class="normal">519</span>
@@ -13011,7 +13112,9 @@ With sufficient large values for <em>n</em>, a <a class="autorefs autorefs-inter
 <span class="normal">602</span>
 <span class="normal">603</span>
 <span class="normal">604</span>
-<span class="normal">605</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">explode_n</span><span class="p">(</span>
     <span class="n">source</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanAdd</span><span class="p">[</span><span class="n">_OtherT</span><span class="p">,</span> <span class="n">_ResultT</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -13164,7 +13267,8 @@ If nested, the innermost context controls.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/h.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 92</span>
+<span class="normal"> 93</span>
 <span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
@@ -13206,8 +13310,7 @@ If nested, the innermost context controls.</p>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="nd">@contextmanager</span>
 <span class="c1"># The type of the return of the undecorated function is Generator, but after the</span>
 <span class="c1"># @contextmanager decorator is applied, it&#39;s AbstractContextManager. By refusing to</span>

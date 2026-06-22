@@ -1654,7 +1654,9 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">414</span>
 <span class="normal">415</span>
 <span class="normal">416</span>
-<span class="normal">417</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_burst</span><span class="p">(</span>
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T1</span><span class="p">],</span>
     <span class="n">compare</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T2</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1748,24 +1750,26 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">24.0</span><span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
-        <span class="n">outer_probs</span><span class="p">,</span>
-        <span class="n">labels</span><span class="o">=</span><span class="n">outer_labels</span><span class="p">,</span>
-        <span class="n">radius</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">labeldistance</span><span class="o">=</span><span class="mf">1.15</span><span class="p">,</span>
-        <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
-        <span class="n">colors</span><span class="o">=</span><span class="n">outer_colors</span><span class="p">,</span>
-        <span class="n">wedgeprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
-        <span class="n">inner_probs</span><span class="p">,</span>
-        <span class="n">labels</span><span class="o">=</span><span class="n">inner_labels</span><span class="p">,</span>
-        <span class="n">radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
-        <span class="n">labeldistance</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-        <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
-        <span class="n">colors</span><span class="o">=</span><span class="n">inner_colors</span><span class="p">,</span>
-        <span class="n">wedgeprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">outer_probs</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
+            <span class="n">outer_probs</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">outer_labels</span><span class="p">,</span>
+            <span class="n">radius</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">labeldistance</span><span class="o">=</span><span class="mf">1.15</span><span class="p">,</span>
+            <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+            <span class="n">colors</span><span class="o">=</span><span class="n">outer_colors</span><span class="p">,</span>
+            <span class="n">wedgeprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">inner_probs</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
+            <span class="n">inner_probs</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">inner_labels</span><span class="p">,</span>
+            <span class="n">radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
+            <span class="n">labeldistance</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+            <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+            <span class="n">colors</span><span class="o">=</span><span class="n">inner_colors</span><span class="p">,</span>
+            <span class="n">wedgeprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+        <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ax</span>
@@ -1832,9 +1836,7 @@ Returns the axes so the caller can further customise the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">422</span>
 <span class="normal">423</span>
 <span class="normal">424</span>
 <span class="normal">425</span>
@@ -1898,7 +1900,9 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">483</span>
 <span class="normal">484</span>
 <span class="normal">485</span>
-<span class="normal">486</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_line</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_ALPHA</span><span class="p">,</span>

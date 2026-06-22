@@ -27,8 +27,7 @@ def fig_callback(line_color: str) -> None:
     ax.legend(loc="upper right")
 
     # Style (dark/light) tweaks
-    ax.tick_params(axis="x", colors=line_color)
-    ax.tick_params(axis="y", colors=line_color)
+    ax.tick_params(colors=line_color)
     ax.title.set_color(line_color)
 
 
