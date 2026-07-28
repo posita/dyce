@@ -30,7 +30,7 @@ import os
 import re
 import shutil
 import signal
-import subprocess  # noqa: S404
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tempfile
 import tomllib
@@ -171,9 +171,9 @@ def _run_checkers(
         cmd = checker_cmd + [str(p) for p in tmp_files]
         _LOGGER.info("%s", " ".join(cmd))
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)  # noqa: PLW1510, S603
+            result = subprocess.run(cmd, capture_output=True, text=True)  # ruff: ignore[subprocess-run-without-check, subprocess-without-shell-equals-true]
         except FileNotFoundError:
-            _LOGGER.error("checker not found: %s", checker_cmd[0])  # noqa: TRY400
+            _LOGGER.error("checker not found: %s", checker_cmd[0])  # ruff: ignore[error-instead-of-exception]
             if fail_fast:
                 return 1
             exit_code |= 1
@@ -209,8 +209,8 @@ def _ruff_format(source: str) -> str | None:
     Returns the formatted source, or `None` if ruff failed or the source is unchanged.
     """
     normalized = source if source.endswith("\n") else source + "\n"
-    result = subprocess.run(  # noqa: PLW1510
-        ["ruff", "format", "--quiet", "-"],  # noqa: S607
+    result = subprocess.run(  # ruff: ignore[subprocess-run-without-check]
+        ["ruff", "format", "--quiet", "-"],  # ruff: ignore[start-process-with-partial-path]
         input=normalized,
         capture_output=True,
         text=True,
@@ -375,7 +375,7 @@ _TOML_SHARED_STR_LIST_KEYS = frozenset({"paths", "suffixes"})
 _TOML_CHECK_BOOL_KEYS = frozenset({"fail_fast", "keep"})
 
 
-def _load_toml_config(  # noqa: C901
+def _load_toml_config(  # ruff: ignore[complex-structure]
     subcommand: str | None,
 ) -> tuple[dict[str, object], dict[str, object]]:
     r"""
@@ -640,8 +640,8 @@ def _enum_src_files(paths: Iterable[Path], suffixes: frozenset[str]) -> list[Pat
                 # Explicitly named files are never filtered by suffix
                 files.append(path)
     else:
-        result = subprocess.run(  # noqa: PLW1510
-            ["git", "rev-parse", "--show-toplevel"],  # noqa: S607
+        result = subprocess.run(  # ruff: ignore[subprocess-run-without-check]
+            ["git", "rev-parse", "--show-toplevel"],  # ruff: ignore[start-process-with-partial-path]
             capture_output=True,
             text=True,
         )
@@ -652,8 +652,8 @@ def _enum_src_files(paths: Iterable[Path], suffixes: frozenset[str]) -> list[Pat
             dirs.append(Path(result.stdout.strip()))
 
     if dirs:
-        result = subprocess.run(  # noqa: PLW1510, S603
-            [  # noqa: S607
+        result = subprocess.run(  # ruff: ignore[subprocess-run-without-check, subprocess-without-shell-equals-true]
+            [  # ruff: ignore[start-process-with-partial-path]
                 "git",
                 "ls-files",
                 "--cached",
@@ -688,7 +688,7 @@ def _enum_src_files(paths: Iterable[Path], suffixes: frozenset[str]) -> list[Pat
 # ── main ──────────────────────────────────────────────────────────────────────
 
 
-def main() -> int:  # noqa: C901
+def main() -> int:  # ruff: ignore[complex-structure]
     pre_argv, checker_commands = _split_argv(sys.argv[1:])
     exit_code = 0
 

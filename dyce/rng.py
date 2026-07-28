@@ -68,7 +68,7 @@ try:
         def seed(
             self,
             a: object | None = None,
-            version: int = 2,  # noqa: ARG002
+            version: int = 2,  # ruff: ignore[unused-method-argument]
         ) -> None:
             if a is None or isinstance(a, (bool, int)):
                 seed = a

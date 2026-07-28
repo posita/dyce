@@ -40,7 +40,7 @@ from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: 
     install_if_missing,
 )
 
-await install_if_missing(  # type: ignore[top-level-await] # noqa: PGH003
+await install_if_missing(  # type: ignore[top-level-await]
     ("dyce", "dyce~=0.7.0", "dyce"),  # piplite_spec omits version (local wheel)
 )
 
@@ -88,7 +88,7 @@ df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
 
 # %% editable=false jupyter={"source_hidden": true}
 # Display df as table
-import jinja2  # noqa: F401
+import jinja2  # ruff: ignore[unused-import]
 
 # Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
 df.style.format("{:.0%}")

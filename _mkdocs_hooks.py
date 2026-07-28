@@ -18,7 +18,7 @@ import logging
 import os
 import re
 import shutil
-import subprocess  # noqa: S404
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tomllib
 from collections.abc import Iterable, Iterator, Sequence
@@ -88,7 +88,7 @@ def on_pre_build(**_kwargs: object) -> None:
 def on_post_build(config: dict, **_kwargs: object) -> None:
     cmd = ["uv", "build", "--wheel"]
     _LOGGER.info("running %s", " ".join(cmd))
-    subprocess.run(cmd, check=True)  # noqa: S603
+    subprocess.run(cmd, check=True)  # ruff: ignore[subprocess-without-shell-equals-true]
 
     cmd = [
         "jupyter",
@@ -137,4 +137,4 @@ def _uv_run(cmd: Sequence[str]) -> None:
         uv_cmd.append("--active")
     uv_cmd.extend(cmd)
     _LOGGER.info("running %s", " ".join(uv_cmd))
-    subprocess.run(uv_cmd, check=True)  # noqa: S603
+    subprocess.run(uv_cmd, check=True)  # ruff: ignore[subprocess-without-shell-equals-true]

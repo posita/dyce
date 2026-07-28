@@ -41,7 +41,7 @@ class TestHableOpsMixin:
         assert _HableImplementationWithOps(H({1: 1, 2: 1})) - 10 == H({-9: 1, -8: 1})
         assert _HableImplementationWithOps(H({1: 1, 2: 1})) * 10 == H({10: 1, 20: 1})
         # Integer results only, even with truediv
-        assert _HableImplementationWithOps(H({10: 1, 20: 1})) / 10 == H(  # noqa: RUF069
+        assert _HableImplementationWithOps(H({10: 1, 20: 1})) / 10 == H(  # ruff: ignore[float-equality-comparison]
             {1.0: 1, 2.0: 1}
         )
         assert _HableImplementationWithOps(H({10: 1, 20: 1})) // 10 == H({1: 1, 2: 1})
@@ -60,7 +60,7 @@ class TestHableOpsMixin:
         assert 10 - _HableImplementationWithOps(H({1: 1, 2: 1})) == H({9: 1, 8: 1})
         assert 10 * _HableImplementationWithOps(H({1: 1, 2: 1})) == H({10: 1, 20: 1})
         # Integer results only, even with truediv
-        assert 10 / _HableImplementationWithOps(H({1: 1, 2: 1})) == H({10.0: 1, 5.0: 1})  # noqa: RUF069
+        assert 10 / _HableImplementationWithOps(H({1: 1, 2: 1})) == H({10.0: 1, 5.0: 1})  # ruff: ignore[float-equality-comparison]
         assert 10 // _HableImplementationWithOps(H({1: 1, 2: 1})) == H({10: 1, 5: 1})
         assert 3 % _HableImplementationWithOps(H({2: 1, 3: 2})) % 2 == H({0: 2, 1: 1})
         assert 2 ** _HableImplementationWithOps(H({1: 2, 2: 1})) == H({2: 2, 4: 1})

@@ -16,7 +16,9 @@
 import operator
 import re
 from collections.abc import Iterable, Iterator, Sequence
-from types import NotImplementedType  # noqa: TC003
+from types import (
+    NotImplementedType,  # ruff: ignore[typing-only-standard-library-import]
+)
 from typing import Any, SupportsIndex, SupportsInt, TypeVar
 
 __all__ = (
@@ -32,7 +34,7 @@ try:
     )
 except ImportError:  # pragma: no cover
 
-    class BeartypeCallHintViolation(Exception):  # type: ignore[no-redef] # noqa: N818
+    class BeartypeCallHintViolation(Exception):  # type: ignore[no-redef] # ruff: ignore[error-suffix-on-exception-name]
         pass
 
 
@@ -75,7 +77,7 @@ class SentinelT:
 
     _singleton: "SentinelT | None" = None
 
-    def __new__(cls, *_: Any, **__: Any) -> "SentinelT":  # noqa: ANN401, PYI034
+    def __new__(cls, *_: Any, **__: Any) -> "SentinelT":  # ruff: ignore[any-type, non-self-return-type]
         if cls._singleton is None:
             cls._singleton = super().__new__(cls)
         return cls._singleton

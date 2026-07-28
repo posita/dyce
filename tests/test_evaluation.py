@@ -54,7 +54,7 @@ class TestExpand:
             def total(self) -> int:
                 return len(self)
 
-        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # ruff: ignore[any-type]
             return d0
 
         with pytest.raises(TypeError, match=r"\bunrecognized source type\b"):
@@ -69,7 +69,7 @@ class TestExpand:
             def total(self) -> int:
                 return len(self)
 
-        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # ruff: ignore[any-type]
             return d0
 
         with pytest.raises(BeartypeCallHintViolation, match=r"\bviolates type hint\b"):
@@ -87,7 +87,7 @@ class TestExpand:
         assert expand(_fn, 4 @ P(6)) == H({Result.ONES: 1, Result.FIVES_OR_SIXES: 2})
 
     def test_no_sources_raises(self) -> None:
-        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # noqa: ANN401
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # ruff: ignore[any-type]
             return d0
 
         with pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"):
