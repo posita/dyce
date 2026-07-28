@@ -84,7 +84,7 @@ def expand(
     source: H[_T],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -92,7 +92,7 @@ def expand(
     source: P[_T],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -101,7 +101,7 @@ def expand(
     source2: H[_T2],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -110,7 +110,7 @@ def expand(
     source2: P[_T2],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -119,7 +119,7 @@ def expand(
     source2: H[_T2],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -128,7 +128,7 @@ def expand(
     source2: P[_T2],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -140,7 +140,7 @@ def expand(
     source3: H[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -152,7 +152,7 @@ def expand(
     source3: P[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -164,7 +164,7 @@ def expand(
     source3: H[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -176,7 +176,7 @@ def expand(
     source3: P[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -188,7 +188,7 @@ def expand(
     source3: H[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -200,7 +200,7 @@ def expand(
     source3: P[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -212,7 +212,7 @@ def expand(
     source3: H[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
@@ -224,16 +224,16 @@ def expand(
     source3: P[_T3],
     *,
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
     precision: Fraction = ...,
-    **state: Any,  # noqa: ANN401
+    **state: Any,  # ruff: ignore[any-type]
 ) -> H[Any]: ...
-def expand(  # noqa: C901
+def expand(  # ruff: ignore[complex-structure]
     callback: Callable,
     *sources: H | P,
     precision: Fraction = _DEFAULT_PRECISION,
@@ -400,8 +400,8 @@ def expand(  # noqa: C901
         >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
         H({0: 71, 1: 38, 2: 11})
     """
-    # TODO(posita): # noqa: TD003 - Put some guardrails on precision and document them
-    # above
+    # TODO(posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
+    # and document them above
     if not sources:
         raise ValueError("expand requires at least one source")
     try:

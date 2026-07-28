@@ -40,7 +40,7 @@ from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: 
     install_if_missing,
 )
 
-await install_if_missing(  # type: ignore[top-level-await] # noqa: PGH003
+await install_if_missing(  # type: ignore[top-level-await]
     ("dyce", "dyce~=0.7.0", "dyce"),  # piplite_spec omits version (local wheel)
 )
 
@@ -126,7 +126,7 @@ df.index.name = "Action Modifier"
 
 # %% editable=false jupyter={"source_hidden": true}
 # Display df as table
-import jinja2  # noqa: F401
+import jinja2  # ruff: ignore[unused-import]
 
 # Translated from print(df.style.format("{:.2%}").to_html()) in plot_ironsworn.py
 df.style.format("{:.2%}")

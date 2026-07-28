@@ -73,7 +73,7 @@ class TestHInit:
 
     def test_int_zero_is_empty(self) -> None:
         assert H(0) == H({})
-        assert H(False) == H({})  # noqa: FBT003
+        assert H(False) == H({})  # ruff: ignore[boolean-positional-value-in-call]
 
     def test_int_scalar_positive(self) -> None:
         for i in range(7, 1, -1):
@@ -137,7 +137,8 @@ class TestHInit:
         with patch.object(
             h_module, "natural_key", side_effect=h_module.natural_key
         ) as mock:
-            # TODO(posita): # noqa: TD003 - This should not need any ignore comments
+            # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+            # ignore comments
             h_of_hs = H((H(1), H(2), H(3), H(4))) ** 2  # type: ignore[operator]
             mock.assert_called()
         assert list(h_of_hs) == [
@@ -221,7 +222,7 @@ class TestHMapping:
         assert len(H(())) == 0
         assert len(H({})) == 0
         assert len(H(0)) == 0
-        assert len(H(False)) == 0  # noqa: FBT003
+        assert len(H(False)) == 0  # ruff: ignore[boolean-positional-value-in-call]
 
     def test_len(self) -> None:
         d6_d8 = H(6) + H(8)
@@ -288,8 +289,8 @@ class TestHMatmul:
 
     def test_lossless_float_rhs(self) -> None:
         # Integer results only, even with floats
-        assert H({1: 1, 2: 1}) @ 3.0 == H({1: 1, 2: 1}) @ 3  # noqa: RUF069
-        assert 3.0 @ H({1: 1, 2: 1}) == 3 @ H({1: 1, 2: 1})  # noqa: RUF069
+        assert H({1: 1, 2: 1}) @ 3.0 == H({1: 1, 2: 1}) @ 3  # ruff: ignore[float-equality-comparison]
+        assert 3.0 @ H({1: 1, 2: 1}) == 3 @ H({1: 1, 2: 1})  # ruff: ignore[float-equality-comparison]
 
     def test_matmul_negative_rhs(self) -> None:
         with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
@@ -307,11 +308,13 @@ class TestHAdd:
         result = H({2: 3, 4: 1}) + 10
         assert result == H({12: 3, 14: 1})
 
-        # TODO(posita): # noqa: TD003 - This should not need any ignore comments
+        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # ignore comments
         frac_int_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1  # type: ignore[operator]
         assert frac_int_result == H({Fraction(3, 2): 2, Fraction(5, 2): 1})
 
-        # TODO(posita): # noqa: TD003 - This should not need any ignore comments
+        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # ignore comments
         frac_float_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1.5  # type: ignore[operator]
         assert frac_float_result == H({Fraction(2): 2, Fraction(3): 1})
 
@@ -342,7 +345,7 @@ class TestHSub:
         assert result == H({7: 1, 6: 2})
 
     def test_histogram(self) -> None:
-        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})
+        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})  # ty: ignore[unsupported-operator]
         # (1.0-0.5)=0.5, (1.0-1.5)=-0.5, (2.0-0.5)=1.5, (2.0-1.5)=0.5
         assert result == H({0.5: 2, -0.5: 1, 1.5: 1})
 
@@ -588,7 +591,7 @@ class TestHUnaryWithoutBeartype:
         with pytest.raises(TypeError):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         with pytest.raises(TypeError):
-            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType]
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
 
     def test_invert_unsupported(self) -> None:
         with pytest.raises(TypeError):
@@ -615,7 +618,7 @@ class TestHUnaryWithBeartype:
         with pytest.raises(BeartypeCallHintViolation):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         with pytest.raises(BeartypeCallHintViolation):
-            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType]
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
 
     def test_invert_unsupported_beartype(self) -> None:
         with pytest.raises(BeartypeCallHintViolation):
@@ -636,7 +639,7 @@ class TestHTotal:
 
     def test_memoized(self) -> None:
         h = H({1: 2, 2: 3})
-        assert h.total is h._total  # noqa: SLF001
+        assert h.total is h._total  # ruff: ignore[private-member-access]
 
 
 class TestHApply:
@@ -807,7 +810,7 @@ class TestHOrderStatForNAtPos:
 
     def test_order_stat_for_n_at_pos_out_of_bounds_raises(self) -> None:
         h = H(6)
-        with pytest.raises(ValueError, match=r"\bpos\b.*\bmust be in range\b"):  # noqa: PT012
+        with pytest.raises(ValueError, match=r"\bpos\b.*\bmust be in range\b"):  # ruff: ignore[pytest-raises-with-multiple-statements]
             result = h.order_stat_for_n_at_pos(3, 5)
             assert all(count == 0 for count in result.counts())
 
@@ -815,9 +818,9 @@ class TestHOrderStatForNAtPos:
         h = H(6)
         _ = h.order_stat_for_n_at_pos(4, 0)
         _ = h.order_stat_for_n_at_pos(4, 3)
-        assert len(h._order_stat_funcs_by_n) == 1  # noqa: SLF001
+        assert len(h._order_stat_funcs_by_n) == 1  # ruff: ignore[private-member-access]
         _ = h.order_stat_for_n_at_pos(5, 0)
-        assert len(h._order_stat_funcs_by_n) == 2  # noqa: SLF001
+        assert len(h._order_stat_funcs_by_n) == 2  # ruff: ignore[private-member-access]
 
     def test_order_stat_for_n_at_pos_warns_experimental(self) -> None:
         with pytest.warns(ExperimentalWarning, match=r"\bexperimental\b"):

@@ -152,8 +152,8 @@ pd20 = _P(d20)
 pd24 = _P(d24)
 pd30 = _P(d30)
 pd60 = _P(d60)
-pD66 = _P(d6 * 10, d6)  # noqa: N816
-pD666 = _P(d6 * 100, pD66)  # noqa: N816
+pD66 = _P(d6 * 10, d6)  # ruff: ignore[mixed-case-variable-in-global-scope]
+pD666 = _P(d6 * 100, pD66)  # ruff: ignore[mixed-case-variable-in-global-scope]
 pd100 = _P(d100)
 pd00 = _P(d10 * 10, d10 - 1)
 pd2_2 = p2d2 = 2 @ pd2

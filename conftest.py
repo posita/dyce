@@ -9,7 +9,7 @@ import pytest
 environ["COLUMNS"] = ""
 
 
-@pytest.fixture(autouse=True)  # noqa: RUF076
+@pytest.fixture(autouse=True)
 def suppress_dyce_warnings() -> None:
     import warnings
 
@@ -25,7 +25,7 @@ def suppress_dyce_warnings() -> None:
 
 def pytest_ignore_collect(
     collection_path: Path,
-    config: pytest.Config,  # noqa: ARG001
+    config: pytest.Config,  # ruff: ignore[unused-function-argument]
 ) -> bool:
     # nb_*.py are jupytext notebook sources. Their top-level await makes them
     # unimportable. plot_*.py have some doc-specific imports (e.g., jinja2) that aren't
