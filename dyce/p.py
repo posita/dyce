@@ -15,7 +15,7 @@
 
 import operator
 from bisect import bisect_right
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
@@ -51,6 +51,7 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
+_StateT = TypeVar("_StateT")
 
 RollT = tuple[_T, ...]
 RollCountT = tuple[RollT[_T], int]
@@ -123,6 +124,34 @@ _SelectionResult = (
     | _SelectionSuffix
     | None
 )
+
+
+def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Ascending outcome ordering for [`P.survey`][dyce.P.survey].
+
+    Sorts *outcomes* using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key)
+    return result
+
+
+def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Descending outcome ordering for [`P.survey`][dyce.P.survey].
+
+    Sorts *outcomes* using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key, reverse=True)
+    return result
 
 
 class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
@@ -367,7 +396,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self: "P[_T]",
         func: Callable[[_T], _ResultT],
         *,
-        apply_to_each: bool = False,
+        apply_to_each: bool = ...,
     ) -> "P[_ResultT]": ...
     @overload
     def apply_to_each_h(
@@ -375,7 +404,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         func: Callable[[_T, _OtherT], _ResultT],
         other: "H[_OtherT]",
         *,
-        apply_to_each: bool = False,
+        apply_to_each: bool = ...,
     ) -> "P[_ResultT]": ...
     @overload
     def apply_to_each_h(
@@ -383,7 +412,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         func: Callable[[_T, _OtherT], _ResultT],
         other: _OtherT,
         *,
-        apply_to_each: bool = False,
+        apply_to_each: bool = ...,
     ) -> "P[_ResultT]": ...
     def apply_to_each_h(
         self: "P[_T]",
@@ -753,6 +782,138 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 taken_outcomes = cast("RollT[_T]", sorted_outcomes_for_roll)
             yield taken_outcomes, roll_count
 
+    @overload
+    def survey(
+        self: "P[_T]",
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        *,
+        initial: _StateT | None = ...,
+        order: Callable[[Iterable[_T]], Iterable[_T]] = ...,
+    ) -> H[_StateT]: ...
+    @overload
+    def survey(
+        self: "P[_T]",
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        *,
+        initial: _StateT | None = ...,
+        final: Callable[[_StateT], _ResultT],
+        order: Callable[[Iterable[_T]], Iterable[_T]] = ...,
+    ) -> H[_ResultT]: ...
+    @experimental
+    def survey(  # ruff: ignore[complex-structure]
+        self: "P[_T]",
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        *,
+        initial: _StateT | None = None,
+        final: Callable[[_StateT], _ResultT] | None = None,
+        order: Callable[[Iterable[_T]], Iterable[_T]] = survey_outcome_order_ascending,
+    ) -> H[_ResultT]:
+        r"""
+        Return a new [`H`][dyce.H] by folding a transition function over the pool one outcome at a time.
+
+        This implements a state-collapsing dynamic program in the style of Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool): rather than enumerating every distinct roll (as [`apply_to_each_roll`][dyce.P.apply_to_each_roll] does), it sweeps the shared outcome axis once, and at each outcome branches on how many dice show it.
+        Equivalent partial rolls that reach the same *state* are merged, so the cost scales with the number of reachable states rather than the number of rolls.
+
+        *accumulate* is called as `accumulate(state, outcome, count)` and returns the successor state.
+        On the first (seed) call, *state* is *initial* (which defaults to `None`).
+        *count* is the number of dice showing *outcome*, aggregated across all of the pool’s (possibly heterogeneous) histograms, and is always at least `1`; *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
+        A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare successive *outcome* values rather than expecting to be notified of the absent ones.
+        States must be hashable, since equal states are merged.
+
+        *final* (when provided) maps each terminal state to the outcome recorded in the resulting [`H`][dyce.H]; without it, the terminal states are themselves the outcomes.
+
+        *order* selects the sweep order over the shared outcome set and defaults to ascending.
+        The transition function and the sweep order are coupled: order-sensitive mechanics (e.g. keeping the highest *n*) are only correct under the matching direction.
+
+        Summing three six-sided dice, cross-checked against [`h`][dyce.P.h] (note that *count* scales each outcome’s contribution):
+
+            >>> from dyce import P
+            >>> def running_sum(state, outcome, count):
+            ...     return outcome * count if state is None else state + outcome * count
+            >>> p_3d6 = 3 @ P(6)
+            >>> p_3d6.survey(running_sum) == p_3d6.h()
+            True
+
+        Keeping the greatest two of four six-sided dice is order-sensitive, so it sweeps descending and uses *final* to project the accumulated sum:
+
+            >>> def keep_highest_two(state, outcome, count):
+            ...     kept, total = (0, 0) if state is None else state
+            ...     take = min(count, 2 - kept)
+            ...     return kept + take, total + outcome * take
+            >>> p_4d6 = 4 @ P(6)
+            >>> descending = lambda outcomes: sorted(outcomes, reverse=True)
+            >>> keep = p_4d6.survey(
+            ...     keep_highest_two, final=lambda s: s[1], order=descending
+            ... )
+            >>> keep == p_4d6.h(slice(-2, None))
+            True
+        """
+        outcomes = list(order(set().union(*(set(h) for h in self._h_groups))))
+
+        if not outcomes:
+            return cast("H[_ResultT]", H({}))
+
+        groups = tuple(self._h_groups.items())
+        n_groups = len(groups)
+        weights = [[h.get(o, 0) for o in outcomes] for h, _ in groups]
+        memo: dict[tuple[int, tuple[int, ...]], dict[Any, int]] = {}
+
+        def solve(hi: int, counts: tuple[int, ...]) -> dict[Any, int]:  # ruff: ignore[complex-structure]
+            key = (hi, counts)
+            if key in memo:
+                return memo[key]
+            outcome = outcomes[hi]
+            result: dict[Any, int] = defaultdict(int)
+            if hi == 0:
+                # Base case: every remaining die must show the first outcome.
+                scale = prod(weights[g][0] ** counts[g] for g in range(n_groups))
+                if scale:
+                    count = sum(counts)
+                    # accumulate is only invoked for outcomes at least one die shows.
+                    seed = accumulate(initial, outcome, count) if count else initial
+                    result[seed] += scale
+            else:
+                # Group tails by total count first, so accumulate fires once per
+                # (count, incoming state) rather than once per per-group split.
+                by_count: dict[int, dict[Any, int]] = defaultdict(
+                    lambda: defaultdict(int)
+                )
+                for split in product(*(range(counts[g] + 1) for g in range(n_groups))):
+                    scale = 1
+                    for g in range(n_groups):
+                        scale *= comb(counts[g], split[g]) * weights[g][hi] ** split[g]
+                    if scale == 0:
+                        # An unsupported outcome forces its group's split to zero.
+                        continue
+                    remaining = tuple(counts[g] - split[g] for g in range(n_groups))
+                    for state, weight in solve(hi - 1, remaining).items():
+                        by_count[sum(split)][state] += weight * scale
+                for count, states in by_count.items():
+                    if count:
+                        for state, weight in states.items():
+                            result[accumulate(state, outcome, count)] += weight
+                    else:
+                        # No dice on this outcome: accumulate is not invoked; the
+                        # incoming states pass through unchanged.
+                        for state, weight in states.items():
+                            result[state] += weight
+            memo[key] = dict(result)
+            return memo[key]
+
+        final_states = solve(len(outcomes) - 1, tuple(n for _, n in groups))
+        finalize = (
+            final
+            if final is not None
+            else cast("Callable[[_StateT], _ResultT]", lambda state: state)
+        )
+
+        return cast(
+            "H[_ResultT]",
+            aggregate_weighted(
+                (finalize(state), weight) for state, weight in final_states.items()
+            ),
+        )
+
 
 # ---- Helpers -------------------------------------------------------------------------
 
@@ -860,9 +1021,9 @@ def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
     elif not missing_indices and len(distinct_counts) == 1:
         return _SelectionUniform(times=distinct_counts.pop())
     elif len(distinct_counts) == 1:
-        # Check for lo-from-left + hi-from-right pattern with a gap in the middle.
-        # Because max_index - min_index == n we know min_index == 0 and max_index ==
-        # n, so positions 0 and n-1 are both selected.
+        # Check for lo-from-left and hi-from-right pattern with a gap in the middle.
+        # Because max_index - min_index == n we know min_index == 0 and max_index == n,
+        # so positions 0 and n-1 are both selected.
         sorted_found = sorted(found_indices)
         # Walk the left side until we find a gap
         lo = 0
