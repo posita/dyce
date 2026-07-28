@@ -1626,7 +1626,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def probability_items(
-        self: "H[_T]", rational_t: None = None
+        self: "H[_T]", rational_t: None = ...
     ) -> Iterator[tuple[_T, Fraction]]: ...
     @overload
     def probability_items(
@@ -1701,14 +1701,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     @overload
     def quantize(
         self: "H[Never]",
-        bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+        bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[Never]": ...
     @overload
     def quantize(
         self: "H[_T]",
-        bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+        bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[_T]": ...
