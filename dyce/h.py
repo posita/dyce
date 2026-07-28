@@ -40,7 +40,6 @@ from typing import (
     NamedTuple,
     Never,
     Protocol,
-    Self,
     SupportsFloat,
     SupportsInt,
     TypeVar,
@@ -103,7 +102,7 @@ def quantize_hs(
     *,
     bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
     preserve_zero_counts: bool = True,
-) -> Any:  # noqa: ANN401
+) -> Any:  # ruff: ignore[any-type]
     r"""
     Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
     If nested, the innermost context controls.
@@ -365,7 +364,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __init__(self: "H[Never]", init_val: Literal[0, False], /) -> None: ...
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
-    def __init__(self, init_val: Any, /) -> None:  # noqa: C901
+    def __init__(self, init_val: Any, /) -> None:  # ruff: ignore[complex-structure]
         r"""Constructor."""
         self._h: dict[_T_co, int]
         self._hash: int | None = None
@@ -422,7 +421,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         cls,
         *sources: Mapping[_T, SupportsInt] | Iterable[tuple[_T, SupportsInt]],
         preserve_zero_counts: bool = False,
-    ) -> Self:
+    ) -> "H[_T]":
         r"""
         Construct an [`H`][dyce.H] by accumulating counts from one or more *sources*.
 
@@ -456,11 +455,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 # Iterable[tuple[_T, SupportsInt]] > Mapping[tuple[_T, SupportsInt],
                 # Any], so type checkers rightly include that as the inferred return
                 # type for source.items()
-                source = cast("ItemsView[_T, SupportsInt]", source.items())  # noqa: PLW2901
+                source = cast("ItemsView[_T, SupportsInt]", source.items())  # ruff: ignore[redefined-loop-name]
             for outcome, count in source:
                 if count or preserve_zero_counts:
                     c[outcome] += lossless_int(count)
-        return cls(c)  # pyright: ignore[reportArgumentType,reportCallIssue]
+        return cast("H[_T]", cls(c))  # pyright: ignore[reportArgumentType,reportCallIssue]
 
     # ---- Overrides -------------------------------------------------------------------
 
@@ -1088,7 +1087,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).lt(H(10)).lowest_terms()
             H({False: 7, True: 13})
         """
-        return self.apply(ot.do_lt, rhs)  # type: ignore[arg-type]
+        return self.apply(ot.do_lt, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
 
     @overload
     def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1103,7 +1102,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).le(H(10)).lowest_terms()
             H({False: 1, True: 3})
         """
-        return self.apply(ot.do_le, rhs)  # type: ignore[arg-type]
+        return self.apply(ot.do_le, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
 
     @overload
     def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1118,7 +1117,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).eq(H(10)).lowest_terms()
             H({False: 9, True: 1})
         """
-        return self.apply(ot.do_eq, rhs)
+        return self.apply(ot.do_eq, rhs)  # ty: ignore[no-matching-overload]
 
     @overload
     def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1133,7 +1132,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).ne(H(10)).lowest_terms()
             H({False: 1, True: 9})
         """
-        return self.apply(ot.do_ne, rhs)
+        return self.apply(ot.do_ne, rhs)  # ty: ignore[no-matching-overload]
 
     @overload
     def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1148,7 +1147,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).ge(H(10)).lowest_terms()
             H({False: 13, True: 7})
         """
-        return self.apply(ot.do_ge, rhs)  # type: ignore[arg-type]
+        return self.apply(ot.do_ge, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
 
     @overload
     def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1163,7 +1162,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).gt(H(10)).lowest_terms()
             H({False: 3, True: 1})
         """
-        return self.apply(ot.do_gt, rhs)  # type: ignore[arg-type]
+        return self.apply(ot.do_gt, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
 
     # ---- Unary operators -------------------------------------------------------------
 
@@ -1346,7 +1345,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         func = cast("Callable[[_T, _OtherT], _ResultT]", func)
         if isinstance(other, H):
             return H(
-                cast("dict[_ResultT, int]", _h_binary_callable(self._h, other._h, func))  # noqa: SLF001
+                cast("dict[_ResultT, int]", _h_binary_callable(self._h, other._h, func))  # ruff: ignore[private-member-access]
             )
         else:
             return H(
@@ -1478,7 +1477,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         try:
             mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
             std: float | None = self.stdev()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # ruff: ignore[blind-except]
             # Broad catch is intentional: format() is a display method that should
             # always produce output. Any failure to compute statistics (including from
             # runtime type checkers like beartype) is treated as "stats not available"
@@ -1529,7 +1528,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         prob_width = 5 + precision
         try:
             mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # ruff: ignore[blind-except]
             # See format() for rationale
             warnings.warn(f"{exc!s}", stacklevel=2)
             mu = None
@@ -1895,9 +1894,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             # == 100`, `num_outcomes == 100`.
             if pos == n - 1:
                 # k_range -> range(n, n+1) -> (n,)
-                # math.comb(n, n)  # -> 1  # noqa: ERA001
+                # math.comb(n, n)  # -> 1  # ruff: ignore[commented-out-code]
                 # * c_le**n
-                # * (total - c_le) ** (n-n)  # -> 1  # noqa: ERA001
+                # * (total - c_le) ** (n-n)  # -> 1  # ruff: ignore[commented-out-code]
                 counts: dict[_T, int] = {}
                 prev_term = 0  # 0^n == 0 for n >= 1
                 for outcome, _c_lt, c_le in betas:
@@ -1907,9 +1906,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 return H(counts)
             elif pos == 0:
                 # k_range -> range(1) -> (0,)
-                # math.comb(n, 0)  # -> 1  # noqa: ERA001
+                # math.comb(n, 0)  # -> 1  # ruff: ignore[commented-out-code]
                 # * c_le**0  # -> 1
-                # * (total - c_le) ** (n-0)  # noqa: ERA001
+                # * (total - c_le) ** (n-0)  # ruff: ignore[commented-out-code]
                 counts = {}
                 prev_term = total**n  # (T-0)^n
                 for outcome, _c_lt, c_le in betas:
@@ -2116,7 +2115,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
         batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
-        result = batch if result is None else result + batch  # type: ignore[operator] # ty: ignore[unsupported-operator]
+        result = batch if result is None else result + batch  # type: ignore[operator]
     return cast("H[_T]", H({})) if result is None else result
 
 
@@ -2128,7 +2127,7 @@ def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
     """
     result: H[_T] | None = None
     for h in hs:
-        result = h if result is None else result + h  # type: ignore[operator] # ty: ignore[unsupported-operator]
+        result = h if result is None else result + h  # type: ignore[operator]
     return cast("H[_T]", H({})) if result is None else result
 
 

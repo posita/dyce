@@ -204,7 +204,7 @@ class TestPEq:
         d6 = H(6)
         p = P(d4, d6)
         assert hash(p) == hash(P(d4.merge(d4), d6.merge(d6)))
-        assert hash(p) == p._hash  # noqa: SLF001
+        assert hash(p) == p._hash  # ruff: ignore[private-member-access]
 
     def test_eq_sanity_check(self) -> None:
         p_d6 = P(6)
@@ -510,7 +510,7 @@ class TestPOp:
         p_d10 = P(10)
         p1 = P(H(range(100, 0, -10)))
         # Integer results only, even with truediv
-        assert p_d10 == p1 / 10  # noqa: RUF069
+        assert p_d10 == p1 / 10  # ruff: ignore[float-equality-comparison]
         lcm_of_1_to_10 = 2 * 2 * 2 * 3 * 3 * 5 * 7
         assert lcm_of_1_to_10 / p_d10 == H(
             {
@@ -645,7 +645,7 @@ class TestPTotal:
     def test_memoized(self) -> None:
         p = P(4, 6, 8)
         assert p.total == 192
-        assert p.total is p._total  # noqa: SLF001
+        assert p.total is p._total  # ruff: ignore[private-member-access]
 
 
 class TestPApplyEachH:
@@ -753,7 +753,7 @@ class TestPH:
             H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2}),
             H({_NoCompare("oh-03"): 3, _NoCompare("oh-04"): 4}),
         )
-        with (  # noqa: PT012
+        with (  # ruff: ignore[pytest-raises-with-multiple-statements]
             pytest.raises(
                 (TypeError, BeartypeCallHintViolation),
                 match=r"\b(unsupported operand type|violates type hint)\b",
@@ -763,9 +763,9 @@ class TestPH:
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             p_weird.h()
 
-        # TODO(posita): # noqa: TD003 - Is this really the right logic? It "works", but
-        # beartype kills the transgression before the warning is emitted (i.e., the
-        # fallback path is taken).
+        # TODO(posita): # ruff: ignore[missing-todo-link] - Is this really the right
+        # logic? It "works", but beartype kills the transgression before the warning is
+        # emitted (i.e., the fallback path is taken).
         if exc_info.type is TypeError:
             assert len(w) == 1
             assert issubclass(w[0].category, _ConvolveFallbackWarning)
@@ -1627,7 +1627,7 @@ def test_analyze_selection_single_pos() -> None:
 def test_rwc_heterogeneous_extremes_matches_brute_force() -> None:
     r"""Verify the inclusion-exclusion result matches Cartesian-product enumeration."""
     cases = [
-        # (list-of-dice, description)  # noqa: ERA001
+        # (list-of-dice, description)  # ruff: ignore[commented-out-code]
         ([H(4), H(6)], "d4+d6"),
         ([H(4), H(4), H(6)], "2d4+d6"),
         ([H(4), H(6), H(8)], "d4+d6+d8"),
@@ -1673,7 +1673,7 @@ def test_rwc_heterogeneous_extremes_natural_order() -> None:
 
 
 class _NoCompareCanOnlyAdd(_NoCompare):
-    def __add__(self, other: Any) -> "_NoCompareCanOnlyAdd":  # noqa: ANN401
+    def __add__(self, other: Any) -> "_NoCompareCanOnlyAdd":  # ruff: ignore[any-type]
         return _NoCompareCanOnlyAdd(f"{self.val}+{other}")
 
 

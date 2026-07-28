@@ -48,7 +48,7 @@ def fig_callback(line_color: str) -> None:
     # --8<-- [end:table]
 
     # Display df as table
-    import jinja2  # noqa: F401
+    import jinja2  # ruff: ignore[unused-import]
 
     # NOTE: Translates to df.style.format("{:.0%}") in docs/assets/nb_great_weapon_fighting.py
     print(df.style.format("{:.0%}").to_html())

@@ -231,7 +231,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             if isinstance(init_val, H):
                 h_counts[init_val] += 1
             elif isinstance(init_val, P):
-                h_counts.update(dict(init_val._h_groups.items()))  # noqa: SLF001
+                h_counts.update(dict(init_val._h_groups.items()))  # ruff: ignore[private-member-access]
             else:
                 h_counts[H(init_val)] += 1
 
@@ -326,10 +326,10 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             raise ValueError(
                 f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
             )
-        # TODO(posita): # noqa: TD003 - Put initialization logic in an _init helper
-        # method and have both this and __init__ use that helper method
+        # TODO(posita): # ruff: ignore[missing-todo-link] - Put initialization logic in
+        # an _init helper method and have both this and __init__ use that helper method
         # The slow and safe way
-        # return P(*chain.from_iterable(repeat(self, n)))  # noqa: ERA001
+        # return P(*chain.from_iterable(repeat(self, n)))  # ruff: ignore[commented-out-code]
         # The dangerous and fast way (needs to know about __init__, __slots__,
         # initialization, etc.)
         p = P()
@@ -463,8 +463,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ),
         )
 
-    # TODO(posita): # noqa: TD003 - Use CanAdd here
-    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:  # noqa: C901
+    # TODO(posita): # ruff: ignore[missing-todo-link] - Use CanAdd here
+    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:  # ruff: ignore[complex-structure]
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
 
@@ -529,7 +529,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             try:
                 # This optimization assumes outcomes support multiplication with native
                 # ints while retaining their type ...
-                return sum_h(self) * i.times  # type: ignore[operator]
+                return sum_h(self) * i.times  # type: ignore[operator] # ty: ignore[unsupported-operator]
             except TypeError:
                 # ... but if we get into trouble, fall through to enumerating via
                 # rolls_with_counts
@@ -543,12 +543,12 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         # Heterogeneous pools and multi-position selections fall through to the existing
         # `rolls_with_counts` path.
         #
-        # TODO(posita): # noqa: TD003 - As of *right now*, we prevent selection of the
-        # single-prefix or single-suffix fast path with repeated single selections. The
-        # fast path can likely support those, but it requires rethinking how we perform
-        # and communicate selection analysis. The current approach opts for correctness
-        # over a smaller surface. We'll likely revisit with a later deep dive into
-        # performance.
+        # TODO(posita): # ruff: ignore[missing-todo-link] - As of *right now*, we
+        # prevent selection of the single-prefix or single-suffix fast path with
+        # repeated single selections. The fast path can likely support those, but it
+        # requires rethinking how we perform and communicate selection analysis. The
+        # current approach opts for correctness over a smaller surface. We'll likely
+        # revisit with a later deep dive into performance.
         if n:
             pos: int | None = None
             if isinstance(i, _SelectionSinglePos):
@@ -571,11 +571,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                     # Bypass `order_stat_for_n_at_pos`'s `@experimental` warning
                     # emission by going through the cached internal helper directly,
                     # since both produce the same result
-                    if n not in h._order_stat_funcs_by_n:  # noqa: SLF001
-                        h._order_stat_funcs_by_n[n] = h._order_stat_func_for_n(n)  # noqa: SLF001
+                    if n not in h._order_stat_funcs_by_n:  # ruff: ignore[private-member-access]
+                        h._order_stat_funcs_by_n[n] = h._order_stat_func_for_n(n)  # ruff: ignore[private-member-access]
                     return cast(
                         "H[_T]",
-                        h._order_stat_funcs_by_n[n](pos),  # noqa: SLF001
+                        h._order_stat_funcs_by_n[n](pos),  # ruff: ignore[private-member-access]
                     )
                 # Heterogeneous + single-END decomposition. The identity `max(X_1..X_n,
                 # Y_1..Y_m) == max(max(X_1..X_n), max(Y_1..Y_m))` (and min
@@ -593,14 +593,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                             reduced_hs.append(h_g)
                             continue
                         per_group_pos = n_g - 1 if pos == n - 1 else 0
-                        if n_g not in h_g._order_stat_funcs_by_n:  # noqa: SLF001
-                            h_g._order_stat_funcs_by_n[n_g] = (  # noqa: SLF001
-                                h_g._order_stat_func_for_n(n_g)  # noqa: SLF001
+                        if n_g not in h_g._order_stat_funcs_by_n:  # ruff: ignore[private-member-access]
+                            h_g._order_stat_funcs_by_n[n_g] = (  # ruff: ignore[private-member-access]
+                                h_g._order_stat_func_for_n(n_g)  # ruff: ignore[private-member-access]
                             )
                         reduced_hs.append(
                             cast(
                                 "H[_T]",
-                                h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # noqa: SLF001
+                                h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # ruff: ignore[private-member-access]
                             )
                         )
                     return P(*reduced_hs).h(0 if pos == 0 else -1)
@@ -629,7 +629,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # noqa: C901
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # ruff: ignore[complex-structure]
         r"""
         Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -946,7 +946,7 @@ def _rwc_homogeneous_n_h_using_partial_selection(
     ):
         count = total_count * prob_nmr8r // prob_dnmn8r
         if fill is not None:
-            outcomes = (  # noqa: PLW2901
+            outcomes = (  # ruff: ignore[redefined-loop-name]
                 (fill,) * (n - k) + outcomes
                 if from_right
                 else outcomes + (fill,) * (n - k)
@@ -1003,7 +1003,7 @@ def _rwc_heterogeneous_h_groups(
         yield sorted_roll, total_count
 
 
-def _rwc_heterogeneous_extremes(  # noqa: C901
+def _rwc_heterogeneous_extremes(  # ruff: ignore[complex-structure]
     groups: Iterable[tuple[H[_T], int]],
     lo: int,
     hi: int,
@@ -1054,7 +1054,7 @@ def _rwc_heterogeneous_extremes(  # noqa: C901
     The multinomial partition formula that works for homogeneous dice (see e.g. [math.stackexchange.com/q/4173084](https://math.stackexchange.com/questions/4173084)) does not factorize per-die when faces differ, so those cases fall back to full Cartesian-product enumeration.
     For homogeneous pools the existing `_rwc_homogeneous_n_h_using_partial_selection` path (Ilmari Karonen’s DP) already handles all selection patterns efficiently.
     """
-    assert lo == 1 and hi == 1, "only (lo=1, hi=1) is currently supported"  # noqa: PT018
+    assert lo == 1 and hi == 1, "only (lo=1, hi=1) is currently supported"  # ruff: ignore[pytest-composite-assertion]
     all_dice: list[H[_T]] = [h for h, n in groups for _ in range(n)]
     all_outcome_set: set[Any] = {v for h in all_dice for v in h}
     all_outcomes = list(all_outcome_set)

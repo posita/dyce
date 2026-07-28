@@ -36,7 +36,7 @@ class TestRngNumpy:
     def test_numpy_rng_installed(self) -> None:
         from dyce.rng import PCG64DXSMRandom
 
-        assert isinstance(rng._DEFAULT_RNG, PCG64DXSMRandom)  # noqa: SLF001
+        assert isinstance(rng._DEFAULT_RNG, PCG64DXSMRandom)  # ruff: ignore[private-member-access]
 
     def test_numpy_rng_getrandbits_negative_raises(self) -> None:
         from dyce.rng import PCG64DXSMRandom
@@ -86,13 +86,13 @@ class TestRngNumpy:
 )
 class TestRngStandard:
     def test_standard_rng_installed(self) -> None:
-        assert rng._DEFAULT_RNG.__class__ is Random  # noqa: SLF001
+        assert rng._DEFAULT_RNG.__class__ is Random  # ruff: ignore[private-member-access]
         for seed in (
             SEED_INT_64,
             SEED_INT_128,
             SEED_INT_192,
         ):
-            _test_random_w_seed_helper(rng._DEFAULT_RNG, seed)  # noqa: SLF001
+            _test_random_w_seed_helper(rng._DEFAULT_RNG, seed)  # ruff: ignore[private-member-access]
 
 
 # ---- Helpers -------------------------------------------------------------------------

@@ -22,10 +22,10 @@ from dyce.d import d0, d1, d6, d8, d12, h2d6
 mpl = pytest.importorskip("matplotlib")
 mpl.use("Agg")
 
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.patches import Wedge  # noqa: E402
+import matplotlib.pyplot as plt  # ruff: ignore[module-import-not-at-top-of-file]
+from matplotlib.patches import Wedge  # ruff: ignore[module-import-not-at-top-of-file]
 
-from dyce.viz import (  # noqa: E402
+from dyce.viz import (  # ruff: ignore[module-import-not-at-top-of-file]
     format_outcome_name,
     format_outcome_name_probability,
     format_probability,
@@ -37,7 +37,7 @@ from dyce.viz import (  # noqa: E402
 __all__ = ()
 
 
-@pytest.fixture(autouse=True)  # noqa: RUF076
+@pytest.fixture(autouse=True)
 def _close_figures() -> Generator[None]:
     yield
     plt.close("all")
