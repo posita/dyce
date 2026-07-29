@@ -48,7 +48,7 @@ _OUTCOME_TYPES: tuple[type, ...] = (
     Fraction,
 )
 
-with contextlib.suppress(ImportError):
+with contextlib.suppress(ImportError, AttributeError):
     import numpy as np
 
     _OUTCOME_TYPES += (
