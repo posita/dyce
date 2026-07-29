@@ -14,6 +14,7 @@
 # ======================================================================================
 
 import operator
+from abc import ABC, abstractmethod
 from bisect import bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -23,6 +24,7 @@ from itertools import chain, product, starmap
 from math import comb, gcd, prod
 from typing import (
     Any,
+    Generic,
     Literal,
     Never,
     SupportsIndex,
@@ -58,6 +60,95 @@ RollCountT = tuple[RollT[_T], int]
 RollProbT = tuple[RollT[_T], int, int]
 
 
+class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
+    r"""
+    Provides the four interfaces required for [`P.survey`][dyce.p.P.survey].
+    """
+
+    @property
+    def initial(self) -> _StateT | None:
+        r"By default, this is `None`."
+        return None
+
+    @abstractmethod
+    def accumulate(self, state: _StateT | None, outcome: _T, count: int) -> _StateT: ...
+
+    @abstractmethod
+    def order(self, outcomes: Iterable[_T]) -> Iterable[_T]: ...
+
+    def settle(self, state: _StateT) -> _ResultT:
+        r"""
+        By default, this is *state* (i.e., the terminal states are themselves the outcomes).
+
+        This can be overridden if additional mutation is required.
+        """
+        return cast("_ResultT", state)
+
+
+class AscendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
+    r"""
+    Surveyor that uses [`survey_outcome_order_ascending`][dyce.p.survey_outcome_order_ascending] for ordering outcomes.
+    """
+
+    def order(self, outcomes: Iterable[_T]) -> Iterable[_T]:
+        return survey_outcome_order_ascending(outcomes)
+
+
+class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
+    r"""
+    Surveyor that uses [`survey_outcome_order_descending`][dyce.p.survey_outcome_order_descending] for ordering outcomes.
+    """
+
+    def order(self, outcomes: Iterable[_T]) -> Iterable[_T]:
+        return survey_outcome_order_descending(outcomes)
+
+
+class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
+    @overload
+    def __init__(  # pyrefly: ignore[invalid-annotation]
+        self: "ParameterizedSurveyor[_T, _StateT, _StateT]",
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        order: Callable[[Iterable[_T]], Iterable[_T]],
+        *,
+        initial: _StateT | None = ...,
+        settle: None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(  # pyrefly: ignore[invalid-annotation]
+        self: "ParameterizedSurveyor[_T, _StateT, _ResultT]",
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        order: Callable[[Iterable[_T]], Iterable[_T]],
+        *,
+        initial: _StateT | None = ...,
+        settle: Callable[[_StateT], _ResultT],
+    ) -> None: ...
+    def __init__(
+        self,
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        order: Callable[[Iterable[_T]], Iterable[_T]],
+        *,
+        initial: _StateT | None = None,
+        settle: Callable[[_StateT], _ResultT] | None = None,
+    ) -> None:
+        self._accumulate = accumulate
+        self._order = order
+        self._initial = initial
+        self._settle = settle
+
+    @property
+    def initial(self) -> _StateT | None:
+        return self._initial
+
+    def accumulate(self, state: _StateT | None, outcome: _T, count: int) -> _StateT:
+        return self._accumulate(state, outcome, count)
+
+    def order(self, outcomes: Iterable[_T]) -> Iterable[_T]:
+        return self._order(outcomes)
+
+    def settle(self, state: _StateT) -> _ResultT:
+        return self._settle(state) if self._settle else cast("_ResultT", state)
+
+
 @dataclass(frozen=True, slots=True)
 class _SelectionEmpty:
     r"""
@@ -89,7 +180,7 @@ class _SelectionExtremes:
 class _SelectionSinglePos:
     r"""
     Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly one distinct position with multiplicity 1, and that position is strictly between the two ends (`0 < pos < n - 1`).
-    The two end-position cases (`pos == 0` and `pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]'s existing partial-selection optimization (driven off Prefix/Suffix's `k`) keeps working unchanged.
+    The two end-position cases (`pos == 0` and `pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]’s existing partial-selection optimization (driven off Prefix/Suffix’s `k`) keeps working unchanged.
     """
 
     pos: int  # absolute position, normalized to [1, n-2]
@@ -124,34 +215,6 @@ _SelectionResult = (
     | _SelectionSuffix
     | None
 )
-
-
-def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Ascending outcome ordering for [`P.survey`][dyce.P.survey].
-
-    Sorts *outcomes* using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
-    except TypeError:
-        result.sort(key=natural_key)
-    return result
-
-
-def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Descending outcome ordering for [`P.survey`][dyce.P.survey].
-
-    Sorts *outcomes* using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
-    except TypeError:
-        result.sort(key=natural_key, reverse=True)
-    return result
 
 
 class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
@@ -785,137 +848,238 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     @overload
     def survey(
         self: "P[_T]",
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        surveyor: SurveyorBase[_T, _StateT, _ResultT],
+    ) -> H[_ResultT]: ...
+    @overload
+    def survey(
+        self: "P[_T]",
         *,
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
         initial: _StateT | None = ...,
-        order: Callable[[Iterable[_T]], Iterable[_T]] = ...,
+        order: Callable[[Iterable[_T]], Iterable[_T]],
+        settle: None = ...,
     ) -> H[_StateT]: ...
     @overload
     def survey(
         self: "P[_T]",
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
         *,
+        accumulate: Callable[[_StateT | None, _T, int], _StateT],
         initial: _StateT | None = ...,
-        final: Callable[[_StateT], _ResultT],
-        order: Callable[[Iterable[_T]], Iterable[_T]] = ...,
+        order: Callable[[Iterable[_T]], Iterable[_T]],
+        settle: Callable[[_StateT], _ResultT],
     ) -> H[_ResultT]: ...
     @experimental
     def survey(  # ruff: ignore[complex-structure]
         self: "P[_T]",
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
+        surveyor: SurveyorBase[_T, _StateT, _ResultT] | None = None,
         *,
+        accumulate: Callable[[_StateT | None, _T, int], _StateT] | None = None,
         initial: _StateT | None = None,
-        final: Callable[[_StateT], _ResultT] | None = None,
-        order: Callable[[Iterable[_T]], Iterable[_T]] = survey_outcome_order_ascending,
-    ) -> H[_ResultT]:
+        order: Callable[[Iterable[_T]], Iterable[_T]] | None = None,
+        settle: Callable[[_StateT], _ResultT] | None = None,
+    ) -> H[_StateT | _ResultT]:
         r"""
-        Return a new [`H`][dyce.H] by folding a transition function over the pool one outcome at a time.
+        Return a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
 
-        This implements a state-collapsing dynamic program in the style of Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool): rather than enumerating every distinct roll (as [`apply_to_each_roll`][dyce.P.apply_to_each_roll] does), it sweeps the shared outcome axis once, and at each outcome branches on how many dice show it.
-        Equivalent partial rolls that reach the same *state* are merged, so the cost scales with the number of reachable states rather than the number of rolls.
+        This implements a state-collapsing dynamic program similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
+        Rather than enumerating every distinct roll (as [`apply_to_each_roll`][dyce.P.apply_to_each_roll] does), it sweeps the shared outcome axis once, and at each distinct outcome branches on how many dice show it.
+        Equivalent partial rolls that reach the same state are merged, so the cost scales with the number of reachable states rather than the number of rolls.
+
+        If provided, *surveyor* bundles the *accumulate*, *order*, and *settle* methods as well as the *initial* property.
+        Otherwise, each may be provided separately.
+        *accumulate* and *order* are required.
+        *initial* and *settle* are optional.
 
         *accumulate* is called as `accumulate(state, outcome, count)` and returns the successor state.
-        On the first (seed) call, *state* is *initial* (which defaults to `None`).
-        *count* is the number of dice showing *outcome*, aggregated across all of the pool’s (possibly heterogeneous) histograms, and is always at least `1`; *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
+        On the first (seed) call, *state* is `surveyor.initial`.
+        *count* is the number of dice showing *outcome*, aggregated across all of the pool’s (possibly heterogeneous) histograms, and is always at least `1`.
+        *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
         A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare successive *outcome* values rather than expecting to be notified of the absent ones.
-        States must be hashable, since equal states are merged.
+        *state* must be hashable, since equal states are merged.
 
-        *final* (when provided) maps each terminal state to the outcome recorded in the resulting [`H`][dyce.H]; without it, the terminal states are themselves the outcomes.
+        *order* selects the sweep order over the shared outcome set.
 
-        *order* selects the sweep order over the shared outcome set and defaults to ascending.
-        The transition function and the sweep order are coupled: order-sensitive mechanics (e.g. keeping the highest *n*) are only correct under the matching direction.
+        If provided, *settle* maps each terminal state to the outcome recorded in the resulting [`H`][dyce.H].
+        Otherwise, *accumulate*’s terminal states are themselves the outcomes.
 
         Summing three six-sided dice, cross-checked against [`h`][dyce.P.h] (note that *count* scales each outcome’s contribution):
 
             >>> from dyce import P
+            >>> from dyce.p import survey_outcome_order_ascending
             >>> def running_sum(state, outcome, count):
             ...     return outcome * count if state is None else state + outcome * count
             >>> p_3d6 = 3 @ P(6)
-            >>> p_3d6.survey(running_sum) == p_3d6.h()
+            >>> p_3d6.survey(
+            ...     accumulate=running_sum, order=survey_outcome_order_ascending
+            ... ) == p_3d6.h()
             True
 
-        Keeping the greatest two of four six-sided dice is order-sensitive, so it sweeps descending and uses *final* to project the accumulated sum:
+        Keeping the greatest two of four six-sided dice is order-sensitive, so it sweeps descending and uses *settle* to project the accumulated sum:
 
+            >>> from dyce.p import survey_outcome_order_descending
             >>> def keep_highest_two(state, outcome, count):
             ...     kept, total = (0, 0) if state is None else state
             ...     take = min(count, 2 - kept)
             ...     return kept + take, total + outcome * take
             >>> p_4d6 = 4 @ P(6)
-            >>> descending = lambda outcomes: sorted(outcomes, reverse=True)
             >>> keep = p_4d6.survey(
-            ...     keep_highest_two, final=lambda s: s[1], order=descending
+            ...     accumulate=keep_highest_two,
+            ...     order=survey_outcome_order_descending,
+            ...     settle=lambda s: s[1],
             ... )
             >>> keep == p_4d6.h(slice(-2, None))
             True
         """
-        outcomes = list(order(set().union(*(set(h) for h in self._h_groups))))
+        if surveyor is None:
+            if accumulate is None or order is None:
+                raise ValueError("must provide a surveyor or an accumulate and order")
+            return self.survey(
+                ParameterizedSurveyor(
+                    accumulate,
+                    order,
+                    initial=initial,
+                    settle=settle,
+                )
+            )
+        elif (
+            accumulate is not None
+            or initial is not None
+            or order is not None
+            or settle is not None
+        ):
+            raise ValueError("must not provide an accumulate and order with a surveyor")
+        uniq_outcomes = list(
+            surveyor.order(set().union(*(set(h) for h in self._h_groups)))
+        )
+        if not uniq_outcomes:
+            return H({})
 
-        if not outcomes:
-            return cast("H[_ResultT]", H({}))
+        group_items = tuple(self._h_groups.items())
+        n_groups = len(group_items)
+        group_weights = tuple(
+            tuple(h.get(outcome, 0) for outcome in uniq_outcomes)
+            for h, _ in group_items
+        )
+        memo: dict[
+            tuple[  # key
+                int,  # current unique outcome index; outcomes[uniq_outcome_idx]
+                tuple[int, ...],  # remaining split counts for outcome (one per group)
+            ],
+            dict[  # value
+                _StateT,
+                int,  # weight
+            ],
+        ] = {}
 
-        groups = tuple(self._h_groups.items())
-        n_groups = len(groups)
-        weights = [[h.get(o, 0) for o in outcomes] for h, _ in groups]
-        memo: dict[tuple[int, tuple[int, ...]], dict[Any, int]] = {}
-
-        def solve(hi: int, counts: tuple[int, ...]) -> dict[Any, int]:  # ruff: ignore[complex-structure]
-            key = (hi, counts)
+        def _solve(  # ruff: ignore[complex-structure]
+            uniq_outcome_idx: int, group_split_counts: tuple[int, ...]
+        ) -> dict[_StateT, int]:
+            key = (uniq_outcome_idx, group_split_counts)
             if key in memo:
                 return memo[key]
-            outcome = outcomes[hi]
-            result: dict[Any, int] = defaultdict(int)
-            if hi == 0:
-                # Base case: every remaining die must show the first outcome.
-                scale = prod(weights[g][0] ** counts[g] for g in range(n_groups))
+            outcome = uniq_outcomes[uniq_outcome_idx]
+            result: dict[
+                _StateT,
+                int,  # weight
+            ] = defaultdict(int)
+            if uniq_outcome_idx == 0:
+                # Base case: every remaining die must show the first outcome (lowest for
+                # ascending, highest for descending)
+                scale = prod(
+                    group_weights[g][0] ** group_split_counts[g]
+                    for g in range(n_groups)
+                )
                 if scale:
-                    count = sum(counts)
-                    # accumulate is only invoked for outcomes at least one die shows.
-                    seed = accumulate(initial, outcome, count) if count else initial
+                    count = sum(group_split_counts)
+                    seed = (
+                        surveyor.accumulate(surveyor.initial, outcome, count)
+                        if count
+                        else cast("_StateT", surveyor.initial)
+                    )
                     result[seed] += scale
             else:
-                # Group tails by total count first, so accumulate fires once per
-                # (count, incoming state) rather than once per per-group split.
-                by_count: dict[int, dict[Any, int]] = defaultdict(
-                    lambda: defaultdict(int)
-                )
-                for split in product(*(range(counts[g] + 1) for g in range(n_groups))):
+                # For a heterogeneous pool, an outcome can come from different groups
+                # ("splits"). accumulate only cares about the total, not which group
+                # supplied them. So the code sums the weight of all splits sharing a
+                # total into by_count first, then calls accumulate(state, outcome,
+                # count) once instead of calling it redundantly for each split.
+                state_weights_by_count: dict[
+                    int,  # count of dice showing uniq_outcomes[uniq_outcome_idx]
+                    dict[
+                        _StateT,
+                        int,  # weight
+                    ],
+                ] = defaultdict(lambda: defaultdict(int))
+                # For each group g, establish a range of 0..group_split_counts[g] (0 up
+                # to all its remaining dice). Then take the Cartesian product across
+                # those group ranges, so split is a tuple (k_0, k_1, ...), one count per
+                # group. For example, take 2 groups with the respective counts (2, 1).
+                # This produces splits of (0,0), (0,1), (1,0), (1,1), (2,0), (2,1). Each
+                # is one candidate allocation of dice to this outcome. The loop body
+                # then weights it and recurses on the leftover.
+                for split in product(
+                    *(range(group_split_counts[g] + 1) for g in range(n_groups))
+                ):
                     scale = 1
                     for g in range(n_groups):
-                        scale *= comb(counts[g], split[g]) * weights[g][hi] ** split[g]
+                        scale *= (
+                            comb(group_split_counts[g], split[g])
+                            * group_weights[g][uniq_outcome_idx] ** split[g]
+                        )
                     if scale == 0:
-                        # An unsupported outcome forces its group's split to zero.
+                        # This group has no such outcome (e.g., trying to role a 6 on a
+                        # d4)
                         continue
-                    remaining = tuple(counts[g] - split[g] for g in range(n_groups))
-                    for state, weight in solve(hi - 1, remaining).items():
-                        by_count[sum(split)][state] += weight * scale
-                for count, states in by_count.items():
+                    remaining = tuple(
+                        group_split_counts[g] - split[g] for g in range(n_groups)
+                    )
+                    for state, weight in _solve(
+                        uniq_outcome_idx - 1, remaining
+                    ).items():
+                        state_weights_by_count[sum(split)][state] += weight * scale
+                for count, states in state_weights_by_count.items():
                     if count:
                         for state, weight in states.items():
-                            result[accumulate(state, outcome, count)] += weight
+                            result[surveyor.accumulate(state, outcome, count)] += weight
                     else:
-                        # No dice on this outcome: accumulate is not invoked; the
-                        # incoming states pass through unchanged.
+                        # States pass through unchanged
                         for state, weight in states.items():
                             result[state] += weight
             memo[key] = dict(result)
             return memo[key]
 
-        final_states = solve(len(outcomes) - 1, tuple(n for _, n in groups))
-        finalize = (
-            final
-            if final is not None
-            else cast("Callable[[_StateT], _ResultT]", lambda state: state)
-        )
+        final_states = _solve(len(uniq_outcomes) - 1, tuple(n for _, n in group_items))
 
-        return cast(
-            "H[_ResultT]",
-            aggregate_weighted(
-                (finalize(state), weight) for state, weight in final_states.items()
-            ),
+        return aggregate_weighted(
+            (surveyor.settle(state), weight) for state, weight in final_states.items()
         )
 
 
 # ---- Helpers -------------------------------------------------------------------------
+
+
+def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in ascending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key)
+    return result
+
+
+def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in descending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key, reverse=True)
+    return result
 
 
 class _MinFill:
@@ -1063,7 +1227,13 @@ def _selected_distros_memoized(
             this_outcome = next(reversed(tuple(h))) if from_right else next(iter(h))
             c_outcome = h[this_outcome]
             rest_total = h.total - c_outcome
-            next_h: H[_T] = H({o: c for o, c in h.items() if o != this_outcome})
+            next_h: H[_T] = H(
+                {
+                    outcome: count
+                    for outcome, count in h.items()
+                    if outcome != this_outcome
+                }
+            )
             cumulative_nmr8r = 0
 
             for i in range(k + 1):

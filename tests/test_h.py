@@ -1152,10 +1152,9 @@ def _aggregate_weighted_prod(
     weighted_sources: Iterable[tuple[Any, int]],
 ) -> H[Any]:
     r"""
-    Reference implementation of `aggregate_weighted` using product-of-totals as the
-    running scalar. Retained as a regression check against the production LCM-based
-    `aggregate_weighted`: the two should always produce H-equal (i.e. distribution-
-    equivalent) results, with the LCM version's totals being <= the product version's.
+    Reference implementation of `aggregate_weighted` using product-of-totals as the running scalar.
+    This is retained as a regression check against the production LCM-based `aggregate_weighted`
+    The two should always produce H-equal (i.e. distribution-equivalent) results, with the LCM version’s totals being <= the product version’s.
     """
     aggregate_scalar = 1
     outcome_counts: list[tuple[Any, int]] = []
