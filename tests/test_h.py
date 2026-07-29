@@ -52,8 +52,8 @@ with contextlib.suppress(ImportError):
     import numpy as np
 
     _OUTCOME_TYPES += (
-        np.int64,
-        np.float128,
+        np.longlong,
+        np.longdouble,
     )
 
 with contextlib.suppress(ImportError):
