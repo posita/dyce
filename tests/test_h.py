@@ -17,6 +17,7 @@ import contextlib
 import itertools
 import math
 import operator
+import os
 import platform
 import statistics
 import warnings
@@ -706,12 +707,14 @@ class TestHFormat:
         ):
             assert (
                 h_of_hs.format(width=65)
-                == r"""
-H({1: 1, 4: 1, 9: 1, 16: 1}) |  25.00% |######
-       H({1: 1, 4: 1, 9: 1}) |  25.00% |######
-             H({1: 1, 4: 1}) |  25.00% |######
-                   H({1: 1}) |  25.00% |######
-        """.strip()
+                == os.linesep.join(
+                    (
+                        "H({1: 1, 4: 1, 9: 1, 16: 1}) |  25.00% |######",
+                        "       H({1: 1, 4: 1, 9: 1}) |  25.00% |######",
+                        "             H({1: 1, 4: 1}) |  25.00% |######",
+                        "                   H({1: 1}) |  25.00% |######",
+                    )
+                ).strip()
             )
 
 

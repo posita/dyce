@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -20,6 +20,8 @@ jobs:
           - { python: "3.14",     tox-env: "py314" }
           - { python: "3.14",     tox-env: "py314-beartype" }
           - { python: "pypy3.11", tox-env: "pypy311" }
+          - { python: "3.11",     tox-env: "py311", os: "macos-14" }  # Apple Silicon (ARM64) sanity check
+          - { python: "3.11",     tox-env: "py311", os: "windows-latest" }  # Windoze sanity check
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
