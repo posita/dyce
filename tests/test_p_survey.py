@@ -24,7 +24,11 @@ import pytest
 
 from dyce import H, P
 from dyce.p import (
+    AscendingSurveyorBase,
+    DescendingSurveyorBase,
     ParameterizedSurveyor,
+    SurveyorBase,
+    _WhichHSurveyor,
     survey_outcome_order_ascending,
     survey_outcome_order_descending,
 )
@@ -71,7 +75,11 @@ def _successes_roll(roll: tuple[int, ...]) -> int:
     return sum(1 for outcome in roll if outcome >= 5)
 
 
-def _largest_set_next(state: int | None, outcome: int, count: int) -> int:  # ruff: ignore[unused-function-argument]
+def _largest_set_next(
+    state: int | None,
+    outcome: int,  # ruff: ignore[unused-function-argument]
+    count: int,
+) -> int:
     return max(0 if state is None else state, count)
 
 
@@ -99,7 +107,11 @@ def _keep_lowest_two_roll(roll: tuple[int, ...]) -> int:
     return sum(sorted(roll)[:2])
 
 
-def _max_next(state: int | None, outcome: int, count: int) -> int:  # ruff: ignore[unused-function-argument]
+def _max_next(
+    state: int | None,
+    outcome: int,
+    count: int,  # ruff: ignore[unused-function-argument]
+) -> int:
     # A presence mechanic: under positive-only calls, accumulate sees only outcomes
     # that appeared, so count need not be consulted.
     return outcome if state is None else max(state, outcome)
@@ -109,7 +121,11 @@ def _max_roll(roll: tuple[int, ...]) -> int:
     return max(roll)
 
 
-def _min_next(state: int | None, outcome: int, count: int) -> int:  # ruff: ignore[unused-function-argument]
+def _min_next(
+    state: int | None,
+    outcome: int,
+    count: int,  # ruff: ignore[unused-function-argument]
+) -> int:
     return outcome if state is None else min(state, outcome)
 
 
@@ -257,7 +273,11 @@ def test_count_blindness_is_safe_for_presence_but_not_multiplicity() -> None:
 
     # ... but WRONG for a multiplicity mechanic: a count-blind sum adds each present
     # outcome once, dropping the extra dice on any doubled face.
-    def count_blind_sum(state: int | None, outcome: int, count: int) -> int:  # ruff: ignore[unused-function-argument]
+    def count_blind_sum(
+        state: int | None,
+        outcome: int,
+        count: int,  # ruff: ignore[unused-function-argument]
+    ) -> int:
         return outcome if state is None else state + outcome
 
     assert pool.survey(
@@ -305,3 +325,67 @@ def test_repeated_invocation_is_stable() -> None:
         order=survey_outcome_order_ascending,
     )
     assert pool.survey(surveyor) == pool.survey(surveyor)
+
+
+def test_survey_without_surveyor_or_accumulate_raises() -> None:
+    # Deliberately-invalid calls, routed through an Any reference so the static
+    # checkers don't (correctly) reject them before the runtime guard fires.
+    survey: Any = P(6).survey
+    with pytest.raises(ValueError, match=r"must provide a surveyor or an accumulate"):
+        survey()
+
+
+def test_survey_with_both_surveyor_and_kwargs_raises() -> None:
+    surveyor = ParameterizedSurveyor(
+        accumulate=_sum_next, order=survey_outcome_order_ascending
+    )
+    survey: Any = P(6).survey
+    with pytest.raises(ValueError, match=r"must not provide an accumulate"):
+        survey(
+            surveyor,
+            accumulate=_sum_next,
+            order=survey_outcome_order_ascending,
+        )
+
+
+def test_which_surveyor_requires_a_selection() -> None:
+    with pytest.raises(ValueError, match=r"requires at least one selection"):
+        _WhichHSurveyor(P(6), ())
+
+
+def test_surveyor_base_default_initial_and_settle() -> None:
+    # A minimal SurveyorBase subclass overriding only the two abstract methods,
+    # exercising the base initial (None) and settle (identity) defaults.
+    class _SumSurveyor(SurveyorBase[int, int, int]):
+        def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+            return (0 if state is None else state) + outcome * count
+
+        def order(self, outcomes: Iterable[int]) -> Iterable[int]:
+            return survey_outcome_order_ascending(outcomes)
+
+    pool = 2 @ P(6)
+    assert pool.survey(_SumSurveyor()) == pool.h()
+
+
+def test_ascending_descending_surveyor_bases_supply_order() -> None:
+    # The two order-mixin bases just delegate to the module order helpers.
+    class _Asc(AscendingSurveyorBase[int, int, int]):
+        def accumulate(
+            self,
+            state: int | None,  # ruff: ignore[unused-method-argument]
+            outcome: int,
+            count: int,  # ruff: ignore[unused-method-argument]
+        ) -> int:
+            return outcome
+
+    class _Desc(DescendingSurveyorBase[int, int, int]):
+        def accumulate(
+            self,
+            state: int | None,  # ruff: ignore[unused-method-argument]
+            outcome: int,
+            count: int,  # ruff: ignore[unused-method-argument]
+        ) -> int:
+            return outcome
+
+    assert list(_Asc().order([3, 1, 2])) == [1, 2, 3]
+    assert list(_Desc().order([3, 1, 2])) == [3, 2, 1]

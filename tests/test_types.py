@@ -13,6 +13,8 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+from typing import Any
+
 import pytest
 
 from dyce.types import lossless_int, natural_key
@@ -65,9 +67,9 @@ class TestNaturalKey:
             str(v)
             for v in sorted(
                 (
-                    _NoCompare("item10"),
-                    _NoCompare("item2"),
-                    _NoCompare("item1"),
+                    NoCompare("item10"),
+                    NoCompare("item2"),
+                    NoCompare("item1"),
                 ),
                 key=natural_key,
             )
@@ -81,7 +83,7 @@ class TestNaturalKey:
 # ---- Helpers -------------------------------------------------------------------------
 
 
-class _NoCompare:
+class NoCompare:
     r"""
     For testing natural_key sorting and other places where outcomes ignorant of mathematical operations is required.
     """
@@ -96,4 +98,9 @@ class _NoCompare:
         return self.val
 
     def __repr__(self) -> str:
-        return f"_NoCompare({self.val!r})"
+        return f"{type(self).__name__}({self.val!r})"
+
+
+class NoCompareCanOnlyAdd(NoCompare):
+    def __add__(self, other: Any) -> "NoCompareCanOnlyAdd":  # ruff: ignore[any-type]
+        return NoCompareCanOnlyAdd(f"{self.val}+{other}")
