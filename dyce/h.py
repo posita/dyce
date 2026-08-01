@@ -512,7 +512,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __matmul__(self: "H[ot.CanAdd[int, int]]", rhs: SupportsInt) -> "H[int]": ...
+    def __matmul__(
+        self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
+    ) -> "H[int]": ...
     @overload
     def __matmul__(
         self: "H[_ConvolvableT]", rhs: SupportsInt
@@ -936,7 +938,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __rmatmul__(self: "H[ot.CanAdd[int, int]]", lhs: SupportsInt) -> "H[int]": ...
+    def __rmatmul__(
+        self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
+    ) -> "H[int]": ...
     @overload
     def __rmatmul__(
         self: "H[_ConvolvableT]", lhs: SupportsInt

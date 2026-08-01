@@ -813,7 +813,7 @@ Selecting all dice works, since it’s equivalent to flattening (no sorting is r
 Enumerating rolls works.
 
     >>> list(p.rolls_with_counts())
-    [((x/3, x/3 + 1/3, x/3 + 2/3), 1), ((x, x/3 + 1/3, x/3 + 2/3), 1), ((2*x/3, x/3 + 1/3, x/3 + 2/3), 1), ..., ((2*x/3 + 1/3, 2*x/3 + 2/3, x/3), 1), ((2*x/3 + 1/3, 2*x/3 + 2/3, x), 1), ((2*x/3, 2*x/3 + 1/3, 2*x/3 + 2/3), 1)]
+    [((2*x/3, 2*x/3 + 1/3, 2*x/3 + 2/3), 1), ((2*x/3 + 1/3, 2*x/3 + 2/3, x), 1), ((2*x/3, 2*x/3 + 2/3, x + 1/3), 1), ..., ((2*x/3, x/3 + 1/3, x/3 + 2/3), 1), ((x, x/3 + 1/3, x/3 + 2/3), 1), ((x/3, x/3 + 1/3, x/3 + 2/3), 1)]
 
 
 [`P.roll`][dyce.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.
