@@ -18,10 +18,8 @@ from abc import ABC, abstractmethod
 from bisect import bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
-from dataclasses import dataclass
-from functools import lru_cache
-from itertools import chain, product, starmap
-from math import comb, gcd, prod
+from itertools import product, starmap
+from math import comb, prod
 from typing import (
     Any,
     Generic,
@@ -33,6 +31,8 @@ from typing import (
     cast,
     overload,
 )
+
+import optype as ot
 
 from .h import H, aggregate_weighted, sum_h
 from .hable import HableOpsMixin
@@ -54,6 +54,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _StateT = TypeVar("_StateT")
+_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
 
 RollT = tuple[_T, ...]
 RollCountT = tuple[RollT[_T], int]
@@ -149,72 +150,98 @@ class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
         return self._settle(state) if self._settle else cast("_ResultT", state)
 
 
-@dataclass(frozen=True, slots=True)
-class _SelectionEmpty:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects zero positions.
-    """
+class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
+    def __init__(self, p: "P[_T]", selected: tuple[int, ...]) -> None:
+        if not selected:
+            raise ValueError(f"{type(self).__name__} requires at least one selection")
+        self._selected = selected
+        self._p_len = len(p)
+        self._ascending = (
+            min(selected) - 0  # distance from left
+            <= self._p_len - 1 - max(selected)  # distance from right
+        )
+
+    def order(self, outcomes: Iterable[_T]) -> Iterable[_T]:
+        return (
+            survey_outcome_order_ascending(outcomes)
+            if self._ascending
+            else survey_outcome_order_descending(outcomes)
+        )
 
 
-@dataclass(frozen=True, slots=True)
-class _SelectionUniform:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects every position exactly *times* times (and nothing else).
-    """
+class _WhichHSurveyor(
+    _WhichSurveyor[_ConvolvableT, tuple[_ConvolvableT | None, int], _ConvolvableT]
+):
+    def __init__(self, p: "P[_ConvolvableT]", selected: tuple[int, ...]) -> None:
+        super().__init__(p, selected)
+        self._counts_by_index: Counter[int] = Counter(selected)
 
-    times: int
+    @property
+    def initial(self) -> tuple[_ConvolvableT | None, int]:
+        return None, (0 if self._ascending else self._p_len - 1)
 
+    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
+    def accumulate(  # type: ignore[override] # ty: ignore[invalid-method-override]
+        self,
+        state: tuple[_ConvolvableT | None, int],
+        outcome: _ConvolvableT,
+        count: int,
+    ) -> tuple[_ConvolvableT | None, int]:
+        sum_so_far, index_so_far = state
+        r = (
+            range(index_so_far, index_so_far + count)
+            if self._ascending
+            else range(index_so_far, index_so_far - count, -1)
+        )
+        for i in r:
+            for _ in range(self._counts_by_index.get(i, 0)):
+                sum_so_far = outcome if sum_so_far is None else sum_so_far + outcome
+        index_so_far += count if self._ascending else -count
+        return sum_so_far, index_so_far
 
-@dataclass(frozen=True, slots=True)
-class _SelectionExtremes:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly the *lo* lowest and *hi* highest sorted positions and nothing else.
-    Both values are positive; together they are strictly fewer than the pool size (so there is at least one unselected interior position).
-    """
-
-    lo: int  # positions [0..lo)
-    hi: int  # positions [n-hi..n)
-
-
-@dataclass(frozen=True, slots=True)
-class _SelectionSinglePos:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects exactly one distinct position with multiplicity 1, and that position is strictly between the two ends (`0 < pos < n - 1`).
-    The two end-position cases (`pos == 0` and `pos == n - 1`) remain classified as [`_SelectionPrefix(max_index=1)`][dyce.p._SelectionPrefix] and [`_SelectionSuffix(min_index=-1)`][dyce.p._SelectionSuffix] respectively, so [`rolls_with_counts`][dyce.p.P.rolls_with_counts]’s existing partial-selection optimization (driven off Prefix/Suffix’s `k`) keeps working unchanged.
-    """
-
-    pos: int  # absolute position, normalized to [1, n-2]
-
-
-@dataclass(frozen=True, slots=True)
-class _SelectionPrefix:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects only contiguous positions from the low (left) end to *max_index* positions `#!math \left[ 0 .. max\_index \right)`.
-    """
-
-    max_index: int  # positive; positions [0..max_index)
-    is_single_non_repeated: bool  # True if it is a single selection at max_index
+    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
+    def settle(self, state: tuple[_ConvolvableT | None, int]) -> _ConvolvableT:
+        total, _ = state
+        assert total is not None
+        return total
 
 
-@dataclass(frozen=True, slots=True)
-class _SelectionSuffix:
-    r"""
-    Returned by [`_analyze_selection`][dyce.p._analyze_selection] when *which* selects only contiguous positions from *min_index* to the high (right) end `#!math \left[ min\_index .. n \right)`.
-    """
+class _WhichRollSurveyor(
+    _WhichSurveyor[_T, tuple[tuple[_T, ...], int], tuple[_T, ...]]
+):
+    def __init__(self, p: "P[_T]", selected: tuple[int, ...]) -> None:
+        super().__init__(p, selected)
+        self._selection_map = {s: i for i, s in enumerate(sorted(set(selected)))}
 
-    min_index: int  # negative; positions [min_index..n)
-    is_single_non_repeated: bool  # True if it is a single selection at min_index
+    @property
+    def initial(self) -> tuple[tuple[_T, ...], int]:
+        return (), (0 if self._ascending else self._p_len - 1)
 
+    def accumulate(  # pyrefly: ignore[bad-override] # ty: ignore[invalid-method-override]
+        self,
+        state: tuple[tuple[_T, ...], int],  # type: ignore[override]
+        outcome: _T,
+        count: int,
+    ) -> tuple[tuple[_T, ...], int]:
+        roll_so_far, index_so_far = state
+        r = (
+            range(index_so_far, index_so_far + count)
+            if self._ascending
+            else range(index_so_far, index_so_far - count, -1)
+        )
+        for i in r:
+            if i in self._selection_map:
+                roll_so_far = (
+                    (*roll_so_far, outcome)
+                    if self._ascending
+                    else (outcome, *roll_so_far)
+                )
+        index_so_far += count if self._ascending else -count
+        return roll_so_far, index_so_far
 
-_SelectionResult = (
-    _SelectionEmpty
-    | _SelectionUniform
-    | _SelectionExtremes
-    | _SelectionSinglePos
-    | _SelectionPrefix
-    | _SelectionSuffix
-    | None
-)
+    def settle(self, state: tuple[tuple[_T, ...], int]) -> tuple[_T, ...]:
+        roll, _ = state
+        return tuple(roll[self._selection_map[s]] for s in self._selected)
 
 
 class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
@@ -555,15 +582,23 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ),
         )
 
-    # TODO(posita): # ruff: ignore[missing-todo-link] - Use CanAdd here
-    def h(self: "P[_T]", *which: GetItemT) -> H[_T]:  # ruff: ignore[complex-structure]
+    @overload
+    def h(self: "P[Never]", *which: GetItemT) -> H[Never]: ...
+    @overload
+    # See <https://github.com/jorenham/optype/discussions/574>
+    def h(self: "P[ot.CanAddSame[int, int]]", *which: GetItemT) -> H[int]: ...
+    @overload
+    def h(self: "P[_ConvolvableT]", *which: GetItemT) -> H[_ConvolvableT]: ...
+    @overload
+    def h(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def h(self: "P", *which: GetItemT) -> H:  # type: ignore[misc] # ty: ignore[invalid-method-override]
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
 
             >>> (2 @ P(6)).h()
             H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
 
-        When on or more optional *which* identifiers is provided, this is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with some short-circuit optimizations.
+        When one or more optional *which* identifiers is provided, this is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with optimizations.
         Identifiers can be `int`s or `slice`s, and can be mixed.
 
         Taking the greatest of two six-sided dice can be modeled as:
@@ -610,99 +645,38 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> p = 2 @ P(d6, d6avg)
             >>> p.h(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
             True
+
+        !!! note "On selection ordering"
+
+            As an optimization, selected outcomes are summed in the order in which they appear in sorted rolls, regardless of the order they appear in *which*.
+            Where addition over the outcomes’ type is commutative, equivalence holds as expected:
+
+                >>> p_c = P(2, 3, 4)
+                >>> p_c.h(
+                ...     slice(None),  # select everything once
+                ...     slice(None),  # then select everything again
+                ... ) == 2 * p_c.h()
+                True
+
+            Where outcomes define `__add__` as non-commutative (e.g., strings, sequences, etc.), ordering can affect construction under certain circumstances:
+
+                >>> p_nc = P(H(((1,), (2,))), H(((3,), (4,))), H(((5,), (6,))))
+                >>> p_nc.h(
+                ...     slice(None),  # select everything once, then again, like above
+                ...     slice(None),  # pyright: ignore[reportCallIssue]
+                ... )
+                H({(1, 1, 3, 3, 5, 5): 1, (1, 1, 3, 3, 6, 6): 1, ..., (2, 2, 4, 4, 5, 5): 1, (2, 2, 4, 4, 6, 6): 1})
+                >>> 2 * p_nc.h()  # type: ignore[operator]
+                H({(1, 3, 5, 1, 3, 5): 1, (1, 3, 6, 1, 3, 6): 1, ..., (2, 4, 5, 2, 4, 5): 1, (2, 4, 6, 2, 4, 6): 1})
         """
         if not which:
             return H({}) if len(self._h_groups) == 0 else sum_h(self)
         n = len(self)
-        i = _analyze_selection(n, which)
-        # Optimization for when each and every position is selected the same number of
-        # times
-        if n and isinstance(i, _SelectionUniform):
-            try:
-                # This optimization assumes outcomes support multiplication with native
-                # ints while retaining their type ...
-                return sum_h(self) * i.times  # type: ignore[operator] # ty: ignore[unsupported-operator]
-            except TypeError:
-                # ... but if we get into trouble, fall through to enumerating via
-                # rolls_with_counts
-                pass
-        # Single-position selection on a homogeneous pool: dispatch directly to
-        # `H.order_stat_for_n_at_pos` instead of enumerating rolls. The selection
-        # variants that flag this case are:
-        #   - `_SelectionSinglePos(pos)` for true-middle positions.
-        #   - `_SelectionPrefix(max_index=1)` for the lowest (pos == 0).
-        #   - `_SelectionSuffix(min_index=-1)` for the highest (pos == n - 1).
-        # Heterogeneous pools and multi-position selections fall through to the existing
-        # `rolls_with_counts` path.
-        #
-        # TODO(posita): # ruff: ignore[missing-todo-link] - As of *right now*, we
-        # prevent selection of the single-prefix or single-suffix fast path with
-        # repeated single selections. The fast path can likely support those, but it
-        # requires rethinking how we perform and communicate selection analysis. The
-        # current approach opts for correctness over a smaller surface. We'll likely
-        # revisit with a later deep dive into performance.
-        if n:
-            pos: int | None = None
-            if isinstance(i, _SelectionSinglePos):
-                pos = i.pos
-            elif (
-                isinstance(i, _SelectionPrefix)
-                and i.max_index == 1
-                and i.is_single_non_repeated
-            ):
-                pos = 0
-            elif (
-                isinstance(i, _SelectionSuffix)
-                and i.min_index == -1
-                and i.is_single_non_repeated
-            ):
-                pos = n - 1
-            if pos is not None:
-                if len(self._h_groups) == 1:
-                    h = next(iter(self._h_groups))
-                    # Bypass `order_stat_for_n_at_pos`'s `@experimental` warning
-                    # emission by going through the cached internal helper directly,
-                    # since both produce the same result
-                    if n not in h._order_stat_funcs_by_n:  # ruff: ignore[private-member-access]
-                        h._order_stat_funcs_by_n[n] = h._order_stat_func_for_n(n)  # ruff: ignore[private-member-access]
-                    return cast(
-                        "H[_T]",
-                        h._order_stat_funcs_by_n[n](pos),  # ruff: ignore[private-member-access]
-                    )
-                # Heterogeneous + single-END decomposition. The identity `max(X_1..X_n,
-                # Y_1..Y_m) == max(max(X_1..X_n), max(Y_1..Y_m))` (and min
-                # symmetrically) lets us reduce each homogeneous sub-group via
-                # `order_stat_for_n_at_pos`, then recurse on the smaller reduced pool.
-                # Termination: a group of size `n_g > 1` becomes a single H, so each
-                # pass strictly decreases `sum(n_g for groups)`. Skip when all groups
-                # are size 1 -- decomposition would be a no-op and could otherwise loop.
-                if (pos == 0 or pos == n - 1) and any(
-                    n_g > 1 for n_g in self._h_groups.values()
-                ):
-                    reduced_hs: list[H[_T]] = []
-                    for h_g, n_g in self._h_groups.items():
-                        if n_g == 1:
-                            reduced_hs.append(h_g)
-                            continue
-                        per_group_pos = n_g - 1 if pos == n - 1 else 0
-                        if n_g not in h_g._order_stat_funcs_by_n:  # ruff: ignore[private-member-access]
-                            h_g._order_stat_funcs_by_n[n_g] = (  # ruff: ignore[private-member-access]
-                                h_g._order_stat_func_for_n(n_g)  # ruff: ignore[private-member-access]
-                            )
-                        reduced_hs.append(
-                            cast(
-                                "H[_T]",
-                                h_g._order_stat_funcs_by_n[n_g](per_group_pos),  # ruff: ignore[private-member-access]
-                            )
-                        )
-                    return P(*reduced_hs).h(0 if pos == 0 else -1)
-        return H.from_counts(
-            # This slightly esoteric use of sum() is to avoid an attempt to 0 to
-            # outcomes, which is sum()'s default behavior. At worst, this results in
-            # more accurate error messages where outcomes don't support addition at all.
-            (sum(roll[1:], start=roll[0]), count)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
-            for roll, count in self.rolls_with_counts(*which)
-        )
+        indices = tuple(range(n))
+        selected = tuple(getitems(indices, which or indices))
+        if not selected:
+            return H({})
+        return self.survey(_WhichHSurveyor(self, selected))
 
     @experimental
     def roll(self: "P[_T]") -> RollT[_T]:
@@ -721,7 +695,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             roll.sort(key=natural_key)
         return tuple(roll)
 
-    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:  # ruff: ignore[complex-structure]
+    def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:
         r"""
         Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
@@ -735,7 +709,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ... ) == p_2d6.h()
             True
 
-        *which* selects by sorted position. To take the highest outcome from 3d6:
+        *which* selects by sorted position.
+        An inefficient way to take the highest outcome from 3d6:
 
             >>> p_3d6 = 3 @ P(6)
             >>> H.from_counts(
@@ -749,8 +724,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ...     p_3d6.rolls_with_counts(0, -1)  # selects lowest and highest of 3d6
             ... )
             >>> lo_hi_from_all_3d6_rolls
-            [((1, 1), 1), ((1, 2), 3), ((1, 2), 3), ..., ((5, 6), 3), ((5, 6), 3), ((6, 6), 1)]
-            >>> lo_hi_from_all_3d6_rolls == sorted(
+            [((1, 1), 1), ((1, 2), 6), ((1, 3), 12), ..., ((5, 5), 1), ((5, 6), 6), ((6, 6), 1)]
+            >>> H.from_counts(lo_hi_from_all_3d6_rolls) == H.from_counts(
             ...     ((r[0], r[-1]), c) for r, c in p_3d6.rolls_with_counts()
             ... )
             True
@@ -771,9 +746,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         This method may yield the same roll more than once under certain conditions (e.g., non-contiguous *which* selections, where heterogeneous pools produce similar rolls for each group ordering):
 
             >>> sorted((3 @ P(H(2))).rolls_with_counts(0, -1))
-            [((1, 1), 1), ((1, 2), 3), ((1, 2), 3), ((2, 2), 1)]
+            [((1, 1), 1), ((1, 2), 6), ((2, 2), 1)]
             >>> sorted(P(H(2), H(3)).rolls_with_counts())
-            [((1, 1), 1), ((1, 2), 1), ((1, 2), 1), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
+            [((1, 1), 1), ((1, 2), 2), ((1, 3), 1), ((2, 2), 1), ((2, 3), 1)]
 
         No rolls will be produced with empty `P` objects or where *which* selects no positions.
 
@@ -783,67 +758,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             []
         """
         n = len(self)
-        if not which:
-            sel: _SelectionResult = _SelectionUniform(times=1)
-        else:
-            sel = _analyze_selection(n, which)
-        rolls_with_counts_iter: Iterator[RollCountT[_T | _MinFill | _MaxFill]]
-        # Short-circuit: empty selection or empty pool
-        if isinstance(sel, _SelectionEmpty) or n == 0:
-            return
-        # The fast path inclusion-exclusion algorithm in _rwc_heterogeneous_extremes
-        # only supports (lo=1, hi=1). Otherwise, fall through and convert selection to
-        # the integer k hint consumed by other lower-level functions:
-        #
-        # * positive k - take k from left (prefix)
-        # * negative k - take k from right (suffix)
-        # * None - full enumeration (uniform, extremes fallback, or arbitrary)
-        if (
-            isinstance(sel, _SelectionExtremes)
-            and len(self._h_groups) > 1
-            and sel.lo == 1
-            and sel.hi == 1
-        ):
-            yield from _rwc_heterogeneous_extremes(
-                self._h_groups.items(), sel.lo, sel.hi
-            )
-            return
-
-        if isinstance(sel, _SelectionPrefix):
-            k: int | None = sel.max_index if sel.max_index >= 0 else n + sel.max_index
-        elif isinstance(sel, _SelectionSuffix):
-            k = sel.min_index if sel.min_index < 0 else sel.min_index - n
-        elif isinstance(sel, _SelectionSinglePos):
-            # Pick the side that yields the smaller partial-selection similar to
-            # _SelectionPrefix/_SelectionSuffix
-            pos = sel.pos
-            k = pos + 1 if pos + 1 <= n - pos else pos - n
-        else:
-            k = None
-        if len(self._h_groups) == 1:
-            h, hn = next(iter(self._h_groups.items()))
-            assert hn == n
-            if k is not None and abs(k) < n:
-                rolls_with_counts_iter = _rwc_homogeneous_n_h_using_partial_selection(
-                    n, h, k=k, fill=cast("_T", 0)
-                )
-            else:
-                rolls_with_counts_iter = _rwc_homogeneous_n_h_using_partial_selection(
-                    n, h, k=n
-                )
-        else:
-            rolls_with_counts_iter = _rwc_heterogeneous_h_groups(
-                self._h_groups.items(), k
-            )
-
-        for sorted_outcomes_for_roll, roll_count in rolls_with_counts_iter:
-            if which:
-                taken_outcomes: RollT[_T] = cast(
-                    "RollT[_T]", tuple(getitems(sorted_outcomes_for_roll, which))
-                )
-            else:
-                taken_outcomes = cast("RollT[_T]", sorted_outcomes_for_roll)
-            yield taken_outcomes, roll_count
+        indices = tuple(range(n))
+        selected = tuple(getitems(indices, which or indices))
+        yield from (
+            self.survey_raw(_WhichRollSurveyor(self, selected)) if selected else ()
+        )
 
     @overload
     def survey(
@@ -869,7 +788,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         settle: Callable[[_StateT], _ResultT],
     ) -> H[_ResultT]: ...
     @experimental
-    def survey(  # ruff: ignore[complex-structure]
+    def survey(
         self: "P[_T]",
         surveyor: SurveyorBase[_T, _StateT, _ResultT] | None = None,
         *,
@@ -941,18 +860,27 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                     settle=settle,
                 )
             )
-        elif (
-            accumulate is not None
-            or initial is not None
-            or order is not None
-            or settle is not None
-        ):
-            raise ValueError("must not provide an accumulate and order with a surveyor")
+        else:
+            if (
+                accumulate is not None
+                or initial is not None
+                or order is not None
+                or settle is not None
+            ):
+                raise ValueError(
+                    "must not provide an accumulate and order with a surveyor"
+                )
+            return aggregate_weighted(self.survey_raw(surveyor))
+
+    def survey_raw(  # ruff: ignore[complex-structure]
+        self: "P[_T]",
+        surveyor: SurveyorBase[_T, _StateT, _ResultT],
+    ) -> Iterator[tuple[_ResultT, int]]:
         uniq_outcomes = list(
             surveyor.order(set().union(*(set(h) for h in self._h_groups)))
         )
         if not uniq_outcomes:
-            return H({})
+            return
 
         group_items = tuple(self._h_groups.items())
         n_groups = len(group_items)
@@ -1050,7 +978,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         final_states = _solve(len(uniq_outcomes) - 1, tuple(n for _, n in group_items))
 
-        return aggregate_weighted(
+        yield from (
             (surveyor.settle(state), weight) for state, weight in final_states.items()
         )
 
@@ -1080,351 +1008,3 @@ def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
     except TypeError:
         result.sort(key=natural_key, reverse=True)
     return result
-
-
-class _MinFill:
-    r"""
-    Sentinel that compares less than any real outcome; used to pad heterogeneous rolls on the low end when a partial-right selection leaves unfilled low positions.
-    """
-
-    __slots__ = ()
-
-    def __hash__(self) -> int:
-        return hash(_MinFill)
-
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}()"
-
-    def __lt__(self, other: object) -> bool:
-        return not isinstance(other, _MinFill)
-
-    def __le__(self, _other: object) -> bool:
-        return True
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, _MinFill)
-
-    def __ge__(self, other: object) -> bool:
-        return isinstance(other, _MinFill)
-
-    def __gt__(self, _other: object) -> bool:
-        return False
-
-
-class _MaxFill:
-    r"""
-    Sentinel that compares greater than any real outcome; used to pad heterogeneous rolls on the high end when a partial-left selection leaves unfilled high positions.
-    """
-
-    __slots__ = ()
-
-    def __hash__(self) -> int:
-        return hash(_MaxFill)
-
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}()"
-
-    def __lt__(self, _other: object) -> bool:
-        return False
-
-    def __le__(self, other: object) -> bool:
-        return isinstance(other, _MaxFill)
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, _MaxFill)
-
-    def __gt__(self, other: object) -> bool:
-        return not isinstance(other, _MaxFill)
-
-    def __ge__(self, _other: object) -> bool:
-        return True
-
-
-_MIN_FILL = _MinFill()
-_MAX_FILL = _MaxFill()
-
-
-def _analyze_selection(n: int, which: Iterable[GetItemT]) -> "_SelectionResult":
-    r"""
-    Examines the selection *which* as applied to the values `range(n)` and returns one of:
-
-    - [`_SelectionEmpty`][dyce.p._SelectionEmpty]: *which* selects zero positions
-    - [`_SelectionUniform(times)`][dyce.p._SelectionUniform]: *which* selects every position exactly *times* times
-    - [`_SelectionSinglePos(pos)`][dyce.p._SelectionSinglePos]: *which* selects exactly one distinct true-middle position with multiplicity 1 (`0 < pos < n - 1`)
-    - [`_SelectionPrefix(max_index, is_single_non_repeated=...)`][dyce.p._SelectionPrefix]: *which* selects positions `[0..max_index)` only
-    - [`_SelectionSuffix(min_index, is_single_non_repeated=...)`][dyce.p._SelectionSuffix]: *which* selects positions `[min_index..n)` only
-    - [`_SelectionExtremes(lo, hi)`][dyce.p._SelectionExtremes]: *which* selects exactly the *lo* lowest and *hi* highest positions with at least one unselected interior position
-    - `None`: any other (arbitrary) selection
-
-    For `_SelectionPrefix` and `_SelectionSuffix`, *single* is `True` iff a single selection has been made and `#! max_index==1` (Prefix) or `#! min_index==1` (Suffix).
-    """
-    indices = tuple(range(n))
-    counts_by_index: Counter[int] = Counter(getitems(indices, which))
-    found_indices = set(counts_by_index)
-    if not found_indices:
-        return _SelectionEmpty()
-
-    missing_indices = set(indices) - found_indices
-    distinct_counts = set(counts_by_index.values())
-    min_index = min(found_indices)
-    max_index = max(found_indices) + 1
-    is_single_non_repeated = len(found_indices) == 1 and distinct_counts == {1}
-    # Single-position selection at a true-middle index (i.e. not 0 or n-1) with
-    # multiplicity 1. End positions deliberately fall through to _SelectionPrefix(1) /
-    # _SelectionSuffix(-1) for backward compatibility with `rolls_with_counts`.
-    if is_single_non_repeated and 0 < min_index < n - 1:
-        return _SelectionSinglePos(pos=min_index)
-    if min_index > n - max_index:
-        return _SelectionSuffix(
-            min_index=min_index - n, is_single_non_repeated=is_single_non_repeated
-        )
-    elif max_index - min_index < n:
-        return _SelectionPrefix(
-            max_index=max_index, is_single_non_repeated=is_single_non_repeated
-        )
-    elif not missing_indices and len(distinct_counts) == 1:
-        return _SelectionUniform(times=distinct_counts.pop())
-    elif len(distinct_counts) == 1:
-        # Check for lo-from-left and hi-from-right pattern with a gap in the middle.
-        # Because max_index - min_index == n we know min_index == 0 and max_index == n,
-        # so positions 0 and n-1 are both selected.
-        sorted_found = sorted(found_indices)
-        # Walk the left side until we find a gap
-        lo = 0
-        while lo < len(sorted_found) and sorted_found[lo] == lo:
-            lo += 1
-        # Walk the right side until we find a gap
-        hi = 0
-        while hi < len(sorted_found) and sorted_found[-(hi + 1)] == n - 1 - hi:
-            hi += 1
-        # If we can account for everything by walking in from both sides, we know
-        # any remaining gap is contiguous
-        if lo + hi == len(sorted_found):
-            return _SelectionExtremes(lo=lo, hi=hi)
-    return None
-
-
-@lru_cache(maxsize=2048)
-def _selected_distros_memoized(
-    h: H[_T],
-    n: int,
-    k: int,
-    *,
-    from_right: bool,
-) -> tuple[RollProbT[_T], ...]:
-    r"""
-    Memoized adaptation of `Ilmari Karonen’s optimization <https://rpg.stackexchange.com/a/166663/71245>`_ that yields three-tuples of `(outcomes, numerator, denominator)` for selecting *k* outcomes from *n* rolls of *h*.
-    `numerator / denominator` is the probability of that specific outcome selection.
-
-    Uses integer arithmetic throughout to avoid `Fraction` overhead.
-    """
-
-    def _roll_probs() -> Iterator[RollProbT]:
-        if len(h) <= 1:
-            yield tuple(h) * k, 1, 1
-        else:
-            this_total = h.total**n
-            this_outcome = next(reversed(tuple(h))) if from_right else next(iter(h))
-            c_outcome = h[this_outcome]
-            rest_total = h.total - c_outcome
-            next_h: H[_T] = H(
-                {
-                    outcome: count
-                    for outcome, count in h.items()
-                    if outcome != this_outcome
-                }
-            )
-            cumulative_nmr8r = 0
-
-            for i in range(k + 1):
-                head = (this_outcome,) * i
-                if i < k:
-                    head_count = comb(n, i) * c_outcome**i * rest_total ** (n - i)
-                    cumulative_nmr8r += head_count
-                    for tail, tail_nmr8r, tail_dnmn8r in _selected_distros_memoized(
-                        next_h, n - i, k - i, from_right=from_right
-                    ):
-                        whole = tail + head if from_right else head + tail
-                        nmr8r = head_count * tail_nmr8r
-                        dnmn8r = this_total * tail_dnmn8r
-                        g = gcd(nmr8r, dnmn8r)
-                        yield whole, nmr8r // g, dnmn8r // g
-                else:
-                    nmr8r = this_total - cumulative_nmr8r
-                    g = gcd(nmr8r, this_total)
-                    yield head, nmr8r // g, this_total // g
-
-    return tuple(_roll_probs())
-
-
-def _rwc_homogeneous_n_h_using_partial_selection(
-    n: int,
-    h: H[_T],
-    k: int,
-    fill: _T | None = None,
-) -> Iterator[RollCountT[_T]]:
-    r"""
-    Yields `(roll, count)` pairs for selecting *k* outcomes from *n* rolls of *h*.
-    If *fill* is not `None` and `abs(k) < n`, unselected positions in each roll are padded with *fill* to preserve positional indexing.
-    """
-    from_right = k < 0
-    k = abs(k)
-    if k == 0 or k > n:
-        return  # pragma: no cover
-    total_count = h.total**n
-    for outcomes, prob_nmr8r, prob_dnmn8r in _selected_distros_memoized(
-        h, n, k, from_right=from_right
-    ):
-        count = total_count * prob_nmr8r // prob_dnmn8r
-        if fill is not None:
-            outcomes = (  # ruff: ignore[redefined-loop-name]
-                (fill,) * (n - k) + outcomes
-                if from_right
-                else outcomes + (fill,) * (n - k)
-            )
-        yield outcomes, count
-
-
-@overload
-def _rwc_heterogeneous_h_groups(
-    h_groups: Iterable[tuple[H[_T], int]],
-    k: None,
-) -> Iterator[RollCountT[_T]]: ...
-@overload
-def _rwc_heterogeneous_h_groups(
-    h_groups: Iterable[tuple[H[_T], int]],
-    k: int,
-) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]: ...
-def _rwc_heterogeneous_h_groups(
-    h_groups: Iterable[tuple[H[_T], int]],
-    k: int | None,
-) -> Iterator[RollCountT[_T | _MinFill | _MaxFill]]:
-    r"""
-    Given an iterable of `(histogram, count)` pairs, yields `(roll, count)` pairs for the Cartesian product of all groups.
-    When *k* is not `None`, it signals which outcomes are selected, enabling the homogeneous partial-selection optimization within each group.
-    """
-    groups = list(h_groups)
-    total_n = sum(gn for _, gn in groups)
-    for v in product(
-        *(
-            _rwc_homogeneous_n_h_using_partial_selection(
-                gn, gh, k if k is not None and abs(k) < gn else gn
-            )
-            for gh, gn in groups
-        )
-    ):
-        # It's possible v is () if h_groups is empty. See
-        # <https://stackoverflow.com/questions/3154301/> for a detailed discussion.
-        if not v:
-            continue  # pragma: no cover
-
-        rolls_by_group, counts_by_group = zip(*v, strict=True)
-        total_count = prod(counts_by_group)
-        sorted_roll_list = list(chain(*rolls_by_group))
-        try:
-            sorted_roll_list.sort()
-        except TypeError:
-            sorted_roll_list.sort(key=natural_key)
-        sorted_roll = tuple(sorted_roll_list)
-        if k is not None:
-            if k < 0:
-                sorted_roll = (_MIN_FILL,) * (total_n - len(sorted_roll)) + sorted_roll
-            else:
-                sorted_roll = sorted_roll + (_MAX_FILL,) * (total_n - len(sorted_roll))
-        yield sorted_roll, total_count
-
-
-def _rwc_heterogeneous_extremes(  # ruff: ignore[complex-structure]
-    groups: Iterable[tuple[H[_T], int]],
-    lo: int,
-    hi: int,
-) -> Iterator[RollCountT[_T]]:
-    r"""
-    Yields `((min_val, max_val), count)` pairs for a heterogeneous pool where exactly the single lowest (*lo* = 1) and single highest (*hi* = 1) sorted outcomes are selected.
-
-    **Why this is fast**
-
-    Naive enumeration visits every element of the Cartesian product of all dice faces (`#!math O\!\left(\prod_i |\text{faces}_i\right)` outcomes) and sorts each roll.
-    For `#!math P(d4, d6, d8, d10, d12, d20)` that is `#!math 4 \times 6 \times 8 \times 10 \times 12 \times 20 = 460{,}800` rolls.
-
-    This function instead iterates over outcome *pairs* `#!math (a, b)` with `#!math a \le b` drawn from the union of all faces, and for each pair computes the count in `#!math O(n)` time using the inclusion-exclusion formula below.
-    Total work is `#!math O(|V|^2 \times n)`, which is roughly 190&times; faster for the example above (~2,400 ops).
-
-    **Inclusion-exclusion formula**
-
-    For each pair `#!math (a, b)` with `#!math a \le b`, the number of ways to roll the pool such that the overall minimum is exactly `#!math a` and the overall maximum is exactly `#!math b` is:
-
-    ```math
-    \text{count}(\min{=}a,\,\max{=}b)
-    = N[a,b] - N(a,b] - N[a,b) + N(a,b)
-    ```
-
-    where `#!math N(I)` denotes the product over all dice of the count of that die’s outcomes that fall in interval `#!math I`.
-    The four terms correspond to the four ways of making each of the two boundary values strict or non-strict:
-
-    | term                  | lower bound       | upper bound       | sign |
-    |-----------------------|-------------------|-------------------|------|
-    | `#!math N[a,b]`       | `#!math v \ge a`  | `#!math v \le b`  | +    |
-    | `#!math N(a,b]`       | `#!math v > a`    | `#!math v \le b`  | −    |
-    | `#!math N[a,b)`       | `#!math v \ge a`  | `#!math v < b`    | −    |
-    | `#!math N(a,b)`       | `#!math v > a`    | `#!math v < b`    | +    |
-
-    This works because "min `#!math > a`" is equivalent to "all dice `#!math > a`", and "max `#!math < b`" is equivalent to "all dice `#!math < b`".
-    Each constraint reduces to an "all-dice-in-interval" event, which factorizes as a product over dice.
-    That factorization is what makes the formula `#!math O(n)` per pair rather than `#!math O(n^k)`.
-
-    **Why this does not extend cleanly to lo > 1 or hi > 1**
-
-    For `#!math (lo, hi) = (2, 1)`, the analogous formula would need to handle the constraint "2nd-minimum `#!math > a_1`", which means "at most 1 die `#!math \le a_1`".
-    That event does *not* factorize as a product over dice (it is a sum of `#!math n+1` product terms via a generating-function expansion), so the `#!math O(n)`-per-tuple structure breaks down.
-    Extension to larger `#!math (lo, hi)` is theoretically possible using polynomial coefficient extraction, but requires substantially more complex machinery.
-
-    **Why interior (arbitrary non-extremes) heterogeneous selections have no fast path**
-
-    For selections that are neither a prefix, a suffix, nor the min+max extremes (e.g. the 2nd and 4th positions out of 5), the constraint on the selected positions involves interior order statistics ("exactly `#!math k` dice fall in region `#!math R`"), which cannot be expressed as an "all-dice-in-interval" product event for heterogeneous dice.
-    The multinomial partition formula that works for homogeneous dice (see e.g. [math.stackexchange.com/q/4173084](https://math.stackexchange.com/questions/4173084)) does not factorize per-die when faces differ, so those cases fall back to full Cartesian-product enumeration.
-    For homogeneous pools the existing `_rwc_homogeneous_n_h_using_partial_selection` path (Ilmari Karonen’s DP) already handles all selection patterns efficiently.
-    """
-    assert lo == 1 and hi == 1, "only (lo=1, hi=1) is currently supported"  # ruff: ignore[pytest-composite-assertion]
-    all_dice: list[H[_T]] = [h for h, n in groups for _ in range(n)]
-    all_outcome_set: set[Any] = {v for h in all_dice for v in h}
-    all_outcomes = list(all_outcome_set)
-    try:
-        all_outcomes.sort()
-        use_natural = False
-    except TypeError:
-        all_outcomes.sort(key=natural_key)
-        use_natural = True
-
-    for i_a, a in enumerate(all_outcomes):
-        for b in all_outcomes[i_a:]:
-            n_ab = n_slo = n_shi = n_sbo = 1
-            for h in all_dice:
-                c_ab = c_slo = c_shi = c_sbo = 0
-                for v, c in h.items():
-                    if use_natural:
-                        nk_v, nk_a, nk_b = (
-                            natural_key(v),
-                            natural_key(a),
-                            natural_key(b),
-                        )
-                        ge_a, le_b = nk_v >= nk_a, nk_v <= nk_b  # ty: ignore[unsupported-operator]
-                        gt_a, lt_b = nk_v > nk_a, nk_v < nk_b  # ty: ignore[unsupported-operator]
-                    else:
-                        ge_a, le_b = v >= a, v <= b
-                        gt_a, lt_b = v > a, v < b
-                    if ge_a and le_b:
-                        c_ab += c
-                        if gt_a:
-                            c_slo += c
-                        if lt_b:
-                            c_shi += c
-                            if gt_a:
-                                c_sbo += c
-                n_ab *= c_ab
-                n_slo *= c_slo
-                n_shi *= c_shi
-                n_sbo *= c_sbo
-            count = n_ab - n_slo - n_shi + n_sbo
-            if count > 0:
-                yield (a, b), count

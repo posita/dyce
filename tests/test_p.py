@@ -16,7 +16,7 @@
 import operator
 import warnings
 from collections import Counter
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from decimal import Decimal
 from fractions import Fraction
 from itertools import chain, combinations_with_replacement, groupby
@@ -30,24 +30,14 @@ import pytest
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
 from dyce.p import (
-    _MAX_FILL,
-    _MIN_FILL,
     RollCountT,
     RollT,
-    _analyze_selection,
-    _rwc_heterogeneous_extremes,
-    _rwc_homogeneous_n_h_using_partial_selection,
-    _SelectionEmpty,
-    _SelectionExtremes,
-    _SelectionPrefix,
-    _SelectionSinglePos,
-    _SelectionSuffix,
-    _SelectionUniform,
+    _WhichRollSurveyor,
 )
-from dyce.types import BeartypeCallHintViolation, GetItemT, natural_key
+from dyce.types import BeartypeCallHintViolation, GetItemT, getitems, natural_key
 
 from .test_h import _OUTCOME_TYPES
-from .test_types import _NoCompare
+from .test_types import NoCompare, NoCompareCanOnlyAdd
 
 __all__ = ()
 
@@ -129,7 +119,7 @@ class TestPInit:
         from dyce import p as p_module
 
         hs = [
-            H({_NoCompare(str(i**2 * (-1) ** i) + "abc" + str(-i)) for i in range(n)})
+            H({NoCompare(str(i**2 * (-1) ** i) + "abc" + str(-i)) for i in range(n)})
             for n in range(1, 6)
         ]
         with patch.object(
@@ -140,11 +130,11 @@ class TestPInit:
         assert (
             str(list(p))
             == "[H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1}), H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}), H({1: 1, 2: 1, 3: 1, 4: 1}), "
-            "H({_NoCompare('0abc0'): 1, _NoCompare('4abc-2'): 1, _NoCompare('16abc-4'): 1, _NoCompare('-1abc-1'): 1, _NoCompare('-9abc-3'): 1}), "
-            "H({_NoCompare('0abc0'): 1, _NoCompare('4abc-2'): 1, _NoCompare('-1abc-1'): 1, _NoCompare('-9abc-3'): 1}), "
-            "H({_NoCompare('0abc0'): 1, _NoCompare('4abc-2'): 1, _NoCompare('-1abc-1'): 1}), "
-            "H({_NoCompare('0abc0'): 1, _NoCompare('-1abc-1'): 1}), "
-            "H({_NoCompare('0abc0'): 1})]"
+            "H({NoCompare('0abc0'): 1, NoCompare('4abc-2'): 1, NoCompare('16abc-4'): 1, NoCompare('-1abc-1'): 1, NoCompare('-9abc-3'): 1}), "
+            "H({NoCompare('0abc0'): 1, NoCompare('4abc-2'): 1, NoCompare('-1abc-1'): 1, NoCompare('-9abc-3'): 1}), "
+            "H({NoCompare('0abc0'): 1, NoCompare('4abc-2'): 1, NoCompare('-1abc-1'): 1}), "
+            "H({NoCompare('0abc0'): 1, NoCompare('-1abc-1'): 1}), "
+            "H({NoCompare('0abc0'): 1})]"
         )
 
 
@@ -742,16 +732,16 @@ class TestPH:
     def test_no_args_weird_single(
         self,
     ) -> None:
-        h = H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2})
+        h = H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2})
         p_weird = P(h)
-        assert p_weird.h() == h
+        assert p_weird.h() == h  # type: ignore[call-arg] # ty: ignore[no-matching-overload]
 
     def test_no_args_weird_multiple_raises(
         self,
     ) -> None:
         p_weird = 2 @ P(
-            H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2}),
-            H({_NoCompare("oh-03"): 3, _NoCompare("oh-04"): 4}),
+            H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2}),
+            H({NoCompare("oh-03"): 3, NoCompare("oh-04"): 4}),
         )
         with (  # ruff: ignore[pytest-raises-with-multiple-statements]
             pytest.raises(
@@ -761,7 +751,7 @@ class TestPH:
             warnings.catch_warnings(record=True) as w,
         ):
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
-            p_weird.h()
+            p_weird.h()  # type: ignore[call-arg] # ty: ignore[no-matching-overload]
 
         # TODO(posita): # ruff: ignore[missing-todo-link] - Is this really the right
         # logic? It "works", but beartype kills the transgression before the warning is
@@ -770,79 +760,77 @@ class TestPH:
             assert len(w) == 1
             assert issubclass(w[0].category, _ConvolveFallbackWarning)
 
-    def test_which_selects_all_shortcuts(self) -> None:
-        p = _PatchableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            assert p.h(slice(None)) == p.h()
-            mock.assert_not_called()
-
-    def test_which_selects_all_exactly_n_times_still_shortcuts(self) -> None:
-        p = _PatchableP(2 @ P(H({1: 1, 2: 2}), H({3: 1, 4: 1})))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            assert p.h(slice(None), slice(None), slice(None)) == 3 * p.h()
-            mock.assert_not_called()
-
-    def test_which_selects_all_exactly_n_times_still_shortcuts_with_operation_aware_outcomes(
+    def test_which_selects_all_exactly_n_times_with_operation_aware_outcomes(
         self,
     ) -> None:
         for p in (
-            _PatchableP(2 @ P(H({"one_": 1, "two_": 2}), H({"three_": 1, "four_": 1}))),
+            _PatchableP(
+                2 @ P(H({("one",): 1, ("two",): 2}), H({("three",): 1, ("four",): 1}))
+            ),
             *(
                 _PatchableP(2 @ H(o_type(i) for i in range(10)))
                 for o_type in _OUTCOME_TYPES
             ),
         ):
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                p_h = p.h(slice(None), slice(None), slice(None))
-                assert p_h == 3 * p.h()
-                assert type(next(iter(p_h.outcomes()))) is type(
-                    next(iter(p[0].outcomes()))
+            p_h = p.h(slice(None), slice(None), slice(None))
+            expected = H.from_counts(
+                (
+                    (
+                        tuple(sorted(outcome))
+                        if isinstance(outcome, Iterable)
+                        else outcome
+                    ),
+                    count,
                 )
-                mock.assert_not_called()
+                for outcome, count in (3 * p.h()).items()
+            )
+            assert p_h == expected
+            assert type(next(iter(p_h.outcomes()))) is type(next(iter(p[0].outcomes())))
 
     def test_which_single_index_weird_outcomes(
         self,
     ) -> None:
         p = 2 @ P(H({1: 1, 2: 2}), H({3: 3, 4: 4}))
         p_weird = 2 @ P(
-            H({_NoCompare("oh-01"): 1, _NoCompare("oh-02"): 2}),
-            H({_NoCompare("oh-03"): 3, _NoCompare("oh-04"): 4}),
+            H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2}),
+            H({NoCompare("oh-03"): 3, NoCompare("oh-04"): 4}),
         )
         p_h_lo = p.h(0)
         assert repr(p_weird.h(0)) == repr(
-            H({_NoCompare("oh-01"): p_h_lo[1], _NoCompare("oh-02"): p_h_lo[2]})
+            H({NoCompare("oh-01"): p_h_lo[1], NoCompare("oh-02"): p_h_lo[2]})
         )
         p_h_hi = p.h(-1)
         assert repr(p_weird.h(-1)) == repr(
-            H({_NoCompare("oh-03"): p_h_hi[3], _NoCompare("oh-04"): p_h_hi[4]})
+            H({NoCompare("oh-03"): p_h_hi[3], NoCompare("oh-04"): p_h_hi[4]})
         )
         for i in range(len(p_weird)):
             assert type(next(iter(p_weird.h(i).outcomes()))) is type(
                 next(iter(p_weird[i].outcomes()))
             )
 
-    def test_which_selects_all_exactly_n_times_falls_back_with_weird_outcomes(
+    def test_which_selects_all_exactly_n_times_with_weird_outcomes(
         self,
     ) -> None:
         p = _PatchableP(
             2
             @ P(
-                H({_NoCompareCanOnlyAdd("one"): 1, _NoCompareCanOnlyAdd("two"): 2}),
-                H({_NoCompareCanOnlyAdd("three"): 1, _NoCompareCanOnlyAdd("four"): 1}),
+                H({NoCompareCanOnlyAdd("one"): 1, NoCompareCanOnlyAdd("two"): 2}),
+                H({NoCompareCanOnlyAdd("three"): 1, NoCompareCanOnlyAdd("four"): 1}),
             )
         )
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            p_h = p.h(slice(None), slice(None), slice(None))
-            assert type(next(iter(p_h.outcomes()))) is type(next(iter(p[0].outcomes())))
-            mock.assert_called()
+        p_h: H[Any] = p.h(slice(None), slice(None), slice(None))
+        assert tuple((str(outcome), count) for outcome, count in p_h.items()) == (
+            ("four+four+four+four+four+four+one+one+one+one+one+one", 1),
+            ("four+four+four+four+four+four+one+one+one+two+two+two", 4),
+            ("four+four+four+four+four+four+two+two+two+two+two+two", 4),
+            ("four+four+four+one+one+one+one+one+one+three+three+three", 2),
+            ("four+four+four+one+one+one+three+three+three+two+two+two", 8),
+            ("four+four+four+three+three+three+two+two+two+two+two+two", 8),
+            ("one+one+one+one+one+one+three+three+three+three+three+three", 1),
+            ("one+one+one+three+three+three+three+three+three+two+two+two", 4),
+            ("three+three+three+three+three+three+two+two+two+two+two+two", 4),
+        )
+        assert type(next(iter(p_h.outcomes()))) is type(next(iter(p[0].outcomes())))
 
     def test_which_equivalence_with_rwc(self) -> None:
         # h(*which) must agree with manually accumulating rolls_with_counts(*which)
@@ -933,168 +921,7 @@ class TestPH:
         assert P().h(slice(0, 1)) == H({})
         assert P().h(slice(-2, -1)) == H({})
 
-
-class TestPHSinglePosFastPath:
-    # For single-position selection on a HOMOGENEOUS pool, `P.h` should
-    # short-circuit to `H.order_stat_for_n_at_pos` and skip
-    # `rolls_with_counts` entirely. The fast path applies for any of the
-    # three single-position selection variants:
-    #   - `_SelectionSinglePos(pos)` (true-middle, e.g. `p.h(2)` on a 5-pool)
-    #   - `_SelectionPrefix(max_index=1, is_single_non_repeated=True)` (lowest, e.g. `p.h(0)`)
-    #   - `_SelectionSuffix(min_index=-1, is_single_non_repeated=True)` (highest, e.g. `p.h(-1)`)
-    # For heterogeneous pools and for multi-position selections, the
-    # existing `rolls_with_counts` path remains in use (hetero composition
-    # is a separate later step).
-
-    # ---- Homogeneous: fast path taken (rolls_with_counts NOT called) ----
-
-    def test_homogeneous_highest_via_suffix_minus1_shortcuts(self) -> None:
-        p = _PatchableP(2 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(-1)
-        assert result == H.from_counts(
-            (sum(roll[1:], start=roll[0]), count)
-            for roll, count in p.rolls_with_counts(-1)
-        )
-        mock.assert_not_called()
-
-    def test_homogeneous_highest_via_suffix_multiple_minus1_falls_through(self) -> None:
-        p = _PatchableP(2 @ P(10))
-        for which in (
-            (-1, -1),
-            (-1, len(p) - 1),
-            (len(p) - 1, -1),
-            (len(p) - 1, len(p) - 1),
-        ):
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(*which)
-            assert result == H.from_counts(
-                (sum(roll[1:], start=roll[0]), count)
-                for roll, count in p.rolls_with_counts(*which)
-            )
-            mock.assert_called()
-
-    def test_homogeneous_lowest_via_prefix_0_shortcuts(self) -> None:
-        p = _PatchableP(2 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(0)
-        assert result == H.from_counts(
-            (sum(roll[1:], start=roll[0]), count)
-            for roll, count in p.rolls_with_counts(0)
-        )
-        mock.assert_not_called()
-
-    def test_homogeneous_lowest_via_multiple_prefix_0_falls_through(self) -> None:
-        p = _PatchableP(2 @ P(10))
-        for which in (
-            (0, 0),
-            (0, -len(p)),
-            (-len(p), 0),
-            (-len(p), -len(p)),
-        ):
-            with patch.object(
-                p, "rolls_with_counts", side_effect=p.rolls_with_counts
-            ) as mock:
-                result = p.h(*which)
-            assert result == H.from_counts(
-                (sum(roll[1:], start=roll[0]), count)
-                for roll, count in p.rolls_with_counts(*which)
-            )
-            mock.assert_called()
-
-    def test_homogeneous_middle_via_single_pos_shortcuts(self) -> None:
-        p = _PatchableP(5 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(2)  # 3rd-lowest of 5d6
-        # Cross-check against the same H produced via order_stat directly.
-        assert result == H(6).order_stat_for_n_at_pos(5, 2)
-        assert result == H.from_counts(
-            (sum(roll[1:], start=roll[0]), count)
-            for roll, count in p.rolls_with_counts(2)
-        )
-        mock.assert_not_called()
-
-    def test_homogeneous_middle_via_multiple_single_pos_falls_through(self) -> None:
-        p = _PatchableP(5 @ P(6))
-        which = 2, 2  # 3rd-lowest of 5d6 (twice)
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(*which)
-        # Cross-check against the same H produced via order_stat directly.
-        assert result == H.from_counts(
-            (sum(roll[1:], start=roll[0]), count)
-            for roll, count in p.rolls_with_counts(*which)
-        )
-        mock.assert_called()
-
-    def test_homogeneous_via_slice_form_shortcuts(self) -> None:
-        # `p.h(slice(2, 3))` should also route through the fast path
-        p = _PatchableP(5 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(slice(2, 3))
-        assert result == H(6).order_stat_for_n_at_pos(5, 2)
-        mock.assert_not_called()
-
-    def test_homogeneous_via_negative_int_shortcuts(self) -> None:
-        # `p.h(-2)` selects second-from-top on a 5-pool, which is the middle position 3
-        p = _PatchableP(5 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            result = p.h(-2)
-        assert result == H(6).order_stat_for_n_at_pos(5, 3)
-        mock.assert_not_called()
-
-    # ---- Heterogeneous: fast path NOT taken (rolls_with_counts called) ----
-
-    def test_heterogeneous_single_pos_falls_through(self) -> None:
-        # Hetero composition is deferred. For now hetero pools take the existing path.
-        p = _PatchableP(P(H(4), H(6), H(8)))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(-1)
-        mock.assert_called()
-
-    # ---- Multi-position: fast path NOT taken (rolls_with_counts called) ----
-
-    def test_homogeneous_multi_position_falls_through(self) -> None:
-        # `p.h(slice(0, 2))` selects two positions; no closed-form fast path. Existing
-        # partial-selection logic in `rolls_with_counts` is still the right tool.
-        p = _PatchableP(5 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(slice(0, 2))
-        mock.assert_called()
-
-    def test_homogeneous_multi_position_with_multiplicity_falls_through(self) -> None:
-        # `p.h(2, 2)` selects position 2 twice. Multi-call so NOT a single-position
-        # selection. Falls through.
-        p = _PatchableP(5 @ P(6))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(2, 2)
-        mock.assert_called()
-
-    # ---- Sanity: single-die pool short-circuits trivially ----
-
     def test_single_die_pool_via_h_returns_self_for_minus_1(self) -> None:
-        # A 1-die pool's "highest 1" is just the underlying H itself. This case
-        # currently flows through the `len(self) == 1` branch at the top of `P.h(no
-        # args)`, but `P.h(-1)` and `P.h(0)` should also work via the new fast path.
         p = P(6)
         assert p.h(-1) == H(6)
         assert p.h(0) == H(6)
@@ -1111,42 +938,6 @@ class TestPHSinglePosFastPath:
     # `rolls_with_counts` on the *original* pool should still see zero
     # calls. The recursive call may or may not exercise
     # `rolls_with_counts` internally (separate object), and that's fine.
-
-    def test_heterogeneous_max_with_multi_die_group_decomposes(self) -> None:
-        p = _PatchableP(H(4), 2 @ P(6), 3 @ P(8))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(-1)
-        mock.assert_not_called()
-
-    def test_heterogeneous_min_with_multi_die_group_decomposes(self) -> None:
-        p = _PatchableP(H(4), 2 @ P(6), 3 @ P(8))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(0)
-        mock.assert_not_called()
-
-    def test_heterogeneous_all_size_1_groups_falls_through(self) -> None:
-        # P(d6, d8).h(-1) -- both groups size 1. No decomposition would change anything.
-        # Existing path handles 2-die hetero pool.
-        p = _PatchableP(H(6), H(8))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(-1)
-        mock.assert_called()
-
-    def test_heterogeneous_middle_pos_falls_through(self) -> None:
-        # No closed form for middle-pos on heterogeneous pool. Falls through even if a
-        # group has n_g > 1.
-        p = _PatchableP(3 @ P(6), 2 @ P(8))
-        with patch.object(
-            p, "rolls_with_counts", side_effect=p.rolls_with_counts
-        ) as mock:
-            _ = p.h(2)
-        mock.assert_called()
 
     def test_heterogeneous_max_matches_brute_force(self) -> None:
         # Cross-check the decomposed result against brute-force enumeration on a
@@ -1240,8 +1031,8 @@ class TestPRollsWithCounts:
 
     def test_which_index_lowest_and_highest(self) -> None:
         p = 3 @ P(6)
-        lo_hi = sorted(p.rolls_with_counts(0, -1))
-        expected = sorted(((r[0], r[-1]), c) for r, c in p.rolls_with_counts())
+        lo_hi = H.from_counts(p.rolls_with_counts(0, -1))
+        expected = H.from_counts(((r[0], r[-1]), c) for r, c in p.rolls_with_counts())
         assert lo_hi == expected
 
     def test_simple_known_output(self) -> None:
@@ -1254,9 +1045,7 @@ class TestPRollsWithCounts:
     def test_may_yield_rolls_more_than_once(self) -> None:
         assert sorted(P(H(2), H(3)).rolls_with_counts()) == [
             ((1, 1), 1),
-            ((1, 2), 1),
-            # Originated as ((2, 1), 1), but outcomes get sorted in each roll
-            ((1, 2), 1),
+            ((1, 2), 2),
             ((1, 3), 1),
             ((2, 2), 1),
             ((2, 3), 1),
@@ -1290,50 +1079,38 @@ class TestPRollsWithCounts:
             slice(0, 4),
             slice(-4, None),
         ):
-            using_partial_selection = _rwc_validation_helper(p_4df, which)
-            assert using_partial_selection.call_args_list == [
-                call(4, H({-1: 1, 0: 1, 1: 1}), k=4)
-            ]
+            indices = tuple(range(len(p_4df)))
+            selected = tuple(getitems(indices, (which,)))
+            which_roll_surveyor_mock = _rwc_validation_helper(p_4df, which)
+            which_roll_surveyor_mock.assert_has_calls([call(p_4df, selected)])
         # 1 outcome from left (each distinct position)
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 1))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=1, fill=0)
-        ]
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(1, 2))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=2, fill=0)
-        ]
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(2, 3))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=-2, fill=0)
-        ]
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(3, 4))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=-1, fill=0)
-        ]
-        # No outcomes (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(0, 0))
-        assert using_partial_selection.call_args_list == []
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(0, 1))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (0,))]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(1, 2))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (1,))]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(2, 3))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (2,))]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(3, 4))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (3,))]
+        # No outcomes (early-exit before P.survey)
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(0, 0))
+        assert which_roll_surveyor_mock.call_args_list == []
         # 2 outcomes from right
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(2, 4))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=-2, fill=0)
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(2, 4))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (2, 3))]
         # Non-contiguous
-        using_partial_selection = _rwc_validation_helper(p_4df, 1, 3)
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-1: 1, 0: 1, 1: 1}), k=-3, fill=0)
-        ]
-        # Off the deep end (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(5, 7))
-        assert using_partial_selection.call_args_list == []
-        using_partial_selection = _rwc_validation_helper(p_4df, slice(-7, -5))
-        assert using_partial_selection.call_args_list == []
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, 1, 3)
+        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (1, 3))]
+        # Off the deep end (early-exit before P.survey)
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(5, 7))
+        assert which_roll_surveyor_mock.call_args_list == []
+        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(-7, -5))
+        assert which_roll_surveyor_mock.call_args_list == []
 
     def test_heterogeneous_vs_known_correct(self) -> None:
-        p_d3 = P(3)
-        p_d4n = P(-4)
-        p_3d3_4d4n = P(3 @ p_d3, 4 @ p_d4n)
+        p_3 = P(H({i: i for i in range(1, 4)}))
+        p_4n = P(H({-i: i for i in range(1, 5)}))
+        p_3x3_4x4n = P(3 @ p_3, 4 @ p_4n)
         for which in (
             # All outcomes
             slice(None),
@@ -1343,128 +1120,44 @@ class TestPRollsWithCounts:
             # Middle bit
             slice(2, 4),
         ):
-            using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, which)
-            using_partial_selection.assert_has_calls(
-                [
-                    call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 4),
-                    call(3, H({1: 1, 2: 1, 3: 1}), 3),
-                ]
-            )
+            indices = tuple(range(len(p_3x3_4x4n)))
+            selected = tuple(getitems(indices, (which,)))
+            which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, which)
+            which_roll_surveyor_mock.assert_has_calls([call(p_3x3_4x4n, selected)])
         # 3 outcomes from left
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(3))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 3),
-            call(3, H({1: 1, 2: 1, 3: 1}), 3),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(3))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1, 2))]
         # 3 outcomes from right
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-3, None))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -3),
-            call(3, H({1: 1, 2: 1, 3: 1}), 3),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-3, None))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (4, 5, 6))]
         # 2 outcomes from left
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(2))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 2),
-            call(3, H({1: 1, 2: 1, 3: 1}), 2),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(2))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1))]
         # 2 outcomes from right
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-2, None))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -2),
-            call(3, H({1: 1, 2: 1, 3: 1}), -2),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-2, None))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (5, 6))]
         # 1 outcome from left
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(1))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 1),
-            call(3, H({1: 1, 2: 1, 3: 1}), 1),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(1))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0,))]
         # 1 outcome from right
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-1, None))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -1),
-            call(3, H({1: 1, 2: 1, 3: 1}), -1),
-        ]
-        # No outcomes (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(0, 0))
-        assert using_partial_selection.call_args_list == []
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-1, None))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (6,))]
+        # No outcomes (early-exit before P.survey)
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(0, 0))
+        assert which_roll_surveyor_mock.call_args_list == []
         # Non-contiguous
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, 1, 3)
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 4),
-            call(3, H({1: 1, 2: 1, 3: 1}), 3),
-        ]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, 1, 3)
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (1, 3))]
         # Near the combined-roll ends but outside any sub-pool
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(5, 7))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), -2),
-            call(3, H({1: 1, 2: 1, 3: 1}), -2),
-        ]
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-7, -5))
-        assert using_partial_selection.call_args_list == [
-            call(4, H({-4: 1, -3: 1, -2: 1, -1: 1}), 2),
-            call(3, H({1: 1, 2: 1, 3: 1}), 2),
-        ]
-        # Off the deep end (early-exit before _rwc_homogeneous_n_h_using_partial_selection)
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(7, 9))
-        assert using_partial_selection.call_args_list == []
-        using_partial_selection = _rwc_validation_helper(p_3d3_4d4n, slice(-9, -7))
-        assert using_partial_selection.call_args_list == []
-
-
-class TestFillSentinels:
-    def test_min_fill_hash(self) -> None:
-        assert {_MIN_FILL: 1}[_MIN_FILL] == 1
-
-    def test_min_fill_repr(self) -> None:
-        assert repr(_MIN_FILL) == "_MinFill()"
-
-    def test_min_fill_lt(self) -> None:
-        assert _MIN_FILL < 0
-        assert not (_MIN_FILL < _MIN_FILL)
-
-    def test_min_fill_le(self) -> None:
-        assert _MIN_FILL <= 0
-        assert _MIN_FILL <= _MIN_FILL
-
-    def test_min_fill_ge(self) -> None:
-        assert not (_MIN_FILL >= 0)
-        assert _MIN_FILL >= _MIN_FILL
-
-    def test_min_fill_eq(self) -> None:
-        assert _MIN_FILL == _MIN_FILL
-        assert _MIN_FILL != 0
-
-    def test_min_fill_gt(self) -> None:
-        assert not (_MIN_FILL > 0)
-        assert not (_MIN_FILL > _MIN_FILL)
-
-    def test_max_fill_hash(self) -> None:
-        assert {_MAX_FILL: 1}[_MAX_FILL] == 1
-
-    def test_max_fill_repr(self) -> None:
-        assert repr(_MAX_FILL) == "_MaxFill()"
-
-    def test_max_fill_lt(self) -> None:
-        assert not (_MAX_FILL < 0)
-        assert not (_MAX_FILL < _MAX_FILL)
-
-    def test_max_fill_le(self) -> None:
-        assert not (_MAX_FILL <= 0)
-        assert _MAX_FILL <= _MAX_FILL
-
-    def test_max_fill_eq(self) -> None:
-        assert _MAX_FILL == _MAX_FILL
-        assert _MAX_FILL != 0
-
-    def test_max_fill_ge(self) -> None:
-        assert _MAX_FILL >= 0
-        assert _MAX_FILL >= _MAX_FILL
-
-    def test_max_fill_gt(self) -> None:
-        assert _MAX_FILL > 0
-        assert not (_MAX_FILL > _MAX_FILL)
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(5, 7))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (5, 6))]
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-7, -5))
+        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1))]
+        # Off the deep end (early-exit before P.survey)
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(7, 9))
+        assert which_roll_surveyor_mock.call_args_list == []
+        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-9, -7))
+        assert which_roll_surveyor_mock.call_args_list == []
 
 
 def test_first_principles() -> None:
@@ -1489,159 +1182,6 @@ def test_first_principles() -> None:
         ):
             multinomial[roll] += count
         assert brute_force == multinomial
-
-
-def test_analyze_selection() -> None:
-    # Prefix: only the first lo positions selected
-    assert _analyze_selection(6, (0,)) == _SelectionPrefix(
-        max_index=1, is_single_non_repeated=True
-    )
-    assert _analyze_selection(6, (0, 1, 0, 0, 1)) == _SelectionPrefix(
-        max_index=2, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (0, 1, 0, 0, 1, 4)) == _SelectionPrefix(
-        max_index=5, is_single_non_repeated=False
-    )
-    # Single-position selections at a true-middle index return _SelectionSinglePos
-    # rather than Prefix/Suffix. End-position single-position selections (pos == 0, pos
-    # == n-1) still return _SelectionPrefix(1, is_single_non_repeated=True) /
-    # _SelectionSuffix(-1, is_single_non_repeated=True) for compatibility with
-    # P.rolls_with_counts's `k`-based partial-selection optimization.
-    assert _analyze_selection(6, (2, 3)) == _SelectionPrefix(
-        max_index=4, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (1, 2, 3)) == _SelectionPrefix(
-        max_index=4, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (1, 3)) == _SelectionPrefix(
-        max_index=4, is_single_non_repeated=False
-    )
-    assert _analyze_selection(5, (1, 2)) == _SelectionPrefix(
-        max_index=3, is_single_non_repeated=False
-    )
-
-    # Suffix: only the last hi positions selected
-    assert _analyze_selection(6, (-1,)) == _SelectionSuffix(
-        min_index=-1, is_single_non_repeated=True
-    )
-    assert _analyze_selection(6, (5, 1, 5, 5, 1, 4)) == _SelectionSuffix(
-        min_index=-5, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (2, 3, 4)) == _SelectionSuffix(
-        min_index=-4, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (2, 4)) == _SelectionSuffix(
-        min_index=-4, is_single_non_repeated=False
-    )
-    assert _analyze_selection(5, (2, 3)) == _SelectionSuffix(
-        min_index=-3, is_single_non_repeated=False
-    )
-
-    # Uniform: every position selected the same number of times
-    assert _analyze_selection(6, tuple(range(6))) == _SelectionUniform(times=1)
-    assert _analyze_selection(6, tuple(range(0, -6, -1))) == _SelectionUniform(times=1)
-    assert _analyze_selection(
-        6, tuple(range(6)) + tuple(range(0, -6, -1))
-    ) == _SelectionUniform(times=2)
-    assert _analyze_selection(6, (slice(None),)) == _SelectionUniform(times=1)
-    assert _analyze_selection(
-        6, (slice(0, None), slice(-6, None))
-    ) == _SelectionUniform(times=2)
-
-    # Extremes: lo lowest + hi highest, with at least one unselected interior position
-    assert _analyze_selection(6, (0, -1)) == _SelectionExtremes(lo=1, hi=1)
-    assert _analyze_selection(6, (-1, 0)) == _SelectionExtremes(
-        lo=1, hi=1
-    )  # order-independent
-    assert _analyze_selection(6, (0, 1, -1)) == _SelectionExtremes(lo=2, hi=1)
-    assert _analyze_selection(6, (0, -2, -1)) == _SelectionExtremes(lo=1, hi=2)
-    assert _analyze_selection(6, (0, 1, -2, -1)) == _SelectionExtremes(lo=2, hi=2)
-    assert _analyze_selection(3, (0, 2)) == _SelectionExtremes(
-        lo=1, hi=1
-    )  # n=3, gap of 1
-
-    # Arbitrary: non-prefix/suffix/extremes selections return None
-    assert (
-        _analyze_selection(6, (0, 2, -1)) is None
-    )  # gap on both sides but lo-side isn't contiguous
-    assert _analyze_selection(6, tuple(range(6)) + tuple(range(3))) is None
-
-    # Empty: no positions selected
-    assert _analyze_selection(0, ()) == _SelectionEmpty()
-    assert _analyze_selection(6, ()) == _SelectionEmpty()
-    assert _analyze_selection(6, (slice(0, 0),)) == _SelectionEmpty()
-
-    with pytest.raises(IndexError):
-        _ = _analyze_selection(0, (1,))
-
-
-def test_analyze_selection_single_pos() -> None:
-    # _SelectionSinglePos(pos) is returned for selections that pick exactly one distinct
-    # position with multiplicity 1, except at the two ends (pos == 0 and pos == n - 1),
-    # which remain _SelectionPrefix(max_index=1, is_single_non_repeated=True) and
-    # _SelectionSuffix(min_index=-1, is_single_non_repeated=True) so that
-    # P.rolls_with_counts's existing partial-selection optimization (driven off
-    # _SelectionPrefix/_SelectionSuffix's k) keeps working unchanged.
-
-    # True-middle single-position selections via bare int.
-    assert _analyze_selection(6, (1,)) == _SelectionSinglePos(pos=1)
-    assert _analyze_selection(6, (2,)) == _SelectionSinglePos(pos=2)
-    assert _analyze_selection(6, (3,)) == _SelectionSinglePos(pos=3)
-    assert _analyze_selection(6, (4,)) == _SelectionSinglePos(pos=4)
-    assert _analyze_selection(5, (2,)) == _SelectionSinglePos(pos=2)
-
-    # Negative-index single positions normalize to the absolute position.
-    assert _analyze_selection(6, (-2,)) == _SelectionSinglePos(pos=4)
-    assert _analyze_selection(6, (-3,)) == _SelectionSinglePos(pos=3)
-    assert _analyze_selection(6, (-5,)) == _SelectionSinglePos(pos=1)
-
-    # Slice forms selecting exactly one position.
-    assert _analyze_selection(6, (slice(2, 3),)) == _SelectionSinglePos(pos=2)
-    assert _analyze_selection(6, (slice(-2, -1),)) == _SelectionSinglePos(pos=4)
-
-    # End-position single selections: backward-compat with Prefix/Suffix.
-    assert _analyze_selection(6, (0,)) == _SelectionPrefix(
-        max_index=1, is_single_non_repeated=True
-    )
-    assert _analyze_selection(6, (-6,)) == _SelectionPrefix(
-        max_index=1, is_single_non_repeated=True
-    )
-    assert _analyze_selection(6, (5,)) == _SelectionSuffix(
-        min_index=-1, is_single_non_repeated=True
-    )
-    assert _analyze_selection(6, (-1,)) == _SelectionSuffix(
-        min_index=-1, is_single_non_repeated=True
-    )
-
-    # Multiplicity > 1: not a single-position selection in the
-    # P.h(*which) sense (`P.h(2, 2)` sums position 2 twice). Falls
-    # through to the existing classification.
-    assert _analyze_selection(6, (2, 2)) == _SelectionPrefix(
-        max_index=3, is_single_non_repeated=False
-    )
-    assert _analyze_selection(6, (3, 3)) == _SelectionSuffix(
-        min_index=-3, is_single_non_repeated=False
-    )
-
-
-def test_rwc_heterogeneous_extremes_matches_brute_force() -> None:
-    r"""Verify the inclusion-exclusion result matches Cartesian-product enumeration."""
-    cases = [
-        # (list-of-dice, description)  # ruff: ignore[commented-out-code]
-        ([H(4), H(6)], "d4+d6"),
-        ([H(4), H(4), H(6)], "2d4+d6"),
-        ([H(4), H(6), H(8)], "d4+d6+d8"),
-        ([H(4), H(6), H(8), H(10)], "d4..d10"),
-    ]
-    for dice, desc in cases:
-        brute: Counter[RollT[int]] = Counter()
-        for roll, count in _rwc_heterogeneous_brute_force_combinations(dice, 0, -1):
-            brute[roll] += count
-        optimised: Counter[RollT[int]] = Counter()
-        groups = [(h, 1) for h in dice]
-        for roll, count in _rwc_heterogeneous_extremes(groups, 1, 1):
-            optimised[roll] += count
-        assert optimised == brute, f"mismatch for {desc}"
 
 
 def test_rwc_heterogeneous_extremes_via_h() -> None:
@@ -1670,11 +1210,6 @@ def test_rwc_heterogeneous_extremes_natural_order() -> None:
 
 
 # ---- Helpers -------------------------------------------------------------------------
-
-
-class _NoCompareCanOnlyAdd(_NoCompare):
-    def __add__(self, other: Any) -> "_NoCompareCanOnlyAdd":  # ruff: ignore[any-type]
-        return _NoCompareCanOnlyAdd(f"{self.val}+{other}")
 
 
 def _roll_which(roll: RollT[_T], *keys: GetItemT) -> RollT[_T]:
@@ -1731,17 +1266,17 @@ def _rwc_homogeneous_n_h_using_multinomial_coefficient(
 
 def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
     r"""
-    Validate rolls_with_counts against brute force and return a mock used to track would-be calls to _rwc_homogeneous_n_h_using_partial_selection.
+    Validate rolls_with_counts against brute force and return a mock used to track would-be calls to _WhichRollSurveyor.
     """
     known_counts: Counter[RollT[_T]] = Counter()
     test_counts: Counter[RollT[_T]] = Counter()
     for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p), *which):
         known_counts[roll] += count
     with patch(
-        "dyce.p._rwc_homogeneous_n_h_using_partial_selection",
-        side_effect=_rwc_homogeneous_n_h_using_partial_selection,
-    ) as using_partial_selection:
+        "dyce.p._WhichRollSurveyor",
+        side_effect=_WhichRollSurveyor,
+    ) as which_roll_surveyor_mock:
         for roll, count in p.rolls_with_counts(*which):
             test_counts[roll] += count
     assert test_counts == known_counts
-    return using_partial_selection
+    return which_roll_surveyor_mock
