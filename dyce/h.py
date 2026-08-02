@@ -1660,6 +1660,45 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         for outcome, count in self._h.items():
             yield outcome, rational_t(count, t)
 
+    @experimental
+    def quantile(self: "H[_T]", numerator: SupportsInt, denominator: SupportsInt) -> _T:
+        r"""
+        Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.
+        It matches NumPy's `numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")` (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
+        Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.
+
+            >>> (2 @ H(10)).quantile(1, 3)
+            9
+            >>> H(6).quantile(0, 1)
+            1
+            >>> H(6).quantile(1, 2)
+            3
+            >>> H(6).quantile(1, 1)
+            6
+        """
+        if not self._h:
+            raise ValueError("quantile of empty histogram is undefined")
+        numerator = lossless_int(numerator)
+        denominator = lossless_int(denominator)
+        if denominator <= 0:
+            raise ValueError(f"denominator ({denominator!r}) must be positive")
+        if not 0 <= numerator <= denominator:
+            raise ValueError(
+                f"numerator / denominator ({numerator}/{denominator}) must be in the interval [0, 1]"
+            )
+        # `cumulative / total >= numerator / denominator` cross-multiplies to
+        # `cumulative * denominator >= numerator * total` for `denominator > 0 and total
+        # > 0` (i.e., no sign flip)
+        scaled_target = numerator * self.total
+        cumulative = 0
+        for outcome, count in self.items():
+            cumulative += count
+            if cumulative * denominator >= scaled_target:
+                return outcome
+        raise AssertionError(
+            "unreachable: cumulative reaches total"
+        )  # pragma: no cover
+
     @overload
     def quantize(
         self: "H[Never]",

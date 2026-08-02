@@ -840,6 +840,88 @@ class TestHProbabilityItems:
         assert total == Fraction(1)
 
 
+class TestHQuantile:
+    _SAMPLE_HS = (
+        H(4),
+        2 @ H(10),
+        H(8) + H(12),
+        3 @ H(6),
+        H({1: 5, 6: 1}),  # heavily skewed
+        H({-3: 5, 2: 1, 7: 100}),  # negative + uneven weights
+        H(20),
+        H(100),
+        H(1_000_000),
+    )
+
+    def test_matches_issue_reference(self) -> None:
+        assert (2 @ H(10)).quantile(1, 3) == 9
+
+    def test_endpoints_are_min_and_max(self) -> None:
+        for h in (
+            *self._SAMPLE_HS,
+            20 @ H(20),
+        ):
+            assert h.quantile(0, 1) == min(h.outcomes())
+            assert h.quantile(1, 1) == max(h.outcomes())
+
+    def test_returns_an_outcome_not_a_derived_value(self) -> None:
+        for h in (
+            *self._SAMPLE_HS,
+            20 @ H(20),
+        ):
+            assert h.quantile(1, 2) in h.outcomes()
+
+    def test_exact_boundary_includes_the_outcome(self) -> None:
+        # 1/10 is exactly the cumulative probability at outcome 2 (2/20), where a float
+        # value of 0.1 (i.e., 0.1000000000000000055511151231257827021181583404541015625)
+        # may be over-inclusive
+        assert H(20).quantile(1, 10) == 2
+
+    def test_empty_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"\bempty histogram\b"):
+            H({}).quantile(1, 2)
+
+    def test_nonpositive_denominator_raises(self) -> None:
+        for denominator in (0, -2):
+            with pytest.raises(ValueError, match=r"\bdenominator\b.*\bpositive\b"):
+                H(6).quantile(1, denominator)
+
+    def test_out_of_range_raises(self) -> None:
+        for numerator, denominator in ((-1, 2), (3, 2), (5, 4)):
+            with pytest.raises(ValueError, match=r"\binterval \[0, 1\]"):
+                H(6).quantile(numerator, denominator)
+
+    @pytest.mark.skipif(find_spec("numpy") is None, reason="requires numpy")
+    def test_matches_numpy_inverted_cdf(self) -> None:
+        import numpy as np
+
+        for h in self._SAMPLE_HS:
+            assert h.total <= 2**53, (
+                f"{h.total} is too big for numpy to represent weights internally ({h.total} > 2**53)"
+            )
+            outcomes = np.array(list(h.outcomes()), dtype=float)
+            counts = np.array(list(h.counts()), dtype=float)
+            for numerator, denominator in (
+                (0, 1),
+                (1, 10),
+                (1, 3),
+                (1, 2),
+                (3, 4),
+                (9, 10),
+                (99, 100),
+                (1, 1),
+            ):
+                want = np.quantile(
+                    outcomes,
+                    numerator / denominator,
+                    weights=counts,
+                    method="inverted_cdf",
+                )
+                assert h.quantile(numerator, denominator) == want, (
+                    f"h={dict(h)} q={numerator}/{denominator}"
+                )
+
+
 class TestHQuantize:
     def test_quantize_empty(self) -> None:
         h = H({})
