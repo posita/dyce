@@ -16,12 +16,9 @@
 import operator
 import warnings
 from collections import Counter
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterable
 from decimal import Decimal
 from fractions import Fraction
-from itertools import chain, combinations_with_replacement, groupby
-from itertools import product as iproduct
-from math import factorial, prod
 from typing import Any, TypeVar
 from unittest.mock import Mock, call, patch
 
@@ -29,15 +26,16 @@ import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
-from dyce.p import (
-    RollCountT,
-    RollT,
-    _WhichRollSurveyor,
-)
-from dyce.types import BeartypeCallHintViolation, GetItemT, getitems, natural_key
+from dyce.p import RollT, _WhichRollSurveyor
+from dyce.types import BeartypeCallHintViolation, GetItemT, getitems
 
-from .test_h import _OUTCOME_TYPES
-from .test_types import NoCompare, NoCompareCanOnlyAdd
+from ._helpers import (
+    SAMPLE_OUTCOME_TYPES,
+    NoCompare,
+    NoCompareCanOnlyAdd,
+    enumerate_weighted_unsorted_rolls_multinomial_coefficient,
+    sort_and_select_from_rolls,
+)
 
 __all__ = ()
 
@@ -769,7 +767,7 @@ class TestPH:
             ),
             *(
                 _PatchableP(2 @ H(o_type(i) for i in range(10)))
-                for o_type in _OUTCOME_TYPES
+                for o_type in SAMPLE_OUTCOME_TYPES
             ),
         ):
             p_h = p.h(slice(None), slice(None), slice(None))
@@ -857,8 +855,6 @@ class TestPH:
         assert (2 @ P(6)).h(0) == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 
     def test_h_which_homogeneous(self) -> None:
-        # Use the brute-force mechanism to validate our harder-to-understand
-        # implementation
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
         for which in (
@@ -870,13 +866,14 @@ class TestPH:
             (0, 1, 1, 0),
             (-2, -1, -1, -2),
         ):
-            from_brute = H.from_counts(
+            expected = H.from_counts(
                 (sum(roll), count)
-                for roll, count in _rwc_heterogeneous_brute_force_combinations(
-                    tuple(p_4df), *which
+                for roll, count in sort_and_select_from_rolls(
+                    enumerate_weighted_unsorted_rolls_multinomial_coefficient(p_4df),
+                    *which,
                 )
             )
-            assert p_4df.h(*which) == from_brute, f"mismatch for which={which}"
+            assert p_4df.h(*which) == expected, f"mismatch for which={which}"
 
     def test_which_heterogeneous(self) -> None:
         p_d3 = P(3)
@@ -893,13 +890,16 @@ class TestPH:
             (0, 1, 1, 0),
             (-2, -1, -1, -2),
         ):
-            from_brute = H.from_counts(
+            expected = H.from_counts(
                 (sum(roll), count)
-                for roll, count in _rwc_heterogeneous_brute_force_combinations(
-                    tuple(p_4d3_4d4), *which
+                for roll, count in sort_and_select_from_rolls(
+                    enumerate_weighted_unsorted_rolls_multinomial_coefficient(
+                        p_4d3_4d4
+                    ),
+                    *which,
                 )
             )
-            assert p_4d3_4d4.h(*which) == from_brute, f"mismatch for which={which}"
+            assert p_4d3_4d4.h(*which) == expected, f"mismatch for which={which}"
 
     def test_which_all_exactly_twice(self) -> None:
         p_df = P(H((-1, 0, 1)))
@@ -944,26 +944,24 @@ class TestPH:
         # small-enough pool to enumerate fully
         p = P(2 @ P(4), 3 @ P(6))
         via_decomp = p.h(-1)
-        brute: Counter[int] = Counter()
-        for r1 in range(1, 5):
-            for r2 in range(1, 5):
-                for r3 in range(1, 7):
-                    for r4 in range(1, 7):
-                        for r5 in range(1, 7):
-                            brute[max(r1, r2, r3, r4, r5)] += 1
-        assert dict(via_decomp) == dict(brute)
+        expected = H.from_counts(
+            (max(roll), weight)
+            for roll, weight in enumerate_weighted_unsorted_rolls_multinomial_coefficient(
+                p
+            )
+        )
+        assert dict(via_decomp) == dict(expected)
 
     def test_heterogeneous_min_matches_brute_force(self) -> None:
         p = P(2 @ P(4), 3 @ P(6))
         via_decomp = p.h(0)
-        brute: Counter[int] = Counter()
-        for r1 in range(1, 5):
-            for r2 in range(1, 5):
-                for r3 in range(1, 7):
-                    for r4 in range(1, 7):
-                        for r5 in range(1, 7):
-                            brute[min(r1, r2, r3, r4, r5)] += 1
-        assert dict(via_decomp) == dict(brute)
+        expected = H.from_counts(
+            (min(roll), weight)
+            for roll, weight in enumerate_weighted_unsorted_rolls_multinomial_coefficient(
+                p
+            )
+        )
+        assert dict(via_decomp) == dict(expected)
 
 
 class TestPRoll:
@@ -1001,7 +999,12 @@ class TestPRollsWithCounts:
             for roll, count in p.rolls_with_counts():
                 from_rwc[roll] += count
             expected: Counter[RollT[int]] = Counter()
-            for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p)):
+            for (
+                roll,
+                count,
+            ) in sort_and_select_from_rolls(
+                enumerate_weighted_unsorted_rolls_multinomial_coefficient(p)
+            ):
                 expected[roll] += count
             assert from_rwc == expected, f"mismatch for p={p}"
 
@@ -1160,37 +1163,15 @@ class TestPRollsWithCounts:
         assert which_roll_surveyor_mock.call_args_list == []
 
 
-def test_first_principles() -> None:
-    for n, h, which in (
-        (3, H(6), ()),
-        (3, H((2, 3, 3, 4, 4, 5)), ()),
-        (6, H(4), ()),
-        (3, H({i: i for i in range(1, 11)}), ()),
-        (3, H({i: 11 - i for i in range(1, 11)}), ()),
-        (3, H(6), (0,)),
-        (3, H(6), (1,)),
-        (3, H(6), (-1,)),
-        (4, H((-1, 0, 1)), (0, 2)),
-        (4, H((-1, 0, 1)), (1, 3)),
-    ):
-        brute_force: Counter[RollT[int]] = Counter()
-        multinomial: Counter[RollT[int]] = Counter()
-        for roll, count in _rwc_heterogeneous_brute_force_combinations([h] * n, *which):
-            brute_force[roll] += count
-        for roll, count in _rwc_homogeneous_n_h_using_multinomial_coefficient(
-            n, h, *which
-        ):
-            multinomial[roll] += count
-        assert brute_force == multinomial
-
-
 def test_rwc_heterogeneous_extremes_via_h() -> None:
     r"""P.h(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
     d4, d6, d8, d10, d12, d20 = (H(n) for n in (4, 6, 8, 10, 12, 20))
     p = P(d4, d6, d8, d10, d12, d20)
     from_brute = H.from_counts(
         (sum(roll), count)
-        for roll, count in _rwc_heterogeneous_brute_force_combinations(list(p), 0, -1)
+        for roll, count in sort_and_select_from_rolls(
+            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+        )
     )
     assert p.h(0, -1) == from_brute
 
@@ -1204,64 +1185,14 @@ def test_rwc_heterogeneous_extremes_natural_order() -> None:
     p = P(d6x, d6x, d8x)
     from_brute = H.from_counts(
         (sum(roll), count)
-        for roll, count in _rwc_heterogeneous_brute_force_combinations(list(p), 0, -1)
+        for roll, count in sort_and_select_from_rolls(
+            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+        )
     )
     assert p.h(0, -1) == from_brute
 
 
 # ---- Helpers -------------------------------------------------------------------------
-
-
-def _roll_which(roll: RollT[_T], *keys: GetItemT) -> RollT[_T]:
-    if not keys:
-        keys = (slice(None),)
-
-    def _roll_selection_from_key(key: GetItemT) -> RollT[_T]:
-        if isinstance(key, slice):
-            return tuple(roll[key])
-        else:
-            return (roll[key],)
-
-    return tuple(chain(*(_roll_selection_from_key(key) for key in keys)))
-
-
-def _rwc_heterogeneous_brute_force_combinations(
-    hs: Sequence[H[_T]],
-    *keys: GetItemT,
-) -> Iterator[RollCountT[_T]]:
-    r"""Naive Cartesian-product enumeration correct for any count magnitude."""
-    for rolls in iproduct(*(h.items() for h in hs)):
-        outcomes, counts = tuple(zip(*rolls, strict=True))
-        try:
-            roll: RollT[_T] = tuple(sorted(outcomes))
-        except TypeError:
-            roll = tuple(sorted(outcomes, key=natural_key))  # pyrefly: ignore[bad-assignment]
-        count = prod(counts)
-        roll_selection = _roll_which(roll, *keys)
-        if roll_selection:
-            yield roll_selection, count
-
-
-def _rwc_homogeneous_n_h_using_multinomial_coefficient(
-    n: int,
-    h: H[_T],
-    *keys: GetItemT,
-) -> Iterator[RollCountT[_T]]:
-    r"""Independent reference implementation using multinomial coefficients."""
-    multinomial_coefficient_numerator = factorial(n)
-    for sorted_outcomes_for_roll in combinations_with_replacement(h, n):
-        count_scalar = prod(h[outcome] for outcome in sorted_outcomes_for_roll)
-        multinomial_coefficient_denominator = prod(
-            factorial(sum(1 for _ in g)) for _, g in groupby(sorted_outcomes_for_roll)
-        )
-        roll_selection = _roll_which(sorted_outcomes_for_roll, *keys)
-        if roll_selection:
-            yield (
-                roll_selection,
-                count_scalar
-                * multinomial_coefficient_numerator
-                // multinomial_coefficient_denominator,
-            )
 
 
 def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
@@ -1270,7 +1201,12 @@ def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
     """
     known_counts: Counter[RollT[_T]] = Counter()
     test_counts: Counter[RollT[_T]] = Counter()
-    for roll, count in _rwc_heterogeneous_brute_force_combinations(tuple(p), *which):
+    for (
+        roll,
+        count,
+    ) in sort_and_select_from_rolls(
+        enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), *which
+    ):
         known_counts[roll] += count
     with patch(
         "dyce.p._WhichRollSurveyor",
