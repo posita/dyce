@@ -13,13 +13,77 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-from typing import Any
+from itertools import chain
 
 import pytest
 
-from dyce.types import lossless_int, natural_key
+from dyce.types import getitems, lossless_int, natural_key
+
+from ._helpers import NoCompare
 
 __all__ = ()
+
+
+class TestGetItems:
+    def test_index(self) -> None:
+        seq = tuple(range(-4, 5))
+        for i in range(len(seq)):
+            assert tuple(getitems(seq, (i,))) == seq[i : i + 1]
+        assert tuple(getitems(seq, range(len(seq)))) == seq
+        assert tuple(getitems(seq, range(len(seq) - 1, -1, -1))) == seq[::-1]
+
+    def test_overlapping_indexes(self) -> None:
+        seq = tuple(range(-4, 5))
+        assert (
+            tuple(getitems(seq, chain(range(len(seq) - 1), range(1, len(seq)))))
+            == seq[:-1] + seq[1:]
+        )
+
+    def test_slice(self) -> None:
+        seq = tuple(range(-4, 5))
+        for i in range(len(seq)):
+            assert tuple(getitems(seq, (slice(i, i + 1),))) == seq[i : i + 1]
+        assert tuple(getitems(seq, (slice(None),))) == seq
+
+    def test_overlapping_slices(self) -> None:
+        seq = tuple(range(-4, 5))
+        assert tuple(getitems(seq, (slice(None), slice(1, -1)))) == seq + seq[1:-1]
+
+    def test_mixed(self) -> None:
+        seq = tuple(range(-4, 5))
+        assert (
+            tuple(
+                getitems(
+                    seq,
+                    (
+                        8,
+                        6,
+                        4,
+                        2,
+                        0,
+                        slice(1, None, 2),
+                        slice(None, None, 2),
+                        7,
+                        5,
+                        3,
+                        1,
+                    ),
+                )
+            )
+            == seq[::-2] + seq[1::2] + seq[::2] + seq[-2::-2]
+        )
+
+    def test_out_of_bounds_index_raises(self) -> None:
+        seq = tuple(range(-4, 0))
+        with pytest.raises(IndexError):
+            tuple(getitems(seq, (0, len(seq))))
+        with pytest.raises(IndexError):
+            tuple(getitems(seq, (-len(seq) - 1,)))
+
+    def test_out_of_bounds_slice(self) -> None:
+        seq = tuple(range(-4, 0))
+        assert tuple(getitems(seq, (slice(len(seq), len(seq) + 1),))) == ()
+        assert tuple(getitems(seq, (slice(-len(seq) - 1, -len(seq)),))) == ()
 
 
 class TestLosslessInt:
@@ -78,29 +142,3 @@ class TestNaturalKey:
             "item2",
             "item10",
         ]
-
-
-# ---- Helpers -------------------------------------------------------------------------
-
-
-class NoCompare:
-    r"""
-    For testing natural_key sorting and other places where outcomes ignorant of mathematical operations is required.
-    """
-
-    def __init__(self, val: str) -> None:
-        self.val = val
-
-    def __lt__(self, other: object) -> bool:
-        raise TypeError
-
-    def __str__(self) -> str:
-        return self.val
-
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.val!r})"
-
-
-class NoCompareCanOnlyAdd(NoCompare):
-    def __add__(self, other: Any) -> "NoCompareCanOnlyAdd":  # ruff: ignore[any-type]
-        return NoCompareCanOnlyAdd(f"{self.val}+{other}")

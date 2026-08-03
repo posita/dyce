@@ -16,8 +16,6 @@
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from itertools import product as iproduct
-from math import prod
 from typing import Any
 
 import pytest
@@ -33,24 +31,19 @@ from dyce.p import (
     survey_outcome_order_descending,
 )
 
+from ._helpers import enumerate_weighted_unsorted_rolls_brute_force
+
 # ---- Brute-force oracle ----------------------------------------------------------------
 
 
 def _oracle(pool: "P[int]", mechanic: Callable[[tuple[int, ...]], Any]) -> "H[Any]":
     r"""
-    Independent ground truth: enumerate every weighted face combination across all dice.
+    Reduces *mechanic* over every weighted roll of *pool*.
 
-    This deliberately shares nothing with [`P.survey`][dyce.P.survey]’s state-collapse machinery.
-    It is a flat cartesian product over each die’s (outcome, count) faces, accumulating the product of face weights for each distinct mechanic result.
+    This deliberately uses an independently verified, brute-force mechanism to enumerate rolls and weights.
     """
-    faces_per_die: list[list[tuple[int, int]]] = []
-    for h, n in pool._h_groups.items():  # ruff: ignore[private-member-access]
-        faces = list(h.items())
-        faces_per_die.extend([faces] * n)
     acc: dict[Any, int] = defaultdict(int)
-    for combo in iproduct(*faces_per_die):
-        roll = tuple(outcome for outcome, _ in combo)
-        weight = prod(count for _, count in combo)
+    for roll, weight in enumerate_weighted_unsorted_rolls_brute_force(pool):
         acc[mechanic(roll)] += weight
     return H(acc)
 
