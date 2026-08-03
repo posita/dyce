@@ -13,7 +13,6 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-import contextlib
 import itertools
 import math
 import operator
@@ -21,6 +20,7 @@ import os
 import platform
 import statistics
 import warnings
+from collections import defaultdict
 from collections.abc import Callable, Iterable
 from decimal import Decimal
 from fractions import Fraction
@@ -40,31 +40,13 @@ from dyce.h import (
 from dyce.lifecycle import ExperimentalWarning
 from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
 
-__all__ = ()
-
-_OUTCOME_TYPES: tuple[type, ...] = (
-    int,
-    float,
-    Decimal,
-    Fraction,
+from ._helpers import (
+    SAMPLE_OUTCOME_TYPES,
+    enumerate_weighted_unsorted_rolls_multinomial_coefficient,
+    sort_and_select_from_rolls,
 )
 
-with contextlib.suppress(ImportError):
-    import numpy as np
-
-    _OUTCOME_TYPES += (
-        np.longlong,
-        np.longdouble,
-    )
-
-with contextlib.suppress(ImportError):
-    import sympy  # type: ignore[import-untyped]
-
-    _OUTCOME_TYPES += (
-        sympy.Integer,
-        sympy.Number,
-        sympy.Rational,
-    )
+__all__ = ()
 
 
 class TestHInit:
@@ -109,7 +91,7 @@ class TestHInit:
         assert h == H(2)
 
     def test_mapping_supportsint(self) -> None:
-        for o_type in _OUTCOME_TYPES:
+        for o_type in SAMPLE_OUTCOME_TYPES:
             for i in range(7, 1, -1):
                 h = H({o_type(o): o_type(1) for o in range(-i, i)})
                 assert h == H(dict.fromkeys(range(-i, i), 1))
@@ -750,7 +732,7 @@ class TestHMean:
             H({}).mean()
 
     def test_mean(self) -> None:
-        for o_type in _OUTCOME_TYPES:
+        for o_type in SAMPLE_OUTCOME_TYPES:
             h = 2 @ H(o_type(i) for i in range(10))  # pyrefly: ignore[unsupported-operation]
             h_mean = h.mean()
             stat_mean = statistics.mean(
@@ -784,21 +766,18 @@ class TestHOrderStatForNAtPos:
             for n in range(1, 5):
                 for pos in range(n):
                     result = h.order_stat_for_n_at_pos(n, pos)
-                    for outcome in h:
-                        brute = sum(
-                            count
-                            for roll, count in (
-                                (sorted(r), c)
-                                for r, c in (
-                                    (list(combo), math.prod(h[v] for v in combo))
-                                    for combo in itertools.product(
-                                        h.outcomes(), repeat=n
-                                    )
-                                )
-                            )
-                            if roll[pos] == outcome
+                    brute: dict[Any, int] = defaultdict(int)
+                    for (
+                        roll,
+                        weight,
+                    ) in sort_and_select_from_rolls(
+                        enumerate_weighted_unsorted_rolls_multinomial_coefficient(
+                            [h] * n
                         )
-                        assert result.get(outcome, 0) == brute  # pyright: ignore[reportArgumentType,reportCallIssue]
+                    ):
+                        brute[roll[pos]] += weight
+                    for outcome in h:
+                        assert result.get(outcome, 0) == brute[outcome]  # pyright: ignore[reportArgumentType,reportCallIssue]
 
     def test_order_stat_for_n_at_pos_negative_index(self) -> None:
         h = H(6)
@@ -951,7 +930,7 @@ class TestHStdev:
             H({}).stdev()
 
     def test_stdev(self) -> None:
-        for o_type in _OUTCOME_TYPES:
+        for o_type in SAMPLE_OUTCOME_TYPES:
             h = 2 @ H(o_type(i) for i in range(10))  # pyrefly: ignore[unsupported-operation]
             h_stdev = h.stdev()
             stat_stdev = statistics.pstdev(
@@ -978,7 +957,7 @@ class TestHVariance:
             H({}).variance()
 
     def test_variance(self) -> None:
-        for o_type in _OUTCOME_TYPES:
+        for o_type in SAMPLE_OUTCOME_TYPES:
             h = H(o_type(i) for i in range(10))
             h_variance = h.variance()
             stat_variance = statistics.pvariance(
