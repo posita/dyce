@@ -40,7 +40,7 @@ from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: 
     install_if_missing,
 )
 
-await install_if_missing(  # type: ignore[top-level-await] # noqa: PGH003
+await install_if_missing(  # type: ignore[top-level-await]
     ("dyce", "dyce~=0.7.0", "dyce"),  # piplite_spec omits version (local wheel)
 )
 
@@ -71,8 +71,8 @@ def gwf_2024(result: HResult[int]) -> H[int] | int:
     return 3 if result.outcome in (1, 2) else result.outcome
 
 
-h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5  # ty: ignore[unsupported-operator]
-h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5  # ty: ignore[unsupported-operator]
+h_gwf_2014 = 2 @ expand(gwf_2014, H(6)) + 5
+h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5
 
 # %%
 import pandas as pd
@@ -88,7 +88,7 @@ df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
 
 # %% editable=false jupyter={"source_hidden": true}
 # Display df as table
-import jinja2  # noqa: F401
+import jinja2  # ruff: ignore[unused-import]
 
 # Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
 df.style.format("{:.0%}")

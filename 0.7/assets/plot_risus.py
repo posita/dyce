@@ -109,9 +109,9 @@ def vs_scenarios_dataframes(  # type: ignore[no-redef]
     vs_dfs: list[pd.DataFrame] = []
     # The explicit type hint here is apparently needed by mypy for properly resolving
     # the call to h_vs.merge below.
-    # TODO(posita): # noqa: TD003 - See:
+    # TODO(posita): # ruff: ignore[missing-todo-link] - See:
     # - <https://github.com/python/mypy/issues/21317>
-    h_vs: H[Versus] = H(Versus)
+    h_vs: H[Versus] = H(Versus)  # ty: ignore[invalid-assignment]
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
@@ -148,7 +148,7 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
     hi_color = cmap(0.0)
 
     for i, df in enumerate(vs_dfs):
-        df = df.copy()  # noqa: PLW2901
+        df = df.copy()  # ruff: ignore[redefined-loop-name]
         df.index = Index(
             data=[f"our\n {idx} …" for idx in df.index],
             dtype=df.index.dtype,
@@ -281,7 +281,7 @@ def risus_combat_driver(
                     return H({})
                 case _:
                     # Should never be here
-                    assert False, (  # noqa: B011, PT015
+                    assert False, (  # ruff: ignore[assert-false, pytest-assert-always-false]
                         f"unrecognized this_round.outcome {this_round.outcome}"
                     )
 
@@ -338,7 +338,7 @@ def single_round_goliath(
 
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),
+        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
         our_pool_size=1,
         their_pool_size=2,
     )
@@ -346,7 +346,7 @@ assert (
 )
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),
+        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
         our_pool_size=2,
         their_pool_size=1,
     )
@@ -354,7 +354,7 @@ assert (
 )
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),
+        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
         our_pool_size=2,
         their_pool_size=2,
     )
@@ -550,7 +550,7 @@ assert d_evens_up_raw_exploded == H(
 def evens_up_decode_hits(outcome: int) -> int:
     # Clever math that is equivalent to:
     #     outcome // 2 +  # a tally of any exploded hits
-    #     outcome % 2  # any final hit  # noqa: ERA001
+    #     outcome % 2  # any final hit  # ruff: ignore[commented-out-code]
     return (outcome + 1) // 2
 
 

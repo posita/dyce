@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1950,8 +1950,8 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
     <span class="c1"># Ones and twos are promoted to 3s</span>
     <span class="k">return</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
 
-<span class="n">h_gwf_2014</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">expand</span><span class="p">(</span><span class="n">gwf_2014</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># ty: ignore[unsupported-operator]</span>
-<span class="n">h_gwf_2024</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">expand</span><span class="p">(</span><span class="n">gwf_2024</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># ty: ignore[unsupported-operator]</span>
+<span class="n">h_gwf_2014</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">expand</span><span class="p">(</span><span class="n">gwf_2014</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">h_gwf_2024</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">expand</span><span class="p">(</span><span class="n">gwf_2024</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">5</span>
 </code></pre></div></td></tr></table></div>
 <p>Example 1 table:</p>
 <details>
@@ -2962,9 +2962,9 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
     <span class="n">vs_dfs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># The explicit type hint here is apparently needed by mypy for properly resolving</span>
     <span class="c1"># the call to h_vs.merge below.</span>
-    <span class="c1"># TODO(posita): # noqa: TD003 - See:</span>
+    <span class="c1"># TODO(posita): # ruff: ignore[missing-todo-link] - See:</span>
     <span class="c1"># - &lt;https://github.com/python/mypy/issues/21317&gt;</span>
-    <span class="n">h_vs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">)</span>
+    <span class="n">h_vs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">)</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
     <span class="k">for</span> <span class="n">their_pool_size</span> <span class="ow">in</span> <span class="n">their_pool_sizes</span><span class="p">:</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">our_pool_rel_size</span> <span class="ow">in</span> <span class="n">our_pool_rel_sizes</span><span class="p">:</span>
@@ -3001,7 +3001,7 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
     <span class="n">hi_color</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># noqa: PLW2901</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># ruff: ignore[redefined-loop-name]</span>
         <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;our</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> …&quot;</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
@@ -3225,7 +3225,7 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
                     <span class="k">return</span> <span class="n">H</span><span class="p">({})</span>
                 <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
                     <span class="c1"># Should never be here</span>
-                    <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span>  <span class="c1"># noqa: B011, PT015</span>
+                    <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span>  <span class="c1"># ruff: ignore[assert-false, pytest-assert-always-false]</span>
                         <span class="sa">f</span><span class="s2">&quot;unrecognized this_round.outcome </span><span class="si">{</span><span class="n">this_round</span><span class="o">.</span><span class="n">outcome</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
 
@@ -3333,7 +3333,7 @@ This means we can use it directly with our <code>vs_scenarios_dataframes</code> 
 
 <span class="k">assert</span> <span class="p">(</span>
     <span class="n">single_round_goliath</span><span class="p">(</span>
-        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>  <span class="c1"># ty: ignore[invalid-argument-type]</span>
         <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">)</span>
@@ -3341,7 +3341,7 @@ This means we can use it directly with our <code>vs_scenarios_dataframes</code> 
 <span class="p">)</span>
 <span class="k">assert</span> <span class="p">(</span>
     <span class="n">single_round_goliath</span><span class="p">(</span>
-        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>  <span class="c1"># ty: ignore[invalid-argument-type]</span>
         <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
@@ -3349,7 +3349,7 @@ This means we can use it directly with our <code>vs_scenarios_dataframes</code> 
 <span class="p">)</span>
 <span class="k">assert</span> <span class="p">(</span>
     <span class="n">single_round_goliath</span><span class="p">(</span>
-        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>  <span class="c1"># ty: ignore[invalid-argument-type]</span>
         <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">)</span>
@@ -3684,7 +3684,7 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 <span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">evens_up_decode_hits</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="c1"># Clever math that is equivalent to:</span>
     <span class="c1">#     outcome // 2 +  # a tally of any exploded hits</span>
-    <span class="c1">#     outcome % 2  # any final hit  # noqa: ERA001</span>
+    <span class="c1">#     outcome % 2  # any final hit  # ruff: ignore[commented-out-code]</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">outcome</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
 
@@ -3868,7 +3868,7 @@ If you’d like help using <code>dyce</code> with modeling your own complicated 
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

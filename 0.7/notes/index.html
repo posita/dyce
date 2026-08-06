@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1090,7 +1090,8 @@ Please review before upgrading.</p>
 <li>Removes <code>P.map</code>, <code>P.rmap</code>, and <code>P.umap</code> in favor of <a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -> P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a>.</li>
 <li>Removes <code>P.is_homogeneous</code>.</li>
 <li>Adds optional <code>preserve_zero_counts</code> parameter to <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -> H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.</li>
-<li>Adds experimental <a class="autorefs autorefs-internal" title="quantize(bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, *, preserve_zero_counts: bool = False) -> H" href="../dyce/#dyce.H.quantize"><code>H.quantize</code></a> method.</li>
+<li>Adds experimental <a class="autorefs autorefs-internal" title="quantile(numerator: SupportsInt, denominator: SupportsInt) -> _T" href="../dyce/#dyce.H.quantile"><code>H.quantile</code></a> method.</li>
+<li>Adds experimental <a class="autorefs autorefs-internal" title="quantize(bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, *, preserve_zero_counts: bool = False) -> H" href="../dyce/#dyce.H.quantize"><code>H.quantize</code> method</a> and <a class="autorefs autorefs-internal" title="quantize_hs(*, bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, preserve_zero_counts: bool = True) -> Any" href="../dyce/#dyce.quantize_hs"><code>quantize_hs</code> context manager</a>.</li>
 <li>Adds experimental (and somewhat inefficient) <a class="autorefs autorefs-internal" title="replace(existing_outcome: _T, repl: H[_T] | _T) -> H[_T]" href="../dyce/#dyce.H.replace"><code>H.replace</code></a> method.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="apply_to_each_roll(func: Callable[[RollT[_T]], H[_ResultT] | _ResultT], *which: GetItemT) -> H[_ResultT]" href="../dyce/#dyce.P.apply_to_each_roll"><code>P.apply_to_each_roll</code></a> method.</li>
 <li>Simplifies and consolidates <code>dyce.evaluation.expandable</code> and <code>dyce.evaluation.foreach</code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
@@ -1387,7 +1388,7 @@ Non-experimental features should be considered stable.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

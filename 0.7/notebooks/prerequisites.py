@@ -51,7 +51,7 @@ async def install_if_missing(
         for spec in to_install:
             await piplite.install(spec, keep_going=True)  # pyrefly: ignore[unbound-name]
     else:
-        get_ipython().run_line_magic(  # noqa: F821
+        get_ipython().run_line_magic(  # ruff: ignore[undefined-name]
             "pip",
             "install --quiet " + " ".join(f"'{s}'" for s in to_install),
         )

@@ -2,12 +2,13 @@
   "jupyter-config-data": {
     "appName": "dyce",
     "appUrl": "./lab",
-    "appVersion": "0.7.6",
+    "appVersion": "0.8.1",
     "baseUrl": "./",
     "collaborative": false,
     "contentStorageDrivers": [
       "memoryStorageDriver"
     ],
+    "contentsAllJsonFile": "all.json",
     "defaultKernelName": "python",
     "enableMemoryStorage": true,
     "exposeAppInBrowser": true,
@@ -20,12 +21,12 @@
       },
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.75ddd7589fd94926c419.js",
+        "load": "static/remoteEntry.1535fa47514890d8.js",
         "name": "@jupyterlite/pyodide-kernel-extension"
       },
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.3cd7db059862f41b8c06.js",
+        "load": "static/remoteEntry.e928860fd982eedb.js",
         "name": "jupyterlab-jupytext"
       },
       {
@@ -414,8 +415,8 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=78ca38412b73162d9580f5da4b77b8f339e79dd3c423279c5e408f9e2346c1d9",
-          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=d4147101a35e1f311a860b1b8976d601b6afcad0e777ffb7946bd9ca3fdefbd6"
+          "./pypi/all.json?sha256=950cec07bac69021eb3d31c09d95a638e2fb8cabca6feb5641e7816922cc727c",
+          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=29fd8c803116f3780a617fc2a3851681a4d44ab695f5384738ffc7ebb5cef7d5"
         ]
       }
     },
@@ -426,7 +427,17 @@
     },
     "settingsStorageDrivers": [
       "memoryStorageDriver"
-    ]
+    ],
+    "versionInfo": {
+      "@jupyter-notebook/application": {
+        "label": "Jupyter Notebook",
+        "version": "7.6.0"
+      },
+      "@jupyterlab/application": {
+        "label": "JupyterLab",
+        "version": "4.6.0"
+      }
+    }
   },
   "jupyter-lite-schema-version": 0
 }
