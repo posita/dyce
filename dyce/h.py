@@ -1667,7 +1667,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def quantile(self: "H[_T]", numerator: SupportsInt, denominator: SupportsInt) -> _T:
         r"""
         Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.
-        It matches NumPy's `numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")` (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
+        It matches NumPy's [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
         Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.
 
             >>> (2 @ H(10)).quantile(1, 3)
