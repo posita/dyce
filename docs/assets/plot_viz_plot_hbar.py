@@ -19,12 +19,12 @@ def fig_callback(line_color: str) -> None:
     from dyce.viz import plot_bar
 
     ax = plot_bar(
-        2 @ H(6),
-        H(12),
+        2 @ H(10),
+        H(8) + H(12),
         horizontal=True,
-        labels=["2d6", "d12"],
+        labels=["2d10", "d8 + d12"],
     )
-    ax.set_title("2d6 vs. d12")
+    ax.set_title("2d10 vs. d8 + d12")
     ax.legend(loc="upper right")
 
     # Style (dark/light) tweaks

@@ -10,10 +10,12 @@ import argparse
 import logging
 from collections.abc import Callable
 from pathlib import Path
+from typing import Literal
 
 __all__ = ("main",)
 
-FigCallbackT = Callable[[str], None]
+ShadeT = Literal["0.15", "0.85"]
+FigCallbackT = Callable[[ShadeT], None]
 
 _PARSER = argparse.ArgumentParser(description="Generate image files for documentation")
 _PARSER.add_argument(
@@ -68,8 +70,8 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
         else args.output_file
     )
     output_path = args.output_dir.resolve().joinpath(output_file)
-    line_color = "0.85" if args.style == "dark" else "0.15"
-    bg_color = "0.15" if args.style == "dark" else "0.85"
+    line_color: ShadeT = "0.85" if args.style == "dark" else "0.15"
+    bg_color: ShadeT = "0.15" if args.style == "dark" else "0.85"
 
     plt.clf()
     mstyle.use("bmh")
@@ -77,7 +79,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     fig_callback(line_color)
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)
-    with mpl.rc_context({"svg.hashsalt": "dyce"}):
+    with mpl.rc_context({"svg.hashsalt": "dyce"}):  # for keeping output byte-stable
         plt.savefig(
             output_path,
             dpi=144,

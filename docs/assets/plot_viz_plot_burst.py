@@ -27,18 +27,18 @@ def fig_callback(line_color: str) -> None:
     )
     ax_d6.set_title("d6")
 
-    ax_2d6_vs_d12 = plt.subplot2grid((1, 2), (0, 1))
+    ax_2d10_vs_d8d12 = plt.subplot2grid((1, 2), (0, 1))
     plot_burst(
-        2 @ H(6),
-        H(12),
-        ax=ax_2d6_vs_d12,
+        2 @ H(10),
+        H(8) + H(12),
         cmap="RdYlGn",
         compare_cmap="RdYlBu",
+        ax=ax_2d10_vs_d8d12,
     )
-    ax_2d6_vs_d12.set_title("2d6 vs. d12")
+    ax_2d10_vs_d8d12.set_title("2d10 vs. d8 + d12")
 
     # Style (dark/light) tweaks
-    for ax in (ax_d6, ax_2d6_vs_d12):
+    for ax in (ax_d6, ax_2d10_vs_d8d12):
         ax.title.set_color(line_color)
         for text in ax.texts:
             text.set_color(line_color)  # wedge labels (both rings)

@@ -32,20 +32,25 @@ uv sync --group viz
 
 import operator
 from collections.abc import Callable, Sequence
+from enum import StrEnum, auto
 from fractions import Fraction
 from itertools import accumulate, cycle
-from typing import Literal, TypeVar, cast, overload
+from typing import Generic, TypedDict, TypeVar, cast, overload
 
 try:
     import matplotlib as mpl
-    from matplotlib import pyplot as plt
-    from matplotlib import ticker as mticker
-    from matplotlib.axes import Axes
-    from matplotlib.colors import Colormap
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
         "dyce[viz] requires matplotlib; install with: pip install 'dyce[viz]'"
     ) from exc
+else:
+    from matplotlib import colors as mcolors
+    from matplotlib import pyplot as plt
+    from matplotlib import ticker as mticker
+    from matplotlib import transforms as mtransforms
+    from matplotlib.axes import Axes
+    from matplotlib.colors import Colormap
+    from matplotlib.typing import RGBAColorType
 
 from .h import H
 from .lifecycle import experimental
@@ -53,27 +58,42 @@ from .types import natural_key
 
 __all__ = (
     "BurstFormatterT",
-    "GraphTypeT",
+    "GraphType",
     "format_outcome_name",
     "format_outcome_name_probability",
     "format_probability",
     "plot_bar",
     "plot_burst",
     "plot_line",
+    "plot_ridge",
 )
 
 _T = TypeVar("_T")
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
-GraphTypeT = Literal["normal", "at_most", "at_least"]
-r"""
-Controls which variant of the distribution is plotted.
 
-- `"normal"`: raw probability for each outcome
-- `"at_most"`: cumulative probability `#!math P(X \le k)`
-- `"at_least"`: survival probability `#!math P(X \ge k)`
-"""
+class _RidgeT(TypedDict, Generic[_T]):
+    label: str
+    outcomes: tuple[_T, ...]
+    probs: tuple[float, ...]
+    baseline: int
+    color: RGBAColorType | None
+
+
+class GraphType(StrEnum):
+    r"""
+    Controls which variant of the distribution is plotted.
+
+    - *NORMAL*: raw probability for each outcome
+    - *AT_MOST*: cumulative probability `#!math P(X \le k)`
+    - *AT_LEAST*: survival probability `#!math P(X \ge k)`
+    """
+
+    NORMAL = auto()
+    AT_MOST = auto()
+    AT_LEAST = auto()
+
 
 BurstFormatterT = Callable[[_T, Fraction, H[_T]], str]
 r"""
@@ -83,9 +103,14 @@ Called as `formatter(outcome, probability, histogram)`.
 Return an empty string to suppress the label for that wedge.
 """
 
-_DEFAULT_ALPHA: float = 0.75
-_DEFAULT_MARKERS: str = "oX^v><dsP"
+_DEFAULT_MARKERS: str = "."
+_DEFAULT_PLOT_ALPHA: float = 0.75
+_DEFAULT_RIDGE_ALPHA: float = 0.4
+_DEFAULT_RIDGE_OVERLAP: float = 2.4
+
 _LABEL_LIM: Fraction = Fraction(1, 2**5)  # suppress burst labels below ~3.1%
+_RIDGE_FILL_FOOT: float = 0.1
+_RIDGE_ROW_STEP: float = 1.0
 
 _formatter: BurstFormatterT
 
@@ -93,8 +118,8 @@ _formatter: BurstFormatterT
 @experimental
 def format_outcome_name(
     outcome: _T,
-    _prob: Fraction,
-    _h: H[_T],
+    prob: Fraction,  # ruff: ignore[unused-function-argument]
+    h: H[_T],  # ruff: ignore[unused-function-argument]
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with its outcome.
@@ -125,9 +150,9 @@ _formatter = format_outcome_name_probability
 
 @experimental
 def format_probability(
-    _outcome: _T,
+    outcome: _T,  # ruff: ignore[unused-function-argument]
     prob: Fraction,
-    _h: H[_T],
+    h: H[_T],  # ruff: ignore[unused-function-argument]
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with its probability as a percentage.
@@ -142,9 +167,10 @@ del _formatter
 @experimental
 def plot_bar(
     *hs: H,
-    alpha: float = _DEFAULT_ALPHA,
+    alpha: float = _DEFAULT_PLOT_ALPHA,
     ax: Axes | None = None,
-    graph_type: GraphTypeT = "normal",
+    cmap: str | Colormap | None = None,
+    graph_type: GraphType = GraphType.NORMAL,
     horizontal: bool = False,
     labels: Sequence[str] = (),
 ) -> Axes:
@@ -158,10 +184,12 @@ def plot_bar(
     Plots a grouped bar chart of one or more histograms.
 
     Pass one or more [`H`][dyce.H] instances as positional arguments.
-    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.
+    Use *labels* to assign legend names to each histogram.
+    Unmatched histograms receive an empty label.
     When multiple histograms are provided, bars are interleaved side-by-side.
 
-    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
+
     When *horizontal* is `True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
@@ -172,17 +200,17 @@ def plot_bar(
             >>> from dyce import H
             >>> from dyce.viz import plot_bar
             >>> ax = plot_bar(
-            ...     2 @ H(6),
-            ...     H(12),
-            ...     labels=["2d6", "d12"],
+            ...     2 @ H(10),
+            ...     H(8) + H(12),
+            ...     labels=["2d10", "d8 + d12"],
             ... )
-            >>> _ = ax.set_title("2d6 vs. d12")
+            >>> _ = ax.set_title("2d10 vs. d8 + d12")
             >>> _ = ax.legend(loc="upper right")
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_bar_light.svg">
-            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_bar_light.svg">
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../assets/plot_viz_plot_bar_light.svg">
         </picture>
 
     === "Horizontal bars (`horizontal=True`)"
@@ -190,56 +218,63 @@ def plot_bar(
             >>> from dyce import H
             >>> from dyce.viz import plot_bar
             >>> ax = plot_bar(
-            ...     2 @ H(6),
-            ...     H(12),
-            ...     labels=["2d6", "d12"],
+            ...     2 @ H(10),
+            ...     H(8) + H(12),
+            ...     labels=["2d10", "d8 + d12"],
             ...     horizontal=True,
             ... )
-            >>> _ = ax.set_title("2d6 vs. d12")
+            >>> _ = ax.set_title("2d10 vs. d8 + d12")
             >>> _ = ax.legend(loc="upper right")
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_hbar_light.svg">
-            <img alt="Plot: 2d6 vs. d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.svg">
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.svg">
         </picture>
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
-
     pct_formatter = mticker.PercentFormatter(xmax=1)
     if horizontal:
         ax.xaxis.set_major_formatter(pct_formatter)
     else:
         ax.yaxis.set_major_formatter(pct_formatter)
-
     if not hs_list:
         return ax
 
     unique_outcomes = _sorted_outcomes(hs_list)
     n = len(hs_list)
     bar_width = 0.8 / n
-
     if unique_outcomes:
-        try:
-            lo, hi = min(unique_outcomes), max(unique_outcomes)
-        except TypeError:  # pragma: no cover
-            pass  # non-comparable outcomes: matplotlib handles categorical axes
+        lo, hi = unique_outcomes[0], unique_outcomes[-1]
+        if horizontal:
+            ax.set_yticks(unique_outcomes)
+            ax.set_ylim(lo - 1.0, hi + 1.0)
         else:
-            if horizontal:
-                ax.set_yticks(unique_outcomes)
-                ax.set_ylim(lo - 1.0, hi + 1.0)
-            else:
-                ax.set_xticks(unique_outcomes)
-                ax.set_xlim(lo - 1.0, hi + 1.0)
-
+            ax.set_xticks(unique_outcomes)
+            ax.set_xlim(lo - 1.0, hi + 1.0)
+    colors = _colors_linear(cmap, len(hs_list), alpha) if cmap else None
     for i, (label, h) in enumerate(hs_list):
         outcomes, probs = _values_for_graph_type(h, graph_type)
         offsets = [o + (i + 0.5) * bar_width - 0.4 for o in outcomes]
         if horizontal:
-            ax.barh(offsets, probs, height=bar_width, label=label or None, alpha=alpha)
+            ax.barh(
+                offsets,
+                probs,
+                height=bar_width,
+                alpha=alpha,
+                color=colors[i] if colors else None,
+                label=label or None,
+            )
         else:
-            ax.bar(offsets, probs, width=bar_width, label=label or None, alpha=alpha)
+            ax.bar(
+                offsets,
+                probs,
+                width=bar_width,
+                alpha=alpha,
+                color=colors[i] if colors else None,
+                label=label or None,
+            )
 
     return ax
 
@@ -305,7 +340,7 @@ def plot_burst(
     h: H[_T1],
     compare: H[_T2] | None = None,
     *,
-    alpha: float = _DEFAULT_ALPHA,
+    alpha: float = _DEFAULT_PLOT_ALPHA,
     ax: Axes | None = None,
     cmap: str | Colormap | None = None,
     compare_cmap: str | Colormap | None = None,
@@ -321,7 +356,7 @@ def plot_burst(
 
       -- END MONKEY PATCH -->
 
-    Plots a dual concentric pie chart for one or two histograms.
+    Plots a dual concentric pie chart for one or two histograms, useful for getting a “feel” when comparing distributions.
 
     The inner ring represents *h* and the outer ring represents *compare*.
     When *compare* is `None` (the default), both rings show the same histogram: the inner ring labels outcomes (via *formatter*) and the outer ring labels probabilities.
@@ -333,7 +368,7 @@ def plot_burst(
     *formatter* and *compare_formatter* are `BurstFormatterT` callables (see `format_outcome_name`, `format_probability`, `format_outcome_name_probability`).
 
     *cmap* / *compare_cmap* accept any matplotlib colormap name or instance.
-    If `None`, the `"image.cmap"` associated with the current style is used.
+    If `None`, `mpl.rcParams["image.cmap"]` is used.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
@@ -344,22 +379,23 @@ def plot_burst(
         >>> ax_d6 = plt.subplot2grid((1, 2), (0, 0))
         >>> _ = plot_burst(H(6), ax=ax_d6)
         >>> _ = ax_d6.set_title("d6")
-        >>> ax_2d6_vs_d12 = plt.subplot2grid((1, 2), (0, 1))
+        >>> ax_2d10_vs_d8d12 = plt.subplot2grid((1, 2), (0, 1))
         >>> _ = plot_burst(
-        ...     2 @ H(6),
-        ...     H(12),
-        ...     ax=ax_2d6_vs_d12,
+        ...     2 @ H(10),
+        ...     H(8) + H(12),
+        ...     cmap="RdYlGn",
+        ...     compare_cmap="RdYlBu",
+        ...     ax=ax_2d10_vs_d8d12,
         ... )
-        >>> _ = ax_2d6_vs_d12.set_title("2d6 vs. d12")
+        >>> _ = ax_2d10_vs_d8d12.set_title("2d10 vs. d8 + d12")
 
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
-        <img alt="Plot: 2d6 vs. d12" src="../assets/plot_viz_plot_burst_light.svg">
+        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_burst_light.svg">
     </picture>
     """
     ax = _get_ax(ax)
-
     h_compare = cast("H[_T2]", h if compare is None else compare)
     if compare_formatter is None:
         compare_formatter = cast(
@@ -379,21 +415,18 @@ def plot_burst(
 
     inner_labels, inner_probs = _wedges(h, formatter)
     outer_labels, outer_probs = _wedges(h_compare, compare_formatter)
-
     cmap = mpl.rcParams["image.cmap"] if cmap is None else cmap
     assert cmap is not None
     compare_cmap = mpl.rcParams["image.cmap"] if compare_cmap is None else compare_cmap
     assert compare_cmap is not None
-    inner_colors = _burst_colors(
+    inner_colors = _colors_proportionate(
         cmap, inner_probs, alpha, use_midpoints=use_midpoints_for_colors
     )
-    outer_colors = _burst_colors(
+    outer_colors = _colors_proportionate(
         compare_cmap, outer_probs, alpha, use_midpoints=use_midpoints_for_colors
     )
-
     if title:
         ax.set_title(title, fontweight="bold", pad=24.0)
-
     if outer_probs:
         ax.pie(
             outer_probs,
@@ -422,9 +455,10 @@ def plot_burst(
 @experimental
 def plot_line(
     *hs: H,
-    alpha: float = _DEFAULT_ALPHA,
+    alpha: float = _DEFAULT_PLOT_ALPHA,
     ax: Axes | None = None,
-    graph_type: GraphTypeT = "normal",
+    cmap: str | Colormap | None = None,
+    graph_type: GraphType = GraphType.NORMAL,
     labels: Sequence[str] = (),
     markers: str = _DEFAULT_MARKERS,
 ) -> Axes:
@@ -438,52 +472,256 @@ def plot_line(
     Plots a line graph of one or more histograms.
 
     Pass one or more [`H`][dyce.H] instances as positional arguments.
-    Use *labels* to assign names to each histogram; unmatched histograms receive an empty label.
+    Use *labels* to assign legend names to each histogram.
+    Unmatched histograms receive an empty label.
+
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
+
     *markers* is a string whose characters are cycled across histograms (e.g. `"oX^"` produces circle, cross, triangle, circle, …).
 
-    *graph_type* controls which variant of the distribution is plotted (see `GraphTypeT`).
+    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
+    Returns the axes so the caller can further customise the plot.
+
+    === "`graph_type=GraphType.NORMAL` (default)"
+
+        >>> from dyce import H
+        >>> from dyce.viz import GraphType, plot_line
+        >>> ax = plot_line(
+        ...     2 @ H(10),
+        ...     H(8) + H(12),
+        ...     labels=["2d10", "d8 + d12"],
+        ... )
+        >>> _ = ax.set_title("2d10 vs. d8 + d12")
+        >>> _ = ax.legend(loc="upper left")
+
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_light.svg">
+        </picture>
+
+    === "`graph_type=GraphType.AT_MOST`"
+
+        >>> from dyce import H
+        >>> from dyce.viz import GraphType, plot_line
+        >>> ax = plot_line(
+        ...     2 @ H(10),
+        ...     H(8) + H(12),
+        ...     graph_type=GraphType.AT_MOST,
+        ...     labels=["2d10", "d8 + d12"],
+        ... )
+        >>> _ = ax.set_title('2d10 vs. d8 + d12 ("at most")')
+        >>> _ = ax.legend(loc="upper left")
+
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_most_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_at_most_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_at_most_light.svg">
+        </picture>
+
+    === "`graph_type=GraphType.AT_LEAST`"
+
+        >>> from dyce import H
+        >>> from dyce.viz import GraphType, plot_line
+        >>> ax = plot_line(
+        ...     2 @ H(10),
+        ...     H(8) + H(12),
+        ...     graph_type=GraphType.AT_LEAST,
+        ...     labels=["2d10", "d8 + d12"],
+        ... )
+        >>> _ = ax.set_title('2d10 vs. d8 + d12 ("at least")')
+        >>> _ = ax.legend(loc="upper left")
+
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_least_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_at_least_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_at_least_light.svg">
+        </picture>
+    """
+    hs_list = _labeled_hs(hs, labels)
+    ax = _get_ax(ax)
+    ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
+    if not hs_list:
+        return ax
+
+    unique_outcomes = _sorted_outcomes(hs_list)
+    if unique_outcomes:
+        lo, hi = unique_outcomes[0], unique_outcomes[-1]
+        ax.set_xticks(unique_outcomes)
+        ax.set_xlim(lo - 0.5, hi + 0.5)
+    colors = _colors_linear(cmap, len(hs_list), alpha) if cmap else None
+    markers_cycle_forever = cycle(markers or " ")
+    for i, ((label, h), marker) in enumerate(
+        zip(hs_list, markers_cycle_forever, strict=False)
+    ):
+        outcomes, probs = _values_for_graph_type(h, graph_type)
+        ax.plot(
+            outcomes,
+            probs,
+            color=colors[i] if colors else None,
+            label=label or None,
+            marker=marker,
+            alpha=alpha,
+        )
+
+    return ax
+
+
+@experimental
+def plot_ridge(
+    *hs: H[_T],
+    alpha: float = _DEFAULT_RIDGE_ALPHA,
+    ax: Axes | None = None,
+    cmap: str | Colormap | None = None,
+    graph_type: GraphType = GraphType.NORMAL,
+    labels: Sequence[str] = (),
+    overlap: float = _DEFAULT_RIDGE_OVERLAP,
+    peak: float | None = None,
+) -> Axes:
+    r"""
+    <!-- BEGIN MONKEY PATCH --
+    >>> import matplotlib as mpl
+    >>> mpl.use("Agg")
+
+      -- END MONKEY PATCH -->
+
+    Plots a ridgeline (“joyplot”) of one or more histograms, useful for comparing a family of related distributions, where [`plot_line`][dyce.viz.plot_line] would produce a tangle of overlapping curves.
+
+    Pass one or more [`H`][dyce.H] instances as positional arguments.
+    Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
+    Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.
+
+    Use *labels* to name each histogram.
+    Names are drawn inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
+    Unmatched histograms get a blank label.
+
+    Each ridge covers only its own outcomes.
+    Where a neighbor has an outcome this histogram lacks, the line bridges the gap rather than dipping to zero, since the histogram says nothing there rather than saying zero.
+
+    *peak* is the probability drawn at full height.
+    It defaults to the largest probability among *hs*, which scales each plot to its own tallest ridge.
+    Overriding the default is useful for achieving uniform scale across subplots by passing the largest probability among all.
+
+    *overlap* is how many rows tall a ridge at *peak* stands.
+    At `#!python 1.0`, such a ridge just reaches the next row’s baseline.
+    The default (`#!python 2.4`) lets ridges climb well into the rows above them, which is the characteristic ridgeline look.
+
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
+
+    *cmap* accepts any Matplotlib colormap name or instance, sampled evenly to color the ridges.
+    If `None`, the default line colors associated with the current style are used.
+    Pass `mpl.rcParams["image.cmap"]` to use the default color map instead.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
         >>> from dyce import H
-        >>> from dyce.viz import plot_line
-        >>> ax = plot_line(
-        ...     2 @ H(6),
-        ...     H(12),
-        ...     graph_type="at_most",
-        ...     labels=["2d6", "d12"],
+        >>> from dyce.viz import plot_ridge
+        >>> ax = plot_ridge(
+        ...     2 @ H(10),
+        ...     H(8) + H(12),
+        ...     labels=["2d10", "d8 + d12"],
+        ...     overlap=2.0,
         ... )
-        >>> _ = ax.set_title("2d6 vs. d12")
-        >>> _ = ax.legend(loc="upper left")
+        >>> _ = ax.set_title("2d10 vs. d8 + d12")
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
-        <img alt="Plot: d6 and 2d6 vs. d12" src="../assets/plot_viz_plot_line_light.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
+        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
     </picture>
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
-    ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
-
     if not hs_list:
         return ax
 
     unique_outcomes = _sorted_outcomes(hs_list)
-
     if unique_outcomes:
-        try:
-            lo, hi = min(unique_outcomes), max(unique_outcomes)
-            ax.set_xticks(unique_outcomes)
-            ax.set_xlim(lo - 0.5, hi + 0.5)
-        except TypeError:  # pragma: no cover
-            pass  # non-comparable outcomes: matplotlib handles categorical axes
-
-    markers_cycle_forever = cycle(markers or " ")
-    for (label, h), marker in zip(hs_list, markers_cycle_forever, strict=False):
+        lo, hi = unique_outcomes[0], unique_outcomes[-1]
+        ax.set_xticks(unique_outcomes)  # type: ignore[arg-type] # ty: ignore[invalid-argument-type]
+        ax.set_xlim(lo - 0.5, hi + 0.5)  # type: ignore[operator] # ty: ignore[unsupported-operator]
+    colors = _colors_linear(cmap, len(hs_list)) if cmap else None
+    ridges: list[_RidgeT[_T]] = []
+    for i, (label, h) in enumerate(hs_list):
         outcomes, probs = _values_for_graph_type(h, graph_type)
-        ax.plot(outcomes, probs, label=label or None, marker=marker, alpha=alpha)
+        ridges.append(
+            {
+                "label": label,
+                "outcomes": outcomes,
+                "probs": probs,
+                "baseline": len(hs_list) - 1 - i,  # ordered top-to-bottom
+                "color": colors[i] if colors else None,
+            }
+        )
+    peak = (
+        max((max(row["probs"], default=0.0) for row in ridges), default=0.0)
+        if peak is None
+        else peak
+    )
+    peak_height = overlap * _RIDGE_ROW_STEP
+    scale = peak_height / peak if peak else 0.0
+    label_transform = mtransforms.blended_transform_factory(
+        # Makes sure labels appear at the leftmost edge of the graph, rather than where
+        # an outcome of value 0 is or would have been
+        ax.transAxes,
+        # This is the default (i.e., no change)
+        ax.transData,
+    )
+
+    for i, ridge in enumerate(ridges):
+        crests = tuple(ridge["baseline"] + prob * scale for prob in ridge["probs"])
+        (line,) = ax.plot(
+            cast("Sequence[float] | Sequence[int] | Sequence[str]", ridge["outcomes"]),
+            crests,
+            color=ridge["color"],
+            marker=_DEFAULT_MARKERS[0],
+            zorder=2 * i + 1,  # lower rows are appear in front of higher rows
+        )
+        red, green, blue = mcolors.to_rgb(line.get_color())
+        fill_outcomes = ridge["outcomes"]
+        fill_crests: tuple[float | int, ...] = crests
+        if fill_outcomes:
+            fill_outcomes = (
+                ridge["outcomes"][0] - _RIDGE_FILL_FOOT,  # type: ignore[arg-type,operator] # ty: ignore[unsupported-operator]
+                *fill_outcomes,
+                ridge["outcomes"][-1] + _RIDGE_FILL_FOOT,  # type: ignore[arg-type,operator] # ty: ignore[unsupported-operator]
+            )
+            fill_crests = (
+                ridge["baseline"],
+                *fill_crests,
+                ridge["baseline"],
+            )
+        if ridge["outcomes"]:
+            ax.fill(
+                fill_outcomes,
+                fill_crests,
+                color=(red, green, blue, alpha),
+                zorder=2 * i,  # sits just behind the line
+            )
+        ax.text(
+            0.0,
+            ridge["baseline"],
+            ridge["label"],
+            transform=label_transform,
+            ha="left",
+            va="bottom",
+            zorder=2 * len(ridges),  # on top of everything
+            bbox={
+                "boxstyle": "square,pad=0.2",
+                "facecolor": mcolors.to_rgba(ax.get_facecolor(), 0.72),
+                "edgecolor": "none",
+            },
+        )
+
+    # Baselines are the only reference the rows need, so the y-axis carries no
+    # ticks or grid of its own.
+    ax.set_yticks([])
+    ax.yaxis.grid(visible=False)
+    ax.set_ylim(
+        -0.5 * _RIDGE_ROW_STEP,
+        (len(ridges) - 1) * _RIDGE_ROW_STEP + peak_height + 0.5 * _RIDGE_ROW_STEP,
+    )
 
     return ax
 
@@ -491,36 +729,20 @@ def plot_line(
 # ---- Helpers -------------------------------------------------------------------------
 
 
-def _labeled_hs(
-    hs: tuple[H[_T], ...],
-    labels: Sequence[str],
-) -> list[tuple[str, H[_T]]]:
-    return [(labels[i] if i < len(labels) else "", h) for i, h in enumerate(hs)]
+def _colors_linear(
+    cmap: str | Colormap,
+    num_rows: int,
+    alpha: float = 1.0,
+) -> list[tuple[float, float, float, float]]:
+    cm: Colormap = plt.colormaps.get_cmap(cmap) if isinstance(cmap, str) else cmap
+    points = [i / (num_rows - 1) for i in range(num_rows)] if num_rows > 1 else [0.5]
+    return [(r, g, b, alpha) for r, g, b, _ in (cm(p) for p in points)]
 
 
-def _get_ax(ax: Axes | None) -> Axes:
-    return ax if ax is not None else plt.gca()
-
-
-def _values_for_graph_type(
-    h: H[_T],
-    graph_type: GraphTypeT,
-) -> tuple[tuple[_T, ...], tuple[float, ...]]:
-    if not h:
-        return (), ()
-    outcomes: tuple[_T, ...] = tuple(h)
-    probs: tuple[float, ...] = tuple(float(p) for _, p in h.probability_items())
-    if graph_type == "at_least":
-        probs = tuple(accumulate(probs, operator.sub, initial=1.0))[:-1]
-    elif graph_type == "at_most":
-        probs = tuple(accumulate(probs, operator.add, initial=0.0))[1:]
-    return outcomes, probs
-
-
-def _burst_colors(
+def _colors_proportionate(
     cmap: str | Colormap,
     probs: tuple[float, ...],
-    alpha: float,
+    alpha: float = 1.0,
     *,
     use_midpoints: bool = True,
 ) -> list[tuple[float, float, float, float]]:
@@ -539,9 +761,42 @@ def _burst_colors(
     return [(r, g, b, alpha) for r, g, b, _ in (cm(p) for p in points)]
 
 
+def _get_ax(ax: Axes | None) -> Axes:
+    return ax if ax is not None else plt.gca()
+
+
+def _labeled_hs(
+    hs: tuple[H[_T], ...],
+    labels: Sequence[str],
+) -> list[tuple[str, H[_T]]]:
+    return [(labels[i] if i < len(labels) else "", h) for i, h in enumerate(hs)]
+
+
 def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
     all_outcomes: set[_T] = {o for _, h in hs_list for o in h}
     try:
         return sorted(all_outcomes)  # type: ignore[type-var]
     except TypeError:  # pragma: no cover
         return sorted(all_outcomes, key=natural_key)
+
+
+def _values_for_graph_type(
+    h: H[_T],
+    graph_type: GraphType,
+) -> tuple[tuple[_T, ...], tuple[float, ...]]:
+    if not h:
+        return (), ()
+
+    outcomes: tuple[_T, ...] = tuple(h)
+    probs: tuple[float, ...] = tuple(float(p) for _, p in h.probability_items())
+    match graph_type:
+        case GraphType.NORMAL:
+            pass
+        case GraphType.AT_LEAST:
+            probs = tuple(accumulate(probs, operator.sub, initial=1.0))[:-1]
+        case GraphType.AT_MOST:
+            probs = tuple(accumulate(probs, operator.add, initial=0.0))[1:]
+        case _:  # pragma: no cover
+            raise ValueError(f"unrecognized graph type ({graph_type})")
+
+    return outcomes, probs

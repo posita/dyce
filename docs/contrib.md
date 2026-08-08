@@ -10,7 +10,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 
 # Contributing to `dyce`
 
@@ -28,7 +28,7 @@ For more free-flow discussions (beefs, rants, ideas, recipes, etc.), consider st
 
 If you’re so inclined, feel free to post on StackExchange (e.g., in [RPG](https://rpg.stackexchange.com/) or [Math](https://math.stackexchange.com/)), and tag the question with `dyce`.
 Feel free to at-mention `@posita` as well.
--->
+  -->
 
 ## Hacking quick-start
 

@@ -73,6 +73,7 @@ markdown_extensions:
 
 exclude_docs: |
   __pycache__/
+  snippets/
 
 extra:
   version:

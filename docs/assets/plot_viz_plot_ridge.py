@@ -16,15 +16,15 @@
 
 def fig_callback(line_color: str) -> None:
     from dyce import H
-    from dyce.viz import plot_line
+    from dyce.viz import plot_ridge
 
-    ax = plot_line(
+    ax = plot_ridge(
         2 @ H(10),
         H(8) + H(12),
         labels=["2d10", "d8 + d12"],
+        overlap=2.0,
     )
     ax.set_title("2d10 vs. d8 + d12")
-    ax.legend(loc="upper left")
 
     # Style (dark/light) tweaks
     ax.tick_params(colors=line_color)

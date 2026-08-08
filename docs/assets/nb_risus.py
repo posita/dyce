@@ -115,7 +115,7 @@ if TYPE_CHECKING:
         cmap_name: str = "viridis",
         plt_total_rows: int = 1,
         plt_cur_row: int = 0,
-    ) -> Sequence[Axes]: ...
+    ) -> list[Axes]: ...
 
 
 # %% editable=false jupyter={"source_hidden": true}
@@ -168,7 +168,7 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
     cmap_name: str = "viridis",
     plt_total_rows: int = 1,
     plt_cur_row: int = 0,
-) -> Sequence[Axes]:
+) -> list[Axes]:
     axes: list[Axes] = []
     col_names = [e.name for e in Versus]
     cmap = mpl.colormaps[cmap_name]
@@ -413,7 +413,7 @@ if TYPE_CHECKING:
 
     def viz_multi_round_goliath_helper(
         single_round_goliath_func: VersusFuncGoliathT,
-    ) -> Sequence[Axes]: ...
+    ) -> list[Axes]: ...
 
 
 # %% editable=false jupyter={"source_hidden": true}
@@ -421,7 +421,7 @@ if TYPE_CHECKING:
 # See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
 def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
     single_round_goliath_func: VersusFuncGoliathT,
-) -> Sequence[Axes]:
+) -> list[Axes]:
     from functools import partial
 
     all_axes: list[Axes] = []
