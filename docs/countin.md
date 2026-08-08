@@ -10,7 +10,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 <!-- BEGIN MONKEY PATCH --
 For typing:
 
@@ -31,7 +31,7 @@ For typing:
 
     `dyce` also provides additional primitives ([`R` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without the overhead of enumeration.
     These are covered [separately](rollin.md).
--->
+  -->
 
 [`H` objects][dyce.H] represent histograms for modeling discrete outcomes.
 They encode finite discrete probability distributions as integer counts without any denominator.

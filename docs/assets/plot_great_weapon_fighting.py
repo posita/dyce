@@ -55,82 +55,21 @@ def fig_callback(line_color: str) -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
     # --8<-- [start:viz]
-    from matplotlib import pyplot as plt
 
-    from dyce.viz import plot_burst, plot_line
+    from dyce.viz import plot_ridge
 
-    cmap_sa = "Reds"
-    cmap_gwf_2014 = "Greens"
-    cmap_gwf_2024 = "Purples"
-
-    ax_sa = plt.subplot2grid((3, 2), (0, 0), rowspan=3)
-    plot_line(
+    ax = plot_ridge(
         single_attack,
         h_gwf_2014,
         h_gwf_2024,
         labels=[label_sa, label_gwf_2014, label_gwf_2024],
-        ax=ax_sa,
+        overlap=2.0,
     )
-    ax_sa.lines[0].set_color(plt.get_cmap(cmap_sa)(0.75))
-    ax_sa.lines[1].set_color(plt.get_cmap(cmap_gwf_2014)(0.75))
-    ax_sa.lines[2].set_color(plt.get_cmap(cmap_gwf_2024)(0.75))
-    ax_sa.legend()
-
-    ax_sa_gwf_2014 = plt.subplot2grid((3, 2), (0, 1))
-    plot_burst(
-        h_gwf_2014,
-        single_attack,
-        cmap=cmap_gwf_2014,
-        compare_cmap=cmap_sa,
-        title=f"{label_sa}\nvs.\n{label_gwf_2014}",
-        ax=ax_sa_gwf_2014,
-    )
-
-    ax_sa_gwf_2024 = plt.subplot2grid((3, 2), (1, 1))
-    plot_burst(
-        h_gwf_2024,
-        single_attack,
-        cmap=cmap_gwf_2024,
-        compare_cmap=cmap_sa,
-        title=f"{label_sa}\nvs.\n{label_gwf_2024}",
-        ax=ax_sa_gwf_2024,
-    )
-
-    ax_gwf_2014_2024 = plt.subplot2grid((3, 2), (2, 1))
-    plot_burst(
-        h_gwf_2024,
-        h_gwf_2014,
-        cmap=cmap_gwf_2024,
-        compare_cmap=cmap_gwf_2014,
-        title=f"{label_gwf_2014}\nvs.\n{label_gwf_2024}",
-        ax=ax_gwf_2014_2024,
-    )
-
-    plt.gcf().set_size_inches(9.6, 9.6)
     # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
-    if line_color == "white":
-        ax_sa.lines[0].set_color(plt.get_cmap(cmap_sa)(0.5))
-        ax_sa.lines[1].set_color(plt.get_cmap(cmap_gwf_2014)(0.5))
-        ax_sa.lines[2].set_color(plt.get_cmap(cmap_gwf_2024)(0.5))
-        ax_sa.legend()
-    ax_sa.tick_params(colors=line_color)
-    for text in ax_sa_gwf_2014.texts:
-        text.set_color(line_color)
-    for patch in ax_sa_gwf_2014.patches:
-        patch.set_edgecolor(line_color)
-    ax_sa_gwf_2014.title.set_color(line_color)
-    for text in ax_sa_gwf_2024.texts:
-        text.set_color(line_color)
-    for patch in ax_sa_gwf_2024.patches:
-        patch.set_edgecolor(line_color)
-    ax_sa_gwf_2024.title.set_color(line_color)
-    for text in ax_gwf_2014_2024.texts:
-        text.set_color(line_color)
-    for patch in ax_gwf_2014_2024.patches:
-        patch.set_edgecolor(line_color)
-    ax_gwf_2014_2024.title.set_color(line_color)
+    ax.tick_params(colors=line_color)
+    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

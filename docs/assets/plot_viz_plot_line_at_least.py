@@ -16,14 +16,15 @@
 
 def fig_callback(line_color: str) -> None:
     from dyce import H
-    from dyce.viz import plot_line
+    from dyce.viz import GraphType, plot_line
 
     ax = plot_line(
         2 @ H(10),
         H(8) + H(12),
+        graph_type=GraphType.AT_LEAST,
         labels=["2d10", "d8 + d12"],
     )
-    ax.set_title("2d10 vs. d8 + d12")
+    ax.set_title('2d10 vs. d8 + d12 ("at least")')
     ax.legend(loc="upper left")
 
     # Style (dark/light) tweaks

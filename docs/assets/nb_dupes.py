@@ -73,8 +73,8 @@ res_8d10 = count_dupes(8 @ P(10))
 from dyce.viz import plot_bar
 
 ax = plot_bar(res_15d6, res_8d10, labels=["15d6", "8d10"])
-ax.legend()
 ax.set_title("Chances of rolling $n$ duplicates")
+ax.legend()
 
 from matplotlib import pyplot as plt
 

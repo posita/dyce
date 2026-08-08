@@ -10,7 +10,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 
 The following examples and translations are intended to showcase `dyce`’s flexibility.
 If you have exposure to another tool, they may also help with transition.
@@ -559,15 +559,9 @@ Example 1 table:
 
 Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-<details>
-<summary>
-  Visualization source code
-</summary>
-
 ```python
 --8<-- "docs/assets/plot_great_weapon_fighting.py:viz"
 ```
-</details>
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -714,9 +708,15 @@ Translation:
 
 Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
+<details>
+<summary>
+  Visualization source code
+</summary>
+
 ```python
 --8<-- "docs/assets/plot_roll_and_keep.py:viz"
 ```
+</details>
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>

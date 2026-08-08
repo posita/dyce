@@ -86,8 +86,8 @@ ax = plot_line(
     labels=["Normal hit", "Critical hit", "Advantage-weighted"],
 )
 ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
-ax.legend()
 ax.set_title("Advantage-weighted attack with critical hits")
+ax.legend()
 
 from matplotlib import pyplot as plt
 

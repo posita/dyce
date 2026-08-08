@@ -10,7 +10,7 @@
   ALL LINKS MUST BE ABSOLUTE.
   This file is used on GitHub and PyPi (via pyproject.toml).
   There is no guarantee that other docs/resources will be available where this content is displayed.
--->
+  -->
 
 <!-- mkdocs:hide:start -->
 *Copyright and other protections apply.
@@ -62,6 +62,13 @@ See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summa
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
 If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://posita.github.io/dyce/latest/contrib/).
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
+  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
+</picture>
 
 ## Installation
 
@@ -149,7 +156,7 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 <!--
 [`R` objects](https://posita.github.io/dyce/latest/dyce/#dyce.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
- -->
+  -->
 
 ```python
 >>> from dyce import H
@@ -234,7 +241,7 @@ Visualization: <a href="https://posita.github.io/dyce/latest/jupyter/lab/?path=2
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Taking the lowest or highest die of 2d6" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
 </picture>
 
 [`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) and [`P` objects](https://posita.github.io/dyce/latest/dyce/#dyce.P) can generate random rolls.

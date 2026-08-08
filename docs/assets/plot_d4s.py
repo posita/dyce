@@ -15,16 +15,34 @@
 
 
 def fig_callback(line_color: str) -> None:
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_d4s.py
+    # --8<-- [start:core]
     from dyce import H
-    from dyce.viz import plot_line
 
-    ax = plot_line(
-        2 @ H(10),
-        H(8) + H(12),
-        labels=["2d10", "d8 + d12"],
+    d4 = H(4)
+    h6d4p15 = 6 @ d4 + 15
+    h8d4p10 = 8 @ d4 + 10
+    h10d4p5 = 10 @ d4 + 5
+    h12d4 = 12 @ d4
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs/assets/nb_d4s.py
+    # --8<-- [start:viz]
+    from dyce.viz import plot_ridge
+
+    ax = plot_ridge(
+        h6d4p15,
+        h8d4p10,
+        h10d4p5,
+        h12d4,
+        labels=("6d4+15", "8d4+10", "10d4+5", "12d4"),
+        cmap="plasma",
+        overlap=4.0,
     )
-    ax.set_title("2d10 vs. d8 + d12")
-    ax.legend(loc="upper left")
+    ax.tick_params(axis="x", labelrotation=60)
+    ax.set_title("Various quantities of d4s")
+    ax.legend()
+    # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
     ax.tick_params(colors=line_color)

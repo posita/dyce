@@ -13,25 +13,30 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
+from typing import cast
 
 import pytest
 
-from dyce.d import d0, d1, d6, d8, d12, h2d6
+from dyce import H
+from dyce.d import d0, d1, d4, d6, d8, d12, d20, h2d6, h2d10
 
 mpl = pytest.importorskip("matplotlib")
 mpl.use("Agg")
 
 import matplotlib.pyplot as plt  # ruff: ignore[module-import-not-at-top-of-file]
+from matplotlib.lines import Line2D  # ruff: ignore[module-import-not-at-top-of-file]
 from matplotlib.patches import Wedge  # ruff: ignore[module-import-not-at-top-of-file]
 
 from dyce.viz import (  # ruff: ignore[module-import-not-at-top-of-file]
+    GraphType,
     format_outcome_name,
     format_outcome_name_probability,
     format_probability,
     plot_bar,
     plot_burst,
     plot_line,
+    plot_ridge,
 )
 
 __all__ = ()
@@ -41,6 +46,14 @@ __all__ = ()
 def _close_figures() -> Generator[None]:
     yield
     plt.close("all")
+
+
+def _line_xdata_as_floats(line: Line2D) -> list[float]:
+    return [float(x) for x in cast("Iterable[float]", line.get_xdata())]
+
+
+def _line_ydata_as_floats(line: Line2D) -> list[float]:
+    return [float(y) for y in cast("Iterable[float]", line.get_ydata())]
 
 
 class TestFormatters:
@@ -85,38 +98,15 @@ class TestFormatters:
 
 
 class TestPlotBar:
-    def test_single_h_returns_axes(self) -> None:
-        ax = plot_bar(d6)
+    def test_no_args(self) -> None:
+        ax = plot_bar()
         assert ax is not None
-
-    def test_labeled_hs(self) -> None:
-        ax = plot_bar(h2d6, d12, labels=["2d6", "d12"])
-        # one container (bar group) per histogram
-        assert len(ax.containers) == 2
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_empty_h(self) -> None:
         ax = plot_bar(d0)
         assert ax is not None
-
-    def test_no_args(self) -> None:
-        ax = plot_bar()
-        assert ax is not None
-
-    def test_graph_type_at_most(self) -> None:
-        ax = plot_bar(d6, graph_type="at_most")
-        assert ax is not None
-
-    def test_graph_type_at_least(self) -> None:
-        ax = plot_bar(d6, graph_type="at_least")
-        assert ax is not None
-
-    def test_horizontal(self) -> None:
-        ax = plot_bar(d6, horizontal=True)
-        assert ax is not None
-
-    def test_horizontal_labeled(self) -> None:
-        ax = plot_bar(d6, d8, labels=["d6", "d8"], horizontal=True)
-        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
@@ -124,28 +114,55 @@ class TestPlotBar:
         returned = plot_bar(d6, ax=supplied)
         assert returned is supplied
 
-    def test_bool_outcomes(self) -> None:
-        ax = plot_bar(d6.ge(4))
-        assert ax is not None
+    def test_labeled_hs(self) -> None:
+        labels = ["d8 + d12", "2d10"]
+        ax = plot_bar(d8 + d12, h2d10, labels=labels)
+        assert [c.get_label() for c in ax.containers] == labels
+
+    def test_labeled_empty_hs(self) -> None:
+        labels = ["empty 1", "empty 2"]
+        ax = plot_bar(d0, d0, labels=labels)
+        assert [c.get_label() for c in ax.containers] == labels
+
+    def test_horizontal_labeled_hs(self) -> None:
+        labels = ["d8 + d12", "2d10"]
+        ax = plot_bar(d8 + d12, h2d10, labels=labels, horizontal=True)
+        assert [c.get_label() for c in ax.containers] == labels
 
     def test_labels_partial(self) -> None:
-        # Labels are shorter than hs, so extra histograms get empty an label
-        ax = plot_bar(d6, d8, labels=["d6"])
-        assert len(ax.containers) == 2
+        labels = ["d6"]
+        ax = plot_bar(d6, d8, labels=labels)
+        assert [c.get_label() for c in ax.containers][: len(labels)] == labels
+
+    def test_graph_type_at_most(self) -> None:
+        ax = plot_bar(d6, graph_type=GraphType.AT_MOST)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # _values_for_graph_type's behavior
+
+    def test_horizontal_graph_type_at_least(self) -> None:
+        ax = plot_bar(d6, graph_type=GraphType.AT_LEAST, horizontal=True)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # _values_for_graph_type's behavior
 
 
 class TestPlotBurst:
-    def test_single_h_returns_axes(self) -> None:
-        ax = plot_burst(d6)
-        assert ax is not None
-
-    def test_with_compare(self) -> None:
-        ax = plot_burst(h2d6, d6)
-        assert ax is not None
-
     def test_empty_h(self) -> None:
         ax = plot_burst(d0)
         assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+
+    def test_respects_provided_ax(self) -> None:
+        _, supplied = plt.subplots()
+
+        returned = plot_burst(d6, ax=supplied)
+        assert returned is supplied
+
+    def test_with_compare(self) -> None:
+        ax = plot_burst(d8 + d12, h2d10)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for differing wedges
 
     def test_title(self) -> None:
         ax = plot_burst(d6, title="d6")
@@ -154,21 +171,18 @@ class TestPlotBurst:
     def test_custom_formatter(self) -> None:
         ax = plot_burst(d6, formatter=format_probability)
         assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether formatter was
+        # actually used
 
     def test_custom_compare_formatter(self) -> None:
         ax = plot_burst(d6, d6, compare_formatter=format_outcome_name_probability)
         assert ax is not None
-
-    def test_respects_provided_ax(self) -> None:
-        _, supplied = plt.subplots()
-
-        returned = plot_burst(d6, ax=supplied)
-        assert returned is supplied
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether formatter was
+        # actually used
 
     def test_plot_burst(self) -> None:
         mpl.use("agg")
-        _, ax = plt.subplots()
-        plot_burst(h2d6, ax=ax)
+        ax = plot_burst(h2d6)
         wedge_labels = [
             w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
         ]
@@ -200,8 +214,7 @@ class TestPlotBurst:
 
     def test_plot_burst_outer(self) -> None:
         mpl.use("agg")
-        _, ax = plt.subplots()
-        plot_burst(h2d6, ax=ax, compare_formatter=format_outcome_name_probability)
+        ax = plot_burst(h2d6, compare_formatter=format_outcome_name_probability)
         wedge_labels = [
             w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
         ]
@@ -231,35 +244,178 @@ class TestPlotBurst:
             "",  # 12 is hidden
         ]
 
+    def test_str_outcomes(self) -> None:
+        ax = plot_burst(H({"one": 1, "two": 1}))
+        wedge_labels = [
+            w.get_label() for w in ax.get_children() if isinstance(w, Wedge)
+        ]
+        assert wedge_labels == ["50.00%", "50.00%", "one", "two"]
+
 
 class TestPlotLine:
-    def test_single_h_returns_axes(self) -> None:
-        ax = plot_line(d6)
+    def test_no_args(self) -> None:
+        ax = plot_line()
         assert ax is not None
-
-    def test_labeled_hs(self) -> None:
-        ax = plot_line(h2d6, d12, labels=["2d6", "d12"])
-        assert len(ax.lines) == 2
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_empty_h(self) -> None:
         ax = plot_line(d0)
         assert ax is not None
-
-    def test_no_args(self) -> None:
-        ax = plot_line()
-        assert ax is not None
-
-    def test_graph_type_at_most(self) -> None:
-        ax = plot_line(d6, graph_type="at_most")
-        assert ax is not None
-
-    def test_markers_cycled(self) -> None:
-        ax = plot_line(d6, d6, d6, markers="ox")
-        markers_used = [line.get_marker() for line in ax.lines]
-        assert markers_used == ["o", "x", "o"]
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
 
         returned = plot_line(d6, ax=supplied)
         assert returned is supplied
+
+    def test_labeled_hs(self) -> None:
+        labels = ["d8 + d12", "2d10"]
+        ax = plot_line(d8 + d12, h2d10, labels=labels)
+        assert [ln.get_label() for ln in ax.lines] == labels
+
+    def test_labeled_empty_hs(self) -> None:
+        labels = ["empty 1", "empty 2"]
+        ax = plot_line(d0, d0, labels=labels)
+        assert [ln.get_label() for ln in ax.lines] == labels
+
+    def test_graph_type_at_most(self) -> None:
+        ax = plot_line(d6, graph_type=GraphType.AT_MOST)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # _values_for_graph_type's behavior
+
+    def test_markers_cycled(self) -> None:
+        ax = plot_line(d6, d6, d6, markers="ox")
+        markers_used = [ln.get_marker() for ln in ax.lines]
+        assert markers_used == ["o", "x", "o"]
+
+
+class TestPlotRidge:
+    def test_no_args(self) -> None:
+        ax = plot_ridge()
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+
+    def test_empty_h(self) -> None:
+        ax = plot_ridge(d0)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+
+    def test_respects_provided_ax(self) -> None:
+        _, supplied = plt.subplots()
+
+        returned = plot_ridge(d6, ax=supplied)
+        assert returned is supplied
+
+    def test_labeled_empty_hs(self) -> None:
+        labels = ["empty 1", "empty 2"]
+        ax = plot_ridge(d0, d0, labels=labels)
+        assert [t.get_text() for t in ax.texts] == labels
+
+    def test_labels_are_drawn_in_the_plot_not_as_yticks(self) -> None:
+        labels = ["2d6", "d12"]
+        ax = plot_ridge(h2d6, d12, labels=labels)
+        assert [t.get_text() for t in ax.texts] == labels
+        assert list(ax.get_yticks()) == []
+
+    def test_labels_partial(self) -> None:
+        labels = ["2d6"]
+        ax = plot_ridge(h2d6, d12, labels=labels)
+        assert [t.get_text() for t in ax.texts] == [*labels, ""]
+
+    def test_one_ridge_per_h(self) -> None:
+        ax = plot_ridge(h2d6, d12, d6)
+        assert len(ax.patches) == 3  # the filled ridges
+        assert len(ax.lines) == 3  # the crest lines
+
+    def test_empty_h_gets_no_ridge(self) -> None:
+        labels = ["d6", "empty"]
+        ax = plot_ridge(d6, d0, labels=labels)
+        assert len(ax.patches) == 1  # no ridge for the empty histogram
+        assert [t.get_text() for t in ax.texts] == labels
+
+    def test_rows_stack_top_down_in_argument_order(self) -> None:
+        labels = ["d6", "d8", "d12"]
+        ax = plot_ridge(d6, d8, d12, labels=labels)
+        assert [t.get_position()[1] for t in ax.texts] == [2.0, 1.0, 0.0]
+        assert [t.get_text() for t in ax.texts] == labels
+
+    def test_each_ridge_contains_only_its_own_outcomes(self) -> None:
+        ax = plot_ridge(d6, d12)
+        assert _line_xdata_as_floats(ax.lines[0]) == [float(outcome) for outcome in d6]
+        assert _line_xdata_as_floats(ax.lines[1]) == [float(outcome) for outcome in d12]
+
+    def test_heights_share_one_scale(self) -> None:
+        ax = plot_ridge(
+            h2d6,
+            h2d6 + 10,  # different outcomes, same peak probability
+            d12,  # half of peak probability
+        )
+        peaks = [
+            max(_line_ydata_as_floats(line)) - baseline
+            for line, baseline in zip(ax.lines, (2.0, 1.0, 0.0), strict=True)
+        ]
+        assert peaks[0] == pytest.approx(peaks[1])
+        assert peaks[0] == pytest.approx(peaks[2] * 2)
+
+    def test_peak_defaults_to_the_tallest_probability(self) -> None:
+        max_prob = max(
+            float(probability)
+            for h in (d4, d20)
+            for _, probability in h.probability_items()
+        )
+        _, provided_peak_ax = plt.subplots()
+        _, default_computed_peak_ax = plt.subplots()
+        plot_ridge(d4, d20, peak=max_prob, ax=provided_peak_ax)
+        plot_ridge(d4, d20, ax=default_computed_peak_ax)
+        assert [_line_ydata_as_floats(line) for line in provided_peak_ax.lines] == [
+            _line_ydata_as_floats(line) for line in default_computed_peak_ax.lines
+        ]
+
+    def test_peak_below_the_tallest_probability_exceeds_overlap(self) -> None:
+        max_prob = max(float(probability) for _, probability in d4.probability_items())
+        scalar = 5
+        overlap = 1.0
+        ax = plot_ridge(d4, peak=max_prob / scalar, overlap=overlap)
+        assert max(_line_ydata_as_floats(ax.lines[0])) == pytest.approx(
+            overlap * scalar
+        )
+
+    def test_explicit_peak_normalizes_scale_across_axes(self) -> None:
+        max_prob = max(
+            float(probability)
+            for h in (d4, d20)
+            for _, probability in h.probability_items()
+        )
+        _, d4_ax = plt.subplots()
+        _, d20_ax = plt.subplots()
+        plot_ridge(d4, peak=max_prob, overlap=2.0, ax=d4_ax)
+        plot_ridge(d20, peak=max_prob, overlap=2.0, ax=d20_ax)
+        assert max(_line_ydata_as_floats(d4_ax.lines[0])) == pytest.approx(
+            2.0  # 25% / 25% * overlap
+        )
+        assert max(_line_ydata_as_floats(d20_ax.lines[0])) == pytest.approx(
+            0.4  # 5% / 25% * overlap = 0.4
+        )
+
+    def test_overlap_scales_ridge_height(self) -> None:
+        _, taller_ax = plt.subplots()
+        _, shorter_ax = plt.subplots()
+        plot_ridge(d6, d8, overlap=1.0, ax=taller_ax)
+        plot_ridge(d6, d8, overlap=0.0, ax=shorter_ax)
+        assert max(_line_ydata_as_floats(taller_ax.lines[0])) > max(
+            _line_ydata_as_floats(shorter_ax.lines[0])
+        )
+
+    def test_graph_type_at_most(self) -> None:
+        ax = plot_ridge(d6, graph_type=GraphType.AT_MOST)
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # _values_for_graph_type's behavior
+
+    def test_cmap(self) -> None:
+        ax = plot_ridge(d6, d8, cmap="plasma")
+        assert ax is not None
+        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether the color map
+        # was used

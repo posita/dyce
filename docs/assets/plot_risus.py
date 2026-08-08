@@ -411,7 +411,7 @@ if TYPE_CHECKING:
 
     def viz_multi_round_goliath_helper(
         single_round_goliath_func: VersusFuncGoliathT,
-    ) -> Sequence[Axes]: ...
+    ) -> list[Axes]: ...
 # --8<-- [end:viz-multi-round-goliath-helper]
 
 
@@ -420,7 +420,7 @@ if TYPE_CHECKING:
 # See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
 def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
     single_round_goliath_func: VersusFuncGoliathT,
-) -> Sequence[Axes]:
+) -> list[Axes]:
     from functools import partial
 
     all_axes: list[Axes] = []
@@ -520,7 +520,7 @@ class EvensUp(IntEnum):
     HIT_EXPLODE = 2
 
 
-d_evens_up_raw = H(
+d_evens_up_raw: H[EvensUp] = H(
     (
         EvensUp.MISS,  # 1
         EvensUp.HIT,  # 2
