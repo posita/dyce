@@ -87,7 +87,6 @@ docs = [
 ]
 # Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
 lint = [
-    "beartype",
     "matplotlib_inline",
     "mypy",
     "pre-commit",
@@ -96,20 +95,22 @@ lint = [
     "pyright",
     "pytest",
     "ruff",
-    "ty",
+    "ty>=0.0.70",  # TODO(posita): https://github.com/astral-sh/ty/issues/4222
     {include-group = "docs"},
 ]
 # Only what's needed for uv run pytest --cov
 test = [
-    "beartype",
     "coverage[toml]",
     "numpy",
     "pandas",
-    "pytest-beartype",
     "pytest-benchmark",
     "pytest-cov",
     {include-group = "test-pypy"},
     {include-group = "viz"},
+]
+test-beartype = [
+    "beartype>=0.23.0rc0",
+    {include-group = "test"},
 ]
 # Only what's needed for uv run pytest specifically with PyPy (via Tox)
 test-pypy = [
@@ -186,31 +187,32 @@ docstring-code-line-length = "dynamic"
 
 [tool.ruff.lint.per-file-ignores]
 "docs/assets/nb_*.py" = [
-  # Allow co-mingled imports for snippets
-  "E402",  # Module level import not at top of file
-  # ruff is confused by jupytext comments
-  "ERA001",  # Found commented-out code
   # Cells support `await` statements
-  "F704",  # `await` statement outside of a function
-  "PLE1142",  # `await` should be used within an async function
+  "await-outside-async",
+  "yield-outside-function",
+  # ruff is confused by jupytext comments
+  "commented-out-code",
+  # Allow co-mingled imports for snippets
+  "module-import-not-at-top-of-file",
   # Useful for cell display
-  "B018",   # Found useless expression
-  "T201",  # `print` found (eglot-check)
+  "print",
+  "useless-expression",
   # Catch-all for things that are only ignored in these files
-  "RUF100",  # Unused `noqa` directive ...
+  "unused-noqa",
 ]
 "docs/assets/plot_*.py" = [
   # Allow co-mingled imports for snippets
-  "E402",  # Module level import not at top of file
+  "module-import-not-at-top-of-file",
   # Useful for cell display
-  "B018",   # Found useless expression
-  "T201",  # `print` found (eglot-check)
+  "print",
+  "useless-expression",
 ]
 "docs/notebooks/*.ipynb" = [
-  "E402",  # Module level import not at top of file
+  # Allow co-mingled imports for snippets
+  "module-import-not-at-top-of-file",
   # Useful for cell display
-  "B018",   # Found useless expression
-  "T201",  # `print` found (eglot-check)
+  "print",
+  "useless-expression",
 ]
 
 [tool.ruff.lint]
@@ -223,18 +225,18 @@ ignore = [
   "FIX",  # TODO(posita): run occasionally, or figure out how to make these warnings
   "PLC",
   "PLR",
-  "COM812",  # Trailing comma missing
-  "E501",  # Line too long (... > ...)
-  "INP001",  # File ... is part of an implicit namespace package. Add an `__init__.py`.
-  "N806",  # Variable ... in function should be lowercase
-  "RET505",  # Unnecessary `else` after `return` statement
-  "RET506",  # Unnecessary `else` after `raise` statement
-  "RET507",  # Unnecessary `else` after `continue` statement
-  "RUF002",  # Docstring contains ambiguous ...
-  "RUF067",  # `__init__` module should only contain docstrings and re-exports
-  "S101",  # Use of `assert` detected
-  "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
-  "TRY003",  # Avoid specifying long messages outside the exception class
+  "ambiguous-unicode-character-docstring",
+  "assert",
+  "implicit-namespace-package",
+  "line-too-long",
+  "missing-trailing-comma",
+  "non-empty-init-module",
+  "non-lowercase-variable-in-function",
+  "raise-vanilla-args",
+  "superfluous-else-continue",
+  "superfluous-else-raise",
+  "superfluous-else-return",
+  "suspicious-non-cryptographic-random-usage",
 ]
 select = [
   "ALL",

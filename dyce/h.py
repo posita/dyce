@@ -386,7 +386,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
         if isinstance(init_val, Iterable):
             if isinstance(init_val, Mapping):
-                self._h = dict(_sorted_items_iter(list(init_val.items())))  # ty: ignore[invalid-argument-type]
+                self._h = dict(_sorted_items_iter(list(init_val.items())))
             else:
                 c: Counter[_T_co] = Counter(init_val)
                 self._h = dict(_sorted_items_iter(list(c.items())))
@@ -1121,7 +1121,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).eq(H(10)).lowest_terms()
             H({False: 9, True: 1})
         """
-        return self.apply(ot.do_eq, rhs)  # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_eq, rhs)
 
     @overload
     def ne(self: "H[ot.CanNe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1136,7 +1136,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> H(6).ne(H(10)).lowest_terms()
             H({False: 1, True: 9})
         """
-        return self.apply(ot.do_ne, rhs)  # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_ne, rhs)
 
     @overload
     def ge(self: "H[ot.CanGe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1233,7 +1233,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         result: dict[_T, int] = dict(self)
         other_h = other if isinstance(other, H) else H(other)
         for outcome, count in other_h.items():
-            result[outcome] = result.get(outcome, 0) + count  # ty: ignore[invalid-assignment]
+            result[outcome] = result.get(outcome, 0) + count
         return H(result)
 
     @overload
@@ -1794,7 +1794,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 if outcome != existing_outcome
             }
             for repl_outcome, repl_count in repl.items():
-                d[repl_outcome] = (  # ty: ignore[invalid-assignment]
+                d[repl_outcome] = (
                     d.get(repl_outcome, 0) + repl_count * existing_outcome_count
                 )
         else:
