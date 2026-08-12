@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+<!--
+  Loads plotly.js in <head/> for interactive figure fragments.
+
+  The version must match the plotly.js that plotly.py bundles, which
+  plotly.offline.get_plotlyjs_version() reports. anydyce's playground
+  pins the same version in its importmap
+  (anydyce/playground/index.html), so that the ridge and line figures
+  look the same in both places. Bump them together.
+  -->
+{% block libs %}
+  {{ super() }}
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+{% endblock %}

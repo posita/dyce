@@ -41,6 +41,7 @@ Homepage = "https://posita.github.io/dyce/"
 "Source Repository" = "https://github.com/posita/dyce/"
 
 [project.optional-dependencies]
+plotly = ["plotly"]
 viz = ["matplotlib"]
 
 [build-system]
@@ -83,6 +84,7 @@ docs = [
     "pandas-stubs",
     "pymdown-extensions",
     "sympy",
+    {include-group = "plotly"},
     {include-group = "viz"},
 ]
 # Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
@@ -125,6 +127,7 @@ tox = [
     "tox-uv",
 ]
 # Mirrors optional dependencies
+plotly = ["plotly"]
 viz = ["matplotlib"]
 
 [tool.codespell]

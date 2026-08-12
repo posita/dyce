@@ -15,17 +15,19 @@
 
 
 def fig_callback(line_color: str) -> None:
+    # --8<-- [start:viz]
     from dyce import H
     from dyce.viz import GraphType, plot_line
 
     ax = plot_line(
         2 @ H(10),
         H(8) + H(12),
-        graph_type=GraphType.AT_MOST,
         labels=["2d10", "d8 + d12"],
+        graph_type=GraphType.AT_MOST,
     )
     ax.set_title('2d10 vs. d8 + d12 ("at most")')
     ax.legend(loc="upper left")
+    # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
     ax.tick_params(colors=line_color)

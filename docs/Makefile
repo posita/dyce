@@ -50,7 +50,8 @@ all : \
 	assets/plot_viz_plot_line_at_least_dark.svg \
 	assets/plot_viz_plot_line_at_least_light.svg \
 	assets/plot_viz_plot_ridge_dark.svg \
-	assets/plot_viz_plot_ridge_light.svg
+	assets/plot_viz_plot_ridge_light.svg \
+	snippets/plotly_viz_plot_ridge.html
 
 # \
 # 	assets/graph_classes_dyce_r_dark.svg \
@@ -107,6 +108,9 @@ assets/plot_%_dark.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 
 assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
+
+snippets/plotly_%.html : assets/plotly_%.py assets/_plotly.py ../dyce/*.py
+	"$${PYTHON:-python3}" assets/plotly_$*.py --log-level INFO --output-file $@
 
 assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True assets/perf_$*.ipy | tee $@

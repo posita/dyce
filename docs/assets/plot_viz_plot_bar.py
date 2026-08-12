@@ -15,6 +15,7 @@
 
 
 def fig_callback(line_color: str) -> None:
+    # --8<-- [start:viz]
     from dyce import H
     from dyce.viz import plot_bar
 
@@ -25,6 +26,7 @@ def fig_callback(line_color: str) -> None:
     )
     ax.set_title("2d10 vs. d8 + d12")
     ax.legend(loc="upper right")
+    # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
     ax.tick_params(colors=line_color)

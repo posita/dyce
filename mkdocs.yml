@@ -10,6 +10,7 @@ repo_url: https://github.com/posita/dyce/
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - content.code.annotate
     - content.tabs.link
@@ -121,3 +122,4 @@ nav:
     - Core: dyce.md
     - Conveniences: dyce.d.md
     - Visualization (optional): dyce.viz.md
+    - Plotly visualization (optional): dyce.viz_plotly.md

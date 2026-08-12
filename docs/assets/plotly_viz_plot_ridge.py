@@ -13,28 +13,38 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+from typing import TYPE_CHECKING
 
-def fig_callback(line_color: str) -> None:
+if TYPE_CHECKING:
+    from dyce.viz_plotly import PlotSpec
+
+
+def fig_callback() -> "PlotSpec":
     # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz import GraphType, plot_line
+    from dyce.viz_plotly import ridge_spec
 
-    ax = plot_line(
+    spec = ridge_spec(
         2 @ H(10),
         H(8) + H(12),
         labels=["2d10", "d8 + d12"],
-        graph_type=GraphType.AT_LEAST,
+        colors=["#1f77b4", "#d62728"],
+        label_bgcolor="rgba(255,255,255,0.72)",
     )
-    ax.set_title('2d10 vs. d8 + d12 ("at least")')
-    ax.legend(loc="upper left")
+    spec.layout.update(
+        {
+            "title": {"text": "2d10 vs. d8 + d12"},
+            "margin": {"l": 40, "r": 20, "t": 50, "b": 40},
+            "paper_bgcolor": "rgba(0,0,0,0)",
+            "plot_bgcolor": "rgba(0,0,0,0)",
+        }
+    )
     # --8<-- [end:viz]
 
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
+    return spec
 
 
 if __name__ == "__main__":
-    from _plot import main  # pyrefly: ignore[missing-import]
+    from _plotly import main  # pyrefly: ignore[missing-import]
 
     main(fig_callback)
