@@ -15,6 +15,7 @@
 
 
 def fig_callback(line_color: str) -> None:
+    # --8<-- [start:viz]
     from matplotlib import pyplot as plt
 
     from dyce import H
@@ -36,6 +37,7 @@ def fig_callback(line_color: str) -> None:
         ax=ax_2d10_vs_d8d12,
     )
     ax_2d10_vs_d8d12.set_title("2d10 vs. d8 + d12")
+    # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
     for ax in (ax_d6, ax_2d10_vs_d8d12):

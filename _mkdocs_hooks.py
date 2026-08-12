@@ -82,7 +82,7 @@ def on_pre_build(**_kwargs: object) -> None:
     # serve --livereload`
     shutil.copy2("LICENSE", "docs/license.md")
 
-    _uv_run(("make", "-C", "docs"))
+    _uv_run(("make", "-C", "docs", "-j", "4"))
 
 
 def on_post_build(config: dict, **_kwargs: object) -> None:
