@@ -19,7 +19,7 @@ from collections.abc import Iterable, Iterator, Sequence
 from types import (
     NotImplementedType,  # ruff: ignore[typing-only-standard-library-import]
 )
-from typing import Any, SupportsIndex, SupportsInt, TypeVar
+from typing import TYPE_CHECKING, Any, SupportsIndex, SupportsInt, TypeVar
 
 __all__ = (
     "GetItemT",
@@ -28,42 +28,52 @@ __all__ = (
     "natural_key",
 )
 
-try:
-    from beartype.roar import (
-        BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType]
-    )
-except ImportError:  # pragma: no cover
-
-    class BeartypeCallHintViolation(Exception):  # type: ignore[no-redef] # ruff: ignore[error-suffix-on-exception-name]
-        pass
-
 
 _T = TypeVar("_T")
 
-try:
-    from beartype import BeartypeConf, BeartypeStrategy, beartype
 
-    nobeartype = beartype(
-        conf=BeartypeConf(
-            strategy=BeartypeStrategy.O0,
+DYCE_IS_BEARIFIED = False
+
+
+class BeartypeCallHintViolation(Exception):  # ruff: ignore[error-suffix-on-exception-name]
+    pass
+
+
+class BeartypeConf:
+    pass
+
+
+_DUMMY_BEARTYPE_CONF = BeartypeConf()
+
+
+def beartype_this_package(*, conf: BeartypeConf = _DUMMY_BEARTYPE_CONF) -> None:
+    pass
+
+
+def nobeartype(arg: _T) -> _T:
+    return arg
+
+
+if not TYPE_CHECKING:  # pragma: no cover
+    try:
+        from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
+            BeartypeConf,
+            BeartypeStrategy,
+            beartype,
         )
-    )  # pyright: ignore[reportAssignmentType]
-except ImportError:  # pragma: no cover
+        from beartype.claw import beartype_this_package  # ruff: ignore[unused-import]
+        from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
+            BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType] # ruff: ignore[unused-import]
+        )
 
-    def nobeartype(arg: _T) -> _T:
-        return arg
-
-
-def _bearified_canary() -> None:
-    return False  # type: ignore[return-value]  # ty: ignore[invalid-return-type]
-
-
-try:
-    _bearified_canary()
-except BeartypeCallHintViolation:  # pragma: no cover
-    DYCE_IS_BEARIFIED = True
-else:  # pragma: no cover
-    DYCE_IS_BEARIFIED = False
+        nobeartype = beartype(
+            conf=BeartypeConf(
+                strategy=BeartypeStrategy.O0,
+            )
+        )  # pyright: ignore[reportAssignmentType]
+        DYCE_IS_BEARIFIED = True
+    except ImportError:  # pragma: no cover
+        pass
 
 
 class SentinelT:
