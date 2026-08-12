@@ -22,6 +22,11 @@ Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for subst
 It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
 """
 
+if True:  # so ruff won't complain imports are out-of-order, but still sort the others
+    from .types import beartype_this_package
+
+    beartype_this_package()
+
 from importlib.metadata import PackageNotFoundError, version
 
 from .evaluation import HResult, PResult, TruncationWarning, expand, explode_n

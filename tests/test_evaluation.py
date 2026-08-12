@@ -19,7 +19,7 @@ from collections.abc import Callable
 from enum import IntEnum, auto
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import Any, Never, cast
+from typing import Any, Never
 
 import pytest
 
@@ -152,7 +152,7 @@ class TestExpandTruncation:
         # is dropped, leaving an empty histogram. A TruncationWarning is emitted
         # by the innermost expand that catches the RecursionError.
         def _always_recurses(result: HResult[int]) -> H[int] | int:
-            return expand(_always_recurses, result.h) + 1  # ty: ignore[unsupported-operator]
+            return expand(_always_recurses, result.h) + 1
 
         with pytest.warns(TruncationWarning, match=r"\brecursion\b"):
             result = expand(_always_recurses, d1)
@@ -219,14 +219,11 @@ def _explode_with_truncation(
         return result.outcome
     else:
         return (
-            cast(
-                "H[int]",
-                expand(
-                    _explode_with_truncation,
-                    result.h,
-                    rcrs_err_countdown=rcrs_err_countdown - 1,
-                    truncate_countdown=truncate_countdown - 1,
-                ),
+            expand(
+                _explode_with_truncation,
+                result.h,
+                rcrs_err_countdown=rcrs_err_countdown - 1,
+                truncate_countdown=truncate_countdown - 1,
             )
             + result.outcome
         )

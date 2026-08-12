@@ -409,12 +409,12 @@ def _load_toml_config(  # ruff: ignore[complex-structure]
                 continue  # sub-table; handled below
             elif key in _TOML_SHARED_STR_KEYS:
                 if isinstance(val, str):
-                    shared[key] = val  # ty: ignore[invalid-assignment]
+                    shared[key] = val
                 else:
                     _LOGGER.warning("%s: %s must be a string; ignoring", candidate, key)
             elif key in _TOML_SHARED_STR_LIST_KEYS:
                 if isinstance(val, list) and all(isinstance(s, str) for s in val):
-                    shared[key] = val  # ty: ignore[invalid-assignment]
+                    shared[key] = val
                 else:
                     _LOGGER.warning(
                         "%s: %s must be a list of strings; ignoring", candidate, key
@@ -441,7 +441,7 @@ def _load_toml_config(  # ruff: ignore[complex-structure]
                                 and all(isinstance(t, str) for t in cmd)
                                 for cmd in val
                             ):
-                                sub[key] = val  # ty: ignore[invalid-assignment]
+                                sub[key] = val
                             else:
                                 _LOGGER.warning(
                                     "%s: checkers must be a list of string lists; ignoring",
@@ -449,7 +449,7 @@ def _load_toml_config(  # ruff: ignore[complex-structure]
                                 )
                         elif key in _TOML_CHECK_BOOL_KEYS:
                             if isinstance(val, bool):
-                                sub[key] = val  # ty: ignore[invalid-assignment]
+                                sub[key] = val
                             else:
                                 _LOGGER.warning(
                                     "%s: %s must be a boolean; ignoring",
