@@ -30,9 +30,7 @@ uv sync --group viz
   -- END MONKEY PATCH -->
 """
 
-import operator
 from collections.abc import Callable, Sequence
-from enum import StrEnum, auto
 from fractions import Fraction
 from itertools import accumulate, cycle
 from typing import Generic, TypedDict, TypeVar, cast, overload
@@ -52,6 +50,7 @@ else:
     from matplotlib.colors import Colormap
     from matplotlib.typing import RGBAColorType
 
+from ._viz import GraphType, values_for_graph_type
 from .h import H
 from .lifecycle import experimental
 from .types import natural_key
@@ -79,20 +78,6 @@ class _RidgeT(TypedDict, Generic[_T]):
     probs: tuple[float, ...]
     baseline: int
     color: RGBAColorType | None
-
-
-class GraphType(StrEnum):
-    r"""
-    Controls which variant of the distribution is plotted.
-
-    - *NORMAL*: raw probability for each outcome
-    - *AT_MOST*: cumulative probability `#!math P(X \le k)`
-    - *AT_LEAST*: survival probability `#!math P(X \ge k)`
-    """
-
-    NORMAL = auto()
-    AT_MOST = auto()
-    AT_LEAST = auto()
 
 
 BurstFormatterT = Callable[[_T, Fraction, H[_T]], str]
@@ -183,10 +168,7 @@ def plot_bar(
 
     Plots a grouped bar chart of one or more histograms.
 
-    Pass one or more [`H`][dyce.H] instances as positional arguments.
     Use *labels* to assign legend names to each histogram.
-    Unmatched histograms receive an empty label.
-    When multiple histograms are provided, bars are interleaved side-by-side.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
@@ -197,7 +179,7 @@ def plot_bar(
 
     === "Vertical bars (default)"
 
-        --8<-- "docs/assets/plot_viz_plot_bar.py:viz"
+            --8<-- "docs/assets/plot_viz_plot_bar.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.svg">
@@ -207,7 +189,7 @@ def plot_bar(
 
     === "Horizontal bars (`horizontal=True`)"
 
-        --8<-- "docs/assets/plot_viz_plot_hbar.py:viz"
+            --8<-- "docs/assets/plot_viz_plot_hbar.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.svg">
@@ -238,7 +220,7 @@ def plot_bar(
             ax.set_xlim(lo - 1.0, hi + 1.0)
     colors = _colors_linear(cmap, len(hs_list), alpha) if cmap else None
     for i, (label, h) in enumerate(hs_list):
-        outcomes, probs = _values_for_graph_type(h, graph_type)
+        outcomes, probs = values_for_graph_type(h, graph_type)
         offsets = [o + (i + 0.5) * bar_width - 0.4 for o in outcomes]
         if horizontal:
             ax.barh(
@@ -440,7 +422,6 @@ def plot_line(
 
     Plots a line graph of one or more histograms.
 
-    Pass one or more [`H`][dyce.H] instances as positional arguments.
     Use *labels* to assign legend names to each histogram.
     Unmatched histograms receive an empty label.
 
@@ -453,7 +434,7 @@ def plot_line(
 
     === "`graph_type=GraphType.NORMAL` (default)"
 
-        --8<-- "docs/assets/plot_viz_plot_line.py:viz"
+            --8<-- "docs/assets/plot_viz_plot_line.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
@@ -463,7 +444,7 @@ def plot_line(
 
     === "`graph_type=GraphType.AT_MOST`"
 
-        --8<-- "docs/assets/plot_viz_plot_line_at_most.py:viz"
+            --8<-- "docs/assets/plot_viz_plot_line_at_most.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_most_dark.svg">
@@ -473,7 +454,7 @@ def plot_line(
 
     === "`graph_type=GraphType.AT_LEAST`"
 
-        --8<-- "docs/assets/plot_viz_plot_line_at_least.py:viz"
+            --8<-- "docs/assets/plot_viz_plot_line_at_least.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_least_dark.svg">
@@ -497,7 +478,7 @@ def plot_line(
     for i, ((label, h), marker) in enumerate(
         zip(hs_list, markers_cycle_forever, strict=False)
     ):
-        outcomes, probs = _values_for_graph_type(h, graph_type)
+        outcomes, probs = values_for_graph_type(h, graph_type)
         ax.plot(
             outcomes,
             probs,
@@ -530,47 +511,38 @@ def plot_ridge(
 
     Plots a ridgeline (“joyplot”) of one or more histograms, useful for comparing a family of related distributions, where [`plot_line`][dyce.viz.plot_line] would produce a tangle of overlapping curves.
 
-    Pass one or more [`H`][dyce.H] instances as positional arguments.
     Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
     Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.
+
+    Each ridge covers only its own outcomes.
+    Where a neighbor has an outcome this histogram lacks, the line bridges the gap rather than dipping to zero, since the histogram says nothing there rather than saying zero.
 
     Use *labels* to name each histogram.
     Names are drawn inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
     Unmatched histograms get a blank label.
 
-    Each ridge covers only its own outcomes.
-    Where a neighbor has an outcome this histogram lacks, the line bridges the gap rather than dipping to zero, since the histogram says nothing there rather than saying zero.
-
-    *peak* is the probability drawn at full height.
-    It defaults to the largest probability among *hs*, which scales each plot to its own tallest ridge.
-    Overriding the default is useful for achieving uniform scale across subplots by passing the largest probability among all.
-
-    *overlap* is how many rows tall a ridge at *peak* stands.
-    At `#!python 1.0`, such a ridge just reaches the next row’s baseline.
-    The default (`#!python 2.4`) lets ridges climb well into the rows above them, which is the characteristic ridgeline look.
-
-    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
-
     *cmap* accepts any Matplotlib colormap name or instance, sampled evenly to color the ridges.
     If `None`, the default line colors associated with the current style are used.
     Pass `mpl.rcParams["image.cmap"]` to use the default color map instead.
+
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
+
+    *overlap* is how many rows tall a ridge at *peak* stands.
+    At `1.0`, such a ridge just reaches the next row's baseline.
+
+    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
+    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
         --8<-- "docs/assets/plot_viz_plot_ridge.py:viz"
 
-    === "Matplotlib rendering"
-
-        <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
-            <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
-        </picture>
-
-    === "Interactive Plotly rendering"
-
-        --8<-- "docs/snippets/plotly_viz_plot_ridge.html"
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
+        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
+    </picture>
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)
@@ -585,7 +557,7 @@ def plot_ridge(
     colors = _colors_linear(cmap, len(hs_list)) if cmap else None
     ridges: list[_RidgeT[_T]] = []
     for i, (label, h) in enumerate(hs_list):
-        outcomes, probs = _values_for_graph_type(h, graph_type)
+        outcomes, probs = values_for_graph_type(h, graph_type)
         ridges.append(
             {
                 "label": label,
@@ -719,25 +691,3 @@ def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
         return sorted(all_outcomes)  # type: ignore[type-var]
     except TypeError:  # pragma: no cover
         return sorted(all_outcomes, key=natural_key)
-
-
-def _values_for_graph_type(
-    h: H[_T],
-    graph_type: GraphType,
-) -> tuple[tuple[_T, ...], tuple[float, ...]]:
-    if not h:
-        return (), ()
-
-    outcomes: tuple[_T, ...] = tuple(h)
-    probs: tuple[float, ...] = tuple(float(p) for _, p in h.probability_items())
-    match graph_type:
-        case GraphType.NORMAL:
-            pass
-        case GraphType.AT_LEAST:
-            probs = tuple(accumulate(probs, operator.sub, initial=1.0))[:-1]
-        case GraphType.AT_MOST:
-            probs = tuple(accumulate(probs, operator.add, initial=0.0))[1:]
-        case _:  # pragma: no cover
-            raise ValueError(f"unrecognized graph type ({graph_type})")
-
-    return outcomes, probs
