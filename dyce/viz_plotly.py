@@ -332,7 +332,7 @@ def ridge_spec(
         line: dict[str, Any] = {
             "type": "scatter",
             "mode": "lines+markers",
-            "x": list(outcomes),
+            "x": list(row_outcomes),
             "y": crests,
             "name": label,
             "customdata": percents,
