@@ -197,7 +197,7 @@ def plot_bar(
 
     === "Vertical bars (default)"
 
-            --8<-- "docs/assets/plot_viz_plot_bar.py:viz"
+        --8<-- "docs/assets/plot_viz_plot_bar.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.svg">
@@ -207,7 +207,7 @@ def plot_bar(
 
     === "Horizontal bars (`horizontal=True`)"
 
-            --8<-- "docs/assets/plot_viz_plot_hbar.py:viz"
+        --8<-- "docs/assets/plot_viz_plot_hbar.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.svg">
@@ -453,7 +453,7 @@ def plot_line(
 
     === "`graph_type=GraphType.NORMAL` (default)"
 
-            --8<-- "docs/assets/plot_viz_plot_line.py:viz"
+        --8<-- "docs/assets/plot_viz_plot_line.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
@@ -463,7 +463,7 @@ def plot_line(
 
     === "`graph_type=GraphType.AT_MOST`"
 
-            --8<-- "docs/assets/plot_viz_plot_line_at_most.py:viz"
+        --8<-- "docs/assets/plot_viz_plot_line_at_most.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_most_dark.svg">
@@ -473,7 +473,7 @@ def plot_line(
 
     === "`graph_type=GraphType.AT_LEAST`"
 
-            --8<-- "docs/assets/plot_viz_plot_line_at_least.py:viz"
+        --8<-- "docs/assets/plot_viz_plot_line_at_least.py:viz"
 
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_least_dark.svg">
@@ -528,17 +528,26 @@ def plot_ridge(
 
       -- END MONKEY PATCH -->
 
-    Plots a ridgeline (“joyplot”) of one or more histograms.
+    Plots a ridgeline (“joyplot”) of one or more histograms, useful for comparing a family of related distributions, where [`plot_line`][dyce.viz.plot_line] would produce a tangle of overlapping curves.
 
+    Pass one or more [`H`][dyce.H] instances as positional arguments.
     Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
     Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.
+
+    Use *labels* to name each histogram.
+    Names are drawn inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
+    Unmatched histograms get a blank label.
 
     Each ridge covers only its own outcomes.
     Where a neighbor has an outcome this histogram lacks, the line bridges the gap rather than dipping to zero, since the histogram says nothing there rather than saying zero.
 
-    Use *labels* to name each histogram.
-    Names are drawn as “pills” inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
-    Unmatched histograms get a blank label.
+    *peak* is the probability drawn at full height.
+    It defaults to the largest probability among *hs*, which scales each plot to its own tallest ridge.
+    Overriding the default is useful for achieving uniform scale across subplots by passing the largest probability among all.
+
+    *overlap* is how many rows tall a ridge at *peak* stands.
+    At `#!python 1.0`, such a ridge just reaches the next row’s baseline.
+    The default (`#!python 2.4`) lets ridges climb well into the rows above them, which is the characteristic ridgeline look.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
@@ -546,22 +555,22 @@ def plot_ridge(
     If `None`, the default line colors associated with the current style are used.
     Pass `mpl.rcParams["image.cmap"]` to use the default color map instead.
 
-    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
-    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
-
-    *overlap* is how many rows tall a ridge at *peak* stands.
-    At `1.0`, such a ridge just reaches the next row's baseline.
-
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
 
         --8<-- "docs/assets/plot_viz_plot_ridge.py:viz"
 
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
-        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
-    </picture>
+    === "Matplotlib rendering"
+
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
+            <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
+        </picture>
+
+    === "Interactive Plotly rendering"
+
+        --8<-- "docs/snippets/plotly_viz_plot_ridge.html"
     """
     hs_list = _labeled_hs(hs, labels)
     ax = _get_ax(ax)

@@ -17,13 +17,90 @@ import pytest
 
 from dyce import H
 from dyce.d import d0, d4, d6, d8, d20, h2d6
-from dyce.viz_plotly import PlotSpec, figure_from_spec, ridge_spec
+from dyce.viz_plotly import PlotSpec, bar_spec, figure_from_spec, line_spec, ridge_spec
 
 __all__ = ()
 
 
 def _traces(spec: PlotSpec, role: str) -> list[dict]:
     return [trace for trace in spec.data if trace["meta"]["role"] == role]
+
+
+class TestBarSpec:
+    def test_vertical_bar_data(self) -> None:
+        trace = bar_spec(d4, labels=["d4"], precision=3).data[0]
+        assert trace["x"] == [1, 2, 3, 4]
+        assert trace["y"] == [pytest.approx(25.0)] * 4
+        assert trace["customdata"] == trace["y"]
+        assert trace["orientation"] == "v"
+        assert "%{x}" in trace["hovertemplate"]
+        assert "customdata:.3f" in trace["hovertemplate"]
+
+    def test_horizontal_bar_data(self) -> None:
+        spec = bar_spec(d4, horizontal=True)
+        trace = spec.data[0]
+        assert trace["x"] == [pytest.approx(25.0)] * 4
+        assert trace["y"] == [1, 2, 3, 4]
+        assert trace["orientation"] == "h"
+        assert "%{y}" in trace["hovertemplate"]
+        assert spec.layout["xaxis"]["title"]["text"] == "Probability (%)"
+
+    def test_multiple_histograms_are_grouped_and_labeled(self) -> None:
+        spec = bar_spec(d4, d6, labels=["d4", "d6"])
+        assert spec.layout["barmode"] == "group"
+        assert spec.layout["showlegend"] is True
+        assert [trace["name"] for trace in spec.data] == ["d4", "d6"]
+
+    def test_colors_cycle_and_metadata_identifies_series(self) -> None:
+        spec = bar_spec(d4, d6, colors=["#123456"])
+        assert [trace["marker"]["color"] for trace in spec.data] == [
+            "#123456",
+            "#123456",
+        ]
+        assert [trace["meta"] for trace in spec.data] == [
+            {"series": 0, "role": "bar"},
+            {"series": 1, "role": "bar"},
+        ]
+
+    def test_max_percent_sets_probability_range(self) -> None:
+        assert bar_spec(d6, max_percent=42.0).layout["yaxis"]["range"] == [
+            0.0,
+            42.0,
+        ]
+
+    def test_empty_inputs(self) -> None:
+        assert bar_spec().data == []
+        assert bar_spec(d0).data[0]["x"] == []
+
+
+class TestLineSpec:
+    def test_one_trace_per_histogram(self) -> None:
+        spec = line_spec(d4, d6, labels=["d4", "d6"])
+        assert len(spec.data) == 2
+        assert spec.data[0]["x"] == [1, 2, 3, 4]
+        assert spec.data[0]["y"] == [pytest.approx(25.0)] * 4
+        assert [trace["name"] for trace in spec.data] == ["d4", "d6"]
+        assert spec.layout["showlegend"] is True
+
+    def test_precision_and_metadata(self) -> None:
+        trace = line_spec(d6, precision=4).data[0]
+        assert "y:.4f" in trace["hovertemplate"]
+        assert trace["meta"] == {"series": 0, "role": "line"}
+
+    def test_colors_cycle_to_line_and_marker(self) -> None:
+        spec = line_spec(d4, d6, colors=["#123456"])
+        for trace in spec.data:
+            assert trace["line"]["color"] == "#123456"
+            assert trace["marker"]["color"] == "#123456"
+
+    def test_without_colors_carries_no_hue(self) -> None:
+        trace = line_spec(d6).data[0]
+        assert "line" not in trace
+        assert "color" not in trace["marker"]
+
+    def test_empty_inputs(self) -> None:
+        assert line_spec().data == []
+        assert line_spec(d0).data[0]["x"] == []
 
 
 class TestRidgeSpec:
