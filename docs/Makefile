@@ -54,6 +54,8 @@ all : \
 	snippets/plotly_viz_plot_bar.html \
 	snippets/plotly_viz_plot_hbar.html \
 	snippets/plotly_viz_plot_line.html \
+	snippets/plotly_viz_plot_line_at_least.html \
+	snippets/plotly_viz_plot_line_at_most.html \
 	snippets/plotly_viz_plot_ridge.html
 
 # \

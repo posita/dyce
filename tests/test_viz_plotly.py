@@ -17,7 +17,14 @@ import pytest
 
 from dyce import H
 from dyce.d import d0, d4, d6, d8, d20, h2d6
-from dyce.viz_plotly import PlotSpec, bar_spec, figure_from_spec, line_spec, ridge_spec
+from dyce.viz_plotly import (
+    GraphType,
+    PlotSpec,
+    bar_spec,
+    figure_from_spec,
+    line_spec,
+    ridge_spec,
+)
 
 __all__ = ()
 
@@ -44,6 +51,18 @@ class TestBarSpec:
         assert trace["orientation"] == "h"
         assert "%{y}" in trace["hovertemplate"]
         assert spec.layout["xaxis"]["title"]["text"] == "Probability (%)"
+
+    @pytest.mark.parametrize(
+        ("graph_type", "expected"),
+        [
+            (GraphType.AT_MOST, [25.0, 50.0, 75.0, 100.0]),
+            (GraphType.AT_LEAST, [100.0, 75.0, 50.0, 25.0]),
+        ],
+    )
+    def test_graph_type(self, graph_type: GraphType, expected: list[float]) -> None:
+        assert bar_spec(d4, graph_type=graph_type).data[0]["y"] == pytest.approx(
+            expected
+        )
 
     def test_multiple_histograms_are_grouped_and_labeled(self) -> None:
         spec = bar_spec(d4, d6, labels=["d4", "d6"])
@@ -86,6 +105,18 @@ class TestLineSpec:
         trace = line_spec(d6, precision=4).data[0]
         assert "y:.4f" in trace["hovertemplate"]
         assert trace["meta"] == {"series": 0, "role": "line"}
+
+    @pytest.mark.parametrize(
+        ("graph_type", "expected"),
+        [
+            (GraphType.AT_MOST, [25.0, 50.0, 75.0, 100.0]),
+            (GraphType.AT_LEAST, [100.0, 75.0, 50.0, 25.0]),
+        ],
+    )
+    def test_graph_type(self, graph_type: GraphType, expected: list[float]) -> None:
+        assert line_spec(d4, graph_type=graph_type).data[0]["y"] == pytest.approx(
+            expected
+        )
 
     def test_colors_cycle_to_line_and_marker(self) -> None:
         spec = line_spec(d4, d6, colors=["#123456"])
@@ -184,6 +215,17 @@ class TestRidgeSpec:
         line = _traces(spec, "line")[0]
         assert line["customdata"] == [pytest.approx(25.0)] * 4
         assert line["y"] != line["customdata"]
+
+    @pytest.mark.parametrize(
+        ("graph_type", "expected"),
+        [
+            (GraphType.AT_MOST, [25.0, 50.0, 75.0, 100.0]),
+            (GraphType.AT_LEAST, [100.0, 75.0, 50.0, 25.0]),
+        ],
+    )
+    def test_graph_type(self, graph_type: GraphType, expected: list[float]) -> None:
+        line = _traces(ridge_spec(d4, graph_type=graph_type), "line")[0]
+        assert line["customdata"] == pytest.approx(expected)
 
     def test_colors_give_each_ridge_one_hue(self) -> None:
         spec = ridge_spec(d6, d8, colors=["#1f77b4", "#d62728"])
@@ -285,6 +327,11 @@ class TestRidgeSpec:
 
 
 class TestPlotSpec:
+    def test_graph_type_is_shared_with_matplotlib_api(self) -> None:
+        from dyce.viz import GraphType as MatplotlibGraphType
+
+        assert GraphType is MatplotlibGraphType
+
     def test_default_config_is_not_shared(self) -> None:
         first = ridge_spec(d6)
         second = ridge_spec(d6)

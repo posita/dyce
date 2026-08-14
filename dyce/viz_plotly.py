@@ -25,10 +25,18 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, cast
 
+from ._viz import GraphType, values_for_graph_type
 from .h import H
 from .lifecycle import experimental
 
-__all__ = ("PlotSpec", "bar_spec", "figure_from_spec", "line_spec", "ridge_spec")
+__all__ = (
+    "GraphType",
+    "PlotSpec",
+    "bar_spec",
+    "figure_from_spec",
+    "line_spec",
+    "ridge_spec",
+)
 
 # Rows sit one _RIDGE_ROW_STEP apart and the tallest ridge stands _DEFAULT_RIDGE_OVERLAP of them
 # high. Only the ratio matters, since the y-axis range derives from it.
@@ -83,6 +91,7 @@ class PlotSpec:
 def bar_spec(
     *hs: H,
     colors: Sequence[str] = (),
+    graph_type: GraphType = GraphType.NORMAL,
     horizontal: bool = False,
     labels: Sequence[str] = (),
     max_percent: float | None = None,
@@ -91,9 +100,17 @@ def bar_spec(
     r"""
     Return a portable Plotly figure specification for a grouped bar chart of one or more histograms.
 
-    Use *labels* to assign legend names and *colors* to assign hues, cycling either sequence as needed.
+    Use *labels* to assign legend names to each histogram.
+    Unmatched histograms receive an empty label.
+
+    *colors* assigns hues, cycling as needed.
+
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
+
     When *horizontal* is `True`, outcomes appear on the y-axis and probabilities on the x-axis.
+
     *max_percent* fixes the probability-axis maximum, which is useful for keeping several separately rendered figures comparable.
+
     *precision* is the number of decimal places tooltips show.
 
     === "Vertical bars (default)"
@@ -111,15 +128,16 @@ def bar_spec(
     data: list[dict[str, Any]] = []
     for i, h in enumerate(hs):
         label = labels[i] if i < len(labels) else ""
-        outcomes = list(h.outcomes())
-        percents = _percents(h)
+        outcomes, probabilities = values_for_graph_type(h, graph_type)
+        outcomes_list = list(outcomes)
+        percents = [probability * 100.0 for probability in probabilities]
         outcome_ref = "y" if horizontal else "x"
         trace: dict[str, Any] = {
             "type": "bar",
             "name": label,
             "orientation": "h" if horizontal else "v",
-            "x": percents if horizontal else outcomes,
-            "y": outcomes if horizontal else percents,
+            "x": percents if horizontal else outcomes_list,
+            "y": outcomes_list if horizontal else percents,
             "customdata": percents,
             "hovertemplate": f"{label}<br>%{{{outcome_ref}}}: %{{customdata:.{precision}f}}%<extra></extra>",
             "texttemplate": f"%{{customdata:.{precision}f}}%",
@@ -152,31 +170,52 @@ def bar_spec(
 def line_spec(
     *hs: H,
     colors: Sequence[str] = (),
+    graph_type: GraphType = GraphType.NORMAL,
     labels: Sequence[str] = (),
     precision: int = _DEFAULT_PRECISION,
 ) -> PlotSpec:
     r"""
     Return a portable Plotly figure specification for a line graph of one or more histograms.
 
-    Each line covers only its own outcomes and carries a marker at every discrete point.
-    Use *labels* to assign legend names and *colors* to assign hues, cycling the latter as needed.
+    Use *labels* to assign legend names to each histogram.
+    Unmatched histograms receive an empty label.
+
+    *colors* assigns hues, cycling as needed.
+
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
+
     *precision* is the number of decimal places tooltips show.
 
-        --8<-- "docs/assets/plotly_viz_plot_line.py:viz"
+    === "`graph_type=GraphType.NORMAL` (default)"
 
-    --8<-- "docs/snippets/plotly_viz_plot_line.html"
+            --8<-- "docs/assets/plotly_viz_plot_line.py:viz"
+
+        --8<-- "docs/snippets/plotly_viz_plot_line.html"
+
+    === "`graph_type=GraphType.AT_MOST`"
+
+            --8<-- "docs/assets/plotly_viz_plot_line_at_most.py:viz"
+
+        --8<-- "docs/snippets/plotly_viz_plot_line_at_most.html"
+
+    === "`graph_type=GraphType.AT_LEAST`"
+
+            --8<-- "docs/assets/plotly_viz_plot_line_at_least.py:viz"
+
+        --8<-- "docs/snippets/plotly_viz_plot_line_at_least.html"
     """
     data: list[dict[str, Any]] = []
     for i, h in enumerate(hs):
         label = labels[i] if i < len(labels) else ""
+        outcomes, probabilities = values_for_graph_type(h, graph_type)
         color = colors[i % len(colors)] if colors else None
         marker: dict[str, Any] = {"size": 5}
         trace: dict[str, Any] = {
             "type": "scatter",
             "mode": "lines+markers",
             "name": label,
-            "x": list(h.outcomes()),
-            "y": _percents(h),
+            "x": list(outcomes),
+            "y": [probability * 100.0 for probability in probabilities],
             "hovertemplate": f"{label}<br>%{{x}}: %{{y:.{precision}f}}%<extra></extra>",
             "marker": marker,
             "meta": {"series": i, "role": "line"},
@@ -203,6 +242,7 @@ def line_spec(
 def ridge_spec(
     *hs: H,
     colors: Sequence[str] = (),
+    graph_type: GraphType = GraphType.NORMAL,
     label_bgcolor: str | None = None,
     labels: Sequence[str] = (),
     overlap: float = _DEFAULT_RIDGE_OVERLAP,
@@ -223,18 +263,20 @@ def ridge_spec(
 
     Use *labels* to name each histogram.
     Names are drawn as “pills” inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
-    Set *label_bgcolor* to a translucent color appropriate for the rendering context.
     Unmatched histograms get a blank label.
+    Set *label_bgcolor* to a translucent color appropriate for the rendering context.
 
     *colors* assigns a hue per ridge, cycled if there are fewer colors than histograms.
     Each ridge’s fill takes that hue translucently and its crest line takes it at full strength.
     Without *colors*, the traces carry none and Plotly’s own sequence gives a ridge’s fill and line different hues, so either supply colors or restyle by `meta` afterward.
 
-    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
-    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
 
     *overlap* is how many rows tall a ridge at *peak* stands.
     At `1.0`, such a ridge just reaches the next row's baseline.
+
+    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
+    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
 
     *precision* is the number of decimal places tooltips show.
 
@@ -242,10 +284,16 @@ def ridge_spec(
 
     --8<-- "docs/snippets/plotly_viz_plot_ridge.html"
     """
-    rows = [
-        (labels[i] if i < len(labels) else "", list(h.outcomes()), _percents(h))
-        for i, h in enumerate(hs)
-    ]
+    rows = []
+    for i, h in enumerate(hs):
+        outcomes, probabilities = values_for_graph_type(h, graph_type)
+        rows.append(
+            (
+                labels[i] if i < len(labels) else "",
+                list(outcomes),
+                [probability * 100.0 for probability in probabilities],
+            )
+        )
     num_rows = len(rows)
     peak_height = overlap * _RIDGE_ROW_STEP
     if peak is None:
@@ -253,7 +301,7 @@ def ridge_spec(
     data: list[dict[str, Any]] = []
     annotations: list[dict[str, Any]] = []
 
-    for i, (label, outcomes, percents) in enumerate(rows):
+    for i, (label, row_outcomes, percents) in enumerate(rows):
         baseline = float(num_rows - 1 - i) * _RIDGE_ROW_STEP
         scale = peak_height / peak if peak else 0.0
         crests = [baseline + percent * scale for percent in percents]
@@ -262,13 +310,13 @@ def ridge_spec(
             "type": "scatter",
             "mode": "lines",
             "x": [
-                outcomes[0] - _RIDGE_FILL_FOOT,
-                *outcomes,
-                outcomes[-1] + _RIDGE_FILL_FOOT,
+                row_outcomes[0] - _RIDGE_FILL_FOOT,
+                *row_outcomes,
+                row_outcomes[-1] + _RIDGE_FILL_FOOT,
             ]
-            if outcomes
+            if row_outcomes
             else [],
-            "y": [baseline, *crests, baseline] if outcomes else [],
+            "y": [baseline, *crests, baseline] if row_outcomes else [],
             "fill": "toself",
             "line": {"width": 0},
             "hoverinfo": "skip",
@@ -341,10 +389,6 @@ def ridge_spec(
 
 
 # ---- Helpers -------------------------------------------------------------------------
-
-
-def _percents(h: H) -> list[float]:
-    return [float(probability) * 100.0 for _, probability in h.probability_items()]
 
 
 @experimental
