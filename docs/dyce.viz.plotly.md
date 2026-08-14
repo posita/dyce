@@ -1,3 +1,3 @@
-::: dyce.viz_plotly
+::: dyce.viz.plotly
     options:
       members_order: source

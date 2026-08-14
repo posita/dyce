@@ -14,7 +14,7 @@
 # ======================================================================================
 
 r"""
-`dyce.viz` provides optional, basic [Matplotlib](https://matplotlib.org/)-based visualization utilities.
+`dyce.viz.matplotlib` provides optional, basic [Matplotlib](https://matplotlib.org/)-based visualization utilities.
 Its requirements can be installed via the `viz` optional dependency group.
 
 ```sh
@@ -50,14 +50,14 @@ else:
     from matplotlib.colors import Colormap
     from matplotlib.typing import RGBAColorType
 
-from ._viz import GraphType, values_for_graph_type
-from .h import H
-from .lifecycle import experimental
-from .types import natural_key
+from dyce.h import H
+from dyce.lifecycle import experimental
+from dyce.types import natural_key
+
+from . import GraphType, values_for_graph_type
 
 __all__ = (
     "BurstFormatterT",
-    "GraphType",
     "format_outcome_name",
     "format_outcome_name_probability",
     "format_probability",
@@ -509,7 +509,7 @@ def plot_ridge(
 
       -- END MONKEY PATCH -->
 
-    Plots a ridgeline (“joyplot”) of one or more histograms, useful for comparing a family of related distributions, where [`plot_line`][dyce.viz.plot_line] would produce a tangle of overlapping curves.
+    Plots a ridgeline (“joyplot”) of one or more histograms, useful for comparing a family of related distributions, where [`plot_line`][dyce.viz.matplotlib.plot_line] would produce a tangle of overlapping curves.
 
     Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
     Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.

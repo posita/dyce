@@ -13,23 +13,23 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+if True:  # so ruff won't complain imports are out-of-order, but still sort the others
+    import pytest
+
+    mpl = pytest.importorskip("matplotlib")
+    mpl.use("Agg")
+
 from collections.abc import Generator, Iterable
 from typing import cast
 
-import pytest
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Wedge
 
 from dyce import H
 from dyce.d import d0, d1, d4, d6, d8, d12, d20, h2d6, h2d10
-
-mpl = pytest.importorskip("matplotlib")
-mpl.use("Agg")
-
-import matplotlib.pyplot as plt  # ruff: ignore[module-import-not-at-top-of-file]
-from matplotlib.lines import Line2D  # ruff: ignore[module-import-not-at-top-of-file]
-from matplotlib.patches import Wedge  # ruff: ignore[module-import-not-at-top-of-file]
-
-from dyce.viz import (  # ruff: ignore[module-import-not-at-top-of-file]
-    GraphType,
+from dyce.viz import GraphType
+from dyce.viz.matplotlib import (
     format_outcome_name,
     format_outcome_name_probability,
     format_probability,

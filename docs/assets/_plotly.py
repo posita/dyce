@@ -16,7 +16,7 @@ import logging
 from collections.abc import Callable
 from pathlib import Path
 
-from dyce.viz_plotly import PlotSpec
+from dyce.viz.plotly import PlotSpec
 
 __all__ = ("main",)
 

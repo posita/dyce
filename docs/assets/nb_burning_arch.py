@@ -66,7 +66,7 @@ damage_half_on_save = burning_arch_damage // (pass_save + 1)
 # %%
 from matplotlib import ticker
 
-from dyce.viz import plot_line
+from dyce.viz.matplotlib import plot_line
 
 ax = plot_line(damage_half_on_save)
 ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))

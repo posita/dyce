@@ -74,7 +74,7 @@ def nkk(n: int, k: int) -> H[int]:
 from matplotlib import pyplot as plt
 from matplotlib import ticker
 
-from dyce.viz import plot_ridge
+from dyce.viz.matplotlib import plot_ridge
 
 k_start, k_end = 3, 6  # range: [start_k..end_k)
 n_start, n_end = 5, 11  # range: [start_n..end_n)

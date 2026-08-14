@@ -62,7 +62,7 @@ h2d6_lowest = p2d6.h(0)
 h2d6_highest = p2d6.h(-1)
 
 # %%
-from dyce.viz import plot_bar
+from dyce.viz.matplotlib import plot_bar
 
 ax = plot_bar(
     h2d6_lowest,

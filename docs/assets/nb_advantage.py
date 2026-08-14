@@ -77,7 +77,7 @@ advantage_weighted = expand(crit, advantage)
 # %%
 from matplotlib import ticker
 
-from dyce.viz import plot_line
+from dyce.viz.matplotlib import plot_line
 
 ax = plot_line(
     normal_hit,

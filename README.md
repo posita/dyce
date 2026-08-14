@@ -103,7 +103,7 @@ It has the following runtime dependencies:
 `dyce` will opportunistically use the following, if available at runtime:
 
 - [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
-- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz`
+- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz.matplotlib`
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
 
@@ -223,7 +223,7 @@ std |    1.40
 ```
 
 [`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) provides a [`probability_items` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) to ease integration with plotting packages.
-[`dyce.viz`](https://posita.github.io/dyce/latest/dyce.viz/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
+[`dyce.viz.matplotlib`](https://posita.github.io/dyce/latest/dyce.viz.matplotlib/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
 [`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
 
 ```python

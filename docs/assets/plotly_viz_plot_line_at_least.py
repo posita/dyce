@@ -9,13 +9,14 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from dyce.viz_plotly import PlotSpec
+    from dyce.viz.plotly import PlotSpec
 
 
 def fig_callback() -> "PlotSpec":
     # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz_plotly import GraphType, line_spec
+    from dyce.viz import GraphType
+    from dyce.viz.plotly import line_spec
 
     spec = line_spec(
         2 @ H(10),

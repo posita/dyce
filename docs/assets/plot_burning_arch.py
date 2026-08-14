@@ -29,7 +29,7 @@ def fig_callback(line_color: str) -> None:
     # --8<-- [start:viz]
     from matplotlib import ticker
 
-    from dyce.viz import plot_line
+    from dyce.viz.matplotlib import plot_line
 
     ax = plot_line(damage_half_on_save)
     ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))

@@ -17,7 +17,7 @@
 def fig_callback(line_color: str) -> None:
     # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz import plot_bar
+    from dyce.viz.matplotlib import plot_bar
 
     ax = plot_bar(
         2 @ H(10),

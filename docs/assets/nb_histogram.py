@@ -57,7 +57,7 @@ warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 # %%
 from dyce.d import h3d6
-from dyce.viz import plot_bar
+from dyce.viz.matplotlib import plot_bar
 
 ax = plot_bar(h3d6)
 ax.set_title("Distribution for 3d6")

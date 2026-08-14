@@ -91,7 +91,7 @@ def normal() -> Iterator[tuple[str, H[int]]]:
 # %%
 from matplotlib import pyplot as plt
 
-from dyce.viz import plot_burst
+from dyce.viz.matplotlib import plot_burst
 
 labels1, hs1 = zip(*tuple(normal()), strict=True)
 labels2, hs2 = zip(*tuple(roll_and_keep_hs()), strict=True)

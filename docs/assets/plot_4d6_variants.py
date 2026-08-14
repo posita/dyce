@@ -43,7 +43,7 @@ def fig_callback(line_color: str) -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
     # --8<-- [start:viz]
-    from dyce.viz import plot_ridge
+    from dyce.viz.matplotlib import plot_ridge
 
     labels, hs = zip(*attr_results.items(), strict=True)
     ax = plot_ridge(*hs, labels=labels, cmap="jet")

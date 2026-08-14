@@ -38,7 +38,7 @@ def fig_callback(line_color: str) -> None:
     # --8<-- [start:viz]
     from matplotlib import ticker
 
-    from dyce.viz import plot_line
+    from dyce.viz.matplotlib import plot_line
 
     ax = plot_line(
         normal_hit,
