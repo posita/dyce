@@ -41,8 +41,7 @@ Homepage = "https://posita.github.io/dyce/"
 "Source Repository" = "https://github.com/posita/dyce/"
 
 [project.optional-dependencies]
-plotly = ["plotly"]
-viz = ["matplotlib"]
+viz-mpl = ["matplotlib"]
 
 [build-system]
 requires = ["setuptools>=64", "setuptools-scm>=8"]
@@ -62,7 +61,6 @@ dev = [
     {include-group = "lint"},
     {include-group = "test"},
     {include-group = "tox"},
-    {include-group = "viz"},
 ]
 # Only what's needed for uv run mkdocs build
 docs = [
@@ -82,10 +80,10 @@ docs = [
     "numpy",
     "pandas",
     "pandas-stubs",
+    "plotly",
     "pymdown-extensions",
     "sympy",
-    {include-group = "plotly"},
-    {include-group = "viz"},
+    {include-group = "viz-mpl"},
 ]
 # Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
 lint = [
@@ -108,7 +106,7 @@ test = [
     "pytest-benchmark",
     "pytest-cov",
     {include-group = "test-pypy"},
-    {include-group = "viz"},
+    {include-group = "viz-mpl"},
 ]
 test-beartype = [
     "beartype>=0.23.0rc0",
@@ -127,8 +125,7 @@ tox = [
     "tox-uv",
 ]
 # Mirrors optional dependencies
-plotly = ["plotly"]
-viz = ["matplotlib"]
+viz-mpl = ["matplotlib"]
 
 [tool.codespell]
 ignore-words-list = "CanGe,countin,ot,rollin"

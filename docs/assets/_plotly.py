@@ -16,7 +16,7 @@ import logging
 from collections.abc import Callable
 from pathlib import Path
 
-from dyce.viz_plotly import PlotSpec, figure_from_spec
+from dyce.viz_plotly import PlotSpec
 
 __all__ = ("main",)
 
@@ -55,6 +55,8 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     import sys
     import warnings
 
+    from plotly.graph_objects import Figure  # type: ignore[import-untyped]
+
     from dyce.lifecycle import ExperimentalWarning
 
     warnings.filterwarnings("ignore", category=ExperimentalWarning)
@@ -69,7 +71,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
 
     _LOGGER.debug("calling %r", fig_callback)
     spec = fig_callback()
-    fig = figure_from_spec(spec)
+    fig = Figure(spec.figure_dict())
     # Plotly.py otherwise serializes its large default template into every
     # fragment. The documentation supplies its own transparent presentation.
     fig.update_layout(template="none")

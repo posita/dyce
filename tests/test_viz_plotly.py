@@ -21,7 +21,6 @@ from dyce.viz_plotly import (
     GraphType,
     PlotSpec,
     bar_spec,
-    figure_from_spec,
     line_spec,
     ridge_spec,
 )
@@ -51,6 +50,14 @@ class TestBarSpec:
         assert trace["orientation"] == "h"
         assert "%{y}" in trace["hovertemplate"]
         assert spec.layout["xaxis"]["title"]["text"] == "Probability (%)"
+
+    @pytest.mark.parametrize("horizontal", [False, True])
+    def test_only_outcome_axis_disables_zero_line(self, *, horizontal: bool) -> None:
+        spec = bar_spec(d4, horizontal=horizontal)
+        outcome_axis = "yaxis" if horizontal else "xaxis"
+        probability_axis = "xaxis" if horizontal else "yaxis"
+        assert spec.layout[outcome_axis]["zeroline"] is False
+        assert "zeroline" not in spec.layout[probability_axis]
 
     @pytest.mark.parametrize(
         ("graph_type", "expected"),
@@ -100,6 +107,8 @@ class TestLineSpec:
         assert spec.data[0]["y"] == [pytest.approx(25.0)] * 4
         assert [trace["name"] for trace in spec.data] == ["d4", "d6"]
         assert spec.layout["showlegend"] is True
+        assert spec.layout["xaxis"]["zeroline"] is False
+        assert "zeroline" not in spec.layout["yaxis"]
 
     def test_precision_and_metadata(self) -> None:
         trace = line_spec(d6, precision=4).data[0]
@@ -188,6 +197,7 @@ class TestRidgeSpec:
     def test_labels_become_annotations(self) -> None:
         spec = ridge_spec(h2d6, d6, labels=["2d6", "d6"])
         assert [note["text"] for note in spec.layout["annotations"]] == ["2d6", "d6"]
+        assert spec.layout["xaxis"]["zeroline"] is False
         assert spec.layout["yaxis"]["showticklabels"] is False
 
     def test_labels_partial(self) -> None:
@@ -311,9 +321,3 @@ class TestPlotSpec:
     def test_figure_dict_excludes_renderer_config(self) -> None:
         spec = ridge_spec(d6)
         assert spec.figure_dict() == {"data": spec.data, "layout": spec.layout}
-
-    def test_figure_from_spec(self) -> None:
-        spec = ridge_spec(d6)
-        figure = figure_from_spec(spec)
-        assert len(figure.data) == len(spec.data)
-        assert figure.layout.hovermode == spec.layout["hovermode"]
