@@ -28,7 +28,7 @@ from typing import Any, Protocol, cast
 from .h import H
 from .lifecycle import experimental
 
-__all__ = ("PlotSpec", "figure_from_spec", "ridge_spec")
+__all__ = ("PlotSpec", "bar_spec", "figure_from_spec", "line_spec", "ridge_spec")
 
 # Rows sit one _RIDGE_ROW_STEP apart and the tallest ridge stands _DEFAULT_RIDGE_OVERLAP of them
 # high. Only the ratio matters, since the y-axis range derives from it.
@@ -77,6 +77,126 @@ class PlotSpec:
     def figure_dict(self) -> dict[str, Any]:
         r"""Return the portion accepted by `plotly.graph_objects.Figure`."""
         return {"data": self.data, "layout": self.layout}
+
+
+@experimental
+def bar_spec(
+    *hs: H,
+    colors: Sequence[str] = (),
+    horizontal: bool = False,
+    labels: Sequence[str] = (),
+    max_percent: float | None = None,
+    precision: int = _DEFAULT_PRECISION,
+) -> PlotSpec:
+    r"""
+    Return a portable Plotly figure specification for a grouped bar chart of one or more histograms.
+
+    Use *labels* to assign legend names and *colors* to assign hues, cycling either sequence as needed.
+    When *horizontal* is `True`, outcomes appear on the y-axis and probabilities on the x-axis.
+    *max_percent* fixes the probability-axis maximum, which is useful for keeping several separately rendered figures comparable.
+    *precision* is the number of decimal places tooltips show.
+
+    === "Vertical bars (default)"
+
+            --8<-- "docs/assets/plotly_viz_plot_bar.py:viz"
+
+        --8<-- "docs/snippets/plotly_viz_plot_bar.html"
+
+    === "Horizontal bars (`horizontal=True`)"
+
+            --8<-- "docs/assets/plotly_viz_plot_hbar.py:viz"
+
+        --8<-- "docs/snippets/plotly_viz_plot_hbar.html"
+    """
+    data: list[dict[str, Any]] = []
+    for i, h in enumerate(hs):
+        label = labels[i] if i < len(labels) else ""
+        outcomes = list(h.outcomes())
+        percents = _percents(h)
+        outcome_ref = "y" if horizontal else "x"
+        trace: dict[str, Any] = {
+            "type": "bar",
+            "name": label,
+            "orientation": "h" if horizontal else "v",
+            "x": percents if horizontal else outcomes,
+            "y": outcomes if horizontal else percents,
+            "customdata": percents,
+            "hovertemplate": f"{label}<br>%{{{outcome_ref}}}: %{{customdata:.{precision}f}}%<extra></extra>",
+            "texttemplate": f"%{{customdata:.{precision}f}}%",
+            "textposition": "auto",
+            "meta": {"series": i, "role": "bar"},
+        }
+        if colors:
+            trace["marker"] = {"color": colors[i % len(colors)]}
+        data.append(trace)
+
+    probability_axis: dict[str, Any] = {
+        "title": {"text": "Probability (%)"},
+        "rangemode": "tozero",
+    }
+    if max_percent is not None:
+        probability_axis["range"] = [0.0, max_percent]
+    outcome_axis = {"title": {"text": "Outcome"}}
+    return PlotSpec(
+        data=data,
+        layout={
+            "barmode": "group",
+            "showlegend": len(hs) > 1,
+            "xaxis": probability_axis if horizontal else outcome_axis,
+            "yaxis": outcome_axis if horizontal else probability_axis,
+        },
+    )
+
+
+@experimental
+def line_spec(
+    *hs: H,
+    colors: Sequence[str] = (),
+    labels: Sequence[str] = (),
+    precision: int = _DEFAULT_PRECISION,
+) -> PlotSpec:
+    r"""
+    Return a portable Plotly figure specification for a line graph of one or more histograms.
+
+    Each line covers only its own outcomes and carries a marker at every discrete point.
+    Use *labels* to assign legend names and *colors* to assign hues, cycling the latter as needed.
+    *precision* is the number of decimal places tooltips show.
+
+        --8<-- "docs/assets/plotly_viz_plot_line.py:viz"
+
+    --8<-- "docs/snippets/plotly_viz_plot_line.html"
+    """
+    data: list[dict[str, Any]] = []
+    for i, h in enumerate(hs):
+        label = labels[i] if i < len(labels) else ""
+        color = colors[i % len(colors)] if colors else None
+        marker: dict[str, Any] = {"size": 5}
+        trace: dict[str, Any] = {
+            "type": "scatter",
+            "mode": "lines+markers",
+            "name": label,
+            "x": list(h.outcomes()),
+            "y": _percents(h),
+            "hovertemplate": f"{label}<br>%{{x}}: %{{y:.{precision}f}}%<extra></extra>",
+            "marker": marker,
+            "meta": {"series": i, "role": "line"},
+        }
+        if color is not None:
+            marker["color"] = color
+            trace["line"] = {"color": color}
+        data.append(trace)
+    return PlotSpec(
+        data=data,
+        layout={
+            "showlegend": len(hs) > 1,
+            "hovermode": "x",
+            "xaxis": {"title": {"text": "Outcome"}},
+            "yaxis": {
+                "title": {"text": "Probability (%)"},
+                "rangemode": "tozero",
+            },
+        },
+    )
 
 
 @experimental

@@ -51,6 +51,9 @@ all : \
 	assets/plot_viz_plot_line_at_least_light.svg \
 	assets/plot_viz_plot_ridge_dark.svg \
 	assets/plot_viz_plot_ridge_light.svg \
+	snippets/plotly_viz_plot_bar.html \
+	snippets/plotly_viz_plot_hbar.html \
+	snippets/plotly_viz_plot_line.html \
 	snippets/plotly_viz_plot_ridge.html
 
 # \
