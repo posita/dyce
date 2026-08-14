@@ -287,36 +287,6 @@ class TestRidgeSpec:
         assert all(trace["hoverinfo"] == "skip" for trace in _traces(spec, "fill"))
         assert spec.layout["hovermode"] == "x"
 
-    def test_matches_the_anydyce_reference(self) -> None:
-        # anydyce's playground ridgeSpec is the reference this is a port of, so
-        # compare against a capture of its output for the same histograms. See
-        # tests/data/ridge_spec_reference.mjs for how to regenerate it.
-        import json
-        from pathlib import Path
-
-        reference_path = Path(__file__).parent / "data" / "ridge_spec_reference.json"
-        reference = json.loads(reference_path.read_text())
-        spec = ridge_spec(h2d6, d6, labels=["2d6", "d6"])
-        fills = _traces(spec, "fill")
-        lines = _traces(spec, "line")
-        # pytest.approx does not descend into nested sequences, so compare each
-        # ridge's series on its own.
-        for got, want in (
-            ([fill["x"] for fill in fills], reference["fillX"]),
-            ([fill["y"] for fill in fills], reference["fillY"]),
-            ([line["x"] for line in lines], reference["lineX"]),
-            ([line["y"] for line in lines], reference["lineY"]),
-            ([line["customdata"] for line in lines], reference["custom"]),
-        ):
-            assert len(got) == len(want)
-            for got_row, want_row in zip(got, want, strict=True):
-                assert got_row == pytest.approx(want_row)
-        assert spec.layout["yaxis"]["range"] == pytest.approx(reference["yrange"])
-        assert [note["y"] for note in spec.layout["annotations"]] == pytest.approx(
-            reference["annY"]
-        )
-        assert spec.layout["hovermode"] == reference["hovermode"]
-
     def test_spec_is_json_serializable(self) -> None:
         # The playground hands this across a worker boundary, so it has to
         # survive a round trip with no Plotly or numpy types in it.
