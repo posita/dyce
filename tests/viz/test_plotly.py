@@ -13,12 +13,14 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+from importlib.util import find_spec
+
 import pytest
 
 from dyce import H
 from dyce.d import d0, d4, d6, d8, d20, h2d6
-from dyce.viz_plotly import (
-    GraphType,
+from dyce.viz import GraphType
+from dyce.viz.plotly import (
     PlotSpec,
     bar_spec,
     line_spec,
@@ -307,8 +309,9 @@ class TestRidgeSpec:
 
 
 class TestPlotSpec:
+    @pytest.mark.skipif(find_spec("matplotlib") is None, reason="requires matplotlib")
     def test_graph_type_is_shared_with_matplotlib_api(self) -> None:
-        from dyce.viz import GraphType as MatplotlibGraphType
+        from dyce.viz.matplotlib import GraphType as MatplotlibGraphType
 
         assert GraphType is MatplotlibGraphType
 

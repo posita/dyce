@@ -14,9 +14,9 @@
 # ======================================================================================
 
 r"""
-`dyce.viz_plotly` builds [Plotly](https://plotly.com/) figure specifications for [`H`][dyce.H] objects.
+`dyce.viz.plotly` builds [Plotly](https://plotly.com/) figure specifications for [`H`][dyce.H] objects.
 
-Each builder returns a [`PlotSpec`][dyce.viz_plotly.PlotSpec] containing plain mappings and lists.
+Each builder returns a [`PlotSpec`][dyce.viz.plotly.PlotSpec] containing plain mappings and lists.
 Neither Plotly nor Matplotlib is required.
 Callers can pass `spec.data`, `spec.layout`, and `spec.config` to `Plotly.newPlot`, or pass `spec.figure_dict()` to `plotly.graph_objects.Figure`.
 """
@@ -25,12 +25,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._viz import GraphType, values_for_graph_type
-from .h import H
-from .lifecycle import experimental
+from dyce.h import H
+from dyce.lifecycle import experimental
+
+from . import GraphType, values_for_graph_type
 
 __all__ = (
-    "GraphType",
     "PlotSpec",
     "bar_spec",
     "line_spec",
@@ -55,7 +55,7 @@ class PlotSpec:
 
     *data* and *layout* are accepted by both Plotly.py and Plotly.js.
     *config* contains renderer options used by Plotly.js and by HTML generated with Plotly.py.
-    [`as_dict`][dyce.viz_plotly.PlotSpec.as_dict] returns a plain, JSON-serializable representation suitable for crossing a worker boundary.
+    [`as_dict`][dyce.viz.plotly.PlotSpec.as_dict] returns a plain, JSON-serializable representation suitable for crossing a worker boundary.
     """
 
     data: list[dict[str, Any]]
@@ -95,7 +95,7 @@ def bar_spec(
 
     *colors* assigns hues, cycling as needed.
 
-    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
     When *horizontal* is `True`, outcomes appear on the y-axis and probabilities on the x-axis.
 
@@ -172,7 +172,7 @@ def line_spec(
 
     *colors* assigns hues, cycling as needed.
 
-    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
     *precision* is the number of decimal places tooltips show.
 
@@ -260,7 +260,7 @@ def ridge_spec(
     Each ridge’s fill takes that hue translucently and its crest line takes it at full strength.
     Without *colors*, the traces carry none and Plotly’s own sequence gives a ridge’s fill and line different hues, so either supply colors or restyle by `meta` afterward.
 
-    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz_plotly.GraphType]).
+    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
     *overlap* is how many rows tall a ridge at *peak* stands.
     At `1.0`, such a ridge just reaches the next row's baseline.

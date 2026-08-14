@@ -31,7 +31,7 @@ def fig_callback(line_color: str) -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_dupes.py
     # --8<-- [start:viz]
-    from dyce.viz import plot_bar
+    from dyce.viz.matplotlib import plot_bar
 
     ax = plot_bar(res_15d6, res_8d10, labels=["15d6", "8d10"])
     ax.set_title("Chances of rolling $n$ duplicates")

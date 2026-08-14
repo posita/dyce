@@ -17,7 +17,7 @@
 def fig_callback(line_color: str) -> None:
     # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz import plot_line
+    from dyce.viz.matplotlib import plot_line
 
     ax = plot_line(
         2 @ H(10),

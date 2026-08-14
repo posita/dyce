@@ -96,7 +96,7 @@ df.style.format("{:.0%}")
 # %%
 from matplotlib import pyplot as plt
 
-from dyce.viz import plot_ridge
+from dyce.viz.matplotlib import plot_ridge
 
 ax = plot_ridge(
     single_attack,

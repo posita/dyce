@@ -724,10 +724,10 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
 ## Visualization
 
 [`H.probability_items`][dyce.H.probability_items] eases integration with plotting packages.
-If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed [`dyce.viz`][dyce.viz] provides plotting conveniences.
+If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed [`dyce.viz.matplotlib`][dyce.viz.matplotlib] provides plotting conveniences.
 For something more sophisticated, [`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
 
-Visualization using [`dyce.viz`][dyce.viz] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
 ```python
 --8<-- "docs/assets/plot_histogram.py:viz"

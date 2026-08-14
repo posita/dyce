@@ -12,8 +12,6 @@
   Thank you!
   -->
 
-# `dyce.viz` package reference
+# `dyce.viz.matplotlib` package reference
 
-::: dyce.viz
-    options:
-      members_order: source
+::: dyce.viz.matplotlib

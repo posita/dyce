@@ -17,7 +17,7 @@
 def fig_callback(line_color: str) -> None:
     # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz import plot_ridge
+    from dyce.viz.matplotlib import plot_ridge
 
     ax = plot_ridge(
         2 @ H(10),

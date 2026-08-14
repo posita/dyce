@@ -80,7 +80,7 @@ attr_results: dict[str, H] = {
 # %%
 from matplotlib import pyplot as plt
 
-from dyce.viz import plot_ridge
+from dyce.viz.matplotlib import plot_ridge
 
 labels, hs = zip(*attr_results.items(), strict=True)
 ax = plot_ridge(*hs, labels=labels, cmap="jet")

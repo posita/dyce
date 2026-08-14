@@ -56,7 +56,7 @@ def fig_callback(line_color: str) -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
     # --8<-- [start:viz]
 
-    from dyce.viz import plot_ridge
+    from dyce.viz.matplotlib import plot_ridge
 
     ax = plot_ridge(
         single_attack,

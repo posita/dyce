@@ -19,7 +19,7 @@ def fig_callback(line_color: str) -> None:
     from matplotlib import pyplot as plt
 
     from dyce import H
-    from dyce.viz import plot_burst
+    from dyce.viz.matplotlib import plot_burst
 
     ax_d6 = plt.subplot2grid((1, 2), (0, 0))
     plot_burst(

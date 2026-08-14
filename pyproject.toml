@@ -48,7 +48,7 @@ requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["dyce"]
+packages = ["dyce", "dyce.viz"]
 package-data = {"dyce" = ["py.typed"]}
 
 [tool.setuptools_scm]

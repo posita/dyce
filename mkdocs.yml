@@ -121,5 +121,7 @@ nav:
   - API:
     - Core: dyce.md
     - Conveniences: dyce.d.md
-    - Visualization (optional): dyce.viz.md
-    - Plotly visualization (optional): dyce.viz_plotly.md
+    - Visualization:
+      - Shared structures: dyce.viz.md
+      - Matplotlib (optional): dyce.viz.matplotlib.md
+      - Plotly: dyce.viz.plotly.md

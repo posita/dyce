@@ -18,7 +18,7 @@ def fig_callback(line_color: str) -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_histogram.py
     # --8<-- [start:viz]
     from dyce.d import h3d6
-    from dyce.viz import plot_bar
+    from dyce.viz.matplotlib import plot_bar
 
     ax = plot_bar(h3d6)
     ax.set_title("Distribution for 3d6")
