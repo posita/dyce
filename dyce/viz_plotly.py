@@ -17,13 +17,13 @@ r"""
 `dyce.viz_plotly` builds [Plotly](https://plotly.com/) figure specifications for [`H`][dyce.H] objects.
 
 Each builder returns a [`PlotSpec`][dyce.viz_plotly.PlotSpec] containing plain mappings and lists.
-Nothing imports Plotly (or Matplotlib) until [`figure_from_spec`][dyce.viz_plotly.figure_from_spec] is called.
-Browser callers can instead pass `spec.data`, `spec.layout`, and `spec.config` to `Plotly.newPlot`.
+Neither Plotly nor Matplotlib is required.
+Callers can pass `spec.data`, `spec.layout`, and `spec.config` to `Plotly.newPlot`, or pass `spec.figure_dict()` to `plotly.graph_objects.Figure`.
 """
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Protocol, cast
+from typing import Any
 
 from ._viz import GraphType, values_for_graph_type
 from .h import H
@@ -33,7 +33,6 @@ __all__ = (
     "GraphType",
     "PlotSpec",
     "bar_spec",
-    "figure_from_spec",
     "line_spec",
     "ridge_spec",
 )
@@ -47,15 +46,6 @@ _RIDGE_FILL_ALPHA: float = 0.4
 # single-outcome spike a visible triangle instead of a zero-width sliver.
 _RIDGE_FILL_FOOT: float = 0.1
 _DEFAULT_PRECISION: int = 2
-
-
-class _FigureT(Protocol):
-    data: tuple[Any, ...]
-    layout: Any
-
-    def to_html(self, *args: object, **kwargs: object) -> str: ...
-
-    def update_layout(self, *args: object, **kwargs: object) -> object: ...
 
 
 @dataclass
@@ -154,7 +144,7 @@ def bar_spec(
     }
     if max_percent is not None:
         probability_axis["range"] = [0.0, max_percent]
-    outcome_axis = {"title": {"text": "Outcome"}}
+    outcome_axis = {"title": {"text": "Outcome"}, "zeroline": False}
     return PlotSpec(
         data=data,
         layout={
@@ -229,7 +219,7 @@ def line_spec(
         layout={
             "showlegend": len(hs) > 1,
             "hovermode": "x",
-            "xaxis": {"title": {"text": "Outcome"}},
+            "xaxis": {"title": {"text": "Outcome"}, "zeroline": False},
             "yaxis": {
                 "title": {"text": "Probability (%)"},
                 "rangemode": "tozero",
@@ -372,7 +362,7 @@ def ridge_spec(
             # apiece.
             "hovermode": "x",
             "annotations": annotations,
-            "xaxis": {"title": {"text": "Outcome"}},
+            "xaxis": {"title": {"text": "Outcome"}, "zeroline": False},
             "yaxis": {
                 "showticklabels": False,
                 "showgrid": False,
@@ -386,26 +376,6 @@ def ridge_spec(
             },
         },
     )
-
-
-# ---- Helpers -------------------------------------------------------------------------
-
-
-@experimental
-def figure_from_spec(spec: PlotSpec) -> _FigureT:
-    r"""
-    Return a `plotly.graph_objects.Figure` for *spec*.
-
-    Plotly is only required when this convenience function is called.
-    """
-    try:
-        from plotly.graph_objects import Figure  # type: ignore[import-untyped]
-    except ImportError as exc:  # pragma: no cover
-        raise ImportError(
-            "figure_from_spec requires plotly; install with: pip install 'dyce[plotly]'"
-        ) from exc
-
-    return cast("_FigureT", Figure(spec.figure_dict()))
 
 
 def _with_alpha(color: str, alpha: float) -> str:

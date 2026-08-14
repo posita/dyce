@@ -705,10 +705,7 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-plotly = [
-    { name = "plotly" },
-]
-viz = [
+viz-mpl = [
     { name = "matplotlib" },
 ]
 
@@ -807,9 +804,6 @@ lint = [
     { name = "sympy" },
     { name = "ty" },
 ]
-plotly = [
-    { name = "plotly" },
-]
 test = [
     { name = "coverage", extra = ["toml"] },
     { name = "griffe-warnings-deprecated" },
@@ -847,18 +841,17 @@ tox = [
     { name = "tox" },
     { name = "tox-uv" },
 ]
-viz = [
+viz-mpl = [
     { name = "matplotlib" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "matplotlib", marker = "extra == 'viz'" },
+    { name = "matplotlib", marker = "extra == 'viz-mpl'" },
     { name = "optype" },
-    { name = "plotly", marker = "extra == 'plotly'" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'", specifier = ">=4.5" },
 ]
-provides-extras = ["plotly", "viz"]
+provides-extras = ["viz-mpl"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -952,7 +945,6 @@ lint = [
     { name = "sympy" },
     { name = "ty", specifier = ">=0.0.70" },
 ]
-plotly = [{ name = "plotly" }]
 test = [
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
@@ -988,7 +980,7 @@ tox = [
     { name = "tox" },
     { name = "tox-uv" },
 ]
-viz = [{ name = "matplotlib" }]
+viz-mpl = [{ name = "matplotlib" }]
 
 [[package]]
 name = "executing"
