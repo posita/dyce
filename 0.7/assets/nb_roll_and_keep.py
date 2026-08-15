@@ -89,17 +89,30 @@ def normal() -> Iterator[tuple[str, H[int]]]:
 
 
 # %%
-from dyce.viz import plot_line
+from matplotlib import pyplot as plt
+
+from dyce.viz.matplotlib import plot_burst
 
 labels1, hs1 = zip(*tuple(normal()), strict=True)
-ax = plot_line(*hs1, labels=labels1, markers=".", alpha=0.75)
-
 labels2, hs2 = zip(*tuple(roll_and_keep_hs()), strict=True)
-plot_line(*hs2, labels=labels2, markers="o", alpha=0.25, ax=ax)
-
-ax.set_title("Roll-and-keep mechanic comparison")
-ax.legend(loc="upper left")
-
-from matplotlib import pyplot as plt
+assert len(hs1) == len(hs2)
+cols = 2
+for i, (h1, h2, label) in enumerate(
+    zip(
+        hs1,
+        hs2,
+        (
+            f"{label1} vs.\n{label2}"
+            for label1, label2 in zip(labels1, labels2, strict=True)
+        ),
+        strict=True,
+    )
+):
+    ax = plt.subplot2grid(
+        (len(hs1) // cols + len(hs1) % cols, cols), (i // cols, i % cols)
+    )
+    plot_burst(h2, h1, compare_cmap="cividis", title=label, ax=ax)
+    ax.set_title(ax.get_title(), wrap=True)
+plt.gcf().set_size_inches(9.6, 14.4)
 
 plt.tight_layout()

@@ -21,13 +21,18 @@
       },
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.1535fa47514890d8.js",
+        "load": "static/remoteEntry.aa04e0a5a4304ac1.js",
         "name": "@jupyterlite/pyodide-kernel-extension"
       },
       {
         "extension": "./extension",
         "load": "static/remoteEntry.e928860fd982eedb.js",
         "name": "jupyterlab-jupytext"
+      },
+      {
+        "load": "static/remoteEntry.58c394332ed33325ffe5.js",
+        "mimeExtension": "./mimeExtension",
+        "name": "jupyterlab-plotly"
       },
       {
         "extension": "./extension",
@@ -415,8 +420,8 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=950cec07bac69021eb3d31c09d95a638e2fb8cabca6feb5641e7816922cc727c",
-          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=29fd8c803116f3780a617fc2a3851681a4d44ab695f5384738ffc7ebb5cef7d5"
+          "./pypi/all.json?sha256=76b34dfec7059f02f081d1739d4bdeb5e83428260282d6039b1b98b1f40a3532",
+          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=f67dd037f0a3fd732fb23ec94f0f1578b5bd12ea0bafcff420696664e732559f"
         ]
       }
     },

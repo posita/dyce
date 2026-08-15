@@ -41,8 +41,11 @@
 
     
     
+  
       
     
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+
     
       
         
@@ -1129,6 +1132,57 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Visualization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../dyce.viz/" class="md-nav__link">
         
@@ -1137,7 +1191,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization (optional)
+    Shared structures
   
 
     
@@ -1146,6 +1200,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matplotlib (optional)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1751,7 +1869,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 
 <h1 id="dyce-package-reference"><code>dyce</code> package reference</h1>
 
@@ -4232,7 +4350,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_val</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>  <span class="c1"># ty: ignore[invalid-argument-type]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_val</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">c</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">init_val</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
@@ -4967,7 +5085,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).eq(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 9, True: 1})</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_eq</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_eq</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[ot.CanNe[_OtherT, bool]]&quot;</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[_OtherT]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span> <span class="o">...</span>
@@ -4982,7 +5100,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).ne(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 1, True: 9})</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ne</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ne</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[ot.CanGe[_OtherT, bool]]&quot;</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">&quot;H[_OtherT]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;H[bool]&quot;</span><span class="p">:</span> <span class="o">...</span>
@@ -5079,7 +5197,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
         <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">other_h</span> <span class="o">=</span> <span class="n">other</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="k">else</span> <span class="n">H</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">other_h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>
         <span class="k">return</span> <span class="n">H</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
     <span class="nd">@overload</span>
@@ -5513,7 +5631,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
     <span class="k">def</span><span class="w"> </span><span class="nf">quantile</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">numerator</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">,</span> <span class="n">denominator</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.</span>
-<span class="sd">        It matches NumPy&#39;s `numpy.quantile(outcomes, numerator / denominator, weights=counts, method=&quot;inverted_cdf&quot;)` (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.</span>
+<span class="sd">        It matches NumPy&#39;s [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method=&quot;inverted_cdf&quot;)`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.</span>
 <span class="sd">        Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.</span>
 
 <span class="sd">            &gt;&gt;&gt; (2 @ H(10)).quantile(1, 3)</span>
@@ -5640,7 +5758,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
                 <span class="k">if</span> <span class="n">outcome</span> <span class="o">!=</span> <span class="n">existing_outcome</span>
             <span class="p">}</span>
             <span class="k">for</span> <span class="n">repl_outcome</span><span class="p">,</span> <span class="n">repl_count</span> <span class="ow">in</span> <span class="n">repl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -6000,7 +6118,7 @@ The result is cached to avoid redundant computation with multiple accesses.</p>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_val</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_val</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>  <span class="c1"># ty: ignore[invalid-argument-type]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_val</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">c</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">init_val</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_sorted_items_iter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
@@ -6475,7 +6593,7 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 <span class="sd">        &gt;&gt;&gt; H(6).eq(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 9, True: 1})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_eq</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_eq</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7634,7 +7752,7 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
     <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">other_h</span> <span class="o">=</span> <span class="n">other</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="k">else</span> <span class="n">H</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">other_h</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>
     <span class="k">return</span> <span class="n">H</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -7688,7 +7806,7 @@ Raises <code>ValueError</code> if the histogram is empty.</p>
 <span class="sd">        &gt;&gt;&gt; H(6).ne(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 1, True: 9})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ne</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ne</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7957,7 +8075,7 @@ Pass any two-argument callable to get a different representation (e.g. <code>flo
 <p><code>dyce.h.H.quantile</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
 <p>Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least <em>numerator</em> / <em>denominator</em>.
-It matches NumPy's <code>numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")</code> (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through <code>float</code>.
+It matches NumPy's <a href="https://numpy.org/doc/stable/reference/generated/numpy.quantile.html"><code>numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")</code></a> (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through <code>float</code>.
 Raises <code>ValueError</code> if the histogram is empty, if <em>denominator</em> is not positive, or if <em>numerator</em> / <em>denominator</em> lies outside the closed interval <span class="arithmatex">\(\left[ 0, 1 \right]\)</span>.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -8020,7 +8138,7 @@ Raises <code>ValueError</code> if the histogram is empty, if <em>denominator</em
 <span class="k">def</span><span class="w"> </span><span class="nf">quantile</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;H[_T]&quot;</span><span class="p">,</span> <span class="n">numerator</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">,</span> <span class="n">denominator</span><span class="p">:</span> <span class="n">SupportsInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.</span>
-<span class="sd">    It matches NumPy&#39;s `numpy.quantile(outcomes, numerator / denominator, weights=counts, method=&quot;inverted_cdf&quot;)` (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.</span>
+<span class="sd">    It matches NumPy&#39;s [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method=&quot;inverted_cdf&quot;)`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.</span>
 <span class="sd">    Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.</span>
 
 <span class="sd">        &gt;&gt;&gt; (2 @ H(10)).quantile(1, 3)</span>
@@ -8361,7 +8479,7 @@ If <em>repl</em> is a histogram, its outcomes will be “folded in”, together 
             <span class="k">if</span> <span class="n">outcome</span> <span class="o">!=</span> <span class="n">existing_outcome</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">repl_outcome</span><span class="p">,</span> <span class="n">repl_count</span> <span class="ow">in</span> <span class="n">repl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">repl_outcome</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repl_outcome</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">repl_count</span> <span class="o">*</span> <span class="n">existing_outcome_count</span>
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>

@@ -17,8 +17,6 @@
 def fig_callback(line_color: str) -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
     # --8<-- [start:core]
-    from math import ceil
-
     from dyce import H, P, explode_n
 
     explode_depth = 2
@@ -37,33 +35,36 @@ def fig_callback(line_color: str) -> None:
     from matplotlib import pyplot as plt
     from matplotlib import ticker
 
-    from dyce.viz import plot_line
+    from dyce.viz.matplotlib import plot_ridge
 
-    # Range: [start_k..end_k)
-    k_start, k_end = 3, 6
-    # Range: [start_n..end_n)
-    n_start, n_end = 5, 11
-    # For normalizing axes scale
-    all_nkk: list[H[int]] = []
-
-    for k in range(k_start, k_end):
-        label_value_pairs = [(f"{n}k{k}", nkk(n, k)) for n in range(n_start, n_end)]
-        labels, hs = zip(*label_value_pairs, strict=True)
-        all_nkk.extend(hs)
+    k_start, k_end = 3, 6  # range: [start_k..end_k)
+    n_start, n_end = 5, 11  # range: [start_n..end_n)
+    rows_by_k = {
+        k: [(f"{n}k{k}", nkk(n, k)) for n in range(n_start, n_end)]
+        for k in range(k_start, k_end)
+    }
+    max_x = max(max(h) for rows in rows_by_k.values() for _, h in rows)
+    max_y = max(
+        float(prob)
+        for rows in rows_by_k.values()
+        for _, h in rows
+        for _, prob in h.probability_items()
+    )
+    for k, rows in rows_by_k.items():
+        labels, hs = zip(*rows, strict=True)
         ax = plt.subplot2grid((k_end - k_start, 1), (k - k_start, 0))
-        plot_line(*hs, labels=labels, ax=ax)
+        plot_ridge(*hs, labels=labels, cmap="cool", peak=max_y, ax=ax)
         for line in ax.lines:
             line.set_marker("")
         ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
         ax.tick_params(axis="x", labelrotation=60)
         ax.set_title(f"Taking the {k} highest of $n$ exploding d10s")
-        ax.legend()
-
-    max_x = max(max(h) for h in all_nkk)
-    max_y = max(prob for h in all_nkk for _, prob in h.probability_items())
-    for ax in plt.gcf().get_axes():
-        ax.set_xlim(left=0, right=max_x)
-        ax.set_ylim(top=ceil(max_y * 100) / 100)
+        ax.set_xlim(left=0, right=max_x)  # subplots should share a horizontal scale
+    # subplots should share a vertical scale
+    axes = plt.gcf().get_axes()
+    y_lims = [ax.get_ylim() for ax in axes]
+    for ax in axes:
+        ax.set_ylim(min(lo for lo, _ in y_lims), max(hi for _, hi in y_lims))
     plt.gcf().set_size_inches(6.4, 8.0)
     # --8<-- [end:viz]
 

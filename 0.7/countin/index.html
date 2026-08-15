@@ -41,8 +41,11 @@
 
     
     
+  
       
     
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+
     
       
         
@@ -662,6 +665,57 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Visualization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../dyce.viz/" class="md-nav__link">
         
@@ -670,7 +724,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization (optional)
+    Shared structures
   
 
     
@@ -679,6 +733,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matplotlib (optional)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -821,7 +939,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 <!-- BEGIN MONKEY PATCH --
 For typing:
 
@@ -841,7 +959,7 @@ For typing:
 
     `dyce` also provides additional primitives ([`R` objects][dyce.r.R] and their kin) which are useful for producing weighted randomized rolls without the overhead of enumeration.
     These are covered [separately](rollin.md).
--->
+  -->
 
 <p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a> represent histograms for modeling discrete outcomes.
 They encode finite discrete probability distributions as integer counts without any denominator.
@@ -1891,15 +2009,15 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
 </code></pre></div></td></tr></table></div>
 <h2 id="visualization">Visualization</h2>
 <p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
-If <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a> is installed <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> provides plotting conveniences.
+If <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a> is installed <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a> provides plotting conveniences.
 For something more sophisticated, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
-<p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
+<p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">h3d6</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_bar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_bar</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_bar</span><span class="p">(</span><span class="n">h3d6</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution for 3d6&quot;</span><span class="p">)</span>

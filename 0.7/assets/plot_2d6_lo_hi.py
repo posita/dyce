@@ -25,7 +25,7 @@ def fig_callback(line_color: str) -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
     # --8<-- [start:viz]
-    from dyce.viz import plot_bar
+    from dyce.viz.matplotlib import plot_bar
 
     ax = plot_bar(
         h2d6_lowest,

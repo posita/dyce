@@ -41,8 +41,11 @@
 
     
     
+  
       
     
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+
     
       
         
@@ -787,6 +790,57 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Visualization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../dyce.viz/" class="md-nav__link">
         
@@ -795,7 +849,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization (optional)
+    Shared structures
   
 
     
@@ -804,6 +858,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matplotlib (optional)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1067,7 +1185,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 
 <h1 id="dyce-release-notes"><code>dyce</code> release notes</h1>
 <h2 id="070"><a href="https://github.com/posita/dyce/releases/tag/v0.7.0">0.7.0</a></h2>
@@ -1111,7 +1229,9 @@ Please review before upgrading.</p>
 <li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a></li>
 <li>Completely eliminates dependency on <a href="https://github.com/beartype/numerary/"><code>numerary</code></a> (which was flawed since conception), and instead relies on <a href="https://jorenham.github.io/optype/"><code>optype</code></a> for mathematical operator typing.
   (<a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code></a> still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)</li>
-<li>Re-introduces low-level <a href="https://matplotlib.org/">Matplotlib</a> plotting functions in <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz"><code>dyce.viz</code></a>. (High-level, interactive visualization functionality still lives in <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.)</li>
+<li>Re-introduces low-level <a href="https://matplotlib.org/">Matplotlib</a> plotting functions in <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a>.</li>
+<li>Adds portable <a href="https://plotly.com/">Plotly</a> figure specifications in <a class="autorefs autorefs-internal" href="../dyce.viz.plotly/#dyce.viz.plotly"><code>dyce.viz.plotly</code></a>.
+  (High-level, interactive visualization functionality still lives in <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.)</li>
 <li>Stabilizes Jupyter Lite installation</li>
 <li>Defaults to collapsed installation cells in notebooks</li>
 <li>Modernizes <code>setup.cfg</code> -&gt; <code>pyproject.toml</code> (and <code>tox.ini</code>)</li>

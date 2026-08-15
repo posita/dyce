@@ -96,55 +96,14 @@ df.style.format("{:.0%}")
 # %%
 from matplotlib import pyplot as plt
 
-from dyce.viz import plot_burst, plot_line
+from dyce.viz.matplotlib import plot_ridge
 
-cmap_sa = "Reds"
-cmap_gwf_2014 = "Greens"
-cmap_gwf_2024 = "Purples"
-
-ax_sa = plt.subplot2grid((3, 2), (0, 0), rowspan=3)
-plot_line(
+ax = plot_ridge(
     single_attack,
     h_gwf_2014,
     h_gwf_2024,
     labels=[label_sa, label_gwf_2014, label_gwf_2024],
-    ax=ax_sa,
+    overlap=2.0,
 )
-ax_sa.lines[0].set_color(plt.get_cmap(cmap_sa)(1.0))
-ax_sa.lines[1].set_color(plt.get_cmap(cmap_gwf_2014)(1.0))
-ax_sa.lines[2].set_color(plt.get_cmap(cmap_gwf_2024)(1.0))
-ax_sa.legend()
-
-ax_sa_gwf_2014 = plt.subplot2grid((3, 2), (0, 1))
-plot_burst(
-    h_gwf_2014,
-    single_attack,
-    cmap=cmap_gwf_2014,
-    compare_cmap=cmap_sa,
-    title=f"{label_sa}\nvs.\n{label_gwf_2014}",
-    ax=ax_sa_gwf_2014,
-)
-
-ax_sa_gwf_2024 = plt.subplot2grid((3, 2), (1, 1))
-plot_burst(
-    h_gwf_2024,
-    single_attack,
-    cmap=cmap_gwf_2024,
-    compare_cmap=cmap_sa,
-    title=f"{label_sa}\nvs.\n{label_gwf_2024}",
-    ax=ax_sa_gwf_2024,
-)
-
-ax_gwf_2014_2024 = plt.subplot2grid((3, 2), (2, 1))
-plot_burst(
-    h_gwf_2024,
-    h_gwf_2014,
-    cmap=cmap_gwf_2024,
-    compare_cmap=cmap_gwf_2014,
-    title=f"{label_gwf_2014}\nvs.\n{label_gwf_2024}",
-    ax=ax_gwf_2014_2024,
-)
-
-plt.gcf().set_size_inches(9.6, 9.6)
 
 plt.tight_layout()

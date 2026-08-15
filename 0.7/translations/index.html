@@ -41,8 +41,11 @@
 
     
     
+  
       
     
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+
     
       
         
@@ -739,6 +742,57 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Visualization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../dyce.viz/" class="md-nav__link">
         
@@ -747,7 +801,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization (optional)
+    Shared structures
   
 
     
@@ -756,6 +810,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matplotlib (optional)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -975,7 +1093,7 @@
   Please keep each sentence on its own unwrapped line.
   It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
   Thank you!
--->
+  -->
 
 <p>The following examples and translations are intended to showcase <code>dyce</code>’s flexibility.
 If you have exposure to another tool, they may also help with transition.</p>
@@ -1677,10 +1795,10 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="n">attr_results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;3d6&quot;</span><span class="p">:</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
     <span class="s2">&quot;4d6 - discard lowest&quot;</span><span class="p">:</span> <span class="n">p_4d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)),</span>
-    <span class="s2">&quot;4d6 - re-roll first 1, discard lowest&quot;</span><span class="p">:</span> <span class="n">p_4d6_reroll_first_one</span><span class="o">.</span><span class="n">h</span><span class="p">(</span>
+    <span class="s2">&quot;4d6 - re-roll first 1,</span><span class="se">\n</span><span class="s2">discard lowest&quot;</span><span class="p">:</span> <span class="n">p_4d6_reroll_first_one</span><span class="o">.</span><span class="n">h</span><span class="p">(</span>
         <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="p">),</span>
-    <span class="s2">&quot;4d6 - re-roll all 1s (i.e., 4d(1d5 + 1)), discard lowest&quot;</span><span class="p">:</span> <span class="n">p_4d6_reroll_all_ones</span><span class="o">.</span><span class="n">h</span><span class="p">(</span>
+    <span class="s2">&quot;4d6 - re-roll all 1s (i.e., 4d(d5 + 1)),</span><span class="se">\n</span><span class="s2">discard lowest&quot;</span><span class="p">:</span> <span class="n">p_4d6_reroll_all_ones</span><span class="o">.</span><span class="n">h</span><span class="p">(</span>
         <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="p">),</span>
     <span class="s2">&quot;2d6 + 6&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span>
@@ -1688,39 +1806,15 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <p>Visualization: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_burst</span><span class="p">,</span> <span class="n">plot_line</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
 
 <span class="n">labels</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">attr_results</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">ax_lines</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">plot_line</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="s2">&quot;Ds^*xo&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_lines</span><span class="p">)</span>
-<span class="n">ax_lines</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">ax_lines</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing various take-three-of-4d6 methods&quot;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">attr_results</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-    <span class="n">ax_burst</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="n">plot_burst</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_burst</span><span class="p">)</span>
-    <span class="n">ax_burst</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax_burst</span><span class="o">.</span><span class="n">get_title</span><span class="p">(),</span> <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing various take-three-of-4d6 methods&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
@@ -1770,7 +1864,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">6</span>
 <span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ticker</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_line</span><span class="p">(</span><span class="n">damage_half_on_save</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">IndexLocator</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
@@ -2047,117 +2141,24 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 </table>
 
 <p>Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
-<details>
-<summary>
-  Visualization source code
-</summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
 
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_burst</span><span class="p">,</span> <span class="n">plot_line</span>
-
-<span class="n">cmap_sa</span> <span class="o">=</span> <span class="s2">&quot;Reds&quot;</span>
-<span class="n">cmap_gwf_2014</span> <span class="o">=</span> <span class="s2">&quot;Greens&quot;</span>
-<span class="n">cmap_gwf_2024</span> <span class="o">=</span> <span class="s2">&quot;Purples&quot;</span>
-
-<span class="n">ax_sa</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">plot_line</span><span class="p">(</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_ridge</span><span class="p">(</span>
     <span class="n">single_attack</span><span class="p">,</span>
     <span class="n">h_gwf_2014</span><span class="p">,</span>
     <span class="n">h_gwf_2024</span><span class="p">,</span>
     <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="n">label_sa</span><span class="p">,</span> <span class="n">label_gwf_2014</span><span class="p">,</span> <span class="n">label_gwf_2024</span><span class="p">],</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax_sa</span><span class="p">,</span>
+    <span class="n">overlap</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">ax_sa</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap_sa</span><span class="p">)(</span><span class="mf">0.75</span><span class="p">))</span>
-<span class="n">ax_sa</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap_gwf_2014</span><span class="p">)(</span><span class="mf">0.75</span><span class="p">))</span>
-<span class="n">ax_sa</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap_gwf_2024</span><span class="p">)(</span><span class="mf">0.75</span><span class="p">))</span>
-<span class="n">ax_sa</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">ax_sa_gwf_2014</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">plot_burst</span><span class="p">(</span>
-    <span class="n">h_gwf_2014</span><span class="p">,</span>
-    <span class="n">single_attack</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_gwf_2014</span><span class="p">,</span>
-    <span class="n">compare_cmap</span><span class="o">=</span><span class="n">cmap_sa</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_sa</span><span class="si">}</span><span class="se">\n</span><span class="s2">vs.</span><span class="se">\n</span><span class="si">{</span><span class="n">label_gwf_2014</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax_sa_gwf_2014</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">ax_sa_gwf_2024</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">plot_burst</span><span class="p">(</span>
-    <span class="n">h_gwf_2024</span><span class="p">,</span>
-    <span class="n">single_attack</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_gwf_2024</span><span class="p">,</span>
-    <span class="n">compare_cmap</span><span class="o">=</span><span class="n">cmap_sa</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_sa</span><span class="si">}</span><span class="se">\n</span><span class="s2">vs.</span><span class="se">\n</span><span class="si">{</span><span class="n">label_gwf_2024</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax_sa_gwf_2024</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">ax_gwf_2014_2024</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">plot_burst</span><span class="p">(</span>
-    <span class="n">h_gwf_2024</span><span class="p">,</span>
-    <span class="n">h_gwf_2014</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_gwf_2024</span><span class="p">,</span>
-    <span class="n">compare_cmap</span><span class="o">=</span><span class="n">cmap_gwf_2014</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_gwf_2014</span><span class="si">}</span><span class="se">\n</span><span class="s2">vs.</span><span class="se">\n</span><span class="si">{</span><span class="n">label_gwf_2024</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax_gwf_2014_2024</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-</details>
-
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_great_weapon_fighting_dark.svg">
@@ -2241,7 +2242,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">12</span>
 <span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ticker</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_line</span><span class="p">(</span>
     <span class="n">normal_hit</span><span class="p">,</span>
@@ -2275,11 +2276,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">ceil</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">explode_n</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">explode_n</span>
 
 <span class="n">explode_depth</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -2326,36 +2323,42 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ticker</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
 
-<span class="c1"># Range: [start_k..end_k)</span>
-<span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span>
-<span class="c1"># Range: [start_n..end_n)</span>
-<span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span>
-<span class="c1"># For normalizing axes scale</span>
-<span class="n">all_nkk</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span><span class="p">):</span>
-    <span class="n">label_value_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">k</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nkk</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span><span class="p">)]</span>
-    <span class="n">labels</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">label_value_pairs</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">all_nkk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span>
+<span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span>  <span class="c1"># range: [start_k..end_k)</span>
+<span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span>  <span class="c1"># range: [start_n..end_n)</span>
+<span class="n">rows_by_k</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">:</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">k</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nkk</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">max_x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)</span>
+<span class="n">max_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+    <span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">rows</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">probability_items</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">labels</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">rows</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="n">k_end</span> <span class="o">-</span> <span class="n">k_start</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">k_start</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="n">plot_line</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;cool&quot;</span><span class="p">,</span> <span class="n">peak</span><span class="o">=</span><span class="n">max_y</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
         <span class="n">line</span><span class="o">.</span><span class="n">set_marker</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Taking the </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> highest of $n$ exploding d10s&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">max_x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">all_nkk</span><span class="p">)</span>
-<span class="n">max_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">prob</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">all_nkk</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">probability_items</span><span class="p">())</span>
-<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">get_axes</span><span class="p">():</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">max_x</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_y</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">max_x</span><span class="p">)</span>  <span class="c1"># subplots should share a horizontal scale</span>
+<span class="c1"># subplots should share a vertical scale</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()</span>
+<span class="n">y_lims</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">lo</span> <span class="k">for</span> <span class="n">lo</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">y_lims</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">hi</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">hi</span> <span class="ow">in</span> <span class="n">y_lims</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 </details>
@@ -2408,7 +2411,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_bar</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_bar</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_bar</span><span class="p">(</span><span class="n">res_15d6</span><span class="p">,</span> <span class="n">res_8d10</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;15d6&quot;</span><span class="p">,</span> <span class="s2">&quot;8d10&quot;</span><span class="p">])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Chances of rolling $n$ duplicates&quot;</span><span class="p">)</span>
@@ -2514,6 +2517,11 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
         <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> keep </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
 <p>Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
+<details>
+<summary>
+  Visualization source code
+</summary>
+
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -2523,17 +2531,49 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_burst</span>
 
 <span class="n">labels1</span><span class="p">,</span> <span class="n">hs1</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">normal</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_line</span><span class="p">(</span><span class="o">*</span><span class="n">hs1</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels1</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
-
 <span class="n">labels2</span><span class="p">,</span> <span class="n">hs2</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">roll_and_keep_hs</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plot_line</span><span class="p">(</span><span class="o">*</span><span class="n">hs2</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels2</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Roll-and-keep mechanic comparison&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs2</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">hs1</span><span class="p">,</span>
+        <span class="n">hs2</span><span class="p">,</span>
+        <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label1</span><span class="si">}</span><span class="s2"> vs.</span><span class="se">\n</span><span class="si">{</span><span class="n">label2</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">label1</span><span class="p">,</span> <span class="n">label2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels1</span><span class="p">,</span> <span class="n">labels2</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span>
+        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hs1</span><span class="p">)</span> <span class="o">//</span> <span class="n">cols</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs1</span><span class="p">)</span> <span class="o">%</span> <span class="n">cols</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span> <span class="o">//</span> <span class="n">cols</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="n">cols</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">plot_burst</span><span class="p">(</span><span class="n">h2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">compare_cmap</span><span class="o">=</span><span class="s2">&quot;cividis&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_title</span><span class="p">(),</span> <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">14.4</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
+</details>
+
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_roll_and_keep_dark.svg">
@@ -3438,7 +3478,7 @@ This pattern will come up again below, so we’ll capture it in a helper functio
 
     <span class="k">def</span><span class="w"> </span><span class="nf">viz_multi_round_goliath_helper</span><span class="p">(</span>
         <span class="n">single_round_goliath_func</span><span class="p">:</span> <span class="n">VersusFuncGoliathT</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div></td></tr></table></div>
 <details>
 <summary>
@@ -3512,7 +3552,7 @@ This pattern will come up again below, so we’ll capture it in a helper functio
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># See &lt;https://github.com/python/mypy/issues/19169#issuecomment-2920914460&gt;</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">viz_multi_round_goliath_helper</span><span class="p">(</span>  <span class="c1"># type: ignore[no-redef]</span>
     <span class="n">single_round_goliath_func</span><span class="p">:</span> <span class="n">VersusFuncGoliathT</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
     <span class="n">all_axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -3649,7 +3689,7 @@ Further, we can observe that every “run” will be zero or more exploding hits
     <span class="n">HIT_EXPLODE</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<span class="n">d_evens_up_raw</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span>
+<span class="n">d_evens_up_raw</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">EvensUp</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span>
     <span class="p">(</span>
         <span class="n">EvensUp</span><span class="o">.</span><span class="n">MISS</span><span class="p">,</span>  <span class="c1"># 1</span>
         <span class="n">EvensUp</span><span class="o">.</span><span class="n">HIT</span><span class="p">,</span>  <span class="c1"># 2</span>

@@ -21,6 +21,8 @@ all : \
 	assets/plot_burning_arch_light.svg \
 	assets/plot_d10_explode_dark.svg \
 	assets/plot_d10_explode_light.svg \
+	assets/plot_d4s_dark.svg \
+	assets/plot_d4s_light.svg \
 	assets/plot_dupes_dark.svg \
 	assets/plot_dupes_light.svg \
 	assets/plot_great_weapon_fighting_dark.svg \
@@ -42,7 +44,19 @@ all : \
 	assets/plot_viz_plot_hbar_dark.svg \
 	assets/plot_viz_plot_hbar_light.svg \
 	assets/plot_viz_plot_line_dark.svg \
-	assets/plot_viz_plot_line_light.svg
+	assets/plot_viz_plot_line_light.svg \
+	assets/plot_viz_plot_line_at_most_dark.svg \
+	assets/plot_viz_plot_line_at_most_light.svg \
+	assets/plot_viz_plot_line_at_least_dark.svg \
+	assets/plot_viz_plot_line_at_least_light.svg \
+	assets/plot_viz_plot_ridge_dark.svg \
+	assets/plot_viz_plot_ridge_light.svg \
+	snippets/plotly_viz_plot_bar.html \
+	snippets/plotly_viz_plot_hbar.html \
+	snippets/plotly_viz_plot_line.html \
+	snippets/plotly_viz_plot_line_at_least.html \
+	snippets/plotly_viz_plot_line_at_most.html \
+	snippets/plotly_viz_plot_ridge.html
 
 # \
 # 	assets/graph_classes_dyce_r_dark.svg \
@@ -89,16 +103,19 @@ assets/plot_risus_multi_round_best_of_set_light.svg \
 assets/plot_risus_multi_round_evens_up_light.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style light --output-dir assets
 
+notebooks/%.ipynb : assets/nb_%.py
+	jupytext --to notebook --update $< --output $@
+	ruff check --fix $@
+	ruff format $@
+
 assets/plot_%_dark.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style dark --output-file $@
 
 assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
 
-notebooks/%.ipynb : assets/nb_%.py
-	jupytext --to notebook --update $< --output $@
-	ruff check --fix $@
-	ruff format $@
+snippets/plotly_%.html : assets/plotly_%.py assets/_plotly.py ../dyce/*.py
+	"$${PYTHON:-python3}" assets/plotly_$*.py --log-level INFO --output-file $@
 
 assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True assets/perf_$*.ipy | tee $@

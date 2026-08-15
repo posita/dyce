@@ -15,17 +15,18 @@
 
 
 def fig_callback(line_color: str) -> None:
+    # --8<-- [start:viz]
     from dyce import H
-    from dyce.viz import plot_line
+    from dyce.viz.matplotlib import plot_line
 
     ax = plot_line(
-        2 @ H(6),
-        H(12),
-        graph_type="at_most",
-        labels=["2d6", "d12"],
+        2 @ H(10),
+        H(8) + H(12),
+        labels=["2d10", "d8 + d12"],
     )
-    ax.set_title("2d6 vs. d12")
+    ax.set_title("2d10 vs. d8 + d12")
     ax.legend(loc="upper left")
+    # --8<-- [end:viz]
 
     # Style (dark/light) tweaks
     ax.tick_params(colors=line_color)
