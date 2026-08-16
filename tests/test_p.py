@@ -20,14 +20,14 @@ from collections.abc import Iterable
 from decimal import Decimal
 from fractions import Fraction
 from typing import Any, TypeVar
-from unittest.mock import Mock, call, patch
+from unittest.mock import patch
 
 import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
 from dyce.p import RollT, _WhichRollSurveyor
-from dyce.types import BeartypeCallHintViolation, GetItemT, getitems
+from dyce.types import BeartypeCallHintViolation, GetItemT
 
 from ._helpers import (
     SAMPLE_OUTCOME_TYPES,
@@ -854,6 +854,21 @@ class TestPH:
         # Lowest of 2d6 (known distribution, mirrors highest)
         assert (2 @ P(6)).h(0) == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 
+    def test_which_single_homogeneous_position_uses_order_stat(self) -> None:
+        p = 4 @ P(H({1: 1, 2: 2, 3: 1}))
+        with (
+            patch.object(
+                H,
+                "order_stat_for_n_at_pos",
+                wraps=H.order_stat_for_n_at_pos,
+                autospec=True,
+            ) as order_stat_for_n_at_pos,
+            warnings.catch_warnings(record=True) as caught_warnings,
+        ):
+            assert p.h(2) == H({1: 13, 2: 176, 3: 67})
+        order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
+        assert not caught_warnings
+
     def test_h_which_homogeneous(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -1032,6 +1047,36 @@ class TestPRollsWithCounts:
         )
         assert lows == {1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1}
 
+    def test_which_single_homogeneous_position_uses_order_stat(self) -> None:
+        p = 4 @ P(H({1: 1, 2: 2, 3: 1}))
+        with (
+            patch.object(
+                H,
+                "order_stat_for_n_at_pos",
+                wraps=H.order_stat_for_n_at_pos,
+                autospec=True,
+            ) as order_stat_for_n_at_pos,
+            patch("dyce.p._WhichRollSurveyor") as which_roll_surveyor,
+            warnings.catch_warnings(record=True) as caught_warnings,
+        ):
+            assert dict(p.rolls_with_counts(2)) == {
+                (1,): 13,
+                (2,): 176,
+                (3,): 67,
+            }
+        order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
+        which_roll_surveyor.assert_not_called()
+        assert not caught_warnings
+
+    def test_which_multiple_positions_uses_surveyor(self) -> None:
+        p = 4 @ P(H((-1, 0, 1)))
+        with patch(
+            "dyce.p._WhichRollSurveyor",
+            wraps=_WhichRollSurveyor,
+        ) as which_roll_surveyor:
+            list(p.rolls_with_counts(1, 3))
+        which_roll_surveyor.assert_called_once_with(p, (1, 3))
+
     def test_which_index_lowest_and_highest(self) -> None:
         p = 3 @ P(6)
         lo_hi = H.from_counts(p.rolls_with_counts(0, -1))
@@ -1074,93 +1119,48 @@ class TestPRollsWithCounts:
         expected = {(r[0], r[0], r[1], r[1]): c for r, c in p.rolls_with_counts()}
         assert doubled_keys == expected
 
-    def test_homogeneous_vs_known_correct(self) -> None:
+    def test_which_homogeneous_matches_brute_force(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
         for which in (
-            slice(None),
-            slice(0, 4),
-            slice(-4, None),
+            (slice(None),),
+            (slice(0, 4),),
+            (slice(-4, None),),
+            (slice(0, 1),),
+            (slice(1, 2),),
+            (slice(2, 3),),
+            (slice(3, 4),),
+            (slice(0, 0),),
+            (slice(2, 4),),
+            (1, 3),
+            (slice(5, 7),),
+            (slice(-7, -5),),
         ):
-            indices = tuple(range(len(p_4df)))
-            selected = tuple(getitems(indices, (which,)))
-            which_roll_surveyor_mock = _rwc_validation_helper(p_4df, which)
-            which_roll_surveyor_mock.assert_has_calls([call(p_4df, selected)])
-        # 1 outcome from left (each distinct position)
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(0, 1))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (0,))]
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(1, 2))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (1,))]
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(2, 3))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (2,))]
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(3, 4))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (3,))]
-        # No outcomes (early-exit before P.survey)
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(0, 0))
-        assert which_roll_surveyor_mock.call_args_list == []
-        # 2 outcomes from right
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(2, 4))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (2, 3))]
-        # Non-contiguous
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, 1, 3)
-        assert which_roll_surveyor_mock.call_args_list == [call(p_4df, (1, 3))]
-        # Off the deep end (early-exit before P.survey)
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(5, 7))
-        assert which_roll_surveyor_mock.call_args_list == []
-        which_roll_surveyor_mock = _rwc_validation_helper(p_4df, slice(-7, -5))
-        assert which_roll_surveyor_mock.call_args_list == []
+            _assert_rwc_matches_brute_force(p_4df, *which)
 
-    def test_heterogeneous_vs_known_correct(self) -> None:
+    def test_which_heterogeneous_matches_brute_force(self) -> None:
         p_3 = P(H({i: i for i in range(1, 4)}))
         p_4n = P(H({-i: i for i in range(1, 5)}))
         p_3x3_4x4n = P(3 @ p_3, 4 @ p_4n)
         for which in (
-            # All outcomes
-            slice(None),
-            # 4 lowest or highest outcomes
-            slice(4),
-            slice(-4, None),
-            # Middle bit
-            slice(2, 4),
+            (slice(None),),
+            (slice(4),),
+            (slice(-4, None),),
+            (slice(2, 4),),
+            (slice(3),),
+            (slice(-3, None),),
+            (slice(2),),
+            (slice(-2, None),),
+            (slice(1),),
+            (slice(-1, None),),
+            (slice(0, 0),),
+            (1, 3),
+            (slice(5, 7),),
+            (slice(-7, -5),),
+            (slice(7, 9),),
+            (slice(-9, -7),),
         ):
-            indices = tuple(range(len(p_3x3_4x4n)))
-            selected = tuple(getitems(indices, (which,)))
-            which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, which)
-            which_roll_surveyor_mock.assert_has_calls([call(p_3x3_4x4n, selected)])
-        # 3 outcomes from left
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(3))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1, 2))]
-        # 3 outcomes from right
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-3, None))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (4, 5, 6))]
-        # 2 outcomes from left
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(2))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1))]
-        # 2 outcomes from right
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-2, None))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (5, 6))]
-        # 1 outcome from left
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(1))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0,))]
-        # 1 outcome from right
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-1, None))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (6,))]
-        # No outcomes (early-exit before P.survey)
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(0, 0))
-        assert which_roll_surveyor_mock.call_args_list == []
-        # Non-contiguous
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, 1, 3)
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (1, 3))]
-        # Near the combined-roll ends but outside any sub-pool
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(5, 7))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (5, 6))]
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-7, -5))
-        assert which_roll_surveyor_mock.call_args_list == [call(p_3x3_4x4n, (0, 1))]
-        # Off the deep end (early-exit before P.survey)
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(7, 9))
-        assert which_roll_surveyor_mock.call_args_list == []
-        which_roll_surveyor_mock = _rwc_validation_helper(p_3x3_4x4n, slice(-9, -7))
-        assert which_roll_surveyor_mock.call_args_list == []
+            _assert_rwc_matches_brute_force(p_3x3_4x4n, *which)
 
 
 def test_rwc_heterogeneous_extremes_via_h() -> None:
@@ -1195,9 +1195,9 @@ def test_rwc_heterogeneous_extremes_natural_order() -> None:
 # ---- Helpers -------------------------------------------------------------------------
 
 
-def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
+def _assert_rwc_matches_brute_force(p: P[_T], *which: GetItemT) -> None:
     r"""
-    Validate rolls_with_counts against brute force and return a mock used to track would-be calls to _WhichRollSurveyor.
+    Validate `rolls_with_counts` against brute-force enumeration.
     """
     known_counts: Counter[RollT[_T]] = Counter()
     test_counts: Counter[RollT[_T]] = Counter()
@@ -1208,11 +1208,6 @@ def _rwc_validation_helper(p: P[_T], *which: GetItemT) -> Mock:
         enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), *which
     ):
         known_counts[roll] += count
-    with patch(
-        "dyce.p._WhichRollSurveyor",
-        side_effect=_WhichRollSurveyor,
-    ) as which_roll_surveyor_mock:
-        for roll, count in p.rolls_with_counts(*which):
-            test_counts[roll] += count
+    for roll, count in p.rolls_with_counts(*which):
+        test_counts[roll] += count
     assert test_counts == known_counts
-    return which_roll_surveyor_mock

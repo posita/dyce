@@ -14,6 +14,7 @@
 # ======================================================================================
 
 import operator
+import warnings
 from abc import ABC, abstractmethod
 from bisect import bisect_right
 from collections import Counter, defaultdict
@@ -36,7 +37,7 @@ import optype as ot
 
 from .h import H, aggregate_weighted, sum_h
 from .hable import HableOpsMixin
-from .lifecycle import experimental
+from .lifecycle import ExperimentalWarning, experimental
 from .types import (
     GetItemT,
     Sentinel,
@@ -676,6 +677,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         selected = tuple(getitems(indices, which or indices))
         if not selected:
             return H({})
+        if len(selected) == 1 and len(self._h_groups) == 1:
+            h, count = next(iter(self._h_groups.items()))
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", ExperimentalWarning)
+                return h.order_stat_for_n_at_pos(count, selected[0])
         return self.survey(_WhichHSurveyor(self, selected))
 
     @experimental
@@ -760,6 +766,15 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         n = len(self)
         indices = tuple(range(n))
         selected = tuple(getitems(indices, which or indices))
+        if len(selected) == 1 and len(self._h_groups) == 1:
+            h, count = next(iter(self._h_groups.items()))
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", ExperimentalWarning)
+                order_stat_h = h.order_stat_for_n_at_pos(count, selected[0])
+            yield from (
+                ((outcome,), weight) for outcome, weight in order_stat_h.items()
+            )
+            return
         yield from (
             self.survey_raw(_WhichRollSurveyor(self, selected)) if selected else ()
         )
