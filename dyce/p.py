@@ -677,12 +677,12 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         selected = tuple(getitems(indices, which or indices))
         if not selected:
             return H({})
-        if len(selected) == 1 and len(self._h_groups) == 1:
-            h, count = next(iter(self._h_groups.items()))
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", ExperimentalWarning)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            if len(selected) == 1 and len(self._h_groups) == 1:
+                h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
-        return self.survey(_WhichHSurveyor(self, selected))
+            return self.survey(_WhichHSurveyor(self, selected))
 
     @experimental
     def roll(self: "P[_T]") -> RollT[_T]:
@@ -776,7 +776,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             )
             return
         yield from (
-            self.survey_raw(_WhichRollSurveyor(self, selected)) if selected else ()
+            self._survey_raw(_WhichRollSurveyor(self, selected)) if selected else ()
         )
 
     @overload
@@ -867,14 +867,29 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         if surveyor is None:
             if accumulate is None or order is None:
                 raise ValueError("must provide a surveyor or an accumulate and order")
-            return self.survey(
-                ParameterizedSurveyor(
-                    accumulate,
-                    order,
-                    initial=initial,
-                    settle=settle,
+            survey_raw_iter = (
+                # Without the convoluted ... if settle is None else ... structure below,
+                # Mypy is confused whether the return type is H[_StateT] or H[_ResultT]
+                self._survey_raw(
+                    # settle is None, return type is H[_StateT]
+                    ParameterizedSurveyor(
+                        accumulate,
+                        order,
+                        initial=initial,
+                    )
+                )
+                if settle is None
+                else self._survey_raw(
+                    # settle is not None, return type is H[_ResultT]
+                    ParameterizedSurveyor(
+                        accumulate,
+                        order,
+                        initial=initial,
+                        settle=settle,
+                    )
                 )
             )
+            return aggregate_weighted(survey_raw_iter)
         else:
             if (
                 accumulate is not None
@@ -885,9 +900,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 raise ValueError(
                     "must not provide an accumulate and order with a surveyor"
                 )
-            return aggregate_weighted(self.survey_raw(surveyor))
+            return aggregate_weighted(self._survey_raw(surveyor))
 
-    def survey_raw(  # ruff: ignore[complex-structure]
+    def _survey_raw(  # ruff: ignore[complex-structure]
         self: "P[_T]",
         surveyor: SurveyorBase[_T, _StateT, _ResultT],
     ) -> Iterator[tuple[_ResultT, int]]:
