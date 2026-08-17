@@ -52,7 +52,7 @@ from typing import (
 
 import optype as ot
 
-from .lifecycle import deprecated, experimental
+from .lifecycle import experimental
 from .types import (
     Sentinel,
     SentinelT,

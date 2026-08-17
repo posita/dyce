@@ -683,7 +683,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
-            if 1 < len(selected) < n and len(self._h_groups) == 1:
+            # Unlike rolls_with_counts, h can fold large selections directly without
+            # materializing rolls, which becomes faster beyond roughly half the pool.
+            if 1 < len(selected) <= n // 2 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 if selected == tuple(range(len(selected))):
                     return H.from_counts(

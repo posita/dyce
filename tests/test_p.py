@@ -26,7 +26,12 @@ import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
-from dyce.p import RollT, _rwc_homogeneous_one_end, _WhichRollSurveyor
+from dyce.p import (
+    RollT,
+    _rwc_homogeneous_one_end,
+    _WhichHSurveyor,
+    _WhichRollSurveyor,
+)
 from dyce.types import BeartypeCallHintViolation, GetItemT
 
 from ._helpers import (
@@ -881,6 +886,19 @@ class TestPH:
             p.h(-2, -1)
         rwc_homogeneous_one_end.assert_called_once_with(4, p[0], 2, from_right=True)
         which_h_surveyor.assert_not_called()
+
+    def test_which_contiguous_homogeneous_large_selection_uses_surveyor(self) -> None:
+        p = 4 @ P(H((-1, 0, 1)))
+        with (
+            patch("dyce.p._rwc_homogeneous_one_end") as rwc_homogeneous_one_end,
+            patch(
+                "dyce.p._WhichHSurveyor",
+                wraps=_WhichHSurveyor,
+            ) as which_h_surveyor,
+        ):
+            p.h(-3, -2, -1)
+        rwc_homogeneous_one_end.assert_not_called()
+        which_h_surveyor.assert_called_once_with(p, (1, 2, 3))
 
     def test_h_which_homogeneous(self) -> None:
         p_df = P(H((-1, 0, 1)))
