@@ -954,19 +954,6 @@ class TestPH:
         assert p.h(-1) == H(6)
         assert p.h(0) == H(6)
 
-    # ---- Heterogeneous: per-group decomposition for single-END positions ----
-    #
-    # For `pos == 0` or `pos == n - 1` on a heterogeneous pool with at
-    # least one group of size > 1, compute the per-group min/max via
-    # `order_stat_for_n_at_pos`, then recurse on the (smaller) reduced
-    # pool. Recursion terminates because each pass strictly decreases
-    # `sum(n_g for groups)` -- a group of size k > 1 becomes a single H.
-    #
-    # The recursion uses a FRESH P object, so mocking
-    # `rolls_with_counts` on the *original* pool should still see zero
-    # calls. The recursive call may or may not exercise
-    # `rolls_with_counts` internally (separate object), and that's fine.
-
     def test_heterogeneous_max_matches_brute_force(self) -> None:
         # Cross-check the decomposed result against brute-force enumeration on a
         # small-enough pool to enumerate fully

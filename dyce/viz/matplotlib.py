@@ -660,7 +660,7 @@ def _colors_proportionate(
     use_midpoints: bool = True,
 ) -> list[tuple[float, float, float, float]]:
     cm: Colormap = plt.colormaps.get_cmap(cmap) if isinstance(cmap, str) else cmap
-    total = sum(probs)
+    total = sum(probs, start=0.0)
     if not total:
         return []
 
