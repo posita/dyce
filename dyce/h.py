@@ -14,6 +14,7 @@
 # ======================================================================================
 
 import math
+import operator
 import os
 import warnings
 from abc import abstractmethod
@@ -31,6 +32,7 @@ from collections.abc import (
 from contextlib import contextmanager
 from contextvars import ContextVar
 from fractions import Fraction
+from functools import reduce
 from itertools import groupby
 from itertools import product as iproduct
 from types import NotImplementedType
@@ -1587,9 +1589,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         """
         if not self._h:
             raise ValueError("mean of empty histogram is undefined")
-        return float(
-            sum(outcome * count for outcome, count in self.items()) / self.total  # type: ignore[misc,operator]  # ty: ignore[unsupported-operator]
+        weighted_outcomes = (
+            outcome * count  # type: ignore[operator] # ty: ignore[unsupported-operator]
+            for outcome, count in self.items()
         )
+        return float(reduce(operator.add, weighted_outcomes) / self.total)
 
     @experimental
     def order_stat_for_n_at_pos(
@@ -1858,8 +1862,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         """
         return (
             sum(
-                count / self.total * float(outcome) ** 2
-                for outcome, count in self._h.items()
+                (
+                    count / self.total * float(outcome) ** 2
+                    for outcome, count in self._h.items()
+                ),
+                start=0.0,
             )
             - self.mean() ** 2
         )
@@ -2120,18 +2127,6 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
         n = sum(1 for _ in group)
         batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
         result = batch if result is None else result + batch  # type: ignore[operator]
-    return cast("H[_T]", H({})) if result is None else result
-
-
-@deprecated("may be removed in future versions")
-def sum_h_old(hs: Iterable[H[_T]]) -> H[_T]:  # pragma: no cover
-    r"""
-    Original `#!math O\left( n \right)` implementation of `sum_h`, preserved for performance comparison.
-    Sums zero or more histograms, returning `H({})` for an empty iterable.
-    """
-    result: H[_T] | None = None
-    for h in hs:
-        result = h if result is None else result + h  # type: ignore[operator]
     return cast("H[_T]", H({})) if result is None else result
 
 
