@@ -26,7 +26,7 @@ import pytest
 
 from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
-from dyce.p import RollT, _WhichRollSurveyor
+from dyce.p import RollT, _rwc_homogeneous_one_end, _WhichRollSurveyor
 from dyce.types import BeartypeCallHintViolation, GetItemT
 
 from ._helpers import (
@@ -869,6 +869,19 @@ class TestPH:
         order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
         assert not caught_warnings
 
+    def test_which_contiguous_homogeneous_end_uses_partial_selection(self) -> None:
+        p = 4 @ P(H((-1, 0, 1)))
+        with (
+            patch(
+                "dyce.p._rwc_homogeneous_one_end",
+                wraps=_rwc_homogeneous_one_end,
+            ) as rwc_homogeneous_one_end,
+            patch("dyce.p._WhichHSurveyor") as which_h_surveyor,
+        ):
+            p.h(-2, -1)
+        rwc_homogeneous_one_end.assert_called_once_with(4, p[0], 2, from_right=True)
+        which_h_surveyor.assert_not_called()
+
     def test_h_which_homogeneous(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -1068,6 +1081,19 @@ class TestPRollsWithCounts:
         which_roll_surveyor.assert_not_called()
         assert not caught_warnings
 
+    def test_which_contiguous_homogeneous_end_uses_partial_selection(self) -> None:
+        p = 4 @ P(H((-1, 0, 1)))
+        with (
+            patch(
+                "dyce.p._rwc_homogeneous_one_end",
+                wraps=_rwc_homogeneous_one_end,
+            ) as rwc_homogeneous_one_end,
+            patch("dyce.p._WhichRollSurveyor") as which_roll_surveyor,
+        ):
+            list(p.rolls_with_counts(-2, -1))
+        rwc_homogeneous_one_end.assert_called_once_with(4, p[0], 2, from_right=True)
+        which_roll_surveyor.assert_not_called()
+
     def test_which_multiple_positions_uses_surveyor(self) -> None:
         p = 4 @ P(H((-1, 0, 1)))
         with patch(
@@ -1137,6 +1163,12 @@ class TestPRollsWithCounts:
             (slice(-7, -5),),
         ):
             _assert_rwc_matches_brute_force(p_4df, *which)
+        p_weighted = 4 @ P(H({1: 1, 2: 2, 3: 1}))
+        _assert_rwc_matches_brute_force(p_weighted, slice(2))
+        _assert_rwc_matches_brute_force(p_weighted, slice(-2, None))
+        p_with_zero_weight = 4 @ P(H({1: 1, 2: 0, 3: 1}))
+        _assert_rwc_matches_brute_force(p_with_zero_weight, slice(2))
+        _assert_rwc_matches_brute_force(p_with_zero_weight, slice(-2, None))
 
     def test_which_heterogeneous_matches_brute_force(self) -> None:
         p_3 = P(H({i: i for i in range(1, 4)}))
