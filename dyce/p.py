@@ -19,6 +19,7 @@ from abc import ABC, abstractmethod
 from bisect import bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
+from functools import cache, reduce
 from itertools import product, starmap
 from math import comb, prod
 from typing import (
@@ -682,6 +683,22 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
+            if 1 < len(selected) < n and len(self._h_groups) == 1:
+                h, count = next(iter(self._h_groups.items()))
+                if selected == tuple(range(len(selected))):
+                    return H.from_counts(
+                        (reduce(operator.add, roll), weight)
+                        for roll, weight in _rwc_homogeneous_one_end(
+                            count, h, len(selected), from_right=False
+                        )
+                    )
+                if selected == tuple(range(n - len(selected), n)):
+                    return H.from_counts(
+                        (reduce(operator.add, roll), weight)
+                        for roll, weight in _rwc_homogeneous_one_end(
+                            count, h, len(selected), from_right=True
+                        )
+                    )
             return self.survey(_WhichHSurveyor(self, selected))
 
     @experimental
@@ -775,6 +792,18 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 ((outcome,), weight) for outcome, weight in order_stat_h.items()
             )
             return
+        if 1 < len(selected) < n and len(self._h_groups) == 1:
+            h, count = next(iter(self._h_groups.items()))
+            if selected == tuple(range(len(selected))):
+                yield from _rwc_homogeneous_one_end(
+                    count, h, len(selected), from_right=False
+                )
+                return
+            if selected == tuple(range(n - len(selected), n)):
+                yield from _rwc_homogeneous_one_end(
+                    count, h, len(selected), from_right=True
+                )
+                return
         yield from (
             self._survey_raw(_WhichRollSurveyor(self, selected)) if selected else ()
         )
@@ -1014,6 +1043,75 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
 
 # ---- Helpers -------------------------------------------------------------------------
+
+
+def _rwc_homogeneous_one_end(
+    n: int,
+    h: H[_T],
+    k: int,
+    *,
+    from_right: bool,
+) -> Iterator[RollCountT[_T]]:
+    r"""
+    Yield the lowest or highest *k* outcomes from *n* rolls of *h*.
+    Once an outcome fills the remaining selected positions, a complementary binomial tail combines every possible assignment of the unselected dice.
+    """
+    ordered_outcomes = (
+        survey_outcome_order_descending(h)
+        if from_right
+        else survey_outcome_order_ascending(h)
+    )
+    outcomes = tuple(outcome for outcome in ordered_outcomes if h[outcome])
+    weights = tuple(h[outcome] for outcome in outcomes)
+    remaining_total = sum(weights)
+    remaining_totals_list: list[int] = []
+    for weight in weights:
+        remaining_total -= weight
+        remaining_totals_list.append(remaining_total)
+    remaining_totals = tuple(remaining_totals_list)
+
+    @cache
+    def _terminal_count(outcome_index: int, remaining: int, needed: int) -> int:
+        weight = weights[outcome_index]
+        remaining_total = remaining_totals[outcome_index]
+        fewer_than_needed = sum(
+            comb(remaining, count)
+            * weight**count
+            * remaining_total ** (remaining - count)
+            for count in range(needed)
+        )
+        return (weight + remaining_total) ** remaining - fewer_than_needed
+
+    def _generate(
+        outcome_index: int,
+        remaining: int,
+        roll: RollT[_T],
+        scale: int,
+    ) -> Iterator[RollCountT[_T]]:
+        if outcome_index >= len(outcomes):
+            return
+        outcome = outcomes[outcome_index]
+        weight = weights[outcome_index]
+        needed = k - len(roll)
+        if remaining >= needed:
+            terminal_count = _terminal_count(outcome_index, remaining, needed)
+            if terminal_count:
+                selected_roll = (*roll, *((outcome,) * needed))
+                yield (
+                    tuple(reversed(selected_roll)) if from_right else selected_roll,
+                    scale * terminal_count,
+                )
+        for count in range(min(needed - 1, remaining) + 1):
+            next_scale = scale * comb(remaining, count) * weight**count
+            if next_scale:
+                yield from _generate(
+                    outcome_index + 1,
+                    remaining - count,
+                    (*roll, *((outcome,) * count)),
+                    next_scale,
+                )
+
+    yield from _generate(0, n, (), 1)
 
 
 def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
