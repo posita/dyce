@@ -504,7 +504,7 @@ def expand(  # ruff: ignore[complex-structure]
     return h
 
 
-@nobeartype
+@nobeartype  # not decoratable by beartype (avoids warning)
 def _explode_on_max(result: HResult[_T], _n_left: int, _n_done: int) -> H[_T] | _T:
     try:
         max_result = max(result.h)  # type: ignore[type-var]
@@ -610,7 +610,7 @@ def explode_n(
 # ---- Helpers -------------------------------------------------------------------------
 
 
-@nobeartype
+@nobeartype  # not decoratable by beartype (avoids warning)
 def _source_to_result_iterable(
     source: H | P,
 ) -> Iterator[tuple[HResult | PResult, int]]:

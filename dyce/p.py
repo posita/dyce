@@ -408,7 +408,6 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def __getitem__(self: "P[_T]", key: SupportsIndex) -> H[_T]: ...
     @overload
     def __getitem__(self: "P[_T]", key: slice) -> "P[_T]": ...
-    @nobeartype  # TODO(posita): <https://github.com/beartype/beartype/issues/636>
     def __getitem__(self: "P[_T]", key: SupportsIndex | slice) -> "P[_T] | H[_T]":
 
         def _selected_hs(*indices: int) -> Iterator[H[_T]]:
