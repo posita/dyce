@@ -688,6 +688,21 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
+            # Reducing each repeated group to its extreme strictly shrinks the pool,
+            # so recursion terminates once every remaining group has count one.
+            if (
+                len(selected) == 1
+                and selected[0] in (0, n - 1)
+                and any(count > 1 for count in self._h_groups.values())
+            ):
+                from_right = selected[0] == n - 1
+                reduced = P(
+                    *(
+                        h.order_stat_for_n_at_pos(count, count - 1 if from_right else 0)
+                        for h, count in self._h_groups.items()
+                    )
+                )
+                return reduced.h(-1 if from_right else 0)
             # Unlike rolls_with_counts, h can fold large selections directly without
             # materializing rolls, which becomes faster beyond roughly half the pool.
             if 1 < len(selected) <= n // 2 and len(self._h_groups) == 1:
@@ -798,6 +813,10 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             yield from (
                 ((outcome,), weight) for outcome, weight in order_stat_h.items()
             )
+            return
+        if len(selected) == 1 and len(self._h_groups) > 1 and selected[0] in (0, n - 1):
+            extreme_h = self.h(-1 if selected[0] == n - 1 else 0)
+            yield from (((outcome,), weight) for outcome, weight in extreme_h.items())
             return
         if 1 < len(selected) < n and len(self._h_groups) == 1:
             h, count = next(iter(self._h_groups.items()))
