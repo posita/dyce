@@ -16,7 +16,7 @@
 import operator
 import warnings
 from abc import ABC, abstractmethod
-from bisect import bisect_right
+from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from functools import cache, reduce
@@ -157,6 +157,7 @@ class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
         if not selected:
             raise ValueError(f"{type(self).__name__} requires at least one selection")
         self._selected = selected
+        self._selected_indices = tuple(sorted(set(selected)))
         self._p_len = len(p)
         self._ascending = (
             min(selected) - 0  # distance from left
@@ -168,6 +169,17 @@ class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
             survey_outcome_order_ascending(outcomes)
             if self._ascending
             else survey_outcome_order_descending(outcomes)
+        )
+
+    def _selected_bounds(self, index: int, count: int) -> tuple[int, int]:
+        start, stop = (
+            (index, index + count)
+            if self._ascending
+            else (index - count + 1, index + 1)
+        )
+        return (
+            bisect_left(self._selected_indices, start),
+            bisect_left(self._selected_indices, stop),
         )
 
 
@@ -190,12 +202,9 @@ class _WhichHSurveyor(
         count: int,
     ) -> tuple[_ConvolvableT | None, int]:
         sum_so_far, index_so_far = state
-        r = (
-            range(index_so_far, index_so_far + count)
-            if self._ascending
-            else range(index_so_far, index_so_far - count, -1)
-        )
-        for i in r:
+        selected_start, selected_stop = self._selected_bounds(index_so_far, count)
+        for selected_pos in range(selected_start, selected_stop):
+            i = self._selected_indices[selected_pos]
             for _ in range(self._counts_by_index.get(i, 0)):
                 sum_so_far = outcome if sum_so_far is None else sum_so_far + outcome
         index_so_far += count if self._ascending else -count
@@ -213,7 +222,7 @@ class _WhichRollSurveyor(
 ):
     def __init__(self, p: "P[_T]", selected: tuple[int, ...]) -> None:
         super().__init__(p, selected)
-        self._selection_map = {s: i for i, s in enumerate(sorted(set(selected)))}
+        self._selection_map = {s: i for i, s in enumerate(self._selected_indices)}
 
     @property
     def initial(self) -> tuple[tuple[_T, ...], int]:
@@ -226,18 +235,14 @@ class _WhichRollSurveyor(
         count: int,
     ) -> tuple[tuple[_T, ...], int]:
         roll_so_far, index_so_far = state
-        r = (
-            range(index_so_far, index_so_far + count)
-            if self._ascending
-            else range(index_so_far, index_so_far - count, -1)
-        )
-        for i in r:
-            if i in self._selection_map:
-                roll_so_far = (
-                    (*roll_so_far, outcome)
-                    if self._ascending
-                    else (outcome, *roll_so_far)
-                )
+        selected_start, selected_stop = self._selected_bounds(index_so_far, count)
+        if selected_start != selected_stop:
+            selected_outcomes = (outcome,) * (selected_stop - selected_start)
+            roll_so_far = (
+                (*roll_so_far, *selected_outcomes)
+                if self._ascending
+                else (*selected_outcomes, *roll_so_far)
+            )
         index_so_far += count if self._ascending else -count
         return roll_so_far, index_so_far
 
