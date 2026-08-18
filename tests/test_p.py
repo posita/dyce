@@ -28,6 +28,7 @@ from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
 from dyce.p import (
     RollT,
+    _rwc_heterogeneous_one_end,
     _rwc_homogeneous_one_end,
     _WhichHSurveyor,
     _WhichRollSurveyor,
@@ -920,6 +921,21 @@ class TestPH:
         rwc_homogeneous_one_end.assert_not_called()
         which_h_surveyor.assert_called_once_with(p, (1, 2, 3))
 
+    def test_which_contiguous_heterogeneous_end_uses_partial_selection(self) -> None:
+        p = P(2 @ P(4), 3 @ P(6))
+        with (
+            patch(
+                "dyce.p._rwc_heterogeneous_one_end",
+                wraps=_rwc_heterogeneous_one_end,
+            ) as rwc_heterogeneous_one_end,
+            patch("dyce.p._WhichHSurveyor") as which_h_surveyor,
+        ):
+            p.h(-2, -1)
+        rwc_heterogeneous_one_end.assert_called_once_with(
+            ((p[0], 2), (p[2], 3)), 2, from_right=True
+        )
+        which_h_surveyor.assert_not_called()
+
     def test_h_which_homogeneous(self) -> None:
         p_df = P(H((-1, 0, 1)))
         p_4df = 4 @ p_df
@@ -1123,6 +1139,21 @@ class TestPRollsWithCounts:
         ):
             list(p.rolls_with_counts(-2, -1))
         rwc_homogeneous_one_end.assert_called_once_with(4, p[0], 2, from_right=True)
+        which_roll_surveyor.assert_not_called()
+
+    def test_which_contiguous_heterogeneous_end_uses_partial_selection(self) -> None:
+        p = P(2 @ P(4), 3 @ P(6))
+        with (
+            patch(
+                "dyce.p._rwc_heterogeneous_one_end",
+                wraps=_rwc_heterogeneous_one_end,
+            ) as rwc_heterogeneous_one_end,
+            patch("dyce.p._WhichRollSurveyor") as which_roll_surveyor,
+        ):
+            list(p.rolls_with_counts(-2, -1))
+        rwc_heterogeneous_one_end.assert_called_once_with(
+            ((p[0], 2), (p[2], 3)), 2, from_right=True
+        )
         which_roll_surveyor.assert_not_called()
 
     def test_which_multiple_positions_uses_surveyor(self) -> None:
