@@ -21,8 +21,8 @@
     Some of the following changes are not backward compatible.
     Please review before upgrading.
 
-- Drops support for 3.9 and 3.10 and extends support to 3.14
-- Fixes embarrassingly long-running logical error in 4d6 variants example
+- Drops support for 3.9 and 3.10 and extends support to 3.14.
+- Fixes embarrassingly long-running logical error in 4d6 variants example.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
 - Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
 - Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`H.apply`][dyce.H.apply].
@@ -38,10 +38,11 @@
 - Adds experimental [`H.quantize` method][dyce.H.quantize] and [`quantize_hs` context manager][dyce.quantize_hs].
 - Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
+- Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
 - Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
 - Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
-- *(Finally!)* removes deprecated interfaces
+- *(Finally!)* removes deprecated interfaces:
     - `H.explode`
     - `H.foreach`
     - `H.substitute`
@@ -50,18 +51,19 @@
     - `dyce.h.resolve_dependent_probability`
     - `dyce.h.sum_h` (not previously deprecated, but to-date unused)
 - Adds [`dyce.d`][dyce.d] convenience aliases.
-- Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype)
+- Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype).
 - Completely eliminates dependency on [`numerary`](https://github.com/beartype/numerary/) (which was flawed since conception), and instead relies on [`optype`](https://jorenham.github.io/optype/) for mathematical operator typing.
   ([`H`][dyce.H] and [`P`][dyce.P] still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)
 - Re-introduces low-level [Matplotlib](https://matplotlib.org/) plotting functions in [`dyce.viz.matplotlib`][dyce.viz.matplotlib].
 - Adds portable [Plotly](https://plotly.com/) figure specifications in [`dyce.viz.plotly`][dyce.viz.plotly].
   (High-level, interactive visualization functionality still lives in [`anydyce`](https://github.com/posita/anydyce/).)
-- Stabilizes Jupyter Lite installation
-- Defaults to collapsed installation cells in notebooks
-- Modernizes `setup.cfg` -> `pyproject.toml` (and `tox.ini`)
-- Updates CI workflow
-- Who let the dogs out? *We* let dogs out.
-  - Migrates to `ruff` for linting
+- Stabilizes Jupyter Lite installation.
+- Defaults to collapsed installation cells in notebooks.
+- Modernizes `setup.cfg` -> `pyproject.toml` (and `tox.ini`).
+- Updates CI workflow.
+- Migrates to `ruff` for linting.
+  Who let the dogs out?
+  *We* let dogs out.
 
 ## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
 
