@@ -102,8 +102,9 @@ It has the following runtime dependencies:
 
 `dyce` will opportunistically use the following, if available at runtime:
 
-- [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
+- [Beartype](https://beartype.github.io/beartype/) for runtime type checking of `dyce` APIs
 - [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz.matplotlib`
+- [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
 
 See the [hacking quick-start](https://posita.github.io/dyce/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
 
@@ -126,7 +127,7 @@ Which, if we possess a modicum of humility, it often is.
 Because `dyce` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
 It can be installed and run anywhere[^2], and modified as desired.
 On its own, `dyce` is completely adequate for casual tinkering.
-However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/) or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
+However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/), [Plotly](https://plotly.com/), or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
 
 [^1]:
 
@@ -224,6 +225,7 @@ std |    1.40
 
 [`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) provides a [`probability_items` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.probability_items) to ease integration with plotting packages.
 [`dyce.viz.matplotlib`](https://posita.github.io/dyce/latest/dyce.viz.matplotlib/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
+[`dyce.viz.plotly`](https://posita.github.io/dyce/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
 [`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
 
 ```python
