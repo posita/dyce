@@ -20,7 +20,7 @@ from collections.abc import Iterable
 from decimal import Decimal
 from fractions import Fraction
 from typing import Any, TypeVar
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 
@@ -874,6 +874,26 @@ class TestPH:
         order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
         assert not caught_warnings
 
+    @pytest.mark.parametrize(
+        ("which", "group_positions"),
+        [(0, (0, 0)), (-1, (1, 2))],
+    )
+    def test_which_heterogeneous_end_uses_group_order_stats(
+        self, which: int, group_positions: tuple[int, int]
+    ) -> None:
+        p = P(2 @ P(4), 3 @ P(6))
+        with patch.object(
+            H,
+            "order_stat_for_n_at_pos",
+            wraps=H.order_stat_for_n_at_pos,
+            autospec=True,
+        ) as order_stat_for_n_at_pos:
+            p.h(which)
+        assert order_stat_for_n_at_pos.call_args_list == [
+            call(p[0], 2, group_positions[0]),
+            call(p[2], 3, group_positions[1]),
+        ]
+
     def test_which_contiguous_homogeneous_end_uses_partial_selection(self) -> None:
         p = 4 @ P(H((-1, 0, 1)))
         with (
@@ -1085,6 +1105,12 @@ class TestPRollsWithCounts:
         order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
         which_roll_surveyor.assert_not_called()
         assert not caught_warnings
+
+    def test_which_heterogeneous_end_delegates_to_h(self) -> None:
+        p = P(4, 6)
+        with patch.object(P, "h", wraps=P.h, autospec=True) as h:
+            list(p.rolls_with_counts(-1))
+        h.assert_called_once_with(p, -1)
 
     def test_which_contiguous_homogeneous_end_uses_partial_selection(self) -> None:
         p = 4 @ P(H((-1, 0, 1)))
