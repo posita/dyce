@@ -705,20 +705,20 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 return reduced.h(-1 if from_right else 0)
             # Unlike rolls_with_counts, h can fold large selections directly without
             # materializing rolls, which becomes faster beyond roughly half the pool.
-            if 1 < len(selected) <= n // 2 and len(self._h_groups) == 1:
-                h, count = next(iter(self._h_groups.items()))
+            if 1 < len(selected) <= n // 2:
+                h_groups = tuple(self._h_groups.items())
                 if selected == tuple(range(len(selected))):
                     return H.from_counts(
                         (reduce(operator.add, roll), weight)
-                        for roll, weight in _rwc_homogeneous_one_end(
-                            count, h, len(selected), from_right=False
+                        for roll, weight in _rwc_heterogeneous_one_end(
+                            h_groups, len(selected), from_right=False
                         )
                     )
                 if selected == tuple(range(n - len(selected), n)):
                     return H.from_counts(
                         (reduce(operator.add, roll), weight)
-                        for roll, weight in _rwc_homogeneous_one_end(
-                            count, h, len(selected), from_right=True
+                        for roll, weight in _rwc_heterogeneous_one_end(
+                            h_groups, len(selected), from_right=True
                         )
                     )
             return self.survey(_WhichHSurveyor(self, selected))
@@ -818,16 +818,18 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             extreme_h = self.h(-1 if selected[0] == n - 1 else 0)
             yield from (((outcome,), weight) for outcome, weight in extreme_h.items())
             return
-        if 1 < len(selected) < n and len(self._h_groups) == 1:
-            h, count = next(iter(self._h_groups.items()))
+        if 1 < len(selected) < n and (
+            len(self._h_groups) == 1 or len(selected) <= n // 2
+        ):
+            h_groups = tuple(self._h_groups.items())
             if selected == tuple(range(len(selected))):
-                yield from _rwc_homogeneous_one_end(
-                    count, h, len(selected), from_right=False
+                yield from _rwc_heterogeneous_one_end(
+                    h_groups, len(selected), from_right=False
                 )
                 return
             if selected == tuple(range(n - len(selected), n)):
-                yield from _rwc_homogeneous_one_end(
-                    count, h, len(selected), from_right=True
+                yield from _rwc_heterogeneous_one_end(
+                    h_groups, len(selected), from_right=True
                 )
                 return
         yield from (
@@ -1069,6 +1071,39 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
 
 # ---- Helpers -------------------------------------------------------------------------
+
+
+def _rwc_heterogeneous_one_end(
+    h_groups: tuple[tuple[H[_T], int], ...],
+    k: int,
+    *,
+    from_right: bool,
+) -> Iterator[RollCountT[_T]]:
+    r"""
+    Yield the lowest or highest *k* outcomes from homogeneous groups.
+    Values outside each group’s own lowest or highest *k* cannot enter the combined selection, so group roll distributions can be merged and truncated incrementally.
+    """
+    if len(h_groups) == 1:
+        h, n = h_groups[0]
+        yield from _rwc_homogeneous_one_end(n, h, k, from_right=from_right)
+        return
+    selected_rolls: Counter[RollT[_T]] = Counter({(): 1})
+    for h, n in h_groups:
+        group_rolls = tuple(
+            _rwc_homogeneous_one_end(n, h, min(k, n), from_right=from_right)
+        )
+        merged_rolls: Counter[RollT[_T]] = Counter()
+        for selected_roll, selected_weight in selected_rolls.items():
+            for group_roll, group_weight in group_rolls:
+                merged: list[_T] = [*selected_roll, *group_roll]
+                try:
+                    merged.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+                except TypeError:
+                    merged.sort(key=natural_key)
+                merged_roll = tuple(merged[-k:] if from_right else merged[:k])
+                merged_rolls[merged_roll] += selected_weight * group_weight
+        selected_rolls = merged_rolls
+    yield from selected_rolls.items()
 
 
 def _rwc_homogeneous_one_end(
