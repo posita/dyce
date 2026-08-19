@@ -26,6 +26,7 @@
       foreground: value("--md-typeset-color"),
       muted: value("--md-default-fg-color--light"),
       border: value("--md-default-fg-color--lightest"),
+      surface: value("--md-code-bg-color"),
     };
   }
 
@@ -39,11 +40,23 @@
       font: { ...(annotation.font || {}), color: theme.muted },
       ...(annotation.name === "ridge-label" ||
       annotation.name === "ridge-peak-label"
-        ? { bgcolor: cssColorWithAlpha(theme.background, 0.72) }
+        ? { bgcolor: cssColorWithAlpha(theme.surface, 0.72) }
         : {}),
     }));
+    const hoverBackgrounds = plot.data.map(
+      (trace) => trace.line?.color || trace.marker?.color || theme.background,
+    );
+    const hoverForegrounds = plot.data.map(() => "#fff");
+    await window.Plotly.restyle(plot, {
+      "hoverlabel.bgcolor": hoverBackgrounds,
+      "hoverlabel.bordercolor": hoverBackgrounds,
+      "hoverlabel.font.color": hoverForegrounds,
+    });
     await window.Plotly.relayout(plot, {
       "font.color": theme.foreground,
+      "hoverlabel.bgcolor": theme.surface,
+      "hoverlabel.bordercolor": theme.foreground,
+      "hoverlabel.font.color": theme.foreground,
       "xaxis.color": theme.muted,
       "xaxis.gridcolor": theme.border,
       "xaxis.linecolor": theme.border,
