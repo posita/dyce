@@ -23,8 +23,11 @@ from collections.abc import Generator, Iterable
 from typing import cast
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Wedge
+from matplotlib.text import Annotation, Text
 
 from dyce import H
 from dyce.d import d0, d1, d4, d6, d8, d12, d20, h2d6, h2d10
@@ -54,6 +57,18 @@ def _line_xdata_as_floats(line: Line2D) -> list[float]:
 
 def _line_ydata_as_floats(line: Line2D) -> list[float]:
     return [float(y) for y in cast("Iterable[float]", line.get_ydata())]
+
+
+def _ridge_label_texts(ax: Axes) -> list[Text]:
+    return [text for text in ax.texts if text.get_gid() == "ridge-label"]
+
+
+def _ridge_peak_texts(ax: Axes) -> list[Annotation]:
+    return [
+        text
+        for text in ax.texts
+        if isinstance(text, Annotation) and text.get_gid() == "ridge-peak-label"
+    ]
 
 
 class TestFormatters:
@@ -311,18 +326,28 @@ class TestPlotRidge:
     def test_labeled_empty_hs(self) -> None:
         labels = ["empty 1", "empty 2"]
         ax = plot_ridge(d0, d0, labels=labels)
-        assert [t.get_text() for t in ax.texts] == labels
+        assert [t.get_text() for t in _ridge_label_texts(ax)] == labels
 
     def test_labels_are_drawn_in_the_plot_not_as_yticks(self) -> None:
         labels = ["2d6", "d12"]
         ax = plot_ridge(h2d6, d12, labels=labels)
-        assert [t.get_text() for t in ax.texts] == labels
+        assert [t.get_text() for t in _ridge_label_texts(ax)] == labels
         assert list(ax.get_yticks()) == []
+
+    def test_label_pills_are_inset_from_the_left_border(self) -> None:
+        ax = plot_ridge(d6, labels=["d6"])
+        figure = ax.get_figure()
+        assert isinstance(figure, Figure)
+        figure.tight_layout()
+        figure.canvas.draw()
+        label_patch = _ridge_label_texts(ax)[0].get_bbox_patch()
+        assert label_patch is not None
+        assert label_patch.get_window_extent().x0 > ax.bbox.x0
 
     def test_labels_partial(self) -> None:
         labels = ["2d6"]
         ax = plot_ridge(h2d6, d12, labels=labels)
-        assert [t.get_text() for t in ax.texts] == [*labels, ""]
+        assert [t.get_text() for t in _ridge_label_texts(ax)] == [*labels, ""]
 
     def test_one_ridge_per_h(self) -> None:
         ax = plot_ridge(h2d6, d12, d6)
@@ -333,13 +358,29 @@ class TestPlotRidge:
         labels = ["d6", "empty"]
         ax = plot_ridge(d6, d0, labels=labels)
         assert len(ax.patches) == 1  # no ridge for the empty histogram
-        assert [t.get_text() for t in ax.texts] == labels
+        assert [t.get_text() for t in _ridge_label_texts(ax)] == labels
 
     def test_rows_stack_top_down_in_argument_order(self) -> None:
         labels = ["d6", "d8", "d12"]
         ax = plot_ridge(d6, d8, d12, labels=labels)
-        assert [t.get_position()[1] for t in ax.texts] == [2.0, 1.0, 0.0]
-        assert [t.get_text() for t in ax.texts] == labels
+        ridge_labels = _ridge_label_texts(ax)
+        assert [t.get_position()[1] for t in ridge_labels] == [2.0, 1.0, 0.0]
+        assert [t.get_text() for t in ridge_labels] == labels
+
+    def test_peak_labels_show_each_ridge_probability(self) -> None:
+        ax = plot_ridge(d4, H({1: 1, 2: 3, 3: 2}), peak=0.5)
+        peak_texts = _ridge_peak_texts(ax)
+        assert [text.get_text() for text in peak_texts] == ["25%", "50%"]
+        assert [text.xy for text in peak_texts] == [
+            pytest.approx((3, 2.2)),
+            pytest.approx((2, 2.4)),
+        ]
+        assert [text.get_position() for text in peak_texts] == [(-8.0, 0.0), (8.0, 0.0)]
+        assert all(text.arrow_patch is not None for text in peak_texts)
+
+    def test_peak_labels_can_be_hidden(self) -> None:
+        ax = plot_ridge(d4, show_peak_labels=False)
+        assert all(text.get_gid() != "ridge-peak-label" for text in ax.texts)
 
     def test_each_ridge_contains_only_its_own_outcomes(self) -> None:
         ax = plot_ridge(d6, d12)

@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_advantage.py
     # --8<-- [start:core]
     from dyce import H, HResult, P, expand
@@ -50,10 +50,6 @@ def fig_callback(line_color: str) -> None:
     ax.set_title("Advantage-weighted attack with critical hits")
     ax.legend()
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

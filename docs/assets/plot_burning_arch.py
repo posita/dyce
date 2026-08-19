@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_burning_arch.py
     # --8<-- [start:core]
     from dyce import H
@@ -35,10 +35,6 @@ def fig_callback(line_color: str) -> None:
     ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))
     ax.set_title("Attack with saving throw for half damage")
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

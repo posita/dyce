@@ -34,6 +34,22 @@ def _traces(spec: PlotSpec, role: str) -> list[dict]:
     return [trace for trace in spec.data if trace["meta"]["role"] == role]
 
 
+def _ridge_annotations(spec: PlotSpec) -> list[dict]:
+    return [
+        annotation
+        for annotation in spec.layout["annotations"]
+        if annotation["name"] == "ridge-label"
+    ]
+
+
+def _ridge_peak_annotations(spec: PlotSpec) -> list[dict]:
+    return [
+        annotation
+        for annotation in spec.layout["annotations"]
+        if annotation["name"] == "ridge-peak-label"
+    ]
+
+
 class TestBarSpec:
     def test_vertical_bar_data(self) -> None:
         trace = bar_spec(d4, labels=["d4"], precision=3).data[0]
@@ -163,10 +179,16 @@ class TestRidgeSpec:
         assert spec.data == []
         assert spec.layout["annotations"] == []
 
+    def test_no_args_with_peak_has_no_peak_labels(self) -> None:
+        spec = ridge_spec(peak=25.0)
+        assert spec.layout["shapes"] == []
+        assert spec.layout["annotations"] == []
+
     def test_empty_h(self) -> None:
         # No outcomes to seat a fill on, so both traces are empty but present.
         spec = ridge_spec(d0)
         assert [trace["x"] for trace in spec.data] == [[], []]
+        assert _ridge_peak_annotations(spec) == []
 
     def test_each_ridge_covers_only_its_own_outcomes(self) -> None:
         spec = ridge_spec(d6, d20)
@@ -194,17 +216,17 @@ class TestRidgeSpec:
 
     def test_rows_stack_top_down_in_argument_order(self) -> None:
         spec = ridge_spec(d6, d8, d20)
-        assert [note["y"] for note in spec.layout["annotations"]] == [2.0, 1.0, 0.0]
+        assert [note["y"] for note in _ridge_annotations(spec)] == [2.0, 1.0, 0.0]
 
     def test_labels_become_annotations(self) -> None:
         spec = ridge_spec(h2d6, d6, labels=["2d6", "d6"])
-        assert [note["text"] for note in spec.layout["annotations"]] == ["2d6", "d6"]
+        assert [note["text"] for note in _ridge_annotations(spec)] == ["2d6", "d6"]
         assert spec.layout["xaxis"]["zeroline"] is False
         assert spec.layout["yaxis"]["showticklabels"] is False
 
     def test_labels_partial(self) -> None:
         spec = ridge_spec(h2d6, d6, labels=["2d6"])
-        assert [note["text"] for note in spec.layout["annotations"]] == ["2d6", ""]
+        assert [note["text"] for note in _ridge_annotations(spec)] == ["2d6", ""]
 
     def test_labels_have_configurable_pill_backgrounds(self) -> None:
         spec = ridge_spec(
@@ -212,14 +234,45 @@ class TestRidgeSpec:
             labels=["d6"],
             label_bgcolor="rgba(255,255,255,0.72)",
         )
-        annotation = spec.layout["annotations"][0]
+        annotation = _ridge_annotations(spec)[0]
         assert annotation["borderpad"] == 2
         assert annotation["bgcolor"] == "rgba(255,255,255,0.72)"
+        assert _ridge_peak_annotations(spec)[0]["bgcolor"] == ("rgba(255,255,255,0.72)")
 
     def test_label_background_color_is_optional(self) -> None:
-        annotation = ridge_spec(d6).layout["annotations"][0]
+        annotation = _ridge_annotations(ridge_spec(d6))[0]
         assert annotation["borderpad"] == 2
         assert "bgcolor" not in annotation
+
+    def test_peak_labels_show_each_ridge_probability(self) -> None:
+        spec = ridge_spec(
+            d4,
+            H({1: 1, 2: 3, 3: 2}),
+            colors=["#1f77b4", "#d62728"],
+            peak=50.0,
+        )
+        peak_annotations = _ridge_peak_annotations(spec)
+        assert [annotation["text"] for annotation in peak_annotations] == [
+            "25%",
+            "50%",
+        ]
+        assert [
+            (annotation["x"], annotation["y"]) for annotation in peak_annotations
+        ] == [pytest.approx((3, 2.2)), pytest.approx((2, 2.4))]
+        assert [annotation["ax"] for annotation in peak_annotations] == [-8, 8]
+        assert [annotation["arrowcolor"] for annotation in peak_annotations] == [
+            "rgba(31,119,180,0.4)",
+            "rgba(214,39,40,0.4)",
+        ]
+        assert spec.layout["shapes"] == []
+
+    def test_peak_labels_can_be_hidden(self) -> None:
+        spec = ridge_spec(d4, show_peak_labels=False)
+        assert spec.layout["shapes"] == []
+        assert all(
+            annotation["name"] != "ridge-peak-label"
+            for annotation in spec.layout["annotations"]
+        )
 
     def test_customdata_carries_true_percentages(self) -> None:
         # The plotted y is offset and scaled, so tooltips read customdata.

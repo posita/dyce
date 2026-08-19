@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # --8<-- [start:viz]
     from matplotlib import pyplot as plt
 
@@ -37,16 +37,8 @@ def fig_callback(line_color: str) -> None:
         ax=ax_2d10_vs_d8d12,
     )
     ax_2d10_vs_d8d12.set_title("2d10 vs. d8 + d12")
-    # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    for ax in (ax_d6, ax_2d10_vs_d8d12):
-        ax.title.set_color(line_color)
-        for text in ax.texts:
-            text.set_color(line_color)  # wedge labels (both rings)
-        for patch in ax.patches:
-            patch.set_edgecolor(line_color)  # wedge edges (both rings)
     plt.gcf().set_size_inches(6.4, 3.2)
+    # --8<-- [end:viz]
 
 
 if __name__ == "__main__":

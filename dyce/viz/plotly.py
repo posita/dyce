@@ -28,7 +28,7 @@ from typing import Any
 from dyce.h import H
 from dyce.lifecycle import experimental
 
-from . import GraphType, values_for_graph_type
+from . import GraphType, _format_percentage, values_for_graph_type
 
 __all__ = (
     "PlotSpec",
@@ -238,6 +238,7 @@ def ridge_spec(
     overlap: float = _DEFAULT_RIDGE_OVERLAP,
     peak: float | None = None,
     precision: int = _DEFAULT_PRECISION,
+    show_peak_labels: bool = True,
 ) -> PlotSpec:
     r"""
     Return a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.
@@ -268,6 +269,8 @@ def ridge_spec(
     *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
     Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
 
+    If *show_peak_labels* is `True`, each ridge’s maximum point is labeled with its probability.
+
     *precision* is the number of decimal places tooltips show.
 
         --8<-- "docs/assets/plotly_viz_plot_ridge.py:viz"
@@ -290,7 +293,6 @@ def ridge_spec(
         peak = max((max(percents, default=0.0) for _, _, percents in rows), default=0.0)
     data: list[dict[str, Any]] = []
     annotations: list[dict[str, Any]] = []
-
     for i, (label, row_outcomes, percents) in enumerate(rows):
         baseline = float(num_rows - 1 - i) * _RIDGE_ROW_STEP
         scale = peak_height / peak if peak else 0.0
@@ -336,6 +338,7 @@ def ridge_spec(
             line["line"] = {"color": color, "width": 1.5}
         data.append(line)
         annotation: dict[str, Any] = {
+            "name": "ridge-label",
             "xref": "paper",
             "x": 0,
             "xanchor": "left",
@@ -352,6 +355,34 @@ def ridge_spec(
         if label_bgcolor is not None:
             annotation["bgcolor"] = label_bgcolor
         annotations.append(annotation)
+        if show_peak_labels and percents:
+            ridge_peak = max(percents)
+            peak_indices = tuple(
+                i for i, percent in enumerate(percents) if percent == ridge_peak
+            )
+            peak_index = peak_indices[len(peak_indices) // 2]
+            peak_on_left = peak_index <= (len(row_outcomes) - 1) / 2.0
+            peak_annotation: dict[str, Any] = {
+                "name": "ridge-peak-label",
+                "xref": "x",
+                "x": row_outcomes[peak_index],
+                "xanchor": "left" if peak_on_left else "right",
+                "ax": 8 if peak_on_left else -8,
+                "ay": 0,
+                "yref": "y",
+                "y": crests[peak_index],
+                "yanchor": "middle",
+                "text": _format_percentage(ridge_peak / 100.0),
+                "showarrow": True,
+                "arrowhead": 0,
+                "arrowwidth": 0.75,
+                "borderpad": 2,
+            }
+            if color is not None:
+                peak_annotation["arrowcolor"] = _with_alpha(color, 0.4)
+            if label_bgcolor is not None:
+                peak_annotation["bgcolor"] = label_bgcolor
+            annotations.append(peak_annotation)
 
     return PlotSpec(
         data=data,
@@ -362,6 +393,7 @@ def ridge_spec(
             # apiece.
             "hovermode": "x",
             "annotations": annotations,
+            "shapes": [],
             "xaxis": {"title": {"text": "Outcome"}, "zeroline": False},
             "yaxis": {
                 "showticklabels": False,

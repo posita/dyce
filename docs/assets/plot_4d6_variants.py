@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
     # --8<-- [start:core]
     from dyce import H, P, expand
@@ -49,10 +49,6 @@ def fig_callback(line_color: str) -> None:
     ax = plot_ridge(*hs, labels=labels, cmap="jet")
     ax.set_title("Comparing various take-three-of-4d6 methods")
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":
