@@ -1153,23 +1153,20 @@ def _rwc_homogeneous_one_end(
         outcome = outcomes[outcome_index]
         weight = weights[outcome_index]
         needed = k - len(roll)
-        if remaining >= needed:
-            terminal_count = _terminal_count(outcome_index, remaining, needed)
-            if terminal_count:
-                selected_roll = (*roll, *((outcome,) * needed))
-                yield (
-                    tuple(reversed(selected_roll)) if from_right else selected_roll,
-                    scale * terminal_count,
-                )
+        terminal_count = _terminal_count(outcome_index, remaining, needed)
+        selected_roll = (*roll, *((outcome,) * needed))
+        yield (
+            tuple(reversed(selected_roll)) if from_right else selected_roll,
+            scale * terminal_count,
+        )
         for count in range(min(needed - 1, remaining) + 1):
             next_scale = scale * comb(remaining, count) * weight**count
-            if next_scale:
-                yield from _generate(
-                    outcome_index + 1,
-                    remaining - count,
-                    (*roll, *((outcome,) * count)),
-                    next_scale,
-                )
+            yield from _generate(
+                outcome_index + 1,
+                remaining - count,
+                (*roll, *((outcome,) * count)),
+                next_scale,
+            )
 
     yield from _generate(0, n, (), 1)
 

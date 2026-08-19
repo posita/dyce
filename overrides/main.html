@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 <!--
-  Loads plotly.js in <head/> for interactive figure fragments.
+  Loads plotly.js and the Material palette adapter in <head/> for interactive
+  figure fragments.
 
   The version must match the plotly.js that plotly.py bundles, which
   plotly.offline.get_plotlyjs_version() reports. anydyce's playground
@@ -11,4 +12,5 @@
 {% block libs %}
   {{ super() }}
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="{{ 'javascripts/plotly-theme.js' | url }}"></script>
 {% endblock %}

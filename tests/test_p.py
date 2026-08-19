@@ -1156,6 +1156,15 @@ class TestPRollsWithCounts:
         )
         which_roll_surveyor.assert_not_called()
 
+    def test_heterogeneous_end_with_incomparable_outcomes(self) -> None:
+        a, b, c, d = (NoCompare(value) for value in "abcd")
+        rolls_with_counts = _rwc_heterogeneous_one_end(
+            ((H({a: 1, b: 1}), 1), (H({c: 1, d: 1}), 1)),
+            1,
+            from_right=False,
+        )
+        assert dict(rolls_with_counts) == {(a,): 2, (b,): 2}
+
     def test_which_multiple_positions_uses_surveyor(self) -> None:
         p = 4 @ P(H((-1, 0, 1)))
         with patch(

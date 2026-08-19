@@ -82,6 +82,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
         default_width="100%",
         default_height=DEFAULT_HEIGHT,  # absolute height because 100% would resolve to zero
         config=spec.config,
+        post_script="window.dyceThemePlotly('{plot_id}')",
     )
     _LOGGER.info("saving %s", output_path)
     output_path.write_text(fragment + "\n")

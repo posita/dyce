@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # --8<-- [start:viz]
     from dyce import H
     from dyce.viz.matplotlib import plot_line
@@ -27,10 +27,6 @@ def fig_callback(line_color: str) -> None:
     ax.set_title("2d10 vs. d8 + d12")
     ax.legend(loc="upper left")
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

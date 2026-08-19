@@ -27,6 +27,10 @@ __all__ = ("GraphType",)
 _T = TypeVar("_T")
 
 
+def _format_percentage(probability: float) -> str:
+    return f"{probability * 100.0:.3g}%"
+
+
 class GraphType(StrEnum):
     r"""
     Controls which variant of the distribution is plotted.

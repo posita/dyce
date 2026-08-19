@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
     # --8<-- [start:core]
     from dyce.d import p2d6
@@ -35,10 +35,6 @@ def fig_callback(line_color: str) -> None:
     ax.set_title("Taking the lowest or highest die of 2d6")
     ax.legend()
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

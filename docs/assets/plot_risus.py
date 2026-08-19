@@ -78,15 +78,15 @@ if TYPE_CHECKING:
     def vs_scenarios_dataframes(
         us_vs_them_func: VersusFuncT,
         *,
-        our_pool_rel_sizes: Sequence[int] = tuple(range(-1, 2)),
-        their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
+        our_pool_rel_sizes: Sequence[int] = ...,
+        their_pool_sizes: Sequence[int] = ...,
     ) -> ScenariosDataframesT: ...
 
     def us_vs_them_heatmap_subplot(
         vs_dfs: ScenariosDataframesT,
-        cmap_name: str = "viridis",
-        plt_total_rows: int = 1,
-        plt_cur_row: int = 0,
+        cmap_name: str = ...,
+        plt_total_rows: int = ...,
+        plt_cur_row: int = ...,
     ) -> list[Axes]: ...
 # --8<-- [end:display]
 
@@ -181,18 +181,13 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
 # --8<-- [end:display-detail]
 
 
-def fig_callback_first_round(line_color: str) -> None:
+def fig_callback_first_round() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz-first-round]
     vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
-    axes = us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
+    us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
     plt.gcf().set_size_inches(6.4, 2.8)
     # --8<-- [end:viz-first-round]
-
-    # Style (dark/light) tweaks
-    for ax in axes:
-        ax.tick_params(colors=line_color)
-        ax.title.set_color(line_color)
 
 
 # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
@@ -256,8 +251,8 @@ def risus_combat_driver(
 
         # Keeping in mind that we're inside our recursive implementation, we
         # define a dependent term suitable for dyce.expand, allowing us to
-        # take our computation for this round, and use that machinery to
-        # "fold in" subsequent rounds.
+        # take our computation for this round, and lean on dyce to "fold in"
+        # subsequent rounds.
         def _resolve_next_round_from_this_round(
             this_round: HResult[Versus],
         ) -> H[Versus]:
@@ -297,7 +292,7 @@ def risus_combat_driver(
 # --8<-- [end:driver]
 
 
-def fig_callback_multi_round_standard(line_color: str) -> None:
+def fig_callback_multi_round_standard() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-standard]
     vs_dfs = vs_scenarios_dataframes(
@@ -305,15 +300,9 @@ def fig_callback_multi_round_standard(line_color: str) -> None:
         our_pool_rel_sizes=tuple(range(-1, 3)),
         their_pool_sizes=range(2, 6),
     )
-    axes = us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
+    us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
     plt.gcf().set_size_inches(8.0, 3.2)
     # --8<-- [end:viz-multi-round-standard]
-
-    # Style (dark/light) tweaks
-    for ax in axes:
-        ax.tick_params(axis="x", colors=line_color)
-        ax.tick_params(axis="y", colors=line_color)
-        ax.title.set_color(line_color)
 
 
 # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
@@ -487,10 +476,10 @@ def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
 # --8<-- [end:viz-multi-round-goliath-helper-detail]
 
 
-def fig_callback_multi_round_best_of_set(line_color: str) -> None:
+def fig_callback_multi_round_best_of_set() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-best-of-set]
-    axes = viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
+    viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
     fig = plt.gcf()
     fig.set_size_inches(9.6, 9.6)
     fig.suptitle(
@@ -500,13 +489,6 @@ def fig_callback_multi_round_best_of_set(line_color: str) -> None:
         "Best-of-Set w/ the Goliath Rule (bottom row)"
     )
     # --8<-- [end:viz-multi-round-best-of-set]
-
-    # Style (dark/light) tweaks
-    for ax in axes:
-        ax.tick_params(axis="x", colors=line_color)
-        ax.tick_params(axis="y", colors=line_color)
-        ax.title.set_color(line_color)
-        fig.suptitle(fig.get_suptitle(), color=line_color)
 
 
 # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
@@ -588,11 +570,11 @@ def evens_up_single_round_us_vs_them(
 # --8<-- [end:evens-up]
 
 
-def fig_callback_multi_round_evens_up(line_color: str) -> None:
+def fig_callback_multi_round_evens_up() -> None:
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-evens-up]
-    axes = viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
+    viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
     fig = plt.gcf()
     fig.set_size_inches(9.6, 9.6)
     fig.suptitle(
@@ -602,13 +584,6 @@ def fig_callback_multi_round_evens_up(line_color: str) -> None:
         "Evens Up w/ the Goliath Rule (bottom row)"
     )
     # --8<-- [end:viz-multi-round-evens-up]
-
-    # Style (dark/light) tweaks
-    for ax in axes:
-        ax.tick_params(axis="x", colors=line_color)
-        ax.tick_params(axis="y", colors=line_color)
-        ax.title.set_color(line_color)
-        fig.suptitle(fig.get_suptitle(), color=line_color)
 
 
 if __name__ == "__main__":

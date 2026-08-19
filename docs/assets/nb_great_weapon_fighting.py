@@ -98,7 +98,7 @@ from matplotlib import pyplot as plt
 
 from dyce.viz.matplotlib import plot_ridge
 
-ax = plot_ridge(
+plot_ridge(
     single_attack,
     h_gwf_2014,
     h_gwf_2024,

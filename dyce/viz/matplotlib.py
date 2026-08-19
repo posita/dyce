@@ -54,7 +54,7 @@ from dyce.h import H
 from dyce.lifecycle import experimental
 from dyce.types import natural_key
 
-from . import GraphType, values_for_graph_type
+from . import GraphType, _format_percentage, values_for_graph_type
 
 __all__ = (
     "BurstFormatterT",
@@ -501,6 +501,7 @@ def plot_ridge(
     labels: Sequence[str] = (),
     overlap: float = _DEFAULT_RIDGE_OVERLAP,
     peak: float | None = None,
+    show_peak_labels: bool = True,
 ) -> Axes:
     r"""
     <!-- BEGIN MONKEY PATCH --
@@ -532,6 +533,8 @@ def plot_ridge(
 
     *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.
     Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.
+
+    If *show_peak_labels* is `True`, each ridge’s maximum point is labeled with its probability.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customise the plot.
@@ -574,14 +577,23 @@ def plot_ridge(
     )
     peak_height = overlap * _RIDGE_ROW_STEP
     scale = peak_height / peak if peak else 0.0
-    label_transform = mtransforms.blended_transform_factory(
+    ridge_transform = mtransforms.blended_transform_factory(
         # Makes sure labels appear at the leftmost edge of the graph, rather than where
         # an outcome of value 0 is or would have been
         ax.transAxes,
         # This is the default (i.e., no change)
         ax.transData,
     )
-
+    label_transform = mtransforms.offset_copy(
+        ridge_transform,
+        fig=ax.get_figure(root=True),
+        x=4.0,
+        units="points",
+    )
+    ylim = (
+        -0.5 * _RIDGE_ROW_STEP,
+        (len(ridges) - 1) * _RIDGE_ROW_STEP + peak_height + 0.5 * _RIDGE_ROW_STEP,
+    )
     for i, ridge in enumerate(ridges):
         crests = tuple(ridge["baseline"] + prob * scale for prob in ridge["probs"])
         (line,) = ax.plot(
@@ -612,7 +624,7 @@ def plot_ridge(
                 color=(red, green, blue, alpha),
                 zorder=2 * i,  # sits just behind the line
             )
-        ax.text(
+        label_text = ax.text(
             0.0,
             ridge["baseline"],
             ridge["label"],
@@ -626,15 +638,48 @@ def plot_ridge(
                 "edgecolor": "none",
             },
         )
+        label_text.set_gid("ridge-label")
+        if show_peak_labels and ridge["probs"]:
+            ridge_peak = max(ridge["probs"])
+            peak_indices = tuple(
+                i for i, prob in enumerate(ridge["probs"]) if prob == ridge_peak
+            )
+            peak_index = peak_indices[len(peak_indices) // 2]
+            peak_outcome = ridge["outcomes"][peak_index]
+            peak_y = crests[peak_index]
+            peak_on_left = (
+                ax.transData.transform((ax.convert_xunits(peak_outcome), peak_y))[0]
+                <= ax.transAxes.transform((0.5, 0.0))[0]
+            )
+            x_offset = 8.0 if peak_on_left else -8.0
+            peak_text = ax.annotate(
+                _format_percentage(ridge_peak),
+                xy=(peak_outcome, peak_y),
+                xytext=(x_offset, 0.0),
+                textcoords="offset points",
+                color=mpl.rcParams["ytick.color"],
+                ha="left" if peak_on_left else "right",
+                va="center",
+                zorder=2 * len(ridges),
+                bbox={
+                    "boxstyle": "square,pad=0.2",
+                    "facecolor": mcolors.to_rgba(ax.get_facecolor(), 0.72),
+                    "edgecolor": "none",
+                },
+                arrowprops={
+                    "arrowstyle": "-",
+                    "color": mcolors.to_rgba(line.get_color(), 0.4),
+                    "linewidth": 0.75,
+                },
+            )
+            peak_text.set_gid("ridge-peak-label")
+            peak_text.set_in_layout(False)
 
     # Baselines are the only reference the rows need, so the y-axis carries no
     # ticks or grid of its own.
     ax.set_yticks([])
     ax.yaxis.grid(visible=False)
-    ax.set_ylim(
-        -0.5 * _RIDGE_ROW_STEP,
-        (len(ridges) - 1) * _RIDGE_ROW_STEP + peak_height + 0.5 * _RIDGE_ROW_STEP,
-    )
+    ax.set_ylim(*ylim)
 
     return ax
 

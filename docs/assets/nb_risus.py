@@ -208,7 +208,7 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
 
 # %% editable=false
 vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
-axes = us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
+us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
 plt.gcf().set_size_inches(6.4, 2.8)
 
 plt.tight_layout()
@@ -318,7 +318,7 @@ vs_dfs = vs_scenarios_dataframes(
     our_pool_rel_sizes=tuple(range(-1, 3)),
     their_pool_sizes=range(2, 6),
 )
-axes = us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
+us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
 plt.gcf().set_size_inches(8.0, 3.2)
 
 plt.tight_layout()
@@ -486,7 +486,7 @@ def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
 
 
 # %% editable=false
-axes = viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
+viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
 fig = plt.gcf()
 fig.set_size_inches(9.6, 9.6)
 fig.suptitle(
@@ -564,7 +564,7 @@ def evens_up_single_round_us_vs_them(
 
 
 # %% editable=false
-axes = viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
+viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
 fig = plt.gcf()
 fig.set_size_inches(9.6, 9.6)
 fig.suptitle(
