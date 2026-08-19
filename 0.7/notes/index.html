@@ -45,6 +45,7 @@
       
     
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
 
     
       
@@ -1195,8 +1196,8 @@
 Please review before upgrading.</p>
 </div>
 <ul>
-<li>Drops support for 3.9 and 3.10 and extends support to 3.14</li>
-<li>Fixes embarrassingly long-running logical error in 4d6 variants example</li>
+<li>Drops support for 3.9 and 3.10 and extends support to 3.14.</li>
+<li>Fixes embarrassingly long-running logical error in 4d6 variants example.</li>
 <li>Removes <code>dyce.r</code> altogether (pending rewrite of an alternative).</li>
 <li>Adds <code>H.from_counts</code> class method constructs an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
 <li>Removes <code>H.map</code>, <code>H.rmap</code>, and <code>H.umap</code> in favor of <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -> H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
@@ -1212,10 +1213,11 @@ Please review before upgrading.</p>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="quantize(bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, *, preserve_zero_counts: bool = False) -> H" href="../dyce/#dyce.H.quantize"><code>H.quantize</code> method</a> and <a class="autorefs autorefs-internal" title="quantize_hs(*, bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, preserve_zero_counts: bool = True) -> Any" href="../dyce/#dyce.quantize_hs"><code>quantize_hs</code> context manager</a>.</li>
 <li>Adds experimental (and somewhat inefficient) <a class="autorefs autorefs-internal" title="replace(existing_outcome: _T, repl: H[_T] | _T) -> H[_T]" href="../dyce/#dyce.H.replace"><code>H.replace</code></a> method.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="apply_to_each_roll(func: Callable[[RollT[_T]], H[_ResultT] | _ResultT], *which: GetItemT) -> H[_ResultT]" href="../dyce/#dyce.P.apply_to_each_roll"><code>P.apply_to_each_roll</code></a> method.</li>
+<li>Adds experimental <a class="autorefs autorefs-internal" title="survey(surveyor: SurveyorBase[_T, _StateT, _ResultT] | None = None, *, accumulate: Callable[[_StateT | None, _T, int], _StateT] | None = None, initial: _StateT | None = None, order: Callable[[Iterable[_T]], Iterable[_T]] | None = None, settle: Callable[[_StateT], _ResultT] | None = None) -> H[_StateT | _ResultT]" href="../dyce/#dyce.P.survey"><code>P.survey</code></a> method implementing a version of <a href="https://github.com/HighDiceRoller/icepool#paper-on-algorithm">Icepool’s algorithm</a> augmented to accommodate heterogeneous pools.</li>
 <li>Simplifies and consolidates <code>dyce.evaluation.expandable</code> and <code>dyce.evaluation.foreach</code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
 <li>Renames <code>explode</code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
 <li>Moves <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableOpsMixin"><code>HableOpsMixin</code></a> to its own module.</li>
-<li><em>(Finally!)</em> removes deprecated interfaces<ul>
+<li><em>(Finally!)</em> removes deprecated interfaces:<ul>
 <li><code>H.explode</code></li>
 <li><code>H.foreach</code></li>
 <li><code>H.substitute</code></li>
@@ -1226,18 +1228,19 @@ Please review before upgrading.</p>
 </ul>
 </li>
 <li>Adds <a class="autorefs autorefs-internal" href="../dyce.d/#dyce.d"><code>dyce.d</code></a> convenience aliases.</li>
-<li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a></li>
+<li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a>.</li>
 <li>Completely eliminates dependency on <a href="https://github.com/beartype/numerary/"><code>numerary</code></a> (which was flawed since conception), and instead relies on <a href="https://jorenham.github.io/optype/"><code>optype</code></a> for mathematical operator typing.
   (<a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code></a> still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)</li>
 <li>Re-introduces low-level <a href="https://matplotlib.org/">Matplotlib</a> plotting functions in <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a>.</li>
 <li>Adds portable <a href="https://plotly.com/">Plotly</a> figure specifications in <a class="autorefs autorefs-internal" href="../dyce.viz.plotly/#dyce.viz.plotly"><code>dyce.viz.plotly</code></a>.
   (High-level, interactive visualization functionality still lives in <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a>.)</li>
-<li>Stabilizes Jupyter Lite installation</li>
-<li>Defaults to collapsed installation cells in notebooks</li>
-<li>Modernizes <code>setup.cfg</code> -&gt; <code>pyproject.toml</code> (and <code>tox.ini</code>)</li>
-<li>Updates CI workflow</li>
-<li>Who let the dogs out? <em>We</em> let dogs out.</li>
-<li>Migrates to <code>ruff</code> for linting</li>
+<li>Stabilizes Jupyter Lite installation.</li>
+<li>Defaults to collapsed installation cells in notebooks.</li>
+<li>Modernizes <code>setup.cfg</code> -&gt; <code>pyproject.toml</code> (and <code>tox.ini</code>).</li>
+<li>Updates CI workflow.</li>
+<li>Migrates to <code>ruff</code> for linting.
+  Who let the dogs out?
+  <em>We</em> let dogs out.</li>
 </ul>
 <h2 id="062"><a href="https://github.com/posita/dyce/releases/tag/v0.6.2">0.6.2</a></h2>
 <ul>

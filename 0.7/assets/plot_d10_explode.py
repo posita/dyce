@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
     # --8<-- [start:core]
     from dyce import H, P, explode_n
@@ -67,11 +67,6 @@ def fig_callback(line_color: str) -> None:
         ax.set_ylim(min(lo for lo, _ in y_lims), max(hi for _, hi in y_lims))
     plt.gcf().set_size_inches(6.4, 8.0)
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    for ax in plt.gcf().get_axes():
-        ax.tick_params(colors=line_color)
-        ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

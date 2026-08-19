@@ -45,6 +45,7 @@
       
     
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
 
     
       
@@ -2151,7 +2152,7 @@ The key to mapping that to <code>dyce</code> internals is recognizing that we ha
 <span class="normal">8</span>
 <span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
 
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_ridge</span><span class="p">(</span>
+<span class="n">plot_ridge</span><span class="p">(</span>
     <span class="n">single_attack</span><span class="p">,</span>
     <span class="n">h_gwf_2014</span><span class="p">,</span>
     <span class="n">h_gwf_2024</span><span class="p">,</span>
@@ -2886,15 +2887,15 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
     <span class="k">def</span><span class="w"> </span><span class="nf">vs_scenarios_dataframes</span><span class="p">(</span>
         <span class="n">us_vs_them_func</span><span class="p">:</span> <span class="n">VersusFuncT</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">our_pool_rel_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
-        <span class="n">their_pool_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)),</span>
+        <span class="n">our_pool_rel_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">their_pool_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScenariosDataframesT</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">us_vs_them_heatmap_subplot</span><span class="p">(</span>
         <span class="n">vs_dfs</span><span class="p">:</span> <span class="n">ScenariosDataframesT</span><span class="p">,</span>
-        <span class="n">cmap_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
-        <span class="n">plt_total_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">plt_cur_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">cmap_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">plt_total_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">plt_cur_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div></td></tr></table></div>
 <details>
@@ -3076,7 +3077,7 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">vs_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span><span class="n">Versus</span><span class="o">.</span><span class="n">single_round_us_vs_them</span><span class="p">)</span>
-<span class="n">axes</span> <span class="o">=</span> <span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">)</span>
+<span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
@@ -3240,8 +3241,8 @@ Our first step is a callback for <a class="autorefs autorefs-internal" title="ap
 
         <span class="c1"># Keeping in mind that we&#39;re inside our recursive implementation, we</span>
         <span class="c1"># define a dependent term suitable for dyce.expand, allowing us to</span>
-        <span class="c1"># take our computation for this round, and use that machinery to</span>
-        <span class="c1"># &quot;fold in&quot; subsequent rounds.</span>
+        <span class="c1"># take our computation for this round, and lean on dyce to &quot;fold in&quot;</span>
+        <span class="c1"># subsequent rounds.</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_next_round_from_this_round</span><span class="p">(</span>
             <span class="n">this_round</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">Versus</span><span class="p">],</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
@@ -3301,7 +3302,7 @@ This means we can use it directly with our <code>vs_scenarios_dataframes</code> 
     <span class="n">our_pool_rel_sizes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
     <span class="n">their_pool_sizes</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">axes</span> <span class="o">=</span> <span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">)</span>
+<span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
@@ -3627,7 +3628,7 @@ This pattern will come up again below, so we’ll capture it in a helper functio
 <span class="normal">6</span>
 <span class="normal">7</span>
 <span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">axes</span> <span class="o">=</span> <span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">best_of_set_single_round_us_vs_them</span><span class="p">)</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">best_of_set_single_round_us_vs_them</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
@@ -3790,7 +3791,7 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 <span class="normal">6</span>
 <span class="normal">7</span>
 <span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">axes</span> <span class="o">=</span> <span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">evens_up_single_round_us_vs_them</span><span class="p">)</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">evens_up_single_round_us_vs_them</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>

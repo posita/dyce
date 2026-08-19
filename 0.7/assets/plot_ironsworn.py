@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
     # --8<-- [start:core]
     from enum import IntEnum
@@ -107,11 +107,6 @@ def fig_callback(line_color: str) -> None:
     ax.set_title("Ironsworn distributions")
     ax.legend(loc="center")
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.yaxis.label.set_color(line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

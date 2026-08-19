@@ -45,6 +45,7 @@
       
     
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
 
     
       
@@ -1598,7 +1599,8 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
-<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_burst</span>
@@ -1619,6 +1621,7 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="n">ax</span><span class="o">=</span><span class="n">ax_2d10_vs_d8d12</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax_2d10_vs_d8d12</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;2d10 vs. d8 + d12&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
     <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
@@ -2142,7 +2145,7 @@ Returns the axes so the caller can further customise the plot.</p>
 
 
 <h2 id="dyce.viz.matplotlib.plot_ridge" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_ALPHA</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Colormap</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">overlap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_OVERLAP</span><span class="p">,</span> <span class="n">peak</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span></code>
+            <code class="highlight language-python"><span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_ALPHA</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Colormap</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">overlap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_OVERLAP</span><span class="p">,</span> <span class="n">peak</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show_peak_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span></code>
 
 </h2>
 
@@ -2175,6 +2178,7 @@ Pass <code>mpl.rcParams["image.cmap"]</code> to use the default color map instea
 At <code>1.0</code>, such a ridge just reaches the next row's baseline.</p>
 <p><em>peak</em> overrides the percentage drawn at full height, which is otherwise the largest among <em>hs</em>.
 Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.</p>
+<p>If <em>show_peak_labels</em> is <code>True</code>, each ridge’s maximum point is labeled with its probability.</p>
 <p>If <em>ax</em> is <code>None</code>, <code>matplotlib.pyplot.gca()</code> is used.
 Returns the axes so the caller can further customise the plot.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -2349,7 +2353,52 @@ Returns the axes so the caller can further customise the plot.</p>
 <span class="normal">636</span>
 <span class="normal">637</span>
 <span class="normal">638</span>
-<span class="normal">639</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_ridge</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_ALPHA</span><span class="p">,</span>
@@ -2359,6 +2408,7 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">overlap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_OVERLAP</span><span class="p">,</span>
     <span class="n">peak</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_peak_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &lt;!-- BEGIN MONKEY PATCH --</span>
@@ -2390,6 +2440,8 @@ Returns the axes so the caller can further customise the plot.</p>
 
 <span class="sd">    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.</span>
 <span class="sd">    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.</span>
+
+<span class="sd">    If *show_peak_labels* is `True`, each ridge’s maximum point is labeled with its probability.</span>
 
 <span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
 <span class="sd">    Returns the axes so the caller can further customise the plot.</span>
@@ -2432,14 +2484,23 @@ Returns the axes so the caller can further customise the plot.</p>
     <span class="p">)</span>
     <span class="n">peak_height</span> <span class="o">=</span> <span class="n">overlap</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span>
     <span class="n">scale</span> <span class="o">=</span> <span class="n">peak_height</span> <span class="o">/</span> <span class="n">peak</span> <span class="k">if</span> <span class="n">peak</span> <span class="k">else</span> <span class="mf">0.0</span>
-    <span class="n">label_transform</span> <span class="o">=</span> <span class="n">mtransforms</span><span class="o">.</span><span class="n">blended_transform_factory</span><span class="p">(</span>
+    <span class="n">ridge_transform</span> <span class="o">=</span> <span class="n">mtransforms</span><span class="o">.</span><span class="n">blended_transform_factory</span><span class="p">(</span>
         <span class="c1"># Makes sure labels appear at the leftmost edge of the graph, rather than where</span>
         <span class="c1"># an outcome of value 0 is or would have been</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
         <span class="c1"># This is the default (i.e., no change)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="p">,</span>
     <span class="p">)</span>
-
+    <span class="n">label_transform</span> <span class="o">=</span> <span class="n">mtransforms</span><span class="o">.</span><span class="n">offset_copy</span><span class="p">(</span>
+        <span class="n">ridge_transform</span><span class="p">,</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">x</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ylim</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span><span class="p">,</span>
+        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ridges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span> <span class="o">+</span> <span class="n">peak_height</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ridge</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ridges</span><span class="p">):</span>
         <span class="n">crests</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;baseline&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">prob</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;probs&quot;</span><span class="p">])</span>
         <span class="p">(</span><span class="n">line</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
@@ -2470,7 +2531,7 @@ Returns the axes so the caller can further customise the plot.</p>
                 <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="p">),</span>
                 <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span>  <span class="c1"># sits just behind the line</span>
             <span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">label_text</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
             <span class="mf">0.0</span><span class="p">,</span>
             <span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;baseline&quot;</span><span class="p">],</span>
             <span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span>
@@ -2484,15 +2545,48 @@ Returns the axes so the caller can further customise the plot.</p>
                 <span class="s2">&quot;edgecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span>
+        <span class="n">label_text</span><span class="o">.</span><span class="n">set_gid</span><span class="p">(</span><span class="s2">&quot;ridge-label&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_peak_labels</span> <span class="ow">and</span> <span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;probs&quot;</span><span class="p">]:</span>
+            <span class="n">ridge_peak</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;probs&quot;</span><span class="p">])</span>
+            <span class="n">peak_indices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;probs&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">prob</span> <span class="o">==</span> <span class="n">ridge_peak</span>
+            <span class="p">)</span>
+            <span class="n">peak_index</span> <span class="o">=</span> <span class="n">peak_indices</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">peak_outcome</span> <span class="o">=</span> <span class="n">ridge</span><span class="p">[</span><span class="s2">&quot;outcomes&quot;</span><span class="p">][</span><span class="n">peak_index</span><span class="p">]</span>
+            <span class="n">peak_y</span> <span class="o">=</span> <span class="n">crests</span><span class="p">[</span><span class="n">peak_index</span><span class="p">]</span>
+            <span class="n">peak_on_left</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="n">ax</span><span class="o">.</span><span class="n">convert_xunits</span><span class="p">(</span><span class="n">peak_outcome</span><span class="p">),</span> <span class="n">peak_y</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="o">&lt;=</span> <span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">x_offset</span> <span class="o">=</span> <span class="mf">8.0</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="o">-</span><span class="mf">8.0</span>
+            <span class="n">peak_text</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="n">_format_percentage</span><span class="p">(</span><span class="n">ridge_peak</span><span class="p">),</span>
+                <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">peak_outcome</span><span class="p">,</span> <span class="n">peak_y</span><span class="p">),</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">x_offset</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ytick.color&quot;</span><span class="p">],</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ridges</span><span class="p">),</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;boxstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;square,pad=0.2&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;facecolor&quot;</span><span class="p">:</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_facecolor</span><span class="p">(),</span> <span class="mf">0.72</span><span class="p">),</span>
+                    <span class="s2">&quot;edgecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">get_color</span><span class="p">(),</span> <span class="mf">0.4</span><span class="p">),</span>
+                    <span class="s2">&quot;linewidth&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">peak_text</span><span class="o">.</span><span class="n">set_gid</span><span class="p">(</span><span class="s2">&quot;ridge-peak-label&quot;</span><span class="p">)</span>
+            <span class="n">peak_text</span><span class="o">.</span><span class="n">set_in_layout</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Baselines are the only reference the rows need, so the y-axis carries no</span>
     <span class="c1"># ticks or grid of its own.</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span>
-        <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span><span class="p">,</span>
-        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ridges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span> <span class="o">+</span> <span class="n">peak_height</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ax</span>
 </code></pre></div></td></tr></table></div>

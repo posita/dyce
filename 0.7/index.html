@@ -43,6 +43,7 @@
       
     
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="javascripts/plotly-theme.js"></script>
 
     
       
@@ -989,15 +990,15 @@
 
 <p><a href="https://github.com/posita/dyce/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg" /></a>
 <a href="https://app.codecov.io/gh/posita/dyce"><img alt="Coverage" src="https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg" /></a>
-<a href="https://pypi.org/project/dyce/0.7.0rc9/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc9.svg" /></a>
-<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc9.svg" />
-<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc9.svg" /></a>
-<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc9.svg" />
-<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc9.svg" />
+<a href="https://pypi.org/project/dyce/0.7.0rc10/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc10.svg" /></a>
+<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc10.svg" />
+<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc10.svg" /></a>
+<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc10.svg" />
+<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc10.svg" />
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
 <a href="https://beartype.rtfd.io/"><img alt="Bear-ified™" src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a></p>
 <p>Now you’re playing with …</p>
-<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/dyce.svg" alt="dyce logo"></p>
+<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/dyce.svg" alt="dyce logo"></p>
 <h1 id="dyce-simple-python-tools-for-exploring-dice-outcomes-and-other-finite-discrete-probabilities"><code>dyce</code> – Simple Python tools for exploring dice outcomes and other finite discrete probabilities</h1>
 <p><code>dyce</code> is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for <strong><em>compact expression</em></strong> and <strong><em>efficient computation</em></strong>, especially for the most common cases.
@@ -1028,9 +1029,9 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 <p>If you find it lacking in any way, please don’t hesitate to <a href="https://posita.github.io/dyce/0.7/contrib/">bring it to my attention</a>.</p>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_d4s_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_d4s_light.svg">
-  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_d4s_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_light.svg">
+  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_light.svg">
 </picture></p>
 <h2 id="installation">Installation</h2>
 <p>Installation can be performed via <a href="https://pypi.python.org/pypi/dyce/">PyPI</a>.</p>
@@ -1061,8 +1062,9 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 </ul>
 <p><code>dyce</code> will opportunistically use the following, if available at runtime:</p>
 <ul>
-<li><a href="https://numpy.org/">NumPy</a> to supply <code>dyce</code> with an alternate random number generator implementation</li>
+<li><a href="https://beartype.github.io/beartype/">Beartype</a> for runtime type checking of <code>dyce</code> APIs</li>
 <li><a href="https://matplotlib.org/">Matplotlib</a> for basic visualization helpers via <code>dyce.viz.matplotlib</code></li>
+<li><a href="https://numpy.org/">NumPy</a> to supply <code>dyce</code> with an alternate random number generator implementation</li>
 </ul>
 <p>See the <a href="https://posita.github.io/dyce/0.7/contrib/#hacking-quick-start">hacking quick-start</a> for additional development and testing dependencies.</p>
 <p><code>dyce</code> is proudly 100% <a href="https://beartype.rtfd.io/">Bear-ified™</a>! 👌🏾🐻</p>
@@ -1080,7 +1082,7 @@ Which, if we possess a modicum of humility, it often is.</p>
 <p>Because <code>dyce</code> exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>
 It can be installed and run anywhere<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and modified as desired.
 On its own, <code>dyce</code> is completely adequate for casual tinkering.
-However, it really shines when used in larger contexts such as with <a href="https://matplotlib.org/">Matplotlib</a> or <a href="https://jupyter.org/">Jupyter</a> or embedded in a special-purpose application.</p>
+However, it really shines when used in larger contexts such as with <a href="https://matplotlib.org/">Matplotlib</a>, <a href="https://plotly.com/">Plotly</a>, or <a href="https://jupyter.org/">Jupyter</a> or embedded in a special-purpose application.</p>
 <p>In an intentional departure from <a href="https://datatracker.ietf.org/doc/html/rfc1925#section-2">RFC 1925, § 2.2</a>, <code>dyce</code> includes some conveniences, such as minor computation optimizations (e.g., the <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code> method</a>, various other shorthands, etc.) and formatting conveniences (e.g., the <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.format"><code>H.format</code></a> methods).</p>
 <h2 id="a-taste">A taste</h2>
 <p><code>dyce</code> provides several core primitives.
@@ -1187,6 +1189,7 @@ All support a variety of operations.
 </code></pre></div></td></tr></table></div>
 <p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> provides a <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.probability_items"><code>probability_items</code> method</a> to ease integration with plotting packages.
 <a href="https://posita.github.io/dyce/0.7/dyce.viz.matplotlib/"><code>dyce.viz.matplotlib</code></a> provides <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>-based visualization conveniences.
+<a href="https://posita.github.io/dyce/0.7/dyce.viz.plotly/"><code>dyce.viz.plotly</code></a> does likewise for <a href="https://plotly.com/python-api-reference/">Plotly</a>.
 <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -1217,9 +1220,9 @@ All support a variety of operations.
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc9/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_light.svg">
 </picture></p>
 <p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P"><code>P</code> objects</a> can generate random rolls.</p>
 <!-- BEGIN MONKEY PATCH --
@@ -1270,7 +1273,7 @@ Other works include:</p>
 <p>When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.</p>
 <ul>
 <li><a href="https://eykd.net/about/">David Eyk</a> not only <a href="https://eykd.net/blog/">inspires others to explore creative writing</a>, but has graciously ceded his PyPI project dedicated to <a href="https://code.google.com/archive/p/dyce/">his own prior work under a similar name</a>.
-  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc9/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
+  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc10/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
   Thanks to his generosity, <del>millions</del> <em>dozens</em> of future <code>dyce</code> users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡</li>
 </ul>

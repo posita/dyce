@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
     # --8<-- [start:core]
     from collections.abc import Iterator
@@ -74,14 +74,6 @@ def fig_callback(line_color: str) -> None:
         ax.set_title(ax.get_title(), wrap=True)
     plt.gcf().set_size_inches(9.6, 14.4)
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    for ax in plt.gcf().axes:
-        ax.title.set_color(line_color)
-        for text in ax.texts:
-            text.set_color(line_color)  # wedge labels (both rings)
-        for patch in ax.patches:
-            patch.set_edgecolor(line_color)  # wedge edges (both rings)
 
 
 if __name__ == "__main__":

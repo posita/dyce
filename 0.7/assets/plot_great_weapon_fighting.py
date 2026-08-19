@@ -14,7 +14,7 @@
 # ======================================================================================
 
 
-def fig_callback(line_color: str) -> None:
+def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
     # --8<-- [start:core]
     from dyce import H, HResult, expand
@@ -58,7 +58,7 @@ def fig_callback(line_color: str) -> None:
 
     from dyce.viz.matplotlib import plot_ridge
 
-    ax = plot_ridge(
+    plot_ridge(
         single_attack,
         h_gwf_2014,
         h_gwf_2024,
@@ -66,10 +66,6 @@ def fig_callback(line_color: str) -> None:
         overlap=2.0,
     )
     # --8<-- [end:viz]
-
-    # Style (dark/light) tweaks
-    ax.tick_params(colors=line_color)
-    ax.title.set_color(line_color)
 
 
 if __name__ == "__main__":

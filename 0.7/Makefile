@@ -85,22 +85,22 @@ perf : \
 # \
  # 	assets/perf_pools_vs_rollers.txt
 
-# assets/graph_%_dark.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py
+# assets/graph_%_dark.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py ../dyce/*/*.py
 # 	"$${PYTHON:-python3}" assets/graph.py --style=dark $*
 
-# assets/graph_%_light.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py
+# assets/graph_%_light.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py ../dyce/*/*.py
 # 	"$${PYTHON:-python3}" assets/graph.py --style=light $*
 
 assets/plot_risus_first_round_dark.svg \
 assets/plot_risus_multi_round_standard_dark.svg \
 assets/plot_risus_multi_round_best_of_set_dark.svg \
-assets/plot_risus_multi_round_evens_up_dark.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
+assets/plot_risus_multi_round_evens_up_dark.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style dark --output-dir assets
 
 assets/plot_risus_first_round_light.svg \
 assets/plot_risus_multi_round_standard_light.svg \
 assets/plot_risus_multi_round_best_of_set_light.svg \
-assets/plot_risus_multi_round_evens_up_light.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py
+assets/plot_risus_multi_round_evens_up_light.svg &: assets/plot_risus.py assets/_plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" assets/plot_risus.py --log-level INFO --style light --output-dir assets
 
 notebooks/%.ipynb : assets/nb_%.py
@@ -108,16 +108,16 @@ notebooks/%.ipynb : assets/nb_%.py
 	ruff check --fix $@
 	ruff format $@
 
-assets/plot_%_dark.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
+assets/plot_%_dark.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style dark --output-file $@
 
-assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py
+assets/plot_%_light.svg : assets/plot_%.py assets/_plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" assets/plot_$*.py --log-level INFO --style light --output-file $@
 
-snippets/plotly_%.html : assets/plotly_%.py assets/_plotly.py ../dyce/*.py
+snippets/plotly_%.html : assets/plotly_%.py assets/_plotly.py ../dyce/*.py ../dyce/viz/plotly.py
 	"$${PYTHON:-python3}" assets/plotly_$*.py --log-level INFO --output-file $@
 
-assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py
+assets/perf_%.txt : assets/perf_%.ipy ../dyce/*.py ../dyce/*/*.py
 	ipython3 --no-banner --quick --LoggingMagics.quiet=True assets/perf_$*.ipy | tee $@
 
 dyce-powered.svg : Makefile
