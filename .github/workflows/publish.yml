@@ -85,3 +85,32 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+  publish-github:
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    # GitHub has no release-specific permission. Keep this job minimal because
+    # contents: write also permits broader repository mutations.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - name: create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=(
+            "$GITHUB_REF_NAME"
+            dist/*
+            --verify-tag
+            --generate-notes
+          )
+
+          if [[ "$GITHUB_REF_NAME" =~ (a|b|rc)[0-9]+$ ]]; then
+            args+=(--prerelease --latest=false)
+          fi
+
+          gh release create "${args[@]}"
