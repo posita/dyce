@@ -184,7 +184,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1})
         >>> H(0)
         H({})
-        >>> H(-4.0)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+        >>> H(-4.0)  # type: ignore[call-overload]
         Traceback (most recent call last):
           ...
         TypeError: scalar init_val must be int; use explicit Mapping or Iterable for 'float' outcomes
@@ -1775,7 +1775,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             ...     exploded_h = h
             ...     for _ in range(n):
             ...         exploded_h = h.replace(max_h, exploded_h + max_h)
-            ...     return exploded_h  # ty: ignore[invalid-return-type]
+            ...     return exploded_h
 
             >>> explode_n_by_replacement(d6, 0) == d6
             True
