@@ -62,7 +62,7 @@ from dyce import H, P
 
 
 def roll_and_keep(p: P[int], k: int) -> H[int]:
-    assert all(h == p[0] for h in p), "pool must be homogeneous"
+    assert not p or p[0] == p[-1], "pool must be homogeneous"
     max_d = max(p[-1]) if p else 0
     return H.from_counts(
         (
