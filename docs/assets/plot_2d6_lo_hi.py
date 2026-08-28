@@ -19,8 +19,8 @@ def fig_callback() -> None:
     # --8<-- [start:core]
     from dyce.d import p2d6
 
-    h2d6_lowest = p2d6.h(0)
-    h2d6_highest = p2d6.h(-1)
+    h2d6_lowest = p2d6.at(0)
+    h2d6_highest = p2d6.at(-1)
     # --8<-- [end:core]
 
     # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py

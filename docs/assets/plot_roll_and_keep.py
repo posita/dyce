@@ -42,7 +42,7 @@ def fig_callback() -> None:
     def normal() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
-            yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
+            yield f"{n}d{d} keep {k}", p.at(slice(-k, None))
 
     # --8<-- [end:core]
 
