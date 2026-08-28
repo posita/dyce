@@ -58,8 +58,8 @@ warnings.filterwarnings("ignore", category=ExperimentalWarning)
 # %%
 from dyce.d import p2d6
 
-h2d6_lowest = p2d6.h(0)
-h2d6_highest = p2d6.h(-1)
+h2d6_lowest = p2d6.at(0)
+h2d6_highest = p2d6.at(-1)
 
 # %%
 from dyce.viz.matplotlib import plot_bar

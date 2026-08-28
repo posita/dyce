@@ -194,7 +194,7 @@ class _WhichHSurveyor(
     def initial(self) -> tuple[_ConvolvableT | None, int]:
         return None, (0 if self._ascending else self._p_len - 1)
 
-    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
+    @nobeartype  # triggers on P[~_ConvolvableT].at(int), which technically works, because no addition is involved
     def accumulate(  # type: ignore[override] # ty: ignore[invalid-method-override]
         self,
         state: tuple[_ConvolvableT | None, int],
@@ -210,7 +210,7 @@ class _WhichHSurveyor(
         index_so_far += count if self._ascending else -count
         return sum_so_far, index_so_far
 
-    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
+    @nobeartype  # triggers on P[~_ConvolvableT].at(int), which technically works, because no addition is involved
     def settle(self, state: tuple[_ConvolvableT | None, int]) -> _ConvolvableT:
         total, _ = state
         assert total is not None
@@ -569,7 +569,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         <!-- -- >
 
-            >>> best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))
+            >>> best_three_of_4d6 = (4 @ P(6)).at(slice(-3, None))
             >>> (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6
             True
 
@@ -589,30 +589,30 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         )
 
     @overload
-    def h(self: "P[Never]", *which: GetItemT) -> H[Never]: ...
+    def at(self: "P[Never]", which: GetItemT, *more: GetItemT) -> H[Never]: ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def h(self: "P[ot.CanAddSame[int, int]]", *which: GetItemT) -> H[int]: ...
+    def at(
+        self: "P[ot.CanAddSame[int, int]]", which: GetItemT, *more: GetItemT
+    ) -> H[int]: ...
     @overload
-    def h(self: "P[_ConvolvableT]", *which: GetItemT) -> H[_ConvolvableT]: ...
+    def at(
+        self: "P[_ConvolvableT]", which: GetItemT, *more: GetItemT
+    ) -> H[_ConvolvableT]: ...
     @overload
-    def h(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
-    def h(self: "P", *which: GetItemT) -> H:  # type: ignore[misc] # ty: ignore[invalid-method-override]
+    def at(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def at(self: "P", which: GetItemT, *more: GetItemT) -> H:
         r"""
-        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
-
-            >>> (2 @ P(6)).h()
-            H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-
-        When one or more optional *which* identifiers is provided, this is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with optimizations.
+        Returns a histogram representing the sum of the outcomes at the selected positions for each possible roll.
+        This is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(which, *more))` with optimizations.
         Identifiers can be `int`s or `slice`s, and can be mixed.
 
         Taking the greatest of two six-sided dice can be modeled as:
 
             >>> p_2d6 = 2 @ P(6)
-            >>> p_2d6.h(-1)
+            >>> p_2d6.at(-1)
             H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
-            >>> print(p_2d6.h(-1).format(width=65))
+            >>> print(p_2d6.at(-1).format(width=65))
             avg |    4.47
             std |    1.40
               1 |   2.78% |#
@@ -625,9 +625,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         Taking the greatest two and least two faces of ten four-sided dice (`10d4`) can be modeled as:
 
             >>> p_10d4 = 10 @ P(4)
-            >>> p_10d4.h(slice(2), slice(-2, None))
+            >>> p_10d4.at(slice(2), slice(-2, None))
             H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
-            >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))
+            >>> print(
+            ...     p_10d4.at(slice(2), slice(-2, None)).format(width=65, scaled=True)
+            ... )
             avg |   10.00
             std |    0.91
               4 |   0.00% |
@@ -649,7 +651,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> d6 = H(6)
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
             >>> p = 2 @ P(d6, d6avg)
-            >>> p.h(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
+            >>> p.at(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
             True
 
         !!! note "On selection ordering"
@@ -658,7 +660,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             Where addition over the outcomes’ type is commutative, equivalence holds as expected:
 
                 >>> p_c = P(2, 3, 4)
-                >>> p_c.h(
+                >>> p_c.at(
                 ...     slice(None),  # select everything once
                 ...     slice(None),  # then select everything again
                 ... ) == 2 * p_c.h()
@@ -667,7 +669,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             Where outcomes define `__add__` as non-commutative (e.g., strings, sequences, etc.), ordering can affect construction under certain circumstances:
 
                 >>> p_nc = P(H(((1,), (2,))), H(((3,), (4,))), H(((5,), (6,))))
-                >>> p_nc.h(
+                >>> p_nc.at(
                 ...     slice(None),  # select everything once, then again, like above
                 ...     slice(None),  # pyright: ignore[reportCallIssue]
                 ... )
@@ -675,11 +677,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 >>> 2 * p_nc.h()  # type: ignore[operator]
                 H({(1, 3, 5, 1, 3, 5): 1, (1, 3, 6, 1, 3, 6): 1, ..., (2, 4, 5, 2, 4, 5): 1, (2, 4, 6, 2, 4, 6): 1})
         """
-        if not which:
-            return H({}) if len(self._h_groups) == 0 else sum_h(self)
         n = len(self)
         indices = tuple(range(n))
-        selected = tuple(getitems(indices, which or indices))
+        selected = tuple(getitems(indices, (which, *more)))
         if not selected:
             return H({})
         with warnings.catch_warnings():
@@ -701,8 +701,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                         for h, count in self._h_groups.items()
                     )
                 )
-                return reduced.h(-1 if from_right else 0)
-            # Unlike rolls_with_counts, h can fold large selections directly without
+                return reduced.at(-1 if from_right else 0)
+            # Unlike rolls_with_counts, at can fold large selections directly without
             # materializing rolls, which becomes faster beyond roughly half the pool.
             if 1 < len(selected) <= n // 2:
                 h_groups = tuple(self._h_groups.items())
@@ -721,6 +721,24 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                         )
                     )
             return self.survey(_WhichHSurveyor(self, selected))
+
+    @overload
+    def h(self: "P[Never]") -> H[Never]: ...
+    @overload
+    # See <https://github.com/jorenham/optype/discussions/574>
+    def h(self: "P[ot.CanAddSame[int, int]]") -> H[int]: ...
+    @overload
+    def h(self: "P[_ConvolvableT]") -> H[_ConvolvableT]: ...
+    @overload
+    def h(self: "P[_T]") -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def h(self: "P") -> H:
+        r"""
+        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
+
+            >>> (2 @ P(6)).h()
+            H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+        """
+        return H({}) if len(self._h_groups) == 0 else sum_h(self)
 
     @experimental
     def roll(self: "P[_T]") -> RollT[_T]:
@@ -814,7 +832,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             )
             return
         if len(selected) == 1 and len(self._h_groups) > 1 and selected[0] in (0, n - 1):
-            extreme_h = self.h(-1 if selected[0] == n - 1 else 0)
+            extreme_h = self.at(-1 if selected[0] == n - 1 else 0)
             yield from (((outcome,), weight) for outcome, weight in extreme_h.items())
             return
         if 1 < len(selected) < n and (
@@ -917,7 +935,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ...     order=survey_outcome_order_descending,
             ...     settle=lambda s: s[1],
             ... )
-            >>> keep == p_4d6.h(slice(-2, None))
+            >>> keep == p_4d6.at(slice(-2, None))
             True
         """
         if surveyor is None:

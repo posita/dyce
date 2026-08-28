@@ -31,6 +31,8 @@
 - Removes `H.vs` and `H.within`.
 - Renames `H.accumulate` to [`H.merge`][dyce.H.merge].
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
+- Modifies [`P.h`][dyce.P.h] such that it now takes no arguments to remain consistent with [`HableT.h`][dyce.HableT.h].
+  Selection is now handled by a separate [`P.at`][dyce.P.at] method.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].

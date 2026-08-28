@@ -440,21 +440,21 @@ An alternative using [`expand`][dyce.expand]:
 
     >>> # this takes the max of a pool of four d7s and two d10s
     >>> from dyce import P
-    >>> max_h = P(4 @ P(7), 2 @ P(10)).h(-1)
+    >>> max_h = P(4 @ P(7), 2 @ P(10)).at(-1)
     >>> print(max_h.format_short())
     {avg: 7.78, 1:  0.00%, 2:  0.03%, 3:  0.28%, 4:  1.40%, 5:  4.80%, 6: 12.92%, 7: 29.57%, 8: 15.00%, 9: 17.00%, 10: 19.00%}
 
     >>> # this takes the max of pool of a first die behaving like the sum of
     >>> # 4d7 and a second die behaving like a the sum of 2d10, which is a
     >>> # very different thing
-    >>> max_h = P(4 @ H(7), 2 @ H(10)).h(-1)
+    >>> max_h = P(4 @ H(7), 2 @ H(10)).at(-1)
     >>> print(max_h.format_short())
     {avg: 16.60, 4:  0.00%, 5:  0.02%, 6:  0.07%, 7:  0.21%, ..., 25:  0.83%, 26:  0.42%, 27:  0.17%, 28:  0.04%}
 
 <!-- -->
 
     >>> # MIN(50, d%)
-    >>> min_h = P(H((50,)), P(100)).h(0)
+    >>> min_h = P(H((50,)), P(100)).at(0)
     >>> print(min_h.format_short())
     {avg: 37.75, 1:  1.00%, 2:  1.00%, 3:  1.00%, ..., 47:  1.00%, 48:  1.00%, 49:  1.00%, 50: 51.00%}
 

@@ -63,7 +63,7 @@ explode_depth = 2
 
 def keep(p: P[int], k: int) -> H[int]:
     r"Negative k keeps lowest, otherwise keeps highest"
-    return p.h(slice(-k, None) if k > 0 else slice(-k))
+    return p.at(slice(-k, None) if k > 0 else slice(-k))
 
 
 def nkk(n: int, k: int) -> H[int]:
