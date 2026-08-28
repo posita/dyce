@@ -379,8 +379,8 @@ def best_of_set_single_round_us_vs_them(
     *,
     with_goliath_rule: bool,
 ) -> H[Versus]:
-    our_best = (our_pool_size @ P(6)).h(-1)
-    their_best = (their_pool_size @ P(6)).h(-1)
+    our_best = (our_pool_size @ P(6)).at(-1)
+    their_best = (their_pool_size @ P(6)).at(-1)
     raw_result = our_best.apply(Versus.raw_vs, their_best)
 
     return (

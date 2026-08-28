@@ -90,52 +90,6 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-@experimental
-@contextmanager
-# The type of the return of the undecorated function is Generator, but after the
-# @contextmanager decorator is applied, it's AbstractContextManager. By refusing to
-# commit, we don't confuse beartype who will otherwise complain because
-# issubclass(AbstractContextManager, Generator) is False. I'm not quite sure why
-# beartype is confused because
-# https://github.com/python/typeshed/blob/main/stdlib/contextlib.pyi provides a hint
-# that the contextmanager-wrapped function should return a Callable[_P,
-# _GeneratorContextManager[_T_co]].
-def quantize_hs(
-    *,
-    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
-    preserve_zero_counts: bool = True,
-) -> Any:  # ruff: ignore[any-type]
-    r"""
-    Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
-    If nested, the innermost context controls.
-
-        >>> from dyce import H, quantize_hs
-        >>> from dyce.d import d20
-        >>> h20d20_full = 20 @ d20
-        >>> h20d20_full
-        H({20: 1, 21: 20, 22: 210, ..., 200: 1496580006525694242666523, ..., 398: 210, 399: 20, 400: 1})
-        >>> with quantize_hs(bit_width=16):
-        ...     h20d20_16bit = 20 @ d20
-        >>> h20d20_16bit
-        H({20: 0, 21: 0, 22: 0, ..., 199: 39947, 200: 40565, 201: 41131, ..., 398: 0, 399: 0, 400: 0})
-        >>> with quantize_hs(bit_width=8):
-        ...     h20d20_8bit = 20 @ d20
-        >>> h20d20_8bit
-        H({20: 0, 21: 0, 22: 0, ..., 199: 156, 200: 158, 201: 161, ..., 398: 0, 399: 0, 400: 0})
-        >>> with quantize_hs(bit_width=8):
-        ...     with quantize_hs(bit_width=16):
-        ...         assert 20 @ d20 == h20d20_16bit
-        ...     assert 20 @ d20 == h20d20_8bit
-    """
-    token = _quantize_ctxt.set(
-        _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
-    )
-    try:
-        yield
-    finally:
-        _quantize_ctxt.reset(token)
-
-
 class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
     r"""
     <!-- BEGIN MONKEY PATCH --
@@ -2027,7 +1981,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 class HableT(Protocol[_T_co]):
     r"""
     A protocol whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
-    Currently, no class implements this protocol, but this affords an integration point for.
 
     !!! info
 
@@ -2115,12 +2068,58 @@ def aggregate_weighted(
     return H.from_counts(outcome_counts, preserve_zero_counts=True)
 
 
+@experimental
+@contextmanager
+# The type of the return of the undecorated function is Generator, but after the
+# @contextmanager decorator is applied, it's AbstractContextManager. By refusing to
+# commit, we don't confuse beartype who will otherwise complain because
+# issubclass(AbstractContextManager, Generator) is False. I'm not quite sure why
+# beartype is confused because
+# https://github.com/python/typeshed/blob/main/stdlib/contextlib.pyi provides a hint
+# that the contextmanager-wrapped function should return a Callable[_P,
+# _GeneratorContextManager[_T_co]].
+def quantize_hs(
+    *,
+    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+    preserve_zero_counts: bool = True,
+) -> Any:  # ruff: ignore[any-type]
+    r"""
+    Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
+    If nested, the innermost context controls.
+
+        >>> from dyce import H, quantize_hs
+        >>> from dyce.d import d20
+        >>> h20d20_full = 20 @ d20
+        >>> h20d20_full
+        H({20: 1, 21: 20, 22: 210, ..., 200: 1496580006525694242666523, ..., 398: 210, 399: 20, 400: 1})
+        >>> with quantize_hs(bit_width=16):
+        ...     h20d20_16bit = 20 @ d20
+        >>> h20d20_16bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 39947, 200: 40565, 201: 41131, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     h20d20_8bit = 20 @ d20
+        >>> h20d20_8bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 156, 200: 158, 201: 161, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     with quantize_hs(bit_width=16):
+        ...         assert 20 @ d20 == h20d20_16bit
+        ...     assert 20 @ d20 == h20d20_8bit
+    """
+    token = _quantize_ctxt.set(
+        _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
+    )
+    try:
+        yield
+    finally:
+        _quantize_ctxt.reset(token)
+
+
 def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     r"""
     Sums zero or more histograms, returning `H({})` for an empty iterable.
     This ensures callers never have to special-case the empty collection.
 
-    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools like those produced by `P.h()` are convolved efficiently.
+    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools are convolved efficiently when flattened by `P.h()`.
     """
     result: H[_T] | None = None
     for h, group in groupby(hs):

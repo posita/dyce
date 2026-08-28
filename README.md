@@ -190,13 +190,13 @@ True
 
 ```
 
-By providing an optional argument to the [`P.h` method](https://posita.github.io/dyce/latest/dyce/#dyce.P.h), one can “take” individual dice from pools, ordered least to greatest.
+By providing one or more index arguments to the [`P.at` method](https://posita.github.io/dyce/latest/dyce/#dyce.P.at), one can “take” individual dice from pools, ordered least to greatest.
 (The [`H.format` method](https://posita.github.io/dyce/latest/dyce/#dyce.H.format) provides rudimentary visualization for convenience.)
 
 ```python
->>> p2d6.h(0)  # take the lowest die of 2d6
+>>> p2d6.at(0)  # take the lowest die of 2d6
 H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
->>> print(p2d6.h(0).format(width=65))
+>>> print(p2d6.at(0).format(width=65))
 avg |    2.53
 std |    1.40
   1 |  30.56% |###############
@@ -209,9 +209,9 @@ std |    1.40
 ```
 
 ```python
->>> p2d6.h(-1)  # take the highest die of 2d6
+>>> p2d6.at(-1)  # take the highest die of 2d6
 H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
->>> print(p2d6.h(-1).format(width=65))
+>>> print(p2d6.at(-1).format(width=65))
 avg |    4.47
 std |    1.40
   1 |   2.78% |#

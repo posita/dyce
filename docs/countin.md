@@ -173,33 +173,33 @@ Arithmetic operations implicitly “flatten” pools into histograms.
 
 Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
-This is done by providing one or more index arguments to the [`P.h` method][dyce.P.h] or the [`P.rolls_with_counts` method][dyce.P.rolls_with_counts].
+This is done by providing one or more index arguments to the [`P.at` method][dyce.P.at] or the [`P.rolls_with_counts` method][dyce.P.rolls_with_counts].
 Indices can be integers, slices, or a mix thereof.
 Outcome indices in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., `[0]`, `[1]`, …, `[-2]`, `[-1]`).
 Summing the least two faces when rolling three six-sided dice would be:
 
     >>> 3 @ P(6)
     3@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
-    >>> (3 @ P(6)).h(0, 1)  # see warning below about parentheses
+    >>> (3 @ P(6)).at(0, 1)  # see warning below about parentheses
     H({2: 16, 3: 27, 4: 34, 5: 36, 6: 34, 7: 27, 8: 19, 9: 12, 10: 7, 11: 3, 12: 1})
 
 !!! bug "Mind your parentheses"
 
     Parentheses are needed in the above example because `@` has a [lower precedence](https://docs.python.org/3/reference/expressions.html#operator-precedence) than `.` and `[…]`.
 
-            >>> 2 @ P(6).h(1)  # equivalent to 2@(P(6).h(1))
+            >>> 2 @ P(6).at(1)  # equivalent to 2@(P(6).at(1))
             Traceback (most recent call last):
             ...
             IndexError: tuple index out of range
-            >>> (2 @ P(6)).h(1)
+            >>> (2 @ P(6)).at(1)
             H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
 Taking the least, middle, or greatest face when rolling three six-sided dice would be:
 
     >>> p3d6 = 3 @ P(6)
-    >>> p3d6.h(0)  # least
+    >>> p3d6.at(0)  # least
     H({1: 91, 2: 61, 3: 37, 4: 19, 5: 7, 6: 1})
-    >>> print(p3d6.h(0).format(width=65))
+    >>> print(p3d6.at(0).format(width=65))
     avg |    2.04
     std |    1.14
       1 |  42.13% |#####################
@@ -211,9 +211,9 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
 
 <!-- -->
 
-    >>> p3d6.h(1)  # middle
+    >>> p3d6.at(1)  # middle
     H({1: 16, 2: 40, 3: 52, 4: 52, 5: 40, 6: 16})
-    >>> print(p3d6.h(1).format(width=65))
+    >>> print(p3d6.at(1).format(width=65))
     avg |    3.50
     std |    1.37
       1 |   7.41% |###
@@ -225,9 +225,9 @@ Taking the least, middle, or greatest face when rolling three six-sided dice wou
 
 <!-- -->
 
-    >>> p3d6.h(2)  # greatest (p3d6.h(-1) would also work)
+    >>> p3d6.at(2)  # greatest (p3d6.at(-1) would also work)
     H({1: 1, 2: 7, 3: 19, 4: 37, 5: 61, 6: 91})
-    >>> print(p3d6.h(-1).format(width=65))
+    >>> print(p3d6.at(-1).format(width=65))
     avg |    4.96
     std |    1.14
       1 |   0.46% |
@@ -242,7 +242,7 @@ Summing the greatest and the least faces when rolling a typical six-die polygona
     >>> d10 = H(10) - 1
     >>> d10  # a common “d10” with faces [0 .. 9]
     H({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
-    >>> h = P(4, 6, 8, d10, 12, 20).h(0, -1)
+    >>> h = P(4, 6, 8, d10, 12, 20).at(0, -1)
     >>> print(h.format(width=65, scaled=True))
     avg |   13.48
     std |    4.40
@@ -800,13 +800,13 @@ Flattening pools works.
 
 Selecting the “lowest” die works
 
-    >>> p.h(0)
+    >>> p.at(0)
     H({2*x/3: 9, 2*x/3 + 1/3: 6, 2*x/3 + 2/3: 4, x: 4, x + 1/3: 2, x + 2/3: 1, x/3: 1})
 
 
 Selecting all dice works, since it’s equivalent to flattening (no sorting is required).
 
-    >>> p.h(slice(None))
+    >>> p.at(slice(None))
     H({2*x + 1: 7, 3*x + 1: 1, 4*x/3 + 1: 3, 5*x/3 + 1: 6, 7*x/3 + 1: 6, 8*x/3 + 1: 3, x + 1: 1})
 
 
@@ -836,7 +836,7 @@ For deterministic outcomes.
     >>> f = lambda outcome: outcome.subs({sympy.abc.x: sympy.Rational(1, 3)})
     >>> p.apply_to_each_h(f)
     P(H({1/9: 1, 2/9: 1, 1/3: 1}), H({4/9: 1, 5/9: 1, 2/3: 1}), H({7/9: 1, 8/9: 1, 1: 1}))
-    >>> p.apply_to_each_h(f).h(-1)
+    >>> p.apply_to_each_h(f).at(-1)
     H({7/9: 9, 8/9: 9, 1: 9})
 
 
