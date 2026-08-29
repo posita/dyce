@@ -13,13 +13,40 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+import operator
+from collections.abc import Callable
+from typing import Any
+
 import pytest
 
-from dyce import H
+from dyce import H, P
 from dyce.h import HableT
 from dyce.hable import HableOpsMixin
 
 __all__ = ()
+
+_BINARY_OPERATORS: tuple[Callable[[Any, Any], Any], ...] = (
+    operator.add,
+    operator.sub,
+    operator.mul,
+    operator.truediv,
+    operator.floordiv,
+    operator.mod,
+    operator.pow,
+    operator.lshift,
+    operator.rshift,
+    operator.and_,
+    operator.or_,
+    operator.xor,
+)
+
+_COMMUTATIVE_OPERATORS: tuple[Callable[[Any, Any], Any], ...] = (
+    operator.add,
+    operator.mul,
+    operator.and_,
+    operator.or_,
+    operator.xor,
+)
 
 
 class _HableImplementationWithOps(HableOpsMixin[int]):
@@ -134,3 +161,65 @@ class TestHForwardOpsWithHableT:
         w = _HableImplementationWithOps(H({3: 1, 4: 1}))
         assert h + w == w + h
         assert h * w == w * h
+
+
+class TestHableOperatorEquivalence:
+    @pytest.mark.parametrize("op", _BINARY_OPERATORS)
+    def test_hable_operands_match_explicit_normalization(
+        self, op: Callable[[Any, Any], Any]
+    ) -> None:
+        h = H({4: 1, 6: 2})
+        w = _HableImplementationWithOps(H({1: 2, 2: 1}))
+
+        assert op(h, w) == op(h, w.h())
+        assert op(w, h) == op(w.h(), h)
+
+    @pytest.mark.parametrize("op", _BINARY_OPERATORS)
+    def test_scalar_operands_match_explicit_normalization(
+        self, op: Callable[[Any, Any], Any]
+    ) -> None:
+        w = _HableImplementationWithOps(H({1: 2, 2: 1}))
+
+        assert op(w, 2) == op(w.h(), 2)
+        assert op(8, w) == op(8, w.h())
+
+    @pytest.mark.parametrize("op", _COMMUTATIVE_OPERATORS)
+    def test_commutative_operators_remain_commutative(
+        self, op: Callable[[Any, Any], Any]
+    ) -> None:
+        h = H({4: 1, 6: 2})
+        w = _HableImplementationWithOps(H({1: 2, 2: 1}))
+
+        assert op(h, w) == op(w, h)
+
+    def test_noncommutative_operators_preserve_operand_order(self) -> None:
+        h = H({4: 1, 6: 2})
+        w = _HableImplementationWithOps(H({1: 2, 2: 1}))
+
+        assert h - w == h - w.h()
+        assert w - h == w.h() - h
+        assert h - w != w - h
+
+    def test_nested_hable_outcomes_are_not_recursively_normalized(self) -> None:
+        p4 = P(4)
+        p3 = P(3)
+        outer = H({p4: 1, p3: 2})
+
+        assert outer + 3 == H({p4 + 3: 1, p3 + 3: 2})  # type: ignore[operator]
+
+    def test_nested_hable_outcomes_preserve_commutative_equivalence(self) -> None:
+        p4 = P(4)
+        p3 = P(3)
+        p2 = P(2)
+        outer = H({p4: 1, p3: 2})
+        expected = H(
+            {
+                p4 + 1: 1,
+                p4 + 2: 1,
+                p3 + 1: 2,
+                p3 + 2: 2,
+            }
+        )
+
+        assert outer + p2 == outer + p2.h() == expected
+        assert p2 + outer == p2.h() + outer == expected
