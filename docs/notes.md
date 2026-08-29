@@ -24,6 +24,7 @@
 - Drops support for 3.9 and 3.10 and extends support to 3.14.
 - Fixes embarrassingly long-running logical error in 4d6 variants example.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
+- Derives [`H`][dyce.H] from [`HableT`][dyce.HableT] and implements [`HableT.h`][dyce.HableT.h] to return `self`.
 - Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
 - Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`expand`][dyce.expand] and [`H.apply`][dyce.H.apply].
 - Removes `H.accumulate` and `H.zero_fill` in favor of [`H.from_counts`][dyce.H.from_counts].
