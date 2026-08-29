@@ -14,7 +14,7 @@ from typing import ClassVar
 import pytest
 
 from dyce import H, rng
-from dyce.roller import HRoller
+from dyce.roller import HRoller, Roll, Roller
 
 __all__ = ()
 
@@ -27,6 +27,20 @@ class _AdditionCountingOutcome:
     def __add__(self, other: "_AdditionCountingOutcome") -> "_AdditionCountingOutcome":
         type(self).times_added += 1
         return _AdditionCountingOutcome(self.value + other.value)
+
+
+class _ConstantRoller(Roller[int]):
+    def __init__(self, value: int) -> None:
+        self._value = value
+
+    def h(self) -> H[int]:
+        return H({self._value: 1})
+
+    def roll(self) -> Roll[int]:
+        return Roll(self._value, self)
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "constant", "value": self._value}
 
 
 class TestHRoller:
@@ -111,3 +125,11 @@ class TestHRoller:
 
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {"kind": "source", "name": str(H(8))}
+
+
+class TestRoller:
+    def test_mixed_roller_addition(self) -> None:
+        roll = (HRoller(H({1: 1}), "one") + _ConstantRoller(2)).roll()
+
+        assert roll.outcome == 3
+        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()

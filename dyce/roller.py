@@ -21,6 +21,7 @@ Its interfaces may change substantially or disappear.
 """
 
 import operator
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Generic, TypeVar, cast, overload
 
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
 from .h import H, HableT
 from .lifecycle import experimental
 
-__all__ = ("HRoller", "Roll")
+__all__ = ("HRoller", "Roll", "Roller")
 
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
@@ -41,7 +42,58 @@ _ResultT = TypeVar("_ResultT")
 _ADD = cast("Callable[[object, object], object]", operator.add)
 
 
-class HRoller(HableT[_T_co]):
+class Roller(HableT[_T_co]):
+    r"""
+    A deferred, traceable computation.
+
+    This prototype currently supports only addition.
+    """
+
+    __slots__ = ()
+
+    @overload
+    def __add__(
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: _OtherT,
+    ) -> "Roller[_ResultT]": ...
+    def __add__(self, rhs: object) -> "Roller[object]":
+        return _BinaryAddRoller(self, _as_roller(rhs))
+
+    def __radd__(
+        self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: _OtherT,
+    ) -> "Roller[_ResultT]":
+        return cast("Roller[_ResultT]", _BinaryAddRoller(_as_roller(lhs), self))
+
+    @abstractmethod
+    def roll(self) -> "Roll[_T_co]":
+        r"""Realizes this computation and returns its outcome with provenance."""
+
+    @property
+    def operands(self) -> tuple["Roller[object]", ...]:
+        r"""The immediate rollers consumed by this roller."""
+        return ()
+
+    @abstractmethod
+    def provenance(self) -> dict[str, object]:
+        r"""
+        Returns JSON-compatible metadata describing this roller.
+
+        The serializer supplies the reserved `operands` field when appropriate.
+        """
+
+
+class HRoller(Roller[_T_co]):
     r"""
     A deferred, traceable computation backed by an [`H`][dyce.H].
 
@@ -59,30 +111,6 @@ class HRoller(HableT[_T_co]):
         r"""Returns the distribution represented by this roller."""
         return self._h
 
-    @overload
-    def __add__(
-        self: "HRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "HRoller[_OtherT]",
-    ) -> "HRoller[_ResultT]": ...
-    @overload
-    def __add__(
-        self: "HRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "H[_OtherT]",
-    ) -> "HRoller[_ResultT]": ...
-    @overload
-    def __add__(
-        self: "HRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> "HRoller[_ResultT]": ...
-    def __add__(self, rhs: object) -> "HRoller[object]":
-        return _BinaryAddHRoller(self, _as_hroller(rhs))
-
-    def __radd__(
-        self: "HRoller[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> "HRoller[_ResultT]":
-        return cast("HRoller[_ResultT]", _BinaryAddHRoller(_as_hroller(lhs), self))
-
     @property
     def name(self) -> str | None:
         r"""The source name supplied when this roller was created, if any."""
@@ -92,15 +120,11 @@ class HRoller(HableT[_T_co]):
         r"""Realizes this computation and returns its outcome with provenance."""
         return Roll(self._h.roll(), self)
 
-    def _definition_record(self, operand_ids: list[str]) -> dict[str, object]:
-        assert not operand_ids
+    def provenance(self) -> dict[str, object]:
         return {
             "kind": "source",
             "name": self._name if self._name is not None else str(self._h),
         }
-
-    def _operands(self) -> tuple["HRoller[object]", ...]:
-        return ()
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -109,11 +133,11 @@ class Roll(Generic[_T_co]):
     An immutable realized outcome with provenance.
 
     Roll identity is significant.
-    Reusing one `Roll` in multiple operands represents one event with fan-out, while calling [`HRoller.roll`][dyce.roller.HRoller.roll] repeatedly represents independent events.
+    Reusing one `Roll` in multiple operands represents one event with fan-out, while calling [`Roller.roll`][dyce.roller.Roller.roll] repeatedly represents independent events.
     """
 
     outcome: _T_co
-    roller: HRoller[_T_co] = field(repr=False)
+    roller: Roller[_T_co] = field(repr=False)
     operands: tuple["Roll[object]", ...] = field(default=(), repr=False)
 
     @overload
@@ -128,7 +152,7 @@ class Roll(Generic[_T_co]):
     ) -> "Roll[_ResultT]": ...
     def __add__(self, rhs: object) -> "Roll[object]":
         rhs_roll = _as_roll(rhs)
-        roller: HRoller[object] = _BinaryAddHRoller(self.roller, rhs_roll.roller)
+        roller: Roller[object] = _BinaryAddRoller(self.roller, rhs_roll.roller)
         outcome = _ADD(self.outcome, rhs_roll.outcome)
         return Roll(outcome, roller, (self, rhs_roll))
 
@@ -137,7 +161,7 @@ class Roll(Generic[_T_co]):
         lhs: _OtherT,
     ) -> "Roll[_ResultT]":
         lhs_roll = _as_roll(lhs)
-        roller: HRoller[object] = _BinaryAddHRoller(lhs_roll.roller, self.roller)
+        roller: Roller[object] = _BinaryAddRoller(lhs_roll.roller, self.roller)
         outcome = _ADD(lhs_roll.outcome, self.outcome)
         return cast("Roll[_ResultT]", Roll(outcome, roller, (lhs_roll, self)))
 
@@ -152,7 +176,7 @@ class Roll(Generic[_T_co]):
         event_ids: dict[int, str] = {}
         events: dict[str, dict[str, object]] = {}
 
-        def visit_definition(roller: HRoller[object]) -> str:
+        def visit_definition(roller: Roller[object]) -> str:
             key = id(roller)
             if key in definition_ids:
                 return definition_ids[key]
@@ -160,13 +184,11 @@ class Roll(Generic[_T_co]):
             definition_id = f"d{len(definition_ids)}"
             definition_ids[key] = definition_id
             definitions[definition_id] = {}
-            operand_ids = [
-                visit_definition(operand)
-                for operand in roller._operands()  # ruff: ignore[private-member-access]
-            ]
-            definitions[definition_id] = roller._definition_record(  # ruff: ignore[private-member-access]
-                operand_ids
-            )
+            operand_ids = [visit_definition(operand) for operand in roller.operands]
+            definitions[definition_id] = {
+                **roller.provenance(),
+                **({"operands": operand_ids} if operand_ids else {}),
+            }
             return definition_id
 
         def visit_event(roll: Roll[object]) -> str:
@@ -190,17 +212,16 @@ class Roll(Generic[_T_co]):
         return {"root": root, "definitions": definitions, "events": events}
 
 
-class _BinaryAddHRoller(HRoller[_ResultT]):
+class _BinaryAddRoller(Roller[_ResultT]):
     __slots__ = ("_left", "_right")
 
     def __init__(
         self,
-        left: HRoller[object],
-        right: HRoller[object],
+        left: Roller[object],
+        right: Roller[object],
     ) -> None:
         self._left = left
         self._right = right
-        self._name = None
 
     def h(self) -> H[_ResultT]:
         return cast("H[_ResultT]", _ADD(self._left.h(), self._right.h()))
@@ -211,39 +232,39 @@ class _BinaryAddHRoller(HRoller[_ResultT]):
         outcome = _ADD(left_roll.outcome, right_roll.outcome)
         return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
 
-    def _definition_record(self, operand_ids: list[str]) -> dict[str, object]:
-        assert len(operand_ids) == 2
-        return {"kind": "binary", "operator": "add", "operands": operand_ids}
-
-    def _operands(self) -> tuple[HRoller[object], ...]:
+    @property
+    def operands(self) -> tuple[Roller[object], ...]:
         return (self._left, self._right)
 
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "binary", "operator": "add"}
 
-class _LiteralHRoller(HRoller[_T]):
+
+class _LiteralRoller(Roller[_T]):
     __slots__ = ("_value",)
 
     def __init__(self, value: _T) -> None:
         self._value = value
-        self._h = H({value: 1})
-        self._name = None
+
+    def h(self) -> H[_T]:
+        return H({self._value: 1})
 
     def roll(self) -> Roll[_T]:
         return Roll(self._value, self)
 
-    def _definition_record(self, operand_ids: list[str]) -> dict[str, object]:
-        assert not operand_ids
+    def provenance(self) -> dict[str, object]:
         return {"kind": "literal", "value": self._value}
 
 
-def _as_hroller(value: _T | H[_T] | HRoller[_T]) -> HRoller[_T]:
-    if isinstance(value, HRoller):
+def _as_roller(value: _T | H[_T] | Roller[_T]) -> Roller[_T]:
+    if isinstance(value, Roller):
         return value
     if isinstance(value, H):
         return HRoller(value)
-    return _LiteralHRoller(value)
+    return _LiteralRoller(value)
 
 
 def _as_roll(value: _T | Roll[_T]) -> Roll[_T]:
     if isinstance(value, Roll):
         return value
-    return _LiteralHRoller(value).roll()
+    return _LiteralRoller(value).roll()
