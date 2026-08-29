@@ -327,7 +327,7 @@ class TestHSub:
         assert result == H({7: 1, 6: 2})
 
     def test_histogram(self) -> None:
-        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})  # ty: ignore[unsupported-operator]
+        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})
         # (1.0-0.5)=0.5, (1.0-1.5)=-0.5, (2.0-0.5)=1.5, (2.0-1.5)=0.5
         assert result == H({0.5: 2, -0.5: 1, 1.5: 1})
 

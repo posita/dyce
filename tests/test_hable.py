@@ -127,6 +127,16 @@ class TestHableOpsMixin:
         assert w1 * w2 == H({3: 1, 4: 1, 6: 1, 8: 1})
 
 
+class TestHableH:
+    def test_satisfies_hable_t(self) -> None:
+        assert isinstance(H({1: 1}), HableT)
+
+    def test_h_returns_self(self) -> None:
+        h = H({1: 1})
+
+        assert h.h() is h
+
+
 class TestHForwardOpsWithHableT:
     r"""H forward operators coerce non-H HableT rhs via _flatten_to_h."""
 

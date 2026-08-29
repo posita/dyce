@@ -90,7 +90,32 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
+@nobeartype  # not decoratable by beartype (avoids warning)
+@runtime_checkable
+class HableT(Protocol[_T_co]):
+    r"""
+    A protocol whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
+
+    !!! info
+
+        The intended pronunciation of `Hable` is *AYCH-uh-BUL*[^1] (i.e., [`H`][dyce.H]-able).
+        Yes, that is a clumsy attempt at [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25).
+        (You could *totally* [`H`][dyce.H] that, dude!)
+        However, if you prefer something else (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you.
+        (Well, they *might*, but they *shouldn’t*.)
+        We all know what you mean.
+
+    [^1]:
+
+        World Book Online (WBO) style [pronunciation respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
+    """
+
+    @abstractmethod
+    def h(self: "HableT[_T]") -> "H[_T]":
+        r"""Express its implementer as an [`H` object][dyce.H]."""
+
+
+class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
     r"""
     <!-- BEGIN MONKEY PATCH --
     For typing.
@@ -459,6 +484,12 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         More descriptive synonym for the `keys` mapping method.
         """
         return self._h.keys()
+
+    # ---- HableT protocol -------------------------------------------------------------
+
+    def h(self: "H[_T]") -> "H[_T]":
+        r"""Expresses this histogram as itself."""
+        return self
 
     # ---- Forward operators -----------------------------------------------------------
 
@@ -1974,33 +2005,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 )
 
         return _order_stat_at_pos
-
-
-@nobeartype  # not decoratable by beartype (avoids warning)
-@runtime_checkable
-class HableT(Protocol[_T_co]):
-    r"""
-    A protocol whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
-
-    !!! info
-
-        The intended pronunciation of `Hable` is *AYCH-uh-BUL*[^1] (i.e., [`H`][dyce.H]-able).
-        Yes, that is a clumsy attempt at [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25).
-        (You could *totally* [`H`][dyce.H] that, dude!)
-        However, if you prefer something else (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you.
-        (Well, they *might*, but they *shouldn’t*.)
-        We all know what you mean.
-
-    [^1]:
-
-        World Book Online (WBO) style [pronunciation respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
-    """
-
-    __slots__ = ()
-
-    @abstractmethod
-    def h(self: "HableT[_T]") -> H[_T]:
-        r"""Express its implementer as an [`H` object][dyce.H]."""
 
 
 # ---- Helpers -------------------------------------------------------------------------
