@@ -95,7 +95,7 @@ lint = [
     "pyright",
     "pytest",
     "ruff",
-    "ty>=0.0.70",  # TODO(posita): https://github.com/astral-sh/ty/issues/4222
+    "ty",
     {include-group = "docs"},
 ]
 # Only what's needed for uv run pytest --cov
