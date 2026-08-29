@@ -158,7 +158,7 @@
 - Renames `HAbleT` and `HAbleOpsMixin` to [`HableT`][dyce.HableT] and [`HableOpsMixin`][dyce.HableOpsMixin].
     Uses alternate spellings.
 - Removes deprecated non-flattening unary operation methods `P.__neg__` and `P.__pos__`.
-    Uses, e.g., `P.umap(operator.__neg__)` or `P(-h for h in p)` instead.
+    Uses, e.g., `P.umap(operator.neg)` or `P(-h for h in p)` instead.
 - Removes deprecated synonym methods `H.even` and `H.odd`.
     Uses `H.is_even` and `H.is_odd` instead.
 - Removes deprecated synonym package `dyce.plt`.

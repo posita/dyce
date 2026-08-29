@@ -392,7 +392,7 @@ An alternative using [`expand`][dyce.expand]:
     >>> expand(
     ...     lambda h_result: (
     ...         burning_arch_damage // 2
-    ...         if operator.__ge__(h_result.outcome, 10)
+    ...         if operator.ge(h_result.outcome, 10)
     ...         else burning_arch_damage
     ...     ),
     ...     save_roll,
