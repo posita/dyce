@@ -44,7 +44,6 @@
 - Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
 - Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
-- Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
 - *(Finally!)* removes deprecated interfaces:
     - `H.explode`
     - `H.foreach`
