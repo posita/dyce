@@ -19,9 +19,7 @@ from typing import Any
 
 import pytest
 
-from dyce import H, P
-from dyce.h import HableT
-from dyce.hable import HableOpsMixin
+from dyce import H, HableOpsMixin, HableT, P
 
 __all__ = ()
 
@@ -57,6 +55,23 @@ class _HableImplementationWithOps(HableOpsMixin[int]):
 
     def h(self) -> H[int]:
         return self._h
+
+
+class _StructuralHableImplementation:
+    r"""Implements the shape of HableT without deriving from it."""
+
+    __slots__ = ("_h",)
+
+    def __init__(self, h: H[int]) -> None:
+        self._h = h
+
+    def h(self) -> H[int]:
+        return self._h
+
+
+class TestHableT:
+    def test_requires_explicit_inheritance(self) -> None:
+        assert not isinstance(_StructuralHableImplementation(H({1: 1})), HableT)
 
 
 class TestHableOpsMixin:
@@ -130,6 +145,9 @@ class TestHableOpsMixin:
 class TestHableH:
     def test_satisfies_hable_t(self) -> None:
         assert isinstance(H({1: 1}), HableT)
+
+    def test_hable_t_does_not_add_instance_dict(self) -> None:
+        assert not hasattr(H({1: 1}), "__dict__")
 
     def test_h_returns_self(self) -> None:
         h = H({1: 1})

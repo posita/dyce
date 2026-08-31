@@ -30,8 +30,7 @@ if True:  # so ruff won't complain imports are out-of-order, but still sort the 
 from importlib.metadata import PackageNotFoundError, version
 
 from .evaluation import HResult, PResult, TruncationWarning, expand, explode_n
-from .h import H, HableT, quantize_hs
-from .hable import HableOpsMixin
+from .h import H, HableOpsMixin, HableT, quantize_hs
 from .p import P, RollCountT, RollProbT, RollT
 
 __all__ = (
