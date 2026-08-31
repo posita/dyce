@@ -36,8 +36,7 @@ from typing import (
 
 import optype as ot
 
-from .h import H, aggregate_weighted, sum_h
-from .hable import HableOpsMixin
+from .h import H, HableOpsMixin, aggregate_weighted, sum_h
 from .lifecycle import ExperimentalWarning, experimental
 from .types import (
     GetItemT,
@@ -275,7 +274,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         >>> p == P(4, 6, 8, 10, 12, 20)
         True
 
-    This class implements the [`HableT` protocol][dyce.HableT] and derives from the [`HableOpsMixin` class][dyce.HableOpsMixin], which means it can be “flattened” into a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
+    This class derives from [`HableT`][dyce.HableT] through [`HableOpsMixin`][dyce.HableOpsMixin], which means it can be “flattened” into a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
 
         >>> -p_d6
         H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
@@ -733,7 +732,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def h(self: "P[_T]") -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
     def h(self: "P") -> H:
         r"""
-        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
+        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` abstract base][dyce.HableT].
 
             >>> (2 @ P(6)).h()
             H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
