@@ -316,6 +316,9 @@ class TestHAdd:
         result = H({1: 1, 2: 1, 3: 1}) + H({4: 2, 5: 3})
         assert result == H({5: 2, 6: 5, 7: 5, 8: 3})
 
+        float_result = H({1.0: 1, 2.0: 1}) + H({0.5: 1, 1.5: 1})
+        assert float_result == H({1.5: 1, 2.5: 2, 3.5: 1})
+
 
 class TestHSub:
     def test_scalar_fwd(self) -> None:

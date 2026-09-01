@@ -182,7 +182,7 @@ class TestPEq:
 
     def test_not_equal_to_non_p(self) -> None:
         # P.__eq__ returns NotImplemented for non-P; H.__eq__ then considers P(6) ==
-        # H(6) True via HableT (both flatten to the same histogram)
+        # H(6) True via HableOpsMixin (both flatten to the same histogram)
         assert (P(6) == H(6)) is True
         assert P(6) != 6
 

@@ -55,7 +55,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _StateT = TypeVar("_StateT")
-_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
+_AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
 
 RollT = tuple[_T, ...]
 RollCountT = tuple[RollT[_T], int]
@@ -183,23 +183,23 @@ class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
 
 
 class _WhichHSurveyor(
-    _WhichSurveyor[_ConvolvableT, tuple[_ConvolvableT | None, int], _ConvolvableT]
+    _WhichSurveyor[_AddableSameT, tuple[_AddableSameT | None, int], _AddableSameT]
 ):
-    def __init__(self, p: "P[_ConvolvableT]", selected: tuple[int, ...]) -> None:
+    def __init__(self, p: "P[_AddableSameT]", selected: tuple[int, ...]) -> None:
         super().__init__(p, selected)
         self._counts_by_index: Counter[int] = Counter(selected)
 
     @property
-    def initial(self) -> tuple[_ConvolvableT | None, int]:
+    def initial(self) -> tuple[_AddableSameT | None, int]:
         return None, (0 if self._ascending else self._p_len - 1)
 
-    @nobeartype  # triggers on P[~_ConvolvableT].at(int), which technically works, because no addition is involved
+    @nobeartype  # triggers on P[~_AddableSameT].at(int), which technically works, because no addition is involved
     def accumulate(  # type: ignore[override] # ty: ignore[invalid-method-override]
         self,
-        state: tuple[_ConvolvableT | None, int],
-        outcome: _ConvolvableT,
+        state: tuple[_AddableSameT | None, int],
+        outcome: _AddableSameT,
         count: int,
-    ) -> tuple[_ConvolvableT | None, int]:
+    ) -> tuple[_AddableSameT | None, int]:
         sum_so_far, index_so_far = state
         selected_start, selected_stop = self._selected_bounds(index_so_far, count)
         for selected_pos in range(selected_start, selected_stop):
@@ -209,8 +209,8 @@ class _WhichHSurveyor(
         index_so_far += count if self._ascending else -count
         return sum_so_far, index_so_far
 
-    @nobeartype  # triggers on P[~_ConvolvableT].at(int), which technically works, because no addition is involved
-    def settle(self, state: tuple[_ConvolvableT | None, int]) -> _ConvolvableT:
+    @nobeartype  # triggers on P[~_AddableSameT].at(int), which technically works, because no addition is involved
+    def settle(self, state: tuple[_AddableSameT | None, int]) -> _AddableSameT:
         total, _ = state
         assert total is not None
         return total
@@ -596,8 +596,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     ) -> H[int]: ...
     @overload
     def at(
-        self: "P[_ConvolvableT]", which: GetItemT, *more: GetItemT
-    ) -> H[_ConvolvableT]: ...
+        self: "P[_AddableSameT]", which: GetItemT, *more: GetItemT
+    ) -> H[_AddableSameT]: ...
     @overload
     def at(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
     def at(self: "P", which: GetItemT, *more: GetItemT) -> H:
@@ -727,7 +727,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     # See <https://github.com/jorenham/optype/discussions/574>
     def h(self: "P[ot.CanAddSame[int, int]]") -> H[int]: ...
     @overload
-    def h(self: "P[_ConvolvableT]") -> H[_ConvolvableT]: ...
+    def h(self: "P[_AddableSameT]") -> H[_AddableSameT]: ...
     @overload
     def h(self: "P[_T]") -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
     def h(self: "P") -> H:
