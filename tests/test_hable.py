@@ -15,7 +15,7 @@
 
 import operator
 from collections.abc import Callable
-from typing import Any
+from typing import Any, assert_type
 
 import pytest
 
@@ -57,6 +57,18 @@ class _HableImplementationWithOps(HableOpsMixin[int]):
         return self._h
 
 
+class _HableImplementation(HableT[int]):
+    r"""Minimal concrete HableT without operator support."""
+
+    __slots__ = ("_h",)
+
+    def __init__(self, h: H[int]) -> None:
+        self._h = h
+
+    def h(self) -> H[int]:
+        return self._h
+
+
 class _StructuralHableImplementation:
     r"""Implements the shape of HableT without deriving from it."""
 
@@ -70,11 +82,49 @@ class _StructuralHableImplementation:
 
 
 class TestHableT:
+    def test_does_not_imply_operator_support(self) -> None:
+        h = H({1: 1})
+        hable = _HableImplementation(H({2: 1}))
+
+        assert not isinstance(hable, HableOpsMixin)
+        assert h != hable
+        assert h.__add__(hable) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert h + hable.h() == H({3: 1})
+
     def test_requires_explicit_inheritance(self) -> None:
         assert not isinstance(_StructuralHableImplementation(H({1: 1})), HableT)
 
 
 class TestHableOpsMixin:
+    def test_binary_operator_types_flatten_operator_owning_operands(self) -> None:
+        p = P(2)
+        hp = H({p: 1})
+
+        assert_type(p + p, H[int])
+        assert_type(p - p, H[int])
+        assert_type(p * p, H[int])
+        assert_type(p / p, H[float])
+        assert_type(p // p, H[int])
+        assert_type(p % p, H[int])
+        assert_type(p**p, H[Any])
+        assert_type(p << p, H[int])
+        assert_type(p >> p, H[int])
+        assert_type(p & p, H[int])
+        assert_type(p | p, H[int])
+        assert_type(p ^ p, H[int])
+
+        assert_type(hp + hp, H[H[int]])
+        assert_type(hp - hp, H[H[int]])
+        assert_type(hp * hp, H[H[int]])
+        assert_type(hp / hp, H[H[float]])
+        assert_type(hp // hp, H[H[int]])
+        assert_type(hp % hp, H[H[int]])
+        assert_type(hp << hp, H[H[int]])
+        assert_type(hp >> hp, H[H[int]])
+        assert_type(hp & hp, H[H[int]])
+        assert_type(hp | hp, H[H[int]])
+        assert_type(hp ^ hp, H[H[int]])
+
     def test_satisfies_hable_t(self) -> None:
         assert isinstance(_HableImplementationWithOps(H({1: 1})), HableT)
 
@@ -133,8 +183,7 @@ class TestHableOpsMixin:
         with pytest.raises(TypeError):
             _HableImplementationWithOps(H({1: 1})) + "incompatible"  # type: ignore[operator]  # ty: ignore[unsupported-operator]
 
-    def test_hable_rhs(self) -> None:
-        # HableOpsMixin forward ops accept another HableT as rhs (via _flatten_to_h)
+    def test_hable_ops_mixin_rhs(self) -> None:
         w1 = _HableImplementationWithOps(H({1: 1, 2: 1}))
         w2 = _HableImplementationWithOps(H({3: 1, 4: 1}))
         assert w1 + w2 == H({4: 1, 5: 2, 6: 1})
@@ -143,6 +192,9 @@ class TestHableOpsMixin:
 
 
 class TestHableH:
+    def test_does_not_use_hable_ops_mixin(self) -> None:
+        assert not isinstance(H({1: 1}), HableOpsMixin)
+
     def test_satisfies_hable_t(self) -> None:
         assert isinstance(H({1: 1}), HableT)
 
@@ -155,22 +207,22 @@ class TestHableH:
         assert h.h() is h
 
 
-class TestHForwardOpsWithHableT:
-    r"""H forward operators coerce non-H HableT rhs via _flatten_to_h."""
+class TestHForwardOpsWithHableOpsMixin:
+    r"""H forward operators coerce HableOpsMixin operands via _flatten_to_h."""
 
-    def test_h_add_hable(self) -> None:
+    def test_h_add_hable_ops_mixin(self) -> None:
         w = _HableImplementationWithOps(H({3: 1, 4: 1}))
         assert H({1: 1, 2: 1}) + w == H({4: 1, 5: 2, 6: 1})
 
-    def test_h_sub_hable(self) -> None:
+    def test_h_sub_hable_ops_mixin(self) -> None:
         w = _HableImplementationWithOps(H({1: 1, 2: 1}))
         assert H({3: 1, 4: 1}) - w == H({1: 1, 2: 2, 3: 1})
 
-    def test_h_mul_hable(self) -> None:
+    def test_h_mul_hable_ops_mixin(self) -> None:
         w = _HableImplementationWithOps(H({2: 1, 3: 1}))
         assert H({1: 1, 2: 1}) * w == H({2: 1, 3: 1, 4: 1, 6: 1})
 
-    def test_h_all_forward_ops_accept_hable(self) -> None:
+    def test_h_forward_ops_accept_hable_ops_mixin(self) -> None:
         # Spot-check each forward operator returns a valid H (not NotImplemented or
         # an H with H-objects as keys)
         h = H({2: 1, 4: 1})
@@ -184,16 +236,16 @@ class TestHForwardOpsWithHableT:
             assert isinstance(result, H)
             assert all(isinstance(k, int) for k in result)
 
-    def test_h_op_hable_commutes_with_hable_op_h(self) -> None:
+    def test_h_op_mixin_commutes_with_mixin_op_h(self) -> None:
         h = H({1: 1, 2: 1})
         w = _HableImplementationWithOps(H({3: 1, 4: 1}))
         assert h + w == w + h
         assert h * w == w * h
 
 
-class TestHableOperatorEquivalence:
+class TestHableOpsMixinOperatorEquivalence:
     @pytest.mark.parametrize("op", _BINARY_OPERATORS)
-    def test_hable_operands_match_explicit_normalization(
+    def test_mixin_operands_match_explicit_normalization(
         self, op: Callable[[Any, Any], Any]
     ) -> None:
         h = H({4: 1, 6: 2})
