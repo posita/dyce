@@ -737,7 +737,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> (2 @ P(6)).h()
             H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
         """
-        return H({}) if len(self._h_groups) == 0 else sum_h(self)
+        if len(self._h_groups) == 0:
+            return H({})
+        if self._len == 1:
+            return next(iter(self._h_groups))
+        return sum_h(self)
 
     @experimental
     def roll(self: "P[_T]") -> RollT[_T]:

@@ -70,6 +70,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
+_HableOpsT = TypeVar("_HableOpsT", bound="HableOpsMixin[Any]")
 _SubtractableSameT = TypeVar("_SubtractableSameT", bound=ot.CanSubSame)
 
 
@@ -509,6 +510,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
     def __matmul__(
         self: "H[_AddableSameT]", rhs: SupportsInt
     ) -> "H[_AddableSameT]": ...
+    # Keep the narrower Literal[1] case first so all type checkers preserve the
+    # concrete HableOpsMixin subtype.
+    @overload
+    def __matmul__(self: "H[_HableOpsT]", rhs: Literal[1]) -> "H[_HableOpsT]": ...
+    @overload
+    def __matmul__(
+        self: "H[HableOpsMixin[_AddableSameT]]", rhs: SupportsInt
+    ) -> "H[HableOpsMixin[_AddableSameT] | H[_AddableSameT]]": ...
     @overload
     def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
     def __matmul__(self: "H", rhs: SupportsInt) -> "H":
@@ -1011,6 +1020,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
     def __rmatmul__(
         self: "H[_AddableSameT]", lhs: SupportsInt
     ) -> "H[_AddableSameT]": ...
+    # Keep the narrower Literal[1] case first so all type checkers preserve the
+    # concrete HableOpsMixin subtype.
+    @overload
+    def __rmatmul__(self: "H[_HableOpsT]", lhs: Literal[1]) -> "H[_HableOpsT]": ...
+    @overload
+    def __rmatmul__(
+        self: "H[HableOpsMixin[_AddableSameT]]", lhs: SupportsInt
+    ) -> "H[HableOpsMixin[_AddableSameT] | H[_AddableSameT]]": ...
     @overload
     def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
     def __rmatmul__(self: "H", lhs: SupportsInt) -> "H":

@@ -25,12 +25,12 @@ from collections.abc import Callable, Iterable
 from decimal import Decimal
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import Any
+from typing import Any, Never, assert_type
 from unittest.mock import patch
 
 import pytest
 
-from dyce import H, TruncationWarning, explode_n
+from dyce import H, HableOpsMixin, P, TruncationWarning, explode_n
 from dyce.h import (
     _convolve_fast,
     _convolve_linear,
@@ -243,6 +243,17 @@ class TestHMapping:
 
 
 class TestHMatmul:
+    def test_hable_ops_mixin_outcome_types(self) -> None:
+        n: int = 2
+        hp = H({P(2): 1})
+
+        assert_type(0 @ hp, H[Never])
+        assert_type(1 @ hp, H[P[int]])
+        assert_type(n @ hp, H[HableOpsMixin[int] | H[int]])
+        assert_type(hp @ 0, H[Never])
+        assert_type(hp @ 1, H[P[int]])
+        assert_type(hp @ n, H[HableOpsMixin[int] | H[int]])
+
     def test_fwd(self) -> None:
         # 3-fold convolution of {1:1, 2:1} (fair d2)
         result = H({1: 1, 2: 1}) @ 3
