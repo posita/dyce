@@ -53,6 +53,54 @@ class _CountingHable(HableT[int]):
         return self._h
 
 
+class TestRoller:
+    def test_hable_forward_addition_defers_to_roller(self) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        assert H(6).__add__(d6) is NotImplemented
+        assert P(6).__add__(d6) is NotImplemented
+
+    def test_hable_addition_is_symmetric(self) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        assert isinstance(d6 + H(6), Roller)
+        assert isinstance(H(6) + d6, Roller)
+        assert isinstance(d6 + P(6), Roller)
+        assert isinstance(P(6) + d6, Roller)
+        assert (d6 + H(6)).h() == 2 @ H(6)
+        assert (H(6) + d6).h() == 2 @ H(6)
+        assert (d6 + P(6)).h() == 2 @ H(6)
+        assert (P(6) + d6).h() == 2 @ H(6)
+
+    def test_hable_promotion_is_lazy(self) -> None:
+        d6 = HRoller(H(6), "d6")
+        hable = _CountingHable(H(6))
+
+        combined = d6 + hable
+
+        assert hable.h_calls == 0
+        assert combined.h() == 2 @ H(6)
+        assert hable.h_calls == 1
+
+    def test_hable_promotion_supports_rolls_and_provenance(self) -> None:
+        hable = _CountingHable(H(6))
+
+        roll = (HRoller(H(6), "d6") + hable).roll()
+        provenance = roll.to_dict()
+        definitions = provenance["definitions"]
+
+        assert roll.outcome in 2 @ H(6)
+        assert hable.h_calls == 1
+        assert isinstance(definitions, dict)
+        assert definitions["d2"] == {"kind": "source", "name": str(hable)}
+
+    def test_mixed_roller_addition(self) -> None:
+        roll = (HRoller(H({1: 1}), "one") + _ConstantRoller(2)).roll()
+
+        assert roll.outcome == 3
+        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
+
+
 class TestHRoller:
     def test_addition_preserves_distribution(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -135,51 +183,3 @@ class TestHRoller:
 
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {"kind": "source", "name": str(H(8))}
-
-
-class TestRoller:
-    def test_hable_forward_addition_defers_to_roller(self) -> None:
-        d6 = HRoller(H(6), "d6")
-
-        assert H(6).__add__(d6) is NotImplemented
-        assert P(6).__add__(d6) is NotImplemented
-
-    def test_hable_addition_is_symmetric(self) -> None:
-        d6 = HRoller(H(6), "d6")
-
-        assert isinstance(d6 + H(6), Roller)
-        assert isinstance(H(6) + d6, Roller)
-        assert isinstance(d6 + P(6), Roller)
-        assert isinstance(P(6) + d6, Roller)
-        assert (d6 + H(6)).h() == 2 @ H(6)
-        assert (H(6) + d6).h() == 2 @ H(6)
-        assert (d6 + P(6)).h() == 2 @ H(6)
-        assert (P(6) + d6).h() == 2 @ H(6)
-
-    def test_hable_promotion_is_lazy(self) -> None:
-        d6 = HRoller(H(6), "d6")
-        hable = _CountingHable(H(6))
-
-        combined = d6 + hable
-
-        assert hable.h_calls == 0
-        assert combined.h() == 2 @ H(6)
-        assert hable.h_calls == 1
-
-    def test_hable_promotion_supports_rolls_and_provenance(self) -> None:
-        hable = _CountingHable(H(6))
-
-        roll = (HRoller(H(6), "d6") + hable).roll()
-        provenance = roll.to_dict()
-        definitions = provenance["definitions"]
-
-        assert roll.outcome in 2 @ H(6)
-        assert hable.h_calls == 1
-        assert isinstance(definitions, dict)
-        assert definitions["d2"] == {"kind": "source", "name": str(hable)}
-
-    def test_mixed_roller_addition(self) -> None:
-        roll = (HRoller(H({1: 1}), "one") + _ConstantRoller(2)).roll()
-
-        assert roll.outcome == 3
-        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
