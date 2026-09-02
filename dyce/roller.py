@@ -22,12 +22,11 @@ Its interfaces may change substantially or disappear.
 
 import operator
 from abc import abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Generic, TypeVar, cast, overload
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     import optype as ot
 
 from .h import H, HableT
@@ -39,8 +38,19 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
-_ADD = cast("Callable[[object, object], object]", operator.add)
-_SUB = cast("Callable[[object, object], object]", operator.sub)
+
+
+@dataclass(frozen=True, slots=True)
+class _BinaryOperator:
+    name: str
+    function: Callable[[object, object], object]
+
+    def __call__(self, lhs: object, rhs: object) -> object:
+        return self.function(lhs, rhs)
+
+
+_ADD = _BinaryOperator("add", cast("Callable[[object, object], object]", operator.add))
+_SUB = _BinaryOperator("sub", cast("Callable[[object, object], object]", operator.sub))
 
 
 class Roller(HableT[_T_co]):
@@ -68,7 +78,7 @@ class Roller(HableT[_T_co]):
         rhs: _OtherT,
     ) -> "Roller[_ResultT]": ...
     def __add__(self, rhs: object) -> "Roller[object]":
-        return _BinaryAddRoller(self, _as_roller(rhs))
+        return _BinaryRoller(self, _as_roller(rhs), _ADD)
 
     @overload
     def __sub__(
@@ -86,7 +96,7 @@ class Roller(HableT[_T_co]):
         rhs: _OtherT,
     ) -> "Roller[_ResultT]": ...
     def __sub__(self, rhs: object) -> "Roller[object]":
-        return _BinarySubRoller(self, _as_roller(rhs))
+        return _BinaryRoller(self, _as_roller(rhs), _SUB)
 
     @overload
     def __radd__(
@@ -99,7 +109,7 @@ class Roller(HableT[_T_co]):
         lhs: _OtherT,
     ) -> "Roller[_ResultT]": ...
     def __radd__(self, lhs: object) -> "Roller[object]":
-        return _BinaryAddRoller(_as_roller(lhs), self)
+        return _BinaryRoller(_as_roller(lhs), self, _ADD)
 
     @overload
     def __rsub__(
@@ -112,7 +122,7 @@ class Roller(HableT[_T_co]):
         lhs: _OtherT,
     ) -> "Roller[_ResultT]": ...
     def __rsub__(self, lhs: object) -> "Roller[object]":
-        return _BinarySubRoller(_as_roller(lhs), self)
+        return _BinaryRoller(_as_roller(lhs), self, _SUB)
 
     @abstractmethod
     def provenance(self) -> dict[str, object]:
@@ -191,7 +201,7 @@ class Roll(Generic[_T_co]):
     ) -> "Roll[_ResultT]": ...
     def __add__(self, rhs: object) -> "Roll[object]":
         rhs_roll = _as_roll(rhs)
-        roller: Roller[object] = _BinaryAddRoller(self.roller, rhs_roll.roller)
+        roller: Roller[object] = _BinaryRoller(self.roller, rhs_roll.roller, _ADD)
         outcome = _ADD(self.outcome, rhs_roll.outcome)
         return Roll(outcome, roller, (self, rhs_roll))
 
@@ -207,7 +217,7 @@ class Roll(Generic[_T_co]):
     ) -> "Roll[_ResultT]": ...
     def __sub__(self, rhs: object) -> "Roll[object]":
         rhs_roll = _as_roll(rhs)
-        roller: Roller[object] = _BinarySubRoller(self.roller, rhs_roll.roller)
+        roller: Roller[object] = _BinaryRoller(self.roller, rhs_roll.roller, _SUB)
         outcome = _SUB(self.outcome, rhs_roll.outcome)
         return Roll(outcome, roller, (self, rhs_roll))
 
@@ -216,7 +226,7 @@ class Roll(Generic[_T_co]):
         lhs: _OtherT,
     ) -> "Roll[_ResultT]":
         lhs_roll = _as_roll(lhs)
-        roller: Roller[object] = _BinaryAddRoller(lhs_roll.roller, self.roller)
+        roller: Roller[object] = _BinaryRoller(lhs_roll.roller, self.roller, _ADD)
         outcome = _ADD(lhs_roll.outcome, self.outcome)
         return cast("Roll[_ResultT]", Roll(outcome, roller, (lhs_roll, self)))
 
@@ -225,7 +235,7 @@ class Roll(Generic[_T_co]):
         lhs: _OtherT,
     ) -> "Roll[_ResultT]":
         lhs_roll = _as_roll(lhs)
-        roller: Roller[object] = _BinarySubRoller(lhs_roll.roller, self.roller)
+        roller: Roller[object] = _BinaryRoller(lhs_roll.roller, self.roller, _SUB)
         outcome = _SUB(lhs_roll.outcome, self.outcome)
         return cast("Roll[_ResultT]", Roll(outcome, roller, (lhs_roll, self)))
 
@@ -308,55 +318,29 @@ class _HableRoller(Roller[_T_co]):
         return Roll(self.h().roll(), self)
 
 
-class _BinaryAddRoller(Roller[_ResultT]):
-    __slots__ = ("_left", "_right")
+class _BinaryRoller(Roller[_ResultT]):
+    __slots__ = ("_left", "_operator", "_right")
 
     def __init__(
         self,
         left: Roller[object],
         right: Roller[object],
+        operator: _BinaryOperator,
     ) -> None:
         self._left = left
         self._right = right
+        self._operator = operator
 
     def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", _ADD(self._left.h(), self._right.h()))
+        return cast("H[_ResultT]", self._operator(self._left.h(), self._right.h()))
 
     def provenance(self) -> dict[str, object]:
-        return {"kind": "binary", "operator": "add"}
+        return {"kind": "binary", "operator": self._operator.name}
 
     def roll(self) -> Roll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
-        outcome = _ADD(left_roll.outcome, right_roll.outcome)
-        return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
-
-    @property
-    def operands(self) -> tuple[Roller[object], ...]:
-        return (self._left, self._right)
-
-
-class _BinarySubRoller(Roller[_ResultT]):
-    __slots__ = ("_left", "_right")
-
-    def __init__(
-        self,
-        left: Roller[object],
-        right: Roller[object],
-    ) -> None:
-        self._left = left
-        self._right = right
-
-    def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", _SUB(self._left.h(), self._right.h()))
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "binary", "operator": "sub"}
-
-    def roll(self) -> Roll[_ResultT]:
-        left_roll = self._left.roll()
-        right_roll = self._right.roll()
-        outcome = _SUB(left_roll.outcome, right_roll.outcome)
+        outcome = self._operator(left_roll.outcome, right_roll.outcome)
         return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
 
     @property
