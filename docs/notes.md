@@ -32,13 +32,14 @@
 - Removes `H.vs` and `H.within`.
 - Renames `H.accumulate` to [`H.merge`][dyce.H.merge].
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
+- [`HableT.h`][dyce.HableT.h] is now an abstract base class, not merely a protocol.
 - Modifies [`P.h`][dyce.P.h] such that it now takes no arguments to remain consistent with [`HableT.h`][dyce.HableT.h].
   Selection is now handled by a separate [`P.at`][dyce.P.at] method.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
-- Removes `P.is_homogeneous`.
+- Returns `P.is_homogeneous` to being a property.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
 - Adds experimental [`H.quantile`][dyce.H.quantile] method.
-- Adds experimental [`H.quantize` method][dyce.H.quantize] and [`quantize_hs` context manager][dyce.quantize_hs].
+- Adds experimental [`H.quantize_counts` method][dyce.H.quantize_counts] and [`quantize_hs` context manager][dyce.quantize_hs].
 - Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
