@@ -34,6 +34,12 @@ _BINARY_OPERATOR_CASES: tuple[tuple[Callable[[Any, Any], Any], str, int, int], .
     (operator.or_, "or", 4, 3),
     (operator.xor, "xor", 6, 3),
 )
+_UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
+    (operator.neg, "neg", 3),
+    (operator.pos, "pos", -3),
+    (operator.abs, "abs", -3),
+    (operator.invert, "invert", 3),
+)
 
 
 @dataclass(frozen=True)
@@ -120,6 +126,14 @@ class TestRoller:
         assert_type(2 | d6, Roller[int])
         assert_type(2 ^ d6, Roller[int])
 
+    def test_unary_operator_types(self) -> None:
+        roller = _ConstantRoller(-2)
+
+        assert_type(-roller, Roller[int])
+        assert_type(+roller, Roller[int])
+        assert_type(abs(roller), Roller[int])
+        assert_type(~roller, Roller[int])
+
     def test_hable_forward_addition_defers_to_roller(self) -> None:
         d6 = HRoller(H(6), "d6")
 
@@ -169,24 +183,31 @@ class TestRoller:
         right_p = P(right_h)
         left_roller = _ConstantRoller(lhs)
         right_roller = _ConstantRoller(rhs)
+        combined = op(left_roller, right_roller)
         expected_h = H({op(lhs, rhs): 1})
 
         assert op(left_roller, right_h).h() == expected_h
         assert op(left_h, right_roller).h() == expected_h
         assert op(left_roller, right_p).h() == expected_h
         assert op(left_p, right_roller).h() == expected_h
+        assert combined.h() == expected_h
+        assert combined.provenance() == {"kind": "binary", "operator": name}
+        assert combined.operands == (left_roller, right_roller)
 
-        deferred_roll = op(left_roller, right_roller).roll()
-        realized_roll = op(left_roller.roll(), right_roller.roll())
-        reflected_deferred_roll = op(lhs, right_roller).roll()
-        reflected_realized_roll = op(lhs, right_roller.roll())
-        definitions = deferred_roll.to_dict()["definitions"]
+    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators_preserve_distributions_and_provenance(
+        self,
+        op: Callable[[Any], Any],
+        name: str,
+        value: int,
+    ) -> None:
+        roller = _ConstantRoller(value)
+        combined = op(roller)
+        expected_h = H({op(value): 1})
 
-        assert deferred_roll.outcome == op(lhs, rhs)
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
-        assert reflected_deferred_roll.to_dict() == reflected_realized_roll.to_dict()
-        assert isinstance(definitions, dict)
-        assert definitions["d0"]["operator"] == name
+        assert combined.h() == expected_h
+        assert combined.provenance() == {"kind": "unary", "operator": name}
+        assert combined.operands == (roller,)
 
     def test_hable_promotion_is_lazy(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -216,6 +237,12 @@ class TestRoller:
         assert roll.outcome == 3
         assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
 
+    def test_raw_histograms_are_promoted_to_named_sources(self) -> None:
+        combined = HRoller(H(6), "d6") + H(8)
+        promoted = combined.operands[1]
+
+        assert promoted.provenance() == {"kind": "source", "name": str(H(8))}
+
 
 class TestHRoller:
     def test_addition_preserves_distribution(self) -> None:
@@ -235,6 +262,149 @@ class TestHRoller:
         assert _AdditionCountingOutcome.times_added == 0
         assert combined.h() == H({_AdditionCountingOutcome(2): 1})
         assert _AdditionCountingOutcome.times_added == 1
+
+
+class TestRoll:
+    def test_roll_binary_operator_types(self) -> None:
+        roll = _ConstantRoller(2).roll()
+        power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
+
+        assert_type(roll * 2, Roll[int])
+        assert_type(roll / 2, Roll[float])
+        assert_type(roll // 2, Roll[int])
+        assert_type(roll % 2, Roll[int])
+        assert_type(power_roll**2, Roll[_PowerOutcome])
+        assert_type(roll << 2, Roll[int])
+        assert_type(roll >> 2, Roll[int])
+        assert_type(roll & 2, Roll[int])
+        assert_type(roll | 2, Roll[int])
+        assert_type(roll ^ 2, Roll[int])
+
+        assert_type(2 * roll, Roll[int])
+        assert_type(12 / roll, Roll[float])
+        assert_type(12 // roll, Roll[int])
+        assert_type(12 % roll, Roll[int])
+        assert_type(2**power_roll, Roll[_PowerOutcome])
+        assert_type(2 << roll, Roll[int])
+        assert_type(12 >> roll, Roll[int])
+        assert_type(2 & roll, Roll[int])
+        assert_type(2 | roll, Roll[int])
+        assert_type(2 ^ roll, Roll[int])
+
+    def test_unary_operator_types(self) -> None:
+        roll = _ConstantRoller(-2).roll()
+
+        assert_type(-roll, Roll[int])
+        assert_type(+roll, Roll[int])
+        assert_type(abs(roll), Roll[int])
+        assert_type(~roll, Roll[int])
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_preserve_outcomes_and_provenance(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roll = _ConstantRoller(lhs).roll()
+        right_roll = _ConstantRoller(rhs).roll()
+        combined = op(left_roll, right_roll)
+        provenance = combined.to_dict()
+        definitions = provenance["definitions"]
+        events = provenance["events"]
+
+        assert combined.outcome == op(lhs, rhs)
+        assert isinstance(definitions, dict)
+        assert definitions["d0"] == {
+            "kind": "binary",
+            "operator": name,
+            "operands": ["d1", "d2"],
+        }
+        assert isinstance(events, dict)
+        assert events["e0"]["operands"] == ["e1", "e2"]
+
+    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators_preserve_outcomes_and_provenance(
+        self,
+        op: Callable[[Any], Any],
+        name: str,
+        value: int,
+    ) -> None:
+        combined = op(_ConstantRoller(value).roll())
+        provenance = combined.to_dict()
+        definitions = provenance["definitions"]
+        events = provenance["events"]
+
+        assert combined.outcome == op(value)
+        assert isinstance(definitions, dict)
+        assert definitions["d0"] == {
+            "kind": "unary",
+            "operator": name,
+            "operands": ["d1"],
+        }
+        assert isinstance(events, dict)
+        assert events["e0"]["operands"] == ["e1"]
+
+    def test_literal_plus_roll_is_serializable(self) -> None:
+        roll = 2 + HRoller(H(6), "d6").roll()
+
+        assert roll.outcome in 2 + H(6)
+        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
+
+    def test_provenance_distinguishes_independent_and_shared_events(self) -> None:
+        d6 = HRoller(H(6), "d6")
+        independent = d6.roll() + d6.roll()
+        shared_source = d6.roll()
+        shared = shared_source + shared_source
+
+        independent_provenance = independent.to_dict()
+        shared_provenance = shared.to_dict()
+        independent_events = independent_provenance["events"]
+        shared_events = shared_provenance["events"]
+        independent_definitions = independent_provenance["definitions"]
+        shared_definitions = shared_provenance["definitions"]
+
+        assert isinstance(independent_events, dict)
+        assert isinstance(shared_events, dict)
+        assert isinstance(independent_definitions, dict)
+        assert isinstance(shared_definitions, dict)
+        assert independent_events["e0"]["operands"] == ["e1", "e2"]
+        assert shared_events["e0"]["operands"] == ["e1", "e1"]
+        assert independent_definitions["d0"]["operands"] == ["d1", "d1"]
+        assert shared_definitions["d0"]["operands"] == ["d1", "d1"]
+
+
+class TestRollerRollEquivalence:
+    @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators(
+        self,
+        op: Callable[[Any, Any], Any],
+        _name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roller = _ConstantRoller(lhs)
+        right_roller = _ConstantRoller(rhs)
+
+        deferred_roll = op(left_roller, right_roller).roll()
+        realized_roll = op(left_roller.roll(), right_roller.roll())
+        reflected_deferred_roll = op(lhs, right_roller).roll()
+        reflected_realized_roll = op(lhs, right_roller.roll())
+
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        assert reflected_deferred_roll.to_dict() == reflected_realized_roll.to_dict()
+
+    @pytest.mark.parametrize(("op", "_name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators(
+        self,
+        op: Callable[[Any], Any],
+        _name: str,
+        value: int,
+    ) -> None:
+        roller = _ConstantRoller(value)
+
+        assert op(roller).roll().to_dict() == op(roller.roll()).to_dict()
 
     def test_adding_after_roll_matches_rolling_after_addition(
         self, monkeypatch: pytest.MonkeyPatch
@@ -291,69 +461,3 @@ class TestHRoller:
 
         assert deferred_roll.outcome == realized_roll.outcome
         assert deferred_roll.to_dict() == realized_roll.to_dict()
-
-    def test_literal_plus_roll_is_serializable(self) -> None:
-        d6 = HRoller(H(6), "d6")
-        roll = 2 + d6.roll()
-
-        assert roll.outcome in 2 + H(6)
-        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
-
-    def test_roll_provenance_distinguishes_independent_and_shared_events(self) -> None:
-        d6 = HRoller(H(6), "d6")
-        independent = d6.roll() + d6.roll()
-        shared_source = d6.roll()
-        shared = shared_source + shared_source
-
-        independent_provenance = independent.to_dict()
-        shared_provenance = shared.to_dict()
-        independent_events = independent_provenance["events"]
-        shared_events = shared_provenance["events"]
-        independent_definitions = independent_provenance["definitions"]
-        shared_definitions = shared_provenance["definitions"]
-
-        assert isinstance(independent_events, dict)
-        assert isinstance(shared_events, dict)
-        assert isinstance(independent_definitions, dict)
-        assert isinstance(shared_definitions, dict)
-        assert independent_events["e0"]["operands"] == ["e1", "e2"]
-        assert shared_events["e0"]["operands"] == ["e1", "e1"]
-        assert independent_definitions["d0"]["operands"] == ["d1", "d1"]
-        assert shared_definitions["d0"]["operands"] == ["d1", "d1"]
-
-    def test_raw_histograms_are_promoted_to_named_sources(self) -> None:
-        d6 = HRoller(H(6), "d6")
-        roll = (d6 + H(8)).roll()
-        provenance = roll.to_dict()
-        definitions = provenance["definitions"]
-
-        assert isinstance(definitions, dict)
-        assert definitions["d2"] == {"kind": "source", "name": str(H(8))}
-
-
-class TestRoll:
-    def test_roll_binary_operator_types(self) -> None:
-        roll = _ConstantRoller(2).roll()
-        power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
-
-        assert_type(roll * 2, Roll[int])
-        assert_type(roll / 2, Roll[float])
-        assert_type(roll // 2, Roll[int])
-        assert_type(roll % 2, Roll[int])
-        assert_type(power_roll**2, Roll[_PowerOutcome])
-        assert_type(roll << 2, Roll[int])
-        assert_type(roll >> 2, Roll[int])
-        assert_type(roll & 2, Roll[int])
-        assert_type(roll | 2, Roll[int])
-        assert_type(roll ^ 2, Roll[int])
-
-        assert_type(2 * roll, Roll[int])
-        assert_type(12 / roll, Roll[float])
-        assert_type(12 // roll, Roll[int])
-        assert_type(12 % roll, Roll[int])
-        assert_type(2**power_roll, Roll[_PowerOutcome])
-        assert_type(2 << roll, Roll[int])
-        assert_type(12 >> roll, Roll[int])
-        assert_type(2 & roll, Roll[int])
-        assert_type(2 | roll, Roll[int])
-        assert_type(2 ^ roll, Roll[int])
