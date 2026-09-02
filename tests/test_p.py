@@ -361,40 +361,42 @@ class TestPSequence:
 
 
 class TestPMatmul:
-    def test_matmul_returns_p(self) -> None:
-        assert isinstance(2 @ P(6), P)
-
-    def test_matmul_correct_length(self) -> None:
-        assert len(2 @ P(6)) == 2
-        assert len(3 @ P(6)) == 3
-
-    def test_matmul_zero(self) -> None:
+    def test_zero(self) -> None:
+        assert P(6) @ 0 == P()
         assert 0 @ P(6) == P()
 
-    def test_matmul_one(self) -> None:
+    def test_one(self) -> None:
+        assert P(6) @ 1 == P(6)
         assert 1 @ P(6) == P(6)
 
-    def test_rmatmul(self) -> None:
+    def test_two(self) -> None:
+        assert P(6) @ 2 == P(6, 6)
         assert 2 @ P(6) == P(6, 6)
 
-    def test_matmul_composition(self) -> None:
+    def test_returns_p(self) -> None:
+        assert isinstance(P(6) @ 2, P)
+        assert isinstance(2 @ P(6), P)
+
+    def test_correct_length(self) -> None:
+        assert len(P(6) @ 3) == 3
+        assert len(2 @ P(6)) == 2
+
+    def test_composition(self) -> None:
         assert 2 @ (2 @ P(6)) == 4 @ P(6)
 
-    def test_matmul_negative_rhs(self) -> None:
+    def test_negative(self) -> None:
+        with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
+            _ = P(6) @ -1
         with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
             _ = -1 @ P(6)
 
-    def test_rmatmul_non_int_rhs(self) -> None:
-        result = P(6).__rmatmul__(1.5)
-        assert result is NotImplemented
+    def test_non_int(self) -> None:
+        assert P(6).__matmul__(1.5) is NotImplemented
+        assert P(6).__rmatmul__(1.5) is NotImplemented
+        with pytest.raises(TypeError):
+            _ = P(6) @ 1.5
         with pytest.raises(TypeError):
             _ = 1.5 @ P(6)
-
-    def test_op_matmul(self) -> None:
-        d6 = P(6)
-        d6_2 = P(d6, d6)
-        assert 2 @ d6 == d6_2
-        assert d6_2 == d6 @ 2
 
 
 class TestPOp:
@@ -626,15 +628,26 @@ class TestPOp:
         assert ~(2 @ p) == ~(2 @ h)
 
 
+class TestPIsHomogeneous:
+    def test_empty(self) -> None:
+        assert P().is_homogeneous
+
+    def test_homogeneous(self) -> None:
+        assert P(6, 6).is_homogeneous
+
+    def test_heterogeneous(self) -> None:
+        assert not P(4, 6).is_homogeneous
+
+
 class TestPTotal:
+    def test_empty(self) -> None:
+        assert P().total == 1  # empty product
+
     def test_homogeneous(self) -> None:
         assert P(6, 6).total == 36
 
     def test_heterogeneous(self) -> None:
         assert P(4, 6).total == 24
-
-    def test_empty(self) -> None:
-        assert P().total == 1  # empty product
 
     def test_memoized(self) -> None:
         p = P(4, 6, 8)
@@ -721,26 +734,26 @@ class TestPApplyEachRoll:
 
 
 class TestPH:
-    def test_no_args_flattens_empty_pool(self) -> None:
+    def test_flattens_empty_pool(self) -> None:
         assert P().h() == H({})
 
-    def test_no_args_flattens(self) -> None:
+    def test_flattens(self) -> None:
         assert (2 @ P(6)).h() == H(6) + H(6)
 
-    def test_no_args_flattens_symbol(self) -> None:
+    def test_flattens_symbol(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
         x = sympy.symbols("x")
         d6x = H(6) * x
         assert (2 @ P(d6x)).h() == 2 @ d6x
 
-    def test_no_args_weird_single(
+    def test_weird_single(
         self,
     ) -> None:
         h = H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2})
         p_weird = P(h)
         assert p_weird.h() == h
 
-    def test_no_args_weird_multiple_raises(
+    def test_weird_multiple_raises(
         self,
     ) -> None:
         p_weird = 2 @ P(
@@ -1009,11 +1022,6 @@ class TestPAt:
         assert P().at(slice(0, 1)) == H({})
         assert P().at(slice(-2, -1)) == H({})
 
-    def test_single_die_pool_via_at_returns_self_for_minus_1(self) -> None:
-        p = P(6)
-        assert p.at(-1) == H(6)
-        assert p.at(0) == H(6)
-
     def test_heterogeneous_max_matches_brute_force(self) -> None:
         # Cross-check the decomposed result against brute-force enumeration on a
         # small-enough pool to enumerate fully
@@ -1037,6 +1045,33 @@ class TestPAt:
             )
         )
         assert dict(via_decomp) == dict(expected)
+
+    def test_at_heterogeneous_extremes(self) -> None:
+        r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
+        d4, d6, d8, d10, d12, d20 = (H(n) for n in (4, 6, 8, 10, 12, 20))
+        p = P(d4, d6, d8, d10, d12, d20)
+        from_brute = H.from_counts(
+            (sum(roll), count)
+            for roll, count in sort_and_select_from_rolls(
+                enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+            )
+        )
+        assert p.at(0, -1) == from_brute
+
+    def test_rwc_heterogeneous_extremes_natural_order(self) -> None:
+        r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d6x = H(6) + x
+        d8x = H(8) + x
+        p = P(d6x, d6x, d8x)
+        from_brute = H.from_counts(
+            (sum(roll), count)
+            for roll, count in sort_and_select_from_rolls(
+                enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+            )
+        )
+        assert p.at(0, -1) == from_brute
 
 
 class TestPRoll:
@@ -1270,35 +1305,6 @@ class TestPRollsWithCounts:
             (slice(-9, -7),),
         ):
             _assert_rwc_matches_brute_force(p_3x3_4x4n, *which)
-
-
-def test_at_heterogeneous_extremes() -> None:
-    r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
-    d4, d6, d8, d10, d12, d20 = (H(n) for n in (4, 6, 8, 10, 12, 20))
-    p = P(d4, d6, d8, d10, d12, d20)
-    from_brute = H.from_counts(
-        (sum(roll), count)
-        for roll, count in sort_and_select_from_rolls(
-            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
-        )
-    )
-    assert p.at(0, -1) == from_brute
-
-
-def test_rwc_heterogeneous_extremes_natural_order() -> None:
-    r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
-    sympy = pytest.importorskip("sympy", reason="requires sympy")
-    x = sympy.symbols("x")
-    d6x = H(6) + x
-    d8x = H(8) + x
-    p = P(d6x, d6x, d8x)
-    from_brute = H.from_counts(
-        (sum(roll), count)
-        for roll, count in sort_and_select_from_rolls(
-            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
-        )
-    )
-    assert p.at(0, -1) == from_brute
 
 
 # ---- Helpers -------------------------------------------------------------------------

@@ -69,9 +69,9 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
-_AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
-_HableOpsT = TypeVar("_HableOpsT", bound="HableOpsMixin[Any]")
-_SubtractableSameT = TypeVar("_SubtractableSameT", bound=ot.CanSubSame)
+_CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
+_CanSubSameT = TypeVar("_CanSubSameT", bound=ot.CanSubSame)
+_HableOpsMixinT = TypeVar("_HableOpsMixinT", bound="HableOpsMixin[Any]")
 
 
 class _QuantizeContext(NamedTuple):
@@ -117,9 +117,9 @@ class HableT(ABC, Generic[_T_co]):
         r"""Express its implementer as an [`H` object][dyce.H]."""
 
 
-# `H` intentionally uses a covariant `Mapping` key; erasing this additional base
-# avoids degrading operator inference, while `H.h()` remains precisely typed.
-class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
+# H is immutable and intentionally covariant in its outcome type, even though Mapping's
+# key type is invariant
+class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
     r"""
     <!-- BEGIN MONKEY PATCH --
     For typing.
@@ -507,17 +507,17 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
         self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
     ) -> "H[int]": ...
     @overload
-    def __matmul__(
-        self: "H[_AddableSameT]", rhs: SupportsInt
-    ) -> "H[_AddableSameT]": ...
+    def __matmul__(self: "H[_CanAddSameT]", rhs: SupportsInt) -> "H[_CanAddSameT]": ...
     # Keep the narrower Literal[1] case first so all type checkers preserve the
     # concrete HableOpsMixin subtype.
     @overload
-    def __matmul__(self: "H[_HableOpsT]", rhs: Literal[1]) -> "H[_HableOpsT]": ...
+    def __matmul__(
+        self: "H[_HableOpsMixinT]", rhs: Literal[1]
+    ) -> "H[_HableOpsMixinT]": ...
     @overload
     def __matmul__(
-        self: "H[HableOpsMixin[_AddableSameT]]", rhs: SupportsInt
-    ) -> "H[HableOpsMixin[_AddableSameT] | H[_AddableSameT]]": ...
+        self: "H[HableOpsMixin[_CanAddSameT]]", rhs: SupportsInt
+    ) -> "H[HableOpsMixin[_CanAddSameT] | H[_CanAddSameT]]": ...
     @overload
     def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
     def __matmul__(self: "H", rhs: SupportsInt) -> "H":
@@ -561,8 +561,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
     def __add__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
     @overload
     def __add__(
-        self: "H[_AddableSameT]", rhs: "H[_AddableSameT]"
-    ) -> "H[_AddableSameT]": ...
+        self: "H[_CanAddSameT]", rhs: "H[_CanAddSameT]"
+    ) -> "H[_CanAddSameT]": ...
     def __add__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -605,8 +605,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
     def __sub__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
     @overload
     def __sub__(
-        self: "H[_SubtractableSameT]", rhs: "H[_SubtractableSameT]"
-    ) -> "H[_SubtractableSameT]": ...
+        self: "H[_CanSubSameT]", rhs: "H[_CanSubSameT]"
+    ) -> "H[_CanSubSameT]": ...
     def __sub__(self, rhs: object) -> "H[object]":
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -1017,17 +1017,17 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
         self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
     ) -> "H[int]": ...
     @overload
-    def __rmatmul__(
-        self: "H[_AddableSameT]", lhs: SupportsInt
-    ) -> "H[_AddableSameT]": ...
+    def __rmatmul__(self: "H[_CanAddSameT]", lhs: SupportsInt) -> "H[_CanAddSameT]": ...
     # Keep the narrower Literal[1] case first so all type checkers preserve the
     # concrete HableOpsMixin subtype.
     @overload
-    def __rmatmul__(self: "H[_HableOpsT]", lhs: Literal[1]) -> "H[_HableOpsT]": ...
+    def __rmatmul__(
+        self: "H[_HableOpsMixinT]", lhs: Literal[1]
+    ) -> "H[_HableOpsMixinT]": ...
     @overload
     def __rmatmul__(
-        self: "H[HableOpsMixin[_AddableSameT]]", lhs: SupportsInt
-    ) -> "H[HableOpsMixin[_AddableSameT] | H[_AddableSameT]]": ...
+        self: "H[HableOpsMixin[_CanAddSameT]]", lhs: SupportsInt
+    ) -> "H[HableOpsMixin[_CanAddSameT] | H[_CanAddSameT]]": ...
     @overload
     def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
     def __rmatmul__(self: "H", lhs: SupportsInt) -> "H":
@@ -1303,21 +1303,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
         return self._total
 
     # ---- Methods ---------------------------------------------------------------------
-
-    def merge(
-        self: "H[_T]", other: "H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]"
-    ) -> "H[_T]":
-        r"""
-        Merges counts.
-
-            >>> H(4).merge(H(6))
-            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
-        """
-        result: dict[_T, int] = dict(self)
-        other_h = other if isinstance(other, H) else H(other)
-        for outcome, count in other_h.items():
-            result[outcome] = result.get(outcome, 0) + count
-        return H(result)
 
     @overload
     def apply(
@@ -1676,6 +1661,21 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
         )
         return float(reduce(operator.add, weighted_outcomes) / self.total)
 
+    def merge(
+        self: "H[_T]", other: "H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]"
+    ) -> "H[_T]":
+        r"""
+        Merges counts.
+
+            >>> H(4).merge(H(6))
+            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
+        """
+        result: dict[_T, int] = dict(self)
+        other_h = other if isinstance(other, H) else H(other)
+        for outcome, count in other_h.items():
+            result[outcome] = result.get(outcome, 0) + count
+        return H(result)
+
     @experimental
     def order_stat_for_n_at_pos(
         self: "H[_T]",
@@ -1788,36 +1788,36 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[Any]):  # type: ignore[type
         )  # pragma: no cover
 
     @overload
-    def quantize(
+    def quantize_counts(
         self: "H[Never]",
         bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[Never]": ...
     @overload
-    def quantize(
+    def quantize_counts(
         self: "H[_T]",
         bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[_T]": ...
     @experimental
-    def quantize(
+    def quantize_counts(
         self,
         bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H":
         r"""
-        Construct an [`H`][dyce.H] by “quantizing” counts such that none are occupy more bits than *bit_width* and proportions are retained.
+        Construct an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits and proportions are retained.
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
 
-            >>> H.quantize(
+            >>> H.quantize_counts(
             ...     H({1: 0x100, 2: 0x400, 3: 0x200, 4: 0x80, 5: 0xFFFF, 6: 0x7F}),
             ...     bit_width=8,
             ... )
             H({1: 1, 2: 4, 3: 2, 4: 1, 5: 255})
-            >>> H.quantize(
+            >>> H.quantize_counts(
             ...     H({1: 0x400, 2: 0x1000, 3: 0xF, 4: 0x10, 5: 0}),
             ...     bit_width=8,
             ...     preserve_zero_counts=True,
@@ -2628,7 +2628,7 @@ def quantize_hs(
         _quantize_ctxt.reset(token)
 
 
-def sum_h(hs: Iterable[H[_AddableSameT]]) -> H[_AddableSameT]:
+def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
     r"""
     Sums zero or more histograms, returning `H({})` for an empty iterable.
     This ensures callers never have to special-case the empty collection.
@@ -2636,12 +2636,12 @@ def sum_h(hs: Iterable[H[_AddableSameT]]) -> H[_AddableSameT]:
 
     Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools are convolved efficiently when flattened by `P.h()`.
     """
-    result: H[_AddableSameT] | None = None
+    result: H[_CanAddSameT] | None = None
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
-        batch = cast("H[_AddableSameT]", h @ n) if n > 1 else h  # type: ignore[redundant-cast]
+        batch = cast("H[_CanAddSameT]", h @ n) if n > 1 else h  # type: ignore[redundant-cast]
         result = batch if result is None else result + batch  # pyrefly: ignore[bad-assignment]
-    return cast("H[_AddableSameT]", H({})) if result is None else result
+    return cast("H[_CanAddSameT]", H({})) if result is None else result
 
 
 class _ConvolveFallbackWarning(UserWarning):
@@ -2668,9 +2668,9 @@ def _apply_opname(
 
 
 def _convolve(
-    mapping: Mapping[_AddableSameT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_AddableSameT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     r"""
     Sum *n* independent copies of *mapping* (*n*-fold additive convolution).
 
@@ -2693,9 +2693,9 @@ def _convolve(
 
 
 def _convolve_fast(
-    mapping: Mapping[_AddableSameT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_AddableSameT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     #     mapping: Mapping[Any, int],
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
@@ -2748,9 +2748,9 @@ def _convolve_fast(
 
 
 def _convolve_linear(
-    mapping: Mapping[_AddableSameT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_AddableSameT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     #     mapping: Mapping[Any, int],
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:

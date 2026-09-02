@@ -474,6 +474,13 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     # ---- Properties ------------------------------------------------------------------
 
     @property
+    def is_homogeneous(self) -> int:
+        r"""
+        `True` if the number of distinct histograms in this pool is less than or equal to one.
+        """
+        return len(self._h_groups) <= 1
+
+    @property
     def total(self) -> int:
         r"""
         Equivalent to `prod(h.total for h in self)`.
@@ -904,11 +911,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         *accumulate* is called as `accumulate(state, outcome, count)` and returns the successor state.
         On the first (seed) call, *state* is `surveyor.initial`.
         *count* is the number of dice showing *outcome*, aggregated across all of the pool’s (possibly heterogeneous) histograms, and is always at least `1`.
-        *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
-        A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare successive *outcome* values rather than expecting to be notified of the absent ones.
         *state* must be hashable, since equal states are merged.
-
         *order* selects the sweep order over the shared outcome set.
+
+        !!! note "Only present outcomes are accumulated"
+
+            *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
+            A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare neighboring *outcome* values rather than expecting to be notified of the absent ones.
+
 
         If provided, *settle* maps each terminal state to the outcome recorded in the resulting [`H`][dyce.H].
         Otherwise, *accumulate*’s terminal states are themselves the outcomes.
@@ -1093,6 +1103,30 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 # ---- Helpers -------------------------------------------------------------------------
 
 
+def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in ascending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key)
+    return result
+
+
+def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in descending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+    except TypeError:
+        result.sort(key=natural_key, reverse=True)
+    return result
+
+
 def _rwc_heterogeneous_one_end(
     h_groups: tuple[tuple[H[_T], int], ...],
     k: int,
@@ -1190,27 +1224,3 @@ def _rwc_homogeneous_one_end(
             )
 
     yield from _generate(0, n, (), 1)
-
-
-def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Sorts *outcomes* in ascending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
-    except TypeError:
-        result.sort(key=natural_key)
-    return result
-
-
-def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Sorts *outcomes* in descending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
-    except TypeError:
-        result.sort(key=natural_key, reverse=True)
-    return result
