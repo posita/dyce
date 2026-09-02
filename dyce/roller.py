@@ -49,6 +49,15 @@ class _BinaryOperator:
         return self.function(lhs, rhs)
 
 
+@dataclass(frozen=True, slots=True)
+class _UnaryOperator:
+    name: str
+    function: Callable[[object], object]
+
+    def __call__(self, operand: object) -> object:
+        return self.function(operand)
+
+
 _ADD = _BinaryOperator("add", cast("Callable[[object, object], object]", operator.add))
 _SUB = _BinaryOperator("sub", cast("Callable[[object, object], object]", operator.sub))
 _MUL = _BinaryOperator("mul", cast("Callable[[object, object], object]", operator.mul))
@@ -69,13 +78,17 @@ _RSHIFT = _BinaryOperator(
 _AND = _BinaryOperator("and", cast("Callable[[object, object], object]", operator.and_))
 _OR = _BinaryOperator("or", cast("Callable[[object, object], object]", operator.or_))
 _XOR = _BinaryOperator("xor", cast("Callable[[object, object], object]", operator.xor))
+_NEG = _UnaryOperator("neg", cast("Callable[[object], object]", operator.neg))
+_POS = _UnaryOperator("pos", cast("Callable[[object], object]", operator.pos))
+_ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
+_INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
 
 class Roller(HableT[_T_co]):
     r"""
     A deferred, traceable computation.
 
-    This prototype currently supports pointwise binary operations.
+    This prototype currently supports pointwise operations.
     """
 
     __slots__ = ()
@@ -432,6 +445,18 @@ class Roller(HableT[_T_co]):
     def __rxor__(self, lhs: object) -> "Roller[object]":
         return _BinaryRoller(_as_roller(lhs), self, _XOR)
 
+    def __neg__(self: "Roller[ot.CanNeg[_ResultT]]") -> "Roller[_ResultT]":
+        return cast("Roller[_ResultT]", _UnaryRoller(self, _NEG))
+
+    def __pos__(self: "Roller[ot.CanPos[_ResultT]]") -> "Roller[_ResultT]":
+        return cast("Roller[_ResultT]", _UnaryRoller(self, _POS))
+
+    def __abs__(self: "Roller[ot.CanAbs[_ResultT]]") -> "Roller[_ResultT]":
+        return cast("Roller[_ResultT]", _UnaryRoller(self, _ABS))
+
+    def __invert__(self: "Roller[ot.CanInvert[_ResultT]]") -> "Roller[_ResultT]":
+        return cast("Roller[_ResultT]", _UnaryRoller(self, _INVERT))
+
     @abstractmethod
     def provenance(self) -> dict[str, object]:
         r"""
@@ -454,7 +479,7 @@ class HRoller(Roller[_T_co]):
     r"""
     A deferred, traceable computation backed by an [`H`][dyce.H].
 
-    This prototype currently supports pointwise binary operations.
+    This prototype currently supports pointwise operations.
     """
 
     __slots__ = ("_h", "_name")
@@ -715,6 +740,18 @@ class Roll(Generic[_T_co]):
     ) -> "Roll[_ResultT]":
         return cast("Roll[_ResultT]", self._reflected_binary_operator(lhs, _XOR))
 
+    def __neg__(self: "Roll[ot.CanNeg[_ResultT]]") -> "Roll[_ResultT]":
+        return cast("Roll[_ResultT]", self._unary_operator(_NEG))
+
+    def __pos__(self: "Roll[ot.CanPos[_ResultT]]") -> "Roll[_ResultT]":
+        return cast("Roll[_ResultT]", self._unary_operator(_POS))
+
+    def __abs__(self: "Roll[ot.CanAbs[_ResultT]]") -> "Roll[_ResultT]":
+        return cast("Roll[_ResultT]", self._unary_operator(_ABS))
+
+    def __invert__(self: "Roll[ot.CanInvert[_ResultT]]") -> "Roll[_ResultT]":
+        return cast("Roll[_ResultT]", self._unary_operator(_INVERT))
+
     def _binary_operator(
         self, rhs: object, operator: _BinaryOperator
     ) -> "Roll[object]":
@@ -730,6 +767,11 @@ class Roll(Generic[_T_co]):
         roller: Roller[object] = _BinaryRoller(lhs_roll.roller, self.roller, operator)
         outcome = operator(lhs_roll.outcome, self.outcome)
         return Roll(outcome, roller, (lhs_roll, self))
+
+    def _unary_operator(self, operator: _UnaryOperator) -> "Roll[object]":
+        roller: Roller[object] = _UnaryRoller(self.roller, operator)
+        outcome = operator(self.outcome)
+        return Roll(outcome, roller, (self,))
 
     def to_dict(self) -> dict[str, object]:
         r"""
@@ -838,6 +880,29 @@ class _BinaryRoller(Roller[_ResultT]):
     @property
     def operands(self) -> tuple[Roller[object], ...]:
         return (self._left, self._right)
+
+
+class _UnaryRoller(Roller[_ResultT]):
+    __slots__ = ("_operand", "_operator")
+
+    def __init__(self, operand: Roller[object], operator: _UnaryOperator) -> None:
+        self._operand = operand
+        self._operator = operator
+
+    def h(self) -> H[_ResultT]:
+        return cast("H[_ResultT]", self._operator(self._operand.h()))
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "unary", "operator": self._operator.name}
+
+    def roll(self) -> Roll[_ResultT]:
+        operand_roll = self._operand.roll()
+        outcome = self._operator(operand_roll.outcome)
+        return Roll(cast("_ResultT", outcome), self, (operand_roll,))
+
+    @property
+    def operands(self) -> tuple[Roller[object], ...]:
+        return (self._operand,)
 
 
 def _as_roller(value: _T | HableT[_T] | Roller[_T]) -> Roller[_T]:
