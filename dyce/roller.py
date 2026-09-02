@@ -485,7 +485,7 @@ class HRoller(Roller[_T_co]):
     __slots__ = ("_h", "_name")
 
     @experimental
-    def __init__(self, h: H[_T_co], name: str | None = None) -> None:
+    def __init__(self, h: H[_T_co], *, name: str | None = None) -> None:
         self._h = h
         self._name = name
 

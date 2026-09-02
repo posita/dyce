@@ -89,19 +89,19 @@ class _PowerOutcome:
 
 class TestRoller:
     def test_hable_addition_types(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert_type(d6 + H(6), Roller[int])
         assert_type(d6 + P(6), Roller[int])
 
     def test_hable_subtraction_types(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert_type(d6 - H(6), Roller[int])
         assert_type(d6 - P(6), Roller[int])
 
     def test_remaining_binary_operator_types(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
         assert_type(d6 * H(2), Roller[int])
@@ -135,19 +135,19 @@ class TestRoller:
         assert_type(~roller, Roller[int])
 
     def test_hable_forward_addition_defers_to_roller(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert H(6).__add__(d6) is NotImplemented
         assert P(6).__add__(d6) is NotImplemented
 
     def test_hable_forward_subtraction_defers_to_roller(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert H(6).__sub__(d6) is NotImplemented
         assert P(6).__sub__(d6) is NotImplemented
 
     def test_hable_addition_is_symmetric(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert isinstance(d6 + H(6), Roller)
         assert isinstance(H(6) + d6, Roller)
@@ -159,7 +159,7 @@ class TestRoller:
         assert (P(6) + d6).h() == 2 @ H(6)
 
     def test_hable_subtraction_preserves_operand_order(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
         two = H({2: 1})
 
         assert isinstance(d6 - two, Roller)
@@ -210,7 +210,7 @@ class TestRoller:
         assert combined.operands == (roller,)
 
     def test_hable_promotion_is_lazy(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
         hable = _CountingHable(H(6))
 
         combined = d6 + hable
@@ -222,7 +222,7 @@ class TestRoller:
     def test_hable_promotion_supports_rolls_and_provenance(self) -> None:
         hable = _CountingHable(H(6))
 
-        roll = (HRoller(H(6), "d6") + hable).roll()
+        roll = (HRoller(H(6), name="d6") + hable).roll()
         provenance = roll.to_dict()
         definitions = provenance["definitions"]
 
@@ -232,13 +232,13 @@ class TestRoller:
         assert definitions["d2"] == {"kind": "source", "name": str(hable)}
 
     def test_mixed_roller_addition(self) -> None:
-        roll = (HRoller(H({1: 1}), "one") + _ConstantRoller(2)).roll()
+        roll = (HRoller(H({1: 1}), name="one") + _ConstantRoller(2)).roll()
 
         assert roll.outcome == 3
         assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
 
     def test_raw_histograms_are_promoted_to_named_sources(self) -> None:
-        combined = HRoller(H(6), "d6") + H(8)
+        combined = HRoller(H(6), name="d6") + H(8)
         promoted = combined.operands[1]
 
         assert promoted.provenance() == {"kind": "source", "name": str(H(8))}
@@ -246,7 +246,7 @@ class TestRoller:
 
 class TestHRoller:
     def test_addition_preserves_distribution(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         assert d6.name == "d6"
         assert (d6 + d6).h() == 2 @ H(6)
@@ -256,7 +256,7 @@ class TestHRoller:
 
     def test_distribution_is_computed_lazily(self) -> None:
         _AdditionCountingOutcome.times_added = 0
-        source = HRoller(H({_AdditionCountingOutcome(1): 1}), "source")
+        source = HRoller(H({_AdditionCountingOutcome(1): 1}), name="source")
         combined = source + source
 
         assert _AdditionCountingOutcome.times_added == 0
@@ -347,13 +347,13 @@ class TestRoll:
         assert events["e0"]["operands"] == ["e1"]
 
     def test_literal_plus_roll_is_serializable(self) -> None:
-        roll = 2 + HRoller(H(6), "d6").roll()
+        roll = 2 + HRoller(H(6), name="d6").roll()
 
         assert roll.outcome in 2 + H(6)
         assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
 
     def test_provenance_distinguishes_independent_and_shared_events(self) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
         independent = d6.roll() + d6.roll()
         shared_source = d6.roll()
         shared = shared_source + shared_source
@@ -409,7 +409,7 @@ class TestRollerRollEquivalence:
     def test_adding_after_roll_matches_rolling_after_addition(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         realized_roll = d6.roll() + 2
@@ -422,7 +422,7 @@ class TestRollerRollEquivalence:
     def test_deferred_and_realized_addition_are_equivalent(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         deferred_roll = (d6 + d6).roll()
@@ -435,8 +435,8 @@ class TestRollerRollEquivalence:
     def test_deferred_and_realized_subtraction_are_equivalent(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        d6 = HRoller(H(6), "d6")
-        d4 = HRoller(H(4), "d4")
+        d6 = HRoller(H(6), name="d6")
+        d4 = HRoller(H(4), name="d4")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         deferred_roll = (d6 - d4).roll()
@@ -452,7 +452,7 @@ class TestRollerRollEquivalence:
     def test_reflected_subtraction_preserves_operand_order(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        d6 = HRoller(H(6), "d6")
+        d6 = HRoller(H(6), name="d6")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         deferred_roll = (2 - d6).roll()
