@@ -38,6 +38,21 @@ _BINARY_OPERATORS: tuple[Callable[[Any, Any], Any], ...] = (
     operator.xor,
 )
 
+_BINARY_OPERATOR_NAMES = (
+    "__add__",
+    "__sub__",
+    "__mul__",
+    "__truediv__",
+    "__floordiv__",
+    "__mod__",
+    "__pow__",
+    "__lshift__",
+    "__rshift__",
+    "__and__",
+    "__or__",
+    "__xor__",
+)
+
 _COMMUTATIVE_OPERATORS: tuple[Callable[[Any, Any], Any], ...] = (
     operator.add,
     operator.mul,
@@ -93,6 +108,18 @@ class TestHableT:
 
     def test_requires_explicit_inheritance(self) -> None:
         assert not isinstance(_StructuralHableImplementation(H({1: 1})), HableT)
+
+    @pytest.mark.parametrize("operator_name", _BINARY_OPERATOR_NAMES)
+    def test_eager_operators_defer_to_non_operator_hables(
+        self, operator_name: str
+    ) -> None:
+        hable = _HableImplementation(H({2: 1}))
+
+        assert getattr(H({1: 1}), operator_name)(hable) is NotImplemented
+        assert (
+            getattr(_HableImplementationWithOps(H({1: 1})), operator_name)(hable)
+            is NotImplemented
+        )
 
 
 class TestHableOpsMixin:

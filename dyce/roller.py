@@ -59,7 +59,7 @@ class Roller(HableT[_T_co]):
     @overload
     def __add__(
         self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "H[_OtherT]",
+        rhs: "HableT[_OtherT]",
     ) -> "Roller[_ResultT]": ...
     @overload
     def __add__(
@@ -69,11 +69,18 @@ class Roller(HableT[_T_co]):
     def __add__(self, rhs: object) -> "Roller[object]":
         return _BinaryAddRoller(self, _as_roller(rhs))
 
+    @overload
+    def __radd__(
+        self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
     def __radd__(
         self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: _OtherT,
-    ) -> "Roller[_ResultT]":
-        return cast("Roller[_ResultT]", _BinaryAddRoller(_as_roller(lhs), self))
+    ) -> "Roller[_ResultT]": ...
+    def __radd__(self, lhs: object) -> "Roller[object]":
+        return _BinaryAddRoller(_as_roller(lhs), self)
 
     @abstractmethod
     def roll(self) -> "Roll[_T_co]":
@@ -256,11 +263,29 @@ class _LiteralRoller(Roller[_T]):
         return {"kind": "literal", "value": self._value}
 
 
-def _as_roller(value: _T | H[_T] | Roller[_T]) -> Roller[_T]:
+class _HableRoller(Roller[_T_co]):
+    __slots__ = ("_hable",)
+
+    def __init__(self, hable: HableT[_T_co]) -> None:
+        self._hable = hable
+
+    def h(self) -> H[_T_co]:
+        return self._hable.h()
+
+    def roll(self) -> Roll[_T_co]:
+        return Roll(self.h().roll(), self)
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "source", "name": str(self._hable)}
+
+
+def _as_roller(value: _T | HableT[_T] | Roller[_T]) -> Roller[_T]:
     if isinstance(value, Roller):
         return value
     if isinstance(value, H):
         return HRoller(value)
+    if isinstance(value, HableT):
+        return _HableRoller(value)
     return _LiteralRoller(value)
 
 

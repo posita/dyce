@@ -564,6 +564,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self: "H[_CanAddSameT]", rhs: "H[_CanAddSameT]"
     ) -> "H[_CanAddSameT]": ...
     def __add__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -608,6 +610,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self: "H[_CanSubSameT]", rhs: "H[_CanSubSameT]"
     ) -> "H[_CanSubSameT]": ...
     def __sub__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -645,6 +649,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __mul__(self: "H[_T]", rhs: ot.CanMul[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mul__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -687,6 +693,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self: "H[_T]", rhs: ot.CanTruediv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __truediv__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -729,6 +737,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self: "H[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -768,6 +778,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __mod__(self: "H[_T]", rhs: ot.CanMod[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mod__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -805,6 +817,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __pow__(self: "H[_T]", rhs: ot.CanPow2[_T, _ResultT]) -> "H[_ResultT]": ...
     def __pow__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -844,6 +858,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __lshift__(self: "H[_T]", rhs: ot.CanLshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -883,6 +899,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __rshift__(self: "H[_T]", rhs: ot.CanRshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rshift__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -920,6 +938,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __and__(self: "H[_T]", rhs: ot.CanAnd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __and__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -957,6 +977,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __or__(self: "H[_T]", rhs: ot.CanOr[_T, _ResultT]) -> "H[_ResultT]": ...
     def __or__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -994,6 +1016,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __xor__(self: "H[_T]", rhs: ot.CanXor[_T, _ResultT]) -> "H[_ResultT]": ...
     def __xor__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -2135,6 +2159,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanAdd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __add__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2156,6 +2182,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanSub[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __sub__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2177,6 +2205,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanMul[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __mul__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2198,6 +2228,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanTruediv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __truediv__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2219,6 +2251,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __floordiv__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2240,6 +2274,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanMod[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __mod__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2261,6 +2297,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanPow2[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __pow__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2282,6 +2320,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanLshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __lshift__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2303,6 +2343,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanRshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rshift__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2324,6 +2366,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanAnd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __and__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2345,6 +2389,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanOr[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __or__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     @overload
@@ -2366,6 +2412,8 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: ot.CanXor[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __xor__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator]
 
     # ---- Reflected operators ---------------------------------------------------------
@@ -2875,3 +2923,13 @@ def _quantize_counts(
         )
         or preserve_zero_counts
     }
+
+
+def _should_defer_hable_operator(rhs: object) -> bool:
+    r"""
+    Returns whether an eager histogram operator should defer to *rhs*.
+
+    [`H`][dyce.H] and [`HableOpsMixin`][dyce.HableOpsMixin] operands participate in eager histogram operations.
+    Other [`HableT`][dyce.HableT] implementations own their expression structure and receive control through their reflected operator.
+    """
+    return isinstance(rhs, HableT) and not isinstance(rhs, (H, HableOpsMixin))
