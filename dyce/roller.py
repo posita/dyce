@@ -83,6 +83,14 @@ class Roller(HableT[_T_co]):
         return _BinaryAddRoller(_as_roller(lhs), self)
 
     @abstractmethod
+    def provenance(self) -> dict[str, object]:
+        r"""
+        Returns JSON-compatible metadata describing this roller.
+
+        The serializer supplies the reserved `operands` field when appropriate.
+        """
+
+    @abstractmethod
     def roll(self) -> "Roll[_T_co]":
         r"""Realizes this computation and returns its outcome with provenance."""
 
@@ -90,14 +98,6 @@ class Roller(HableT[_T_co]):
     def operands(self) -> tuple["Roller[object]", ...]:
         r"""The immediate rollers consumed by this roller."""
         return ()
-
-    @abstractmethod
-    def provenance(self) -> dict[str, object]:
-        r"""
-        Returns JSON-compatible metadata describing this roller.
-
-        The serializer supplies the reserved `operands` field when appropriate.
-        """
 
 
 class HRoller(Roller[_T_co]):
@@ -118,20 +118,20 @@ class HRoller(Roller[_T_co]):
         r"""Returns the distribution represented by this roller."""
         return self._h
 
-    @property
-    def name(self) -> str | None:
-        r"""The source name supplied when this roller was created, if any."""
-        return self._name
-
-    def roll(self) -> "Roll[_T_co]":
-        r"""Realizes this computation and returns its outcome with provenance."""
-        return Roll(self._h.roll(), self)
-
     def provenance(self) -> dict[str, object]:
         return {
             "kind": "source",
             "name": self._name if self._name is not None else str(self._h),
         }
+
+    def roll(self) -> "Roll[_T_co]":
+        r"""Realizes this computation and returns its outcome with provenance."""
+        return Roll(self._h.roll(), self)
+
+    @property
+    def name(self) -> str | None:
+        r"""The source name supplied when this roller was created, if any."""
+        return self._name
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -219,6 +219,38 @@ class Roll(Generic[_T_co]):
         return {"root": root, "definitions": definitions, "events": events}
 
 
+class _LiteralRoller(Roller[_T]):
+    __slots__ = ("_value",)
+
+    def __init__(self, value: _T) -> None:
+        self._value = value
+
+    def h(self) -> H[_T]:
+        return H({self._value: 1})
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "literal", "value": self._value}
+
+    def roll(self) -> Roll[_T]:
+        return Roll(self._value, self)
+
+
+class _HableRoller(Roller[_T_co]):
+    __slots__ = ("_hable",)
+
+    def __init__(self, hable: HableT[_T_co]) -> None:
+        self._hable = hable
+
+    def h(self) -> H[_T_co]:
+        return self._hable.h()
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "source", "name": str(self._hable)}
+
+    def roll(self) -> Roll[_T_co]:
+        return Roll(self.h().roll(), self)
+
+
 class _BinaryAddRoller(Roller[_ResultT]):
     __slots__ = ("_left", "_right")
 
@@ -233,6 +265,9 @@ class _BinaryAddRoller(Roller[_ResultT]):
     def h(self) -> H[_ResultT]:
         return cast("H[_ResultT]", _ADD(self._left.h(), self._right.h()))
 
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "binary", "operator": "add"}
+
     def roll(self) -> Roll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
@@ -242,41 +277,6 @@ class _BinaryAddRoller(Roller[_ResultT]):
     @property
     def operands(self) -> tuple[Roller[object], ...]:
         return (self._left, self._right)
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "binary", "operator": "add"}
-
-
-class _LiteralRoller(Roller[_T]):
-    __slots__ = ("_value",)
-
-    def __init__(self, value: _T) -> None:
-        self._value = value
-
-    def h(self) -> H[_T]:
-        return H({self._value: 1})
-
-    def roll(self) -> Roll[_T]:
-        return Roll(self._value, self)
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "literal", "value": self._value}
-
-
-class _HableRoller(Roller[_T_co]):
-    __slots__ = ("_hable",)
-
-    def __init__(self, hable: HableT[_T_co]) -> None:
-        self._hable = hable
-
-    def h(self) -> H[_T_co]:
-        return self._hable.h()
-
-    def roll(self) -> Roll[_T_co]:
-        return Roll(self.h().roll(), self)
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "source", "name": str(self._hable)}
 
 
 def _as_roller(value: _T | HableT[_T] | Roller[_T]) -> Roller[_T]:
