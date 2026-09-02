@@ -40,13 +40,14 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _ADD = cast("Callable[[object, object], object]", operator.add)
+_SUB = cast("Callable[[object, object], object]", operator.sub)
 
 
 class Roller(HableT[_T_co]):
     r"""
     A deferred, traceable computation.
 
-    This prototype currently supports only addition.
+    This prototype currently supports addition and subtraction.
     """
 
     __slots__ = ()
@@ -70,6 +71,24 @@ class Roller(HableT[_T_co]):
         return _BinaryAddRoller(self, _as_roller(rhs))
 
     @overload
+    def __sub__(
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: _OtherT,
+    ) -> "Roller[_ResultT]": ...
+    def __sub__(self, rhs: object) -> "Roller[object]":
+        return _BinarySubRoller(self, _as_roller(rhs))
+
+    @overload
     def __radd__(
         self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
@@ -81,6 +100,19 @@ class Roller(HableT[_T_co]):
     ) -> "Roller[_ResultT]": ...
     def __radd__(self, lhs: object) -> "Roller[object]":
         return _BinaryAddRoller(_as_roller(lhs), self)
+
+    @overload
+    def __rsub__(
+        self: "Roller[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "Roller[_ResultT]": ...
+    @overload
+    def __rsub__(
+        self: "Roller[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: _OtherT,
+    ) -> "Roller[_ResultT]": ...
+    def __rsub__(self, lhs: object) -> "Roller[object]":
+        return _BinarySubRoller(_as_roller(lhs), self)
 
     @abstractmethod
     def provenance(self) -> dict[str, object]:
@@ -104,7 +136,7 @@ class HRoller(Roller[_T_co]):
     r"""
     A deferred, traceable computation backed by an [`H`][dyce.H].
 
-    This prototype currently supports only addition.
+    This prototype currently supports addition and subtraction.
     """
 
     __slots__ = ("_h", "_name")
@@ -163,6 +195,22 @@ class Roll(Generic[_T_co]):
         outcome = _ADD(self.outcome, rhs_roll.outcome)
         return Roll(outcome, roller, (self, rhs_roll))
 
+    @overload
+    def __sub__(
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
+    ) -> "Roll[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: _OtherT,
+    ) -> "Roll[_ResultT]": ...
+    def __sub__(self, rhs: object) -> "Roll[object]":
+        rhs_roll = _as_roll(rhs)
+        roller: Roller[object] = _BinarySubRoller(self.roller, rhs_roll.roller)
+        outcome = _SUB(self.outcome, rhs_roll.outcome)
+        return Roll(outcome, roller, (self, rhs_roll))
+
     def __radd__(
         self: "Roll[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: _OtherT,
@@ -170,6 +218,15 @@ class Roll(Generic[_T_co]):
         lhs_roll = _as_roll(lhs)
         roller: Roller[object] = _BinaryAddRoller(lhs_roll.roller, self.roller)
         outcome = _ADD(lhs_roll.outcome, self.outcome)
+        return cast("Roll[_ResultT]", Roll(outcome, roller, (lhs_roll, self)))
+
+    def __rsub__(
+        self: "Roll[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: _OtherT,
+    ) -> "Roll[_ResultT]":
+        lhs_roll = _as_roll(lhs)
+        roller: Roller[object] = _BinarySubRoller(lhs_roll.roller, self.roller)
+        outcome = _SUB(lhs_roll.outcome, self.outcome)
         return cast("Roll[_ResultT]", Roll(outcome, roller, (lhs_roll, self)))
 
     def to_dict(self) -> dict[str, object]:
@@ -272,6 +329,34 @@ class _BinaryAddRoller(Roller[_ResultT]):
         left_roll = self._left.roll()
         right_roll = self._right.roll()
         outcome = _ADD(left_roll.outcome, right_roll.outcome)
+        return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
+
+    @property
+    def operands(self) -> tuple[Roller[object], ...]:
+        return (self._left, self._right)
+
+
+class _BinarySubRoller(Roller[_ResultT]):
+    __slots__ = ("_left", "_right")
+
+    def __init__(
+        self,
+        left: Roller[object],
+        right: Roller[object],
+    ) -> None:
+        self._left = left
+        self._right = right
+
+    def h(self) -> H[_ResultT]:
+        return cast("H[_ResultT]", _SUB(self._left.h(), self._right.h()))
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "binary", "operator": "sub"}
+
+    def roll(self) -> Roll[_ResultT]:
+        left_roll = self._left.roll()
+        right_roll = self._right.roll()
+        outcome = _SUB(left_roll.outcome, right_roll.outcome)
         return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
 
     @property
