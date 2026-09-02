@@ -16,7 +16,7 @@ from typing import Any, ClassVar, assert_type
 import pytest
 
 from dyce import H, HableT, P, rng
-from dyce.roller import HRoller, Roll, Roller
+from dyce.roller import HableRoller, HRoller, LiteralRoller, Roll, Roller
 
 __all__ = ()
 
@@ -216,6 +216,7 @@ class TestRoller:
         combined = d6 + hable
 
         assert hable.h_calls == 0
+        assert isinstance(combined.operands[1], HableRoller)
         assert combined.h() == 2 @ H(6)
         assert hable.h_calls == 1
 
@@ -262,6 +263,30 @@ class TestHRoller:
         assert _AdditionCountingOutcome.times_added == 0
         assert combined.h() == H({_AdditionCountingOutcome(2): 1})
         assert _AdditionCountingOutcome.times_added == 1
+
+
+class TestHableRoller:
+    def test_exposes_hable_source(self) -> None:
+        hable = _CountingHable(H(6))
+        roller = HableRoller(hable)
+
+        assert_type(roller, HableRoller[int])
+        assert roller.hable is hable
+        assert roller.h() == H(6)
+        assert roller.provenance() == {"kind": "source", "name": str(hable)}
+
+
+class TestLiteralRoller:
+    def test_exposes_and_rolls_value(self) -> None:
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+
+        assert_type(roller, LiteralRoller[int])
+        assert roller.value == 3
+        assert roller.h() == H({3: 1})
+        assert roller.provenance() == {"kind": "literal", "value": 3}
+        assert roll.outcome == 3
+        assert roll.roller is roller
 
 
 class TestRoll:
