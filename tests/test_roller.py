@@ -9,7 +9,7 @@
 import json
 import random
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, assert_type
 
 import pytest
 
@@ -54,11 +54,29 @@ class _CountingHable(HableT[int]):
 
 
 class TestRoller:
+    def test_hable_addition_types(self) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        assert_type(d6 + H(6), Roller[int])
+        assert_type(d6 + P(6), Roller[int])
+
+    def test_hable_subtraction_types(self) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        assert_type(d6 - H(6), Roller[int])
+        assert_type(d6 - P(6), Roller[int])
+
     def test_hable_forward_addition_defers_to_roller(self) -> None:
         d6 = HRoller(H(6), "d6")
 
         assert H(6).__add__(d6) is NotImplemented
         assert P(6).__add__(d6) is NotImplemented
+
+    def test_hable_forward_subtraction_defers_to_roller(self) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        assert H(6).__sub__(d6) is NotImplemented
+        assert P(6).__sub__(d6) is NotImplemented
 
     def test_hable_addition_is_symmetric(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -71,6 +89,17 @@ class TestRoller:
         assert (H(6) + d6).h() == 2 @ H(6)
         assert (d6 + P(6)).h() == 2 @ H(6)
         assert (P(6) + d6).h() == 2 @ H(6)
+
+    def test_hable_subtraction_preserves_operand_order(self) -> None:
+        d6 = HRoller(H(6), "d6")
+        two = H({2: 1})
+
+        assert isinstance(d6 - two, Roller)
+        assert isinstance(d6 - P(4), Roller)
+        assert (d6 - two).h() == H(6) - 2
+        assert (two - d6).h() == 2 - H(6)
+        assert (d6 - P(4)).h() == H(6) - H(4)
+        assert (P(4) - d6).h() == H(4) - H(6)
 
     def test_hable_promotion_is_lazy(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -142,6 +171,36 @@ class TestHRoller:
         deferred_roll = (d6 + d6).roll()
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         realized_roll = d6.roll() + d6.roll()
+
+        assert deferred_roll.outcome == realized_roll.outcome
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
+
+    def test_deferred_and_realized_subtraction_are_equivalent(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        d6 = HRoller(H(6), "d6")
+        d4 = HRoller(H(4), "d4")
+
+        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
+        deferred_roll = (d6 - d4).roll()
+        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
+        realized_roll = d6.roll() - d4.roll()
+
+        assert deferred_roll.outcome == realized_roll.outcome
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        definitions = deferred_roll.to_dict()["definitions"]
+        assert isinstance(definitions, dict)
+        assert definitions["d0"]["operator"] == "sub"
+
+    def test_reflected_subtraction_preserves_operand_order(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        d6 = HRoller(H(6), "d6")
+
+        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
+        deferred_roll = (2 - d6).roll()
+        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
+        realized_roll = 2 - d6.roll()
 
         assert deferred_roll.outcome == realized_roll.outcome
         assert deferred_roll.to_dict() == realized_roll.to_dict()
