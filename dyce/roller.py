@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 from .h import H, HableT
 from .lifecycle import experimental
 
-__all__ = ("HRoller", "Roll", "Roller")
+__all__ = ("HRoller", "HableRoller", "LiteralRoller", "Roll", "Roller")
 
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
@@ -509,6 +509,52 @@ class HRoller(Roller[_T_co]):
         return self._name
 
 
+class HableRoller(Roller[_T_co]):
+    r"""A deferred, traceable source backed by a [`HableT`][dyce.HableT]."""
+
+    __slots__ = ("_hable",)
+
+    def __init__(self, hable: HableT[_T_co]) -> None:
+        self._hable = hable
+
+    def h(self) -> H[_T_co]:
+        return self._hable.h()
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "source", "name": str(self._hable)}
+
+    def roll(self) -> Roll[_T_co]:
+        return Roll(self.h().roll(), self)
+
+    @property
+    def hable(self) -> HableT[_T_co]:
+        r"""The source supplying this roller’s distribution."""
+        return self._hable
+
+
+class LiteralRoller(Roller[_T]):
+    r"""A deterministic, traceable source for a literal outcome."""
+
+    __slots__ = ("_value",)
+
+    def __init__(self, value: _T) -> None:
+        self._value = value
+
+    def h(self) -> H[_T]:
+        return H({self._value: 1})
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "literal", "value": self._value}
+
+    def roll(self) -> Roll[_T]:
+        return Roll(self._value, self)
+
+    @property
+    def value(self) -> _T:
+        r"""The outcome produced by this roller."""
+        return self._value
+
+
 @dataclass(frozen=True, slots=True, eq=False)
 class Roll(Generic[_T_co]):
     r"""
@@ -820,38 +866,6 @@ class Roll(Generic[_T_co]):
         return {"root": root, "definitions": definitions, "events": events}
 
 
-class _LiteralRoller(Roller[_T]):
-    __slots__ = ("_value",)
-
-    def __init__(self, value: _T) -> None:
-        self._value = value
-
-    def h(self) -> H[_T]:
-        return H({self._value: 1})
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "literal", "value": self._value}
-
-    def roll(self) -> Roll[_T]:
-        return Roll(self._value, self)
-
-
-class _HableRoller(Roller[_T_co]):
-    __slots__ = ("_hable",)
-
-    def __init__(self, hable: HableT[_T_co]) -> None:
-        self._hable = hable
-
-    def h(self) -> H[_T_co]:
-        return self._hable.h()
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "source", "name": str(self._hable)}
-
-    def roll(self) -> Roll[_T_co]:
-        return Roll(self.h().roll(), self)
-
-
 class _BinaryRoller(Roller[_ResultT]):
     __slots__ = ("_left", "_operator", "_right")
 
@@ -911,11 +925,11 @@ def _as_roller(value: _T | HableT[_T] | Roller[_T]) -> Roller[_T]:
     if isinstance(value, H):
         return HRoller(value)
     if isinstance(value, HableT):
-        return _HableRoller(value)
-    return _LiteralRoller(value)
+        return HableRoller(value)
+    return LiteralRoller(value)
 
 
 def _as_roll(value: _T | Roll[_T]) -> Roll[_T]:
     if isinstance(value, Roll):
         return value
-    return _LiteralRoller(value).roll()
+    return LiteralRoller(value).roll()
