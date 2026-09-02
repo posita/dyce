@@ -7,9 +7,11 @@
 # ======================================================================================
 
 import json
+import operator
 import random
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import ClassVar, assert_type
+from typing import Any, ClassVar, assert_type
 
 import pytest
 
@@ -17,6 +19,21 @@ from dyce import H, HableT, P, rng
 from dyce.roller import HRoller, Roll, Roller
 
 __all__ = ()
+
+_BINARY_OPERATOR_CASES: tuple[tuple[Callable[[Any, Any], Any], str, int, int], ...] = (
+    (operator.add, "add", 8, 3),
+    (operator.sub, "sub", 8, 3),
+    (operator.mul, "mul", 8, 3),
+    (operator.truediv, "truediv", 8, 2),
+    (operator.floordiv, "floordiv", 8, 3),
+    (operator.mod, "mod", 8, 3),
+    (operator.pow, "pow", 3, 2),
+    (operator.lshift, "lshift", 3, 2),
+    (operator.rshift, "rshift", 12, 2),
+    (operator.and_, "and", 6, 3),
+    (operator.or_, "or", 4, 3),
+    (operator.xor, "xor", 6, 3),
+)
 
 
 @dataclass(frozen=True)
@@ -53,6 +70,17 @@ class _CountingHable(HableT[int]):
         return self._h
 
 
+@dataclass(frozen=True)
+class _PowerOutcome:
+    value: int
+
+    def __pow__(self, rhs: int) -> "_PowerOutcome":
+        return _PowerOutcome(self.value**rhs)
+
+    def __rpow__(self, lhs: int) -> "_PowerOutcome":
+        return _PowerOutcome(lhs**self.value)
+
+
 class TestRoller:
     def test_hable_addition_types(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -65,6 +93,32 @@ class TestRoller:
 
         assert_type(d6 - H(6), Roller[int])
         assert_type(d6 - P(6), Roller[int])
+
+    def test_remaining_binary_operator_types(self) -> None:
+        d6 = HRoller(H(6), "d6")
+        power_roller = HRoller(H({_PowerOutcome(2): 1}))
+
+        assert_type(d6 * H(2), Roller[int])
+        assert_type(d6 / H(2), Roller[float])
+        assert_type(d6 // H(2), Roller[int])
+        assert_type(d6 % H(2), Roller[int])
+        assert_type(power_roller**2, Roller[_PowerOutcome])
+        assert_type(d6 << H(2), Roller[int])
+        assert_type(d6 >> H(2), Roller[int])
+        assert_type(d6 & H(2), Roller[int])
+        assert_type(d6 | H(2), Roller[int])
+        assert_type(d6 ^ H(2), Roller[int])
+
+        assert_type(2 * d6, Roller[int])
+        assert_type(12 / d6, Roller[float])
+        assert_type(12 // d6, Roller[int])
+        assert_type(12 % d6, Roller[int])
+        assert_type(2**power_roller, Roller[_PowerOutcome])
+        assert_type(2 << d6, Roller[int])
+        assert_type(12 >> d6, Roller[int])
+        assert_type(2 & d6, Roller[int])
+        assert_type(2 | d6, Roller[int])
+        assert_type(2 ^ d6, Roller[int])
 
     def test_hable_forward_addition_defers_to_roller(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -100,6 +154,39 @@ class TestRoller:
         assert (two - d6).h() == 2 - H(6)
         assert (d6 - P(4)).h() == H(6) - H(4)
         assert (P(4) - d6).h() == H(4) - H(6)
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_preserve_hable_ordering(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_h = H({lhs: 1})
+        right_h = H({rhs: 1})
+        left_p = P(left_h)
+        right_p = P(right_h)
+        left_roller = _ConstantRoller(lhs)
+        right_roller = _ConstantRoller(rhs)
+        expected_h = H({op(lhs, rhs): 1})
+
+        assert op(left_roller, right_h).h() == expected_h
+        assert op(left_h, right_roller).h() == expected_h
+        assert op(left_roller, right_p).h() == expected_h
+        assert op(left_p, right_roller).h() == expected_h
+
+        deferred_roll = op(left_roller, right_roller).roll()
+        realized_roll = op(left_roller.roll(), right_roller.roll())
+        reflected_deferred_roll = op(lhs, right_roller).roll()
+        reflected_realized_roll = op(lhs, right_roller.roll())
+        definitions = deferred_roll.to_dict()["definitions"]
+
+        assert deferred_roll.outcome == op(lhs, rhs)
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        assert reflected_deferred_roll.to_dict() == reflected_realized_roll.to_dict()
+        assert isinstance(definitions, dict)
+        assert definitions["d0"]["operator"] == name
 
     def test_hable_promotion_is_lazy(self) -> None:
         d6 = HRoller(H(6), "d6")
@@ -242,3 +329,31 @@ class TestHRoller:
 
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {"kind": "source", "name": str(H(8))}
+
+
+class TestRoll:
+    def test_roll_binary_operator_types(self) -> None:
+        roll = _ConstantRoller(2).roll()
+        power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
+
+        assert_type(roll * 2, Roll[int])
+        assert_type(roll / 2, Roll[float])
+        assert_type(roll // 2, Roll[int])
+        assert_type(roll % 2, Roll[int])
+        assert_type(power_roll**2, Roll[_PowerOutcome])
+        assert_type(roll << 2, Roll[int])
+        assert_type(roll >> 2, Roll[int])
+        assert_type(roll & 2, Roll[int])
+        assert_type(roll | 2, Roll[int])
+        assert_type(roll ^ 2, Roll[int])
+
+        assert_type(2 * roll, Roll[int])
+        assert_type(12 / roll, Roll[float])
+        assert_type(12 // roll, Roll[int])
+        assert_type(12 % roll, Roll[int])
+        assert_type(2**power_roll, Roll[_PowerOutcome])
+        assert_type(2 << roll, Roll[int])
+        assert_type(12 >> roll, Roll[int])
+        assert_type(2 & roll, Roll[int])
+        assert_type(2 | roll, Roll[int])
+        assert_type(2 ^ roll, Roll[int])
