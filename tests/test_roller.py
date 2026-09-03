@@ -402,17 +402,25 @@ class TestPoolRoller:
         }
         assert definitions["d3"]["kind"] == "pool-source"
 
-    def test_roll_preserves_sorted_constituent_outcomes(self) -> None:
-        pool = PoolRoller(P(H({2: 1}), H({1: 1})), name="pool")
+    def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        p = P(H({2: 1}), H({1: 1}))
+
+        def p_roll(source: P[int]) -> tuple[int, ...]:
+            assert source is p
+            return (1, 2)
+
+        monkeypatch.setattr(P, "roll", p_roll)
+        pool = PoolRoller(p, name="pool")
         roll = pool.roll()
 
         assert_type(pool, PoolRoller[int])
         assert_type(roll, PoolRoll[int])
-        assert pool.p == P(H({2: 1}), H({1: 1}))
+        assert pool.p is p
         assert pool.name == "pool"
+        assert pool.operands == ()
         assert roll.outcomes == (1, 2)
-        assert tuple(constituent.outcome for constituent in roll.rolls) == (1, 2)
         assert roll.roller is pool
+        assert roll.operands == ()
 
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
         pool = PoolRoller(P(H({2j: 1}), H({1j: 1})))

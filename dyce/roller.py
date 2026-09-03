@@ -33,7 +33,7 @@ import optype as ot
 from .h import H, HableT
 from .lifecycle import ExperimentalWarning, experimental
 from .p import P
-from .types import GetItemT, getitems, natural_key
+from .types import GetItemT, getitems
 
 __all__ = (
     "HRoller",
@@ -583,7 +583,7 @@ class LiteralRoller(Roller[_T]):
 class PoolRoller(HableT[_T_co]):
     r"""A deferred, traceable pool computation backed by a [`P`][dyce.P]."""
 
-    __slots__ = ("_die_rollers", "_name", "_p")
+    __slots__ = ("_name", "_p")
 
     @overload
     def __add__(
@@ -957,12 +957,6 @@ class PoolRoller(HableT[_T_co]):
     def __init__(self, p: P[_T_co], *, name: str | None = None) -> None:
         self._p = p
         self._name = name
-        die_rollers_by_h: dict[H[_T_co], HRoller[_T_co]] = {}
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            self._die_rollers = tuple(
-                die_rollers_by_h.setdefault(h, HRoller(h)) for h in p
-            )
 
     @property
     def name(self) -> str | None:
@@ -972,9 +966,7 @@ class PoolRoller(HableT[_T_co]):
     @property
     def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
         r"""The immediate rollers consumed by this pool roller."""
-        return cast(
-            "tuple[PoolRoller[object] | Roller[object], ...]", self._die_rollers
-        )
+        return ()
 
     @property
     def p(self) -> P[_T_co]:
@@ -1000,15 +992,10 @@ class PoolRoller(HableT[_T_co]):
 
     def roll(self) -> "PoolRoll[_T_co]":
         r"""Realizes this pool computation and returns its outcomes with provenance."""
-        rolls = [roller.roll() for roller in self._die_rollers]
-        try:
-            rolls.sort(
-                key=cast("Callable[[Roll[_T_co]], Any]", lambda roll: roll.outcome)
-            )
-        except TypeError:
-            rolls.sort(key=lambda roll: natural_key(roll.outcome))
-        operands = cast("tuple[PoolRoll[object] | Roll[object], ...]", tuple(rolls))
-        return PoolRoll(tuple(rolls), self, operands)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            outcomes = self._p.roll()
+        return PoolRoll(outcomes, self)
 
     def select(self, which: GetItemT, *more: GetItemT) -> "PoolRoller[_T_co]":
         r"""Returns a pool roller selecting the specified sorted positions."""
@@ -1075,9 +1062,9 @@ class _SelectedPoolRoller(PoolRoller[_T_co]):
 
     def roll(self) -> "PoolRoll[_T_co]":
         parent_roll = self._parent.roll()
-        rolls = tuple(parent_roll.rolls[position] for position in self._positions)
+        outcomes = tuple(parent_roll.outcomes[position] for position in self._positions)
         operands = (cast("PoolRoll[object]", parent_roll),)
-        return PoolRoll(rolls, self, operands)
+        return PoolRoll(outcomes, self, operands)
 
     def _absolute_positions(self) -> tuple[int, ...]:
         return self._root_positions
@@ -1365,16 +1352,11 @@ class Roll(Generic[_T_co]):
 class PoolRoll(Generic[_T_co]):
     r"""An immutable realized collection of outcomes with provenance."""
 
-    rolls: tuple[Roll[_T_co], ...]
+    outcomes: tuple[_T_co, ...]
     roller: PoolRoller[_T_co] = field(repr=False)
     operands: tuple["PoolRoll[object] | Roll[object]", ...] = field(
         default=(), repr=False
     )
-
-    @property
-    def outcomes(self) -> tuple[_T_co, ...]:
-        r"""The outcomes contained in this pool roll."""
-        return tuple(roll.outcome for roll in self.rolls)
 
     def sum(self: "PoolRoll[_CanAddSameT]") -> Roll[_CanAddSameT]:
         r"""Returns the sum of this pool roll's outcomes with provenance."""
