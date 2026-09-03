@@ -96,22 +96,14 @@ class _PowerOutcome:
 
 
 class TestRoller:
-    def test_hable_addition_types(self) -> None:
-        d6 = HRoller(H(6), name="d6")
-
-        assert_type(d6 + H(6), Roller[int])
-        assert_type(d6 + P(6), Roller[int])
-
-    def test_hable_subtraction_types(self) -> None:
-        d6 = HRoller(H(6), name="d6")
-
-        assert_type(d6 - H(6), Roller[int])
-        assert_type(d6 - P(6), Roller[int])
-
-    def test_remaining_binary_operator_types(self) -> None:
+    def test_binary_operator_types(self) -> None:
         d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
+        assert_type(d6 + H(6), Roller[int])
+        assert_type(d6 + P(6), Roller[int])
+        assert_type(d6 - H(6), Roller[int])
+        assert_type(d6 - P(6), Roller[int])
         assert_type(d6 * H(2), Roller[int])
         assert_type(d6 / H(2), Roller[float])
         assert_type(d6 // H(2), Roller[int])
@@ -276,11 +268,19 @@ class TestHRoller:
 class TestHableRoller:
     def test_exposes_hable_source(self) -> None:
         hable = _CountingHable(H(6))
-        roller = HableRoller(hable)
+        roller = HableRoller(hable, name="d6")
 
         assert_type(roller, HableRoller[int])
         assert roller.hable is hable
+        assert roller.name == "d6"
         assert roller.h() == H(6)
+        assert roller.provenance() == {"kind": "source", "name": "d6"}
+
+    def test_uses_hable_representation_as_default_name(self) -> None:
+        hable = _CountingHable(H(6))
+        roller = HableRoller(hable)
+
+        assert roller.name is None
         assert roller.provenance() == {"kind": "source", "name": str(hable)}
 
 
@@ -298,6 +298,110 @@ class TestLiteralRoller:
 
 
 class TestPoolRoller:
+    def test_is_hable_as_aggregate_distribution(self) -> None:
+        p = P(H({1: 1}), H({2: 1}))
+        pool = PoolRoller(p, name="pool")
+
+        assert isinstance(pool, HableT)
+        assert pool.h() == p.h()
+
+    def test_binary_operator_types(self) -> None:
+        left = PoolRoller(P(H({2: 1})), name="left")
+        right = PoolRoller(P(H({3: 1})), name="right")
+        scalar = HRoller(H({5: 1}), name="scalar")
+        power_pool = PoolRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
+
+        assert_type(left + right, Roller[int])
+        assert_type(left + scalar, Roller[int])
+        assert_type(scalar + left, Roller[int])
+        assert_type(left + P(H({5: 1})), Roller[int])
+        assert_type(left - right, Roller[int])
+        assert_type(right - left, Roller[int])
+        assert_type(10 - left, Roller[int])
+        assert_type(left * 2, Roller[int])
+        assert_type(left / 2, Roller[float])
+        assert_type(left // 2, Roller[int])
+        assert_type(left % 2, Roller[int])
+        assert_type(power_pool**2, Roller[_PowerOutcome])
+        assert_type(left << 2, Roller[int])
+        assert_type(left >> 2, Roller[int])
+        assert_type(left & 2, Roller[int])
+        assert_type(left | 2, Roller[int])
+        assert_type(left ^ 2, Roller[int])
+
+        assert_type(2 * left, Roller[int])
+        assert_type(12 / left, Roller[float])
+        assert_type(12 // left, Roller[int])
+        assert_type(12 % left, Roller[int])
+        assert_type(2**power_pool, Roller[_PowerOutcome])
+        assert_type(2 << left, Roller[int])
+        assert_type(12 >> left, Roller[int])
+        assert_type(2 & left, Roller[int])
+        assert_type(2 | left, Roller[int])
+        assert_type(2 ^ left, Roller[int])
+
+    def test_addition_aggregates_pool_operands(self) -> None:
+        left = PoolRoller(P(H({1: 1}), H({2: 1})), name="left")
+        right = PoolRoller(P(H({3: 1}), H({4: 1})), name="right")
+        scalar = HRoller(H({5: 1}), name="scalar")
+
+        assert (left + right).h() == H({10: 1})
+        assert (left + scalar).h() == H({8: 1})
+        assert (scalar + left).h() == H({8: 1})
+        assert (left + P(H({5: 1}))).h() == H({8: 1})
+        assert (P(H({5: 1})) + left).h() == H({8: 1})
+
+    def test_subtraction_aggregates_pools_and_preserves_order(self) -> None:
+        left = PoolRoller(P(H({1: 1}), H({2: 1})), name="left")
+        right = PoolRoller(P(H({3: 1}), H({4: 1})), name="right")
+
+        assert (left - right).h() == H({-4: 1})
+        assert (right - left).h() == H({4: 1})
+        assert (10 - left).h() == H({7: 1})
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_aggregate_pools(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left = PoolRoller(P(H({lhs: 1})), name="left")
+        right = PoolRoller(P(H({rhs: 1})), name="right")
+        expected = H({op(lhs, rhs): 1})
+        combined = op(left, right)
+
+        assert combined.h() == expected
+        assert combined.provenance() == {"kind": "binary", "operator": name}
+        assert op(lhs, right).h() == expected
+        assert op(P(H({lhs: 1})), right).h() == expected
+        assert op(left, P(H({rhs: 1}))).h() == expected
+
+    def test_unary_operator_types_and_distributions(self) -> None:
+        pool = PoolRoller(P(H({-2: 1})), name="pool")
+
+        assert_type(-pool, Roller[int])
+        assert_type(+pool, Roller[int])
+        assert_type(abs(pool), Roller[int])
+        assert_type(~pool, Roller[int])
+        assert (-pool).h() == H({2: 1})
+        assert (+pool).h() == H({-2: 1})
+        assert abs(pool).h() == H({2: 1})
+        assert (~pool).h() == H({1: 1})
+
+    def test_raw_pool_promotion_preserves_pool_provenance(self) -> None:
+        combined = HRoller(H({1: 1}), name="one") + P(H({2: 1}), H({3: 1}))
+        provenance = combined.roll().to_dict()
+        definitions = provenance["definitions"]
+
+        assert isinstance(definitions, dict)
+        assert definitions["d2"] == {
+            "kind": "pool-sum",
+            "operands": ["d3"],
+        }
+        assert definitions["d3"]["kind"] == "pool-source"
+
     def test_roll_preserves_sorted_constituent_outcomes(self) -> None:
         pool = PoolRoller(P(H({2: 1}), H({1: 1})), name="pool")
         roll = pool.roll()
