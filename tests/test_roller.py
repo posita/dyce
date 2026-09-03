@@ -16,7 +16,15 @@ from typing import Any, ClassVar, assert_type
 import pytest
 
 from dyce import H, HableT, P, rng
-from dyce.roller import HableRoller, HRoller, LiteralRoller, Roll, Roller
+from dyce.roller import (
+    HableRoller,
+    HRoller,
+    LiteralRoller,
+    PoolRoll,
+    PoolRoller,
+    Roll,
+    Roller,
+)
 
 __all__ = ()
 
@@ -289,6 +297,76 @@ class TestLiteralRoller:
         assert roll.roller is roller
 
 
+class TestPoolRoller:
+    def test_roll_preserves_sorted_constituent_outcomes(self) -> None:
+        pool = PoolRoller(P(H({2: 1}), H({1: 1})), name="pool")
+        roll = pool.roll()
+
+        assert_type(pool, PoolRoller[int])
+        assert_type(roll, PoolRoll[int])
+        assert pool.p == P(H({2: 1}), H({1: 1}))
+        assert pool.name == "pool"
+        assert roll.outcomes == (1, 2)
+        assert tuple(constituent.outcome for constituent in roll.rolls) == (1, 2)
+        assert roll.roller is pool
+
+    def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
+        pool = PoolRoller(P(H({2j: 1}), H({1j: 1})))
+
+        assert pool.roll().outcomes == (1j, 2j)
+
+    def test_sum_bridges_to_scalar_roller(self) -> None:
+        pool = PoolRoller(P(H({1: 1}), H({2: 1})), name="pool")
+        summed = pool.sum()
+
+        assert_type(summed, Roller[int])
+        assert summed.h() == H({3: 1})
+        assert_type(summed.roll(), Roll[int])
+        assert summed.roll().outcome == 3
+
+    def test_select_creates_deferred_pool_definition(self) -> None:
+        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        selected = pool.select(-1, 0)
+        roll = selected.roll()
+        provenance = roll.to_dict()
+        definitions = provenance["definitions"]
+        events = provenance["events"]
+
+        assert_type(selected, PoolRoller[int])
+        assert roll.outcomes == (3, 1)
+        assert isinstance(definitions, dict)
+        assert definitions["d0"] == {
+            "kind": "pool-selection",
+            "positions": [2, 0],
+            "operands": ["d1"],
+        }
+        assert isinstance(events, dict)
+        assert events["e0"]["outcomes"] == [3, 1]
+        assert events["e0"]["operands"] == ["e1"]
+        assert events["e1"]["outcomes"] == [1, 2, 3]
+
+    def test_nested_selection_uses_positions_from_selected_pool(self) -> None:
+        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        selected = pool.select(slice(1, None)).select(-1)
+
+        assert selected.name is None
+        assert selected.roll().outcomes == (3,)
+        assert selected.sum().h() == H({3: 1})
+
+    def test_empty_selection_has_empty_distribution(self) -> None:
+        pool = PoolRoller(P(H({1: 1})), name="pool")
+
+        assert pool.select(slice(0)).roll().outcomes == ()
+        assert pool.select(slice(0)).sum().h() == H({})
+
+    def test_at_composes_selection_and_sum(self) -> None:
+        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+
+        assert_type(pool.at(-1, 0), Roller[int])
+        assert pool.at(-1, 0).h() == H({4: 1})
+        assert pool.at(-1, 0).roll().outcome == 4
+
+
 class TestRoll:
     def test_roll_binary_operator_types(self) -> None:
         roll = _ConstantRoller(2).roll()
@@ -400,6 +478,16 @@ class TestRoll:
         assert shared_definitions["d0"]["operands"] == ["d1", "d1"]
 
 
+class TestPoolRoll:
+    def test_sum_bridges_to_scalar_roll(self) -> None:
+        pool_roll = PoolRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
+        roll = pool_roll.sum()
+
+        assert_type(roll, Roll[int])
+        assert roll.outcome == 3
+        assert roll.operands == (pool_roll,)
+
+
 class TestRollerRollEquivalence:
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators(
@@ -430,6 +518,14 @@ class TestRollerRollEquivalence:
         roller = _ConstantRoller(value)
 
         assert op(roller).roll().to_dict() == op(roller.roll()).to_dict()
+
+    def test_pool_selection_and_sum(self) -> None:
+        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+
+        deferred_roll = pool.select(-1, 0).sum().roll()
+        realized_roll = pool.select(-1, 0).roll().sum()
+
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
 
     def test_adding_after_roll_matches_rolling_after_addition(
         self, monkeypatch: pytest.MonkeyPatch
