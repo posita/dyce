@@ -246,7 +246,7 @@ def expand(  # ruff: ignore[complex-structure]
 
     Evaluate *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
 
-    For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument pe [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
+    For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument per [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
     The return value controls how the branch contributes to the accumulation:
 
     - **Scalar** - The outcome is recorded directly.

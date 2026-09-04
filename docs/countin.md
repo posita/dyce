@@ -21,7 +21,7 @@ For typing:
 
   -- END MONKEY PATCH -->
 
-`dyce` provides two core primitives for enumeration.
+`dyce` provides two core primitives for finite discrete probability computations.
 
 <!-- TODO(posita): Figure out what we're doing with dyce.r -->
 <!--
@@ -33,8 +33,8 @@ For typing:
     These are covered [separately](rollin.md).
   -->
 
-[`H` objects][dyce.H] represent histograms for modeling discrete outcomes.
-They encode finite discrete probability distributions as integer counts without any denominator.
+[`H` objects][dyce.H] represent finite discrete probability distributions as histograms.
+They encode outcomes as integer counts without any denominator.
 [`P` objects][dyce.P] represent pools (ordered sequences) of histograms.
 If all you need is to aggregate outcomes (sums) from rolling a bunch of dice (or perform calculations on aggregate outcomes), [`H` objects][dyce.H] are probably sufficient.
 If you need to *select* certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [`P` objects][dyce.P] come in.

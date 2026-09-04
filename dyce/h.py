@@ -350,7 +350,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
     def __init__(self, init_val: Any, /) -> None:  # ruff: ignore[complex-structure]
-        r"""Constructor."""
+        r"""Construct an [`H`][dyce.H] from *init_val*, which can be a mapping, iterable, or an integer shorthand."""
         self._h: dict[_T_co, int]
         self._hash: int | None = None
         self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}
