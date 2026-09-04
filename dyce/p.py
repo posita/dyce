@@ -347,7 +347,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self,
         *init_vals: Any,
     ) -> None:
-        r"""Constructor."""
+        r"""Construct a [`P`][dyce.P] from zero or more *init_vals*, each of which can be a histogram, pool, or initializer shorthand value."""
         super().__init__()
         self._h_groups: dict[H[_T_co], int]
         h_counts: Counter[H[_T_co]] = Counter()

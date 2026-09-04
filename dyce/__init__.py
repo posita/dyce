@@ -16,7 +16,7 @@
 r"""
 `dyce` revolves around two core primitives.
 [`H` objects][dyce.H] are histograms (outcomes or individual dice).
-[`P` objects][dyce.P] are collections of histograms (pools).
+[`P` objects][dyce.P] are ordered sequences of histograms (pools).
 
 Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
 It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.

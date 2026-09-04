@@ -52,12 +52,12 @@ While not as compact as a dedicated grammar, `dyce`’s Python-based primitives 
 Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
 If you’re looking at something on which to build your own grammar or interface, `dyce` can serve you well.
 
-`dyce` should be able to replicate or replace most other dice probability modeling tools.
-It strives to be [fully documented](https://posita.github.io/dyce/latest/) and relies heavily on examples to develop understanding.
+`dyce` is intended to model a broad range of dice probability problems.
+The documentation combines API reference material with examples to help you understand and use `dyce`.
 
 `dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 See the accompanying `LICENSE` file for details.
-Non-experimental features should be considered stable (but an unquenchable thirst to increase performance remains).
+Experimental features are marked in the API documentation and may change or be removed in a future release.
 See the [release notes](https://posita.github.io/dyce/latest/notes/) for a summary of version-to-version changes.
 Source code is [available on GitHub](https://github.com/posita/dyce).
 
@@ -149,10 +149,10 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 
 ## A taste
 
-`dyce` provides several core primitives.
+`dyce` provides two core primitives and tools for dependent computations.
 [`H` objects](https://posita.github.io/dyce/latest/dyce/#dyce.H) represent histograms for modeling finite discrete outcomes, like individual dice.
 [`P` objects](https://posita.github.io/dyce/latest/dyce/#dyce.P) represent pools (ordered sequences) of histograms.
-[`expand`](https://posita.github.io/dyce/latest/dyce/#expand) for mechanics that include dependent variables.
+[`expand`](https://posita.github.io/dyce/latest/dyce/#expand) handles mechanics that include dependent variables.
 <!-- TODO(posita): Figure out what we're doing with dyce.r -->
 <!--
 [`R` objects](https://posita.github.io/dyce/latest/dyce/#dyce.R) (covered [elsewhere](https://posita.github.io/dyce/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.

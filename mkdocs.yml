@@ -121,6 +121,9 @@ nav:
   - API:
     - Core: dyce.md
     - Conveniences: dyce.d.md
+    # The following are internal and intentionally excluded from the
+    # published API navigation: dyce.lifecycle, dyce.rng, and
+    # dyce.types
     - Visualization:
       - Shared structures: dyce.viz.md
       - Matplotlib (optional): dyce.viz.matplotlib.md
