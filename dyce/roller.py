@@ -23,7 +23,7 @@ Its interfaces may change substantially or disappear.
 import operator
 import warnings
 from abc import abstractmethod
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from functools import reduce
 from typing import Any, Generic, TypeVar, cast, overload
@@ -33,16 +33,18 @@ import optype as ot
 from .h import H, HableT
 from .lifecycle import ExperimentalWarning, experimental
 from .p import P
-from .types import GetItemT, getitems
+from .types import GetItemT, getitems, natural_key
 
 __all__ = (
     "HRoller",
     "HableRoller",
     "LiteralRoller",
+    "PRoller",
     "PoolRoll",
     "PoolRoller",
     "Roll",
     "Roller",
+    "RollerPool",
 )
 
 _T = TypeVar("_T")
@@ -581,9 +583,9 @@ class LiteralRoller(Roller[_T]):
 
 
 class PoolRoller(HableT[_T_co]):
-    r"""A deferred, traceable pool computation backed by a [`P`][dyce.P]."""
+    r"""A deferred, traceable computation producing a fixed-size pool."""
 
-    __slots__ = ("_name", "_p")
+    __slots__ = ()
 
     @overload
     def __add__(
@@ -953,25 +955,19 @@ class PoolRoller(HableT[_T_co]):
     ) -> "Roller[_ResultT]":
         return cast("Roller[_ResultT]", _UnaryRoller(_as_roller(self), _INVERT))
 
-    @experimental
-    def __init__(self, p: P[_T_co], *, name: str | None = None) -> None:
-        self._p = p
-        self._name = name
+    @abstractmethod
+    def __len__(self) -> int:
+        r"""Returns the fixed number of outcomes produced by this pool roller."""
 
     @property
+    @abstractmethod
     def name(self) -> str | None:
-        r"""The source name supplied when this pool roller was created, if any."""
-        return self._name
+        r"""The name associated with this pool roller, if any."""
 
     @property
     def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
         r"""The immediate rollers consumed by this pool roller."""
         return ()
-
-    @property
-    def p(self) -> P[_T_co]:
-        r"""The pool supplying this roller's outcomes."""
-        return self._p
 
     def at(
         self: "PoolRoller[_CanAddSameT]", which: GetItemT, *more: GetItemT
@@ -981,30 +977,34 @@ class PoolRoller(HableT[_T_co]):
 
     def h(self) -> H[_T_co]:
         r"""Returns the distribution of the sum of this pool roller's outcomes."""
-        return self._p.h()
+        if len(self) == 0:
+            return cast("H[_T_co]", H({}))
+        return cast(
+            "H[_T_co]",
+            H.from_counts(
+                (
+                    (_sum_outcomes(cast("Iterable[Any]", roll)), count)
+                    for roll, count in self.rolls_with_counts()
+                )
+            ),
+        )
 
+    @abstractmethod
     def provenance(self) -> dict[str, object]:
         r"""Returns JSON-compatible metadata describing this pool roller."""
-        return {
-            "kind": "pool-source",
-            "name": self._name if self._name is not None else str(self._p),
-        }
 
+    @abstractmethod
     def roll(self) -> "PoolRoll[_T_co]":
         r"""Realizes this pool computation and returns its outcomes with provenance."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            outcomes = self._p.roll()
-        return PoolRoll(outcomes, self)
+
+    @abstractmethod
+    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
+        r"""Yields the possible pool outcomes and their weights."""
 
     def select(self, which: GetItemT, *more: GetItemT) -> "PoolRoller[_T_co]":
         r"""Returns a pool roller selecting the specified sorted positions."""
-        positions = tuple(getitems(tuple(range(self._size())), (which, *more)))
-        absolute_positions = self._absolute_positions()
-        selected_absolute_positions = tuple(
-            absolute_positions[position] for position in positions
-        )
-        return _SelectedPoolRoller(self, positions, selected_absolute_positions)
+        positions = tuple(getitems(tuple(range(len(self))), (which, *more)))
+        return _SelectedPoolRoller(self, positions)
 
     def sum(
         self: "PoolRoller[_CanAddSameT]",
@@ -1012,65 +1012,99 @@ class PoolRoller(HableT[_T_co]):
         r"""Returns a scalar roller summing every outcome in this pool roller."""
         return _PoolSumRoller(self, self.h)
 
-    def _absolute_positions(self) -> tuple[int, ...]:
-        return tuple(range(len(self._p)))
 
-    def _size(self) -> int:
+class PRoller(PoolRoller[_T_co]):
+    r"""A deferred, traceable pool computation backed by a [`P`][dyce.P]."""
+
+    __slots__ = ("_name", "_p")
+
+    @experimental
+    def __init__(self, p: P[_T_co], *, name: str | None = None) -> None:
+        self._p = p
+        self._name = name
+
+    def __len__(self) -> int:
         return len(self._p)
 
-
-class _SelectedPoolRoller(PoolRoller[_T_co]):
-    __slots__ = ("_parent", "_positions", "_root_positions")
-
-    def __init__(
-        self,
-        parent: PoolRoller[_T_co],
-        positions: tuple[int, ...],
-        root_positions: tuple[int, ...],
-    ) -> None:
-        self._parent = parent
-        self._positions = positions
-        self._root_positions = root_positions
-
     @property
-    def name(self) -> None:
-        return None
-
-    @property
-    def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
-        return (cast("PoolRoller[object]", self._parent),)
+    def name(self) -> str | None:
+        r"""The source name supplied when this pool roller was created, if any."""
+        return self._name
 
     @property
     def p(self) -> P[_T_co]:
-        return self._parent.p
+        r"""The pool supplying this roller's outcomes."""
+        return self._p
 
     def h(self) -> H[_T_co]:
-        if not self._root_positions:
-            return cast("H[_T_co]", H({}))
-        return cast(
-            "H[_T_co]",
-            H.from_counts(
-                (
-                    (_sum_outcomes(cast("Iterable[Any]", roll)), count)
-                    for roll, count in self.p.rolls_with_counts(*self._root_positions)
-                )
-            ),
-        )
+        return self._p.h()
 
     def provenance(self) -> dict[str, object]:
-        return {"kind": "pool-selection", "positions": list(self._positions)}
+        return {
+            "kind": "pool-source",
+            "name": self._name if self._name is not None else str(self._p),
+        }
 
     def roll(self) -> "PoolRoll[_T_co]":
-        parent_roll = self._parent.roll()
-        outcomes = tuple(parent_roll.outcomes[position] for position in self._positions)
-        operands = (cast("PoolRoll[object]", parent_roll),)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            outcomes = self._p.roll()
+        return PoolRoll(outcomes, self)
+
+    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
+        yield from self._p.rolls_with_counts()
+
+
+class RollerPool(PoolRoller[_T_co]):
+    r"""A deferred, traceable pool composed of scalar rollers."""
+
+    __slots__ = ("_name", "_rollers")
+
+    @experimental
+    def __init__(self, *rollers: Roller[_T_co], name: str | None = None) -> None:
+        self._rollers = rollers
+        self._name = name
+
+    def __len__(self) -> int:
+        return len(self._rollers)
+
+    @property
+    def name(self) -> str | None:
+        r"""The name supplied when this roller pool was created, if any."""
+        return self._name
+
+    @property
+    def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
+        return cast("tuple[PoolRoller[object] | Roller[object], ...]", self._rollers)
+
+    @property
+    def rollers(self) -> tuple[Roller[_T_co], ...]:
+        r"""The scalar rollers comprising this pool."""
+        return self._rollers
+
+    def h(self) -> H[_T_co]:
+        return P(*(roller.h() for roller in self._rollers)).h()
+
+    def provenance(self) -> dict[str, object]:
+        provenance: dict[str, object] = {"kind": "pool"}
+        if self._name is not None:
+            provenance["name"] = self._name
+        return provenance
+
+    def roll(self) -> "PoolRoll[_T_co]":
+        rolls = [roller.roll() for roller in self._rollers]
+        try:
+            rolls.sort(
+                key=cast("Callable[[Roll[_T_co]], Any]", lambda roll: roll.outcome)
+            )
+        except TypeError:
+            rolls.sort(key=lambda roll: natural_key(roll.outcome))
+        outcomes = tuple(roll.outcome for roll in rolls)
+        operands = cast("tuple[PoolRoll[object] | Roll[object], ...]", tuple(rolls))
         return PoolRoll(outcomes, self, operands)
 
-    def _absolute_positions(self) -> tuple[int, ...]:
-        return self._root_positions
-
-    def _size(self) -> int:
-        return len(self._positions)
+    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
+        yield from P(*(roller.h() for roller in self._rollers)).rolls_with_counts()
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1403,29 +1437,6 @@ class _BinaryRoller(Roller[_ResultT]):
         return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
 
 
-class _UnaryRoller(Roller[_ResultT]):
-    __slots__ = ("_operand", "_operator")
-
-    def __init__(self, operand: Roller[object], operator: _UnaryOperator) -> None:
-        self._operand = operand
-        self._operator = operator
-
-    @property
-    def operands(self) -> tuple[Roller[object], ...]:
-        return (self._operand,)
-
-    def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", self._operator(self._operand.h()))
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "unary", "operator": self._operator.name}
-
-    def roll(self) -> Roll[_ResultT]:
-        operand_roll = self._operand.roll()
-        outcome = self._operator(operand_roll.outcome)
-        return Roll(cast("_ResultT", outcome), self, (operand_roll,))
-
-
 class _PoolSumRoller(Roller[_CanAddSameT]):
     __slots__ = ("_h", "_pool_roller")
 
@@ -1451,6 +1462,97 @@ class _PoolSumRoller(Roller[_CanAddSameT]):
         pool_roll = self._pool_roller.roll()
         outcome = _sum_outcomes(pool_roll.outcomes)
         return Roll(outcome, self, (cast("PoolRoll[object]", pool_roll),))
+
+
+class _SelectedPoolRoller(PoolRoller[_T_co]):
+    __slots__ = ("_parent", "_positions")
+
+    def __init__(
+        self,
+        parent: PoolRoller[_T_co],
+        positions: tuple[int, ...],
+    ) -> None:
+        self._parent = parent
+        self._positions = positions
+
+    def __len__(self) -> int:
+        return len(self._positions)
+
+    @property
+    def name(self) -> None:
+        return None
+
+    @property
+    def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
+        return (cast("PoolRoller[object]", self._parent),)
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "pool-selection", "positions": list(self._positions)}
+
+    def roll(self) -> "PoolRoll[_T_co]":
+        parent_roll = self._parent.roll()
+        outcomes = tuple(parent_roll.outcomes[position] for position in self._positions)
+        operands = (cast("PoolRoll[object]", parent_roll),)
+        return PoolRoll(outcomes, self, operands)
+
+    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
+        yield from (
+            (tuple(roll[position] for position in self._positions), count)
+            for roll, count in self._parent.rolls_with_counts()
+        )
+
+
+class _UnaryRoller(Roller[_ResultT]):
+    __slots__ = ("_operand", "_operator")
+
+    def __init__(self, operand: Roller[object], operator: _UnaryOperator) -> None:
+        self._operand = operand
+        self._operator = operator
+
+    @property
+    def operands(self) -> tuple[Roller[object], ...]:
+        return (self._operand,)
+
+    def h(self) -> H[_ResultT]:
+        return cast("H[_ResultT]", self._operator(self._operand.h()))
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "unary", "operator": self._operator.name}
+
+    def roll(self) -> Roll[_ResultT]:
+        operand_roll = self._operand.roll()
+        outcome = self._operator(operand_roll.outcome)
+        return Roll(cast("_ResultT", outcome), self, (operand_roll,))
+
+
+def _as_roll(value: _T | Roll[_T]) -> Roll[_T]:
+    if isinstance(value, Roll):
+        return value
+    else:
+        return LiteralRoller(value).roll()
+
+
+def _as_roller(
+    value: _T | HableT[_T] | PoolRoller[_T] | Roller[_T],
+) -> Roller[_T]:
+    if isinstance(value, Roller):
+        return value
+    elif isinstance(value, PoolRoller):
+        return cast("Roller[_T]", cast("PoolRoller[Any]", value).sum())
+    elif isinstance(value, H):
+        return HRoller(value)
+    elif isinstance(value, P):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            pool_roller = PRoller(value)
+        return cast(
+            "Roller[_T]",
+            cast("PoolRoller[Any]", pool_roller).sum(),
+        )
+    elif isinstance(value, HableT):
+        return HableRoller(value)
+    else:
+        return LiteralRoller(value)
 
 
 def _provenance_to_dict(
@@ -1500,31 +1602,3 @@ def _provenance_to_dict(
 
     root = visit_event(root_roll)
     return {"root": root, "definitions": definitions, "events": events}
-
-
-def _as_roller(
-    value: _T | HableT[_T] | PoolRoller[_T] | Roller[_T],
-) -> Roller[_T]:
-    if isinstance(value, Roller):
-        return value
-    if isinstance(value, PoolRoller):
-        return cast("Roller[_T]", cast("PoolRoller[Any]", value).sum())
-    if isinstance(value, H):
-        return HRoller(value)
-    if isinstance(value, P):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            pool_roller = PoolRoller(value)
-        return cast(
-            "Roller[_T]",
-            cast("PoolRoller[Any]", pool_roller).sum(),  # type: ignore[redundant-cast]
-        )
-    if isinstance(value, HableT):
-        return HableRoller(value)
-    return LiteralRoller(value)
-
-
-def _as_roll(value: _T | Roll[_T]) -> Roll[_T]:
-    if isinstance(value, Roll):
-        return value
-    return LiteralRoller(value).roll()
