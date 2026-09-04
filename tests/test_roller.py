@@ -22,8 +22,10 @@ from dyce.roller import (
     LiteralRoller,
     PoolRoll,
     PoolRoller,
+    PRoller,
     Roll,
     Roller,
+    RollerPool,
 )
 
 __all__ = ()
@@ -58,20 +60,6 @@ class _AdditionCountingOutcome:
     def __add__(self, other: "_AdditionCountingOutcome") -> "_AdditionCountingOutcome":
         type(self).times_added += 1
         return _AdditionCountingOutcome(self.value + other.value)
-
-
-class _ConstantRoller(Roller[int]):
-    def __init__(self, value: int) -> None:
-        self._value = value
-
-    def h(self) -> H[int]:
-        return H({self._value: 1})
-
-    def roll(self) -> Roll[int]:
-        return Roll(self._value, self)
-
-    def provenance(self) -> dict[str, object]:
-        return {"kind": "constant", "value": self._value}
 
 
 class _CountingHable(HableT[int]):
@@ -127,7 +115,7 @@ class TestRoller:
         assert_type(2 ^ d6, Roller[int])
 
     def test_unary_operator_types(self) -> None:
-        roller = _ConstantRoller(-2)
+        roller = LiteralRoller(-2)
 
         assert_type(-roller, Roller[int])
         assert_type(+roller, Roller[int])
@@ -181,8 +169,8 @@ class TestRoller:
         right_h = H({rhs: 1})
         left_p = P(left_h)
         right_p = P(right_h)
-        left_roller = _ConstantRoller(lhs)
-        right_roller = _ConstantRoller(rhs)
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
         combined = op(left_roller, right_roller)
         expected_h = H({op(lhs, rhs): 1})
 
@@ -201,7 +189,7 @@ class TestRoller:
         name: str,
         value: int,
     ) -> None:
-        roller = _ConstantRoller(value)
+        roller = LiteralRoller(value)
         combined = op(roller)
         expected_h = H({op(value): 1})
 
@@ -233,7 +221,7 @@ class TestRoller:
         assert definitions["d2"] == {"kind": "source", "name": str(hable)}
 
     def test_mixed_roller_addition(self) -> None:
-        roll = (HRoller(H({1: 1}), name="one") + _ConstantRoller(2)).roll()
+        roll = (HRoller(H({1: 1}), name="one") + LiteralRoller(2)).roll()
 
         assert roll.outcome == 3
         assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
@@ -297,19 +285,19 @@ class TestLiteralRoller:
         assert roll.roller is roller
 
 
-class TestPoolRoller:
+class TestPRoller:
     def test_is_hable_as_aggregate_distribution(self) -> None:
         p = P(H({1: 1}), H({2: 1}))
-        pool = PoolRoller(p, name="pool")
+        pool = PRoller(p, name="pool")
 
         assert isinstance(pool, HableT)
         assert pool.h() == p.h()
 
     def test_binary_operator_types(self) -> None:
-        left = PoolRoller(P(H({2: 1})), name="left")
-        right = PoolRoller(P(H({3: 1})), name="right")
+        left = PRoller(P(H({2: 1})), name="left")
+        right = PRoller(P(H({3: 1})), name="right")
         scalar = HRoller(H({5: 1}), name="scalar")
-        power_pool = PoolRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
+        power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
 
         assert_type(left + right, Roller[int])
         assert_type(left + scalar, Roller[int])
@@ -341,8 +329,8 @@ class TestPoolRoller:
         assert_type(2 ^ left, Roller[int])
 
     def test_addition_aggregates_pool_operands(self) -> None:
-        left = PoolRoller(P(H({1: 1}), H({2: 1})), name="left")
-        right = PoolRoller(P(H({3: 1}), H({4: 1})), name="right")
+        left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
+        right = PRoller(P(H({3: 1}), H({4: 1})), name="right")
         scalar = HRoller(H({5: 1}), name="scalar")
 
         assert (left + right).h() == H({10: 1})
@@ -352,8 +340,8 @@ class TestPoolRoller:
         assert (P(H({5: 1})) + left).h() == H({8: 1})
 
     def test_subtraction_aggregates_pools_and_preserves_order(self) -> None:
-        left = PoolRoller(P(H({1: 1}), H({2: 1})), name="left")
-        right = PoolRoller(P(H({3: 1}), H({4: 1})), name="right")
+        left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
+        right = PRoller(P(H({3: 1}), H({4: 1})), name="right")
 
         assert (left - right).h() == H({-4: 1})
         assert (right - left).h() == H({4: 1})
@@ -367,8 +355,8 @@ class TestPoolRoller:
         lhs: int,
         rhs: int,
     ) -> None:
-        left = PoolRoller(P(H({lhs: 1})), name="left")
-        right = PoolRoller(P(H({rhs: 1})), name="right")
+        left = PRoller(P(H({lhs: 1})), name="left")
+        right = PRoller(P(H({rhs: 1})), name="right")
         expected = H({op(lhs, rhs): 1})
         combined = op(left, right)
 
@@ -379,7 +367,7 @@ class TestPoolRoller:
         assert op(left, P(H({rhs: 1}))).h() == expected
 
     def test_unary_operator_types_and_distributions(self) -> None:
-        pool = PoolRoller(P(H({-2: 1})), name="pool")
+        pool = PRoller(P(H({-2: 1})), name="pool")
 
         assert_type(-pool, Roller[int])
         assert_type(+pool, Roller[int])
@@ -410,10 +398,10 @@ class TestPoolRoller:
             return (1, 2)
 
         monkeypatch.setattr(P, "roll", p_roll)
-        pool = PoolRoller(p, name="pool")
+        pool = PRoller(p, name="pool")
         roll = pool.roll()
 
-        assert_type(pool, PoolRoller[int])
+        assert_type(pool, PRoller[int])
         assert_type(roll, PoolRoll[int])
         assert pool.p is p
         assert pool.name == "pool"
@@ -423,12 +411,17 @@ class TestPoolRoller:
         assert roll.operands == ()
 
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
-        pool = PoolRoller(P(H({2j: 1}), H({1j: 1})))
+        pool = PRoller(P(H({2j: 1}), H({1j: 1})))
 
         assert pool.roll().outcomes == (1j, 2j)
 
+    def test_rolls_with_counts_delegates_to_p(self) -> None:
+        p = P(H(2), H(3))
+
+        assert list(PRoller(p).rolls_with_counts()) == list(p.rolls_with_counts())
+
     def test_sum_bridges_to_scalar_roller(self) -> None:
-        pool = PoolRoller(P(H({1: 1}), H({2: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1})), name="pool")
         summed = pool.sum()
 
         assert_type(summed, Roller[int])
@@ -437,7 +430,7 @@ class TestPoolRoller:
         assert summed.roll().outcome == 3
 
     def test_select_creates_deferred_pool_definition(self) -> None:
-        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
         selected = pool.select(-1, 0)
         roll = selected.roll()
         provenance = roll.to_dict()
@@ -458,30 +451,79 @@ class TestPoolRoller:
         assert events["e1"]["outcomes"] == [1, 2, 3]
 
     def test_nested_selection_uses_positions_from_selected_pool(self) -> None:
-        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
-        selected = pool.select(slice(1, None)).select(-1)
+        p = 3 @ P(2)
+        selected = PRoller(p, name="pool").select(-1, 0).select(1)
 
         assert selected.name is None
-        assert selected.roll().outcomes == (3,)
-        assert selected.sum().h() == H({3: 1})
+        assert len(selected) == 1
+        assert selected.sum().h() == p.at(0)
 
     def test_empty_selection_has_empty_distribution(self) -> None:
-        pool = PoolRoller(P(H({1: 1})), name="pool")
+        pool = PRoller(P(H({1: 1})), name="pool")
 
         assert pool.select(slice(0)).roll().outcomes == ()
         assert pool.select(slice(0)).sum().h() == H({})
 
     def test_at_composes_selection_and_sum(self) -> None:
-        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
         assert_type(pool.at(-1, 0), Roller[int])
         assert pool.at(-1, 0).h() == H({4: 1})
         assert pool.at(-1, 0).roll().outcome == 4
 
 
+class TestRollerPool:
+    def test_composes_scalar_rollers(self) -> None:
+        two = LiteralRoller(2)
+        one = LiteralRoller(1)
+        pool = RollerPool(two, one, name="pool")
+        roll = pool.roll()
+
+        assert_type(pool, RollerPool[int])
+        assert isinstance(pool, PoolRoller)
+        assert len(pool) == 2
+        assert pool.name == "pool"
+        assert pool.rollers == (two, one)
+        assert pool.operands == (two, one)
+        assert pool.h() == H({3: 1})
+        assert list(pool.rolls_with_counts()) == [((1, 2), 1)]
+        assert roll.outcomes == (1, 2)
+        assert tuple(operand.roller for operand in roll.operands) == (one, two)
+        assert pool.provenance() == {"kind": "pool", "name": "pool"}
+
+    def test_reused_roller_has_one_definition_and_independent_events(self) -> None:
+        d6 = HRoller(H(6), name="d6")
+        provenance = RollerPool(d6, d6).roll().to_dict()
+        definitions = provenance["definitions"]
+        events = provenance["events"]
+
+        assert isinstance(definitions, dict)
+        assert isinstance(events, dict)
+        assert definitions["d0"] == {
+            "kind": "pool",
+            "operands": ["d1", "d1"],
+        }
+        assert events["e0"]["operands"] == ["e1", "e2"]
+
+    def test_selection_uses_composite_pool_distribution(self) -> None:
+        d2 = HRoller(H(2), name="d2")
+        d3 = HRoller(H(3), name="d3")
+        pool = RollerPool(d2, d3)
+
+        assert pool.select(-1).sum().h() == P(H(2), H(3)).at(-1)
+
+    def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
+        pool = RollerPool(
+            HRoller(H({2j: 1})),
+            HRoller(H({1j: 1})),
+        )
+
+        assert pool.roll().outcomes == (1j, 2j)
+
+
 class TestRoll:
     def test_roll_binary_operator_types(self) -> None:
-        roll = _ConstantRoller(2).roll()
+        roll = LiteralRoller(2).roll()
         power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
 
         assert_type(roll * 2, Roll[int])
@@ -507,7 +549,7 @@ class TestRoll:
         assert_type(2 ^ roll, Roll[int])
 
     def test_unary_operator_types(self) -> None:
-        roll = _ConstantRoller(-2).roll()
+        roll = LiteralRoller(-2).roll()
 
         assert_type(-roll, Roll[int])
         assert_type(+roll, Roll[int])
@@ -522,8 +564,8 @@ class TestRoll:
         lhs: int,
         rhs: int,
     ) -> None:
-        left_roll = _ConstantRoller(lhs).roll()
-        right_roll = _ConstantRoller(rhs).roll()
+        left_roll = LiteralRoller(lhs).roll()
+        right_roll = LiteralRoller(rhs).roll()
         combined = op(left_roll, right_roll)
         provenance = combined.to_dict()
         definitions = provenance["definitions"]
@@ -546,7 +588,7 @@ class TestRoll:
         name: str,
         value: int,
     ) -> None:
-        combined = op(_ConstantRoller(value).roll())
+        combined = op(LiteralRoller(value).roll())
         provenance = combined.to_dict()
         definitions = provenance["definitions"]
         events = provenance["events"]
@@ -592,7 +634,7 @@ class TestRoll:
 
 class TestPoolRoll:
     def test_sum_bridges_to_scalar_roll(self) -> None:
-        pool_roll = PoolRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
+        pool_roll = PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
         roll = pool_roll.sum()
 
         assert_type(roll, Roll[int])
@@ -609,8 +651,8 @@ class TestRollerRollEquivalence:
         lhs: int,
         rhs: int,
     ) -> None:
-        left_roller = _ConstantRoller(lhs)
-        right_roller = _ConstantRoller(rhs)
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
 
         deferred_roll = op(left_roller, right_roller).roll()
         realized_roll = op(left_roller.roll(), right_roller.roll())
@@ -627,12 +669,12 @@ class TestRollerRollEquivalence:
         _name: str,
         value: int,
     ) -> None:
-        roller = _ConstantRoller(value)
+        roller = LiteralRoller(value)
 
         assert op(roller).roll().to_dict() == op(roller.roll()).to_dict()
 
     def test_pool_selection_and_sum(self) -> None:
-        pool = PoolRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
         deferred_roll = pool.select(-1, 0).sum().roll()
         realized_roll = pool.select(-1, 0).roll().sum()
