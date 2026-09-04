@@ -15,12 +15,12 @@
 
 r"""
 `dyce.viz.matplotlib` provides optional, basic [Matplotlib](https://matplotlib.org/)-based visualization utilities.
-Its requirements can be installed via the `viz` optional dependency group.
+Its requirements can be installed via the `viz-mpl` optional dependency group.
 
 ```sh
-pip install 'dyce[viz]'
+pip install 'dyce[viz-mpl]'
 # or
-uv sync --group viz
+uv sync --group viz-mpl
 ```
 
 <!-- BEGIN MONKEY PATCH --
@@ -39,7 +39,7 @@ try:
     import matplotlib as mpl
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
-        "dyce[viz] requires matplotlib; install with: pip install 'dyce[viz]'"
+        "dyce[viz-mpl] requires matplotlib; install with: pip install 'dyce[viz-mpl]'"
     ) from exc
 else:
     from matplotlib import colors as mcolors
