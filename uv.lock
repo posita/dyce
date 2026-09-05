@@ -797,7 +797,6 @@ viz-mpl = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "beartype" },
     { name = "click" },
     { name = "coverage", extra = ["toml"] },
     { name = "griffe-warnings-deprecated" },
@@ -942,7 +941,6 @@ provides-extras = ["viz-mpl"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "beartype", specifier = ">=0.23.0rc0" },
     { name = "click", specifier = ">=8.3.2" },
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
