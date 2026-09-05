@@ -1002,7 +1002,10 @@ class PoolRoller(HableT[_T_co]):
 
     @abstractmethod
     def roll(self) -> "PoolRoll[_T_co]":
-        r"""Realizes this pool computation and returns its outcomes with provenance."""
+        r"""
+        Realizes this pool computation and returns its outcomes with provenance.
+        Raises `ValueError` if no outcomes can be produced, including an empty selection.
+        """
 
     @abstractmethod
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
@@ -1106,6 +1109,8 @@ class RollerPool(PoolRoller[_T_co]):
         return provenance
 
     def roll(self) -> "PoolRoll[_T_co]":
+        if not self._rollers:
+            raise ValueError("no outcomes from an empty pool")
         rolls = [roller.roll() for roller in self._rollers]
         try:
             rolls.sort(
@@ -1518,6 +1523,8 @@ class _SelectedPoolRoller(PoolRoller[_T_co]):
         return {"kind": "pool-selection", "positions": list(self._positions)}
 
     def roll(self) -> "PoolRoll[_T_co]":
+        if not self._positions:
+            raise ValueError("no outcomes from an empty selection")
         parent_roll = self._parent.roll()
         outcomes = tuple(parent_roll.outcomes[position] for position in self._positions)
         operands = (cast("PoolRoll[object]", parent_roll),)
