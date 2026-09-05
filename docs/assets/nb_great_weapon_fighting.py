@@ -53,7 +53,7 @@ from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
 style.use("bmh")
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
 from dyce import H, HResult, expand

@@ -689,7 +689,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         if not selected:
             return H({})
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            warnings.simplefilter("ignore", ExperimentalWarning)
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
@@ -760,9 +760,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             This method “works” (i.e., falls back to a “natural” ordering of string representations) for outcomes whose relative values cannot be known (e.g., symbolic expressions).
             This is deliberate to allow random roll functionality where symbolic resolution is not needed or will happen later.
         """
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            roll = [h.roll() for h in self]
+        roll = [h.roll() for h in self]
         try:
             roll.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue]
         except TypeError:

@@ -45,7 +45,7 @@ experimental_msg = (
 
 def experimental(fn: Callable[_ParamsT, _ReturnT]) -> Callable[_ParamsT, _ReturnT]:
     r"""
-    Decorator that emits an [`ExperimentalWarning`][dyce.lifecycle.ExperimentalWarning] at each call site and prepends a warning admonition to the callable’s docstring.
+    Decorator that emits an [`ExperimentalWarning`][dyce.lifecycle.ExperimentalWarning] at each outermost call site, suppresses nested experimental warnings, and prepends a warning admonition to the callable’s docstring.
     """
     msg = experimental_msg % fn.__qualname__  # ty: ignore[unresolved-attribute]
     admonition = f'!!! warning "Experimental"\n\n    {msg}'
@@ -54,7 +54,9 @@ def experimental(fn: Callable[_ParamsT, _ReturnT]) -> Callable[_ParamsT, _Return
     @functools.wraps(fn)
     def wrapper(*args: _ParamsT.args, **kwargs: _ParamsT.kwargs) -> _ReturnT:
         warnings.warn(msg, ExperimentalWarning, stacklevel=2)
-        return fn(*args, **kwargs)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ExperimentalWarning)
+            return fn(*args, **kwargs)
 
     wrapper.__doc__ = admonition + ("\n\n" + original_doc if original_doc else "")
     return wrapper

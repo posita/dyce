@@ -59,7 +59,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
 
     from dyce.lifecycle import ExperimentalWarning
 
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    warnings.simplefilter("ignore", ExperimentalWarning)
     args = args or _PARSER.parse_args()
     logging.basicConfig(
         level=getattr(logging, args.log_level),
