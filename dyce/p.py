@@ -646,7 +646,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         if not selected:
             return H({})
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            warnings.simplefilter("ignore", ExperimentalWarning)
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
