@@ -59,7 +59,7 @@ dev = [
     "ipython",
     {include-group = "docs"},
     {include-group = "lint"},
-    {include-group = "test"},
+    {include-group = "test-beartype"},
     {include-group = "tox"},
 ]
 # Only what's needed for uv run mkdocs build
