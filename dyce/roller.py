@@ -51,17 +51,14 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
-_EmptyT = TypeVar("_EmptyT")
 
 
-def _sum_outcomes(
-    outcomes: Iterable[_CanAddSameT], empty: _EmptyT
-) -> _CanAddSameT | _EmptyT:
+def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
     iterator = iter(outcomes)
     try:
         first = next(iterator)
     except StopIteration:
-        return empty
+        raise ValueError("no outcomes to sum") from None
     return reduce(operator.add, iterator, first)
 
 
@@ -978,7 +975,7 @@ class PoolRoller(HableT[_T_co]):
 
     def at(
         self: "PoolRoller[_CanAddSameT]", which: GetItemT, *more: GetItemT
-    ) -> Roller[_CanAddSameT | int]:
+    ) -> Roller[_CanAddSameT]:
         r"""Returns a scalar roller summing the outcomes at the selected positions."""
         return self.select(which, *more).sum()
 
@@ -990,7 +987,7 @@ class PoolRoller(HableT[_T_co]):
             "H[_T_co]",
             H.from_counts(
                 (
-                    (_sum_outcomes(cast("Iterable[Any]", roll), 0), count)
+                    (_sum_outcomes(cast("Iterable[Any]", roll)), count)
                     for roll, count in self.rolls_with_counts()
                 )
             ),
@@ -1016,17 +1013,14 @@ class PoolRoller(HableT[_T_co]):
         positions = tuple(getitems(tuple(range(len(self))), (which, *more)))
         return _SelectedPoolRoller(self, positions)
 
-    @overload
     def sum(
         self: "PoolRoller[_CanAddSameT]",
-    ) -> Roller[_CanAddSameT | int]: ...
-    @overload
-    def sum(
-        self: "PoolRoller[_CanAddSameT]", *, empty: _EmptyT
-    ) -> Roller[_CanAddSameT | _EmptyT]: ...
-    def sum(self, *, empty: object = 0) -> Roller[object]:
-        r"""Returns a scalar roller summing every outcome, or *empty* when there are none."""
-        return _PoolSumRoller(cast("PoolRoller[Any]", self), empty)
+    ) -> Roller[_CanAddSameT]:
+        r"""
+        Returns a scalar roller summing every outcome.
+        An empty pool or selection has an empty sum distribution and raises `ValueError` when rolled.
+        """
+        return _PoolSumRoller(self)
 
 
 class PRoller(PoolRoller[_T_co]):
@@ -1414,16 +1408,13 @@ class PoolRoll(Generic[_T_co]):
         default=(), repr=False
     )
 
-    @overload
-    def sum(self: "PoolRoll[_CanAddSameT]") -> Roll[_CanAddSameT | int]: ...
-    @overload
-    def sum(
-        self: "PoolRoll[_CanAddSameT]", *, empty: _EmptyT
-    ) -> Roll[_CanAddSameT | _EmptyT]: ...
-    def sum(self, *, empty: object = 0) -> Roll[object]:
-        r"""Returns the sum of this pool roll's outcomes, or *empty* when there are none."""
-        roller = cast("PoolRoller[Any]", self.roller).sum(empty=empty)
-        outcome = _sum_outcomes(cast("Iterable[Any]", self.outcomes), empty)
+    def sum(self: "PoolRoll[_CanAddSameT]") -> Roll[_CanAddSameT]:
+        r"""
+        Returns the sum of this pool roll’s outcomes.
+        Raises `ValueError` if there are no outcomes.
+        """
+        roller = self.roller.sum()
+        outcome = _sum_outcomes(self.outcomes)
         return Roll(outcome, roller, (cast("PoolRoll[object]", self),))
 
     def to_dict(self) -> dict[str, object]:
@@ -1465,35 +1456,28 @@ class _BinaryRoller(Roller[_ResultT]):
         return Roll(cast("_ResultT", outcome), self, (left_roll, right_roll))
 
 
-class _PoolSumRoller(Roller[_CanAddSameT | _EmptyT]):
-    __slots__ = ("_empty", "_pool_roller")
+class _PoolSumRoller(Roller[_CanAddSameT]):
+    __slots__ = ("_pool_roller",)
 
     def __init__(
         self,
         pool_roller: PoolRoller[_CanAddSameT],
-        empty: _EmptyT,
     ) -> None:
         self._pool_roller = pool_roller
-        self._empty = empty
 
     @property
     def operands(self) -> tuple["PoolRoller[object] | Roller[object]", ...]:
         return (cast("PoolRoller[object]", self._pool_roller),)
 
-    def h(self) -> H[_CanAddSameT | _EmptyT]:
-        if len(self._pool_roller) == 0:
-            return H.from_counts(
-                (self._empty, count)
-                for _outcomes, count in self._pool_roller.rolls_with_counts()
-            )
-        return cast("H[_CanAddSameT | _EmptyT]", self._pool_roller.h())
+    def h(self) -> H[_CanAddSameT]:
+        return self._pool_roller.h()
 
     def provenance(self) -> dict[str, object]:
-        return {"kind": "pool-sum", "empty": self._empty}
+        return {"kind": "pool-sum"}
 
-    def roll(self) -> Roll[_CanAddSameT | _EmptyT]:
+    def roll(self) -> Roll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
-        outcome = _sum_outcomes(pool_roll.outcomes, self._empty)
+        outcome = _sum_outcomes(pool_roll.outcomes)
         return Roll(outcome, self, (cast("PoolRoll[object]", pool_roll),))
 
 
