@@ -11,7 +11,7 @@ import operator
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, ClassVar, assert_type
+from typing import Any, ClassVar, Never, assert_type
 
 import pytest
 
@@ -385,6 +385,7 @@ class TestPRoller:
 
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {
+            "empty": 0,
             "kind": "pool-sum",
             "operands": ["d3"],
         }
@@ -458,11 +459,30 @@ class TestPRoller:
         assert len(selected) == 1
         assert selected.sum().h() == p.at(0)
 
-    def test_empty_selection_has_empty_distribution(self) -> None:
+    def test_empty_selection_sums_to_default_zero(self) -> None:
         pool = PRoller(P(H({1: 1})), name="pool")
 
         assert pool.select(slice(0)).roll().outcomes == ()
-        assert pool.select(slice(0)).sum().h() == H({})
+        assert pool.select(slice(0)).sum().h() == H({0: 1})
+
+    def test_empty_pool_is_one_possible_empty_roll(self) -> None:
+        pool = PRoller(P())
+        summed = pool.sum()
+
+        assert_type(pool, PRoller[Never])
+        assert_type(summed, Roller[int])
+        assert list(pool.rolls_with_counts()) == [((), 1)]
+        assert pool.h() == H({})
+        assert summed.h() == H({0: 1})
+        assert summed.roll().outcome == 0
+
+    def test_empty_pool_accepts_explicit_sum_value(self) -> None:
+        pool = PRoller(P())
+        summed: Roller[str] = pool.sum(empty="")
+
+        assert summed.h() == H({"": 1})
+        assert summed.roll().outcome == ""
+        assert summed.provenance() == {"kind": "pool-sum", "empty": ""}
 
     def test_at_composes_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
@@ -512,6 +532,12 @@ class TestRollerPool:
 
         assert pool.select(-1).sum().h() == P(H(2), H(3)).at(-1)
 
+    def test_sum_does_not_combine_nonempty_outcomes_with_fallback(self) -> None:
+        pool = RollerPool(LiteralRoller("a"), LiteralRoller("b"))
+
+        assert pool.sum(empty="fallback").h() == H({"ab": 1})
+        assert pool.roll().sum(empty="fallback").outcome == "ab"
+
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
         pool = RollerPool(
             HRoller(H({2j: 1})),
@@ -519,6 +545,22 @@ class TestRollerPool:
         )
 
         assert pool.roll().outcomes == (1j, 2j)
+
+    def test_empty_pool_is_one_possible_empty_roll(self) -> None:
+        pool: RollerPool[Never] = RollerPool()
+
+        assert_type(pool, RollerPool[Never])
+        assert list(pool.rolls_with_counts()) == [((), 1)]
+        assert pool.h() == H({})
+        assert pool.sum().h() == H({0: 1})
+
+    def test_impossible_pool_remains_an_empty_distribution(self) -> None:
+        impossible_pool = RollerPool(HRoller(H({}))).select(slice(0))
+
+        assert len(impossible_pool) == 0
+        assert list(impossible_pool.rolls_with_counts()) == []
+        assert impossible_pool.h() == H({})
+        assert impossible_pool.sum().h() == H({})
 
 
 class TestRoll:
@@ -641,6 +683,21 @@ class TestPoolRoll:
         assert roll.outcome == 3
         assert roll.operands == (pool_roll,)
 
+    def test_empty_sum_uses_default_or_explicit_value(self) -> None:
+        pool_roll = PRoller(P()).roll()
+        default_roll = pool_roll.sum()
+        string_roll: Roll[str] = pool_roll.sum(empty="")
+
+        assert_type(pool_roll, PoolRoll[Never])
+        assert_type(default_roll, Roll[int])
+        assert default_roll.outcome == 0
+        assert string_roll.outcome == ""
+        assert default_roll.roller.provenance() == {"kind": "pool-sum", "empty": 0}
+        assert string_roll.roller.provenance() == {
+            "kind": "pool-sum",
+            "empty": "",
+        }
+
 
 class TestRollerRollEquivalence:
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
@@ -678,6 +735,15 @@ class TestRollerRollEquivalence:
 
         deferred_roll = pool.select(-1, 0).sum().roll()
         realized_roll = pool.select(-1, 0).roll().sum()
+
+        assert deferred_roll.to_dict() == realized_roll.to_dict()
+
+    @pytest.mark.parametrize("empty", [0, ""])
+    def test_empty_pool_sum(self, empty: object) -> None:
+        pool = PRoller(P())
+
+        deferred_roll = pool.sum(empty=empty).roll()
+        realized_roll = pool.roll().sum(empty=empty)
 
         assert deferred_roll.to_dict() == realized_roll.to_dict()
 
