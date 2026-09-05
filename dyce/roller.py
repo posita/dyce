@@ -21,7 +21,6 @@ Its interfaces may change substantially or disappear.
 """
 
 import operator
-import warnings
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
@@ -31,7 +30,7 @@ from typing import Any, Generic, TypeVar, cast, overload
 import optype as ot
 
 from .h import H, HableT
-from .lifecycle import ExperimentalWarning, experimental
+from .lifecycle import experimental
 from .p import P
 from .types import GetItemT, getitems, natural_key
 
@@ -1060,9 +1059,7 @@ class PRoller(PoolRoller[_T_co]):
         }
 
     def roll(self) -> "PoolRoll[_T_co]":
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            outcomes = self._p.roll()
+        outcomes = self._p.roll()
         return PoolRoll(outcomes, self)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
@@ -1573,9 +1570,7 @@ def _as_roller(
     elif isinstance(value, H):
         return HRoller(value)
     elif isinstance(value, P):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
-            pool_roller = PRoller(value)
+        pool_roller = PRoller(value)
         return cast(
             "Roller[_T]",
             cast("PoolRoller[Any]", pool_roller).sum(),
