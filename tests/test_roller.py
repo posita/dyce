@@ -462,7 +462,6 @@ class TestPRoller:
     def test_empty_selection_sums_to_default_zero(self) -> None:
         pool = PRoller(P(H({1: 1})), name="pool")
 
-        assert pool.select(slice(0)).roll().outcomes == ()
         assert pool.select(slice(0)).sum().h() == H({0: 1})
 
     def test_empty_pool_is_one_possible_empty_roll(self) -> None:
@@ -474,14 +473,12 @@ class TestPRoller:
         assert list(pool.rolls_with_counts()) == [((), 1)]
         assert pool.h() == H({})
         assert summed.h() == H({0: 1})
-        assert summed.roll().outcome == 0
 
     def test_empty_pool_accepts_explicit_sum_value(self) -> None:
         pool = PRoller(P())
         summed: Roller[str] = pool.sum(empty="")
 
         assert summed.h() == H({"": 1})
-        assert summed.roll().outcome == ""
         assert summed.provenance() == {"kind": "pool-sum", "empty": ""}
 
     def test_at_composes_selection_and_sum(self) -> None:
@@ -684,7 +681,7 @@ class TestPoolRoll:
         assert roll.operands == (pool_roll,)
 
     def test_empty_sum_uses_default_or_explicit_value(self) -> None:
-        pool_roll = PRoller(P()).roll()
+        pool_roll = PoolRoll((), PRoller(P()))
         default_roll = pool_roll.sum()
         string_roll: Roll[str] = pool_roll.sum(empty="")
 
@@ -739,13 +736,26 @@ class TestRollerRollEquivalence:
         assert deferred_roll.to_dict() == realized_roll.to_dict()
 
     @pytest.mark.parametrize("empty", [0, ""])
-    def test_empty_pool_sum(self, empty: object) -> None:
-        pool = PRoller(P())
-
-        deferred_roll = pool.sum(empty=empty).roll()
-        realized_roll = pool.roll().sum(empty=empty)
-
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
+    @pytest.mark.parametrize(
+        "make_pool",
+        [
+            lambda: PRoller(P()),
+            RollerPool,
+            lambda: PRoller(P(6)).select(slice(0)),
+            lambda: RollerPool(LiteralRoller(1)).select(slice(0)),
+            lambda: PRoller(P(6)).select(0).select(slice(0)),
+        ],
+    )
+    def test_empty_pool_roll_raises(
+        self, make_pool: Callable[[], PoolRoller[int]], empty: object
+    ) -> None:
+        pool = make_pool()
+        with pytest.raises(ValueError, match="no outcomes from an empty"):
+            pool.roll()
+        with pytest.raises(ValueError, match="no outcomes from an empty"):
+            pool.sum(empty=empty).roll()
+        with pytest.raises(ValueError, match="no outcomes from an empty"):
+            pool.roll().sum(empty=empty)
 
     def test_adding_after_roll_matches_rolling_after_addition(
         self, monkeypatch: pytest.MonkeyPatch
