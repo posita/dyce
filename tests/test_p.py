@@ -1075,8 +1075,9 @@ class TestPAt:
 
 
 class TestPRoll:
-    def test_roll_empty(self) -> None:
-        assert P().roll() == ()
+    def test_roll_empty_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty pool\b"):
+            P().roll()
 
     def test_roll(self) -> None:
         d10 = H(10)
