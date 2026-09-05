@@ -23,7 +23,7 @@ from dyce import H
 from dyce.d import d6
 from dyce.lifecycle import ExperimentalWarning
 
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 VersusFuncT = Callable[[int, int], H["Versus"]]
 

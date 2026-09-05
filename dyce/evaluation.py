@@ -599,9 +599,7 @@ def explode_n(
             )
         return next_h_or_outcome
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=ExperimentalWarning)
-        return expand(_callback, source, n_left=n, precision=precision)
+    return expand(_callback, source, n_left=n, precision=precision)
 
 
 # ---- Helpers -------------------------------------------------------------------------
