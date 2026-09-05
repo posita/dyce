@@ -29,11 +29,11 @@ def fig_callback() -> None:
 
     attr_results: dict[str, H] = {
         "3d6": 3 @ H(6),
-        "4d6 - discard lowest": p_4d6.h(slice(1, None)),
-        "4d6 - re-roll first 1,\ndiscard lowest": p_4d6_reroll_first_one.h(
+        "4d6 - discard lowest": p_4d6.at(slice(1, None)),
+        "4d6 - re-roll first 1,\ndiscard lowest": p_4d6_reroll_first_one.at(
             slice(1, None)
         ),
-        "4d6 - re-roll all 1s (i.e., 4d(d5 + 1)),\ndiscard lowest": p_4d6_reroll_all_ones.h(
+        "4d6 - re-roll all 1s (i.e., 4d(d5 + 1)),\ndiscard lowest": p_4d6_reroll_all_ones.at(
             slice(1, None)
         ),
         "2d6 + 6": 2 @ H(6) + 6,

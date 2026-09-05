@@ -53,7 +53,7 @@ from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
 style.use("bmh")
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
 from collections.abc import Iterator
@@ -62,7 +62,7 @@ from dyce import H, P
 
 
 def roll_and_keep(p: P[int], k: int) -> H[int]:
-    assert all(h == p[0] for h in p), "pool must be homogeneous"
+    assert not p or p[0] == p[-1], "pool must be homogeneous"
     max_d = max(p[-1]) if p else 0
     return H.from_counts(
         (
@@ -85,7 +85,7 @@ def roll_and_keep_hs() -> Iterator[tuple[str, H[int]]]:
 def normal() -> Iterator[tuple[str, H[int]]]:
     for n in range(k + 1, k + 9):
         p = n @ P(d)
-        yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
+        yield f"{n}d{d} keep {k}", p.at(slice(-k, None))
 
 
 # %%

@@ -16,7 +16,7 @@
 r"""
 `dyce` revolves around two core primitives.
 [`H` objects][dyce.H] are histograms (outcomes or individual dice).
-[`P` objects][dyce.P] are collections of histograms (pools).
+[`P` objects][dyce.P] are ordered sequences of histograms (pools).
 
 Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
 It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
@@ -30,8 +30,7 @@ if True:  # so ruff won't complain imports are out-of-order, but still sort the 
 from importlib.metadata import PackageNotFoundError, version
 
 from .evaluation import HResult, PResult, TruncationWarning, expand, explode_n
-from .h import H, HableT, quantize_hs
-from .hable import HableOpsMixin
+from .h import H, HableOpsMixin, HableT, quantize_hs
 from .p import P, RollCountT, RollProbT, RollT
 
 __all__ = (

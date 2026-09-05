@@ -22,7 +22,7 @@ def fig_callback() -> None:
     from dyce import H, P
 
     def roll_and_keep(p: P[int], k: int) -> H[int]:
-        assert all(h == p[0] for h in p), "pool must be homogeneous"
+        assert not p or p[0] == p[-1], "pool must be homogeneous"
         max_d = max(p[-1]) if p else 0
         return H.from_counts(
             (
@@ -42,7 +42,7 @@ def fig_callback() -> None:
     def normal() -> Iterator[tuple[str, H[int]]]:
         for n in range(k + 1, k + 9):
             p = n @ P(d)
-            yield f"{n}d{d} keep {k}", p.h(slice(-k, None))
+            yield f"{n}d{d} keep {k}", p.at(slice(-k, None))
 
     # --8<-- [end:core]
 

@@ -53,13 +53,13 @@ from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
 style.use("bmh")
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
 from dyce.d import p2d6
 
-h2d6_lowest = p2d6.h(0)
-h2d6_highest = p2d6.h(-1)
+h2d6_lowest = p2d6.at(0)
+h2d6_highest = p2d6.at(-1)
 
 # %%
 from dyce.viz.matplotlib import plot_bar

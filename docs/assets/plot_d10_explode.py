@@ -23,7 +23,7 @@ def fig_callback() -> None:
 
     def keep(p: P[int], k: int) -> H[int]:
         r"Negative k keeps lowest, otherwise keeps highest"
-        return p.h(slice(-k, None) if k > 0 else slice(-k))
+        return p.at(slice(-k, None) if k > 0 else slice(-k))
 
     def nkk(n: int, k: int) -> H[int]:
         return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)

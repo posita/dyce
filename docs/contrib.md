@@ -87,7 +87,7 @@ Linting and type checking are run via [pre-commit](https://pre-commit.com/).
 
 If you are willing and able, consider [submitting a pull request](https://github.com/posita/dyce/pulls) with a fix.
 See [the docs](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) if you’re not already familiar with pull requests.
-`dyce` releases from [`master`](https://github.com/posita/dyce/tree/master) (although not always immediately), so [this workflow](https://githubflow.github.io/#how-we-do-it) might be helpful to understand.
+`dyce` releases from [`main`](https://github.com/posita/dyce/tree/main) (although not always immediately), so [this workflow](https://githubflow.github.io/#how-we-do-it) might be helpful to understand.
 There are only a few additional guidelines:
 
 - If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [`LICENSE`](license.md) file.

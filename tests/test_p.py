@@ -182,7 +182,7 @@ class TestPEq:
 
     def test_not_equal_to_non_p(self) -> None:
         # P.__eq__ returns NotImplemented for non-P; H.__eq__ then considers P(6) ==
-        # H(6) True via HableT (both flatten to the same histogram)
+        # H(6) True via HableOpsMixin (both flatten to the same histogram)
         assert (P(6) == H(6)) is True
         assert P(6) != 6
 
@@ -361,40 +361,42 @@ class TestPSequence:
 
 
 class TestPMatmul:
-    def test_matmul_returns_p(self) -> None:
-        assert isinstance(2 @ P(6), P)
-
-    def test_matmul_correct_length(self) -> None:
-        assert len(2 @ P(6)) == 2
-        assert len(3 @ P(6)) == 3
-
-    def test_matmul_zero(self) -> None:
+    def test_zero(self) -> None:
+        assert P(6) @ 0 == P()
         assert 0 @ P(6) == P()
 
-    def test_matmul_one(self) -> None:
+    def test_one(self) -> None:
+        assert P(6) @ 1 == P(6)
         assert 1 @ P(6) == P(6)
 
-    def test_rmatmul(self) -> None:
+    def test_two(self) -> None:
+        assert P(6) @ 2 == P(6, 6)
         assert 2 @ P(6) == P(6, 6)
 
-    def test_matmul_composition(self) -> None:
+    def test_returns_p(self) -> None:
+        assert isinstance(P(6) @ 2, P)
+        assert isinstance(2 @ P(6), P)
+
+    def test_correct_length(self) -> None:
+        assert len(P(6) @ 3) == 3
+        assert len(2 @ P(6)) == 2
+
+    def test_composition(self) -> None:
         assert 2 @ (2 @ P(6)) == 4 @ P(6)
 
-    def test_matmul_negative_rhs(self) -> None:
+    def test_negative(self) -> None:
+        with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
+            _ = P(6) @ -1
         with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
             _ = -1 @ P(6)
 
-    def test_rmatmul_non_int_rhs(self) -> None:
-        result = P(6).__rmatmul__(1.5)
-        assert result is NotImplemented
+    def test_non_int(self) -> None:
+        assert P(6).__matmul__(1.5) is NotImplemented
+        assert P(6).__rmatmul__(1.5) is NotImplemented
+        with pytest.raises(TypeError):
+            _ = P(6) @ 1.5
         with pytest.raises(TypeError):
             _ = 1.5 @ P(6)
-
-    def test_op_matmul(self) -> None:
-        d6 = P(6)
-        d6_2 = P(d6, d6)
-        assert 2 @ d6 == d6_2
-        assert d6_2 == d6 @ 2
 
 
 class TestPOp:
@@ -626,15 +628,26 @@ class TestPOp:
         assert ~(2 @ p) == ~(2 @ h)
 
 
+class TestPIsHomogeneous:
+    def test_empty(self) -> None:
+        assert P().is_homogeneous
+
+    def test_homogeneous(self) -> None:
+        assert P(6, 6).is_homogeneous
+
+    def test_heterogeneous(self) -> None:
+        assert not P(4, 6).is_homogeneous
+
+
 class TestPTotal:
+    def test_empty(self) -> None:
+        assert P().total == 1  # empty product
+
     def test_homogeneous(self) -> None:
         assert P(6, 6).total == 36
 
     def test_heterogeneous(self) -> None:
         assert P(4, 6).total == 24
-
-    def test_empty(self) -> None:
-        assert P().total == 1  # empty product
 
     def test_memoized(self) -> None:
         p = P(4, 6, 8)
@@ -707,40 +720,40 @@ class TestPApplyEachRoll:
         for m in range(len(p)):
             for n in range(m + 1, len(p) + 1):
                 which = slice(m, n)
-                assert p.h(which) == p.apply_to_each_roll(sum, which)
+                assert p.at(which) == p.apply_to_each_roll(sum, which)
 
     def test_sum_which_multi(self) -> None:
         p = 4 @ P(6)
         for m in range(len(p)):
             for n in range(m + 1, len(p) + 1):
                 which = slice(m, n)
-                assert p.h(slice(None), which, slice(None)) == p.apply_to_each_roll(
+                assert p.at(slice(None), which, slice(None)) == p.apply_to_each_roll(
                     sum, slice(None), which, slice(None)
                 )
-        assert p.h(slice(0, 0)) == p.apply_to_each_roll(sum, slice(0, 0))
+        assert p.at(slice(0, 0)) == p.apply_to_each_roll(sum, slice(0, 0))
 
 
 class TestPH:
-    def test_no_args_flattens_empty_pool(self) -> None:
+    def test_flattens_empty_pool(self) -> None:
         assert P().h() == H({})
 
-    def test_no_args_flattens(self) -> None:
+    def test_flattens(self) -> None:
         assert (2 @ P(6)).h() == H(6) + H(6)
 
-    def test_no_args_flattens_symbol(self) -> None:
+    def test_flattens_symbol(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
         x = sympy.symbols("x")
         d6x = H(6) * x
         assert (2 @ P(d6x)).h() == 2 @ d6x
 
-    def test_no_args_weird_single(
+    def test_weird_single(
         self,
     ) -> None:
         h = H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2})
         p_weird = P(h)
-        assert p_weird.h() == h  # type: ignore[call-arg] # ty: ignore[no-matching-overload]
+        assert p_weird.h() == h
 
-    def test_no_args_weird_multiple_raises(
+    def test_weird_multiple_raises(
         self,
     ) -> None:
         p_weird = 2 @ P(
@@ -755,7 +768,7 @@ class TestPH:
             warnings.catch_warnings(record=True) as w,
         ):
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
-            p_weird.h()  # type: ignore[call-arg] # ty: ignore[no-matching-overload]
+            p_weird.h()
 
         # TODO(posita): # ruff: ignore[missing-todo-link] - Is this really the right
         # logic? It "works", but beartype kills the transgression before the warning is
@@ -763,6 +776,12 @@ class TestPH:
         if exc_info.type is TypeError:
             assert len(w) == 1
             assert issubclass(w[0].category, _ConvolveFallbackWarning)
+
+
+class TestPAt:
+    def test_no_selectors_raises(self) -> None:
+        with pytest.raises(TypeError, match=r"\bmissing\b.*\bwhich\b"):
+            P().at()  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
 
     def test_which_selects_all_exactly_n_times_with_operation_aware_outcomes(
         self,
@@ -776,7 +795,7 @@ class TestPH:
                 for o_type in SAMPLE_OUTCOME_TYPES
             ),
         ):
-            p_h = p.h(slice(None), slice(None), slice(None))
+            p_h = p.at(slice(None), slice(None), slice(None))
             expected = H.from_counts(
                 (
                     (
@@ -799,16 +818,16 @@ class TestPH:
             H({NoCompare("oh-01"): 1, NoCompare("oh-02"): 2}),
             H({NoCompare("oh-03"): 3, NoCompare("oh-04"): 4}),
         )
-        p_h_lo = p.h(0)
-        assert repr(p_weird.h(0)) == repr(
+        p_h_lo = p.at(0)
+        assert repr(p_weird.at(0)) == repr(
             H({NoCompare("oh-01"): p_h_lo[1], NoCompare("oh-02"): p_h_lo[2]})
         )
-        p_h_hi = p.h(-1)
-        assert repr(p_weird.h(-1)) == repr(
+        p_h_hi = p.at(-1)
+        assert repr(p_weird.at(-1)) == repr(
             H({NoCompare("oh-03"): p_h_hi[3], NoCompare("oh-04"): p_h_hi[4]})
         )
         for i in range(len(p_weird)):
-            assert type(next(iter(p_weird.h(i).outcomes()))) is type(
+            assert type(next(iter(p_weird.at(i).outcomes()))) is type(
                 next(iter(p_weird[i].outcomes()))
             )
 
@@ -822,7 +841,7 @@ class TestPH:
                 H({NoCompareCanOnlyAdd("three"): 1, NoCompareCanOnlyAdd("four"): 1}),
             )
         )
-        p_h: H[Any] = p.h(slice(None), slice(None), slice(None))
+        p_h: H[Any] = p.at(slice(None), slice(None), slice(None))
         assert tuple((str(outcome), count) for outcome, count in p_h.items()) == (
             ("four+four+four+four+four+four+one+one+one+one+one+one", 1),
             ("four+four+four+four+four+four+one+one+one+two+two+two", 4),
@@ -837,7 +856,7 @@ class TestPH:
         assert type(next(iter(p_h.outcomes()))) is type(next(iter(p[0].outcomes())))
 
     def test_which_equivalence_with_rwc(self) -> None:
-        # h(*which) must agree with manually accumulating rolls_with_counts(*which)
+        # at(*which) must agree with manually accumulating rolls_with_counts(*which)
         p = 3 @ P(H({1: 1, 2: 2, 3: 1}), H({3: 1, 4: 1, 5: 1}))
         for which in (
             (-1,),
@@ -846,19 +865,19 @@ class TestPH:
             (slice(1, 2),),
             (slice(None),),
         ):
-            from_h = p.h(*which)
+            from_at = p.at(*which)
             from_rwc = H.from_counts(
                 (sum(roll), count) for roll, count in p.rolls_with_counts(*which)
             )
-            assert from_h == from_rwc, f"mismatch for which={which}"
+            assert from_at == from_rwc, f"mismatch for which={which}"
 
     def test_which_index_highest(self) -> None:
         # Highest of 2d6 (known distribution)
-        assert (2 @ P(6)).h(-1) == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
+        assert (2 @ P(6)).at(-1) == H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
 
     def test_which_index_lowest(self) -> None:
         # Lowest of 2d6 (known distribution, mirrors highest)
-        assert (2 @ P(6)).h(0) == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
+        assert (2 @ P(6)).at(0) == H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
 
     def test_which_single_homogeneous_position_uses_order_stat(self) -> None:
         p = 4 @ P(H({1: 1, 2: 2, 3: 1}))
@@ -871,7 +890,7 @@ class TestPH:
             ) as order_stat_for_n_at_pos,
             warnings.catch_warnings(record=True) as caught_warnings,
         ):
-            assert p.h(2) == H({1: 13, 2: 176, 3: 67})
+            assert p.at(2) == H({1: 13, 2: 176, 3: 67})
         order_stat_for_n_at_pos.assert_called_once_with(p[0], 4, 2)
         assert not caught_warnings
 
@@ -889,7 +908,7 @@ class TestPH:
             wraps=H.order_stat_for_n_at_pos,
             autospec=True,
         ) as order_stat_for_n_at_pos:
-            p.h(which)
+            p.at(which)
         assert order_stat_for_n_at_pos.call_args_list == [
             call(p[0], 2, group_positions[0]),
             call(p[2], 3, group_positions[1]),
@@ -904,7 +923,7 @@ class TestPH:
             ) as rwc_homogeneous_one_end,
             patch("dyce.p._WhichHSurveyor") as which_h_surveyor,
         ):
-            p.h(-2, -1)
+            p.at(-2, -1)
         rwc_homogeneous_one_end.assert_called_once_with(4, p[0], 2, from_right=True)
         which_h_surveyor.assert_not_called()
 
@@ -917,7 +936,7 @@ class TestPH:
                 wraps=_WhichHSurveyor,
             ) as which_h_surveyor,
         ):
-            p.h(-3, -2, -1)
+            p.at(-3, -2, -1)
         rwc_homogeneous_one_end.assert_not_called()
         which_h_surveyor.assert_called_once_with(p, (1, 2, 3))
 
@@ -930,7 +949,7 @@ class TestPH:
             ) as rwc_heterogeneous_one_end,
             patch("dyce.p._WhichHSurveyor") as which_h_surveyor,
         ):
-            p.h(-2, -1)
+            p.at(-2, -1)
         rwc_heterogeneous_one_end.assert_called_once_with(
             ((p[0], 2), (p[2], 3)), 2, from_right=True
         )
@@ -955,7 +974,7 @@ class TestPH:
                     *which,
                 )
             )
-            assert p_4df.h(*which) == expected, f"mismatch for which={which}"
+            assert p_4df.at(*which) == expected, f"mismatch for which={which}"
 
     def test_which_heterogeneous(self) -> None:
         p_d3 = P(3)
@@ -981,7 +1000,7 @@ class TestPH:
                     *which,
                 )
             )
-            assert p_4d3_4d4.h(*which) == expected, f"mismatch for which={which}"
+            assert p_4d3_4d4.at(*which) == expected, f"mismatch for which={which}"
 
     def test_which_all_exactly_twice(self) -> None:
         p_df = P(H((-1, 0, 1)))
@@ -989,30 +1008,25 @@ class TestPH:
         from_rwc = H.from_counts(
             (sum(roll) * 2, count) for roll, count in p_4df.rolls_with_counts()
         )
-        assert p_4df.h(slice(None), slice(None)) == from_rwc
+        assert p_4df.at(slice(None), slice(None)) == from_rwc
 
     def test_which_out_of_range_index_raises(self) -> None:
         # Out-of-bounds index raises (analogous to [][0], [][-1])
         with pytest.raises(IndexError):
-            P().h(0)
+            P().at(0)
         with pytest.raises(IndexError):
-            P().h(-1)
+            P().at(-1)
 
     def test_which_out_of_range_slice_empty(self) -> None:
         # Slice that selects nothing yields no rolls (analogous to [][0:1])
-        assert P().h(slice(0, 1)) == H({})
-        assert P().h(slice(-2, -1)) == H({})
-
-    def test_single_die_pool_via_h_returns_self_for_minus_1(self) -> None:
-        p = P(6)
-        assert p.h(-1) == H(6)
-        assert p.h(0) == H(6)
+        assert P().at(slice(0, 1)) == H({})
+        assert P().at(slice(-2, -1)) == H({})
 
     def test_heterogeneous_max_matches_brute_force(self) -> None:
         # Cross-check the decomposed result against brute-force enumeration on a
         # small-enough pool to enumerate fully
         p = P(2 @ P(4), 3 @ P(6))
-        via_decomp = p.h(-1)
+        via_decomp = p.at(-1)
         expected = H.from_counts(
             (max(roll), weight)
             for roll, weight in enumerate_weighted_unsorted_rolls_multinomial_coefficient(
@@ -1023,7 +1037,7 @@ class TestPH:
 
     def test_heterogeneous_min_matches_brute_force(self) -> None:
         p = P(2 @ P(4), 3 @ P(6))
-        via_decomp = p.h(0)
+        via_decomp = p.at(0)
         expected = H.from_counts(
             (min(roll), weight)
             for roll, weight in enumerate_weighted_unsorted_rolls_multinomial_coefficient(
@@ -1032,10 +1046,38 @@ class TestPH:
         )
         assert dict(via_decomp) == dict(expected)
 
+    def test_at_heterogeneous_extremes(self) -> None:
+        r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
+        d4, d6, d8, d10, d12, d20 = (H(n) for n in (4, 6, 8, 10, 12, 20))
+        p = P(d4, d6, d8, d10, d12, d20)
+        from_brute = H.from_counts(
+            (sum(roll), count)
+            for roll, count in sort_and_select_from_rolls(
+                enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+            )
+        )
+        assert p.at(0, -1) == from_brute
+
+    def test_rwc_heterogeneous_extremes_natural_order(self) -> None:
+        r"""P.at(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
+        sympy = pytest.importorskip("sympy", reason="requires sympy")
+        x = sympy.symbols("x")
+        d6x = H(6) + x
+        d8x = H(8) + x
+        p = P(d6x, d6x, d8x)
+        from_brute = H.from_counts(
+            (sum(roll), count)
+            for roll, count in sort_and_select_from_rolls(
+                enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
+            )
+        )
+        assert p.at(0, -1) == from_brute
+
 
 class TestPRoll:
-    def test_roll_empty(self) -> None:
-        assert P().roll() == ()
+    def test_roll_empty_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty pool\b"):
+            P().roll()
 
     def test_roll(self) -> None:
         d10 = H(10)
@@ -1122,11 +1164,11 @@ class TestPRollsWithCounts:
         which_roll_surveyor.assert_not_called()
         assert not caught_warnings
 
-    def test_which_heterogeneous_end_delegates_to_h(self) -> None:
+    def test_which_heterogeneous_end_delegates_to_at(self) -> None:
         p = P(4, 6)
-        with patch.object(P, "h", wraps=P.h, autospec=True) as h:
+        with patch.object(P, "at", wraps=P.at, autospec=True) as at:
             list(p.rolls_with_counts(-1))
-        h.assert_called_once_with(p, -1)
+        at.assert_called_once_with(p, -1)
 
     def test_which_contiguous_homogeneous_end_uses_partial_selection(self) -> None:
         p = 4 @ P(H((-1, 0, 1)))
@@ -1264,35 +1306,6 @@ class TestPRollsWithCounts:
             (slice(-9, -7),),
         ):
             _assert_rwc_matches_brute_force(p_3x3_4x4n, *which)
-
-
-def test_rwc_heterogeneous_extremes_via_h() -> None:
-    r"""P.h(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
-    d4, d6, d8, d10, d12, d20 = (H(n) for n in (4, 6, 8, 10, 12, 20))
-    p = P(d4, d6, d8, d10, d12, d20)
-    from_brute = H.from_counts(
-        (sum(roll), count)
-        for roll, count in sort_and_select_from_rolls(
-            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
-        )
-    )
-    assert p.h(0, -1) == from_brute
-
-
-def test_rwc_heterogeneous_extremes_natural_order() -> None:
-    r"""P.h(0, -1) on a heterogeneous pool agrees with the brute-force sum."""
-    sympy = pytest.importorskip("sympy", reason="requires sympy")
-    x = sympy.symbols("x")
-    d6x = H(6) + x
-    d8x = H(8) + x
-    p = P(d6x, d6x, d8x)
-    from_brute = H.from_counts(
-        (sum(roll), count)
-        for roll, count in sort_and_select_from_rolls(
-            enumerate_weighted_unsorted_rolls_multinomial_coefficient(p), 0, -1
-        )
-    )
-    assert p.h(0, -1) == from_brute
 
 
 # ---- Helpers -------------------------------------------------------------------------

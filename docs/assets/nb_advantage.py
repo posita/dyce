@@ -53,14 +53,14 @@ from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
 style.use("bmh")
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
 from dyce import H, HResult, P, expand
 
 normal_hit = H(12) + 5
 critical_hit = 3 @ H(12) + 5
-advantage = (2 @ P(20)).h(-1)
+advantage = (2 @ P(20)).at(-1)
 
 
 def crit(result: HResult[int]) -> H[int] | int:

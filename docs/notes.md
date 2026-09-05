@@ -24,6 +24,7 @@
 - Drops support for 3.9 and 3.10 and extends support to 3.14.
 - Fixes embarrassingly long-running logical error in 4d6 variants example.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
+- Derives [`H`][dyce.H] from [`HableT`][dyce.HableT] and implements [`HableT.h`][dyce.HableT.h] to return `self`.
 - Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
 - Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`H.apply`][dyce.H.apply].
 - Removes `H.is_even` and `H.is_odd`, whose functionality can be trivially reintroduced using [`H.apply`][dyce.H.apply].
@@ -31,17 +32,19 @@
 - Removes `H.vs` and `H.within`.
 - Renames `H.accumulate` to [`H.merge`][dyce.H.merge].
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
+- [`HableT.h`][dyce.HableT.h] is now an abstract base class, not merely a protocol.
+- Modifies [`P.h`][dyce.P.h] such that it now takes no arguments to remain consistent with [`HableT.h`][dyce.HableT.h].
+  Selection is now handled by a separate [`P.at`][dyce.P.at] method.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
-- Removes `P.is_homogeneous`.
+- Returns `P.is_homogeneous` to being a property.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
 - Adds experimental [`H.quantile`][dyce.H.quantile] method.
-- Adds experimental [`H.quantize` method][dyce.H.quantize] and [`quantize_hs` context manager][dyce.quantize_hs].
+- Adds experimental [`H.quantize_counts` method][dyce.H.quantize_counts] and [`quantize_hs` context manager][dyce.quantize_hs].
 - Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
 - Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
 - Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
-- Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
 - *(Finally!)* removes deprecated interfaces:
     - `H.explode`
     - `H.foreach`
@@ -156,7 +159,7 @@
 - Renames `HAbleT` and `HAbleOpsMixin` to [`HableT`][dyce.HableT] and [`HableOpsMixin`][dyce.HableOpsMixin].
     Uses alternate spellings.
 - Removes deprecated non-flattening unary operation methods `P.__neg__` and `P.__pos__`.
-    Uses, e.g., `P.umap(operator.__neg__)` or `P(-h for h in p)` instead.
+    Uses, e.g., `P.umap(operator.neg)` or `P(-h for h in p)` instead.
 - Removes deprecated synonym methods `H.even` and `H.odd`.
     Uses `H.is_even` and `H.is_odd` instead.
 - Removes deprecated synonym package `dyce.plt`.
