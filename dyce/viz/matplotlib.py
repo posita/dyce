@@ -85,7 +85,7 @@ r"""
 Callable type for burst-plot wedge labels.
 
 Called as `formatter(outcome, probability, histogram)`.
-Return an empty string to suppress the label for that wedge.
+Returns an empty string to suppress the label for that wedge.
 """
 
 _DEFAULT_MARKERS: str = "."
@@ -108,7 +108,9 @@ def format_outcome_name(
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with its outcome.
-    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.
+
+    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used.
+    Otherwise `str(outcome)` is used.
     """
     return str(outcome.name) if hasattr(outcome, "name") else str(outcome)  # pyright: ignore[reportAttributeAccessIssue]
 
@@ -124,7 +126,9 @@ def format_outcome_name_probability(
 ) -> str:
     r"""
     Burst-plot formatter that labels each wedge with both its outcome and probability.
-    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used; otherwise `str(outcome)` is used.
+
+    If *outcome* has a `.name` attribute (e.g. an `Enum`), that is used.
+    Otherwise `str(outcome)` is used.
     """
     name = format_outcome_name(outcome, prob, h)
     return f"{name}\n{format_probability(outcome, prob, h)}"
@@ -168,7 +172,7 @@ def plot_bar(
 
     Plots a grouped bar chart of one or more histograms.
 
-    Use *labels* to assign legend names to each histogram.
+    Uses *labels* to assign legend names to each histogram.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
@@ -422,7 +426,7 @@ def plot_line(
 
     Plots a line graph of one or more histograms.
 
-    Use *labels* to assign legend names to each histogram.
+    Uses *labels* to assign legend names to each histogram.
     Unmatched histograms receive an empty label.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
@@ -518,7 +522,7 @@ def plot_ridge(
     Each ridge covers only its own outcomes.
     Where a neighbor has an outcome this histogram lacks, the line bridges the gap rather than dipping to zero, since the histogram says nothing there rather than saying zero.
 
-    Use *labels* to name each histogram.
+    Uses *labels* to name each histogram.
     Names are drawn inside the plot at their ridge’s baseline, pinned to the left edge, so a long one grows rightward over its own ridge rather than clipping into the margin.
     Unmatched histograms get a blank label.
 

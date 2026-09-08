@@ -13,7 +13,9 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-r"""Shared structures for dyce visualization backends."""
+r"""
+Shared structures for dyce visualization backends.
+"""
 
 import operator
 from enum import StrEnum, auto

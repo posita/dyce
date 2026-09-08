@@ -63,13 +63,15 @@ RollProbT = tuple[RollT[_T], int, int]
 
 
 class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
-    r"""
-    Provides the four interfaces required for [`P.survey`][dyce.p.P.survey].
-    """
+    r"""Provides the four interfaces required for [`P.survey`][dyce.p.P.survey]."""
 
     @property
     def initial(self) -> _StateT | None:
-        r"By default, this is `None`."
+        r"""
+        Returns the initial state value for the first call to [`accumulate][dyce.p.SurveyorBase].
+
+        By default, this is `None`.
+        """
         return None
 
     @abstractmethod
@@ -80,9 +82,9 @@ class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
 
     def settle(self, state: _StateT) -> _ResultT:
         r"""
-        By default, this is *state* (i.e., the terminal states are themselves the outcomes).
+        Callback to finalize *state* after the last call to [`accumulate][dyce.p.SurveyorBase] if additional mutation is required.
 
-        This can be overridden if additional mutation is required.
+        By default, this returns *state* (i.e., the terminal states are themselves the outcomes).
         """
         return cast("_ResultT", state)
 
@@ -351,7 +353,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self,
         *init_vals: Any,
     ) -> None:
-        r"""Constructor."""
+        r"""
+        Constructs a [`P`][dyce.P] from zero or more *init_vals*, each of which can be a histogram, pool, or initializer shorthand value.
+        """
         super().__init__()
         self._h_groups: dict[H[_T_co], int]
         h_counts: Counter[H[_T_co]] = Counter()
@@ -488,6 +492,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def total(self) -> int:
         r"""
         Equivalent to `prod(h.total for h in self)`.
+
         Consistent with the empty product, this is `1` for an empty pool.
         The result is cached to avoid redundant computation with multiple accesses.
         """
@@ -528,7 +533,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         apply_to_each: bool = False,
     ) -> "P[_ResultT]":
         r"""
-        Return a new [`P`][dyce.P] by applying *func* to each histogram via its [`H.apply`][dyce.H.apply] method.
+        Returns a new [`P`][dyce.P] by applying *func* to each histogram via its [`H.apply`][dyce.H.apply] method.
+
         If *other* is provided, *func* should have two parameters, otherwise it should have one.
 
         *func* is assumed to be idempotent, meaning that for each distinct histogram `h`, calling `h.apply(func, other)` should return the same result regardless of context.
@@ -567,6 +573,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def at(self: "P[Any]", which: GetItemT, *more: GetItemT) -> H[Any]:
         r"""
         Returns a histogram representing the sum of the outcomes at the selected positions for each possible roll.
+
         This is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(which, *more))` with optimizations.
         Identifiers can be `int`s or `slice`s, and can be mixed.
 
@@ -727,6 +734,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:
         r"""
         Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
+
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
 
         If one or more *which* arguments are provided (as `SupportsIndex` or `slice` values), each roll is filtered to the selected positions before yielding.
@@ -854,7 +862,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         settle: Callable[[_StateT], _ResultT] | None = None,
     ) -> H[_StateT | _ResultT]:
         r"""
-        Return a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
+        Returns a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
 
         This implements a state-collapsing dynamic program similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
         Rather than enumerating every distinct roll, it sweeps the shared outcome axis once, and branches on how many dice show each distinct outcome.
@@ -1093,7 +1101,8 @@ def _rwc_heterogeneous_one_end(
     from_right: bool,
 ) -> Iterator[RollCountT[_T]]:
     r"""
-    Yield the lowest or highest *k* outcomes from homogeneous groups.
+    Yields the lowest or highest *k* outcomes from homogeneous groups.
+
     Values outside each group’s own lowest or highest *k* cannot enter the combined selection, so group roll distributions can be merged and truncated incrementally.
     """
     if len(h_groups) == 1:
@@ -1127,7 +1136,8 @@ def _rwc_homogeneous_one_end(
     from_right: bool,
 ) -> Iterator[RollCountT[_T]]:
     r"""
-    Yield the lowest or highest *k* outcomes from *n* rolls of *h*.
+    Yields the lowest or highest *k* outcomes from *n* rolls of *h*.
+
     Once an outcome fills the remaining selected positions, a complementary binomial tail combines every possible assignment of the unselected dice.
     """
     ordered_outcomes = (

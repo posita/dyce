@@ -14,7 +14,8 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-r"""Synthesize type-checkable files from doctests and run type checkers, or reformat doctest examples in place.
+r"""
+Synthesizes type-checkable files from doctests and run type checkers, or reformat doctest examples in place.
 
 Run "check --help" or "format --help" for subcommand-specific usage.
 """
@@ -47,7 +48,7 @@ _DEFAULT_SUFFIXES: frozenset[str] = frozenset({".md", ".py", ".pyi"})
 
 
 def _leading_blank_lines(s: str) -> int:
-    r"""Return the number of leading blank lines in *s*."""
+    r"""Returns the number of leading blank lines in *s*."""
     count = 0
     for line in s.split("\n"):
         if line.strip():
@@ -58,7 +59,7 @@ def _leading_blank_lines(s: str) -> int:
 
 def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.DocTest]]:
     r"""
-    Yield `(doc_offset, dt)` for every doctest block in *text*.
+    Yields `(doc_offset, dt)` for every doctest block in *text*.
 
     First tries to locate docstrings via `ast` (text-only, no import).
     Each docstring's `doc_offset` maps `dt.examples[i].lineno` to an absolute 0-based line number in the original file.
@@ -106,7 +107,7 @@ def _iter_doctests(text: str, filepath: Path) -> Iterator[tuple[int, doctest.Doc
 
 def _synthesize_filepath(filepath: Path) -> str:
     r"""
-    Return a buffer whose doctest code lines occupy their original positions.
+    Returns a buffer whose doctest code lines occupy their original positions.
 
     All other lines are blank. The result ends with exactly one `os.linesep`.
     """
@@ -204,7 +205,7 @@ def _run_checkers(
 
 def _ruff_format(source: str) -> str | None:
     r"""
-    Format *source* through `ruff format`.
+    Formats *source* through `ruff format`.
 
     Returns the formatted source, or `None` if ruff failed or the source is unchanged.
     """
@@ -223,7 +224,7 @@ def _ruff_format(source: str) -> str | None:
 
 def _make_prefixed_lines(source: str, indent: int) -> list[str] | None:
     r"""
-    Convert formatted Python *source* to doctest-prefixed lines.
+    Converts formatted Python *source* to doctest-prefixed lines.
 
     Applies *indent* spaces before each `>>>` or `...` prompt.
     Returns `None` if the formatted source contains blank lines between top-level statements, which would silently split the example into multiple interactions.
@@ -256,7 +257,7 @@ def _make_prefixed_lines(source: str, indent: int) -> list[str] | None:
 
 def _format_filepath(filepath: Path) -> bool:
     r"""
-    Format doctest examples in *filepath* in place.
+    Formats doctest examples in *filepath* in place.
 
     Skips `.py` and `.pyi` files.
     Relies on `ruff format` for those, which handles docstring line-length adjustments natively via `docstring-code-line-length`.
@@ -323,7 +324,7 @@ def _format_filepath(filepath: Path) -> bool:
 
 
 def _format_filepaths(filepaths: Iterable[Path]) -> bool:
-    r"""Format doctest examples across all *filepaths*, logging a summary."""
+    r"""Formats doctest examples across all *filepaths*, logging a summary."""
     changed: list[Path] = [
         filepath for filepath in filepaths if _format_filepath(filepath)
     ]
@@ -345,7 +346,7 @@ _tmp_dir: Path | None = None
 
 def _flat_name(filepath: Path) -> str:
     r"""
-    Derive a flat filename for *filepath* suitable for a shared temp directory.
+    Derives a flat filename for *filepath* suitable for a shared temp directory.
 
     Leading dots and path separators are stripped, remaining separators are replaced with `__`, and the extension is forced to `.py` so that type checkers will analyse the file.
     """
@@ -379,7 +380,7 @@ def _load_toml_config(  # ruff: ignore[complex-structure]
     subcommand: str | None,
 ) -> tuple[dict[str, object], dict[str, object]]:
     r"""
-    Find and return `[tool.check_doctests]` from the nearest `pyproject.toml`.
+    Finds and return `[tool.check_doctests]` from the nearest `pyproject.toml`.
 
     Walks up from the current directory.
     Returns `({}, {})` if no file is found or the section is absent.
@@ -480,7 +481,7 @@ def _split_argv(
     argv: list[str],
 ) -> tuple[list[str], list[list[str]]]:
     r"""
-    Split *argv* on `--` boundaries.
+    Splits *argv* on `--` boundaries.
 
     Returns `(pre_args, checker_commands)` where *pre_args* is everything before the first `--` (passed to argparse) and *checker_commands* is a list of token lists, one per checker, split on subsequent `--` tokens.
 

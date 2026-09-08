@@ -244,7 +244,7 @@ def expand(  # ruff: ignore[complex-structure]
 
         `expand` is experimental; its interface may change or it may be removed in a future release.
 
-    Evaluate *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
+    Evaluates *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
 
     For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument pe [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
     The return value controls how the branch contributes to the accumulation:
@@ -530,6 +530,7 @@ def explode_n(
        -- END MONKEY PATCH -->
 
     Convenience wrapper around [`expand`][dyce.expand] for exploding dice.
+
     *resolver* can return either a histogram to indicate the next die to be rolled and accumulated (up to *n* times) or an outcome.
     The default *resolver* explodes on the maximum face.
 

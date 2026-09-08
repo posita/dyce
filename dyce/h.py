@@ -114,7 +114,7 @@ class HableT(ABC, Generic[_T_co]):
 
     @abstractmethod
     def h(self: "HableT[_T]") -> "H[_T]":
-        r"""Express its implementer as an [`H` object][dyce.H]."""
+        r"""Expresses its implementer as an [`H` object][dyce.H]."""
 
 
 # H is immutable and intentionally covariant in its outcome type, even though Mapping's
@@ -350,7 +350,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
     def __init__(self, init_val: Any, /) -> None:  # ruff: ignore[complex-structure]
-        r"""Constructor."""
+        r"""
+        Constructs an [`H`][dyce.H] from *init_val*, which can be a mapping, iterable, or an integer shorthand.
+        """
         self._h: dict[_T_co, int]
         self._hash: int | None = None
         self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}
@@ -408,7 +410,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         preserve_zero_counts: bool = False,
     ) -> "H[_T]":
         r"""
-        Construct an [`H`][dyce.H] by accumulating counts from one or more *sources*.
+        Constructs an [`H`][dyce.H] by accumulating counts from one or more *sources*.
 
         Each source may be a mapping of outcomes to counts, or an iterable of `(outcome, count)` pairs.
         Counts for the same outcome across all sources are summed.
@@ -480,21 +482,17 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         return len(self._h)
 
     def counts(self) -> ValuesView[int]:
-        r"""
-        More descriptive synonym for the `values` mapping method.
-        """
+        r"""A more descriptive synonym for the `values` mapping method."""
         return self._h.values()
 
     def outcomes(self: "H[_T]") -> KeysView[_T]:
-        r"""
-        More descriptive synonym for the `keys` mapping method.
-        """
+        r"""A more descriptive synonym for the `keys` mapping method."""
         return self._h.keys()
 
     # ---- HableT abstract methods -----------------------------------------------------
 
     def h(self: "H[_T]") -> "H[_T]":
-        r"""Expresses this histogram as itself."""
+        r"""Returns `self`."""
         return self
 
     # ---- Forward operators -----------------------------------------------------------
@@ -1293,6 +1291,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     def total(self) -> int:
         r"""
         Equivalent to `sum(self.counts())`.
+
         The result is cached to avoid redundant computation with multiple accesses.
 
             >>> H({4: 2, 5: 3, 6: 1}).total
@@ -1329,11 +1328,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
     ) -> "H[_ResultT]":
         r"""
-        Return a new [`H`][dyce.H] by applying *func* to outcomes.
+        Returns a new [`H`][dyce.H] by applying *func* to outcomes.
+
         If *operand* is provided, *func* should have two parameters, otherwise it should have one.
-
         If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
-
         If *operand* is a scalar, call `func(outcome, operand)` for each outcome, passing counts through unchanged.
 
         Resulting counts for duplicate outcomes are summed.
@@ -1437,6 +1435,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> int:
         r"""
         Computes and returns (in constant time) the number of ways *outcome* appears exactly *k* times among *n* like histograms.
+
         Uses the binomial coefficient as a more efficient alternative to `(n @ self.eq(outcome))[k]`.
 
             >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
@@ -1492,6 +1491,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> str:
         r"""
         Returns a formatted string representation of the histogram.
+
         *precision* is the number of decimal places to use and defaults to `2`.
         *tick* is used as the bar character and defaults to `"#"`.
         *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
@@ -1621,7 +1621,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 
     def lowest_terms(self: "H[_T]", *, preserve_zero_counts: bool = False) -> "H[_T]":
         r"""
-        Return a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
+        Returns a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
 
             >>> H({1: 2, 2: 4, 3: 6, 4: 0}).lowest_terms()
             H({1: 1, 2: 2, 3: 3})
@@ -1649,7 +1649,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 
     def mean(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the mean (expected value) of the weighted outcomes.
+        Returns the mean (expected value) of the weighted outcomes.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).mean()
@@ -1688,6 +1689,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> "H[_T]":
         r"""
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
+
         *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
 
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
@@ -1729,7 +1731,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
     ) -> Iterator[tuple[_T, _OtherT]]:
         r"""
-        Yield `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
+        Yields `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
 
         *rational_t* defaults to `fractions.Fraction`, giving exact rational probabilities.
         Pass any two-argument callable to get a different representation (e.g. `float` division via `lambda n, d: n / d`).
@@ -1756,6 +1758,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     def quantile(self: "H[_T]", numerator: SupportsInt, denominator: SupportsInt) -> _T:
         r"""
         Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.
+
         It matches NumPy's [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
         Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.
 
@@ -1813,7 +1816,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         preserve_zero_counts: bool = False,
     ) -> "H[Any]":
         r"""
-        Construct an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits and proportions are retained.
+        Constructs an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits and proportions are retained.
+
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
 
             >>> H.quantize_counts(
@@ -1863,7 +1867,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 
     def stdev(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the standard deviation of the weighted outcomes as a `float`.
+        Returns the standard deviation of the weighted outcomes as a `float`.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).stdev()
@@ -1875,7 +1880,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 
     def variance(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the variance of the weighted outcomes as a `float`.
+        Returns the variance of the weighted outcomes as a `float`.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).variance()
@@ -2039,10 +2045,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 class HableOpsMixin(HableT[_T_co]):
     r"""
     An abstract mixin that provides [`H`][dyce.H] math operators to its subclasses.
-    Each operator delegates to the [`H`][dyce.H] object returned by [`h()`][dyce.HableT.h].
 
-    This class also inherits from [`HableT`][dyce.HableT].
-    Subclasses are required to define [`h()`][dyce.HableT.h].
+    Each operator delegates to the [`H`][dyce.H] object returned by subclass-defined [`h()`][dyce.HableT.h].
     """
 
     __slots__ = ()
@@ -2463,7 +2467,7 @@ def aggregate_weighted(
     weighted_sources: Iterable[tuple[Any, int]],
 ) -> H[Any]:
     r"""
-    Aggregate *weighted_sources* into an [`H`][dyce.H] object.
+    Aggregates *weighted_sources* into an [`H`][dyce.H] object.
 
     Each element of *weighted_sources* is a two-tuple of either an `(outcome, count)` pair or an `(H, count)` pair.
     When a source is an [`H`][dyce.H], its total takes on the weight of *count*.
@@ -2532,6 +2536,7 @@ def quantize_hs(
 ) -> Any:  # ruff: ignore[any-type]
     r"""
     Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
+
     If nested, the innermost context controls.
 
         >>> from dyce import H, quantize_hs
@@ -2564,6 +2569,7 @@ def quantize_hs(
 def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
     r"""
     Sums zero or more histograms, returning `H({})` for an empty iterable.
+
     This ensures callers never have to special-case the empty collection.
     Outcomes must support addition with outcomes of the same type and produce that same type.
 
@@ -2589,9 +2595,7 @@ def _apply_opname(
     rop_name: str,
     r_val: object,
 ) -> object:
-    r"""
-    Try `l_val.op_name(r_val)`; if `NotImplemented`, try `r_val.rop_name(l_val)`.
-    """
+    r"""Try `l_val.op_name(r_val)`; if `NotImplemented`, try `r_val.rop_name(l_val)`."""
     op = getattr(l_val, op_name, None)
     result = op(r_val) if op is not None else NotImplemented
     if result is NotImplemented:
@@ -2605,7 +2609,7 @@ def _convolve(
     n: int,
 ) -> dict[_CanAddSameT, int] | NotImplementedType:
     r"""
-    Sum *n* independent copies of *mapping* (*n*-fold additive convolution).
+    Sums *n* independent copies of *mapping* (*n*-fold additive convolution).
 
     Tries `#!math O\left( \log n \right)` exponentiation by squaring first, falling back to the `#!math O\left( n \right)` linear approach if squaring fails.
     (Some outcome types may only support addition with the original outcome type, not with evolved sums.)
@@ -2633,7 +2637,7 @@ def _convolve_fast(
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Compute n-fold additive convolution in `#!math O\left( \log n \right)` steps.
+    Computes n-fold additive convolution in `#!math O\left( \log n \right)` steps.
 
     This is the classic "exponentiation by squaring" algorithm, generalized from multiplication to any associative binary operation.
     Additive convolution of histograms is associative, so it qualifies.
@@ -2707,14 +2711,12 @@ def _convolve_linear(
 
 def _flatten_to_h(rhs: object) -> object:
     r"""
-    If *rhs* is an [`HableOpsMixin`][dyce.HableOpsMixin] but not already an [`H`][dyce.H], coerce it to [`H`][dyce.H] via [`.h()`][dyce.HableT.h].
-    Otherwise return *rhs* unchanged.
+    Coerces *rhs* it to [`H`][dyce.H] via [`.h()`][dyce.HableT.h] is an [`HableOpsMixin`][dyce.HableOpsMixin].
+    Otherwise returns *rhs* unchanged.
 
     Used in forward binary operators so that `H(…) + P(…)` is treated as `H(…) + P(…).h()` rather than using `P` as a scalar outcome.
     Also used by [`HableOpsMixin`][dyce.HableOpsMixin] forward operators.
     """
-    if isinstance(rhs, H):
-        return rhs
     if isinstance(rhs, HableOpsMixin):
         return rhs.h()
     return rhs
@@ -2726,7 +2728,7 @@ def _h_binary_callable(
     func: Callable[[Any, Any], Any],
 ) -> "dict[Any, int] | NotImplementedType":
     r"""
-    Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulate `lhs_count * rhs_count`.
+    Computes and returns the Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulates `lhs_count * rhs_count`.
     Returns `NotImplemented` immediately if *func* does.
     """
     result: dict[Any, int] = {}
@@ -2744,7 +2746,7 @@ def _h_unary_opname(
     mapping: Mapping[Any, int],
     op_name: str,
 ) -> dict[Any, int] | NotImplementedType:
-    r"""Apply a unary op to each outcome key, preserving counts."""
+    r"""Applis a unary op to each outcome key, preserving counts."""
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
         op_fn = getattr(outcome, op_name, None)
@@ -2759,7 +2761,7 @@ def _map_opname_fwd(
     mapping: Mapping[Any, int], op_name: str, rop_name: str, scalar: object
 ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Forward op with scalar rhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    Applies [`_apply_opname`][dyce.h._apply_opname] as a forward operator across all outcome keys.
     """
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
@@ -2777,7 +2779,7 @@ def _map_opname_ref(
     scalar: object,
 ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Reflected op with scalar lhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    Applies [`_apply_opname`][dyce.h._apply_opname] as a reflected operator across all outcome keys.
     """
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
