@@ -27,7 +27,9 @@ _EXPERIMENTAL_TARGET = "dyce.lifecycle.experimental"
 
 
 def _resolve(obj: griffe.Object, name: str) -> str:
-    r"""Resolve *name* to its fully-qualified target path via the enclosing module’s aliases."""
+    r"""
+    Resolves *name* to its fully-qualified target path via the enclosing module’s aliases.
+    """
     node: griffe.Object | griffe.Alias | None = obj.parent
     while node is not None and not isinstance(node, griffe.Module):
         node = node.parent
@@ -39,7 +41,7 @@ def _resolve(obj: griffe.Object, name: str) -> str:
 
 
 class LifecycleExtension(griffe.Extension):
-    r"""Prepend an Experimental admonition to docstrings of decorated callables."""
+    r"""Prepends an Experimental admonition to docstrings of decorated callables."""
 
     def on_function_instance(  # zuban: ignore[override]
         self,
@@ -47,7 +49,7 @@ class LifecycleExtension(griffe.Extension):
         func: griffe.Function,
         **_kwargs: object,
     ) -> None:
-        r"""Process functions and methods."""
+        r"""Processes functions and methods."""
         self._annotate(func)
 
     def on_class_instance(  # zuban: ignore[override]
@@ -56,7 +58,7 @@ class LifecycleExtension(griffe.Extension):
         cls: griffe.Class,
         **_kwargs: object,
     ) -> None:
-        r"""Process classes."""
+        r"""Processes classes."""
         self._annotate(cls)
 
     def _annotate(self, obj: griffe.Class | griffe.Function) -> None:
