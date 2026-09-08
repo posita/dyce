@@ -18,7 +18,8 @@ import operator
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, ClassVar, Never, assert_type
+from typing import Any, Never, assert_type
+from unittest.mock import patch
 
 import pytest
 
@@ -60,22 +61,18 @@ _UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
 
 
 @dataclass(frozen=True)
-class _AdditionCountingOutcome:
+class _AddableOutcome:
     value: int
-    times_added: ClassVar[int] = 0
 
-    def __add__(self, other: "_AdditionCountingOutcome") -> "_AdditionCountingOutcome":
-        type(self).times_added += 1
-        return _AdditionCountingOutcome(self.value + other.value)
+    def __add__(self, other: "_AddableOutcome") -> "_AddableOutcome":
+        return _AddableOutcome(self.value + other.value)
 
 
-class _CountingHable(HableT[int]):
+class _Hable(HableT[int]):
     def __init__(self, h: H[int]) -> None:
         self._h = h
-        self.h_calls = 0
 
     def h(self) -> H[int]:
-        self.h_calls += 1
         return self._h
 
 
@@ -206,24 +203,26 @@ class TestSingleOutcomeRoller:
 
     def test_hable_promotion_is_lazy(self) -> None:
         d6 = HRoller(H(6), name="d6")
-        hable = _CountingHable(H(6))
+        hable = _Hable(H(6))
 
-        combined = d6 + hable
-
-        assert hable.h_calls == 0
-        assert isinstance(combined.operands[1], HableRoller)
-        assert combined.h() == 2 @ H(6)
-        assert hable.h_calls == 1
+        with patch.object(hable, "h", wraps=hable.h) as h:
+            combined = d6 + hable
+            h.assert_not_called()
+            assert isinstance(combined.operands[1], HableRoller)
+            assert combined.h() == 2 @ H(6)
+            h.assert_called_once_with()
 
     def test_hable_promotion_supports_rolls_and_trace(self) -> None:
-        hable = _CountingHable(H(6))
+        hable = _Hable(H(6))
 
-        roll = (HRoller(H(6), name="d6") + hable).roll()
+        with patch.object(hable, "h", wraps=hable.h) as h:
+            roll = (HRoller(H(6), name="d6") + hable).roll()
+            h.assert_called_once_with()
+
         trace = roll.trace()
         definitions = trace["definitions"]
 
         assert roll.outcome in 2 @ H(6)
-        assert hable.h_calls == 1
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {"kind": "source", "name": str(hable)}
 
@@ -251,18 +250,24 @@ class TestHRoller:
         assert (2 + d6).h() == 2 + H(6)
 
     def test_distribution_is_computed_lazily(self) -> None:
-        _AdditionCountingOutcome.times_added = 0
-        source = HRoller(H({_AdditionCountingOutcome(1): 1}), name="source")
-        combined = source + source
+        outcome = _AddableOutcome(1)
+        source = HRoller(H({outcome: 1}), name="source")
 
-        assert _AdditionCountingOutcome.times_added == 0
-        assert combined.h() == H({_AdditionCountingOutcome(2): 1})
-        assert _AdditionCountingOutcome.times_added == 1
+        with patch.object(
+            _AddableOutcome,
+            "__add__",
+            autospec=True,
+            side_effect=_AddableOutcome.__add__,
+        ) as add:
+            combined = source + source
+            add.assert_not_called()
+            assert combined.h() == H({_AddableOutcome(2): 1})
+            add.assert_called_once_with(outcome, outcome)
 
 
 class TestHableRoller:
     def test_exposes_hable_source(self) -> None:
-        hable = _CountingHable(H(6))
+        hable = _Hable(H(6))
         roller = HableRoller(hable, name="d6")
 
         assert_type(roller, HableRoller[int])
@@ -271,7 +276,7 @@ class TestHableRoller:
         assert roller.metadata() == {"kind": "source", "name": "d6"}
 
     def test_uses_hable_representation_as_default_name(self) -> None:
-        hable = _CountingHable(H(6))
+        hable = _Hable(H(6))
         roller = HableRoller(hable)
 
         assert roller.metadata() == {"kind": "source", "name": str(hable)}
