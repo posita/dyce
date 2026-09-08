@@ -24,8 +24,8 @@ import operator
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from functools import reduce
-from typing import Any, Generic, TypeVar, cast, overload
+from functools import reduce, wraps
+from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, overload
 
 import optype as ot
 
@@ -44,6 +44,7 @@ __all__ = (
     "Roll",
     "Roller",
     "RollerPool",
+    "mechanic",
 )
 
 _T = TypeVar("_T")
@@ -51,15 +52,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
-
-
-def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
-    iterator = iter(outcomes)
-    try:
-        first = next(iterator)
-    except StopIteration:
-        raise ValueError("no outcomes to sum") from None
-    return reduce(operator.add, iterator, first)
+_ParamsT = ParamSpec("_ParamsT")
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,6 +71,15 @@ class _UnaryOperator:
 
     def __call__(self, operand: object) -> object:
         return self.function(operand)
+
+
+def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
+    iterator = iter(outcomes)
+    try:
+        first = next(iterator)
+    except StopIteration:
+        raise ValueError("no outcomes to sum") from None
+    return reduce(operator.add, iterator, first)
 
 
 _ADD = _BinaryOperator("add", cast("Callable[[object, object], object]", operator.add))
@@ -1542,6 +1544,138 @@ class _UnaryRoller(Roller[_ResultT]):
         operand_roll = self._operand.roll()
         outcome = self._operator(operand_roll.outcome)
         return Roll(cast("_ResultT", outcome), self, (operand_roll,))
+
+
+class _MechanicDecorator(Protocol):
+    @overload
+    def __call__(
+        self, fn: Callable[_ParamsT, Roller[_T]], /
+    ) -> Callable[_ParamsT, Roller[_T]]: ...
+    @overload
+    def __call__(
+        self, fn: Callable[_ParamsT, PoolRoller[_T]], /
+    ) -> Callable[_ParamsT, PoolRoller[_T]]: ...
+
+
+class _MechanicPoolRoller(PoolRoller[_T_co]):
+    def __init__(self, expression: PoolRoller[_T_co], name: str) -> None:
+        self._expression = expression
+        self._name = name
+
+    def __len__(self) -> int:
+        return len(self._expression)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def operands(self) -> tuple[PoolRoller[_T_co], ...]:
+        return (self._expression,)
+
+    def h(self) -> H[_T_co]:
+        return self._expression.h()
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "mechanic", "name": self._name}
+
+    def roll(self) -> PoolRoll[_T_co]:
+        result = self._expression.roll()
+        return PoolRoll(result.outcomes, self, (result,))
+
+    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
+        yield from self._expression.rolls_with_counts()
+
+
+class _MechanicRoller(Roller[_T_co]):
+    def __init__(self, expression: Roller[_T_co], name: str) -> None:
+        self._expression = expression
+        self._name = name
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def operands(self) -> tuple[Roller[_T_co], ...]:
+        return (self._expression,)
+
+    def h(self) -> H[_T_co]:
+        return self._expression.h()
+
+    def provenance(self) -> dict[str, object]:
+        return {"kind": "mechanic", "name": self._name}
+
+    def roll(self) -> Roll[_T_co]:
+        result = self._expression.roll()
+        return Roll(result.outcome, self, (result,))
+
+
+@overload
+def mechanic(
+    fn: Callable[_ParamsT, Roller[_T]], /, *, name: str | None = None
+) -> Callable[_ParamsT, Roller[_T]]: ...
+@overload
+def mechanic(
+    roller_factory: Callable[_ParamsT, PoolRoller[_T]], /, *, name: str | None = None
+) -> Callable[_ParamsT, PoolRoller[_T]]: ...
+@overload
+def mechanic(
+    roller_factory: None = None, /, *, name: str | None = None
+) -> _MechanicDecorator: ...
+def mechanic(
+    roller_factory: Callable[..., object] | None = None, /, *, name: str | None = None
+) -> Any:
+    r"""
+    Decorates *roller_factory* to wrap its returned [`Roller`][dyce.roller.Roller] or [`PoolRoller`][dyce.roller.PoolRoller] so that *name* appears in [`Roll`][dyce.roller.Roll] provenances.
+    If not provided, *name* defaults to the *roller_factory*’s `__name__` or its type’s `__name__`.
+
+    Create a roller factory that accepts a modifier and use it to produce a named roller:
+
+        >>> from dyce import H
+        >>> from dyce.roller import HRoller, Roller, mechanic
+        >>> d20 = HRoller(H(20), name="d20")
+        >>> @mechanic
+        ... def attack(modifier: int = 0) -> Roller[int]:
+        ...     return d20 + modifier
+        >>> attack_3_roller = attack(modifier=3)
+
+    Now use the roller to produce rolls:
+
+        >>> roll = attack_3_roller.roll()
+        >>> roll.roller.provenance()
+        {'kind': 'mechanic', 'name': 'attack'}
+        >>> roll.operands[0].roller.provenance()
+        {'kind': 'binary', 'operator': 'add'}
+
+    Supply *name* to better distinguish *roller_factory*:
+
+        >>> @mechanic(name="my_game.melee_attack")
+        ... def melee_attack(modifier: int = 0) -> Roller[int]:
+        ...     return d20 + modifier
+        >>> melee_attack(modifier=-1).roll().roller.provenance()
+        {'kind': 'mechanic', 'name': 'my_game.melee_attack'}
+    """
+
+    def decorate(factory: Callable[..., object]) -> Callable[..., object]:
+        resolved_name = (
+            name
+            if name is not None
+            else getattr(factory, "__name__", type(factory).__name__)
+        )
+
+        @wraps(factory)
+        def wrapped(*args: object, **kwargs: object) -> Roller[Any] | PoolRoller[Any]:
+            expression = factory(*args, **kwargs)
+            if isinstance(expression, Roller):
+                return _MechanicRoller(expression, resolved_name)
+            if isinstance(expression, PoolRoller):
+                return _MechanicPoolRoller(expression, resolved_name)
+            raise TypeError("mechanics must return a Roller or PoolRoller")
+
+        return wrapped
+
+    return decorate if roller_factory is None else decorate(roller_factory)
 
 
 def _as_roll(value: _T | Roll[_T]) -> Roll[_T]:
