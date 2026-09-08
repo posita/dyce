@@ -17,6 +17,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
+from unittest.mock import Mock
 
 import pytest
 
@@ -287,19 +288,17 @@ def test_count_blindness_is_safe_for_presence_but_not_multiplicity() -> None:
 def test_accumulate_never_invoked_with_zero_count() -> None:
     # The positive-only contract: accumulate is called only for outcomes at least one
     # die shows, never for outcomes a branch places no dice on.
-    seen: list[tuple[int, int]] = []
-
-    def spy(state: int | None, outcome: int, count: int) -> int:
-        seen.append((outcome, count))
+    def accumulate(state: int | None, outcome: int, count: int) -> int:
         return (0 if state is None else state) + outcome * count
 
+    accumulate_mock = Mock(wraps=accumulate)
     (2 @ P(H({1: 1, 2: 1}))).survey(
-        accumulate=spy,
+        accumulate=accumulate_mock,
         initial=0,
         order=survey_outcome_order_ascending,
     )
-    assert seen  # it was called
-    assert all(count > 0 for _, count in seen)
+    accumulate_mock.assert_called()
+    assert all(invocation.args[2] > 0 for invocation in accumulate_mock.call_args_list)
 
 
 def test_empty_pool_returns_empty_h() -> None:
