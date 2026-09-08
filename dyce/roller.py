@@ -43,7 +43,7 @@ __all__ = (
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
-    "mechanic",
+    "roller_factory",
 )
 
 _T = TypeVar("_T")
@@ -1589,7 +1589,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
         return SingleOutcomeRoll(cast("_ResultT", outcome), self, (operand_roll,))
 
 
-class _MechanicDecorator(Protocol):
+class _RollerFactoryDecorator(Protocol):
     @overload
     def __call__(
         self, fn: Callable[_ParamsT, SingleOutcomeRoller[_T]], /
@@ -1600,7 +1600,7 @@ class _MechanicDecorator(Protocol):
     ) -> Callable[_ParamsT, MultiOutcomeRoller[_T]]: ...
 
 
-class _MechanicPoolRoller(MultiOutcomeRoller[_T_co]):
+class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
     def __init__(self, expression: MultiOutcomeRoller[_T_co], name: str) -> None:
         self._expression = expression
         self._name = name
@@ -1616,7 +1616,7 @@ class _MechanicPoolRoller(MultiOutcomeRoller[_T_co]):
         return self._expression.h()
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "mechanic", "name": self._name}
+        return {"kind": "factory", "name": self._name}
 
     def roll(self) -> MultiOutcomeRoll[_T_co]:
         result = self._expression.roll()
@@ -1626,7 +1626,7 @@ class _MechanicPoolRoller(MultiOutcomeRoller[_T_co]):
         yield from self._expression.rolls_with_counts()
 
 
-class _MechanicRoller(SingleOutcomeRoller[_T_co]):
+class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
     def __init__(self, expression: SingleOutcomeRoller[_T_co], name: str) -> None:
         self._expression = expression
         self._name = name
@@ -1639,7 +1639,7 @@ class _MechanicRoller(SingleOutcomeRoller[_T_co]):
         return self._expression.h()
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "mechanic", "name": self._name}
+        return {"kind": "factory", "name": self._name}
 
     def roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
@@ -1647,34 +1647,34 @@ class _MechanicRoller(SingleOutcomeRoller[_T_co]):
 
 
 @overload
-def mechanic(
+def roller_factory(
     fn: Callable[_ParamsT, SingleOutcomeRoller[_T]], /, *, name: str | None = None
 ) -> Callable[_ParamsT, SingleOutcomeRoller[_T]]: ...
 @overload
-def mechanic(
-    roller_factory: Callable[_ParamsT, MultiOutcomeRoller[_T]],
+def roller_factory(
+    fn: Callable[_ParamsT, MultiOutcomeRoller[_T]],
     /,
     *,
     name: str | None = None,
 ) -> Callable[_ParamsT, MultiOutcomeRoller[_T]]: ...
 @overload
-def mechanic(
-    roller_factory: None = None, /, *, name: str | None = None
-) -> _MechanicDecorator: ...
-def mechanic(
-    roller_factory: Callable[..., object] | None = None, /, *, name: str | None = None
+def roller_factory(
+    fn: None = None, /, *, name: str | None = None
+) -> _RollerFactoryDecorator: ...
+def roller_factory(
+    fn: Callable[..., object] | None = None, /, *, name: str | None = None
 ) -> Any:
     r"""
-    Decorates *roller_factory* to wrap its returned [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] or [`MultiOutcomeRoller`][dyce.roller.MultiOutcomeRoller] so that *name* appears in [`SingleOutcomeRoll`][dyce.roller.SingleOutcomeRoll] traces.
+    Decorates *fn* to wrap its returned [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] or [`MultiOutcomeRoller`][dyce.roller.MultiOutcomeRoller] so that *name* appears in [`SingleOutcomeRoll`][dyce.roller.SingleOutcomeRoll] traces.
 
-    If not provided, *name* defaults to the *roller_factory*’s `__name__` or its type’s `__name__`.
+    If not provided, *name* defaults to the *fn*’s `__name__` or its type’s `__name__`.
 
     Create a factory that accepts a modifier and uses it to produce a named roller:
 
         >>> from dyce import H
-        >>> from dyce.roller import HRoller, SingleOutcomeRoller, mechanic
+        >>> from dyce.roller import HRoller, SingleOutcomeRoller, roller_factory
         >>> d8 = HRoller(H(8), name="d8")
-        >>> @mechanic
+        >>> @roller_factory
         ... def damage(modifier: int = 0) -> SingleOutcomeRoller[int]:
         ...     return d8 + modifier
         >>> damage_3_roller = damage(modifier=3)
@@ -1683,18 +1683,18 @@ def mechanic(
 
         >>> roll = damage_3_roller.roll()
         >>> roll.roller.metadata()
-        {'kind': 'mechanic', 'name': 'damage'}
+        {'kind': 'factory', 'name': 'damage'}
         >>> roll.operands[0].roller.metadata()
         {'kind': 'binary', 'operator': 'add'}
 
-    Supply *name* to better distinguish *roller_factory*:
+    Supply *name* to better distinguish *fn*:
 
         >>> d20 = HRoller(H(20), name="d20")
-        >>> @mechanic(name="my_game.melee_attack")
+        >>> @roller_factory(name="my_game.melee_attack")
         ... def melee_attack(modifier: int = 0) -> SingleOutcomeRoller[int]:
         ...     return d20 + modifier
         >>> melee_attack(modifier=-1).roll().roller.metadata()
-        {'kind': 'mechanic', 'name': 'my_game.melee_attack'}
+        {'kind': 'factory', 'name': 'my_game.melee_attack'}
     """
 
     def decorate(factory: Callable[..., object]) -> Callable[..., object]:
@@ -1710,16 +1710,16 @@ def mechanic(
         ) -> SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]:
             expression = factory(*args, **kwargs)
             if isinstance(expression, SingleOutcomeRoller):
-                return _MechanicRoller(expression, resolved_name)
+                return _SingleOutcomeFactoryRoller(expression, resolved_name)
             if isinstance(expression, MultiOutcomeRoller):
-                return _MechanicPoolRoller(expression, resolved_name)
+                return _MultiOutcomeFactoryRoller(expression, resolved_name)
             raise TypeError(
-                "mechanics must return a SingleOutcomeRoller or MultiOutcomeRoller"
+                "roller factories must return a SingleOutcomeRoller or MultiOutcomeRoller"
             )
 
         return wrapped
 
-    return decorate if roller_factory is None else decorate(roller_factory)
+    return decorate if fn is None else decorate(fn)
 
 
 def _as_roll(value: _T | SingleOutcomeRoll[_T]) -> SingleOutcomeRoll[_T]:
