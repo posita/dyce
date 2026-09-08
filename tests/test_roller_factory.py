@@ -26,16 +26,16 @@ from dyce.roller import (
     PRoller,
     RollerPool,
     SingleOutcomeRoller,
-    _MechanicPoolRoller,
-    _MechanicRoller,
-    mechanic,
+    _MultiOutcomeFactoryRoller,
+    _SingleOutcomeFactoryRoller,
+    roller_factory,
 )
 
 
-class TestMechanicRoller:
+class TestSingleOutcomeFactoryRoller:
     def test_callables(self) -> None:
         class RollerFactories:
-            @mechanic()
+            @roller_factory()
             def factory(self, value: int) -> SingleOutcomeRoller[int]:
                 return LiteralRoller(value)
 
@@ -43,33 +43,33 @@ class TestMechanicRoller:
                 return LiteralRoller(value)
 
         some_rollers = RollerFactories()
-        roller_factory = some_rollers.factory(3)
-        assert_type(roller_factory, SingleOutcomeRoller[int])
-        assert isinstance(roller_factory, _MechanicRoller)
-        assert roller_factory.roll().outcome == 3
+        returned_roller = some_rollers.factory(3)
+        assert_type(returned_roller, SingleOutcomeRoller[int])
+        assert isinstance(returned_roller, _SingleOutcomeFactoryRoller)
+        assert returned_roller.roll().outcome == 3
 
-        callable_factory = mechanic(some_rollers)
+        callable_factory = roller_factory(some_rollers)
         callable_roller = callable_factory(4)
         assert_type(callable_roller, SingleOutcomeRoller[int])
-        assert isinstance(callable_roller, _MechanicRoller)
+        assert isinstance(callable_roller, _SingleOutcomeFactoryRoller)
         assert callable_roller.metadata()["name"] == "RollerFactories"
         assert callable_roller.roll().outcome == 4
 
-        bound_factory = mechanic(partial(some_rollers, 5), name="bound")
+        bound_factory = roller_factory(partial(some_rollers, 5), name="bound")
         bound_roller = bound_factory()
-        assert isinstance(bound_roller, _MechanicRoller)
+        assert isinstance(bound_roller, _SingleOutcomeFactoryRoller)
         assert bound_roller.metadata()["name"] == "bound"
         assert bound_roller.roll().outcome == 5
 
     def test_implicit_name(self) -> None:
-        @mechanic
+        @roller_factory
         def factory() -> SingleOutcomeRoller[int]:
             return LiteralRoller(3)
 
         assert factory().metadata()["name"] == factory.__name__
 
     def test_explicit_name(self) -> None:
-        @mechanic(name="explicit_name")
+        @roller_factory(name="explicit_name")
         def factory() -> SingleOutcomeRoller[int]:
             return LiteralRoller(3)
 
@@ -78,7 +78,7 @@ class TestMechanicRoller:
     def test_operands(self) -> None:
         literal_roller = LiteralRoller(3)
 
-        @mechanic
+        @roller_factory
         def factory() -> SingleOutcomeRoller[int]:
             return literal_roller
 
@@ -87,14 +87,14 @@ class TestMechanicRoller:
     def test_h(self) -> None:
         d6 = H(6)
 
-        @mechanic
+        @roller_factory
         def factory() -> SingleOutcomeRoller[int]:
             return HRoller(d6)
 
         assert factory().h() == d6
 
     def test_factory_returning_non_roller_raises(self) -> None:
-        @mechanic
+        @roller_factory
         def invalid_factory() -> SingleOutcomeRoller[int]:
             return cast("Any", "not_a_roller")
 
@@ -104,10 +104,10 @@ class TestMechanicRoller:
             invalid_factory()
 
 
-class TestMechanicPoolRoller:
+class TestMultiOutcomeFactoryRoller:
     def test_callables(self) -> None:
         class RollerFactories:
-            @mechanic()
+            @roller_factory()
             def factory(self, n: int) -> MultiOutcomeRoller[int]:
                 return PRoller(n @ P(2))
 
@@ -115,33 +115,33 @@ class TestMechanicPoolRoller:
                 return RollerPool(LiteralRoller(first), LiteralRoller(second))
 
         some_rollers = RollerFactories()
-        roller_factory = some_rollers.factory(2)
-        assert_type(roller_factory, MultiOutcomeRoller[int])
-        assert isinstance(roller_factory, _MechanicPoolRoller)
-        assert len(roller_factory) == 2
+        returned_roller = some_rollers.factory(2)
+        assert_type(returned_roller, MultiOutcomeRoller[int])
+        assert isinstance(returned_roller, _MultiOutcomeFactoryRoller)
+        assert len(returned_roller) == 2
 
-        callable_factory = mechanic(some_rollers)
+        callable_factory = roller_factory(some_rollers)
         callable_roller = callable_factory(3, 4)
         assert_type(callable_roller, MultiOutcomeRoller[int])
-        assert isinstance(callable_roller, _MechanicPoolRoller)
+        assert isinstance(callable_roller, _MultiOutcomeFactoryRoller)
         assert callable_roller.metadata()["name"] == "RollerFactories"
         assert callable_roller.roll().outcomes == (3, 4)
 
-        bound_factory = mechanic(partial(some_rollers, 5, 6), name="bound")
+        bound_factory = roller_factory(partial(some_rollers, 5, 6), name="bound")
         bound_roller = bound_factory()
-        assert isinstance(bound_roller, _MechanicPoolRoller)
+        assert isinstance(bound_roller, _MultiOutcomeFactoryRoller)
         assert bound_roller.metadata()["name"] == "bound"
         assert bound_roller.roll().outcomes == (5, 6)
 
     def test_implicit_name(self) -> None:
-        @mechanic
+        @roller_factory
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(P(2))
 
         assert factory().metadata()["name"] == factory.__name__
 
     def test_explicit_name(self) -> None:
-        @mechanic(name="explicit_name")
+        @roller_factory(name="explicit_name")
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(P(2))
 
@@ -150,7 +150,7 @@ class TestMechanicPoolRoller:
     def test_operands(self) -> None:
         p_roller = PRoller(P(2))
 
-        @mechanic
+        @roller_factory
         def factory() -> MultiOutcomeRoller[int]:
             return p_roller
 
@@ -159,7 +159,7 @@ class TestMechanicPoolRoller:
     def test_h(self) -> None:
         p3d6 = 3 @ P(6)
 
-        @mechanic
+        @roller_factory
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(p3d6)
 
@@ -168,7 +168,7 @@ class TestMechanicPoolRoller:
     def test_rolls_with_counts(self) -> None:
         p2d2 = 2 @ P(2)
 
-        @mechanic
+        @roller_factory
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(p2d2)
 
