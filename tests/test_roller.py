@@ -27,12 +27,12 @@ from dyce.roller import (
     HableRoller,
     HRoller,
     LiteralRoller,
-    PoolRoll,
-    PoolRoller,
+    MultiOutcomeRoll,
+    MultiOutcomeRoller,
     PRoller,
-    Roll,
-    Roller,
     RollerPool,
+    SingleOutcomeRoll,
+    SingleOutcomeRoller,
 )
 
 __all__ = ()
@@ -90,44 +90,44 @@ class _PowerOutcome:
         return _PowerOutcome(lhs**self.value)
 
 
-class TestRoller:
+class TestSingleOutcomeRoller:
     def test_binary_operator_types(self) -> None:
         d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
-        assert_type(d6 + H(6), Roller[int])
-        assert_type(d6 + P(6), Roller[int])
-        assert_type(d6 - H(6), Roller[int])
-        assert_type(d6 - P(6), Roller[int])
-        assert_type(d6 * H(2), Roller[int])
-        assert_type(d6 / H(2), Roller[float])
-        assert_type(d6 // H(2), Roller[int])
-        assert_type(d6 % H(2), Roller[int])
-        assert_type(power_roller**2, Roller[_PowerOutcome])
-        assert_type(d6 << H(2), Roller[int])
-        assert_type(d6 >> H(2), Roller[int])
-        assert_type(d6 & H(2), Roller[int])
-        assert_type(d6 | H(2), Roller[int])
-        assert_type(d6 ^ H(2), Roller[int])
+        assert_type(d6 + H(6), SingleOutcomeRoller[int])
+        assert_type(d6 + P(6), SingleOutcomeRoller[int])
+        assert_type(d6 - H(6), SingleOutcomeRoller[int])
+        assert_type(d6 - P(6), SingleOutcomeRoller[int])
+        assert_type(d6 * H(2), SingleOutcomeRoller[int])
+        assert_type(d6 / H(2), SingleOutcomeRoller[float])
+        assert_type(d6 // H(2), SingleOutcomeRoller[int])
+        assert_type(d6 % H(2), SingleOutcomeRoller[int])
+        assert_type(power_roller**2, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(d6 << H(2), SingleOutcomeRoller[int])
+        assert_type(d6 >> H(2), SingleOutcomeRoller[int])
+        assert_type(d6 & H(2), SingleOutcomeRoller[int])
+        assert_type(d6 | H(2), SingleOutcomeRoller[int])
+        assert_type(d6 ^ H(2), SingleOutcomeRoller[int])
 
-        assert_type(2 * d6, Roller[int])
-        assert_type(12 / d6, Roller[float])
-        assert_type(12 // d6, Roller[int])
-        assert_type(12 % d6, Roller[int])
-        assert_type(2**power_roller, Roller[_PowerOutcome])
-        assert_type(2 << d6, Roller[int])
-        assert_type(12 >> d6, Roller[int])
-        assert_type(2 & d6, Roller[int])
-        assert_type(2 | d6, Roller[int])
-        assert_type(2 ^ d6, Roller[int])
+        assert_type(2 * d6, SingleOutcomeRoller[int])
+        assert_type(12 / d6, SingleOutcomeRoller[float])
+        assert_type(12 // d6, SingleOutcomeRoller[int])
+        assert_type(12 % d6, SingleOutcomeRoller[int])
+        assert_type(2**power_roller, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(2 << d6, SingleOutcomeRoller[int])
+        assert_type(12 >> d6, SingleOutcomeRoller[int])
+        assert_type(2 & d6, SingleOutcomeRoller[int])
+        assert_type(2 | d6, SingleOutcomeRoller[int])
+        assert_type(2 ^ d6, SingleOutcomeRoller[int])
 
     def test_unary_operator_types(self) -> None:
         roller = LiteralRoller(-2)
 
-        assert_type(-roller, Roller[int])
-        assert_type(+roller, Roller[int])
-        assert_type(abs(roller), Roller[int])
-        assert_type(~roller, Roller[int])
+        assert_type(-roller, SingleOutcomeRoller[int])
+        assert_type(+roller, SingleOutcomeRoller[int])
+        assert_type(abs(roller), SingleOutcomeRoller[int])
+        assert_type(~roller, SingleOutcomeRoller[int])
 
     def test_hable_forward_addition_defers_to_roller(self) -> None:
         d6 = HRoller(H(6), name="d6")
@@ -144,10 +144,10 @@ class TestRoller:
     def test_hable_addition_is_symmetric(self) -> None:
         d6 = HRoller(H(6), name="d6")
 
-        assert isinstance(d6 + H(6), Roller)
-        assert isinstance(H(6) + d6, Roller)
-        assert isinstance(d6 + P(6), Roller)
-        assert isinstance(P(6) + d6, Roller)
+        assert isinstance(d6 + H(6), SingleOutcomeRoller)
+        assert isinstance(H(6) + d6, SingleOutcomeRoller)
+        assert isinstance(d6 + P(6), SingleOutcomeRoller)
+        assert isinstance(P(6) + d6, SingleOutcomeRoller)
         assert (d6 + H(6)).h() == 2 @ H(6)
         assert (H(6) + d6).h() == 2 @ H(6)
         assert (d6 + P(6)).h() == 2 @ H(6)
@@ -157,8 +157,8 @@ class TestRoller:
         d6 = HRoller(H(6), name="d6")
         two = H({2: 1})
 
-        assert isinstance(d6 - two, Roller)
-        assert isinstance(d6 - P(4), Roller)
+        assert isinstance(d6 - two, SingleOutcomeRoller)
+        assert isinstance(d6 - P(4), SingleOutcomeRoller)
         assert (d6 - two).h() == H(6) - 2
         assert (two - d6).h() == 2 - H(6)
         assert (d6 - P(4)).h() == H(6) - H(4)
@@ -186,11 +186,11 @@ class TestRoller:
         assert op(left_roller, right_p).h() == expected_h
         assert op(left_p, right_roller).h() == expected_h
         assert combined.h() == expected_h
-        assert combined.provenance() == {"kind": "binary", "operator": name}
+        assert combined.metadata() == {"kind": "binary", "operator": name}
         assert combined.operands == (left_roller, right_roller)
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_distributions_and_provenance(
+    def test_unary_operators_preserve_distributions_and_metadata(
         self,
         op: Callable[[Any], Any],
         name: str,
@@ -201,7 +201,7 @@ class TestRoller:
         expected_h = H({op(value): 1})
 
         assert combined.h() == expected_h
-        assert combined.provenance() == {"kind": "unary", "operator": name}
+        assert combined.metadata() == {"kind": "unary", "operator": name}
         assert combined.operands == (roller,)
 
     def test_hable_promotion_is_lazy(self) -> None:
@@ -215,12 +215,12 @@ class TestRoller:
         assert combined.h() == 2 @ H(6)
         assert hable.h_calls == 1
 
-    def test_hable_promotion_supports_rolls_and_provenance(self) -> None:
+    def test_hable_promotion_supports_rolls_and_trace(self) -> None:
         hable = _CountingHable(H(6))
 
         roll = (HRoller(H(6), name="d6") + hable).roll()
-        provenance = roll.to_dict()
-        definitions = provenance["definitions"]
+        trace = roll.trace()
+        definitions = trace["definitions"]
 
         assert roll.outcome in 2 @ H(6)
         assert hable.h_calls == 1
@@ -231,20 +231,20 @@ class TestRoller:
         roll = (HRoller(H({1: 1}), name="one") + LiteralRoller(2)).roll()
 
         assert roll.outcome == 3
-        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
+        assert json.loads(json.dumps(roll.trace())) == roll.trace()
 
     def test_raw_histograms_are_promoted_to_named_sources(self) -> None:
         combined = HRoller(H(6), name="d6") + H(8)
         promoted = combined.operands[1]
 
-        assert promoted.provenance() == {"kind": "source", "name": str(H(8))}
+        assert promoted.metadata() == {"kind": "source", "name": str(H(8))}
 
 
 class TestHRoller:
     def test_addition_preserves_distribution(self) -> None:
         d6 = HRoller(H(6), name="d6")
 
-        assert d6.name == "d6"
+        assert d6.metadata()["name"] == "d6"
         assert (d6 + d6).h() == 2 @ H(6)
         assert (d6 + H(6)).h() == 2 @ H(6)
         assert (d6 + 2).h() == H(6) + 2
@@ -267,16 +267,14 @@ class TestHableRoller:
 
         assert_type(roller, HableRoller[int])
         assert roller.hable is hable
-        assert roller.name == "d6"
         assert roller.h() == H(6)
-        assert roller.provenance() == {"kind": "source", "name": "d6"}
+        assert roller.metadata() == {"kind": "source", "name": "d6"}
 
     def test_uses_hable_representation_as_default_name(self) -> None:
         hable = _CountingHable(H(6))
         roller = HableRoller(hable)
 
-        assert roller.name is None
-        assert roller.provenance() == {"kind": "source", "name": str(hable)}
+        assert roller.metadata() == {"kind": "source", "name": str(hable)}
 
 
 class TestLiteralRoller:
@@ -287,7 +285,7 @@ class TestLiteralRoller:
         assert_type(roller, LiteralRoller[int])
         assert roller.value == 3
         assert roller.h() == H({3: 1})
-        assert roller.provenance() == {"kind": "literal", "value": 3}
+        assert roller.metadata() == {"kind": "literal", "value": 3}
         assert roll.outcome == 3
         assert roll.roller is roller
 
@@ -303,46 +301,46 @@ class TestPRoller:
     def test_binary_operator_types(self) -> None:
         left = PRoller(P(H({2: 1})), name="left")
         right = PRoller(P(H({3: 1})), name="right")
-        scalar = HRoller(H({5: 1}), name="scalar")
+        single = HRoller(H({5: 1}), name="single")
         power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
 
-        assert_type(left + right, Roller[int])
-        assert_type(left + scalar, Roller[int])
-        assert_type(scalar + left, Roller[int])
-        assert_type(left + P(H({5: 1})), Roller[int])
-        assert_type(left - right, Roller[int])
-        assert_type(right - left, Roller[int])
-        assert_type(10 - left, Roller[int])
-        assert_type(left * 2, Roller[int])
-        assert_type(left / 2, Roller[float])
-        assert_type(left // 2, Roller[int])
-        assert_type(left % 2, Roller[int])
-        assert_type(power_pool**2, Roller[_PowerOutcome])
-        assert_type(left << 2, Roller[int])
-        assert_type(left >> 2, Roller[int])
-        assert_type(left & 2, Roller[int])
-        assert_type(left | 2, Roller[int])
-        assert_type(left ^ 2, Roller[int])
+        assert_type(left + right, SingleOutcomeRoller[int])
+        assert_type(left + single, SingleOutcomeRoller[int])
+        assert_type(single + left, SingleOutcomeRoller[int])
+        assert_type(left + P(H({5: 1})), SingleOutcomeRoller[int])
+        assert_type(left - right, SingleOutcomeRoller[int])
+        assert_type(right - left, SingleOutcomeRoller[int])
+        assert_type(10 - left, SingleOutcomeRoller[int])
+        assert_type(left * 2, SingleOutcomeRoller[int])
+        assert_type(left / 2, SingleOutcomeRoller[float])
+        assert_type(left // 2, SingleOutcomeRoller[int])
+        assert_type(left % 2, SingleOutcomeRoller[int])
+        assert_type(power_pool**2, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(left << 2, SingleOutcomeRoller[int])
+        assert_type(left >> 2, SingleOutcomeRoller[int])
+        assert_type(left & 2, SingleOutcomeRoller[int])
+        assert_type(left | 2, SingleOutcomeRoller[int])
+        assert_type(left ^ 2, SingleOutcomeRoller[int])
 
-        assert_type(2 * left, Roller[int])
-        assert_type(12 / left, Roller[float])
-        assert_type(12 // left, Roller[int])
-        assert_type(12 % left, Roller[int])
-        assert_type(2**power_pool, Roller[_PowerOutcome])
-        assert_type(2 << left, Roller[int])
-        assert_type(12 >> left, Roller[int])
-        assert_type(2 & left, Roller[int])
-        assert_type(2 | left, Roller[int])
-        assert_type(2 ^ left, Roller[int])
+        assert_type(2 * left, SingleOutcomeRoller[int])
+        assert_type(12 / left, SingleOutcomeRoller[float])
+        assert_type(12 // left, SingleOutcomeRoller[int])
+        assert_type(12 % left, SingleOutcomeRoller[int])
+        assert_type(2**power_pool, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(2 << left, SingleOutcomeRoller[int])
+        assert_type(12 >> left, SingleOutcomeRoller[int])
+        assert_type(2 & left, SingleOutcomeRoller[int])
+        assert_type(2 | left, SingleOutcomeRoller[int])
+        assert_type(2 ^ left, SingleOutcomeRoller[int])
 
     def test_addition_aggregates_pool_operands(self) -> None:
         left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
         right = PRoller(P(H({3: 1}), H({4: 1})), name="right")
-        scalar = HRoller(H({5: 1}), name="scalar")
+        single = HRoller(H({5: 1}), name="single")
 
         assert (left + right).h() == H({10: 1})
-        assert (left + scalar).h() == H({8: 1})
-        assert (scalar + left).h() == H({8: 1})
+        assert (left + single).h() == H({8: 1})
+        assert (single + left).h() == H({8: 1})
         assert (left + P(H({5: 1}))).h() == H({8: 1})
         assert (P(H({5: 1})) + left).h() == H({8: 1})
 
@@ -368,7 +366,7 @@ class TestPRoller:
         combined = op(left, right)
 
         assert combined.h() == expected
-        assert combined.provenance() == {"kind": "binary", "operator": name}
+        assert combined.metadata() == {"kind": "binary", "operator": name}
         assert op(lhs, right).h() == expected
         assert op(P(H({lhs: 1})), right).h() == expected
         assert op(left, P(H({rhs: 1}))).h() == expected
@@ -376,19 +374,19 @@ class TestPRoller:
     def test_unary_operator_types_and_distributions(self) -> None:
         pool = PRoller(P(H({-2: 1})), name="pool")
 
-        assert_type(-pool, Roller[int])
-        assert_type(+pool, Roller[int])
-        assert_type(abs(pool), Roller[int])
-        assert_type(~pool, Roller[int])
+        assert_type(-pool, SingleOutcomeRoller[int])
+        assert_type(+pool, SingleOutcomeRoller[int])
+        assert_type(abs(pool), SingleOutcomeRoller[int])
+        assert_type(~pool, SingleOutcomeRoller[int])
         assert (-pool).h() == H({2: 1})
         assert (+pool).h() == H({-2: 1})
         assert abs(pool).h() == H({2: 1})
         assert (~pool).h() == H({1: 1})
 
-    def test_raw_pool_promotion_preserves_pool_provenance(self) -> None:
+    def test_raw_pool_promotion_preserves_pool_trace(self) -> None:
         combined = HRoller(H({1: 1}), name="one") + P(H({2: 1}), H({3: 1}))
-        provenance = combined.roll().to_dict()
-        definitions = provenance["definitions"]
+        trace = combined.roll().trace()
+        definitions = trace["definitions"]
 
         assert isinstance(definitions, dict)
         assert definitions["d2"] == {
@@ -409,9 +407,9 @@ class TestPRoller:
         roll = pool.roll()
 
         assert_type(pool, PRoller[int])
-        assert_type(roll, PoolRoll[int])
+        assert_type(roll, MultiOutcomeRoll[int])
         assert pool.p is p
-        assert pool.name == "pool"
+        assert pool.metadata()["name"] == "pool"
         assert pool.operands == ()
         assert roll.outcomes == (1, 2)
         assert roll.roller is pool
@@ -427,24 +425,24 @@ class TestPRoller:
 
         assert list(PRoller(p).rolls_with_counts()) == list(p.rolls_with_counts())
 
-    def test_sum_bridges_to_scalar_roller(self) -> None:
+    def test_sum_bridges_to_single_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1})), name="pool")
         summed = pool.sum()
 
-        assert_type(summed, Roller[int])
+        assert_type(summed, SingleOutcomeRoller[int])
         assert summed.h() == H({3: 1})
-        assert_type(summed.roll(), Roll[int])
+        assert_type(summed.roll(), SingleOutcomeRoll[int])
         assert summed.roll().outcome == 3
 
     def test_select_creates_deferred_pool_definition(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
         selected = pool.select(-1, 0)
         roll = selected.roll()
-        provenance = roll.to_dict()
-        definitions = provenance["definitions"]
-        events = provenance["events"]
+        trace = roll.trace()
+        definitions = trace["definitions"]
+        events = trace["events"]
 
-        assert_type(selected, PoolRoller[int])
+        assert_type(selected, MultiOutcomeRoller[int])
         assert roll.outcomes == (3, 1)
         assert isinstance(definitions, dict)
         assert definitions["d0"] == {
@@ -461,7 +459,6 @@ class TestPRoller:
         p = 3 @ P(2)
         selected = PRoller(p, name="pool").select(-1, 0).select(1)
 
-        assert selected.name is None
         assert len(selected) == 1
         assert selected.sum().h() == p.at(0)
 
@@ -475,44 +472,43 @@ class TestPRoller:
         summed = pool.sum()
 
         assert_type(pool, PRoller[Never])
-        assert_type(summed, Roller[Never])
+        assert_type(summed, SingleOutcomeRoller[Never])
         assert list(pool.rolls_with_counts()) == [((), 1)]
         assert pool.h() == H({})
         assert summed.h() == H({})
-        assert summed.provenance() == {"kind": "pool-sum"}
+        assert summed.metadata() == {"kind": "pool-sum"}
 
     def test_at_composes_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
-        assert_type(pool.at(-1, 0), Roller[int])
+        assert_type(pool.at(-1, 0), SingleOutcomeRoller[int])
         assert pool.at(-1, 0).h() == H({4: 1})
         assert pool.at(-1, 0).roll().outcome == 4
 
 
 class TestRollerPool:
-    def test_composes_scalar_rollers(self) -> None:
+    def test_composes_single_rollers(self) -> None:
         two = LiteralRoller(2)
         one = LiteralRoller(1)
         pool = RollerPool(two, one, name="pool")
         roll = pool.roll()
 
         assert_type(pool, RollerPool[int])
-        assert isinstance(pool, PoolRoller)
+        assert isinstance(pool, MultiOutcomeRoller)
         assert len(pool) == 2
-        assert pool.name == "pool"
         assert pool.rollers == (two, one)
         assert pool.operands == (two, one)
         assert pool.h() == H({3: 1})
         assert list(pool.rolls_with_counts()) == [((1, 2), 1)]
         assert roll.outcomes == (1, 2)
         assert tuple(operand.roller for operand in roll.operands) == (one, two)
-        assert pool.provenance() == {"kind": "pool", "name": "pool"}
+        assert pool.metadata() == {"kind": "pool", "name": "pool"}
 
     def test_reused_roller_has_one_definition_and_independent_events(self) -> None:
         d6 = HRoller(H(6), name="d6")
-        provenance = RollerPool(d6, d6).roll().to_dict()
-        definitions = provenance["definitions"]
-        events = provenance["events"]
+        trace = RollerPool(d6, d6).roll().trace()
+        definitions = trace["definitions"]
+        events = trace["events"]
 
         assert isinstance(definitions, dict)
         assert isinstance(events, dict)
@@ -532,8 +528,8 @@ class TestRollerPool:
     def test_sum_preserves_string_outcomes(self) -> None:
         pool = RollerPool(LiteralRoller("a"), LiteralRoller("b"))
 
-        assert_type(pool.sum(), Roller[str])
-        assert_type(pool.roll().sum(), Roll[str])
+        assert_type(pool.sum(), SingleOutcomeRoller[str])
+        assert_type(pool.roll().sum(), SingleOutcomeRoll[str])
         assert pool.sum().h() == H({"ab": 1})
         assert pool.roll().sum().outcome == "ab"
 
@@ -562,43 +558,43 @@ class TestRollerPool:
         assert impossible_pool.sum().h() == H({})
 
 
-class TestRoll:
+class TestSingleOutcomeRoll:
     def test_roll_binary_operator_types(self) -> None:
         roll = LiteralRoller(2).roll()
         power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
 
-        assert_type(roll * 2, Roll[int])
-        assert_type(roll / 2, Roll[float])
-        assert_type(roll // 2, Roll[int])
-        assert_type(roll % 2, Roll[int])
-        assert_type(power_roll**2, Roll[_PowerOutcome])
-        assert_type(roll << 2, Roll[int])
-        assert_type(roll >> 2, Roll[int])
-        assert_type(roll & 2, Roll[int])
-        assert_type(roll | 2, Roll[int])
-        assert_type(roll ^ 2, Roll[int])
+        assert_type(roll * 2, SingleOutcomeRoll[int])
+        assert_type(roll / 2, SingleOutcomeRoll[float])
+        assert_type(roll // 2, SingleOutcomeRoll[int])
+        assert_type(roll % 2, SingleOutcomeRoll[int])
+        assert_type(power_roll**2, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(roll << 2, SingleOutcomeRoll[int])
+        assert_type(roll >> 2, SingleOutcomeRoll[int])
+        assert_type(roll & 2, SingleOutcomeRoll[int])
+        assert_type(roll | 2, SingleOutcomeRoll[int])
+        assert_type(roll ^ 2, SingleOutcomeRoll[int])
 
-        assert_type(2 * roll, Roll[int])
-        assert_type(12 / roll, Roll[float])
-        assert_type(12 // roll, Roll[int])
-        assert_type(12 % roll, Roll[int])
-        assert_type(2**power_roll, Roll[_PowerOutcome])
-        assert_type(2 << roll, Roll[int])
-        assert_type(12 >> roll, Roll[int])
-        assert_type(2 & roll, Roll[int])
-        assert_type(2 | roll, Roll[int])
-        assert_type(2 ^ roll, Roll[int])
+        assert_type(2 * roll, SingleOutcomeRoll[int])
+        assert_type(12 / roll, SingleOutcomeRoll[float])
+        assert_type(12 // roll, SingleOutcomeRoll[int])
+        assert_type(12 % roll, SingleOutcomeRoll[int])
+        assert_type(2**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(2 << roll, SingleOutcomeRoll[int])
+        assert_type(12 >> roll, SingleOutcomeRoll[int])
+        assert_type(2 & roll, SingleOutcomeRoll[int])
+        assert_type(2 | roll, SingleOutcomeRoll[int])
+        assert_type(2 ^ roll, SingleOutcomeRoll[int])
 
     def test_unary_operator_types(self) -> None:
         roll = LiteralRoller(-2).roll()
 
-        assert_type(-roll, Roll[int])
-        assert_type(+roll, Roll[int])
-        assert_type(abs(roll), Roll[int])
-        assert_type(~roll, Roll[int])
+        assert_type(-roll, SingleOutcomeRoll[int])
+        assert_type(+roll, SingleOutcomeRoll[int])
+        assert_type(abs(roll), SingleOutcomeRoll[int])
+        assert_type(~roll, SingleOutcomeRoll[int])
 
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_outcomes_and_provenance(
+    def test_binary_operators_preserve_outcomes_and_trace(
         self,
         op: Callable[[Any, Any], Any],
         name: str,
@@ -608,9 +604,9 @@ class TestRoll:
         left_roll = LiteralRoller(lhs).roll()
         right_roll = LiteralRoller(rhs).roll()
         combined = op(left_roll, right_roll)
-        provenance = combined.to_dict()
-        definitions = provenance["definitions"]
-        events = provenance["events"]
+        trace = combined.trace()
+        definitions = trace["definitions"]
+        events = trace["events"]
 
         assert combined.outcome == op(lhs, rhs)
         assert isinstance(definitions, dict)
@@ -623,16 +619,16 @@ class TestRoll:
         assert events["e0"]["operands"] == ["e1", "e2"]
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_outcomes_and_provenance(
+    def test_unary_operators_preserve_outcomes_and_trace(
         self,
         op: Callable[[Any], Any],
         name: str,
         value: int,
     ) -> None:
         combined = op(LiteralRoller(value).roll())
-        provenance = combined.to_dict()
-        definitions = provenance["definitions"]
-        events = provenance["events"]
+        trace = combined.trace()
+        definitions = trace["definitions"]
+        events = trace["events"]
 
         assert combined.outcome == op(value)
         assert isinstance(definitions, dict)
@@ -648,20 +644,20 @@ class TestRoll:
         roll = 2 + HRoller(H(6), name="d6").roll()
 
         assert roll.outcome in 2 + H(6)
-        assert json.loads(json.dumps(roll.to_dict())) == roll.to_dict()
+        assert json.loads(json.dumps(roll.trace())) == roll.trace()
 
-    def test_provenance_distinguishes_independent_and_shared_events(self) -> None:
+    def test_trace_distinguishes_independent_and_shared_events(self) -> None:
         d6 = HRoller(H(6), name="d6")
         independent = d6.roll() + d6.roll()
         shared_source = d6.roll()
         shared = shared_source + shared_source
 
-        independent_provenance = independent.to_dict()
-        shared_provenance = shared.to_dict()
-        independent_events = independent_provenance["events"]
-        shared_events = shared_provenance["events"]
-        independent_definitions = independent_provenance["definitions"]
-        shared_definitions = shared_provenance["definitions"]
+        independent_trace = independent.trace()
+        shared_trace = shared.trace()
+        independent_events = independent_trace["events"]
+        shared_events = shared_trace["events"]
+        independent_definitions = independent_trace["definitions"]
+        shared_definitions = shared_trace["definitions"]
 
         assert isinstance(independent_events, dict)
         assert isinstance(shared_events, dict)
@@ -673,19 +669,19 @@ class TestRoll:
         assert shared_definitions["d0"]["operands"] == ["d1", "d1"]
 
 
-class TestPoolRoll:
-    def test_sum_bridges_to_scalar_roll(self) -> None:
+class TestMultiOutcomeRoll:
+    def test_sum_bridges_to_single_roll(self) -> None:
         pool_roll = PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
         roll = pool_roll.sum()
 
-        assert_type(roll, Roll[int])
+        assert_type(roll, SingleOutcomeRoll[int])
         assert roll.outcome == 3
         assert roll.operands == (pool_roll,)
 
     def test_empty_sum_raises(self) -> None:
-        pool_roll: PoolRoll[Never] = PoolRoll((), PRoller(P()))
+        pool_roll: MultiOutcomeRoll[Never] = MultiOutcomeRoll((), PRoller(P()))
 
-        assert_type(pool_roll, PoolRoll[Never])
+        assert_type(pool_roll, MultiOutcomeRoll[Never])
         with pytest.raises(ValueError, match="no outcomes to sum"):
             pool_roll.sum()
 
@@ -707,8 +703,8 @@ class TestRollerRollEquivalence:
         reflected_deferred_roll = op(lhs, right_roller).roll()
         reflected_realized_roll = op(lhs, right_roller.roll())
 
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
-        assert reflected_deferred_roll.to_dict() == reflected_realized_roll.to_dict()
+        assert deferred_roll.trace() == realized_roll.trace()
+        assert reflected_deferred_roll.trace() == reflected_realized_roll.trace()
 
     @pytest.mark.parametrize(("op", "_name", "value"), _UNARY_OPERATOR_CASES)
     def test_unary_operators(
@@ -719,7 +715,7 @@ class TestRollerRollEquivalence:
     ) -> None:
         roller = LiteralRoller(value)
 
-        assert op(roller).roll().to_dict() == op(roller.roll()).to_dict()
+        assert op(roller).roll().trace() == op(roller.roll()).trace()
 
     def test_pool_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
@@ -727,7 +723,7 @@ class TestRollerRollEquivalence:
         deferred_roll = pool.select(-1, 0).sum().roll()
         realized_roll = pool.select(-1, 0).roll().sum()
 
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        assert deferred_roll.trace() == realized_roll.trace()
 
     @pytest.mark.parametrize(
         "make_pool",
@@ -740,7 +736,7 @@ class TestRollerRollEquivalence:
         ],
     )
     def test_empty_pool_roll_raises(
-        self, make_pool: Callable[[], PoolRoller[int]]
+        self, make_pool: Callable[[], MultiOutcomeRoller[int]]
     ) -> None:
         pool = make_pool()
         with pytest.raises(ValueError, match="no outcomes from an empty"):
@@ -761,7 +757,7 @@ class TestRollerRollEquivalence:
         deferred_roll = (d6 + 2).roll()
 
         assert realized_roll.outcome == deferred_roll.outcome
-        assert realized_roll.to_dict() == deferred_roll.to_dict()
+        assert realized_roll.trace() == deferred_roll.trace()
 
     def test_deferred_and_realized_addition_are_equivalent(
         self, monkeypatch: pytest.MonkeyPatch
@@ -774,7 +770,7 @@ class TestRollerRollEquivalence:
         realized_roll = d6.roll() + d6.roll()
 
         assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        assert deferred_roll.trace() == realized_roll.trace()
 
     def test_deferred_and_realized_subtraction_are_equivalent(
         self, monkeypatch: pytest.MonkeyPatch
@@ -788,8 +784,8 @@ class TestRollerRollEquivalence:
         realized_roll = d6.roll() - d4.roll()
 
         assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
-        definitions = deferred_roll.to_dict()["definitions"]
+        assert deferred_roll.trace() == realized_roll.trace()
+        definitions = deferred_roll.trace()["definitions"]
         assert isinstance(definitions, dict)
         assert definitions["d0"]["operator"] == "sub"
 
@@ -804,4 +800,4 @@ class TestRollerRollEquivalence:
         realized_roll = 2 - d6.roll()
 
         assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.to_dict() == realized_roll.to_dict()
+        assert deferred_roll.trace() == realized_roll.trace()
