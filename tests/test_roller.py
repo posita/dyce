@@ -902,6 +902,100 @@ class TestMultiOutcomeRoll:
             pool_roll.sum()
 
 
+class TestMixedRollArithmetic:
+    def test_mixed_operator_types(self) -> None:
+        single = LiteralRoller(4)
+        multi = PRoller(P(H({1: 1}), H({3: 1})))
+        single_roll = LiteralRoller(9).roll()
+        multi_roll = PRoller(P(H({2: 1}), H({7: 1}))).roll()
+
+        assert_type(single + single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll + single, SingleOutcomeRoller[int])
+        assert_type(single + multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll + single, SingleOutcomeRoller[int])
+        assert_type(multi + single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll + multi, SingleOutcomeRoller[int])
+        assert_type(multi + multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll + multi, SingleOutcomeRoller[int])
+        assert_type(single_roll + multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll + single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll + multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single - single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll - single, SingleOutcomeRoller[int])
+        assert_type(single - multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll - single, SingleOutcomeRoller[int])
+        assert_type(multi - single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll - multi, SingleOutcomeRoller[int])
+        assert_type(multi - multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll - multi, SingleOutcomeRoller[int])
+        assert_type(single_roll - multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll - single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll - multi_roll, SingleOutcomeRoll[int])
+
+    @pytest.mark.parametrize("op", [operator.add, operator.sub], ids=["add", "sub"])
+    @pytest.mark.parametrize(
+        "reverse", [False, True], ids=["roller-first", "roll-first"]
+    )
+    @pytest.mark.parametrize(
+        "make_roller",
+        [lambda: LiteralRoller(4), lambda: PRoller(P(H({1: 1}), H({3: 1})))],
+        ids=["single-roller", "multi-roller"],
+    )
+    @pytest.mark.parametrize(
+        "make_roll",
+        [
+            lambda: LiteralRoller(9).roll(),
+            lambda: PRoller(P(H({2: 1}), H({7: 1}))).roll(),
+        ],
+        ids=["single-roll", "multi-roll"],
+    )
+    def test_roller_and_roll(
+        self,
+        *,
+        op: Callable[[Any, Any], Any],
+        reverse: bool,
+        make_roller: Callable[[], SingleOutcomeRoller[int] | MultiOutcomeRoller[int]],
+        make_roll: Callable[[], SingleOutcomeRoll[int] | MultiOutcomeRoll[int]],
+    ) -> None:
+        roller = make_roller()
+        roll = make_roll()
+
+        combined = op(roll, roller) if reverse else op(roller, roll)
+
+        assert isinstance(combined, SingleOutcomeRoller)
+        assert combined.roll().outcome == (op(9, 4) if reverse else op(4, 9))
+
+    @pytest.mark.parametrize("op", [operator.add, operator.sub], ids=["add", "sub"])
+    @pytest.mark.parametrize(
+        ("left_multi", "right_multi"),
+        [(False, True), (True, False), (True, True)],
+        ids=["single-multi", "multi-single", "multi-multi"],
+    )
+    def test_rolls_with_multi_outcomes(
+        self,
+        *,
+        op: Callable[[Any, Any], Any],
+        left_multi: bool,
+        right_multi: bool,
+    ) -> None:
+        left = (
+            PRoller(P(H({1: 1}), H({3: 1}))).roll()
+            if left_multi
+            else LiteralRoller(4).roll()
+        )
+        right = (
+            PRoller(P(H({2: 1}), H({7: 1}))).roll()
+            if right_multi
+            else LiteralRoller(9).roll()
+        )
+
+        combined = op(left, right)
+
+        assert isinstance(combined, SingleOutcomeRoll)
+        assert combined.outcome == op(4, 9)
+
+
 class TestRollerRollEquivalence:
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators(
@@ -962,22 +1056,7 @@ class TestRollerRollEquivalence:
         with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.roll().sum()
 
-    def test_adding_after_roll_matches_rolling_after_addition(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        d6 = HRoller(H(6), name="d6")
-
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        realized_roll = d6.roll() + 2
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        deferred_roll = (d6 + 2).roll()
-
-        assert realized_roll.outcome == deferred_roll.outcome
-        assert realized_roll.trace() == deferred_roll.trace()
-
-    def test_deferred_and_realized_addition_are_equivalent(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_addition(self, monkeypatch: pytest.MonkeyPatch) -> None:
         d6 = HRoller(H(6), name="d6")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
@@ -988,9 +1067,7 @@ class TestRollerRollEquivalence:
         assert deferred_roll.outcome == realized_roll.outcome
         assert deferred_roll.trace() == realized_roll.trace()
 
-    def test_deferred_and_realized_subtraction_are_equivalent(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_subtraction(self, monkeypatch: pytest.MonkeyPatch) -> None:
         d6 = HRoller(H(6), name="d6")
         d4 = HRoller(H(4), name="d4")
 
