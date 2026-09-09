@@ -16,7 +16,7 @@
 r"""
 Experimental traceable rollers.
 
-Its interfaces may change substantially or disappear.
+Interfaces may change substantially or disappear.
 """
 
 import operator
@@ -24,7 +24,7 @@ from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from functools import reduce, wraps
-from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, overload
+from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, final, overload
 
 import optype as ot
 
@@ -44,7 +44,6 @@ __all__ = (
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
-    "roll_path",
     "roller_factory",
 )
 
@@ -54,16 +53,13 @@ _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
 _ParamsT = ParamSpec("_ParamsT")
-_RollerT = TypeVar(
-    "_RollerT", bound="SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]"
-)
 
 
 class RollError(Exception):
     r"""
     A failure during rolling, with the original exception in `__cause__`.
 
-    *path* contains the participating rollers from the outermost decorated call to the failing call.
+    *path* contains the participating rollers from the outermost call to the failing call.
     """
 
     def __init__(
@@ -80,29 +76,6 @@ class RollError(Exception):
             label = repr(roller.metadata())
             labels.append(label)
         return super().__str__() + "\nRoller path:\n  " + "\n  → ".join(labels)
-
-
-def roll_path(fn: Callable[[_RollerT], _ResultT]) -> Callable[[_RollerT], _ResultT]:
-    r"""
-    Decorates a roller’s [`roll` method][dyce.roller.Roller.roll] to report failures with a [`RollError`][dyce.roller.RollError] path.
-
-    Custom rollers can decorate their implementations without changing how they call child rollers.
-    Undecorated calls do not contribute path entries.
-    The path identifies rollers, not operand positions or individual invocations of a reused roller.
-    Distribution computation and operations on already-produced rolls are unaffected.
-    """
-
-    @wraps(fn)
-    def wrapped(self: _RollerT) -> _ResultT:
-        try:
-            return fn(self)
-        except RollError as exc:
-            exc.path = (self, *exc.path)
-            raise
-        except Exception as exc:
-            raise RollError(str(exc), (self,)) from exc
-
-    return wrapped
 
 
 @dataclass(frozen=True, slots=True)
@@ -546,9 +519,28 @@ class SingleOutcomeRoller(HableT[_T_co]):
     def metadata(self) -> dict[str, object]:
         r"""Returns JSON-compatible metadata describing this roller."""
 
-    @abstractmethod
+    @final
     def roll(self) -> "SingleOutcomeRoll[_T_co]":
-        r"""Produces a sample outcome trace."""
+        r"""
+        Produces a sample outcome trace, reporting failures as [`RollError`][dyce.roller.RollError].
+
+        Subclasses implement the [`_roll` method][dyce.roller.SingleOutcomeRoller._roll] instead of overriding this method.
+        """
+        try:
+            return self._roll()
+        except RollError as exc:
+            exc.path = (self, *exc.path)
+            raise
+        except Exception as exc:
+            raise RollError(str(exc), (self,)) from exc
+
+    @abstractmethod
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
+        r"""
+        Subclass implementation hook for producing a sample outcome trace.
+
+        Child rollers should be called via their public [`roll` methods][dyce.roller.SingleOutcomeRoller.roll].
+        """
 
 
 class HRoller(SingleOutcomeRoller[_T_co]):
@@ -571,8 +563,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
-    @roll_path
-    def roll(self) -> "SingleOutcomeRoll[_T_co]":
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self._h.roll(), self)
 
 
@@ -581,6 +572,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
 
     __slots__ = ("_hable", "_name")
 
+    @experimental
     def __init__(self, hable: HableT[_T_co], *, name: str | None = None) -> None:
         self._hable = hable
         self._name = name if name is not None else str(hable)
@@ -599,8 +591,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
-    @roll_path
-    def roll(self) -> "SingleOutcomeRoll[_T_co]":
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self.h().roll(), self)
 
 
@@ -609,6 +600,7 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
 
     __slots__ = ("_value",)
 
+    @experimental
     def __init__(self, value: _T) -> None:
         self._value = value
 
@@ -623,8 +615,7 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "literal", "value": self._value}
 
-    @roll_path
-    def roll(self) -> "SingleOutcomeRoll[_T]":
+    def _roll(self) -> "SingleOutcomeRoll[_T]":
         return SingleOutcomeRoll(self._value, self)
 
 
@@ -1047,12 +1038,28 @@ class MultiOutcomeRoller(HableT[_T_co]):
     def metadata(self) -> dict[str, object]:
         r"""Returns JSON-compatible metadata describing this multi roller."""
 
-    @abstractmethod
+    @final
     def roll(self) -> "MultiOutcomeRoll[_T_co]":
         r"""
-        Produces a sample outcome collection trace.
+        Produces a sample outcome collection trace, reporting failures as [`RollError`][dyce.roller.RollError].
+
+        Subclasses implement the [`_roll` method][dyce.roller.MultiOutcomeRoller._roll] instead of overriding this method.
+        """
+        try:
+            return self._roll()
+        except RollError as exc:
+            exc.path = (self, *exc.path)
+            raise
+        except Exception as exc:
+            raise RollError(str(exc), (self,)) from exc
+
+    @abstractmethod
+    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
+        r"""
+        Subclass implementation hook for producing a nonempty sample outcome collection trace.
 
         Raises `ValueError` if no outcomes can be produced.
+        Child rollers should be called via their public [`roll` methods][dyce.roller.MultiOutcomeRoller.roll].
         """
 
     @abstractmethod
@@ -1102,8 +1109,7 @@ class PRoller(MultiOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
-    @roll_path
-    def roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
         outcomes = self._p.roll()
         return MultiOutcomeRoll(outcomes, self)
 
@@ -1152,8 +1158,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
             metadata["name"] = self._name
         return metadata
 
-    @roll_path
-    def roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
         if not self._rollers:
             raise ValueError("no outcomes from an empty pool")
         rolls = [roller.roll() for roller in self._rollers]
@@ -1548,8 +1553,7 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "binary", "operator": self._operator.name}
 
-    @roll_path
-    def roll(self) -> SingleOutcomeRoll[_ResultT]:
+    def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
         outcome = self._operator(left_roll.outcome, right_roll.outcome)
@@ -1579,8 +1583,7 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-sum"}
 
-    @roll_path
-    def roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
+    def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
         outcome = _sum_outcomes(pool_roll.outcomes)
         return SingleOutcomeRoll(
@@ -1611,8 +1614,7 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-selection", "positions": list(self._positions)}
 
-    @roll_path
-    def roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
         if not self._positions:
             raise ValueError("no outcomes from an empty selection")
         parent_roll = self._parent.roll()
@@ -1646,8 +1648,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "unary", "operator": self._operator.name}
 
-    @roll_path
-    def roll(self) -> SingleOutcomeRoll[_ResultT]:
+    def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
         outcome = self._operator(operand_roll.outcome)
         return SingleOutcomeRoll(cast("_ResultT", outcome), self, (operand_roll,))
@@ -1682,8 +1683,7 @@ class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
-    @roll_path
-    def roll(self) -> MultiOutcomeRoll[_T_co]:
+    def _roll(self) -> MultiOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return MultiOutcomeRoll(result.outcomes, self, (result,))
 
@@ -1706,8 +1706,7 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
-    @roll_path
-    def roll(self) -> SingleOutcomeRoll[_T_co]:
+    def _roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return SingleOutcomeRoll(result.outcome, self, (result,))
 
