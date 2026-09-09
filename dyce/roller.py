@@ -40,9 +40,11 @@ __all__ = (
     "MultiOutcomeRoll",
     "MultiOutcomeRoller",
     "PRoller",
+    "RollError",
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
+    "roll_path",
     "roller_factory",
 )
 
@@ -52,6 +54,55 @@ _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
 _ParamsT = ParamSpec("_ParamsT")
+_RollerT = TypeVar(
+    "_RollerT", bound="SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]"
+)
+
+
+class RollError(Exception):
+    r"""
+    A failure during rolling, with the original exception in `__cause__`.
+
+    *path* contains the participating rollers from the outermost decorated call to the failing call.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        path: tuple["SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]", ...],
+    ) -> None:
+        super().__init__(message)
+        self.path = path
+
+    def __str__(self) -> str:
+        labels = []
+        for roller in self.path:
+            label = repr(roller.metadata())
+            labels.append(label)
+        return super().__str__() + "\nRoller path:\n  " + "\n  → ".join(labels)
+
+
+def roll_path(fn: Callable[[_RollerT], _ResultT]) -> Callable[[_RollerT], _ResultT]:
+    r"""
+    Decorates a roller’s [`roll` method][dyce.roller.Roller.roll] to report failures with a [`RollError`][dyce.roller.RollError] path.
+
+    Custom rollers can decorate their implementations without changing how they call child rollers.
+    Undecorated calls do not contribute path entries.
+    The path identifies rollers, not operand positions or individual invocations of a reused roller.
+    Distribution computation and operations on already-produced rolls are unaffected.
+    """
+
+    @wraps(fn)
+    def wrapped(self: _RollerT) -> _ResultT:
+        try:
+            return fn(self)
+        except RollError as exc:
+            exc.path = (self, *exc.path)
+            raise
+        except Exception as exc:
+            raise RollError(str(exc), (self,)) from exc
+
+    return wrapped
 
 
 @dataclass(frozen=True, slots=True)
@@ -520,6 +571,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
+    @roll_path
     def roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self._h.roll(), self)
 
@@ -547,6 +599,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
+    @roll_path
     def roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self.h().roll(), self)
 
@@ -570,6 +623,7 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "literal", "value": self._value}
 
+    @roll_path
     def roll(self) -> "SingleOutcomeRoll[_T]":
         return SingleOutcomeRoll(self._value, self)
 
@@ -1048,6 +1102,7 @@ class PRoller(MultiOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
+    @roll_path
     def roll(self) -> "MultiOutcomeRoll[_T_co]":
         outcomes = self._p.roll()
         return MultiOutcomeRoll(outcomes, self)
@@ -1097,6 +1152,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
             metadata["name"] = self._name
         return metadata
 
+    @roll_path
     def roll(self) -> "MultiOutcomeRoll[_T_co]":
         if not self._rollers:
             raise ValueError("no outcomes from an empty pool")
@@ -1404,6 +1460,8 @@ class SingleOutcomeRoll(Generic[_T_co]):
         r"""
         Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
 
+        The `root` entry identifies a record in `rolls`.
+        Each roll’s `roller` entry identifies its producing roller in `rollers`.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
         return _trace(cast("SingleOutcomeRoll[object]", self))
@@ -1460,6 +1518,8 @@ class MultiOutcomeRoll(Generic[_T_co]):
         r"""
         Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
 
+        The `root` entry identifies a record in `rolls`.
+        Each roll’s `roller` entry identifies its producing roller in `rollers`.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
         return _trace(cast("MultiOutcomeRoll[object]", self))
@@ -1488,6 +1548,7 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "binary", "operator": self._operator.name}
 
+    @roll_path
     def roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
@@ -1518,6 +1579,7 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-sum"}
 
+    @roll_path
     def roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
         outcome = _sum_outcomes(pool_roll.outcomes)
@@ -1549,6 +1611,7 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-selection", "positions": list(self._positions)}
 
+    @roll_path
     def roll(self) -> "MultiOutcomeRoll[_T_co]":
         if not self._positions:
             raise ValueError("no outcomes from an empty selection")
@@ -1583,6 +1646,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "unary", "operator": self._operator.name}
 
+    @roll_path
     def roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
         outcome = self._operator(operand_roll.outcome)
@@ -1618,6 +1682,7 @@ class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
+    @roll_path
     def roll(self) -> MultiOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return MultiOutcomeRoll(result.outcomes, self, (result,))
@@ -1641,6 +1706,7 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
+    @roll_path
     def roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return SingleOutcomeRoll(result.outcome, self, (result,))
@@ -1755,49 +1821,49 @@ def _as_roller(
 def _trace(
     root_roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object],
 ) -> dict[str, object]:
-    definition_ids: dict[int, str] = {}
-    definitions: dict[str, dict[str, object]] = {}
-    event_ids: dict[int, str] = {}
-    events: dict[str, dict[str, object]] = {}
+    roller_ids: dict[int, str] = {}
+    rollers: dict[str, dict[str, object]] = {}
+    roll_ids: dict[int, str] = {}
+    rolls: dict[str, dict[str, object]] = {}
 
-    def visit_definition(
+    def visit_roller(
         roller: MultiOutcomeRoller[object] | SingleOutcomeRoller[object],
     ) -> str:
         key = id(roller)
-        if key in definition_ids:
-            return definition_ids[key]
+        if key in roller_ids:
+            return roller_ids[key]
 
-        definition_id = f"d{len(definition_ids)}"
-        definition_ids[key] = definition_id
-        definitions[definition_id] = {}
-        operand_ids = [visit_definition(operand) for operand in roller.operands]
-        definitions[definition_id] = {
+        roller_id = f"roller{len(roller_ids)}"
+        roller_ids[key] = roller_id
+        rollers[roller_id] = {}
+        operand_ids = [visit_roller(operand) for operand in roller.operands]
+        rollers[roller_id] = {
             **roller.metadata(),
             **({"operands": operand_ids} if operand_ids else {}),
         }
-        return definition_id
+        return roller_id
 
-    def visit_event(roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object]) -> str:
+    def visit_roll(roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object]) -> str:
         key = id(roll)
-        if key in event_ids:
-            return event_ids[key]
+        if key in roll_ids:
+            return roll_ids[key]
 
-        event_id = f"e{len(event_ids)}"
-        event_ids[key] = event_id
-        events[event_id] = {}
-        definition_id = visit_definition(roll.roller)
-        operand_ids = [visit_event(operand) for operand in roll.operands]
-        event_data: dict[str, object]
+        roll_id = f"roll{len(roll_ids)}"
+        roll_ids[key] = roll_id
+        rolls[roll_id] = {}
+        roller_id = visit_roller(roll.roller)
+        operand_ids = [visit_roll(operand) for operand in roll.operands]
+        roll_data: dict[str, object]
         if isinstance(roll, MultiOutcomeRoll):
-            event_data = {"outcomes": list(roll.outcomes)}
+            roll_data = {"outcomes": list(roll.outcomes)}
         else:
-            event_data = {"outcome": roll.outcome}
-        events[event_id] = {
-            "definition": definition_id,
-            **event_data,
+            roll_data = {"outcome": roll.outcome}
+        rolls[roll_id] = {
+            "roller": roller_id,
+            **roll_data,
             "operands": operand_ids,
         }
-        return event_id
+        return roll_id
 
-    root = visit_event(root_roll)
-    return {"root": root, "definitions": definitions, "events": events}
+    root = visit_roll(root_roll)
+    return {"root": root, "rollers": rollers, "rolls": rolls}
