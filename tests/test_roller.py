@@ -32,8 +32,10 @@ from dyce.roller import (
     MultiOutcomeRoller,
     PRoller,
     RollerPool,
+    RollError,
     SingleOutcomeRoll,
     SingleOutcomeRoller,
+    roller_factory,
 )
 
 __all__ = ()
@@ -85,6 +87,65 @@ class _PowerOutcome:
 
     def __rpow__(self, lhs: int) -> "_PowerOutcome":
         return _PowerOutcome(lhs**self.value)
+
+
+class TestRollError:
+    def test_parent_failure(self) -> None:
+        roller = LiteralRoller(1) / 0
+
+        with pytest.raises(RollError) as caught:
+            roller.roll()
+        assert caught.value.path == (roller,)
+
+    def test_sibling_failure(self) -> None:
+        damage = PRoller(P(), name="damage")
+
+        @roller_factory
+        def attack() -> SingleOutcomeRoller[int]:
+            return LiteralRoller(20) + damage
+
+        roller = attack()
+
+        with pytest.raises(RollError) as caught:
+            roller.roll()
+        assert caught.value.path == (
+            roller,
+            roller.operands[0],
+            roller.operands[0].operands[1],
+            damage,
+        )
+
+    def test_cause_preserved(self) -> None:
+        failure = RuntimeError("source failure")
+        roller = HRoller(H(6)) + 1
+
+        with (
+            patch.object(H, "roll", side_effect=failure),
+            pytest.raises(RollError) as caught,
+        ):
+            roller.roll()
+        assert caught.value.__cause__ is failure
+
+    def test_message_formatting(self) -> None:
+        source = PRoller(P(), name="damage")
+        parent = source.sum()
+        grandparent = RollerPool(parent)
+
+        with pytest.raises(RollError) as caught:
+            grandparent.roll()
+        assert str(caught.value) == (
+            "no outcomes from an empty pool\nRoller path:\n"
+            "  {'kind': 'pool'}\n"
+            "  → {'kind': 'pool-sum'}\n"
+            "  → {'kind': 'pool-source', 'name': 'damage'}"
+        )
+
+    def test_base_exception_propagates(self) -> None:
+        with (
+            patch.object(H, "roll", side_effect=KeyboardInterrupt),
+            pytest.raises(KeyboardInterrupt),
+        ):
+            HRoller(H(6)).roll()
 
 
 class TestSingleOutcomeRoller:
@@ -220,11 +281,11 @@ class TestSingleOutcomeRoller:
             h.assert_called_once_with()
 
         trace = roll.trace()
-        definitions = trace["definitions"]
+        rollers = trace["rollers"]
 
         assert roll.outcome in 2 @ H(6)
-        assert isinstance(definitions, dict)
-        assert definitions["d2"] == {"kind": "source", "name": str(hable)}
+        assert isinstance(rollers, dict)
+        assert rollers["roller2"] == {"kind": "source", "name": str(hable)}
 
     def test_mixed_roller_addition(self) -> None:
         roll = (HRoller(H({1: 1}), name="one") + LiteralRoller(2)).roll()
@@ -391,14 +452,14 @@ class TestPRoller:
     def test_raw_pool_promotion_preserves_pool_trace(self) -> None:
         combined = HRoller(H({1: 1}), name="one") + P(H({2: 1}), H({3: 1}))
         trace = combined.roll().trace()
-        definitions = trace["definitions"]
+        rollers = trace["rollers"]
 
-        assert isinstance(definitions, dict)
-        assert definitions["d2"] == {
+        assert isinstance(rollers, dict)
+        assert rollers["roller2"] == {
             "kind": "pool-sum",
-            "operands": ["d3"],
+            "operands": ["roller3"],
         }
-        assert definitions["d3"]["kind"] == "pool-source"
+        assert rollers["roller3"]["kind"] == "pool-source"
 
     def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
         p = P(H({2: 1}), H({1: 1}))
@@ -439,26 +500,26 @@ class TestPRoller:
         assert_type(summed.roll(), SingleOutcomeRoll[int])
         assert summed.roll().outcome == 3
 
-    def test_select_creates_deferred_pool_definition(self) -> None:
+    def test_select_creates_deferred_pool_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
         selected = pool.select(-1, 0)
         roll = selected.roll()
         trace = roll.trace()
-        definitions = trace["definitions"]
-        events = trace["events"]
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
 
         assert_type(selected, MultiOutcomeRoller[int])
         assert roll.outcomes == (3, 1)
-        assert isinstance(definitions, dict)
-        assert definitions["d0"] == {
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {
             "kind": "pool-selection",
             "positions": [2, 0],
-            "operands": ["d1"],
+            "operands": ["roller1"],
         }
-        assert isinstance(events, dict)
-        assert events["e0"]["outcomes"] == [3, 1]
-        assert events["e0"]["operands"] == ["e1"]
-        assert events["e1"]["outcomes"] == [1, 2, 3]
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["outcomes"] == [3, 1]
+        assert rolls["roll0"]["operands"] == ["roll1"]
+        assert rolls["roll1"]["outcomes"] == [1, 2, 3]
 
     def test_nested_selection_uses_positions_from_selected_pool(self) -> None:
         p = 3 @ P(2)
@@ -509,19 +570,19 @@ class TestRollerPool:
         assert tuple(operand.roller for operand in roll.operands) == (one, two)
         assert pool.metadata() == {"kind": "pool", "name": "pool"}
 
-    def test_reused_roller_has_one_definition_and_independent_events(self) -> None:
+    def test_reused_roller_has_one_roller_and_independent_rolls(self) -> None:
         d6 = HRoller(H(6), name="d6")
         trace = RollerPool(d6, d6).roll().trace()
-        definitions = trace["definitions"]
-        events = trace["events"]
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
 
-        assert isinstance(definitions, dict)
-        assert isinstance(events, dict)
-        assert definitions["d0"] == {
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"] == {
             "kind": "pool",
-            "operands": ["d1", "d1"],
+            "operands": ["roller1", "roller1"],
         }
-        assert events["e0"]["operands"] == ["e1", "e2"]
+        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
 
     def test_selection_uses_composite_pool_distribution(self) -> None:
         d2 = HRoller(H(2), name="d2")
@@ -610,18 +671,18 @@ class TestSingleOutcomeRoll:
         right_roll = LiteralRoller(rhs).roll()
         combined = op(left_roll, right_roll)
         trace = combined.trace()
-        definitions = trace["definitions"]
-        events = trace["events"]
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
 
         assert combined.outcome == op(lhs, rhs)
-        assert isinstance(definitions, dict)
-        assert definitions["d0"] == {
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {
             "kind": "binary",
             "operator": name,
-            "operands": ["d1", "d2"],
+            "operands": ["roller1", "roller2"],
         }
-        assert isinstance(events, dict)
-        assert events["e0"]["operands"] == ["e1", "e2"]
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
     def test_unary_operators_preserve_outcomes_and_trace(
@@ -632,18 +693,18 @@ class TestSingleOutcomeRoll:
     ) -> None:
         combined = op(LiteralRoller(value).roll())
         trace = combined.trace()
-        definitions = trace["definitions"]
-        events = trace["events"]
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
 
         assert combined.outcome == op(value)
-        assert isinstance(definitions, dict)
-        assert definitions["d0"] == {
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {
             "kind": "unary",
             "operator": name,
-            "operands": ["d1"],
+            "operands": ["roller1"],
         }
-        assert isinstance(events, dict)
-        assert events["e0"]["operands"] == ["e1"]
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["operands"] == ["roll1"]
 
     def test_literal_plus_roll_is_serializable(self) -> None:
         roll = 2 + HRoller(H(6), name="d6").roll()
@@ -651,7 +712,7 @@ class TestSingleOutcomeRoll:
         assert roll.outcome in 2 + H(6)
         assert json.loads(json.dumps(roll.trace())) == roll.trace()
 
-    def test_trace_distinguishes_independent_and_shared_events(self) -> None:
+    def test_trace_distinguishes_independent_and_shared_rolls(self) -> None:
         d6 = HRoller(H(6), name="d6")
         independent = d6.roll() + d6.roll()
         shared_source = d6.roll()
@@ -659,19 +720,23 @@ class TestSingleOutcomeRoll:
 
         independent_trace = independent.trace()
         shared_trace = shared.trace()
-        independent_events = independent_trace["events"]
-        shared_events = shared_trace["events"]
-        independent_definitions = independent_trace["definitions"]
-        shared_definitions = shared_trace["definitions"]
+        assert independent_trace["root"] == "roll0"
+        assert shared_trace["root"] == "roll0"
+        independent_rolls = independent_trace["rolls"]
+        shared_rolls = shared_trace["rolls"]
+        independent_rollers = independent_trace["rollers"]
+        shared_rollers = shared_trace["rollers"]
 
-        assert isinstance(independent_events, dict)
-        assert isinstance(shared_events, dict)
-        assert isinstance(independent_definitions, dict)
-        assert isinstance(shared_definitions, dict)
-        assert independent_events["e0"]["operands"] == ["e1", "e2"]
-        assert shared_events["e0"]["operands"] == ["e1", "e1"]
-        assert independent_definitions["d0"]["operands"] == ["d1", "d1"]
-        assert shared_definitions["d0"]["operands"] == ["d1", "d1"]
+        assert isinstance(independent_rolls, dict)
+        assert isinstance(shared_rolls, dict)
+        assert isinstance(independent_rollers, dict)
+        assert isinstance(shared_rollers, dict)
+        assert independent_rolls["roll0"]["roller"] == "roller0"
+        assert shared_rolls["roll0"]["roller"] == "roller0"
+        assert independent_rolls["roll0"]["operands"] == ["roll1", "roll2"]
+        assert shared_rolls["roll0"]["operands"] == ["roll1", "roll1"]
+        assert independent_rollers["roller0"]["operands"] == ["roller1", "roller1"]
+        assert shared_rollers["roller0"]["operands"] == ["roller1", "roller1"]
 
 
 class TestMultiOutcomeRoll:
@@ -744,11 +809,11 @@ class TestRollerRollEquivalence:
         self, make_pool: Callable[[], MultiOutcomeRoller[int]]
     ) -> None:
         pool = make_pool()
-        with pytest.raises(ValueError, match="no outcomes from an empty"):
+        with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.roll()
-        with pytest.raises(ValueError, match="no outcomes from an empty"):
+        with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.sum().roll()
-        with pytest.raises(ValueError, match="no outcomes from an empty"):
+        with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.roll().sum()
 
     def test_adding_after_roll_matches_rolling_after_addition(
@@ -790,9 +855,9 @@ class TestRollerRollEquivalence:
 
         assert deferred_roll.outcome == realized_roll.outcome
         assert deferred_roll.trace() == realized_roll.trace()
-        definitions = deferred_roll.trace()["definitions"]
-        assert isinstance(definitions, dict)
-        assert definitions["d0"]["operator"] == "sub"
+        rollers = deferred_roll.trace()["rollers"]
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"]["operator"] == "sub"
 
     def test_reflected_subtraction_preserves_operand_order(
         self, monkeypatch: pytest.MonkeyPatch
