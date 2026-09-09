@@ -933,7 +933,151 @@ class TestMixedRollArithmetic:
         assert_type(multi_roll - single_roll, SingleOutcomeRoll[int])
         assert_type(multi_roll - multi_roll, SingleOutcomeRoll[int])
 
-    @pytest.mark.parametrize("op", [operator.add, operator.sub], ids=["add", "sub"])
+        assert_type(single * single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll * single, SingleOutcomeRoller[int])
+        assert_type(single * multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll * single, SingleOutcomeRoller[int])
+        assert_type(multi * single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll * multi, SingleOutcomeRoller[int])
+        assert_type(multi * multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll * multi, SingleOutcomeRoller[int])
+        assert_type(single_roll * multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll * single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll * multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single / single_roll, SingleOutcomeRoller[float])
+        assert_type(single_roll / single, SingleOutcomeRoller[float])
+        assert_type(single / multi_roll, SingleOutcomeRoller[float])
+        assert_type(multi_roll / single, SingleOutcomeRoller[float])
+        assert_type(multi / single_roll, SingleOutcomeRoller[float])
+        assert_type(single_roll / multi, SingleOutcomeRoller[float])
+        assert_type(multi / multi_roll, SingleOutcomeRoller[float])
+        assert_type(multi_roll / multi, SingleOutcomeRoller[float])
+        assert_type(single_roll / multi_roll, SingleOutcomeRoll[float])
+        assert_type(multi_roll / single_roll, SingleOutcomeRoll[float])
+        assert_type(multi_roll / multi_roll, SingleOutcomeRoll[float])
+
+        assert_type(single // single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll // single, SingleOutcomeRoller[int])
+        assert_type(single // multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll // single, SingleOutcomeRoller[int])
+        assert_type(multi // single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll // multi, SingleOutcomeRoller[int])
+        assert_type(multi // multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll // multi, SingleOutcomeRoller[int])
+        assert_type(single_roll // multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll // single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll // multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single % single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll % single, SingleOutcomeRoller[int])
+        assert_type(single % multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll % single, SingleOutcomeRoller[int])
+        assert_type(multi % single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll % multi, SingleOutcomeRoller[int])
+        assert_type(multi % multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll % multi, SingleOutcomeRoller[int])
+        assert_type(single_roll % multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll % single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll % multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single << single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll << single, SingleOutcomeRoller[int])
+        assert_type(single << multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll << single, SingleOutcomeRoller[int])
+        assert_type(multi << single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll << multi, SingleOutcomeRoller[int])
+        assert_type(multi << multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll << multi, SingleOutcomeRoller[int])
+        assert_type(single_roll << multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll << single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll << multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single >> single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll >> single, SingleOutcomeRoller[int])
+        assert_type(single >> multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll >> single, SingleOutcomeRoller[int])
+        assert_type(multi >> single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll >> multi, SingleOutcomeRoller[int])
+        assert_type(multi >> multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll >> multi, SingleOutcomeRoller[int])
+        assert_type(single_roll >> multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll >> single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll >> multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single & single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll & single, SingleOutcomeRoller[int])
+        assert_type(single & multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll & single, SingleOutcomeRoller[int])
+        assert_type(multi & single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll & multi, SingleOutcomeRoller[int])
+        assert_type(multi & multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll & multi, SingleOutcomeRoller[int])
+        assert_type(single_roll & multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll & single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll & multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single | single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll | single, SingleOutcomeRoller[int])
+        assert_type(single | multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll | single, SingleOutcomeRoller[int])
+        assert_type(multi | single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll | multi, SingleOutcomeRoller[int])
+        assert_type(multi | multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll | multi, SingleOutcomeRoller[int])
+        assert_type(single_roll | multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll | single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll | multi_roll, SingleOutcomeRoll[int])
+
+        assert_type(single ^ single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll ^ single, SingleOutcomeRoller[int])
+        assert_type(single ^ multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll ^ single, SingleOutcomeRoller[int])
+        assert_type(multi ^ single_roll, SingleOutcomeRoller[int])
+        assert_type(single_roll ^ multi, SingleOutcomeRoller[int])
+        assert_type(multi ^ multi_roll, SingleOutcomeRoller[int])
+        assert_type(multi_roll ^ multi, SingleOutcomeRoller[int])
+        assert_type(single_roll ^ multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll ^ single_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll ^ multi_roll, SingleOutcomeRoll[int])
+
+    def test_mixed_power_types(self) -> None:
+        single = LiteralRoller(2)
+        multi = PRoller(P(H({1: 1}), H({2: 1})))
+        single_roll = single.roll()
+        multi_roll = multi.roll()
+        power_single = LiteralRoller(_PowerOutcome(2))
+        power_multi = PRoller(P(H({_PowerOutcome(2): 1})))
+        power_single_roll = power_single.roll()
+        power_multi_roll = power_multi.roll()
+
+        assert_type(power_single**single_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(single_roll**power_single, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single**multi_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(multi_roll**power_single, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_multi**single_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(single_roll**power_multi, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_multi**multi_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(multi_roll**power_multi, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single_roll**single, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(single**power_single_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single_roll**multi, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(multi**power_single_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_multi_roll**single, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(single**power_multi_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_multi_roll**multi, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(multi**power_multi_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(multi_roll**power_single_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_multi_roll**single_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(single_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_multi_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(multi_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome])
+
+    @pytest.mark.parametrize(
+        "op",
+        [pytest.param(op, id=name) for op, name, _, _ in _BINARY_OPERATOR_CASES],
+    )
     @pytest.mark.parametrize(
         "reverse", [False, True], ids=["roller-first", "roll-first"]
     )
@@ -966,7 +1110,10 @@ class TestMixedRollArithmetic:
         assert isinstance(combined, SingleOutcomeRoller)
         assert combined.roll().outcome == (op(9, 4) if reverse else op(4, 9))
 
-    @pytest.mark.parametrize("op", [operator.add, operator.sub], ids=["add", "sub"])
+    @pytest.mark.parametrize(
+        "op",
+        [pytest.param(op, id=name) for op, name, _, _ in _BINARY_OPERATOR_CASES],
+    )
     @pytest.mark.parametrize(
         ("left_multi", "right_multi"),
         [(False, True), (True, False), (True, True)],
@@ -994,6 +1141,23 @@ class TestMixedRollArithmetic:
 
         assert isinstance(combined, SingleOutcomeRoll)
         assert combined.outcome == op(4, 9)
+
+    @pytest.mark.parametrize(
+        "op",
+        [pytest.param(op, id=name) for op, name, _, _ in _BINARY_OPERATOR_CASES],
+    )
+    @pytest.mark.parametrize(
+        "reverse", [False, True], ids=["roll-first", "outcome-first"]
+    )
+    def test_multi_roll_and_outcome(
+        self, *, op: Callable[[Any, Any], Any], reverse: bool
+    ) -> None:
+        roll = PRoller(P(H({2: 1}), H({7: 1}))).roll()
+
+        combined = op(4, roll) if reverse else op(roll, 4)
+
+        assert isinstance(combined, SingleOutcomeRoll)
+        assert combined.outcome == (op(4, 9) if reverse else op(9, 4))
 
 
 class TestRollerRollEquivalence:
