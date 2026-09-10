@@ -27,7 +27,7 @@ def fig_callback() -> None:
     p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
     p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 
-    attr_results: dict[str, H] = {
+    attr_results: dict[str, H[int]] = {
         "3d6": 3 @ H(6),
         "4d6 - discard lowest": p_4d6.h(slice(1, None)),
         "4d6 - re-roll first 1,\ndiscard lowest": p_4d6_reroll_first_one.h(
@@ -52,6 +52,6 @@ def fig_callback() -> None:
 
 
 if __name__ == "__main__":
-    from _plot import main  # pyrefly: ignore[missing-import]
+    from _plot import main
 
     main(fig_callback)

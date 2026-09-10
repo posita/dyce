@@ -23,6 +23,10 @@ import sys
 import tomllib
 from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mkdocs.config.defaults import MkDocsConfig
 
 _LOGGER = logging.getLogger("mkdocs.hooks")
 
@@ -85,7 +89,7 @@ def on_pre_build(**_kwargs: object) -> None:
     _uv_run(("make", "-C", "docs", "-j", "4"))
 
 
-def on_post_build(config: dict, **_kwargs: object) -> None:
+def on_post_build(config: "MkDocsConfig", **_kwargs: object) -> None:
     cmd = ["uv", "build", "--wheel"]
     _LOGGER.info("running %s", " ".join(cmd))
     subprocess.run(cmd, check=True)  # ruff: ignore[subprocess-without-shell-equals-true]
@@ -96,7 +100,7 @@ def on_post_build(config: dict, **_kwargs: object) -> None:
         "build",
         "--debug",
         "--output-dir",
-        f"{config['site_dir']}/jupyter",
+        f"{config.site_dir}/jupyter",
     ]
     wheels: list[Path | str] = [_get_latest_pkg_wheel_from_dist()]
     wheels.extend(_bundled_wheel_urls(_BUNDLED_PKG_NAMES))

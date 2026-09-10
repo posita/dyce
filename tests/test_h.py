@@ -21,11 +21,11 @@ import platform
 import statistics
 import warnings
 from collections import defaultdict
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from decimal import Decimal
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
@@ -45,6 +45,9 @@ from ._helpers import (
     enumerate_weighted_unsorted_rolls_multinomial_coefficient,
     sort_and_select_from_rolls,
 )
+
+if TYPE_CHECKING:
+    from pytest_benchmark.fixture import BenchmarkFixture
 
 __all__ = ()
 
@@ -103,12 +106,16 @@ class TestHInit:
         from dyce import h as h_module
 
         with patch.object(
-            h_module, "natural_key", side_effect=h_module.natural_key
+            h_module,
+            "natural_key",
+            side_effect=h_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             assert list(H(4)) == [1, 2, 3, 4]
             mock.assert_not_called()
         with patch.object(
-            h_module, "natural_key", side_effect=h_module.natural_key
+            h_module,
+            "natural_key",
+            side_effect=h_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             assert list(H(-3)) == [-3, -2, -1]
             mock.assert_not_called()
@@ -117,7 +124,9 @@ class TestHInit:
         from dyce import h as h_module
 
         with patch.object(
-            h_module, "natural_key", side_effect=h_module.natural_key
+            h_module,
+            "natural_key",
+            side_effect=h_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
             # ignore comments
@@ -524,7 +533,7 @@ class TestHUnary:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             try:
-                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload]
+                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
                 assert result is NotImplemented
                 assert any(
                     issubclass(w.category, _ConvolveFallbackWarning) for w in caught
@@ -539,17 +548,17 @@ class TestHUnary:
                 _ = 2 @ H({frozenset({"incompatible"}): 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_add_unsupported(self) -> None:
-        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         with pytest.raises(TypeError):
             H({3: 1}) + "incompatible"  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_radd_unsupported(self) -> None:
-        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         with pytest.raises(TypeError):
             frozenset({"incompatible"}) + H({3: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_mul_unsupported(self) -> None:
-        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload]
+        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         assert result is NotImplemented
         with pytest.raises(TypeError):
             H({3.0: 1}) * Decimal("3.0")  # type: ignore[operator] # ty: ignore[unsupported-operator]
@@ -573,7 +582,7 @@ class TestHUnaryWithoutBeartype:
         with pytest.raises(TypeError):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         with pytest.raises(TypeError):
-            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type] # zuban: ignore[arg-type]
 
     def test_invert_unsupported(self) -> None:
         with pytest.raises(TypeError):
@@ -600,7 +609,7 @@ class TestHUnaryWithBeartype:
         with pytest.raises(BeartypeCallHintViolation):
             H({"hello": 1}).__abs__()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
         with pytest.raises(BeartypeCallHintViolation):
-            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
+            abs(H({"hello": 1}))  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type] # zuban: ignore[arg-type]
 
     def test_invert_unsupported_beartype(self) -> None:
         with pytest.raises(BeartypeCallHintViolation):
@@ -733,7 +742,7 @@ class TestHMean:
 
     def test_mean(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))  # pyrefly: ignore[unsupported-operation]
+            h = 2 @ H(o_type(i) for i in range(10))
             h_mean = h.mean()
             stat_mean = statistics.mean(
                 itertools.chain(
@@ -931,7 +940,7 @@ class TestHStdev:
 
     def test_stdev(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))  # pyrefly: ignore[unsupported-operation]
+            h = 2 @ H(o_type(i) for i in range(10))
             h_stdev = h.stdev()
             stat_stdev = statistics.pstdev(
                 itertools.chain(
@@ -992,10 +1001,10 @@ class TestHVariance:
     reason="pytest_benchmark not available",
 )
 class TestAggregateWeightedBenchmark:
-    def test_aggregate_weighted(self, benchmark: Callable) -> None:
+    def test_aggregate_weighted(self, benchmark: "BenchmarkFixture") -> None:
         benchmark(aggregate_weighted, ((H(4), 3), (5, 2), (H(6), 2)))
 
-    def test_aggregate_weighted_prod(self, benchmark: Callable) -> None:
+    def test_aggregate_weighted_prod(self, benchmark: "BenchmarkFixture") -> None:
         benchmark(_aggregate_weighted_prod, ((H(4), 3), (5, 2), (H(6), 2)))
 
 

@@ -36,7 +36,7 @@
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary
-from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: ignore[missing-import] # ty: ignore[unresolved-import]
+from prerequisites import (  # pyright: ignore[reportMissingImports] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
     install_if_missing,
 )
 
@@ -51,7 +51,7 @@ from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
+matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
 style.use("bmh")
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 

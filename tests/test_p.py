@@ -19,7 +19,7 @@ from collections import Counter
 from collections.abc import Iterable
 from decimal import Decimal
 from fractions import Fraction
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 from unittest.mock import call, patch
 
 import pytest
@@ -46,10 +46,6 @@ from ._helpers import (
 __all__ = ()
 
 _T = TypeVar("_T")
-
-
-class _PatchableP(P):
-    pass
 
 
 class TestPInit:
@@ -97,7 +93,9 @@ class TestPInit:
         d4pls1 = H(4) + 1
         d6pls1 = H(6) + 1
         with patch.object(
-            p_module, "natural_key", side_effect=p_module.natural_key
+            p_module,
+            "natural_key",
+            side_effect=p_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             p = P(d4pls1, 8, 6, 4, d6pls1)
             mock.assert_not_called()
@@ -112,7 +110,9 @@ class TestPInit:
         d6x = H(6) + x
         d8x = H(8) + x
         with patch.object(
-            p_module, "natural_key", side_effect=p_module.natural_key
+            p_module,
+            "natural_key",
+            side_effect=p_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             p = P(d8x, d6x)
             mock.assert_not_called()
@@ -127,7 +127,9 @@ class TestPInit:
             for n in range(1, 6)
         ]
         with patch.object(
-            p_module, "natural_key", side_effect=p_module.natural_key
+            p_module,
+            "natural_key",
+            side_effect=p_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
             p = P(8, 4, *hs, 6)
             mock.assert_called()
@@ -767,15 +769,15 @@ class TestPH:
     def test_which_selects_all_exactly_n_times_with_operation_aware_outcomes(
         self,
     ) -> None:
-        for p in (
-            _PatchableP(
-                2 @ P(H({("one",): 1, ("two",): 2}), H({("three",): 1, ("four",): 1}))
-            ),
+        pools = (
+            P(2 @ P(H({("one",): 1, ("two",): 2}), H({("three",): 1, ("four",): 1}))),
             *(
-                _PatchableP(2 @ H(o_type(i) for i in range(10)))
+                P(2 @ H(o_type(i) for i in range(10)))
                 for o_type in SAMPLE_OUTCOME_TYPES
             ),
-        ):
+        )
+        for pool in pools:
+            p = cast("P[Any]", pool)
             p_h = p.h(slice(None), slice(None), slice(None))
             expected = H.from_counts(
                 (
@@ -786,7 +788,9 @@ class TestPH:
                     ),
                     count,
                 )
-                for outcome, count in (3 * p.h()).items()
+                for outcome, count in (  # zuban: ignore[var-annotated]
+                    3 * p.h()
+                ).items()
             )
             assert p_h == expected
             assert type(next(iter(p_h.outcomes()))) is type(next(iter(p[0].outcomes())))
@@ -815,7 +819,7 @@ class TestPH:
     def test_which_selects_all_exactly_n_times_with_weird_outcomes(
         self,
     ) -> None:
-        p = _PatchableP(
+        p = P(
             2
             @ P(
                 H({NoCompareCanOnlyAdd("one"): 1, NoCompareCanOnlyAdd("two"): 2}),
@@ -1055,7 +1059,7 @@ class TestPRoll:
         for _ in range(50):
             roll = p_6d10x.roll()
             assert len(roll) == len(p_6d10x)
-            assert all(v in d10x for v in roll)
+            assert all(v in d10x for v in roll)  # zuban: ignore[operator]
 
 
 class TestPRollsWithCounts:

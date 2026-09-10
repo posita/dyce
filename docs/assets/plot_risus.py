@@ -591,7 +591,7 @@ if __name__ == "__main__":
     import sys
     from pathlib import Path
 
-    from _plot import _PARSER, main  # pyrefly: ignore[missing-import]
+    from _plot import _PARSER, main
 
     args = _PARSER.parse_args()
     orig_output_file = args.output_file

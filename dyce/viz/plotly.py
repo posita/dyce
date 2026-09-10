@@ -79,7 +79,7 @@ class PlotSpec:
 
 @experimental
 def bar_spec(
-    *hs: H,
+    *hs: H[Any],
     colors: Sequence[str] = (),
     graph_type: GraphType = GraphType.NORMAL,
     horizontal: bool = False,
@@ -158,7 +158,7 @@ def bar_spec(
 
 @experimental
 def line_spec(
-    *hs: H,
+    *hs: H[Any],
     colors: Sequence[str] = (),
     graph_type: GraphType = GraphType.NORMAL,
     labels: Sequence[str] = (),
@@ -230,7 +230,7 @@ def line_spec(
 
 @experimental
 def ridge_spec(
-    *hs: H,
+    *hs: H[Any],
     colors: Sequence[str] = (),
     graph_type: GraphType = GraphType.NORMAL,
     label_bgcolor: str | None = None,

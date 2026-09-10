@@ -36,7 +36,7 @@
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary
-from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: ignore[missing-import] # ty: ignore[unresolved-import]
+from prerequisites import (  # pyright: ignore[reportMissingImports] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
     install_if_missing,
 )
 
@@ -51,7 +51,7 @@ from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
+matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
 style.use("bmh")
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
@@ -59,7 +59,7 @@ warnings.filterwarnings("ignore", category=ExperimentalWarning)
 from dyce import H, P
 
 
-def count_dupes(pool: P) -> H[int]:
+def count_dupes(pool: P[int]) -> H[int]:
     return H.from_counts(
         (sum(1 for i in range(1, len(roll)) if roll[i] == roll[i - 1]), count)
         for roll, count in pool.rolls_with_counts()

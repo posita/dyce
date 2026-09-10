@@ -14,6 +14,7 @@
 # ======================================================================================
 
 from importlib.util import find_spec
+from typing import Any
 
 import pytest
 
@@ -30,11 +31,11 @@ from dyce.viz.plotly import (
 __all__ = ()
 
 
-def _traces(spec: PlotSpec, role: str) -> list[dict]:
+def _traces(spec: PlotSpec, role: str) -> list[dict[str, Any]]:
     return [trace for trace in spec.data if trace["meta"]["role"] == role]
 
 
-def _ridge_annotations(spec: PlotSpec) -> list[dict]:
+def _ridge_annotations(spec: PlotSpec) -> list[dict[str, Any]]:
     return [
         annotation
         for annotation in spec.layout["annotations"]
@@ -42,7 +43,7 @@ def _ridge_annotations(spec: PlotSpec) -> list[dict]:
     ]
 
 
-def _ridge_peak_annotations(spec: PlotSpec) -> list[dict]:
+def _ridge_peak_annotations(spec: PlotSpec) -> list[dict[str, Any]]:
     return [
         annotation
         for annotation in spec.layout["annotations"]
@@ -364,7 +365,9 @@ class TestRidgeSpec:
 class TestPlotSpec:
     @pytest.mark.skipif(find_spec("matplotlib") is None, reason="requires matplotlib")
     def test_graph_type_is_shared_with_matplotlib_api(self) -> None:
-        from dyce.viz.matplotlib import GraphType as MatplotlibGraphType
+        from dyce.viz.matplotlib import (  # type: ignore[attr-defined]
+            GraphType as MatplotlibGraphType,  # zuban: ignore[attr-defined]
+        )
 
         assert GraphType is MatplotlibGraphType
 

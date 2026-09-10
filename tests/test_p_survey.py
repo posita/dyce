@@ -179,7 +179,7 @@ def _mech(name: str) -> Mechanic:
 @pytest.mark.parametrize("pool", [p for _, p in POOLS], ids=[n for n, _ in POOLS])
 def test_survey_matches_oracle(pool: "P[int]", mech: Mechanic) -> None:
     order = mech.order if mech.order is not None else survey_outcome_order_ascending
-    got = pool.survey(
+    got = pool.survey(  # zuban: ignore[call-overload]
         accumulate=mech.accumulate,
         initial=mech.initial,
         order=order,
@@ -313,7 +313,7 @@ def test_empty_pool_returns_empty_h() -> None:
 def test_repeated_invocation_is_stable() -> None:
     # The memo is scoped per top-level call; repeated calls must be identical.
     pool = P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))
-    surveyor = ParameterizedSurveyor(
+    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
         accumulate=_largest_set_next,
         order=survey_outcome_order_ascending,
     )
@@ -329,7 +329,7 @@ def test_survey_without_surveyor_or_accumulate_raises() -> None:
 
 
 def test_survey_with_both_surveyor_and_kwargs_raises() -> None:
-    surveyor = ParameterizedSurveyor(
+    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
         accumulate=_sum_next, order=survey_outcome_order_ascending
     )
     survey: Any = P(6).survey

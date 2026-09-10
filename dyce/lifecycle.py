@@ -56,5 +56,7 @@ def experimental(fn: Callable[_ParamsT, _ReturnT]) -> Callable[_ParamsT, _Return
         warnings.warn(msg, ExperimentalWarning, stacklevel=2)
         return fn(*args, **kwargs)
 
-    wrapper.__doc__ = admonition + ("\n\n" + original_doc if original_doc else "")
+    wrapper.__doc__ = admonition + (  # zuban: ignore[assignment]
+        "\n\n" + original_doc if original_doc else ""
+    )
     return wrapper

@@ -16,9 +16,7 @@
 import operator
 import re
 from collections.abc import Iterable, Iterator, Sequence
-from types import (
-    NotImplementedType,  # ruff: ignore[typing-only-standard-library-import]
-)
+from types import NotImplementedType
 from typing import TYPE_CHECKING, Any, SupportsIndex, SupportsInt, TypeVar
 
 __all__ = (
@@ -56,13 +54,13 @@ def nobeartype(arg: _T) -> _T:
 
 if not TYPE_CHECKING:  # pragma: no cover
     try:
-        from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
+        from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
             BeartypeConf,
             BeartypeStrategy,
             beartype,
         )
         from beartype.claw import beartype_this_package  # ruff: ignore[unused-import]
-        from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
+        from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
             BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType] # ruff: ignore[unused-import]
         )
 
@@ -134,15 +132,13 @@ def lossless_int(candidate: SupportsInt) -> int:
     return result
 
 
-def lossless_int_or_not_implemented(
-    candidate: SupportsInt,
-) -> "int | NotImplementedType":
+def lossless_int_or_not_implemented(candidate: SupportsInt) -> int | NotImplementedType:
     r"""
     Like [`lossless_int`][dyce.types.lossless_int], but returns `NotImplemented` instead of raising `ValueError` when the conversion is lossy.
     """
     int_val = int(candidate)
     if int_val != candidate:
-        return NotImplemented
+        return NotImplemented  # type: ignore[no-any-return]
     return int_val
 
 

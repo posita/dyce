@@ -13,25 +13,18 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+# TODO(posita): <https://github.com/ionelmc/pytest-benchmark/issues/212>
 
-def fig_callback() -> None:
-    # --8<-- [start:viz]
-    from dyce import H
-    from dyce.viz import GraphType
-    from dyce.viz.matplotlib import plot_line
+from collections.abc import Callable
+from typing import ParamSpec, TypeVar
 
-    ax = plot_line(
-        2 @ H(10),
-        H(8) + H(12),
-        labels=["2d10", "d8 + d12"],
-        graph_type=GraphType.AT_LEAST,
-    )
-    ax.set_title('2d10 vs. d8 + d12 ("at least")')
-    ax.legend(loc="upper left")
-    # --8<-- [end:viz]
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
 
-
-if __name__ == "__main__":
-    from _plot import main
-
-    main(fig_callback)
+class BenchmarkFixture:
+    def __call__(
+        self,
+        function_to_benchmark: Callable[_P, _R],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> _R: ...
