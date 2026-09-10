@@ -133,7 +133,7 @@ def sort_and_select_from_rolls(
 ) -> Iterator[RollCountT[_T]]:
     for unsorted_roll, count in unsorted_roll_counts:
         try:
-            roll = tuple(sorted(unsorted_roll))  # type: ignore[type-var]
+            roll = tuple(sorted(unsorted_roll))  # type: ignore[type-var] # zuban: ignore[arg-type]
         except TypeError:
             roll = tuple(sorted(unsorted_roll, key=natural_key))
         roll = tuple(getitems(roll, which)) if which else roll

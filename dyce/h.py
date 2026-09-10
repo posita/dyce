@@ -523,7 +523,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ConvolvableT]": ...
     @overload
     def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
-    def __matmul__(self: "H", rhs: SupportsInt) -> "H":
+    def __matmul__(self: "H[Any]", rhs: SupportsInt) -> "H[Any]":
         n = lossless_int_or_not_implemented(rhs)
         if n is NotImplemented:
             return NotImplemented
@@ -949,7 +949,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ConvolvableT]": ...
     @overload
     def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
-    def __rmatmul__(self: "H", lhs: SupportsInt) -> "H":
+    def __rmatmul__(self: "H[Any]", lhs: SupportsInt) -> "H[Any]":
         return self.__matmul__(lhs)
 
     @overload
@@ -1412,7 +1412,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             raise ValueError(f"k ({k!r}) must be less than or equal to n ({n!r})")
 
         c_outcome = self.get(outcome, 0)
-        return math.comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)
+        return math.comb(n, k) * c_outcome**k * (self.total - c_outcome) ** (n - k)  # type: ignore[no-any-return]
 
     def format(
         self,
@@ -1726,7 +1726,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
         *,
         preserve_zero_counts: bool = False,
-    ) -> "H":
+    ) -> "H[Any]":
         r"""
         Construct an [`H`][dyce.H] by “quantizing” counts such that none are occupy more bits than *bit_width* and proportions are retained.
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
@@ -2125,7 +2125,7 @@ def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
     result: H[_T] | None = None
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
-        batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # pyrefly: ignore[unsupported-operation] # ty: ignore[unsupported-operator]
+        batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # ty: ignore[unsupported-operator] # zuban: ignore[operator]
         result = batch if result is None else result + batch  # type: ignore[operator]
     return cast("H[_T]", H({})) if result is None else result
 
@@ -2218,7 +2218,9 @@ def _convolve_fast(
                     lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
                 )
                 if new_acc is NotImplemented:
-                    return NotImplemented  # pragma: no cover
+                    return (  # type: ignore[no-any-return] # pragma: no cover
+                        NotImplemented
+                    )
                 acc = new_acc
         n >>= 1
         if n:
@@ -2228,7 +2230,7 @@ def _convolve_fast(
                 lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
             )
             if new_base is NotImplemented:
-                return NotImplemented
+                return NotImplemented  # type: ignore[no-any-return]
             base = new_base
     return acc if acc is not None else {}
 
@@ -2251,7 +2253,7 @@ def _convolve_linear(
             lambda lhs, rhs: _apply_opname(lhs, "__add__", "__radd__", rhs),
         )
         if new_result is NotImplemented:
-            return NotImplemented
+            return NotImplemented  # type: ignore[no-any-return]
         result = new_result
     return result
 
@@ -2286,7 +2288,7 @@ def _h_binary_callable(
     ):
         new_outcome = func(lhs_outcome, rhs_outcome)
         if new_outcome is NotImplemented:
-            return NotImplemented
+            return NotImplemented  # type: ignore[no-any-return]
         result[new_outcome] = result.get(new_outcome, 0) + lhs_count * rhs_count
     return result
 
@@ -2301,7 +2303,7 @@ def _h_unary_opname(
         op_fn = getattr(outcome, op_name, None)
         new_outcome = op_fn() if op_fn is not None else NotImplemented
         if new_outcome is NotImplemented:
-            return NotImplemented
+            return NotImplemented  # type: ignore[no-any-return]
         result[new_outcome] = result.get(new_outcome, 0) + count
     return result
 
@@ -2316,7 +2318,7 @@ def _map_opname_fwd(
     for outcome, count in mapping.items():
         new_outcome = _apply_opname(outcome, op_name, rop_name, scalar)
         if new_outcome is NotImplemented:
-            return NotImplemented
+            return NotImplemented  # type: ignore[no-any-return]
         result[new_outcome] = result.get(new_outcome, 0) + count
     return result
 
@@ -2334,7 +2336,7 @@ def _map_opname_ref(
     for outcome, count in mapping.items():
         new_outcome = _apply_opname(scalar, op_name, rop_name, outcome)
         if new_outcome is NotImplemented:
-            return NotImplemented
+            return NotImplemented  # type: ignore[no-any-return]
         result[new_outcome] = result.get(new_outcome, 0) + count
     return result
 

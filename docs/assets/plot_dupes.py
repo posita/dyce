@@ -19,7 +19,7 @@ def fig_callback() -> None:
     # --8<-- [start:core]
     from dyce import H, P
 
-    def count_dupes(pool: P) -> H[int]:
+    def count_dupes(pool: P[int]) -> H[int]:
         return H.from_counts(
             (sum(1 for i in range(1, len(roll)) if roll[i] == roll[i - 1]), count)
             for roll, count in pool.rolls_with_counts()
@@ -40,6 +40,6 @@ def fig_callback() -> None:
 
 
 if __name__ == "__main__":
-    from _plot import main  # pyrefly: ignore[missing-import]
+    from _plot import main
 
     main(fig_callback)

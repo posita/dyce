@@ -108,8 +108,8 @@ class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
 
 class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
     @overload
-    def __init__(  # pyrefly: ignore[invalid-annotation]
-        self: "ParameterizedSurveyor[_T, _StateT, _StateT]",
+    def __init__(
+        self: "ParameterizedSurveyor[_T, _StateT, _StateT]",  # zuban: ignore[misc]
         accumulate: Callable[[_StateT | None, _T, int], _StateT],
         order: Callable[[Iterable[_T]], Iterable[_T]],
         *,
@@ -117,7 +117,7 @@ class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
         settle: None = ...,
     ) -> None: ...
     @overload
-    def __init__(  # pyrefly: ignore[invalid-annotation]
+    def __init__(
         self: "ParameterizedSurveyor[_T, _StateT, _ResultT]",
         accumulate: Callable[[_StateT | None, _T, int], _StateT],
         order: Callable[[Iterable[_T]], Iterable[_T]],
@@ -228,7 +228,7 @@ class _WhichRollSurveyor(
     def initial(self) -> tuple[tuple[_T, ...], int]:
         return (), (0 if self._ascending else self._p_len - 1)
 
-    def accumulate(  # pyrefly: ignore[bad-override] # ty: ignore[invalid-method-override]
+    def accumulate(  # ty: ignore[invalid-method-override]
         self,
         state: tuple[tuple[_T, ...], int],  # type: ignore[override]
         outcome: _T,
@@ -304,7 +304,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     <!-- -->
 
         >>> P(4, 6).apply_to_each_h(
-        ...     lambda h_outcome, other_outcome: operator.pow(other_outcome, h_outcome),
+        ...     lambda h_outcome, other_outcome: (
+        ...         operator.pow(  # zuban: ignore[no-untyped-call]
+        ...             other_outcome, h_outcome
+        ...         )
+        ...     ),
         ...     2,
         ... )
         P(H({2: 1, 4: 1, 8: 1, 16: 1}), H({2: 1, 4: 1, 8: 1, 16: 1, 32: 1, 64: 1}))
@@ -442,7 +446,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def __matmul__(self: "P[Any]", lhs: Literal[0]) -> "P[Never]": ...
     @overload
     def __matmul__(self: "P[_T]", lhs: SupportsInt) -> "P[_T]": ...
-    def __matmul__(self: "P", lhs: SupportsInt) -> "P":
+    def __matmul__(self: "P[Any]", lhs: SupportsInt) -> "P[Any]":
         try:
             n = lossless_int(lhs)
         except (TypeError, ValueError):
@@ -469,7 +473,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def __rmatmul__(self: "P[Any]", rhs: Literal[0]) -> "P[Never]": ...
     @overload
     def __rmatmul__(self: "P[_T]", rhs: SupportsInt) -> "P[_T]": ...
-    def __rmatmul__(self: "P", rhs: SupportsInt) -> "P":
+    def __rmatmul__(self: "P[Any]", rhs: SupportsInt) -> "P[Any]":
         return self.__matmul__(rhs)
 
     # ---- Properties ------------------------------------------------------------------
@@ -581,7 +585,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> p3d6.apply_to_each_roll(count_ones_in_roll) == ones_rolled_in_3d6
             True
         """
-        return cast(
+        return cast(  # zuban: ignore[redundant-cast]
             "H[_ResultT]",
             aggregate_weighted(
                 (func(roll), count) for roll, count in self.rolls_with_counts(*which)
@@ -589,15 +593,17 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         )
 
     @overload
-    def h(self: "P[Never]", *which: GetItemT) -> H[Never]: ...
+    def h(  # zuban: ignore[override]
+        self: "P[Never]", *which: GetItemT
+    ) -> H[Never]: ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
     def h(self: "P[ot.CanAddSame[int, int]]", *which: GetItemT) -> H[int]: ...
     @overload
     def h(self: "P[_ConvolvableT]", *which: GetItemT) -> H[_ConvolvableT]: ...
     @overload
-    def h(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
-    def h(self: "P", *which: GetItemT) -> H:  # type: ignore[misc] # ty: ignore[invalid-method-override]
+    def h(self: "P[_T]", which: int) -> H[_T]: ...
+    def h(self: "P[Any]", *which: GetItemT) -> H[Any]:  # type: ignore[misc] # ty: ignore[invalid-method-override]
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
 
@@ -734,7 +740,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         """
         roll = [h.roll() for h in self]
         try:
-            roll.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue]
+            roll.sort()  # pyright: ignore[reportCallIssue] # zuban: ignore[call-arg]
         except TypeError:
             roll.sort(key=natural_key)
         return tuple(roll)
@@ -896,7 +902,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
             >>> from dyce import P
             >>> from dyce.p import survey_outcome_order_ascending
-            >>> def running_sum(state, outcome, count):
+            >>> def running_sum(state: int | None, outcome: int, count: int) -> int:
             ...     return outcome * count if state is None else state + outcome * count
             >>> p_3d6 = 3 @ P(6)
             >>> p_3d6.survey(
@@ -907,7 +913,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         Keeping the greatest two of four six-sided dice is order-sensitive, so it sweeps descending and uses *settle* to project the accumulated sum:
 
             >>> from dyce.p import survey_outcome_order_descending
-            >>> def keep_highest_two(state, outcome, count):
+            >>> def keep_highest_two(
+            ...     state: tuple[int, int] | None, outcome: int, count: int
+            ... ) -> tuple[int, int]:
             ...     kept, total = (0, 0) if state is None else state
             ...     take = min(count, 2 - kept)
             ...     return kept + take, total + outcome * take
@@ -945,7 +953,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                     )
                 )
             )
-            return aggregate_weighted(survey_raw_iter)
+            return aggregate_weighted(survey_raw_iter)  # zuban: ignore[no-any-return]
         else:
             if (
                 accumulate is not None
@@ -1096,7 +1104,7 @@ def _rwc_heterogeneous_one_end(
             for group_roll, group_weight in group_rolls:
                 merged: list[_T] = [*selected_roll, *group_roll]
                 try:
-                    merged.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+                    merged.sort()  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
                 except TypeError:
                     merged.sort(key=natural_key)
                 merged_roll = tuple(merged[-k:] if from_right else merged[:k])
@@ -1140,7 +1148,7 @@ def _rwc_homogeneous_one_end(
             * remaining_total ** (remaining - count)
             for count in range(needed)
         )
-        return (weight + remaining_total) ** remaining - fewer_than_needed
+        return (weight + remaining_total) ** remaining - fewer_than_needed  # type: ignore[no-any-return]
 
     def _generate(
         outcome_index: int,
@@ -1177,7 +1185,7 @@ def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
     """
     result = list(outcomes)
     try:
-        result.sort()  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+        result.sort()  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
     except TypeError:
         result.sort(key=natural_key)
     return result
@@ -1189,7 +1197,7 @@ def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
     """
     result = list(outcomes)
     try:
-        result.sort(reverse=True)  # pyrefly: ignore[bad-specialization,no-matching-overload] # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type]
+        result.sort(reverse=True)  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
     except TypeError:
         result.sort(key=natural_key, reverse=True)
     return result

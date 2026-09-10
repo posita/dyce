@@ -55,7 +55,9 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     import sys
     import warnings
 
-    from plotly.graph_objects import Figure  # type: ignore[import-untyped]
+    from plotly.graph_objects import (  # type: ignore[import-untyped]
+        Figure,  # zuban: ignore[attr-defined]
+    )
 
     from dyce.lifecycle import ExperimentalWarning
 
@@ -75,7 +77,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     # Plotly.py otherwise serializes its large default template into every
     # fragment. The documentation supplies its own transparent presentation.
     fig.update_layout(template="none")
-    fragment = fig.to_html(
+    fragment = fig.to_html(  # zuban: ignore[no-untyped-call]
         full_html=False,
         include_plotlyjs=False,
         div_id=f"{name}-figure",  # for keeping output byte-stable

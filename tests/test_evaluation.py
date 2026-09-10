@@ -15,17 +15,19 @@
 
 import sys
 from collections import Counter, UserString
-from collections.abc import Callable
 from enum import IntEnum, auto
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import Any, Never
+from typing import TYPE_CHECKING, Any, Never
 
 import pytest
 
 from dyce import H, HResult, P, PResult, TruncationWarning, expand, explode_n
 from dyce.d import d0, d1, d6, d8, d10, p2d8
 from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
+
+if TYPE_CHECKING:
+    from pytest_benchmark.fixture import BenchmarkFixture
 
 __all__ = ()
 
@@ -165,14 +167,14 @@ class TestExpandTruncation:
     reason="requires benchmark fixture",
 )
 class TestExpandTruncationBenchmark:
-    def test_default(self, benchmark: Callable) -> None:
+    def test_default(self, benchmark: "BenchmarkFixture") -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
 
         h = d6
         benchmark(expand, _callback, h)
 
-    def test_skip_truncation(self, benchmark: Callable) -> None:
+    def test_skip_truncation(self, benchmark: "BenchmarkFixture") -> None:
         def _callback(r: HResult[int]) -> int:
             return r.outcome * 2
 

@@ -49,7 +49,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanAdd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __add__(self, rhs: object) -> H[object]:
-        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __sub__(
@@ -60,7 +60,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanSub[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __sub__(self, rhs: object) -> H[object]:
-        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __mul__(
@@ -71,7 +71,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanMul[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __mul__(self, rhs: object) -> H[object]:
-        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __truediv__(
@@ -82,7 +82,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanTruediv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __truediv__(self, rhs: object) -> H[object]:
-        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __floordiv__(
@@ -93,7 +93,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanFloordiv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __floordiv__(self, rhs: object) -> H[object]:
-        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __mod__(
@@ -104,7 +104,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanMod[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __mod__(self, rhs: object) -> H[object]:
-        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __pow__(
@@ -115,7 +115,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanPow2[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __pow__(self, rhs: object) -> H[object]:
-        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __lshift__(
@@ -126,7 +126,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanLshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __lshift__(self, rhs: object) -> H[object]:
-        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __rshift__(
@@ -137,7 +137,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanRshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rshift__(self, rhs: object) -> H[object]:
-        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __and__(
@@ -148,7 +148,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanAnd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __and__(self, rhs: object) -> H[object]:
-        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __or__(
@@ -159,7 +159,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanOr[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __or__(self, rhs: object) -> H[object]:
-        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     @overload
     def __xor__(
@@ -170,7 +170,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", rhs: optype.CanXor[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __xor__(self, rhs: object) -> H[object]:
-        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator,no-any-return]
 
     # ---- Reflected operators ---------------------------------------------------------
 

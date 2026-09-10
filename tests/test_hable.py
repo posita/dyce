@@ -85,7 +85,7 @@ class TestHableOpsMixin:
 
     def test_not_implemented(self) -> None:
         assert (
-            _HableImplementationWithOps(H({1: 1})).__add__("incompatible")  # type: ignore[operator]  # ty: ignore[no-matching-overload]
+            _HableImplementationWithOps(H({1: 1})).__add__("incompatible")  # type: ignore[operator]  # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
             is NotImplemented
         )
         with pytest.raises(TypeError):

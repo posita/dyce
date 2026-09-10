@@ -36,7 +36,7 @@
 
 # %% jupyter={"source_hidden": true}
 # Install additional requirements if necessary
-from prerequisites import (  # pyright: ignore[reportMissingImports] # pyrefly: ignore[missing-import] # ty: ignore[unresolved-import]
+from prerequisites import (  # pyright: ignore[reportMissingImports] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
     install_if_missing,
 )
 
@@ -51,7 +51,7 @@ from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
+matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
 style.use("bmh")
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
@@ -66,7 +66,7 @@ d6_reroll_first_one = expand(
 p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
 p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
 
-attr_results: dict[str, H] = {
+attr_results: dict[str, H[int]] = {
     "3d6": 3 @ H(6),
     "4d6 - discard lowest": p_4d6.h(slice(1, None)),
     "4d6 - re-roll first 1,\ndiscard lowest": p_4d6_reroll_first_one.h(slice(1, None)),

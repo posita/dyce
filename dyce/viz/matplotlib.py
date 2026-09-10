@@ -33,7 +33,7 @@ uv sync --group viz
 from collections.abc import Callable, Sequence
 from fractions import Fraction
 from itertools import accumulate, cycle
-from typing import Generic, TypedDict, TypeVar, cast, overload
+from typing import Any, Generic, TypedDict, TypeVar, cast, overload
 
 try:
     import matplotlib as mpl
@@ -97,7 +97,7 @@ _LABEL_LIM: Fraction = Fraction(1, 2**5)  # suppress burst labels below ~3.1%
 _RIDGE_FILL_FOOT: float = 0.1
 _RIDGE_ROW_STEP: float = 1.0
 
-_formatter: BurstFormatterT
+_formatter: BurstFormatterT[Any]
 
 
 @experimental
@@ -151,7 +151,7 @@ del _formatter
 
 @experimental
 def plot_bar(
-    *hs: H,
+    *hs: H[Any],
     alpha: float = _DEFAULT_PLOT_ALPHA,
     ax: Axes | None = None,
     cmap: str | Colormap | None = None,
@@ -405,7 +405,7 @@ def plot_burst(
 
 @experimental
 def plot_line(
-    *hs: H,
+    *hs: H[Any],
     alpha: float = _DEFAULT_PLOT_ALPHA,
     ax: Axes | None = None,
     cmap: str | Colormap | None = None,
@@ -648,7 +648,7 @@ def plot_ridge(
             peak_outcome = ridge["outcomes"][peak_index]
             peak_y = crests[peak_index]
             peak_on_left = (
-                ax.transData.transform((ax.convert_xunits(peak_outcome), peak_y))[0]
+                ax.transData.transform((ax.convert_xunits(peak_outcome), peak_y))[0]  # type: ignore[no-untyped-call] # zuban: ignore[arg-type]
                 <= ax.transAxes.transform((0.5, 0.0))[0]
             )
             x_offset = 8.0 if peak_on_left else -8.0
@@ -733,6 +733,6 @@ def _labeled_hs(
 def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
     all_outcomes: set[_T] = {o for _, h in hs_list for o in h}
     try:
-        return sorted(all_outcomes)  # type: ignore[type-var]
+        return sorted(all_outcomes)  # type: ignore[type-var] # zuban: ignore[arg-type]
     except TypeError:  # pragma: no cover
         return sorted(all_outcomes, key=natural_key)

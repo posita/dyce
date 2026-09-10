@@ -91,11 +91,11 @@ lint = [
     "mypy",
     "pre-commit",
     "pre-commit-uv",
-    "pyrefly",
     "pyright",
     "pytest",
     "ruff",
-    "ty>=0.0.70",  # TODO(posita): https://github.com/astral-sh/ty/issues/4222
+    "ty",
+    "zuban",
     {include-group = "docs"},
 ]
 # Only what's needed for uv run pytest --cov
@@ -145,15 +145,11 @@ files = ["docs", "dyce", "helpers", "tests", "*.py"]
 # )"""
 exclude_gitignore = true
 python_version = "3.11"
-warn_redundant_casts = true
+strict = true
+# warn_redundant_casts = true
 warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
-
-[tool.pyrefly]
-project-includes = ["docs", "dyce", "helpers", "tests", "*.py"]
-python-version = "3.11.0"
-infer-with-first-use = false
+# warn_unused_configs = true
+# warn_unused_ignores = true
 
 [warnings]
 unused-ignore = true
@@ -253,16 +249,28 @@ extend-immutable-calls = [
 include = ["docs", "dyce", "helpers", "tests", "*.py"]
 exclude = ["docs/assets/nb_*.py"]
 
+[tool.zuban]
+files = ["docs", "dyce", "helpers", "tests", "*.py"]
+# exclude = """(?x)(
+#     ^docs/assets/nb_.*\\.py$
+# )"""
+exclude_gitignore = true
+python_version = "3.11"
+strict = true
+# warn_redundant_casts = true
+warn_unreachable = true
+# warn_unused_configs = true
+# warn_unused_ignores = true
+
 [tool.check_doctests]
 # log_level = "DEBUG"
 
 [tool.check_doctests.check]
 checkers = [
   # TODO(posita): See:
-  # - <https://github.com/facebook/pyrefly/issues/3313>
   # - <https://github.com/astral-sh/ty/issues/3415>
   # ["ty", "check"],
-  ["pyrefly", "check", "--search-path", "."],
+  ["zuban", "check"],
   ["pyright"],
   ["mypy"],
 ]

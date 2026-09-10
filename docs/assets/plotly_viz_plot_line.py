@@ -37,6 +37,6 @@ def fig_callback() -> "PlotSpec":
 
 
 if __name__ == "__main__":
-    from _plotly import main  # pyrefly: ignore[missing-import]
+    from _plotly import main
 
     main(fig_callback)

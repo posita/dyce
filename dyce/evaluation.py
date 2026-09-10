@@ -234,11 +234,11 @@ def expand(
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[Any]: ...
 def expand(  # ruff: ignore[complex-structure]
-    callback: Callable,
-    *sources: H | P,
+    callback: Callable[..., Any],
+    *sources: H[Any] | P[Any],
     precision: Fraction = _DEFAULT_PRECISION,
     **state: Any,
-) -> H:
+) -> H[Any]:
     r"""
     !!! warning "Experimental"
 
@@ -358,7 +358,7 @@ def expand(  # ruff: ignore[complex-structure]
     To pass updated state into recursive calls, include it explicitly:
 
         >>> def explode_on_max_up_to_n_times(
-        ...     result: HResult, *, n: int
+        ...     result: HResult[int], *, n: int
         ... ) -> H[int] | int:
         ...     if n > 0 and result.outcome == max(result.h):
         ...         inner = expand(explode_on_max_up_to_n_times, result.h, n=n - 1)
@@ -500,14 +500,14 @@ def expand(  # ruff: ignore[complex-structure]
         )
 
     if current_path_prob == Fraction(1):
-        return h.lowest_terms(preserve_zero_counts=True)
-    return h
+        return h.lowest_terms(preserve_zero_counts=True)  # zuban: ignore[no-any-return]
+    return h  # zuban: ignore[no-any-return]
 
 
 @nobeartype  # not decoratable by beartype (avoids warning)
 def _explode_on_max(result: HResult[_T], _n_left: int, _n_done: int) -> H[_T] | _T:
     try:
-        max_result = max(result.h)  # type: ignore[type-var]
+        max_result = max(result.h)  # type: ignore[type-var] # zuban: ignore[arg-type]
     except TypeError:
         max_result = max(result.h, key=natural_key)
     return result.h if bool(result.outcome == max_result) else result.outcome
@@ -612,8 +612,8 @@ def explode_n(
 
 @nobeartype  # not decoratable by beartype (avoids warning)
 def _source_to_result_iterable(
-    source: H | P,
-) -> Iterator[tuple[HResult | PResult, int]]:
+    source: H[Any] | P[Any],
+) -> Iterator[tuple[HResult[Any] | PResult[Any], int]]:
     if isinstance(source, H):
         for outcome, count in source.items():
             yield HResult(source, outcome), count

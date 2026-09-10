@@ -745,7 +745,7 @@ Translation:
 
     >>> from dyce.evaluation import PResult
 
-    >>> def brawl(p_result_a: PResult[int], p_result_b: PResult[int]):
+    >>> def brawl(p_result_a: PResult[int], p_result_b: PResult[int]) -> int:
     ...     a_successes = sum(1 for v in p_result_a.roll if v >= p_result_b.roll[-1])
     ...     b_successes = sum(1 for v in p_result_b.roll if v >= p_result_a.roll[-1])
     ...     return a_successes - b_successes
@@ -790,7 +790,7 @@ output [brawl 3d6 vs 3d6 with optional swap] named "A vs B Damage"
 
 Translation:
 
-    >>> def brawl_w_optional_swap(p_result_a: PResult[int], p_result_b: PResult[int]):
+    >>> def brawl_w_optional_swap(p_result_a: PResult[int], p_result_b: PResult[int]) -> int:
     ...     roll_a, roll_b = p_result_a.roll, p_result_b.roll
     ...     if roll_a[0] < roll_b[-1]:
     ...         roll_a, roll_b = roll_a[1:] + roll_b[-1:], roll_a[:1] + roll_b[:-1]

@@ -596,7 +596,7 @@ If we wanted to make that the default, we could create a simple wrapper.
     ... ) -> H[T]:
     ...
     ...     def _callback(result: HResult[T], *, n_left: int) -> H[T] | T:
-    ...         if n_left > 0 and result.outcome == max(result.h):  # type: ignore[type-var]
+    ...         if n_left > 0 and result.outcome == max(result.h):  # type: ignore[type-var] # zuban: ignore[arg-type]
     ...             inner = expand(_callback, result.h, n_left=n_left - 1)
     ...             if inner:
     ...                 return result.outcome + inner
@@ -629,10 +629,10 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
     ...         # [max - 2..max] if we've already exploded twice, etc.
     ...         # ...
     ...         if (
-    ...             result.outcome >= max(result.h) - n_done  # type: ignore[operator,type-var]
+    ...             result.outcome >= max(result.h) - n_done  # type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]
     ...             and
     ...             # ... but never explode on the minimum
-    ...             result.outcome > min(result.h)  # type: ignore[operator,type-var]
+    ...             result.outcome > min(result.h)  # type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]
     ...         )
     ...         else result.outcome
     ...     )
@@ -700,7 +700,7 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
     ... ) -> H[T] | T:
     ...     if result.h in pool:
     ...         which = pool.index(result.h)
-    ...         if which > 0 and result.outcome == max(result.h):  # type: ignore[type-var]
+    ...         if which > 0 and result.outcome == max(result.h):  # type: ignore[type-var] # zuban: ignore[arg-type,operator]
     ...             return pool[which - 1]
     ...     return result.outcome
 
@@ -778,7 +778,7 @@ Instead, it relies on the caller to invoke its proprietary solver APIs.
       ...
     TypeError: cannot determine truth value of Relational...
     >>> import sympy.solvers.inequalities
-    >>> sympy.solvers.inequalities.reduce_inequalities(
+    >>> sympy.solvers.inequalities.reduce_inequalities(  # zuban: ignore[no-untyped-call]
     ...     sympy.abc.x < sympy.abc.x + 1, [sympy.abc.x]
     ... )
     True
