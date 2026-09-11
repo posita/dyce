@@ -46,9 +46,13 @@ __all__ = (
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
     "roller_factory",
+    "trace",
 )
 
 _T = TypeVar("_T")
+_T1 = TypeVar("_T1")
+_T2 = TypeVar("_T2")
+_T3 = TypeVar("_T3")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
@@ -66,7 +70,9 @@ class RollError(Exception):
     def __init__(
         self,
         message: str,
-        path: tuple["SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]", ...],
+        path: tuple[
+            "SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any] | _TraceCall", ...
+        ],
     ) -> None:
         super().__init__(message)
         self.path = path
@@ -752,7 +758,7 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
 
 class MultiOutcomeRoller(HableT[_T_co]):
     r"""
-    A deferred, traceable computation producing a fixed-size tuple of outcomes.
+    A deferred, traceable computation producing a tuple of outcomes.
     “Multi” describes the collection result, which may contain just one outcome.
     """
 
@@ -1264,10 +1270,6 @@ class MultiOutcomeRoller(HableT[_T_co]):
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _INVERT)
         )
 
-    @abstractmethod
-    def __len__(self) -> int:
-        r"""Returns the fixed number of outcomes produced by this multi roller."""
-
     @property
     def operands(
         self,
@@ -1283,14 +1285,13 @@ class MultiOutcomeRoller(HableT[_T_co]):
 
     def h(self) -> H[_T_co]:
         r"""Returns the distribution of the sum of this multi roller's outcomes."""
-        if len(self) == 0:
-            return cast("H[_T_co]", H({}))
         return cast(
             "H[_T_co]",
             H.from_counts(
                 (
                     (_sum_outcomes(cast("Iterable[Any]", roll)), count)
                     for roll, count in self.rolls_with_counts()
+                    if roll
                 )
             ),
         )
@@ -1328,9 +1329,13 @@ class MultiOutcomeRoller(HableT[_T_co]):
         r"""Yields the possible pool outcomes and their weights."""
 
     def select(self, which: GetItemT, *more: GetItemT) -> "MultiOutcomeRoller[_T_co]":
-        r"""Returns a multi roller selecting the specified sorted positions."""
-        positions = tuple(getitems(tuple(range(len(self))), (which, *more)))
-        return _SelectedPoolRoller(self, positions)
+        r"""
+        Returns a multi roller selecting the specified positions.
+
+        Selectors are resolved against each tuple produced when rolling or enumerating outcomes.
+        Invalid indices raise at that time rather than during construction.
+        """
+        return _SelectedPoolRoller(self, (which, *more))
 
     def sum(
         self: "MultiOutcomeRoller[_CanAddSameT]",
@@ -1375,7 +1380,7 @@ class PRoller(MultiOutcomeRoller[_T_co]):
         return MultiOutcomeRoll(outcomes, self)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        if len(self) == 0:
+        if not self._p:
             yield (), 1
         else:
             yield from self._p.rolls_with_counts()
@@ -1440,7 +1445,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
         return MultiOutcomeRoll(outcomes, self, operands)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        if len(self) == 0:
+        if not self._rollers:
             yield (), 1
         else:
             yield from P(*(roller.h() for roller in self._rollers)).rolls_with_counts()
@@ -1816,7 +1821,7 @@ class SingleOutcomeRoll(Generic[_T_co]):
         Each roll’s `roller` entry identifies its producing roller in `rollers`.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
-        return _trace(cast("SingleOutcomeRoll[object]", self))
+        return _trace_from_root_roll(cast("SingleOutcomeRoll[object]", self))
 
     def _binary_operator(
         self, rhs: object, operator: _BinaryOperator
@@ -2212,7 +2217,7 @@ class MultiOutcomeRoll(Generic[_T_co]):
         Each roll’s `roller` entry identifies its producing roller in `rollers`.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
-        return _trace(cast("MultiOutcomeRoll[object]", self))
+        return _trace_from_root_roll(cast("MultiOutcomeRoll[object]", self))
 
 
 class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
@@ -2247,7 +2252,32 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
         )
 
 
-class _CapturedRoller(SingleOutcomeRoller[_T_co]):
+class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
+    __slots__ = ("_operand", "_operator")
+
+    def __init__(
+        self, operand: SingleOutcomeRoller[object], operator: _UnaryOperator
+    ) -> None:
+        self._operand = operand
+        self._operator = operator
+
+    @property
+    def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
+        return (self._operand,)
+
+    def h(self) -> H[_ResultT]:
+        return cast("H[_ResultT]", self._operator(self._operand.h()))
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "unary", "operator": self._operator.name}
+
+    def _roll(self) -> SingleOutcomeRoll[_ResultT]:
+        operand_roll = self._operand.roll()
+        outcome = self._operator(operand_roll.outcome)
+        return SingleOutcomeRoll(cast("_ResultT", outcome), self, (operand_roll,))
+
+
+class _CapturedRollRoller(SingleOutcomeRoller[_T_co]):
     __slots__ = ("_roll_result",)
 
     def __init__(self, roll: SingleOutcomeRoll[_T_co]) -> None:
@@ -2297,18 +2327,15 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
 
 
 class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
-    __slots__ = ("_parent", "_positions")
+    __slots__ = ("_parent", "_selectors")
 
     def __init__(
         self,
         parent: MultiOutcomeRoller[_T_co],
-        positions: tuple[int, ...],
+        selectors: tuple[GetItemT, ...],
     ) -> None:
         self._parent = parent
-        self._positions = positions
-
-    def __len__(self) -> int:
-        return len(self._positions)
+        self._selectors = selectors
 
     @property
     def operands(
@@ -2317,46 +2344,91 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
         return (cast("MultiOutcomeRoller[object]", self._parent),)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "pool-selection", "positions": list(self._positions)}
+        return {
+            "kind": "pool-selection",
+            "selectors": [
+                {"start": key.start, "stop": key.stop, "step": key.step}
+                if isinstance(key, slice)
+                else operator.index(key)
+                for key in self._selectors
+            ],
+        }
 
     def _roll(self) -> "MultiOutcomeRoll[_T_co]":
-        if not self._positions:
-            raise ValueError("no outcomes from an empty selection")
         parent_roll = self._parent.roll()
-        outcomes = tuple(parent_roll.outcomes[position] for position in self._positions)
+        outcomes = tuple(getitems(parent_roll.outcomes, self._selectors))
+        if not outcomes:
+            raise ValueError("no outcomes from an empty selection")
         operands = (cast("MultiOutcomeRoll[object]", parent_roll),)
         return MultiOutcomeRoll(outcomes, self, operands)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
         yield from (
-            (tuple(roll[position] for position in self._positions), count)
+            (tuple(getitems(roll, self._selectors)), count)
             for roll, count in self._parent.rolls_with_counts()
         )
 
 
-class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
-    __slots__ = ("_operand", "_operator")
-
-    def __init__(
-        self, operand: SingleOutcomeRoller[object], operator: _UnaryOperator
-    ) -> None:
-        self._operand = operand
-        self._operator = operator
-
-    @property
-    def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
-        return (self._operand,)
-
-    def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", self._operator(self._operand.h()))
+@dataclass(frozen=True)
+class _TraceCall:
+    callback: Callable[..., object]
+    sources: tuple[SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any], ...]
+    name: str
+    state: dict[str, Any]
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "unary", "operator": self._operator.name}
+        return {"kind": "trace", "name": self.name, "state": self.state}
 
-    def _roll(self) -> SingleOutcomeRoll[_ResultT]:
-        operand_roll = self._operand.roll()
-        outcome = self._operator(operand_roll.outcome)
-        return SingleOutcomeRoll(cast("_ResultT", outcome), self, (operand_roll,))
+
+class _TraceRoller:
+    def __init__(
+        self,
+        call: _TraceCall,
+        result_roller: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    ) -> None:
+        self._call = call
+        self._result_roller = result_roller
+
+    @property
+    def operands(
+        self,
+    ) -> tuple[SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any], ...]:
+        return (*self._call.sources, self._result_roller)
+
+    def metadata(self) -> dict[str, object]:
+        return self._call.metadata()
+
+    def h(self) -> H[Any]:  # pragma: no cover
+        raise NotImplementedError(
+            "trace callbacks do not support distribution computation"
+        )
+
+
+class _SingleOutcomeTraceRoller(_TraceRoller, SingleOutcomeRoller[_T_co]):
+    def _roll(self) -> SingleOutcomeRoll[_T_co]:
+        result = _eval_trace_call(self._call)
+        if not isinstance(result, SingleOutcomeRoll):  # pragma: no cover
+            raise TypeError(
+                f"trace callback did not produce a single outcome when called again ({result!r})"
+            )
+        return result
+
+
+class _MultiOutcomeTraceRoller(_TraceRoller, MultiOutcomeRoller[_T_co]):
+    def _roll(self) -> MultiOutcomeRoll[_T_co]:
+        result = _eval_trace_call(self._call)
+        if not isinstance(result, MultiOutcomeRoll):  # pragma: no cover
+            raise TypeError(
+                f"trace callback did not produce multiple outcomes when called again ({result!r})"
+            )
+        return result
+
+    def rolls_with_counts(
+        self,
+    ) -> Iterator[tuple[tuple[_T_co, ...], int]]:  # pragma: no cover
+        raise NotImplementedError(
+            "trace callbacks do not support distribution computation"
+        )
 
 
 class _RollerFactoryDecorator(Protocol):
@@ -2374,9 +2446,6 @@ class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
     def __init__(self, expression: MultiOutcomeRoller[_T_co], name: str) -> None:
         self._expression = expression
         self._name = name
-
-    def __len__(self) -> int:
-        return len(self._expression)
 
     @property
     def operands(self) -> tuple[MultiOutcomeRoller[_T_co], ...]:
@@ -2492,6 +2561,602 @@ def roller_factory(
     return decorate if fn is None else decorate(fn)
 
 
+@overload
+def trace(
+    callback: Callable[[], MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT]],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[], SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT]],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[], _ResultT],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[SingleOutcomeRoll[_T1]], _ResultT],
+    source1: SingleOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[MultiOutcomeRoll[_T1]], _ResultT],
+    source1: MultiOutcomeRoller[_T1],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]], _ResultT],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[[MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]], _ResultT],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        _ResultT,
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        _ResultT,
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        _ResultT,
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]], _ResultT
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: SingleOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        _ResultT,
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: SingleOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
+    ],
+    source1: SingleOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
+    ],
+    source1: MultiOutcomeRoller[_T1],
+    source2: MultiOutcomeRoller[_T2],
+    source3: MultiOutcomeRoller[_T3],
+    *,
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[..., MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT]],
+    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> MultiOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[
+        ..., SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT]
+    ],
+    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+@overload
+def trace(
+    callback: Callable[..., _ResultT],
+    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    name: str | None = ...,
+    **state: Any,  # ruff: ignore[any-type]
+) -> SingleOutcomeRoll[_ResultT]: ...
+def trace(
+    callback: Callable[..., object],
+    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    name: str | None = None,
+    **state: Any,
+) -> SingleOutcomeRoll[Any] | MultiOutcomeRoll[Any]:
+    r"""
+    Rolls *sources*, calls *callback* with those rolls and *state*, and returns a named outcome trace.
+
+    A returned roller is rolled, a returned roll is retained, and any other return value is wrapped in a roll from a [`LiteralRoller`][dyce.roller.LiteralRoller].
+    The enclosing roll has that roll as its sole operand.
+    Supplied *state* is included unchanged in the callback metadata.
+    Its values must be JSON-compatible for JSON serialization of the trace.
+    *name* defaults to the callback’s `__name__` or its type’s `__name__`.
+    Exceptions are reported as [`RollError`][dyce.roller.RollError] with the original exception as their cause.
+
+    Explode a six once, retaining both the initial roll and any additional roll:
+
+        >>> from dyce.roller import (
+        ...     HRoller,
+        ...     SingleOutcomeRoll,
+        ...     SingleOutcomeRoller,
+        ...     trace,
+        ... )
+        >>> d6 = HRoller(H(6), name="d6")
+        >>> def explode_once(
+        ...     roll: SingleOutcomeRoll[int],
+        ... ) -> SingleOutcomeRoll[int] | SingleOutcomeRoller[int]:
+        ...     return roll + roll.roller if roll.outcome == 6 else roll
+        >>> result = trace(explode_once, d6)
+        >>> result.roller.metadata()
+        {'kind': 'trace', 'name': 'explode_once', 'state': {}}
+        >>> result.operands[0].roller is d6
+        True
+    """
+    call = _TraceCall(
+        callback,
+        sources,
+        name
+        if name is not None
+        else getattr(callback, "__name__", type(callback).__name__),
+        state,
+    )
+    try:
+        return _eval_trace_call(call)
+    except RollError as exc:
+        exc.path = (call, *exc.path)
+        raise
+    except Exception as exc:
+        raise RollError(str(exc), (call,)) from exc
+
+
 def _as_roll(
     value: _T | SingleOutcomeRoll[_T] | MultiOutcomeRoll[_T],
 ) -> SingleOutcomeRoll[_T]:
@@ -2518,7 +3183,7 @@ def _as_roller(
             "SingleOutcomeRoller[_T]", cast("MultiOutcomeRoller[Any]", value).sum()
         )
     elif isinstance(value, (SingleOutcomeRoll, MultiOutcomeRoll)):
-        return _CapturedRoller(_as_roll(value))
+        return _CapturedRollRoller(_as_roll(value))
     elif isinstance(value, H):
         return HRoller(value)
     elif isinstance(value, P):
@@ -2533,7 +3198,35 @@ def _as_roller(
         return LiteralRoller(value)
 
 
-def _trace(
+def _eval_trace_call(
+    call: _TraceCall,
+) -> SingleOutcomeRoll[Any] | MultiOutcomeRoll[Any]:
+    if any(
+        not isinstance(source, (SingleOutcomeRoller, MultiOutcomeRoller))
+        for source in call.sources
+    ):
+        raise TypeError("trace sources must be rollers")
+    inputs = tuple(source.roll() for source in call.sources)
+    result = call.callback(*inputs, **call.state)
+    if isinstance(result, (SingleOutcomeRoller, MultiOutcomeRoller)):
+        result = result.roll()
+    elif not isinstance(result, (SingleOutcomeRoll, MultiOutcomeRoll)):
+        result = LiteralRoller(result).roll()
+    if isinstance(result, MultiOutcomeRoll):
+        return MultiOutcomeRoll(
+            result.outcomes,
+            _MultiOutcomeTraceRoller(call, result.roller),
+            (result,),
+        )
+    else:
+        return SingleOutcomeRoll(
+            result.outcome,
+            _SingleOutcomeTraceRoller(call, result.roller),
+            (result,),
+        )
+
+
+def _trace_from_root_roll(
     root_roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object],
 ) -> dict[str, object]:
     roller_ids: dict[int, str] = {}
