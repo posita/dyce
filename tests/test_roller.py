@@ -20,7 +20,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Never, assert_type, cast
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -39,6 +39,7 @@ from dyce.roller import (
     _MultiOutcomeFactoryRoller,
     _SingleOutcomeFactoryRoller,
     roller_factory,
+    trace,
 )
 
 __all__ = ()
@@ -149,6 +150,223 @@ class TestRollError:
             pytest.raises(KeyboardInterrupt),
         ):
             HRoller(H(6)).roll()
+
+
+class TestTrace:
+    def test_single_outcome_roller_calls_callback_again(self) -> None:
+        callback = Mock(side_effect=[2, 5])
+        result = trace(cast("Callable[[], int]", callback))
+
+        assert result.roller.roll().outcome == 5
+
+    def test_rejects_nonroller_source(self) -> None:
+        with pytest.raises(RollError) as caught:
+            trace(Mock(), cast("Any", H(6)))
+
+        assert isinstance(caught.value.__cause__, TypeError)
+        assert str(caught.value.__cause__) == "trace sources must be rollers"
+
+    def test_binary_return_trace(self) -> None:
+        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
+            return 1 + roll
+
+        result = trace(callback, HRoller(H(6), name="d6"))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["operands"] == ["roll1"]
+        assert rolls["roll1"]["operands"] == ["roll2", "roll3"]
+        assert rolls["roll2"]["outcome"] == 1
+        assert rolls["roll0"]["outcome"] == 1 + rolls["roll3"]["outcome"]
+
+    def test_source_arguments_and_state(self) -> None:
+        single = LiteralRoller(3)
+        multi = PRoller(P(H({2: 1}), H({4: 1})))
+        token = object()
+        callback = Mock(return_value=0)
+
+        trace(callback, single, multi, token=token)
+
+        callback.assert_called_once()
+        args, kwargs = callback.call_args
+        assert isinstance(args[0], SingleOutcomeRoll)
+        assert args[0].outcome == 3
+        assert args[0].roller is single
+        assert isinstance(args[1], MultiOutcomeRoll)
+        assert args[1].outcomes == (2, 4)
+        assert args[1].roller is multi
+        assert kwargs == {"token": token}
+
+    def test_single_roll_return(self) -> None:
+        returned = LiteralRoller(4).roll()
+
+        def callback() -> SingleOutcomeRoll[int]:
+            return returned
+
+        result = trace(callback)
+
+        assert_type(result, SingleOutcomeRoll[int])
+        assert result.outcome == 4
+        assert result.operands == (returned,)
+
+    def test_multi_roll_return(self) -> None:
+        returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
+
+        def callback() -> MultiOutcomeRoll[int]:
+            return returned
+
+        result = trace(callback)
+
+        assert_type(result, MultiOutcomeRoll[int])
+        assert result.outcomes == (2, 3)
+        assert result.operands == (returned,)
+
+    def test_single_roller_return(self) -> None:
+        def callback() -> SingleOutcomeRoller[int]:
+            return LiteralRoller(8)
+
+        result = trace(callback)
+
+        assert_type(result, SingleOutcomeRoll[int])
+        assert result.outcome == 8
+        assert isinstance(result.operands[0], SingleOutcomeRoll)
+        assert result.operands[0].outcome == 8
+
+    def test_multi_roller_return(self) -> None:
+        def callback() -> MultiOutcomeRoller[int]:
+            return PRoller(P(H({2: 1}), H({3: 1})))
+
+        result = trace(callback)
+
+        assert_type(result, MultiOutcomeRoll[int])
+        assert result.outcomes == (2, 3)
+        assert isinstance(result.operands[0], MultiOutcomeRoll)
+        assert result.operands[0].outcomes == (2, 3)
+
+    def test_literal_return(self) -> None:
+        source = LiteralRoller(3)
+
+        def callback(roll: SingleOutcomeRoll[int]) -> str:
+            return "hit" if roll.outcome == 3 else "miss"
+
+        result = trace(callback, source)
+
+        assert_type(result, SingleOutcomeRoll[str])
+        assert result.outcome == "hit"
+        assert len(result.operands) == 1
+        assert isinstance(result.operands[0], SingleOutcomeRoll)
+        assert result.operands[0].outcome == "hit"
+        assert isinstance(result.operands[0].roller, LiteralRoller)
+
+    @pytest.mark.parametrize("name", [None, "trace.custom", ""])
+    def test_name(self, name: str | None) -> None:
+        def callback() -> int:
+            return 4
+
+        result = trace(callback, name=name)
+
+        assert result.roller.metadata() == {
+            "kind": "trace",
+            "name": "callback" if name is None else name,
+            "state": {},
+        }
+
+    def test_state_metadata(self) -> None:
+        token = object()
+
+        def callback(*, token: object) -> object:
+            return token
+
+        result = trace(callback, token=token)
+
+        assert result.roller.metadata()["state"] == {"token": token}
+        rollers = result.trace()["rollers"]
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"]["state"] == {"token": token}
+
+    def test_recursive_callback_with_state(self) -> None:
+        def explode(
+            roll: SingleOutcomeRoll[int], remaining: int = 2
+        ) -> SingleOutcomeRoll[int]:
+            if remaining:
+                return roll + trace(explode, roll.roller, remaining=remaining - 1)
+            return roll
+
+        result = trace(explode, LiteralRoller(6))
+
+        assert_type(result, SingleOutcomeRoll[int])
+        assert result.outcome == 18
+        rollers = result.trace()["rollers"]
+        assert isinstance(rollers, dict)
+        assert sum(data["kind"] == "trace" for data in rollers.values()) == 3
+
+    def test_source_failure_path(self) -> None:
+        source = PRoller(P())
+        with pytest.raises(RollError) as caught:
+            trace(lambda roll: roll, source, name="custom")
+
+        assert caught.value.path[0].metadata() == {
+            "kind": "trace",
+            "name": "custom",
+            "state": {},
+        }
+        assert caught.value.path[1:] == (source,)
+
+    def test_callback_failure_path(self) -> None:
+        with pytest.raises(RollError) as caught:
+            trace(Mock(side_effect=ValueError("callback")), name="custom")
+
+        assert [entry.metadata() for entry in caught.value.path] == [
+            {"kind": "trace", "name": "custom", "state": {}}
+        ]
+
+    def test_returned_roller_failure_path(self) -> None:
+        returned = PRoller(P())
+        with pytest.raises(RollError) as caught:
+            trace(lambda: returned, name="custom")
+
+        assert caught.value.path[0].metadata() == {
+            "kind": "trace",
+            "name": "custom",
+            "state": {},
+        }
+        assert caught.value.path[1:] == (returned,)
+
+    @pytest.mark.parametrize("exception_type", [ValueError, RecursionError])
+    def test_cause_preserved(self, exception_type: type[Exception]) -> None:
+        failure = exception_type("callback failure")
+        with pytest.raises(RollError) as caught:
+            trace(Mock(side_effect=failure))
+
+        assert caught.value.__cause__ is failure
+
+    def test_mixed_source_types(self) -> None:
+        def callback(
+            single: SingleOutcomeRoll[int], multi: MultiOutcomeRoll[str]
+        ) -> str:
+            return str(single.outcome) + multi.outcomes[0]
+
+        result = trace(callback, LiteralRoller(3), PRoller(P(H({"a": 1}))))
+
+        assert_type(result, SingleOutcomeRoll[str])
+        assert result.outcome == "3a"
+
+    @pytest.mark.parametrize(
+        ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
+    )
+    def test_selection_uses_current_outcome_count(
+        self, selector: int | slice, expected: tuple[int, ...]
+    ) -> None:
+        callback = Mock(
+            side_effect=[
+                RollerPool(LiteralRoller(1)),
+                RollerPool(LiteralRoller(1), LiteralRoller(2), LiteralRoller(3)),
+            ]
+        )
+
+        result = trace(cast("Callable[[], MultiOutcomeRoller[int]]", callback))
+
+        assert result.roller.select(selector).roll().outcomes == expected
 
 
 class TestSingleOutcomeRoller:
@@ -360,6 +578,10 @@ class TestLiteralRoller:
 
 
 class TestPRoller:
+    @pytest.mark.parametrize("size", [0, 1, 3])
+    def test_length(self, size: int) -> None:
+        assert len(PRoller(size @ P(6))) == size
+
     def test_is_hable_as_aggregate_distribution(self) -> None:
         p = P(H({1: 1}), H({2: 1}))
         pool = PRoller(p, name="pool")
@@ -516,7 +738,7 @@ class TestPRoller:
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
             "kind": "pool-selection",
-            "positions": [2, 0],
+            "selectors": [-1, 0],
             "operands": ["roller1"],
         }
         assert isinstance(rolls, dict)
@@ -528,8 +750,43 @@ class TestPRoller:
         p = 3 @ P(2)
         selected = PRoller(p, name="pool").select(-1, 0).select(1)
 
-        assert len(selected) == 1
         assert selected.sum().h() == p.at(0)
+
+    def test_invalid_selection_fails_when_rolled(self) -> None:
+        selected = PRoller(P(2)).select(1)
+
+        with pytest.raises(RollError) as caught:
+            selected.roll()
+
+        assert isinstance(caught.value.__cause__, IndexError)
+
+    def test_selection_enumerates_each_outcome_tuple(self) -> None:
+        pool = PRoller(P(2))
+        with patch.object(
+            PRoller,
+            "rolls_with_counts",
+            return_value=iter(
+                [
+                    ((1, 2), 3),
+                    ((1, 2, 3), 4),
+                ]
+            ),
+        ):
+            assert list(pool.select(-1).rolls_with_counts()) == [((2,), 3), ((3,), 4)]
+
+    def test_sum_distribution_skips_empty_selections(self) -> None:
+        pool = PRoller(P(2))
+        with patch.object(
+            PRoller,
+            "rolls_with_counts",
+            return_value=iter(
+                [
+                    ((1,), 3),
+                    ((1, 2, 3), 4),
+                ]
+            ),
+        ):
+            assert pool.select(slice(1, None)).h() == H({5: 4})
 
     def test_empty_selection_has_empty_sum_distribution(self) -> None:
         pool = PRoller(P(H({1: 1})), name="pool")
@@ -621,7 +878,6 @@ class TestRollerPool:
     def test_impossible_pool_remains_an_empty_distribution(self) -> None:
         impossible_pool = RollerPool(HRoller(H({}))).select(slice(0))
 
-        assert len(impossible_pool) == 0
         assert list(impossible_pool.rolls_with_counts()) == []
         assert impossible_pool.h() == H({})
         assert impossible_pool.sum().h() == H({})
@@ -713,7 +969,7 @@ class TestMultiOutcomeFactoryRoller:
         returned_roller = some_rollers.factory(2)
         assert_type(returned_roller, MultiOutcomeRoller[int])
         assert isinstance(returned_roller, _MultiOutcomeFactoryRoller)
-        assert len(returned_roller) == 2
+        assert len(returned_roller.roll().outcomes) == 2
 
         callable_factory = roller_factory(some_rollers)
         callable_roller = callable_factory(3, 4)
@@ -1158,6 +1414,23 @@ class TestMixedRollArithmetic:
 
         assert isinstance(combined, SingleOutcomeRoll)
         assert combined.outcome == (op(4, 9) if reverse else op(9, 4))
+
+
+class TestCapturedRollRoller:
+    def test_distribution_uses_captured_outcome(self) -> None:
+        source = HRoller(H(6))
+        captured = SingleOutcomeRoll(3, source)
+
+        assert (captured + LiteralRoller(2)).h() == H({5: 1})
+
+    def test_metadata_and_source_link(self) -> None:
+        source = HRoller(H(6))
+        captured = SingleOutcomeRoll(3, source)
+        combined = captured + LiteralRoller(2)
+        captured_roller = combined.operands[0]
+
+        assert captured_roller.metadata() == {"kind": "captured"}
+        assert captured_roller.operands == (source,)
 
 
 class TestRollerRollEquivalence:
