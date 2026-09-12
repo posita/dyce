@@ -23,7 +23,7 @@ For typing:
 
 `dyce` provides two core primitives for finite discrete probability computations.
 
-<!-- TODO(posita): Figure out what we're doing with dyce.r -->
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
 <!--
 [^1].
 

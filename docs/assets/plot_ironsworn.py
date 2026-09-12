@@ -85,7 +85,7 @@ def fig_callback() -> None:
 
     df = pd.DataFrame(
         data,
-        # TODO(posita): <https://github.com/pandas-dev/pandas/issues/54386>
+        # TODO(@posita): <https://github.com/pandas-dev/pandas/issues/54386>
         columns=[v.name for v in IronDramaticResult],
         index=action_mods,
     )

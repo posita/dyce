@@ -772,7 +772,7 @@ class TestPH:
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             p_weird.h()
 
-        # TODO(posita): # ruff: ignore[missing-todo-link] - Is this really the right
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Is this really the right
         # logic? It "works", but beartype kills the transgression before the warning is
         # emitted (i.e., the fallback path is taken).
         if exc_info.type is TypeError:

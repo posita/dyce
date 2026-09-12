@@ -535,6 +535,15 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         rhs: "H[HableOpsMixin[_OtherT]]",
     ) -> "H[H[_ResultT]]": ...
     @overload
+    def __add__(self: "H[int]", rhs: "H[int]") -> "H[int]": ...
+    @overload
+    # See <https://github.com/astral-sh/ty/issues/3234>.
+    def __add__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
+    @overload
+    def __add__(
+        self: "H[_CanAddSameT]", rhs: "H[_CanAddSameT]"
+    ) -> "H[_CanAddSameT]": ...
+    @overload
     def __add__(
         self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
@@ -554,13 +563,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(self: "H[_T]", rhs: ot.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
-    @overload
-    # See <https://github.com/astral-sh/ty/issues/3234>.
-    def __add__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
-    @overload
-    def __add__(
-        self: "H[_CanAddSameT]", rhs: "H[_CanAddSameT]"
-    ) -> "H[_CanAddSameT]": ...
     def __add__(self, rhs: object) -> "H[object]":
         if _should_defer_hable_operator(rhs):
             return NotImplemented
@@ -581,6 +583,15 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         rhs: "H[HableOpsMixin[_OtherT]]",
     ) -> "H[H[_ResultT]]": ...
     @overload
+    def __sub__(self: "H[int]", rhs: "H[int]") -> "H[int]": ...
+    @overload
+    # See <https://github.com/astral-sh/ty/issues/3234>.
+    def __sub__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
+    @overload
+    def __sub__(
+        self: "H[_CanSubSameT]", rhs: "H[_CanSubSameT]"
+    ) -> "H[_CanSubSameT]": ...
+    @overload
     def __sub__(
         self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
@@ -600,13 +611,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(self: "H[_T]", rhs: ot.CanSub[_T, _ResultT]) -> "H[_ResultT]": ...
-    @overload
-    # See <https://github.com/astral-sh/ty/issues/3234>.
-    def __sub__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
-    @overload
-    def __sub__(
-        self: "H[_CanSubSameT]", rhs: "H[_CanSubSameT]"
-    ) -> "H[_CanSubSameT]": ...
     def __sub__(self, rhs: object) -> "H[object]":
         if _should_defer_hable_operator(rhs):
             return NotImplemented
@@ -2166,7 +2170,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __add__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __sub__(
@@ -2189,7 +2193,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __sub__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __mul__(
@@ -2212,7 +2216,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __mul__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __truediv__(
@@ -2235,7 +2239,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __truediv__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __floordiv__(
@@ -2258,7 +2262,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __floordiv__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __mod__(
@@ -2281,7 +2285,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __mod__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __pow__(
@@ -2304,7 +2308,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __pow__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __lshift__(
@@ -2327,7 +2331,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __lshift__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __rshift__(
@@ -2350,7 +2354,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rshift__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __and__(
@@ -2373,7 +2377,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __and__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __or__(
@@ -2396,7 +2400,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __or__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     @overload
     def __xor__(
@@ -2419,7 +2423,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __xor__(self, rhs: object) -> H[object]:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator]
+        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
 
     # ---- Reflected operators ---------------------------------------------------------
 
@@ -2432,7 +2436,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRAdd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __radd__(self, lhs: object) -> H[object]:
-        return self.h().__radd__(lhs)  # type: ignore[operator]
+        return self.h().__radd__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rsub__(
@@ -2443,7 +2447,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRSub[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rsub__(self, lhs: object) -> H[object]:
-        return self.h().__rsub__(lhs)  # type: ignore[operator]
+        return self.h().__rsub__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rmul__(
@@ -2454,7 +2458,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRMul[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rmul__(self, lhs: object) -> H[object]:
-        return self.h().__rmul__(lhs)  # type: ignore[operator]
+        return self.h().__rmul__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rtruediv__(
@@ -2465,7 +2469,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRTruediv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rtruediv__(self, lhs: object) -> H[object]:
-        return self.h().__rtruediv__(lhs)  # type: ignore[operator]
+        return self.h().__rtruediv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rfloordiv__(
@@ -2476,7 +2480,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRFloordiv[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rfloordiv__(self, lhs: object) -> H[object]:
-        return self.h().__rfloordiv__(lhs)  # type: ignore[operator]
+        return self.h().__rfloordiv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rmod__(
@@ -2487,7 +2491,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRMod[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rmod__(self, lhs: object) -> H[object]:
-        return self.h().__rmod__(lhs)  # type: ignore[operator]
+        return self.h().__rmod__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rpow__(
@@ -2498,7 +2502,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRPow[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rpow__(self, lhs: object) -> H[object]:
-        return self.h().__rpow__(lhs)  # type: ignore[operator]
+        return self.h().__rpow__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rlshift__(
@@ -2509,7 +2513,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRLshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rlshift__(self, lhs: object) -> H[object]:
-        return self.h().__rlshift__(lhs)  # type: ignore[operator]
+        return self.h().__rlshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rrshift__(
@@ -2520,7 +2524,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRRshift[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rrshift__(self, lhs: object) -> H[object]:
-        return self.h().__rrshift__(lhs)  # type: ignore[operator]
+        return self.h().__rrshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rand__(
@@ -2531,7 +2535,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRAnd[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rand__(self, lhs: object) -> H[object]:
-        return self.h().__rand__(lhs)  # type: ignore[operator]
+        return self.h().__rand__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __ror__(
@@ -2542,7 +2546,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanROr[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __ror__(self, lhs: object) -> H[object]:
-        return self.h().__ror__(lhs)  # type: ignore[operator]
+        return self.h().__ror__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
     def __rxor__(
@@ -2553,7 +2557,7 @@ class HableOpsMixin(HableT[_T_co]):
         self: "HableOpsMixin[_T]", lhs: ot.CanRXor[_T, _ResultT]
     ) -> H[_ResultT]: ...
     def __rxor__(self, lhs: object) -> H[object]:
-        return self.h().__rxor__(lhs)  # type: ignore[operator]
+        return self.h().__rxor__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     # ---- Unary operators -------------------------------------------------------------
 

@@ -146,10 +146,10 @@ files = ["docs", "dyce", "helpers", "tests", "*.py"]
 exclude_gitignore = true
 python_version = "3.11"
 strict = true
-# warn_redundant_casts = true
+# warn_redundant_casts = true  # included in strict
 warn_unreachable = true
-# warn_unused_configs = true
-# warn_unused_ignores = true
+# warn_unused_configs = true  # included in strict
+# warn_unused_ignores = true  # included in strict
 
 [warnings]
 unused-ignore = true
@@ -257,10 +257,10 @@ files = ["docs", "dyce", "helpers", "tests", "*.py"]
 exclude_gitignore = true
 python_version = "3.11"
 strict = true
-# warn_redundant_casts = true
+# warn_redundant_casts = true  # included in strict
 warn_unreachable = true
-# warn_unused_configs = true
-# warn_unused_ignores = true
+# warn_unused_configs = true  # included in strict
+# warn_unused_ignores = true  # included in strict
 
 [tool.check_doctests]
 # log_level = "DEBUG"

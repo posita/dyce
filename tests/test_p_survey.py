@@ -312,7 +312,7 @@ def test_empty_pool_returns_empty_h() -> None:
 def test_repeated_invocation_is_stable() -> None:
     # The memo is scoped per top-level call; repeated calls must be identical.
     pool = P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))
-    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
+    surveyor: ParameterizedSurveyor[int, int, int] = ParameterizedSurveyor(  # ty: ignore[invalid-assignment]
         accumulate=_largest_set_next,
         order=survey_outcome_order_ascending,
     )
@@ -328,7 +328,7 @@ def test_survey_without_surveyor_or_accumulate_raises() -> None:
 
 
 def test_survey_with_both_surveyor_and_kwargs_raises() -> None:
-    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
+    surveyor = ParameterizedSurveyor(
         accumulate=_sum_next, order=survey_outcome_order_ascending
     )
     survey: Any = P(6).survey

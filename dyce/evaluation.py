@@ -400,14 +400,14 @@ def expand(  # ruff: ignore[complex-structure]
         >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
         H({0: 71, 1: 38, 2: 11})
     """
-    # TODO(posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
+    # TODO(@posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
     # and document them above
     if not sources:
         raise ValueError("expand requires at least one source")
     try:
         cur_ctxt = _expand_ctxt.get()
     except LookupError:
-        # TODO(posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
+        # TODO(@posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
         # @experimental decorator instead once that issue is fixed
         warnings.warn(experimental_msg % "expand", ExperimentalWarning, stacklevel=2)
         # We're at the top level, so create a new context

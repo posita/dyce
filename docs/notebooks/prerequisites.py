@@ -41,7 +41,7 @@ async def install_if_missing(
     to_install: list[str] = []
     for pkg in packages:
         if importlib.util.find_spec(pkg[0]) is None:
-            spec = pkg[2] if len(pkg) > 2 and in_piplite else pkg[1]  # ty: ignore[index-out-of-bounds]
+            spec = pkg[2] if len(pkg) > 2 and in_piplite else pkg[1]
             to_install.append(spec)
 
     if not to_install:
