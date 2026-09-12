@@ -218,7 +218,7 @@ ignore = [
   "D",
   "DOC",
   "EM",
-  "FIX",  # TODO(posita): run occasionally, or figure out how to make these warnings
+  "FIX",  # TODO(@posita): run occasionally, or figure out how to make these warnings
   "PLC",
   "PLR",
   "ambiguous-unicode-character-docstring",
@@ -240,7 +240,7 @@ select = [
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = [
-  # TODO(posita): <https://github.com/astral-sh/ruff/issues/16536> -
+  # TODO(@posita): <https://github.com/astral-sh/ruff/issues/16536> -
   # NamedTuples are not mutable
   "dyce.h._QuantizeContext",
 ]
@@ -267,7 +267,7 @@ warn_unreachable = true
 
 [tool.check_doctests.check]
 checkers = [
-  # TODO(posita): See:
+  # TODO(@posita): See:
   # - <https://github.com/astral-sh/ty/issues/3415>
   # ["ty", "check"],
   ["zuban", "check"],
