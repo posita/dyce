@@ -73,7 +73,10 @@ markdown_extensions:
   - pymdownx.tilde
 
 exclude_docs: |
+  Makefile
   __pycache__/
+  assets/_*.py
+  assets/nb_*.py
   snippets/
 
 extra:

@@ -134,7 +134,7 @@ However, it really shines when used in larger contexts such as with [Matplotlib]
     You won’t find any lexers, parsers, or tokenizers in `dyce`’s core, other than straight-up Python.
     That being said, you can always “roll” your own (see what we did there?) and lean on `dyce` underneath.
     It doesn’t mind.
-    <!-- TODO(posita): Figure out what we're doing with dyce.r -->
+    <!-- TODO(@posita): Figure out what we're doing with dyce.r -->
     <!-- It actually [kind of *likes* it](https://dycelib.org/latest/rollin/). -->
 
 [^2]:
@@ -153,7 +153,7 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 [`H` objects](https://dycelib.org/latest/dyce/#dyce.H) represent histograms for modeling finite discrete outcomes, like individual dice.
 [`P` objects](https://dycelib.org/latest/dyce/#dyce.P) represent pools (ordered sequences) of histograms.
 [`expand`](https://dycelib.org/latest/dyce/#expand) for mechanics that include dependent variables.
-<!-- TODO(posita): Figure out what we're doing with dyce.r -->
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
 <!--
 [`R` objects](https://dycelib.org/latest/dyce/#dyce.R) (covered [elsewhere](https://dycelib.org/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.

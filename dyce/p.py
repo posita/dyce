@@ -56,6 +56,9 @@ _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _StateT = TypeVar("_StateT")
 _AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
+_ParameterizedOutcomeT = TypeVar("_ParameterizedOutcomeT")
+_ParameterizedResultT = TypeVar("_ParameterizedResultT")
+_ParameterizedStateT = TypeVar("_ParameterizedStateT")
 
 RollT = tuple[_T, ...]
 RollCountT = tuple[RollT[_T], int]
@@ -110,34 +113,44 @@ class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
 class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
     @overload
     def __init__(
-        self: "ParameterizedSurveyor[_T, _StateT, _StateT]",  # zuban: ignore[misc]
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        self: "ParameterizedSurveyor[_ParameterizedOutcomeT, _ParameterizedStateT, _ParameterizedStateT]",
+        accumulate: Callable[
+            [_ParameterizedStateT | None, _ParameterizedOutcomeT, int],
+            _ParameterizedStateT,
+        ],
+        order: Callable[
+            [Iterable[_ParameterizedOutcomeT]], Iterable[_ParameterizedOutcomeT]
+        ],
         *,
-        initial: _StateT | None = ...,
+        initial: _ParameterizedStateT | None = ...,
         settle: None = ...,
     ) -> None: ...
     @overload
     def __init__(
-        self: "ParameterizedSurveyor[_T, _StateT, _ResultT]",
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        self: "ParameterizedSurveyor[_ParameterizedOutcomeT, _ParameterizedStateT, _ParameterizedResultT]",
+        accumulate: Callable[
+            [_ParameterizedStateT | None, _ParameterizedOutcomeT, int],
+            _ParameterizedStateT,
+        ],
+        order: Callable[
+            [Iterable[_ParameterizedOutcomeT]], Iterable[_ParameterizedOutcomeT]
+        ],
         *,
-        initial: _StateT | None = ...,
-        settle: Callable[[_StateT], _ResultT],
+        initial: _ParameterizedStateT | None = ...,
+        settle: Callable[[_ParameterizedStateT], _ParameterizedResultT],
     ) -> None: ...
     def __init__(
         self,
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        accumulate: Callable[..., Any],
+        order: Callable[..., Any],
         *,
-        initial: _StateT | None = None,
-        settle: Callable[[_StateT], _ResultT] | None = None,
+        initial: Any = None,
+        settle: Callable[..., Any] | None = None,
     ) -> None:
-        self._accumulate = accumulate
-        self._order = order
-        self._initial = initial
-        self._settle = settle
+        self._accumulate: Callable[[_StateT | None, _T, int], _StateT] = accumulate
+        self._order: Callable[[Iterable[_T]], Iterable[_T]] = order
+        self._initial: _StateT | None = initial
+        self._settle: Callable[[_StateT], _ResultT] | None = settle
 
     @property
     def initial(self) -> _StateT | None:
@@ -458,7 +471,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             raise ValueError(
                 f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
             )
-        # TODO(posita): # ruff: ignore[missing-todo-link] - Put initialization logic in
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Put initialization logic in
         # an _init helper method and have both this and __init__ use that helper method
         # The slow and safe way
         # return P(*chain.from_iterable(repeat(self, n)))  # ruff: ignore[commented-out-code]
@@ -1076,7 +1089,7 @@ def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
     """
     result = list(outcomes)
     try:
-        result.sort()  # ty: ignore[invalid-argument-type]
+        result.sort()  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
     except TypeError:
         result.sort(key=natural_key)
     return result
@@ -1088,7 +1101,7 @@ def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
     """
     result = list(outcomes)
     try:
-        result.sort(reverse=True)  # ty: ignore[invalid-argument-type]
+        result.sort(reverse=True)  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
     except TypeError:
         result.sort(key=natural_key, reverse=True)
     return result

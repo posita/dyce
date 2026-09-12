@@ -128,7 +128,7 @@ class TestHInit:
             "natural_key",
             side_effect=h_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
-            # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+            # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
             # ignore comments
             h_of_hs = H((H(1), H(2), H(3), H(4))) ** 2  # type: ignore[operator]
             mock.assert_called()
@@ -309,7 +309,7 @@ class TestHMatmul:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", category=_ConvolveFallbackWarning)
             try:
-                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload]
+                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
                 assert result is NotImplemented
                 assert any(
                     issubclass(w.category, _ConvolveFallbackWarning) for w in caught
@@ -325,14 +325,14 @@ class TestHMatmul:
 
     def test_hable_ops_mixin_outcome_types(self) -> None:
         n: int = 2
-        hp = H({P(2): 1})
+        hp = H({P(2): 1})  # zuban: ignore[arg-type]
 
         assert_type(0 @ hp, H[Never])
-        assert_type(1 @ hp, H[P[int]])
-        assert_type(n @ hp, H[HableOpsMixin[int] | H[int]])
+        assert_type(1 @ hp, H[P[int]])  # zuban: ignore[misc]
+        assert_type(n @ hp, H[HableOpsMixin[int] | H[int]])  # zuban: ignore[misc]
         assert_type(hp @ 0, H[Never])
-        assert_type(hp @ 1, H[P[int]])
-        assert_type(hp @ n, H[HableOpsMixin[int] | H[int]])
+        assert_type(hp @ 1, H[P[int]])  # zuban: ignore[misc]
+        assert_type(hp @ n, H[HableOpsMixin[int] | H[int]])  # zuban: ignore[misc]
 
 
 class TestHAdd:
@@ -340,12 +340,12 @@ class TestHAdd:
         result = H({2: 3, 4: 1}) + 10
         assert result == H({12: 3, 14: 1})
 
-        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
         # ignore comments
         frac_int_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1  # type: ignore[operator]
         assert frac_int_result == H({Fraction(3, 2): 2, Fraction(5, 2): 1})
 
-        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
         # ignore comments
         frac_float_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1.5  # type: ignore[operator]
         assert frac_float_result == H({Fraction(2): 2, Fraction(3): 1})
@@ -370,12 +370,12 @@ class TestHAdd:
         assert float_result == H({1.5: 1, 2.5: 2, 3.5: 1})
 
     def test_unsupported_fwd(self) -> None:
-        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         with pytest.raises(TypeError):
             H({3: 1}) + "incompatible"  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_unsupported_ref(self) -> None:
-        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         with pytest.raises(TypeError):
             frozenset({"incompatible"}) + H({3: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
@@ -412,13 +412,13 @@ class TestHMul:
         assert result == H({8: 1, 10: 1, 12: 1, 15: 1})
 
     def test_unsupported_fwd(self) -> None:
-        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload]
+        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         assert result is NotImplemented
         with pytest.raises(TypeError):
             H({3.0: 1}) * Decimal("3.0")  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
     def test_unsupported_ref(self) -> None:
-        result = H({3.0: 1}).__rmul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload]
+        result = H({3.0: 1}).__rmul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         assert result is NotImplemented
         with pytest.raises(TypeError):
             Decimal("3.0") * H({3.0: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]

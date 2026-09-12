@@ -118,7 +118,7 @@ data = [
     for result in results_by_action_mod.values()
 ]
 
-# TODO(posita): <https://github.com/pandas-dev/pandas/issues/54386>
+# TODO(@posita): <https://github.com/pandas-dev/pandas/issues/54386>
 df = pd.DataFrame(
     data,
     columns=[v.name for v in IronDramaticResult],

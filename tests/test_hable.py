@@ -103,7 +103,7 @@ class TestHableT:
 
         assert not isinstance(hable, HableOpsMixin)
         assert h != hable
-        assert h.__add__(hable) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload]
+        assert h.__add__(hable) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
         assert h + hable.h() == H({3: 1})
 
     def test_requires_explicit_inheritance(self) -> None:
@@ -133,7 +133,7 @@ class TestHableOpsMixin:
         assert_type(p / p, H[float])
         assert_type(p // p, H[int])
         assert_type(p % p, H[int])
-        assert_type(p**p, H[Any])
+        assert_type(p**p, H[Any])  # zuban: ignore[misc]
         assert_type(p << p, H[int])
         assert_type(p >> p, H[int])
         assert_type(p & p, H[int])

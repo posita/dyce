@@ -44,7 +44,7 @@ uv run mkdocs build
 make -C docs
 ```
 
-The pre-push hooks run Ruff, doctest normalization checks, and all four static type checkers: mypy, Pyrefly, Pyright, and ty.
+The pre-push hooks run Ruff, doctest normalization checks, and all four static type checkers: mypy, pyright, ty, and zuban.
 Do not validate a typing change with only one checker.
 Tox adds runtime checking with beartype and covers the supported Python matrix.
 The PyPy environment intentionally avoids Matplotlib.
