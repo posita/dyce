@@ -190,10 +190,11 @@ class TestTrace:
         callback.assert_called_once()
         args, kwargs = callback.call_args
         assert isinstance(args[0], SingleOutcomeRoll)
-        assert args[0].outcome == 3
-        assert args[0].roller is single
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/561>
+        assert args[0].outcome == 3  # zuban: ignore[comparison-overlap]
+        assert args[0].roller is single  # zuban: ignore[comparison-overlap]
         assert isinstance(args[1], MultiOutcomeRoll)
-        assert args[1].outcomes == (2, 4)
+        assert args[1].outcomes == (2, 4)  # zuban: ignore[comparison-overlap]
         assert args[1].roller is multi
         assert kwargs == {"token": token}
 
@@ -348,7 +349,7 @@ class TestTrace:
 
         result = trace(callback, LiteralRoller(3), PRoller(P(H({"a": 1}))))
 
-        assert_type(result, SingleOutcomeRoll[str])
+        assert_type(result, SingleOutcomeRoll[str])  # zuban: ignore[misc]
         assert result.outcome == "3a"
 
     @pytest.mark.parametrize(
@@ -374,31 +375,36 @@ class TestSingleOutcomeRoller:
         d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
-        assert_type(d6 + H(6), SingleOutcomeRoller[int])
-        assert_type(d6 + P(6), SingleOutcomeRoller[int])
-        assert_type(d6 - H(6), SingleOutcomeRoller[int])
-        assert_type(d6 - P(6), SingleOutcomeRoller[int])
-        assert_type(d6 * H(2), SingleOutcomeRoller[int])
-        assert_type(d6 / H(2), SingleOutcomeRoller[float])
-        assert_type(d6 // H(2), SingleOutcomeRoller[int])
-        assert_type(d6 % H(2), SingleOutcomeRoller[int])
-        assert_type(power_roller**2, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(d6 << H(2), SingleOutcomeRoller[int])
-        assert_type(d6 >> H(2), SingleOutcomeRoller[int])
-        assert_type(d6 & H(2), SingleOutcomeRoller[int])
-        assert_type(d6 | H(2), SingleOutcomeRoller[int])
-        assert_type(d6 ^ H(2), SingleOutcomeRoller[int])
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(d6 + H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 + P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 - H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 - P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 * H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 / H(2), SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(d6 // H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 % H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            power_roller**2, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(d6 << H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 >> H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 & H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 | H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 ^ H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
-        assert_type(2 * d6, SingleOutcomeRoller[int])
-        assert_type(12 / d6, SingleOutcomeRoller[float])
-        assert_type(12 // d6, SingleOutcomeRoller[int])
-        assert_type(12 % d6, SingleOutcomeRoller[int])
-        assert_type(2**power_roller, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(2 << d6, SingleOutcomeRoller[int])
-        assert_type(12 >> d6, SingleOutcomeRoller[int])
-        assert_type(2 & d6, SingleOutcomeRoller[int])
-        assert_type(2 | d6, SingleOutcomeRoller[int])
-        assert_type(2 ^ d6, SingleOutcomeRoller[int])
+        assert_type(2 * d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 / d6, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(12 // d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 % d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            2**power_roller, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(2 << d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 >> d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 & d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 | d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 ^ d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
     def test_unary_operator_types(self) -> None:
         roller = LiteralRoller(-2)
@@ -424,9 +430,9 @@ class TestSingleOutcomeRoller:
         d6 = HRoller(H(6), name="d6")
 
         assert isinstance(d6 + H(6), SingleOutcomeRoller)
-        assert isinstance(H(6) + d6, SingleOutcomeRoller)
+        assert isinstance(cast("Any", H(6) + d6), SingleOutcomeRoller)
         assert isinstance(d6 + P(6), SingleOutcomeRoller)
-        assert isinstance(P(6) + d6, SingleOutcomeRoller)
+        assert isinstance(cast("Any", P(6) + d6), SingleOutcomeRoller)
         assert (d6 + H(6)).h() == 2 @ H(6)
         assert (H(6) + d6).h() == 2 @ H(6)
         assert (d6 + P(6)).h() == 2 @ H(6)
@@ -595,34 +601,41 @@ class TestPRoller:
         single = HRoller(H({5: 1}), name="single")
         power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
 
-        assert_type(left + right, SingleOutcomeRoller[int])
-        assert_type(left + single, SingleOutcomeRoller[int])
-        assert_type(single + left, SingleOutcomeRoller[int])
-        assert_type(left + P(H({5: 1})), SingleOutcomeRoller[int])
-        assert_type(left - right, SingleOutcomeRoller[int])
-        assert_type(right - left, SingleOutcomeRoller[int])
-        assert_type(10 - left, SingleOutcomeRoller[int])
-        assert_type(left * 2, SingleOutcomeRoller[int])
-        assert_type(left / 2, SingleOutcomeRoller[float])
-        assert_type(left // 2, SingleOutcomeRoller[int])
-        assert_type(left % 2, SingleOutcomeRoller[int])
-        assert_type(power_pool**2, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(left << 2, SingleOutcomeRoller[int])
-        assert_type(left >> 2, SingleOutcomeRoller[int])
-        assert_type(left & 2, SingleOutcomeRoller[int])
-        assert_type(left | 2, SingleOutcomeRoller[int])
-        assert_type(left ^ 2, SingleOutcomeRoller[int])
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(left + right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left + single, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single + left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            left + P(H({5: 1})), SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(left - right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(right - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(10 - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left * 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left / 2, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(left // 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left % 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            power_pool**2, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(left << 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left >> 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left & 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left | 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left ^ 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
-        assert_type(2 * left, SingleOutcomeRoller[int])
-        assert_type(12 / left, SingleOutcomeRoller[float])
-        assert_type(12 // left, SingleOutcomeRoller[int])
-        assert_type(12 % left, SingleOutcomeRoller[int])
-        assert_type(2**power_pool, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(2 << left, SingleOutcomeRoller[int])
-        assert_type(12 >> left, SingleOutcomeRoller[int])
-        assert_type(2 & left, SingleOutcomeRoller[int])
-        assert_type(2 | left, SingleOutcomeRoller[int])
-        assert_type(2 ^ left, SingleOutcomeRoller[int])
+        assert_type(2 * left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 / left, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(12 // left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 % left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            2**power_pool, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(2 << left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 >> left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 & left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 | left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 ^ left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
     def test_addition_aggregates_pool_operands(self) -> None:
         left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
@@ -665,10 +678,10 @@ class TestPRoller:
     def test_unary_operator_types_and_distributions(self) -> None:
         pool = PRoller(P(H({-2: 1})), name="pool")
 
-        assert_type(-pool, SingleOutcomeRoller[int])
-        assert_type(+pool, SingleOutcomeRoller[int])
-        assert_type(abs(pool), SingleOutcomeRoller[int])
-        assert_type(~pool, SingleOutcomeRoller[int])
+        assert_type(-pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(abs(pool), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert (-pool).h() == H({2: 1})
         assert (+pool).h() == H({-2: 1})
         assert abs(pool).h() == H({2: 1})
@@ -697,8 +710,8 @@ class TestPRoller:
         pool = PRoller(p, name="pool")
         roll = pool.roll()
 
-        assert_type(pool, PRoller[int])
-        assert_type(roll, MultiOutcomeRoll[int])
+        assert_type(pool, PRoller[int])  # zuban: ignore[misc]
+        assert_type(roll, MultiOutcomeRoll[int])  # zuban: ignore[misc]
         assert pool.p is p
         assert pool.metadata()["name"] == "pool"
         assert pool.operands == ()
@@ -720,9 +733,9 @@ class TestPRoller:
         pool = PRoller(P(H({1: 1}), H({2: 1})), name="pool")
         summed = pool.sum()
 
-        assert_type(summed, SingleOutcomeRoller[int])
+        assert_type(summed, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert summed.h() == H({3: 1})
-        assert_type(summed.roll(), SingleOutcomeRoll[int])
+        assert_type(summed.roll(), SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert summed.roll().outcome == 3
 
     def test_select_creates_deferred_pool_roller(self) -> None:
@@ -733,7 +746,7 @@ class TestPRoller:
         rollers = trace["rollers"]
         rolls = trace["rolls"]
 
-        assert_type(selected, MultiOutcomeRoller[int])
+        assert_type(selected, MultiOutcomeRoller[int])  # zuban: ignore[misc]
         assert roll.outcomes == (3, 1)
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
@@ -797,8 +810,8 @@ class TestPRoller:
         pool = PRoller(P())
         summed = pool.sum()
 
-        assert_type(pool, PRoller[Never])
-        assert_type(summed, SingleOutcomeRoller[Never])
+        assert_type(pool, PRoller[Never])  # zuban: ignore[misc]
+        assert_type(summed, SingleOutcomeRoller[Never])  # zuban: ignore[misc]
         assert list(pool.rolls_with_counts()) == [((), 1)]
         assert pool.h() == H({})
         assert summed.h() == H({})
@@ -807,7 +820,7 @@ class TestPRoller:
     def test_at_composes_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
-        assert_type(pool.at(-1, 0), SingleOutcomeRoller[int])
+        assert_type(pool.at(-1, 0), SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert pool.at(-1, 0).h() == H({4: 1})
         assert pool.at(-1, 0).roll().outcome == 4
 
@@ -947,7 +960,7 @@ class TestSingleOutcomeFactoryRoller:
     def test_factory_returning_non_roller_raises(self) -> None:
         @roller_factory
         def invalid_factory() -> SingleOutcomeRoller[int]:
-            return cast("Any", "not_a_roller")
+            return cast("Any", "not_a_roller")  # type: ignore[no-any-return]
 
         with pytest.raises(
             TypeError, match="must return a SingleOutcomeRoller or MultiOutcomeRoller"
@@ -1035,7 +1048,9 @@ class TestSingleOutcomeRoll:
         assert_type(roll / 2, SingleOutcomeRoll[float])
         assert_type(roll // 2, SingleOutcomeRoll[int])
         assert_type(roll % 2, SingleOutcomeRoll[int])
-        assert_type(power_roll**2, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(
+            power_roll**2, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
         assert_type(roll << 2, SingleOutcomeRoll[int])
         assert_type(roll >> 2, SingleOutcomeRoll[int])
         assert_type(roll & 2, SingleOutcomeRoll[int])
@@ -1046,7 +1061,9 @@ class TestSingleOutcomeRoll:
         assert_type(12 / roll, SingleOutcomeRoll[float])
         assert_type(12 // roll, SingleOutcomeRoll[int])
         assert_type(12 % roll, SingleOutcomeRoll[int])
-        assert_type(2**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(
+            2**power_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
         assert_type(2 << roll, SingleOutcomeRoll[int])
         assert_type(12 >> roll, SingleOutcomeRoll[int])
         assert_type(2 & roll, SingleOutcomeRoll[int])
@@ -1146,7 +1163,7 @@ class TestMultiOutcomeRoll:
         pool_roll = PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
         roll = pool_roll.sum()
 
-        assert_type(roll, SingleOutcomeRoll[int])
+        assert_type(roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert roll.outcome == 3
         assert roll.operands == (pool_roll,)
 
@@ -1168,134 +1185,261 @@ class TestMixedRollArithmetic:
         assert_type(single + single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll + single, SingleOutcomeRoller[int])
         assert_type(single + multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll + single, SingleOutcomeRoller[int])
-        assert_type(multi + single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll + multi, SingleOutcomeRoller[int])
-        assert_type(multi + multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll + multi, SingleOutcomeRoller[int])
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(
+            multi_roll + single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi + single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll + multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi + multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll + multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll + multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll + single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll + multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll + single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll + multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single - single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll - single, SingleOutcomeRoller[int])
         assert_type(single - multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll - single, SingleOutcomeRoller[int])
-        assert_type(multi - single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll - multi, SingleOutcomeRoller[int])
-        assert_type(multi - multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll - multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll - single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi - single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll - multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi - multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll - multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll - multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll - single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll - multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll - single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll - multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single * single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll * single, SingleOutcomeRoller[int])
         assert_type(single * multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll * single, SingleOutcomeRoller[int])
-        assert_type(multi * single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll * multi, SingleOutcomeRoller[int])
-        assert_type(multi * multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll * multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll * single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi * single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll * multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi * multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll * multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll * multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll * single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll * multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll * single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll * multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single / single_roll, SingleOutcomeRoller[float])
         assert_type(single_roll / single, SingleOutcomeRoller[float])
         assert_type(single / multi_roll, SingleOutcomeRoller[float])
-        assert_type(multi_roll / single, SingleOutcomeRoller[float])
-        assert_type(multi / single_roll, SingleOutcomeRoller[float])
-        assert_type(single_roll / multi, SingleOutcomeRoller[float])
-        assert_type(multi / multi_roll, SingleOutcomeRoller[float])
-        assert_type(multi_roll / multi, SingleOutcomeRoller[float])
+        assert_type(
+            multi_roll / single, SingleOutcomeRoller[float]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi / single_roll, SingleOutcomeRoller[float]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll / multi, SingleOutcomeRoller[float]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi / multi_roll, SingleOutcomeRoller[float]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll / multi, SingleOutcomeRoller[float]
+        )  # zuban: ignore[misc]
         assert_type(single_roll / multi_roll, SingleOutcomeRoll[float])
-        assert_type(multi_roll / single_roll, SingleOutcomeRoll[float])
-        assert_type(multi_roll / multi_roll, SingleOutcomeRoll[float])
+        assert_type(
+            multi_roll / single_roll, SingleOutcomeRoll[float]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll / multi_roll, SingleOutcomeRoll[float]
+        )  # zuban: ignore[misc]
 
         assert_type(single // single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll // single, SingleOutcomeRoller[int])
         assert_type(single // multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll // single, SingleOutcomeRoller[int])
-        assert_type(multi // single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll // multi, SingleOutcomeRoller[int])
-        assert_type(multi // multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll // multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll // single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi // single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll // multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi // multi_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll // multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
         assert_type(single_roll // multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll // single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll // multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll // single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll // multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single % single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll % single, SingleOutcomeRoller[int])
         assert_type(single % multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll % single, SingleOutcomeRoller[int])
-        assert_type(multi % single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll % multi, SingleOutcomeRoller[int])
-        assert_type(multi % multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll % multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll % single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi % single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll % multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi % multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll % multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll % multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll % single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll % multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll % single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll % multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single << single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll << single, SingleOutcomeRoller[int])
         assert_type(single << multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll << single, SingleOutcomeRoller[int])
-        assert_type(multi << single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll << multi, SingleOutcomeRoller[int])
-        assert_type(multi << multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll << multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll << single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi << single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll << multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi << multi_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll << multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
         assert_type(single_roll << multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll << single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll << multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll << single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll << multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single >> single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll >> single, SingleOutcomeRoller[int])
         assert_type(single >> multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll >> single, SingleOutcomeRoller[int])
-        assert_type(multi >> single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll >> multi, SingleOutcomeRoller[int])
-        assert_type(multi >> multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll >> multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll >> single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi >> single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll >> multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi >> multi_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll >> multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
         assert_type(single_roll >> multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll >> single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll >> multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll >> single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll >> multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single & single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll & single, SingleOutcomeRoller[int])
         assert_type(single & multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll & single, SingleOutcomeRoller[int])
-        assert_type(multi & single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll & multi, SingleOutcomeRoller[int])
-        assert_type(multi & multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll & multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll & single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi & single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll & multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi & multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll & multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll & multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll & single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll & multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll & single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll & multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single | single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll | single, SingleOutcomeRoller[int])
         assert_type(single | multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll | single, SingleOutcomeRoller[int])
-        assert_type(multi | single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll | multi, SingleOutcomeRoller[int])
-        assert_type(multi | multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll | multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll | single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi | single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll | multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi | multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll | multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll | multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll | single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll | multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll | single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll | multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
         assert_type(single ^ single_roll, SingleOutcomeRoller[int])
         assert_type(single_roll ^ single, SingleOutcomeRoller[int])
         assert_type(single ^ multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll ^ single, SingleOutcomeRoller[int])
-        assert_type(multi ^ single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll ^ multi, SingleOutcomeRoller[int])
-        assert_type(multi ^ multi_roll, SingleOutcomeRoller[int])
-        assert_type(multi_roll ^ multi, SingleOutcomeRoller[int])
+        assert_type(
+            multi_roll ^ single, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi ^ single_roll, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll ^ multi, SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(multi ^ multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(multi_roll ^ multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(single_roll ^ multi_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll ^ single_roll, SingleOutcomeRoll[int])
-        assert_type(multi_roll ^ multi_roll, SingleOutcomeRoll[int])
+        assert_type(
+            multi_roll ^ single_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll ^ multi_roll, SingleOutcomeRoll[int]
+        )  # zuban: ignore[misc]
 
     def test_mixed_power_types(self) -> None:
         single = LiteralRoller(2)
@@ -1309,26 +1453,59 @@ class TestMixedRollArithmetic:
 
         assert_type(power_single**single_roll, SingleOutcomeRoller[_PowerOutcome])
         assert_type(single_roll**power_single, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_single**multi_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(multi_roll**power_single, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_multi**single_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(single_roll**power_multi, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_multi**multi_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(multi_roll**power_multi, SingleOutcomeRoller[_PowerOutcome])
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(
+            power_single**multi_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll**power_single, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi**single_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll**power_multi, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi**multi_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll**power_multi, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
         assert_type(power_single_roll**single, SingleOutcomeRoller[_PowerOutcome])
         assert_type(single**power_single_roll, SingleOutcomeRoller[_PowerOutcome])
         assert_type(power_single_roll**multi, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(multi**power_single_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_multi_roll**single, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(single**power_multi_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_multi_roll**multi, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(multi**power_multi_roll, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(
+            multi**power_single_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi_roll**single, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single**power_multi_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi_roll**multi, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi**power_multi_roll, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
         assert_type(power_single_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(multi_roll**power_single_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(power_multi_roll**single_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(single_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(power_multi_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(multi_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(
+            multi_roll**power_single_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi_roll**single_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            single_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            power_multi_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi_roll**power_multi_roll, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
 
     @pytest.mark.parametrize(
         "op",
@@ -1421,7 +1598,10 @@ class TestCapturedRollRoller:
         source = HRoller(H(6))
         captured = SingleOutcomeRoll(3, source)
 
-        assert (captured + LiteralRoller(2)).h() == H({5: 1})
+        assert (
+            (captured + LiteralRoller(2)).h()  # zuban: ignore[attr-defined]
+            == H({5: 1})
+        )
 
     def test_metadata_and_source_link(self) -> None:
         source = HRoller(H(6))
@@ -1429,8 +1609,13 @@ class TestCapturedRollRoller:
         combined = captured + LiteralRoller(2)
         captured_roller = combined.operands[0]
 
-        assert captured_roller.metadata() == {"kind": "captured"}
-        assert captured_roller.operands == (source,)
+        assert (
+            captured_roller.metadata()  # zuban: ignore[union-attr]
+            == {"kind": "captured"}
+        )
+        assert captured_roller.operands == (
+            source,
+        )  # zuban: ignore[comparison-overlap]
 
 
 class TestRollerRollEquivalence:
