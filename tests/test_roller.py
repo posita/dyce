@@ -159,7 +159,7 @@ class TestTrace:
 
         assert result.roller.roll().outcome == 5
 
-    def test_rejects_nonroller_source(self) -> None:
+    def test_nonroller_source_raises(self) -> None:
         with pytest.raises(RollError) as caught:
             trace(Mock(), cast("Any", H(6)))
 
@@ -180,6 +180,8 @@ class TestTrace:
         assert rolls["roll0"]["outcome"] == 1 + rolls["roll3"]["outcome"]
 
     def test_source_arguments_and_state(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
+        # stress that other tests don't?
         single = LiteralRoller(3)
         multi = PRoller(P(H({2: 1}), H({4: 1})))
         token = object()
@@ -198,19 +200,19 @@ class TestTrace:
         assert args[1].roller is multi
         assert kwargs == {"token": token}
 
-    def test_single_roll_return(self) -> None:
-        returned = LiteralRoller(4).roll()
+    def test_callback_returns_single_roll(self) -> None:
+        roll = LiteralRoller(4).roll()
 
         def callback() -> SingleOutcomeRoll[int]:
-            return returned
+            return roll
 
         result = trace(callback)
 
         assert_type(result, SingleOutcomeRoll[int])
         assert result.outcome == 4
-        assert result.operands == (returned,)
+        assert result.operands == (roll,)
 
-    def test_multi_roll_return(self) -> None:
+    def test_callback_returns_multi_roll(self) -> None:
         returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
 
         def callback() -> MultiOutcomeRoll[int]:
@@ -222,7 +224,7 @@ class TestTrace:
         assert result.outcomes == (2, 3)
         assert result.operands == (returned,)
 
-    def test_single_roller_return(self) -> None:
+    def test_callback_returns_single_roller(self) -> None:
         def callback() -> SingleOutcomeRoller[int]:
             return LiteralRoller(8)
 
@@ -233,7 +235,7 @@ class TestTrace:
         assert isinstance(result.operands[0], SingleOutcomeRoll)
         assert result.operands[0].outcome == 8
 
-    def test_multi_roller_return(self) -> None:
+    def test_callback_returns_multi_roller(self) -> None:
         def callback() -> MultiOutcomeRoller[int]:
             return PRoller(P(H({2: 1}), H({3: 1})))
 
@@ -244,7 +246,7 @@ class TestTrace:
         assert isinstance(result.operands[0], MultiOutcomeRoll)
         assert result.operands[0].outcomes == (2, 3)
 
-    def test_literal_return(self) -> None:
+    def test_callback_returns_literal_string(self) -> None:
         source = LiteralRoller(3)
 
         def callback(roll: SingleOutcomeRoll[int]) -> str:
@@ -260,7 +262,9 @@ class TestTrace:
         assert isinstance(result.operands[0].roller, LiteralRoller)
 
     @pytest.mark.parametrize("name", [None, "trace.custom", ""])
-    def test_name(self, name: str | None) -> None:
+    def test_implicit_and_explicit_names(self, name: str | None) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be broken up
+        # into two tests like with TestSingleOutcomeFactoryRoller below?
         def callback() -> int:
             return 4
 
@@ -301,7 +305,7 @@ class TestTrace:
         assert isinstance(rollers, dict)
         assert sum(data["kind"] == "trace" for data in rollers.values()) == 3
 
-    def test_source_failure_path(self) -> None:
+    def test_parameter_roller_failure_path(self) -> None:
         source = PRoller(P())
         with pytest.raises(RollError) as caught:
             trace(lambda roll: roll, source, name="custom")
@@ -334,14 +338,16 @@ class TestTrace:
         assert caught.value.path[1:] == (returned,)
 
     @pytest.mark.parametrize("exception_type", [ValueError, RecursionError])
-    def test_cause_preserved(self, exception_type: type[Exception]) -> None:
+    def test_original_exception_preserved_as_cause(
+        self, exception_type: type[Exception]
+    ) -> None:
         failure = exception_type("callback failure")
         with pytest.raises(RollError) as caught:
             trace(Mock(side_effect=failure))
 
         assert caught.value.__cause__ is failure
 
-    def test_mixed_source_types(self) -> None:
+    def test_mixed_parameter_types(self) -> None:
         def callback(
             single: SingleOutcomeRoll[int], multi: MultiOutcomeRoll[str]
         ) -> str:
@@ -355,9 +361,11 @@ class TestTrace:
     @pytest.mark.parametrize(
         ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
     )
-    def test_selection_uses_current_outcome_count(
+    def test_select_applied_to_produced_rolls(
         self, selector: int | slice, expected: tuple[int, ...]
     ) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Shouldn't this be a
+        # MultiOutcomeRoller test and not a trace test?
         callback = Mock(
             side_effect=[
                 RollerPool(LiteralRoller(1)),
@@ -415,18 +423,30 @@ class TestSingleOutcomeRoller:
         assert_type(~roller, SingleOutcomeRoller[int])
 
     def test_hable_forward_addition_defers_to_roller(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         d6 = HRoller(H(6), name="d6")
 
         assert H(6).__add__(d6) is NotImplemented
         assert P(6).__add__(d6) is NotImplemented
 
     def test_hable_forward_subtraction_defers_to_roller(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         d6 = HRoller(H(6), name="d6")
 
         assert H(6).__sub__(d6) is NotImplemented
         assert P(6).__sub__(d6) is NotImplemented
 
     def test_hable_addition_is_symmetric(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         d6 = HRoller(H(6), name="d6")
 
         assert isinstance(d6 + H(6), SingleOutcomeRoller)
@@ -439,6 +459,10 @@ class TestSingleOutcomeRoller:
         assert (P(6) + d6).h() == 2 @ H(6)
 
     def test_hable_subtraction_preserves_operand_order(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         d6 = HRoller(H(6), name="d6")
         two = H({2: 1})
 
@@ -457,6 +481,11 @@ class TestSingleOutcomeRoller:
         lhs: int,
         rhs: int,
     ) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be renamed to
+        # test_binary_operators_preserve_distributions_and_metadata? Should this be
+        # translated to use our marker and moved to its own test suite? Alternatively,
+        # should it be part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         left_h = H({lhs: 1})
         right_h = H({rhs: 1})
         left_p = P(left_h)
@@ -490,6 +519,10 @@ class TestSingleOutcomeRoller:
         assert combined.operands == (roller,)
 
     def test_hable_promotion_is_lazy(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         d6 = HRoller(H(6), name="d6")
         hable = _Hable(H(6))
 
@@ -501,6 +534,10 @@ class TestSingleOutcomeRoller:
             h.assert_called_once_with()
 
     def test_hable_promotion_supports_rolls_and_trace(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
+        # to use our marker and moved to its own test suite? Alternatively, should it be
+        # part of an implementation-specific sub-suite (e.g., TestHRoller,
+        # TestHableRoller)?
         hable = _Hable(H(6))
 
         with patch.object(hable, "h", wraps=hable.h) as h:
@@ -596,6 +633,10 @@ class TestPRoller:
         assert pool.h() == p.h()
 
     def test_binary_operator_types(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Above, similar tests are a
+        # part of TestSingleOutcomeRoller. Should TestMultiOutcomeRoller exist, and
+        # these be moved there? Should there be a corresponding
+        # test_unary_operator_types?
         left = PRoller(P(H({2: 1})), name="left")
         right = PRoller(P(H({3: 1})), name="right")
         single = HRoller(H({5: 1}), name="single")
@@ -688,10 +729,15 @@ class TestPRoller:
         assert (~pool).h() == H({1: 1})
 
     def test_raw_pool_promotion_preserves_pool_trace(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What is a "raw pool"? What
+        # does "promotion" mean?
         combined = HRoller(H({1: 1}), name="one") + P(H({2: 1}), H({3: 1}))
         trace = combined.roll().trace()
         rollers = trace["rollers"]
 
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should we inspect combined
+        # to ensure it contains a PRoller as an operand? Only looking at "kind" seems
+        # indirect?
         assert isinstance(rollers, dict)
         assert rollers["roller2"] == {
             "kind": "pool-sum",
@@ -720,16 +766,20 @@ class TestPRoller:
         assert roll.operands == ()
 
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
+        # stress? That P works correctly?
         pool = PRoller(P(H({2j: 1}), H({1j: 1})))
 
         assert pool.roll().outcomes == (1j, 2j)
 
     def test_rolls_with_counts_delegates_to_p(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
+        # stress? That P works correctly?
         p = P(H(2), H(3))
 
         assert list(PRoller(p).rolls_with_counts()) == list(p.rolls_with_counts())
 
-    def test_sum_bridges_to_single_roller(self) -> None:
+    def test_sum_produces_single_outcome_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1})), name="pool")
         summed = pool.sum()
 
@@ -738,7 +788,7 @@ class TestPRoller:
         assert_type(summed.roll(), SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert summed.roll().outcome == 3
 
-    def test_select_creates_deferred_pool_roller(self) -> None:
+    def test_select_produces_multi_outcome_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
         selected = pool.select(-1, 0)
         roll = selected.roll()
@@ -759,7 +809,10 @@ class TestPRoller:
         assert rolls["roll0"]["operands"] == ["roll1"]
         assert rolls["roll1"]["outcomes"] == [1, 2, 3]
 
-    def test_nested_selection_uses_positions_from_selected_pool(self) -> None:
+    def test_nested_selects_apply_to_produced_rolls(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - How is this fundamentally
+        # different from test_roller_select_applied_to_produced_rolls above? Why are
+        # we introducing sum into the test?
         p = 3 @ P(2)
         selected = PRoller(p, name="pool").select(-1, 0).select(1)
 
@@ -773,7 +826,11 @@ class TestPRoller:
 
         assert isinstance(caught.value.__cause__, IndexError)
 
-    def test_selection_enumerates_each_outcome_tuple(self) -> None:
+    def test_select_applies_to_rolls_that_work_with_downstream_rolls_with_counts(
+        self,
+    ) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
+        # stress? That producing rolls works with downstream rollers?
         pool = PRoller(P(2))
         with patch.object(
             PRoller,
@@ -788,6 +845,9 @@ class TestPRoller:
             assert list(pool.select(-1).rolls_with_counts()) == [((2,), 3), ((3,), 4)]
 
     def test_sum_distribution_skips_empty_selections(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - This test has sum in the
+        # name. Where is sum called? What does this actually stress? How is this
+        # different from test_empty_selection_has_empty_sum_distribution below?
         pool = PRoller(P(2))
         with patch.object(
             PRoller,
@@ -806,7 +866,9 @@ class TestPRoller:
 
         assert pool.select(slice(0)).sum().h() == H({})
 
-    def test_empty_pool_is_one_possible_empty_roll(self) -> None:
+    def test_roll_with_counts_produces_one_empty_roll_from_empty_pool(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Is this behavior actually
+        # desirable? Is it meaningful to produce a single empty roll?
         pool = PRoller(P())
         summed = pool.sum()
 
@@ -818,6 +880,9 @@ class TestPRoller:
         assert summed.metadata() == {"kind": "pool-sum"}
 
     def test_at_composes_selection_and_sum(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "compose" mean?
+        # If this uses sub-rollers, then we should test whether those sub-rollers exist.
+        # If not, we should make clear what this does without using ambiguous language.
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
         assert_type(pool.at(-1, 0), SingleOutcomeRoller[int])  # zuban: ignore[misc]
@@ -843,7 +908,7 @@ class TestRollerPool:
         assert tuple(operand.roller for operand in roll.operands) == (one, two)
         assert pool.metadata() == {"kind": "pool", "name": "pool"}
 
-    def test_reused_roller_has_one_roller_and_independent_rolls(self) -> None:
+    def test_reused_single_roller_produces_independent_rolls(self) -> None:
         d6 = HRoller(H(6), name="d6")
         trace = RollerPool(d6, d6).roll().trace()
         rollers = trace["rollers"]
@@ -858,6 +923,9 @@ class TestRollerPool:
         assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
 
     def test_selection_uses_composite_pool_distribution(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "composite pool
+        # distribution" mean? Those sound like invented terms. What is this meant to
+        # stress?
         d2 = HRoller(H(2), name="d2")
         d3 = HRoller(H(3), name="d3")
         pool = RollerPool(d2, d3)
@@ -865,6 +933,8 @@ class TestRollerPool:
         assert pool.select(-1).sum().h() == P(H(2), H(3)).at(-1)
 
     def test_sum_preserves_string_outcomes(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - RollerPool inherits sum
+        # from MultiOutcomeRoller. What is this intended to stress?
         pool = RollerPool(LiteralRoller("a"), LiteralRoller("b"))
 
         assert_type(pool.sum(), SingleOutcomeRoller[str])
@@ -880,7 +950,9 @@ class TestRollerPool:
 
         assert pool.roll().outcomes == (1j, 2j)
 
-    def test_empty_pool_is_one_possible_empty_roll(self) -> None:
+    def test_roll_with_counts_produces_one_empty_roll_from_empty_pool(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Is this behavior actually
+        # desirable? Is it meaningful to produce a single empty roll?
         pool: RollerPool[Never] = RollerPool()
 
         assert_type(pool, RollerPool[Never])
@@ -888,7 +960,9 @@ class TestRollerPool:
         assert pool.h() == H({})
         assert pool.sum().h() == H({})
 
-    def test_impossible_pool_remains_an_empty_distribution(self) -> None:
+    def test_impossible_pool_produces_no_rolls_but_remains_an_empty_distribution(
+        self,
+    ) -> None:
         impossible_pool = RollerPool(HRoller(H({}))).select(slice(0))
 
         assert list(impossible_pool.rolls_with_counts()) == []
@@ -957,7 +1031,7 @@ class TestSingleOutcomeFactoryRoller:
 
         assert factory().h() == d6
 
-    def test_factory_returning_non_roller_raises(self) -> None:
+    def test_returning_non_roller_raises(self) -> None:
         @roller_factory
         def invalid_factory() -> SingleOutcomeRoller[int]:
             return cast("Any", "not_a_roller")  # type: ignore[no-any-return]
@@ -1126,12 +1200,18 @@ class TestSingleOutcomeRoll:
         assert rolls["roll0"]["operands"] == ["roll1"]
 
     def test_literal_plus_roll_is_serializable(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
+        # stress? Is it a serialization smoke test? What is special about a literal plus
+        # a roll from an HRoller?
         roll = 2 + HRoller(H(6), name="d6").roll()
 
         assert roll.outcome in 2 + H(6)
         assert json.loads(json.dumps(roll.trace())) == roll.trace()
 
     def test_trace_distinguishes_independent_and_shared_rolls(self) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What important feature does
+        # this actually stress? What is an "independent roll" vs. a "shared roll"? How
+        # does a "shared roll" get created?
         d6 = HRoller(H(6), name="d6")
         independent = d6.roll() + d6.roll()
         shared_source = d6.roll()
@@ -1159,7 +1239,7 @@ class TestSingleOutcomeRoll:
 
 
 class TestMultiOutcomeRoll:
-    def test_sum_bridges_to_single_roll(self) -> None:
+    def test_sum_produces_single_outcome_roll(self) -> None:
         pool_roll = PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
         roll = pool_roll.sum()
 
@@ -1175,28 +1255,22 @@ class TestMultiOutcomeRoll:
             pool_roll.sum()
 
 
-class TestMixedRollArithmetic:
-    def test_mixed_operator_types(self) -> None:
+class TestMixedRollBinaryArithmetic:
+    def test_types(self) -> None:
         single = LiteralRoller(4)
         multi = PRoller(P(H({1: 1}), H({3: 1})))
         single_roll = LiteralRoller(9).roll()
         multi_roll = PRoller(P(H({2: 1}), H({7: 1}))).roll()
 
-        assert_type(single + single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll + single, SingleOutcomeRoller[int])
-        assert_type(single + multi_roll, SingleOutcomeRoller[int])
+        assert_type(single + single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll + single, SingleOutcomeRoll[int])
         # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
-        assert_type(
-            multi_roll + single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi + single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll + multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi + multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll + multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single + multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll + single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi + single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll + multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi + multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll + multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll + multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll + single_roll, SingleOutcomeRoll[int]
@@ -1205,20 +1279,14 @@ class TestMixedRollArithmetic:
             multi_roll + multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single - single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll - single, SingleOutcomeRoller[int])
-        assert_type(single - multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll - single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi - single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll - multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi - multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll - multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single - single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll - single, SingleOutcomeRoll[int])
+        assert_type(single - multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll - single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi - single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll - multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi - multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll - multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll - multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll - single_roll, SingleOutcomeRoll[int]
@@ -1227,20 +1295,14 @@ class TestMixedRollArithmetic:
             multi_roll - multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single * single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll * single, SingleOutcomeRoller[int])
-        assert_type(single * multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll * single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi * single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll * multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi * multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll * multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single * single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll * single, SingleOutcomeRoll[int])
+        assert_type(single * multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll * single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi * single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll * multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi * multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll * multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll * multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll * single_roll, SingleOutcomeRoll[int]
@@ -1249,24 +1311,20 @@ class TestMixedRollArithmetic:
             multi_roll * multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single / single_roll, SingleOutcomeRoller[float])
-        assert_type(single_roll / single, SingleOutcomeRoller[float])
-        assert_type(single / multi_roll, SingleOutcomeRoller[float])
+        assert_type(single / single_roll, SingleOutcomeRoll[float])
+        assert_type(single_roll / single, SingleOutcomeRoll[float])
+        assert_type(single / multi_roll, SingleOutcomeRoll[float])
         assert_type(
-            multi_roll / single, SingleOutcomeRoller[float]
+            multi_roll / single, SingleOutcomeRoll[float]
         )  # zuban: ignore[misc]
         assert_type(
-            multi / single_roll, SingleOutcomeRoller[float]
+            multi / single_roll, SingleOutcomeRoll[float]
         )  # zuban: ignore[misc]
         assert_type(
-            single_roll / multi, SingleOutcomeRoller[float]
+            single_roll / multi, SingleOutcomeRoll[float]
         )  # zuban: ignore[misc]
-        assert_type(
-            multi / multi_roll, SingleOutcomeRoller[float]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi_roll / multi, SingleOutcomeRoller[float]
-        )  # zuban: ignore[misc]
+        assert_type(multi / multi_roll, SingleOutcomeRoll[float])  # zuban: ignore[misc]
+        assert_type(multi_roll / multi, SingleOutcomeRoll[float])  # zuban: ignore[misc]
         assert_type(single_roll / multi_roll, SingleOutcomeRoll[float])
         assert_type(
             multi_roll / single_roll, SingleOutcomeRoll[float]
@@ -1275,24 +1333,14 @@ class TestMixedRollArithmetic:
             multi_roll / multi_roll, SingleOutcomeRoll[float]
         )  # zuban: ignore[misc]
 
-        assert_type(single // single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll // single, SingleOutcomeRoller[int])
-        assert_type(single // multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll // single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi // single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll // multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi // multi_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi_roll // multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
+        assert_type(single // single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll // single, SingleOutcomeRoll[int])
+        assert_type(single // multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll // single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi // single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll // multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi // multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll // multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll // multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll // single_roll, SingleOutcomeRoll[int]
@@ -1301,20 +1349,14 @@ class TestMixedRollArithmetic:
             multi_roll // multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single % single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll % single, SingleOutcomeRoller[int])
-        assert_type(single % multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll % single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi % single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll % multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi % multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll % multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single % single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll % single, SingleOutcomeRoll[int])
+        assert_type(single % multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll % single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi % single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll % multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi % multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll % multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll % multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll % single_roll, SingleOutcomeRoll[int]
@@ -1323,24 +1365,14 @@ class TestMixedRollArithmetic:
             multi_roll % multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single << single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll << single, SingleOutcomeRoller[int])
-        assert_type(single << multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll << single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi << single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll << multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi << multi_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi_roll << multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
+        assert_type(single << single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll << single, SingleOutcomeRoll[int])
+        assert_type(single << multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll << single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi << single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll << multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi << multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll << multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll << multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll << single_roll, SingleOutcomeRoll[int]
@@ -1349,24 +1381,14 @@ class TestMixedRollArithmetic:
             multi_roll << multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single >> single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll >> single, SingleOutcomeRoller[int])
-        assert_type(single >> multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll >> single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi >> single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll >> multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi >> multi_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi_roll >> multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
+        assert_type(single >> single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll >> single, SingleOutcomeRoll[int])
+        assert_type(single >> multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll >> single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi >> single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll >> multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi >> multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll >> multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll >> multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll >> single_roll, SingleOutcomeRoll[int]
@@ -1375,20 +1397,14 @@ class TestMixedRollArithmetic:
             multi_roll >> multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single & single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll & single, SingleOutcomeRoller[int])
-        assert_type(single & multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll & single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi & single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll & multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi & multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll & multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single & single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll & single, SingleOutcomeRoll[int])
+        assert_type(single & multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll & single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi & single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll & multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi & multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll & multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll & multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll & single_roll, SingleOutcomeRoll[int]
@@ -1397,20 +1413,14 @@ class TestMixedRollArithmetic:
             multi_roll & multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single | single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll | single, SingleOutcomeRoller[int])
-        assert_type(single | multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll | single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi | single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll | multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi | multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll | multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single | single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll | single, SingleOutcomeRoll[int])
+        assert_type(single | multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll | single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi | single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll | multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi | multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll | multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll | multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll | single_roll, SingleOutcomeRoll[int]
@@ -1419,20 +1429,14 @@ class TestMixedRollArithmetic:
             multi_roll | multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-        assert_type(single ^ single_roll, SingleOutcomeRoller[int])
-        assert_type(single_roll ^ single, SingleOutcomeRoller[int])
-        assert_type(single ^ multi_roll, SingleOutcomeRoller[int])
-        assert_type(
-            multi_roll ^ single, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            multi ^ single_roll, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(
-            single_roll ^ multi, SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(multi ^ multi_roll, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(multi_roll ^ multi, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single ^ single_roll, SingleOutcomeRoll[int])
+        assert_type(single_roll ^ single, SingleOutcomeRoll[int])
+        assert_type(single ^ multi_roll, SingleOutcomeRoll[int])
+        assert_type(multi_roll ^ single, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi ^ single_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(single_roll ^ multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi ^ multi_roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(multi_roll ^ multi, SingleOutcomeRoll[int])  # zuban: ignore[misc]
         assert_type(single_roll ^ multi_roll, SingleOutcomeRoll[int])
         assert_type(
             multi_roll ^ single_roll, SingleOutcomeRoll[int]
@@ -1441,7 +1445,16 @@ class TestMixedRollArithmetic:
             multi_roll ^ multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-    def test_mixed_power_types(self) -> None:
+    def test_addition_with_forward_only_outcome_type(self) -> None:
+        addable_roller = LiteralRoller(_AddableOutcome(1))
+        addable_roll = LiteralRoller(_AddableOutcome(2)).roll()
+
+        assert_type(
+            addable_roller + addable_roll,  # zuban: ignore[misc]
+            SingleOutcomeRoll[_AddableOutcome],
+        )
+
+    def test_power_types(self) -> None:
         single = LiteralRoller(2)
         multi = PRoller(P(H({1: 1}), H({2: 1})))
         single_roll = single.roll()
@@ -1451,44 +1464,44 @@ class TestMixedRollArithmetic:
         power_single_roll = power_single.roll()
         power_multi_roll = power_multi.roll()
 
-        assert_type(power_single**single_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(single_roll**power_single, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single**single_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(single_roll**power_single, SingleOutcomeRoll[_PowerOutcome])
         # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
         assert_type(
-            power_single**multi_roll, SingleOutcomeRoller[_PowerOutcome]
+            power_single**multi_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            multi_roll**power_single, SingleOutcomeRoller[_PowerOutcome]
+            multi_roll**power_single, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            power_multi**single_roll, SingleOutcomeRoller[_PowerOutcome]
+            power_multi**single_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            single_roll**power_multi, SingleOutcomeRoller[_PowerOutcome]
+            single_roll**power_multi, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            power_multi**multi_roll, SingleOutcomeRoller[_PowerOutcome]
+            power_multi**multi_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            multi_roll**power_multi, SingleOutcomeRoller[_PowerOutcome]
+            multi_roll**power_multi, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
-        assert_type(power_single_roll**single, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(single**power_single_roll, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_single_roll**multi, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_single_roll**single, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(single**power_single_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_single_roll**multi, SingleOutcomeRoll[_PowerOutcome])
         assert_type(
-            multi**power_single_roll, SingleOutcomeRoller[_PowerOutcome]
-        )  # zuban: ignore[misc]
-        assert_type(
-            power_multi_roll**single, SingleOutcomeRoller[_PowerOutcome]
+            multi**power_single_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            single**power_multi_roll, SingleOutcomeRoller[_PowerOutcome]
+            power_multi_roll**single, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            power_multi_roll**multi, SingleOutcomeRoller[_PowerOutcome]
+            single**power_multi_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(
-            multi**power_multi_roll, SingleOutcomeRoller[_PowerOutcome]
+            power_multi_roll**multi, SingleOutcomeRoll[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(
+            multi**power_multi_roll, SingleOutcomeRoll[_PowerOutcome]
         )  # zuban: ignore[misc]
         assert_type(power_single_roll**multi_roll, SingleOutcomeRoll[_PowerOutcome])
         assert_type(
@@ -1527,7 +1540,7 @@ class TestMixedRollArithmetic:
         ],
         ids=["single-roll", "multi-roll"],
     )
-    def test_roller_and_roll(
+    def test_roll_with_roller_produces_roll(
         self,
         *,
         op: Callable[[Any, Any], Any],
@@ -1540,8 +1553,8 @@ class TestMixedRollArithmetic:
 
         combined = op(roll, roller) if reverse else op(roller, roll)
 
-        assert isinstance(combined, SingleOutcomeRoller)
-        assert combined.roll().outcome == (op(9, 4) if reverse else op(4, 9))
+        assert isinstance(combined, SingleOutcomeRoll)
+        assert combined.outcome == (op(9, 4) if reverse else op(4, 9))
 
     @pytest.mark.parametrize(
         "op",
@@ -1552,7 +1565,7 @@ class TestMixedRollArithmetic:
         [(False, True), (True, False), (True, True)],
         ids=["single-multi", "multi-single", "multi-multi"],
     )
-    def test_rolls_with_multi_outcomes(
+    def test_multi_outcome_roll_with_single_or_multi_outcome_roll_produces_single_outcome_roll(
         self,
         *,
         op: Callable[[Any, Any], Any],
@@ -1582,7 +1595,7 @@ class TestMixedRollArithmetic:
     @pytest.mark.parametrize(
         "reverse", [False, True], ids=["roll-first", "outcome-first"]
     )
-    def test_multi_roll_and_outcome(
+    def test_multi_outcome_roll_with_literal_produces_single_outcome_roll(
         self, *, op: Callable[[Any, Any], Any], reverse: bool
     ) -> None:
         roll = PRoller(P(H({2: 1}), H({7: 1}))).roll()
@@ -1592,33 +1605,48 @@ class TestMixedRollArithmetic:
         assert isinstance(combined, SingleOutcomeRoll)
         assert combined.outcome == (op(4, 9) if reverse else op(9, 4))
 
+    @pytest.mark.parametrize(("_op", "name", "_lhs", "_rhs"), _BINARY_OPERATOR_CASES)
+    def test_roller_methods_with_roll_return_not_implemented(
+        self,
+        _op: Callable[[Any, Any], Any],
+        name: str,
+        _lhs: int,
+        _rhs: int,
+    ) -> None:
+        single_roller = LiteralRoller(2)
+        multi_roller = PRoller(P(H({1: 1}), H({2: 1})))
+        roll = LiteralRoller(3).roll()
+        method_name = f"__{name}__"
+        reflected_method_name = f"__r{name}__"
 
-class TestCapturedRollRoller:
-    def test_distribution_uses_captured_outcome(self) -> None:
-        source = HRoller(H(6))
-        captured = SingleOutcomeRoll(3, source)
+        assert getattr(single_roller, method_name)(roll) is NotImplemented
+        assert getattr(single_roller, reflected_method_name)(roll) is NotImplemented
+        assert getattr(multi_roller, method_name)(roll) is NotImplemented
+        assert getattr(multi_roller, reflected_method_name)(roll) is NotImplemented
 
-        assert (
-            (captured + LiteralRoller(2)).h()  # zuban: ignore[attr-defined]
-            == H({5: 1})
-        )
+    def test_roll_with_roller_preserves_rolls_and_rerolls_sources(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "preserves rolls"
+        # mean in this context?
+        choices = Mock(side_effect=[[3], [6]])
+        monkeypatch.setattr(rng.RNG, "choices", choices)
+        source = HRoller(H({3: 1, 6: 1}))
+        left_roll = source.roll()
+        right_roller = LiteralRoller(2)
 
-    def test_metadata_and_source_link(self) -> None:
-        source = HRoller(H(6))
-        captured = SingleOutcomeRoll(3, source)
-        combined = captured + LiteralRoller(2)
-        captured_roller = combined.operands[0]
+        combined = left_roll + right_roller
 
-        assert (
-            captured_roller.metadata()  # zuban: ignore[union-attr]
-            == {"kind": "captured"}
-        )
-        assert captured_roller.operands == (
-            source,
-        )  # zuban: ignore[comparison-overlap]
+        assert combined.outcome == 5
+        assert combined.operands[0] is left_roll
+        assert combined.operands[1].roller is right_roller
+        assert combined.roller.operands[0] is source
+        assert combined.roller.operands[1] is right_roller
+        assert combined.roller.roll().outcome == 8
+        assert choices.call_count == 2
 
 
-class TestRollerRollEquivalence:
+class TestRollerAndRollOperationEquivalence:
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators(
         self,
@@ -1630,13 +1658,16 @@ class TestRollerRollEquivalence:
         left_roller = LiteralRoller(lhs)
         right_roller = LiteralRoller(rhs)
 
-        deferred_roll = op(left_roller, right_roller).roll()
-        realized_roll = op(left_roller.roll(), right_roller.roll())
-        reflected_deferred_roll = op(lhs, right_roller).roll()
-        reflected_realized_roll = op(lhs, right_roller.roll())
+        roll_from_roller_arithmetic = op(left_roller, right_roller).roll()
+        roll_from_roll_arithmetic = op(left_roller.roll(), right_roller.roll())
+        reflected_roll_from_roller_arithmetic = op(lhs, right_roller).roll()
+        reflected_roll_from_roll_arithmetic = op(lhs, right_roller.roll())
 
-        assert deferred_roll.trace() == realized_roll.trace()
-        assert reflected_deferred_roll.trace() == reflected_realized_roll.trace()
+        assert roll_from_roller_arithmetic.trace() == roll_from_roll_arithmetic.trace()
+        assert (
+            reflected_roll_from_roller_arithmetic.trace()
+            == reflected_roll_from_roll_arithmetic.trace()
+        )
 
     @pytest.mark.parametrize(("op", "_name", "value"), _UNARY_OPERATOR_CASES)
     def test_unary_operators(
@@ -1652,10 +1683,10 @@ class TestRollerRollEquivalence:
     def test_pool_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
 
-        deferred_roll = pool.select(-1, 0).sum().roll()
-        realized_roll = pool.select(-1, 0).roll().sum()
+        roll_from_roller_sum = pool.select(-1, 0).sum().roll()
+        roll_from_roll_sum = pool.select(-1, 0).roll().sum()
 
-        assert deferred_roll.trace() == realized_roll.trace()
+        assert roll_from_roller_sum.trace() == roll_from_roll_sum.trace()
 
     @pytest.mark.parametrize(
         "make_pool",
@@ -1678,41 +1709,19 @@ class TestRollerRollEquivalence:
         with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.roll().sum()
 
-    def test_addition(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        d6 = HRoller(H(6), name="d6")
-
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        deferred_roll = (d6 + d6).roll()
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        realized_roll = d6.roll() + d6.roll()
-
-        assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.trace() == realized_roll.trace()
-
-    def test_subtraction(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_roller_subtraction_and_roll_subtraction_produce_equivalent_rolls(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         d6 = HRoller(H(6), name="d6")
         d4 = HRoller(H(4), name="d4")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        deferred_roll = (d6 - d4).roll()
+        roll_from_roller_arithmetic = (d6 - d4).roll()
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        realized_roll = d6.roll() - d4.roll()
+        roll_from_roll_arithmetic = d6.roll() - d4.roll()
 
-        assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.trace() == realized_roll.trace()
-        rollers = deferred_roll.trace()["rollers"]
+        assert roll_from_roller_arithmetic.outcome == roll_from_roll_arithmetic.outcome
+        assert roll_from_roller_arithmetic.trace() == roll_from_roll_arithmetic.trace()
+        rollers = roll_from_roller_arithmetic.trace()["rollers"]
         assert isinstance(rollers, dict)
         assert rollers["roller0"]["operator"] == "sub"
-
-    def test_reflected_subtraction_preserves_operand_order(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        d6 = HRoller(H(6), name="d6")
-
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        deferred_roll = (2 - d6).roll()
-        monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
-        realized_roll = 2 - d6.roll()
-
-        assert deferred_roll.outcome == realized_roll.outcome
-        assert deferred_roll.trace() == realized_roll.trace()
