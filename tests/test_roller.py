@@ -41,6 +41,7 @@ from dyce.roller import (
     roller_factory,
     trace,
 )
+from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
 
 __all__ = ()
 
@@ -85,6 +86,11 @@ class _Hable(HableT[int]):
 @dataclass(frozen=True)
 class _PowerOutcome:
     value: int
+
+    # Needed to ensure that _PowerOutcome satisfies CanAddSame, so it can be used with
+    # sum() methods from either MultiOutcomeRoller or MultiOutcomeRoll
+    def __add__(self, rhs: "_PowerOutcome") -> "_PowerOutcome":
+        return _PowerOutcome(self.value + rhs.value)
 
     def __pow__(self, rhs: int) -> "_PowerOutcome":
         return _PowerOutcome(self.value**rhs)
@@ -153,35 +159,7 @@ class TestRollError:
 
 
 class TestTrace:
-    def test_single_outcome_roller_calls_callback_again(self) -> None:
-        callback = Mock(side_effect=[2, 5])
-        result = trace(cast("Callable[[], int]", callback))
-
-        assert result.roller.roll().outcome == 5
-
-    def test_nonroller_source_raises(self) -> None:
-        with pytest.raises(RollError) as caught:
-            trace(Mock(), cast("Any", H(6)))
-
-        assert isinstance(caught.value.__cause__, TypeError)
-        assert str(caught.value.__cause__) == "trace sources must be rollers"
-
-    def test_binary_return_trace(self) -> None:
-        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
-            return 1 + roll
-
-        result = trace(callback, HRoller(H(6), name="d6"))
-        rolls = result.trace()["rolls"]
-
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["operands"] == ["roll1"]
-        assert rolls["roll1"]["operands"] == ["roll2", "roll3"]
-        assert rolls["roll2"]["outcome"] == 1
-        assert rolls["roll0"]["outcome"] == 1 + rolls["roll3"]["outcome"]
-
-    def test_source_arguments_and_state(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
-        # stress that other tests don't?
+    def test_callback_called_with_rolls_from_source_rollers_and_state(self) -> None:
         single = LiteralRoller(3)
         multi = PRoller(P(H({2: 1}), H({4: 1})))
         token = object()
@@ -261,10 +239,46 @@ class TestTrace:
         assert result.operands[0].outcome == "hit"
         assert isinstance(result.operands[0].roller, LiteralRoller)
 
-    @pytest.mark.parametrize("name", [None, "trace.custom", ""])
-    def test_implicit_and_explicit_names(self, name: str | None) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be broken up
-        # into two tests like with TestSingleOutcomeFactoryRoller below?
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_nonroller_source_raises(self) -> None:
+        with pytest.raises(RollError) as caught:
+            trace(Mock(), cast("Any", H(6)))
+
+        assert isinstance(caught.value.__cause__, TypeError)
+        assert str(caught.value.__cause__) == "trace sources must be rollers"
+
+    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+    def test_nonroller_source_triggers_beartype_violation(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            trace(Mock(), cast("Any", H(6)))
+
+    def test_binary_return_trace(self) -> None:
+        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
+            return 1 + roll
+
+        result = trace(callback, HRoller(H(6), name="d6"))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["operands"] == ["roll1"]
+        assert rolls["roll1"]["operands"] == ["roll2", "roll3"]
+        assert rolls["roll2"]["outcome"] == 1
+        assert rolls["roll0"]["outcome"] == 1 + rolls["roll3"]["outcome"]
+
+    def test_implicit_name_uses_callback_name(self) -> None:
+        def callback() -> int:
+            return 4
+
+        result = trace(callback)
+
+        assert result.roller.metadata() == {
+            "kind": "trace",
+            "name": "callback",
+            "state": {},
+        }
+
+    @pytest.mark.parametrize("name", ["trace.custom", ""])
+    def test_explicit_name_preserved(self, name: str) -> None:
         def callback() -> int:
             return 4
 
@@ -272,7 +286,7 @@ class TestTrace:
 
         assert result.roller.metadata() == {
             "kind": "trace",
-            "name": "callback" if name is None else name,
+            "name": name,
             "state": {},
         }
 
@@ -347,7 +361,7 @@ class TestTrace:
 
         assert caught.value.__cause__ is failure
 
-    def test_mixed_parameter_types(self) -> None:
+    def test_mixed_parameter_type_inference(self) -> None:
         def callback(
             single: SingleOutcomeRoll[int], multi: MultiOutcomeRoll[str]
         ) -> str:
@@ -358,14 +372,18 @@ class TestTrace:
         assert_type(result, SingleOutcomeRoll[str])  # zuban: ignore[misc]
         assert result.outcome == "3a"
 
+    def test_single_outcome_roller_calls_callback_again(self) -> None:
+        callback = Mock(side_effect=[2, 5])
+        result = trace(cast("Callable[[], int]", callback))
+
+        assert result.roller.roll().outcome == 5
+
     @pytest.mark.parametrize(
         ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
     )
-    def test_select_applied_to_produced_rolls(
+    def test_multi_outcome_roller_selection_calls_callback_again(
         self, selector: int | slice, expected: tuple[int, ...]
     ) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Shouldn't this be a
-        # MultiOutcomeRoller test and not a trace test?
         callback = Mock(
             side_effect=[
                 RollerPool(LiteralRoller(1)),
@@ -378,8 +396,84 @@ class TestTrace:
         assert result.roller.select(selector).roll().outcomes == expected
 
 
+class TestHableAndRollerBinaryArithmetic:
+    @pytest.mark.parametrize(
+        "method_name",
+        [
+            pytest.param(f"__{name}__", id=name)
+            for _, name, _, _ in _BINARY_OPERATOR_CASES
+        ],
+    )
+    def test_h_and_p_binary_operator_methods_return_not_implemented_for_roller(
+        self, method_name: str
+    ) -> None:
+        roller = LiteralRoller(1)
+
+        assert getattr(H(6), method_name)(roller) is NotImplemented
+        assert getattr(P(6), method_name)(roller) is NotImplemented
+
+    @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_with_h_and_p_produce_expected_distributions(
+        self,
+        op: Callable[[Any, Any], Any],
+        _name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_h = H({lhs: 1})
+        right_h = H({rhs: 1})
+        left_p = P(left_h)
+        right_p = P(right_h)
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+        expected_h = H({op(lhs, rhs): 1})
+
+        results = (
+            op(left_roller, right_h),
+            op(left_h, right_roller),
+            op(left_roller, right_p),
+            op(left_p, right_roller),
+        )
+
+        for result in results:
+            assert isinstance(result, SingleOutcomeRoller)
+            assert result.h() == expected_h
+
+    def test_hable_operand_is_wrapped_in_hable_roller_without_calling_h(self) -> None:
+        hable = _Hable(H(6))
+
+        with patch.object(hable, "h", wraps=hable.h) as h_mock:
+            combined = LiteralRoller(1) + hable
+            wrapped = combined.operands[1]
+
+            assert isinstance(wrapped, HableRoller)
+            assert wrapped.hable is hable
+            h_mock.assert_not_called()
+            assert combined.h() == H(6) + 1
+            h_mock.assert_called_once_with()
+
+    def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
+        h = H(8)
+        combined = LiteralRoller(1) + h
+        wrapped = combined.operands[1]
+
+        assert isinstance(wrapped, HRoller)
+        assert wrapped.h() is h
+        assert wrapped.metadata() == {"kind": "source", "name": str(h)}
+
+    def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
+        p = P(H({2: 1}), H({3: 1}))
+        combined = LiteralRoller(1) + p
+        pool_sum_roller = combined.operands[1]
+        (p_roller,) = pool_sum_roller.operands
+
+        assert pool_sum_roller.metadata() == {"kind": "pool-sum"}
+        assert isinstance(p_roller, PRoller)
+        assert p_roller.p is p
+
+
 class TestSingleOutcomeRoller:
-    def test_binary_operator_types(self) -> None:
+    def test_binary_operator_type_inference(self) -> None:
         d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
@@ -414,7 +508,7 @@ class TestSingleOutcomeRoller:
         assert_type(2 | d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(2 ^ d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
-    def test_unary_operator_types(self) -> None:
+    def test_unary_operator_type_inference(self) -> None:
         roller = LiteralRoller(-2)
 
         assert_type(-roller, SingleOutcomeRoller[int])
@@ -422,83 +516,19 @@ class TestSingleOutcomeRoller:
         assert_type(abs(roller), SingleOutcomeRoller[int])
         assert_type(~roller, SingleOutcomeRoller[int])
 
-    def test_hable_forward_addition_defers_to_roller(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        d6 = HRoller(H(6), name="d6")
-
-        assert H(6).__add__(d6) is NotImplemented
-        assert P(6).__add__(d6) is NotImplemented
-
-    def test_hable_forward_subtraction_defers_to_roller(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        d6 = HRoller(H(6), name="d6")
-
-        assert H(6).__sub__(d6) is NotImplemented
-        assert P(6).__sub__(d6) is NotImplemented
-
-    def test_hable_addition_is_symmetric(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        d6 = HRoller(H(6), name="d6")
-
-        assert isinstance(d6 + H(6), SingleOutcomeRoller)
-        assert isinstance(cast("Any", H(6) + d6), SingleOutcomeRoller)
-        assert isinstance(d6 + P(6), SingleOutcomeRoller)
-        assert isinstance(cast("Any", P(6) + d6), SingleOutcomeRoller)
-        assert (d6 + H(6)).h() == 2 @ H(6)
-        assert (H(6) + d6).h() == 2 @ H(6)
-        assert (d6 + P(6)).h() == 2 @ H(6)
-        assert (P(6) + d6).h() == 2 @ H(6)
-
-    def test_hable_subtraction_preserves_operand_order(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        d6 = HRoller(H(6), name="d6")
-        two = H({2: 1})
-
-        assert isinstance(d6 - two, SingleOutcomeRoller)
-        assert isinstance(d6 - P(4), SingleOutcomeRoller)
-        assert (d6 - two).h() == H(6) - 2
-        assert (two - d6).h() == 2 - H(6)
-        assert (d6 - P(4)).h() == H(6) - H(4)
-        assert (P(4) - d6).h() == H(4) - H(6)
-
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_hable_ordering(
+    def test_binary_operators_preserve_distributions_and_metadata(
         self,
         op: Callable[[Any, Any], Any],
         name: str,
         lhs: int,
         rhs: int,
     ) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be renamed to
-        # test_binary_operators_preserve_distributions_and_metadata? Should this be
-        # translated to use our marker and moved to its own test suite? Alternatively,
-        # should it be part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        left_h = H({lhs: 1})
-        right_h = H({rhs: 1})
-        left_p = P(left_h)
-        right_p = P(right_h)
         left_roller = LiteralRoller(lhs)
         right_roller = LiteralRoller(rhs)
         combined = op(left_roller, right_roller)
         expected_h = H({op(lhs, rhs): 1})
 
-        assert op(left_roller, right_h).h() == expected_h
-        assert op(left_h, right_roller).h() == expected_h
-        assert op(left_roller, right_p).h() == expected_h
-        assert op(left_p, right_roller).h() == expected_h
         assert combined.h() == expected_h
         assert combined.metadata() == {"kind": "binary", "operator": name}
         assert combined.operands == (left_roller, right_roller)
@@ -517,51 +547,6 @@ class TestSingleOutcomeRoller:
         assert combined.h() == expected_h
         assert combined.metadata() == {"kind": "unary", "operator": name}
         assert combined.operands == (roller,)
-
-    def test_hable_promotion_is_lazy(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        d6 = HRoller(H(6), name="d6")
-        hable = _Hable(H(6))
-
-        with patch.object(hable, "h", wraps=hable.h) as h:
-            combined = d6 + hable
-            h.assert_not_called()
-            assert isinstance(combined.operands[1], HableRoller)
-            assert combined.h() == 2 @ H(6)
-            h.assert_called_once_with()
-
-    def test_hable_promotion_supports_rolls_and_trace(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should this be translated
-        # to use our marker and moved to its own test suite? Alternatively, should it be
-        # part of an implementation-specific sub-suite (e.g., TestHRoller,
-        # TestHableRoller)?
-        hable = _Hable(H(6))
-
-        with patch.object(hable, "h", wraps=hable.h) as h:
-            roll = (HRoller(H(6), name="d6") + hable).roll()
-            h.assert_called_once_with()
-
-        trace = roll.trace()
-        rollers = trace["rollers"]
-
-        assert roll.outcome in 2 @ H(6)
-        assert isinstance(rollers, dict)
-        assert rollers["roller2"] == {"kind": "source", "name": str(hable)}
-
-    def test_mixed_roller_addition(self) -> None:
-        roll = (HRoller(H({1: 1}), name="one") + LiteralRoller(2)).roll()
-
-        assert roll.outcome == 3
-        assert json.loads(json.dumps(roll.trace())) == roll.trace()
-
-    def test_raw_histograms_are_promoted_to_named_sources(self) -> None:
-        combined = HRoller(H(6), name="d6") + H(8)
-        promoted = combined.operands[1]
-
-        assert promoted.metadata() == {"kind": "source", "name": str(H(8))}
 
 
 class TestHRoller:
@@ -606,6 +591,22 @@ class TestHableRoller:
 
         assert roller.metadata() == {"kind": "source", "name": str(hable)}
 
+    def test_roll_calls_h_and_includes_source_metadata_in_trace(self) -> None:
+        hable = _Hable(H({4: 1}))
+        roller = HableRoller(hable, name="source")
+
+        with patch.object(hable, "h", wraps=hable.h) as h_mock:
+            roll = roller.roll()
+
+        trace = roll.trace()
+        rollers = trace["rollers"]
+
+        h_mock.assert_called_once_with()
+        assert roll.outcome == 4
+        assert roll.roller is roller
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {"kind": "source", "name": "source"}
+
 
 class TestLiteralRoller:
     def test_exposes_and_rolls_value(self) -> None:
@@ -620,23 +621,8 @@ class TestLiteralRoller:
         assert roll.roller is roller
 
 
-class TestPRoller:
-    @pytest.mark.parametrize("size", [0, 1, 3])
-    def test_length(self, size: int) -> None:
-        assert len(PRoller(size @ P(6))) == size
-
-    def test_is_hable_as_aggregate_distribution(self) -> None:
-        p = P(H({1: 1}), H({2: 1}))
-        pool = PRoller(p, name="pool")
-
-        assert isinstance(pool, HableT)
-        assert pool.h() == p.h()
-
-    def test_binary_operator_types(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Above, similar tests are a
-        # part of TestSingleOutcomeRoller. Should TestMultiOutcomeRoller exist, and
-        # these be moved there? Should there be a corresponding
-        # test_unary_operator_types?
+class TestMultiOutcomeRoller:
+    def test_binary_operator_type_inference(self) -> None:
         left = PRoller(P(H({2: 1})), name="left")
         right = PRoller(P(H({3: 1})), name="right")
         single = HRoller(H({5: 1}), name="single")
@@ -678,72 +664,131 @@ class TestPRoller:
         assert_type(2 | left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(2 ^ left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
-    def test_addition_aggregates_pool_operands(self) -> None:
-        left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
-        right = PRoller(P(H({3: 1}), H({4: 1})), name="right")
-        single = HRoller(H({5: 1}), name="single")
-
-        assert (left + right).h() == H({10: 1})
-        assert (left + single).h() == H({8: 1})
-        assert (single + left).h() == H({8: 1})
-        assert (left + P(H({5: 1}))).h() == H({8: 1})
-        assert (P(H({5: 1})) + left).h() == H({8: 1})
-
-    def test_subtraction_aggregates_pools_and_preserves_order(self) -> None:
-        left = PRoller(P(H({1: 1}), H({2: 1})), name="left")
-        right = PRoller(P(H({3: 1}), H({4: 1})), name="right")
-
-        assert (left - right).h() == H({-4: 1})
-        assert (right - left).h() == H({4: 1})
-        assert (10 - left).h() == H({7: 1})
-
-    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_aggregate_pools(
-        self,
-        op: Callable[[Any, Any], Any],
-        name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left = PRoller(P(H({lhs: 1})), name="left")
-        right = PRoller(P(H({rhs: 1})), name="right")
-        expected = H({op(lhs, rhs): 1})
-        combined = op(left, right)
-
-        assert combined.h() == expected
-        assert combined.metadata() == {"kind": "binary", "operator": name}
-        assert op(lhs, right).h() == expected
-        assert op(P(H({lhs: 1})), right).h() == expected
-        assert op(left, P(H({rhs: 1}))).h() == expected
-
-    def test_unary_operator_types_and_distributions(self) -> None:
+    def test_unary_operator_type_inference(self) -> None:
         pool = PRoller(P(H({-2: 1})), name="pool")
 
         assert_type(-pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(abs(pool), SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert (-pool).h() == H({2: 1})
-        assert (+pool).h() == H({-2: 1})
-        assert abs(pool).h() == H({2: 1})
-        assert (~pool).h() == H({1: 1})
 
-    def test_raw_pool_promotion_preserves_pool_trace(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What is a "raw pool"? What
-        # does "promotion" mean?
-        combined = HRoller(H({1: 1}), name="one") + P(H({2: 1}), H({3: 1}))
-        trace = combined.roll().trace()
-        rollers = trace["rollers"]
+    def test_sum_produces_single_outcome_roller(self) -> None:
+        pool = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool")
+        summed = pool.sum()
+        roll = summed.roll()
 
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Should we inspect combined
-        # to ensure it contains a PRoller as an operand? Only looking at "kind" seems
-        # indirect?
-        assert isinstance(rollers, dict)
-        assert rollers["roller2"] == {
-            "kind": "pool-sum",
-            "operands": ["roller3"],
-        }
-        assert rollers["roller3"]["kind"] == "pool-source"
+        assert_type(summed, SingleOutcomeRoller[str])  # zuban: ignore[misc]
+        assert summed.h() == H({"ab": 1})
+        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
+        assert roll.outcome == "ab"
+
+    def test_select_on_selection_applies_selector_to_parent_selection(self) -> None:
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        parent_selection = pool.select(-1, 0)
+        selection = parent_selection.select(1)
+        roll = selection.roll()
+        (parent_roll,) = roll.operands
+
+        assert_type(selection, MultiOutcomeRoller[int])  # zuban: ignore[misc]
+        assert selection.operands == (parent_selection,)
+        assert list(selection.rolls_with_counts()) == [((1,), 1)]
+        assert roll.outcomes == (1,)
+        assert isinstance(parent_roll, MultiOutcomeRoll)
+        assert parent_roll.outcomes == (3, 1)
+
+    def test_select_applies_selector_to_each_outcome_tuple_and_preserves_counts(
+        self,
+    ) -> None:
+        pool = PRoller(P(2))
+        with patch.object(
+            PRoller,
+            "rolls_with_counts",
+            return_value=iter(
+                [
+                    ((1, 2), 3),
+                    ((1, 2, 3), 4),
+                ]
+            ),
+        ):
+            assert list(pool.select(-1).rolls_with_counts()) == [((2,), 3), ((3,), 4)]
+
+    def test_h_excludes_empty_selection_results_from_distribution(self) -> None:
+        pool = PRoller(P(2))
+        with patch.object(
+            PRoller,
+            "rolls_with_counts",
+            return_value=iter(
+                [
+                    ((1,), 3),
+                    ((1, 2, 3), 4),
+                ]
+            ),
+        ):
+            assert pool.select(slice(1, None)).h() == H({5: 4})
+
+    def test_at_returns_sum_of_selected_outcomes(self) -> None:
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        result = pool.at(-1, 0)
+
+        assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert result.h() == H({4: 1})
+        assert result.roll().outcome == 4
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_preserve_distributions_and_metadata(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left = PRoller(P(H({lhs - 1: 1}), H({1: 1})), name="left")
+        right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
+        combined = op(left, right)
+        expected_h = H({op(lhs, rhs): 1})
+        left_operand, right_operand = combined.operands
+
+        assert combined.h() == expected_h
+        assert combined.metadata() == {"kind": "binary", "operator": name}
+        assert left_operand.metadata() == {"kind": "pool-sum"}
+        assert left_operand.operands == (left,)
+        assert right_operand.metadata() == {"kind": "pool-sum"}
+        assert right_operand.operands == (right,)
+        assert op(left, LiteralRoller(rhs)).h() == expected_h
+        assert op(LiteralRoller(lhs), right).h() == expected_h
+        assert op(lhs, right).h() == expected_h
+        assert op(P(H({lhs: 1})), right).h() == expected_h
+        assert op(left, P(H({rhs: 1}))).h() == expected_h
+
+    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators_preserve_distributions_and_metadata(
+        self,
+        op: Callable[[Any], Any],
+        name: str,
+        value: int,
+    ) -> None:
+        pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
+        combined = op(pool)
+        expected_h = H({op(value): 1})
+        (operand,) = combined.operands
+
+        assert combined.h() == expected_h
+        assert combined.metadata() == {"kind": "unary", "operator": name}
+        assert operand.metadata() == {"kind": "pool-sum"}
+        assert operand.operands == (pool,)
+
+
+class TestPRoller:
+    @pytest.mark.parametrize("size", [0, 1, 3])
+    def test_length(self, size: int) -> None:
+        assert len(PRoller(size @ P(6))) == size
+
+    def test_is_hable_as_aggregate_distribution(self) -> None:
+        p = P(H({1: 1}), H({2: 1}))
+        pool = PRoller(p, name="pool")
+
+        assert isinstance(pool, HableT)
+        assert pool.h() == p.h()
 
     def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
         p = P(H({2: 1}), H({1: 1}))
@@ -765,28 +810,10 @@ class TestPRoller:
         assert roll.roller is pool
         assert roll.operands == ()
 
-    def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
-        # stress? That P works correctly?
-        pool = PRoller(P(H({2j: 1}), H({1j: 1})))
-
-        assert pool.roll().outcomes == (1j, 2j)
-
-    def test_rolls_with_counts_delegates_to_p(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
-        # stress? That P works correctly?
+    def test_rolls_with_counts_matches_source_p(self) -> None:
         p = P(H(2), H(3))
 
         assert list(PRoller(p).rolls_with_counts()) == list(p.rolls_with_counts())
-
-    def test_sum_produces_single_outcome_roller(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1})), name="pool")
-        summed = pool.sum()
-
-        assert_type(summed, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert summed.h() == H({3: 1})
-        assert_type(summed.roll(), SingleOutcomeRoll[int])  # zuban: ignore[misc]
-        assert summed.roll().outcome == 3
 
     def test_select_produces_multi_outcome_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
@@ -809,15 +836,6 @@ class TestPRoller:
         assert rolls["roll0"]["operands"] == ["roll1"]
         assert rolls["roll1"]["outcomes"] == [1, 2, 3]
 
-    def test_nested_selects_apply_to_produced_rolls(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - How is this fundamentally
-        # different from test_roller_select_applied_to_produced_rolls above? Why are
-        # we introducing sum into the test?
-        p = 3 @ P(2)
-        selected = PRoller(p, name="pool").select(-1, 0).select(1)
-
-        assert selected.sum().h() == p.at(0)
-
     def test_invalid_selection_fails_when_rolled(self) -> None:
         selected = PRoller(P(2)).select(1)
 
@@ -826,68 +844,21 @@ class TestPRoller:
 
         assert isinstance(caught.value.__cause__, IndexError)
 
-    def test_select_applies_to_rolls_that_work_with_downstream_rolls_with_counts(
-        self,
-    ) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
-        # stress? That producing rolls works with downstream rollers?
-        pool = PRoller(P(2))
-        with patch.object(
-            PRoller,
-            "rolls_with_counts",
-            return_value=iter(
-                [
-                    ((1, 2), 3),
-                    ((1, 2, 3), 4),
-                ]
-            ),
-        ):
-            assert list(pool.select(-1).rolls_with_counts()) == [((2,), 3), ((3,), 4)]
-
-    def test_sum_distribution_skips_empty_selections(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - This test has sum in the
-        # name. Where is sum called? What does this actually stress? How is this
-        # different from test_empty_selection_has_empty_sum_distribution below?
-        pool = PRoller(P(2))
-        with patch.object(
-            PRoller,
-            "rolls_with_counts",
-            return_value=iter(
-                [
-                    ((1,), 3),
-                    ((1, 2, 3), 4),
-                ]
-            ),
-        ):
-            assert pool.select(slice(1, None)).h() == H({5: 4})
-
     def test_empty_selection_has_empty_sum_distribution(self) -> None:
         pool = PRoller(P(H({1: 1})), name="pool")
 
         assert pool.select(slice(0)).sum().h() == H({})
 
-    def test_roll_with_counts_produces_one_empty_roll_from_empty_pool(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Is this behavior actually
-        # desirable? Is it meaningful to produce a single empty roll?
+    def test_empty_p_produces_no_rolls(self) -> None:
         pool = PRoller(P())
         summed = pool.sum()
 
         assert_type(pool, PRoller[Never])  # zuban: ignore[misc]
         assert_type(summed, SingleOutcomeRoller[Never])  # zuban: ignore[misc]
-        assert list(pool.rolls_with_counts()) == [((), 1)]
+        assert list(pool.rolls_with_counts()) == []
         assert pool.h() == H({})
         assert summed.h() == H({})
         assert summed.metadata() == {"kind": "pool-sum"}
-
-    def test_at_composes_selection_and_sum(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "compose" mean?
-        # If this uses sub-rollers, then we should test whether those sub-rollers exist.
-        # If not, we should make clear what this does without using ambiguous language.
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
-
-        assert_type(pool.at(-1, 0), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert pool.at(-1, 0).h() == H({4: 1})
-        assert pool.at(-1, 0).roll().outcome == 4
 
 
 class TestRollerPool:
@@ -922,25 +893,14 @@ class TestRollerPool:
         }
         assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
 
-    def test_selection_uses_composite_pool_distribution(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "composite pool
-        # distribution" mean? Those sound like invented terms. What is this meant to
-        # stress?
+    def test_selection_distribution_uses_each_source_roller_distribution(
+        self,
+    ) -> None:
         d2 = HRoller(H(2), name="d2")
         d3 = HRoller(H(3), name="d3")
         pool = RollerPool(d2, d3)
 
-        assert pool.select(-1).sum().h() == P(H(2), H(3)).at(-1)
-
-    def test_sum_preserves_string_outcomes(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - RollerPool inherits sum
-        # from MultiOutcomeRoller. What is this intended to stress?
-        pool = RollerPool(LiteralRoller("a"), LiteralRoller("b"))
-
-        assert_type(pool.sum(), SingleOutcomeRoller[str])
-        assert_type(pool.roll().sum(), SingleOutcomeRoll[str])
-        assert pool.sum().h() == H({"ab": 1})
-        assert pool.roll().sum().outcome == "ab"
+        assert pool.select(-1).sum().h() == H({1: 1, 2: 3, 3: 2})
 
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
         pool = RollerPool(
@@ -950,13 +910,11 @@ class TestRollerPool:
 
         assert pool.roll().outcomes == (1j, 2j)
 
-    def test_roll_with_counts_produces_one_empty_roll_from_empty_pool(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - Is this behavior actually
-        # desirable? Is it meaningful to produce a single empty roll?
+    def test_empty_pool_produces_no_rolls(self) -> None:
         pool: RollerPool[Never] = RollerPool()
 
         assert_type(pool, RollerPool[Never])
-        assert list(pool.rolls_with_counts()) == [((), 1)]
+        assert list(pool.rolls_with_counts()) == []
         assert pool.h() == H({})
         assert pool.sum().h() == H({})
 
@@ -999,19 +957,20 @@ class TestSingleOutcomeFactoryRoller:
         assert bound_roller.metadata()["name"] == "bound"
         assert bound_roller.roll().outcome == 5
 
-    def test_implicit_name(self) -> None:
+    def test_implicit_name_uses_factory_name(self) -> None:
         @roller_factory
         def factory() -> SingleOutcomeRoller[int]:
             return LiteralRoller(3)
 
         assert factory().metadata()["name"] == factory.__name__
 
-    def test_explicit_name(self) -> None:
-        @roller_factory(name="explicit_name")
+    @pytest.mark.parametrize("name", ["explicit_name", ""])
+    def test_explicit_name_preserved(self, name: str) -> None:
+        @roller_factory(name=name)
         def factory() -> SingleOutcomeRoller[int]:
             return LiteralRoller(3)
 
-        assert factory().metadata()["name"] == "explicit_name"
+        assert factory().metadata()["name"] == name
 
     def test_operands(self) -> None:
         literal_roller = LiteralRoller(3)
@@ -1071,19 +1030,20 @@ class TestMultiOutcomeFactoryRoller:
         assert bound_roller.metadata()["name"] == "bound"
         assert bound_roller.roll().outcomes == (5, 6)
 
-    def test_implicit_name(self) -> None:
+    def test_implicit_name_uses_factory_name(self) -> None:
         @roller_factory
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(P(2))
 
         assert factory().metadata()["name"] == factory.__name__
 
-    def test_explicit_name(self) -> None:
-        @roller_factory(name="explicit_name")
+    @pytest.mark.parametrize("name", ["explicit_name", ""])
+    def test_explicit_name_preserved(self, name: str) -> None:
+        @roller_factory(name=name)
         def factory() -> MultiOutcomeRoller[int]:
             return PRoller(P(2))
 
-        assert factory().metadata()["name"] == "explicit_name"
+        assert factory().metadata()["name"] == name
 
     def test_operands(self) -> None:
         p_roller = PRoller(P(2))
@@ -1114,7 +1074,7 @@ class TestMultiOutcomeFactoryRoller:
 
 
 class TestSingleOutcomeRoll:
-    def test_roll_binary_operator_types(self) -> None:
+    def test_binary_operator_type_inference(self) -> None:
         roll = LiteralRoller(2).roll()
         power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
 
@@ -1144,7 +1104,7 @@ class TestSingleOutcomeRoll:
         assert_type(2 | roll, SingleOutcomeRoll[int])
         assert_type(2 ^ roll, SingleOutcomeRoll[int])
 
-    def test_unary_operator_types(self) -> None:
+    def test_unary_operator_type_inference(self) -> None:
         roll = LiteralRoller(-2).roll()
 
         assert_type(-roll, SingleOutcomeRoll[int])
@@ -1199,52 +1159,35 @@ class TestSingleOutcomeRoll:
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["operands"] == ["roll1"]
 
-    def test_literal_plus_roll_is_serializable(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does this actually
-        # stress? Is it a serialization smoke test? What is special about a literal plus
-        # a roll from an HRoller?
-        roll = 2 + HRoller(H(6), name="d6").roll()
+    def test_trace_is_json_serializable(self) -> None:
+        roll = 2 + LiteralRoller(3).roll()
+        trace = roll.trace()
 
-        assert roll.outcome in 2 + H(6)
-        assert json.loads(json.dumps(roll.trace())) == roll.trace()
+        assert json.loads(json.dumps(trace)) == trace
 
-    def test_trace_distinguishes_independent_and_shared_rolls(self) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What important feature does
-        # this actually stress? What is an "independent roll" vs. a "shared roll"? How
-        # does a "shared roll" get created?
+    def test_trace_uses_distinct_ids_for_separate_rolls_and_same_id_for_reused_roll(
+        self,
+    ) -> None:
         d6 = HRoller(H(6), name="d6")
-        independent = d6.roll() + d6.roll()
-        shared_source = d6.roll()
-        shared = shared_source + shared_source
+        separate = d6.roll() + d6.roll()
+        reused_operand = d6.roll()
+        reused = reused_operand + reused_operand
+        separate_rolls = separate.trace()["rolls"]
+        reused_rolls = reused.trace()["rolls"]
 
-        independent_trace = independent.trace()
-        shared_trace = shared.trace()
-        assert independent_trace["root"] == "roll0"
-        assert shared_trace["root"] == "roll0"
-        independent_rolls = independent_trace["rolls"]
-        shared_rolls = shared_trace["rolls"]
-        independent_rollers = independent_trace["rollers"]
-        shared_rollers = shared_trace["rollers"]
-
-        assert isinstance(independent_rolls, dict)
-        assert isinstance(shared_rolls, dict)
-        assert isinstance(independent_rollers, dict)
-        assert isinstance(shared_rollers, dict)
-        assert independent_rolls["roll0"]["roller"] == "roller0"
-        assert shared_rolls["roll0"]["roller"] == "roller0"
-        assert independent_rolls["roll0"]["operands"] == ["roll1", "roll2"]
-        assert shared_rolls["roll0"]["operands"] == ["roll1", "roll1"]
-        assert independent_rollers["roller0"]["operands"] == ["roller1", "roller1"]
-        assert shared_rollers["roller0"]["operands"] == ["roller1", "roller1"]
+        assert isinstance(separate_rolls, dict)
+        assert isinstance(reused_rolls, dict)
+        assert separate_rolls["roll0"]["operands"] == ["roll1", "roll2"]
+        assert reused_rolls["roll0"]["operands"] == ["roll1", "roll1"]
 
 
 class TestMultiOutcomeRoll:
     def test_sum_produces_single_outcome_roll(self) -> None:
-        pool_roll = PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll()
+        pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
         roll = pool_roll.sum()
 
-        assert_type(roll, SingleOutcomeRoll[int])  # zuban: ignore[misc]
-        assert roll.outcome == 3
+        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
+        assert roll.outcome == "ab"
         assert roll.operands == (pool_roll,)
 
     def test_empty_sum_raises(self) -> None:
@@ -1256,7 +1199,7 @@ class TestMultiOutcomeRoll:
 
 
 class TestMixedRollBinaryArithmetic:
-    def test_types(self) -> None:
+    def test_type_inference(self) -> None:
         single = LiteralRoller(4)
         multi = PRoller(P(H({1: 1}), H({3: 1})))
         single_roll = LiteralRoller(9).roll()
@@ -1445,7 +1388,7 @@ class TestMixedRollBinaryArithmetic:
             multi_roll ^ multi_roll, SingleOutcomeRoll[int]
         )  # zuban: ignore[misc]
 
-    def test_addition_with_forward_only_outcome_type(self) -> None:
+    def test_addition_with_forward_only_outcome_type_inference(self) -> None:
         addable_roller = LiteralRoller(_AddableOutcome(1))
         addable_roll = LiteralRoller(_AddableOutcome(2)).roll()
 
@@ -1454,7 +1397,7 @@ class TestMixedRollBinaryArithmetic:
             SingleOutcomeRoll[_AddableOutcome],
         )
 
-    def test_power_types(self) -> None:
+    def test_power_type_inference(self) -> None:
         single = LiteralRoller(2)
         multi = PRoller(P(H({1: 1}), H({2: 1})))
         single_roll = single.roll()
@@ -1606,7 +1549,7 @@ class TestMixedRollBinaryArithmetic:
         assert combined.outcome == (op(4, 9) if reverse else op(9, 4))
 
     @pytest.mark.parametrize(("_op", "name", "_lhs", "_rhs"), _BINARY_OPERATOR_CASES)
-    def test_roller_methods_with_roll_return_not_implemented(
+    def test_roller_methods_return_not_implemented_for_roll(
         self,
         _op: Callable[[Any, Any], Any],
         name: str,
@@ -1624,25 +1567,25 @@ class TestMixedRollBinaryArithmetic:
         assert getattr(multi_roller, method_name)(roll) is NotImplemented
         assert getattr(multi_roller, reflected_method_name)(roll) is NotImplemented
 
-    def test_roll_with_roller_preserves_rolls_and_rerolls_sources(
+    def test_result_roller_rerolls_sources_after_roll(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        # TODO(@posita): # ruff: ignore[missing-todo-link] - What does "preserves rolls"
-        # mean in this context?
-        choices = Mock(side_effect=[[3], [6]])
+        first, second = 3, 6
+        choices = Mock(side_effect=[[first], [second]])
         monkeypatch.setattr(rng.RNG, "choices", choices)
-        source = HRoller(H({3: 1, 6: 1}))
-        left_roll = source.roll()
+        left_roller = HRoller(H({first: 1, second: 1}))
+        left_roll = left_roller.roll()
         right_roller = LiteralRoller(2)
 
-        combined = left_roll + right_roller
+        result = left_roll + right_roller
+        rerolled_result = result.roller.roll()
 
-        assert combined.outcome == 5
-        assert combined.operands[0] is left_roll
-        assert combined.operands[1].roller is right_roller
-        assert combined.roller.operands[0] is source
-        assert combined.roller.operands[1] is right_roller
-        assert combined.roller.roll().outcome == 8
+        assert result.outcome == first + 2
+        assert result.operands[0] is left_roll
+        assert result.operands[1].roller is right_roller
+        assert result.roller.operands[0] is left_roller
+        assert result.roller.operands[1] is right_roller
+        assert rerolled_result.outcome == second + 2
         assert choices.call_count == 2
 
 
