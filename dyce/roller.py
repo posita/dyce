@@ -102,15 +102,6 @@ class _UnaryOperator:
         return self.function(operand)
 
 
-def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
-    iterator = iter(outcomes)
-    try:
-        first = next(iterator)
-    except StopIteration:
-        raise ValueError("no outcomes to sum") from None
-    return reduce(operator.add, iterator, first)
-
-
 _ADD = _BinaryOperator("add", cast("Callable[[object, object], object]", operator.add))
 _SUB = _BinaryOperator("sub", cast("Callable[[object, object], object]", operator.sub))
 _MUL = _BinaryOperator("mul", cast("Callable[[object, object], object]", operator.mul))
@@ -678,82 +669,6 @@ class SingleOutcomeRoller(HableT[_T_co]):
 
         Child rollers should be called via their public [`roll` methods][dyce.roller.SingleOutcomeRoller.roll].
         """
-
-
-class HRoller(SingleOutcomeRoller[_T_co]):
-    r"""A roller backed by [`H.roll`][dyce.H.roll]."""
-
-    __slots__ = ("_h", "_name")
-
-    @experimental
-    def __init__(self, h: H[_T_co], *, name: str | None = None) -> None:
-        self._h = h
-        self._name = name if name is not None else str(h)
-
-    def h(self) -> H[_T_co]:
-        r"""Returns this roller’s [`H`][dyce.H] source object."""
-        return self._h
-
-    def metadata(self) -> dict[str, object]:
-        return {
-            "kind": "source",
-            "name": self._name,
-        }
-
-    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        return SingleOutcomeRoll(self._h.roll(), self)
-
-
-class HableRoller(SingleOutcomeRoller[_T_co]):
-    r"""A roller backed by a [`HableT`][dyce.HableT]."""
-
-    __slots__ = ("_hable", "_name")
-
-    @experimental
-    def __init__(self, hable: HableT[_T_co], *, name: str | None = None) -> None:
-        self._hable = hable
-        self._name = name if name is not None else str(hable)
-
-    @property
-    def hable(self) -> HableT[_T_co]:
-        r"""Returns this roller’s [`HableT`][dyce.HableT] source object."""
-        return self._hable
-
-    def h(self) -> H[_T_co]:
-        return self._hable.h()
-
-    def metadata(self) -> dict[str, object]:
-        return {
-            "kind": "source",
-            "name": self._name,
-        }
-
-    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        return SingleOutcomeRoll(self.h().roll(), self)
-
-
-class LiteralRoller(SingleOutcomeRoller[_T]):
-    r"""A deterministic roller for a single, literal value."""
-
-    __slots__ = ("_value",)
-
-    @experimental
-    def __init__(self, value: _T) -> None:
-        self._value = value
-
-    @property
-    def value(self) -> _T:
-        r"""Returns this roller’s source value."""
-        return self._value
-
-    def h(self) -> H[_T]:
-        return H({self._value: 1})
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "literal", "value": self._value}
-
-    def _roll(self) -> "SingleOutcomeRoll[_T]":
-        return SingleOutcomeRoll(self._value, self)
 
 
 class MultiOutcomeRoller(HableT[_T_co]):
@@ -1350,6 +1265,82 @@ class MultiOutcomeRoller(HableT[_T_co]):
         return _PoolSumRoller(self)
 
 
+class HRoller(SingleOutcomeRoller[_T_co]):
+    r"""A roller backed by [`H.roll`][dyce.H.roll]."""
+
+    __slots__ = ("_h", "_name")
+
+    @experimental
+    def __init__(self, h: H[_T_co], *, name: str | None = None) -> None:
+        self._h = h
+        self._name = name if name is not None else str(h)
+
+    def h(self) -> H[_T_co]:
+        r"""Returns this roller’s [`H`][dyce.H] source object."""
+        return self._h
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "kind": "source",
+            "name": self._name,
+        }
+
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
+        return SingleOutcomeRoll(self._h.roll(), self)
+
+
+class HableRoller(SingleOutcomeRoller[_T_co]):
+    r"""A roller backed by a [`HableT`][dyce.HableT]."""
+
+    __slots__ = ("_hable", "_name")
+
+    @experimental
+    def __init__(self, hable: HableT[_T_co], *, name: str | None = None) -> None:
+        self._hable = hable
+        self._name = name if name is not None else str(hable)
+
+    @property
+    def hable(self) -> HableT[_T_co]:
+        r"""Returns this roller’s [`HableT`][dyce.HableT] source object."""
+        return self._hable
+
+    def h(self) -> H[_T_co]:
+        return self._hable.h()
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "kind": "source",
+            "name": self._name,
+        }
+
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
+        return SingleOutcomeRoll(self.h().roll(), self)
+
+
+class LiteralRoller(SingleOutcomeRoller[_T]):
+    r"""A deterministic roller for a single, literal value."""
+
+    __slots__ = ("_value",)
+
+    @experimental
+    def __init__(self, value: _T) -> None:
+        self._value = value
+
+    @property
+    def value(self) -> _T:
+        r"""Returns this roller’s source value."""
+        return self._value
+
+    def h(self) -> H[_T]:
+        return H({self._value: 1})
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "literal", "value": self._value}
+
+    def _roll(self) -> "SingleOutcomeRoll[_T]":
+        return SingleOutcomeRoll(self._value, self)
+
+
 class PRoller(MultiOutcomeRoller[_T_co]):
     r"""A multi roller backed by a [`P`][dyce.P]."""
 
@@ -1382,10 +1373,7 @@ class PRoller(MultiOutcomeRoller[_T_co]):
         return MultiOutcomeRoll(outcomes, self)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        if not self._p:
-            yield (), 1
-        else:
-            yield from self._p.rolls_with_counts()
+        yield from self._p.rolls_with_counts()
 
 
 class RollerPool(MultiOutcomeRoller[_T_co]):
@@ -1406,7 +1394,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple["MultiOutcomeRoller[object] | SingleOutcomeRoller[object]", ...]:
+    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
         return cast(
             "tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]",
             self._rollers,
@@ -1447,10 +1435,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
         return MultiOutcomeRoll(outcomes, self, operands)
 
     def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        if not self._rollers:
-            yield (), 1
-        else:
-            yield from P(*(roller.h() for roller in self._rollers)).rolls_with_counts()
+        yield from P(*(roller.h() for roller in self._rollers)).rolls_with_counts()
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -2371,7 +2356,7 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     @property
     def operands(
         self,
-    ) -> tuple["MultiOutcomeRoller[object] | SingleOutcomeRoller[object]", ...]:
+    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
         return (cast("MultiOutcomeRoller[object]", self._pool_roller),)
 
     def h(self) -> H[_CanAddSameT]:
@@ -2402,7 +2387,7 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple["MultiOutcomeRoller[object] | SingleOutcomeRoller[object]", ...]:
+    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
         return (cast("MultiOutcomeRoller[object]", self._parent),)
 
     def metadata(self) -> dict[str, object]:
@@ -2416,7 +2401,7 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
             ],
         }
 
-    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> MultiOutcomeRoll[_T_co]:
         parent_roll = self._parent.roll()
         outcomes = tuple(getitems(parent_roll.outcomes, self._selectors))
         if not outcomes:
@@ -3293,6 +3278,15 @@ def _eval_trace_call(
             _SingleOutcomeTraceRoller(call, result.roller),
             (result,),
         )
+
+
+def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
+    iterator = iter(outcomes)
+    try:
+        first = next(iterator)
+    except StopIteration:
+        raise ValueError("no outcomes to sum") from None
+    return reduce(operator.add, iterator, first)
 
 
 def _trace_from_root_roll(
