@@ -372,11 +372,37 @@ class TestTrace:
         assert_type(result, SingleOutcomeRoll[str])  # zuban: ignore[misc]
         assert result.outcome == "3a"
 
-    def test_single_outcome_roller_calls_callback_again(self) -> None:
-        callback = Mock(side_effect=[2, 5])
-        result = trace(cast("Callable[[], int]", callback))
+    def test_single_outcome_reroll_preserves_trace_roller_and_records_new_callback_result(
+        self,
+    ) -> None:
+        first_roller = LiteralRoller(2)
+        second_roller = LiteralRoller(5)
+        callback = Mock(side_effect=[first_roller, second_roller])
 
-        assert result.roller.roll().outcome == 5
+        result = trace(cast("Callable[[], SingleOutcomeRoller[int]]", callback))
+        trace_roller = result.roller
+        rerolled_result = trace_roller.roll()
+
+        assert trace_roller.operands == ()
+        assert result.operands[0].roller is first_roller
+        assert rerolled_result.roller is trace_roller
+        assert rerolled_result.operands[0].roller is second_roller
+
+    def test_multi_outcome_reroll_preserves_trace_roller_and_records_new_callback_result(
+        self,
+    ) -> None:
+        first_roller = RollerPool(LiteralRoller(2))
+        second_roller = RollerPool(LiteralRoller(5), LiteralRoller(8))
+        callback = Mock(side_effect=[first_roller, second_roller])
+
+        result = trace(cast("Callable[[], MultiOutcomeRoller[int]]", callback))
+        trace_roller = result.roller
+        rerolled_result = trace_roller.roll()
+
+        assert trace_roller.operands == ()
+        assert result.operands[0].roller is first_roller
+        assert rerolled_result.roller is trace_roller
+        assert rerolled_result.operands[0].roller is second_roller
 
     @pytest.mark.parametrize(
         ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
@@ -1190,12 +1216,9 @@ class TestMultiOutcomeRoll:
         assert roll.outcome == "ab"
         assert roll.operands == (pool_roll,)
 
-    def test_empty_sum_raises(self) -> None:
-        pool_roll: MultiOutcomeRoll[Never] = MultiOutcomeRoll((), PRoller(P()))
-
-        assert_type(pool_roll, MultiOutcomeRoll[Never])
-        with pytest.raises(ValueError, match="no outcomes to sum"):
-            pool_roll.sum()
+    def test_empty_outcomes_raise(self) -> None:
+        with pytest.raises(ValueError, match="at least one outcome"):
+            MultiOutcomeRoll((), PRoller(P()))
 
 
 class TestMixedRollBinaryArithmetic:
