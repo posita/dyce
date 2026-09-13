@@ -1887,6 +1887,10 @@ class MultiOutcomeRoll(Generic[_T_co]):
         field(default=(), repr=False)
     )
 
+    def __post_init__(self) -> None:
+        if not self.outcomes:
+            raise ValueError("a roll must contain at least one outcome")
+
     @overload
     def __add__(
         self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
@@ -2428,19 +2432,14 @@ class _TraceCall:
 
 
 class _TraceRoller:
-    def __init__(
-        self,
-        call: _TraceCall,
-        result_roller: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
-    ) -> None:
+    def __init__(self, call: _TraceCall) -> None:
         self._call = call
-        self._result_roller = result_roller
 
     @property
     def operands(
         self,
     ) -> tuple[SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any], ...]:
-        return (*self._call.sources, self._result_roller)
+        return self._call.sources
 
     def metadata(self) -> dict[str, object]:
         return self._call.metadata()
@@ -2458,7 +2457,7 @@ class _SingleOutcomeTraceRoller(_TraceRoller, SingleOutcomeRoller[_T_co]):
             raise TypeError(
                 f"trace callback did not produce a single outcome when called again ({result!r})"
             )
-        return result
+        return SingleOutcomeRoll(result.outcome, self, (result,))
 
 
 class _MultiOutcomeTraceRoller(_TraceRoller, MultiOutcomeRoller[_T_co]):
@@ -2468,7 +2467,7 @@ class _MultiOutcomeTraceRoller(_TraceRoller, MultiOutcomeRoller[_T_co]):
             raise TypeError(
                 f"trace callback did not produce multiple outcomes when called again ({result!r})"
             )
-        return result
+        return MultiOutcomeRoll(result.outcomes, self, (result,))
 
     def rolls_with_counts(
         self,
@@ -3196,7 +3195,19 @@ def trace(
         state,
     )
     try:
-        return _eval_trace_call(call)
+        result = _eval_trace_call(call)
+        if isinstance(result, MultiOutcomeRoll):
+            return MultiOutcomeRoll(
+                result.outcomes,
+                _MultiOutcomeTraceRoller(call),
+                (result,),
+            )
+        else:
+            return SingleOutcomeRoll(
+                result.outcome,
+                _SingleOutcomeTraceRoller(call),
+                (result,),
+            )
     except RollError as exc:
         exc.path = (call, *exc.path)
         raise
@@ -3266,18 +3277,7 @@ def _eval_trace_call(
         result = result.roll()
     elif not isinstance(result, (SingleOutcomeRoll, MultiOutcomeRoll)):
         result = LiteralRoller(result).roll()
-    if isinstance(result, MultiOutcomeRoll):
-        return MultiOutcomeRoll(
-            result.outcomes,
-            _MultiOutcomeTraceRoller(call, result.roller),
-            (result,),
-        )
-    else:
-        return SingleOutcomeRoll(
-            result.outcome,
-            _SingleOutcomeTraceRoller(call, result.roller),
-            (result,),
-        )
+    return result
 
 
 def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
