@@ -1085,6 +1085,9 @@ class TestPRoll:
             assert len(roll) == len(p_6d10)
             assert all(v in d10 for v in roll)
 
+    def test_incomparable_outcomes_use_natural_order(self) -> None:
+        assert P(H({2j: 1}), H({1j: 1})).roll() == (1j, 2j)
+
     def test_roll_symbols(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
         x = sympy.symbols("x")
