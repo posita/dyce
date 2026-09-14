@@ -28,7 +28,7 @@ from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, final, over
 
 import optype as ot
 
-from .h import H, HableT
+from .h import H, HableT, _HableOpsOptOut
 from .lifecycle import experimental
 from .p import P
 from .types import GetItemT, getitems, natural_key
@@ -128,7 +128,7 @@ _ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
 _INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
 
-class SingleOutcomeRoller(HableT[_T_co]):
+class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     r"""A computation capable of producing deferred, traceable samples."""
 
     __slots__ = ()
@@ -671,7 +671,7 @@ class SingleOutcomeRoller(HableT[_T_co]):
         """
 
 
-class MultiOutcomeRoller(HableT[_T_co]):
+class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     r"""
     A deferred, traceable computation producing a tuple of outcomes.
     “Multi” describes the collection result, which may contain just one outcome.
@@ -1439,7 +1439,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
-class SingleOutcomeRoll(Generic[_T_co]):
+class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     r"""
     An immutable outcome trace.
     """
@@ -1463,6 +1463,11 @@ class SingleOutcomeRoll(Generic[_T_co]):
     @overload
     def __add__(
         self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __add__(
+        self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __add__(
@@ -1471,6 +1476,8 @@ class SingleOutcomeRoll(Generic[_T_co]):
     ) -> "SingleOutcomeRoll[object]":
         if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             rhs = rhs.roll()
+        elif isinstance(rhs, HableT):
+            rhs = _as_roller(rhs).roll()
         return self._binary_operator(rhs, _ADD)
 
     @overload
@@ -1667,11 +1674,18 @@ class SingleOutcomeRoll(Generic[_T_co]):
     @overload
     def __radd__(
         self: "SingleOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __radd__(
+        self: "SingleOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __radd__(self, lhs: object) -> "SingleOutcomeRoll[object]":
         if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             lhs = lhs.roll()
+        elif isinstance(lhs, HableT):
+            lhs = _as_roller(lhs).roll()
         return self._reflected_binary_operator(lhs, _ADD)
 
     @overload
@@ -1878,7 +1892,7 @@ class SingleOutcomeRoll(Generic[_T_co]):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
-class MultiOutcomeRoll(Generic[_T_co]):
+class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     r"""An immutable trace of a collection of outcomes."""
 
     outcomes: tuple[_T_co, ...]
@@ -1904,6 +1918,11 @@ class MultiOutcomeRoll(Generic[_T_co]):
     @overload
     def __add__(
         self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __add__(
+        self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __add__(
@@ -1912,6 +1931,8 @@ class MultiOutcomeRoll(Generic[_T_co]):
     ) -> SingleOutcomeRoll[object]:
         if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             rhs = rhs.roll()
+        elif isinstance(rhs, HableT):
+            rhs = _as_roller(rhs).roll()
         return _as_roll(cast("object", self))._binary_operator(rhs, _ADD)
 
     @overload
@@ -2118,11 +2139,18 @@ class MultiOutcomeRoll(Generic[_T_co]):
     @overload
     def __radd__(
         self: "MultiOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __radd__(
+        self: "MultiOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __radd__(self, lhs: object) -> SingleOutcomeRoll[object]:
         if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             lhs = lhs.roll()
+        elif isinstance(lhs, HableT):
+            lhs = _as_roller(lhs).roll()
         return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _ADD)
 
     @overload
