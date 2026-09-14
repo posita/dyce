@@ -423,20 +423,42 @@ class TestTrace:
 
 
 class TestHableAndRollerBinaryArithmetic:
-    @pytest.mark.parametrize(
-        "method_name",
-        [
-            pytest.param(f"__{name}__", id=name)
-            for _, name, _, _ in _BINARY_OPERATOR_CASES
-        ],
-    )
-    def test_h_and_p_binary_operator_methods_return_not_implemented_for_roller(
-        self, method_name: str
-    ) -> None:
-        roller = LiteralRoller(1)
+    def test_addition_with_h_and_p_type_inference(self) -> None:
+        h = H({2: 1})
+        p = P(h)
+        roller = LiteralRoller(3)
+        roll = roller.roll()
 
-        assert getattr(H(6), method_name)(roller) is NotImplemented
-        assert getattr(P(6), method_name)(roller) is NotImplemented
+        assert_type(h + roller, SingleOutcomeRoller[int])
+        assert_type(roller + h, SingleOutcomeRoller[int])
+        assert_type(p + roller, SingleOutcomeRoller[int])
+        assert_type(roller + p, SingleOutcomeRoller[int])
+        assert_type(h + roll, SingleOutcomeRoll[int])
+        assert_type(roll + h, SingleOutcomeRoll[int])
+        assert_type(p + roll, SingleOutcomeRoll[int])
+        assert_type(roll + p, SingleOutcomeRoll[int])
+
+    def test_addition_with_h_and_p_produces_expected_rolls(self) -> None:
+        h = H({2: 1})
+        p = P(h)
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+
+        for roller_result in (h + roller, roller + h, p + roller, roller + p):
+            assert isinstance(roller_result, SingleOutcomeRoller)
+            assert roller_result.h() == H({5: 1})
+
+        for roll_result in (h + roll, roll + h, p + roll, roll + p):
+            assert isinstance(roll_result, SingleOutcomeRoll)
+            assert roll_result.outcome == 5
+
+    def test_h_and_p_addition_methods_return_not_implemented_for_roll(self) -> None:
+        roll = LiteralRoller(1).roll()
+
+        assert H(6).__add__(roll) is NotImplemented
+        assert H(6).__radd__(roll) is NotImplemented
+        assert P(6).__add__(roll) is NotImplemented
+        assert P(6).__radd__(roll) is NotImplemented
 
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators_with_h_and_p_produce_expected_distributions(
@@ -464,6 +486,21 @@ class TestHableAndRollerBinaryArithmetic:
         for result in results:
             assert isinstance(result, SingleOutcomeRoller)
             assert result.h() == expected_h
+
+    @pytest.mark.parametrize(
+        "method_name",
+        [
+            pytest.param(f"__{name}__", id=name)
+            for _, name, _, _ in _BINARY_OPERATOR_CASES
+        ],
+    )
+    def test_h_and_p_binary_operator_methods_return_not_implemented_for_roller(
+        self, method_name: str
+    ) -> None:
+        roller = LiteralRoller(1)
+
+        assert getattr(H(6), method_name)(roller) is NotImplemented
+        assert getattr(P(6), method_name)(roller) is NotImplemented
 
     def test_hable_operand_is_wrapped_in_hable_roller_without_calling_h(self) -> None:
         hable = _Hable(H(6))
