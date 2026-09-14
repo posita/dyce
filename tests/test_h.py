@@ -23,6 +23,7 @@ import warnings
 from collections import defaultdict
 from collections.abc import Iterable
 from decimal import Decimal
+from enum import IntEnum
 from fractions import Fraction
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Never, assert_type
@@ -257,6 +258,21 @@ class TestHMapping:
 
 
 class TestHMatmul:
+    def test_convolution_outcome_type_inference(self) -> None:
+        class IntOutcome(IntEnum):
+            ONE = 1
+
+        decimal_h = H({Decimal("1.0"): 1})
+        fraction_h = H({Fraction(1, 2): 1})
+        int_outcome_h = H({IntOutcome.ONE: 1})
+
+        assert_type(decimal_h @ 3, H[Decimal])
+        assert_type(3 @ decimal_h, H[Decimal])
+        assert_type(fraction_h @ 3, H[Fraction])
+        assert_type(3 @ fraction_h, H[Fraction])
+        assert_type(int_outcome_h @ 3, H[int])
+        assert_type(3 @ int_outcome_h, H[int])
+
     def test_zero(self) -> None:
         result = H({1: 1, 2: 1}) @ 0
         assert result == H({})
