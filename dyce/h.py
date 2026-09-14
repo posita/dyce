@@ -71,7 +71,6 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
-_CanSubSameT = TypeVar("_CanSubSameT", bound=ot.CanSubSame)
 _HableOpsOperandT_contra = TypeVar("_HableOpsOperandT_contra", contravariant=True)
 _HableOpsResultT_co = TypeVar("_HableOpsResultT_co", covariant=True)
 _HableOpsMixinT = TypeVar("_HableOpsMixinT", bound="HableOpsMixin[Any]")
@@ -525,9 +524,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __matmul__(
-        self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
-    ) -> "H[int]": ...
+    def __matmul__(self: "H[ot.CanAdd[int, int]]", rhs: SupportsInt) -> "H[int]": ...
     @overload
     def __matmul__(self: "H[_CanAddSameT]", rhs: SupportsInt) -> "H[_CanAddSameT]": ...
     # Keep the narrower Literal[1] case first so all type checkers preserve the
@@ -567,10 +564,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     # See <https://github.com/astral-sh/ty/issues/3234>.
     def __add__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
-    @overload
-    def __add__(
-        self: "H[_CanAddSameT]", rhs: "H[_CanAddSameT]"
-    ) -> "H[_CanAddSameT]": ...
     @overload
     def __add__(
         self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
@@ -615,10 +608,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     @overload
     # See <https://github.com/astral-sh/ty/issues/3234>.
     def __sub__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
-    @overload
-    def __sub__(
-        self: "H[_CanSubSameT]", rhs: "H[_CanSubSameT]"
-    ) -> "H[_CanSubSameT]": ...
     @overload
     def __sub__(
         self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
@@ -1067,9 +1056,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __rmatmul__(
-        self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
-    ) -> "H[int]": ...
+    def __rmatmul__(self: "H[ot.CanAdd[int, int]]", lhs: SupportsInt) -> "H[int]": ...
     @overload
     def __rmatmul__(self: "H[_CanAddSameT]", lhs: SupportsInt) -> "H[_CanAddSameT]": ...
     # Keep the narrower Literal[1] case first so all type checkers preserve the
@@ -2735,8 +2722,8 @@ def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
     result: H[_CanAddSameT] | None = None
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
-        batch = cast("H[_CanAddSameT]", h @ n) if n > 1 else h  # type: ignore[redundant-cast]
-        result = batch if result is None else result + batch
+        batch = h @ n if n > 1 else h
+        result = batch if result is None else result + batch  # type: ignore[operator]
     return cast("H[_CanAddSameT]", H({})) if result is None else result
 
 
