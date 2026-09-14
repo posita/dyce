@@ -42,6 +42,7 @@ from typing import (
     Literal,
     NamedTuple,
     Never,
+    Protocol,
     SupportsFloat,
     SupportsInt,
     TypeVar,
@@ -70,7 +71,30 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
+_HableOpsOperandT_contra = TypeVar("_HableOpsOperandT_contra", contravariant=True)
+_HableOpsResultT_co = TypeVar("_HableOpsResultT_co", covariant=True)
 _HableOpsMixinT = TypeVar("_HableOpsMixinT", bound="HableOpsMixin[Any]")
+
+
+class _HableOpsOptOut:
+    __slots__ = ()
+    _hable_ops_opt_out: Literal[True] = True
+
+
+class _HableOpsOptOutT(Protocol):
+    @property
+    def _hable_ops_opt_out(self) -> Literal[True]:
+        r"""
+        Marker to expose _HableOpsOptOut membership to structural typing for operator overloads.
+        """
+        ...
+
+
+class _CanRAddHableOpsOptOut(
+    _HableOpsOptOutT,
+    ot.CanRAdd[_HableOpsOperandT_contra, _HableOpsResultT_co],
+    Protocol[_HableOpsOperandT_contra, _HableOpsResultT_co],
+): ...
 
 
 class _QuantizeContext(NamedTuple):
@@ -529,6 +553,10 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         return NotImplemented if result is NotImplemented else H(result)
 
     @overload
+    def __add__(  # type: ignore[overload-overlap]
+        self: "H[_T]", rhs: _CanRAddHableOpsOptOut["H[_T]", _ResultT]
+    ) -> _ResultT: ...
+    @overload
     def __add__(
         self: "H[HableOpsMixin[ot.CanAdd[_OtherT, _ResultT]]]",
         rhs: "H[HableOpsMixin[_OtherT]]",
@@ -558,8 +586,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(self: "H[_T]", rhs: ot.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
-    def __add__(self, rhs: object) -> "H[object]":
-        if _should_defer_hable_operator(rhs):
+    def __add__(self, rhs: object) -> object:
+        if _should_defer_hable_addition(rhs) or _should_defer_hable_operator(rhs):
             return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
@@ -1054,7 +1082,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     ) -> "H[_ResultT]": ...
     @overload
     def __radd__(self: "H[_T]", lhs: ot.CanRAdd[_T, _ResultT]) -> "H[_ResultT]": ...
-    def __radd__(self, lhs: object) -> "H[object]":
+    def __radd__(self, lhs: object) -> object:
+        if _should_defer_hable_addition(lhs):
+            return NotImplemented
         result = _map_opname_ref(self._h, "__add__", "__radd__", lhs)
         return NotImplemented if result is NotImplemented else H(result)
 
@@ -2069,6 +2099,11 @@ class HableOpsMixin(HableT[_T_co]):
     # ---- Forward operators -----------------------------------------------------------
 
     @overload
+    def __add__(  # type: ignore[overload-overlap]
+        self: "HableOpsMixin[_T]",
+        rhs: _CanRAddHableOpsOptOut["HableOpsMixin[_T]", _ResultT],
+    ) -> _ResultT: ...
+    @overload
     def __add__(
         self: "HableOpsMixin[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
@@ -2086,10 +2121,10 @@ class HableOpsMixin(HableT[_T_co]):
     def __add__(
         self: "HableOpsMixin[_T]", rhs: ot.CanAdd[_T, _ResultT]
     ) -> H[_ResultT]: ...
-    def __add__(self, rhs: object) -> H[object]:
-        if _should_defer_hable_operator(rhs):
+    def __add__(self, rhs: object) -> object:
+        if _should_defer_hable_addition(rhs) or _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
 
     @overload
     def __sub__(
@@ -2354,7 +2389,9 @@ class HableOpsMixin(HableT[_T_co]):
     def __radd__(
         self: "HableOpsMixin[_T]", lhs: ot.CanRAdd[_T, _ResultT]
     ) -> H[_ResultT]: ...
-    def __radd__(self, lhs: object) -> H[object]:
+    def __radd__(self, lhs: object) -> object:
+        if _should_defer_hable_addition(lhs):
+            return NotImplemented
         return self.h().__radd__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
 
     @overload
@@ -2851,6 +2888,10 @@ def _quantize_counts(
         )
         or preserve_zero_counts
     }
+
+
+def _should_defer_hable_addition(operand: object) -> bool:
+    return isinstance(operand, _HableOpsOptOut)
 
 
 def _should_defer_hable_operator(rhs: object) -> bool:
