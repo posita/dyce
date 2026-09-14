@@ -1474,10 +1474,6 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
         self,
         rhs: object,
     ) -> "SingleOutcomeRoll[object]":
-        if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
-            rhs = rhs.roll()
-        elif isinstance(rhs, HableT):
-            rhs = _as_roller(rhs).roll()
         return self._binary_operator(rhs, _ADD)
 
     @overload
@@ -1489,6 +1485,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __sub__(
         self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __sub__(
+        self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __sub__(
@@ -1513,6 +1514,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mul__(
+        self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __mul__(
         self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mul__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1527,6 +1533,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __truediv__(
         self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __truediv__(
+        self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __truediv__(
@@ -1547,6 +1558,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __floordiv__(
+        self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __floordiv__(
         self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1564,6 +1580,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mod__(
+        self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __mod__(
         self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mod__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1573,6 +1594,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __pow__(
         self: "SingleOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __pow__(
+        self: "SingleOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __pow__(
@@ -1593,6 +1619,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __lshift__(
+        self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __lshift__(
         self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1607,6 +1638,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rshift__(
         self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rshift__(
+        self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rshift__(
@@ -1627,6 +1663,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __and__(
+        self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __and__(
         self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __and__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1644,6 +1685,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __or__(
+        self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __or__(
         self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __or__(self, rhs: object) -> "SingleOutcomeRoll[object]":
@@ -1658,6 +1704,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __xor__(
         self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __xor__(
+        self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __xor__(
@@ -1682,16 +1733,17 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __radd__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
-            lhs = lhs.roll()
-        elif isinstance(lhs, HableT):
-            lhs = _as_roller(lhs).roll()
         return self._reflected_binary_operator(lhs, _ADD)
 
     @overload
     def __rsub__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rsub__(
+        self: "SingleOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rsub__(
@@ -1709,6 +1761,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rmul__(
         self: "SingleOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rmul__(
+        self: "SingleOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rmul__(self, lhs: object) -> "SingleOutcomeRoll[object]":
@@ -1718,6 +1775,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rtruediv__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rtruediv__(
+        self: "SingleOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rtruediv__(
@@ -1735,6 +1797,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rfloordiv__(
         self: "SingleOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rfloordiv__(
+        self: "SingleOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rfloordiv__(self, lhs: object) -> "SingleOutcomeRoll[object]":
@@ -1744,6 +1811,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rmod__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rmod__(
+        self: "SingleOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmod__(
@@ -1761,6 +1833,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rpow__(
         self: "SingleOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rpow__(
+        self: "SingleOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rpow__(self, lhs: object) -> "SingleOutcomeRoll[object]":
@@ -1770,6 +1847,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rlshift__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rlshift__(
+        self: "SingleOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rlshift__(
@@ -1787,6 +1869,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rrshift__(
         self: "SingleOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rrshift__(
+        self: "SingleOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rrshift__(self, lhs: object) -> "SingleOutcomeRoll[object]":
@@ -1796,6 +1883,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rand__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rand__(
+        self: "SingleOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rand__(
@@ -1813,6 +1905,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __ror__(
         self: "SingleOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __ror__(
+        self: "SingleOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __ror__(self, lhs: object) -> "SingleOutcomeRoll[object]":
@@ -1822,6 +1919,11 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rxor__(  # type: ignore[misc]
         self: "SingleOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> "SingleOutcomeRoll[_ResultT]": ...
+    @overload
+    def __rxor__(
+        self: "SingleOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rxor__(
@@ -1866,6 +1968,8 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[object]":
         if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             rhs = rhs.roll()
+        elif isinstance(rhs, HableT):
+            rhs = _as_roller(rhs).roll()
         rhs_roll = _as_roll(rhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             self.roller, rhs_roll.roller, operator
@@ -1878,6 +1982,8 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[object]":
         if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
             lhs = lhs.roll()
+        elif isinstance(lhs, HableT):
+            lhs = _as_roller(lhs).roll()
         lhs_roll = _as_roll(lhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             lhs_roll.roller, self.roller, operator
@@ -1929,10 +2035,6 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
         self,
         rhs: object,
     ) -> SingleOutcomeRoll[object]:
-        if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
-            rhs = rhs.roll()
-        elif isinstance(rhs, HableT):
-            rhs = _as_roller(rhs).roll()
         return _as_roll(cast("object", self))._binary_operator(rhs, _ADD)
 
     @overload
@@ -1944,6 +2046,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __sub__(
         self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __sub__(
+        self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __sub__(
@@ -1969,6 +2076,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __mul__(
         self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __mul__(
+        self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __mul__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -1983,6 +2095,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __truediv__(
         self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __truediv__(
+        self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __truediv__(
@@ -2005,6 +2122,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __floordiv__(
         self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __floordiv__(
+        self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __floordiv__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -2023,6 +2145,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __mod__(
         self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __mod__(
+        self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __mod__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -2032,6 +2159,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __pow__(
         self: "MultiOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __pow__(
+        self: "MultiOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __pow__(
@@ -2054,6 +2186,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __lshift__(
         self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __lshift__(
+        self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __lshift__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -2068,6 +2205,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rshift__(
         self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rshift__(
+        self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rshift__(
@@ -2090,6 +2232,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __and__(
         self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __and__(
+        self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __and__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -2108,6 +2255,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __or__(
         self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __or__(
+        self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __or__(self, rhs: object) -> SingleOutcomeRoll[object]:
@@ -2122,6 +2274,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __xor__(
         self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
         rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __xor__(
+        self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __xor__(
@@ -2147,16 +2304,17 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __radd__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
-            lhs = lhs.roll()
-        elif isinstance(lhs, HableT):
-            lhs = _as_roller(lhs).roll()
         return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _ADD)
 
     @overload
     def __rsub__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rsub__(
+        self: "MultiOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rsub__(
@@ -2174,6 +2332,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rmul__(
         self: "MultiOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rmul__(
+        self: "MultiOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __rmul__(self, lhs: object) -> SingleOutcomeRoll[object]:
@@ -2183,6 +2346,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rtruediv__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rtruediv__(
+        self: "MultiOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rtruediv__(
@@ -2200,6 +2368,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rfloordiv__(
         self: "MultiOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rfloordiv__(
+        self: "MultiOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __rfloordiv__(self, lhs: object) -> SingleOutcomeRoll[object]:
@@ -2209,6 +2382,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rmod__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rmod__(
+        self: "MultiOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rmod__(
@@ -2226,6 +2404,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rpow__(
         self: "MultiOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rpow__(
+        self: "MultiOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __rpow__(self, lhs: object) -> SingleOutcomeRoll[object]:
@@ -2235,6 +2418,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rlshift__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rlshift__(
+        self: "MultiOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rlshift__(
@@ -2252,6 +2440,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __rrshift__(
         self: "MultiOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rrshift__(
+        self: "MultiOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __rrshift__(self, lhs: object) -> SingleOutcomeRoll[object]:
@@ -2261,6 +2454,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rand__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rand__(
+        self: "MultiOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rand__(
@@ -2278,6 +2476,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     @overload
     def __ror__(
         self: "MultiOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __ror__(
+        self: "MultiOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> SingleOutcomeRoll[_ResultT]: ...
     def __ror__(self, lhs: object) -> SingleOutcomeRoll[object]:
@@ -2287,6 +2490,11 @@ class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def __rxor__(  # type: ignore[misc]
         self: "MultiOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
         lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+    ) -> SingleOutcomeRoll[_ResultT]: ...
+    @overload
+    def __rxor__(
+        self: "MultiOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
+        lhs: "HableT[_OtherT]",
     ) -> SingleOutcomeRoll[_ResultT]: ...
     @overload
     def __rxor__(
