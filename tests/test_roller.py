@@ -423,11 +423,15 @@ class TestTrace:
 
 
 class TestHableAndRollerBinaryArithmetic:
-    def test_addition_with_h_and_p_type_inference(self) -> None:
-        h = H({2: 1})
+    def test_binary_operator_type_inference(self) -> None:
+        h = H({8: 1})
         p = P(h)
         roller = LiteralRoller(3)
         roll = roller.roll()
+        power_h = H({2: 1})
+        power_p = P(power_h)
+        power_roller = LiteralRoller(_PowerOutcome(3))
+        power_roll = power_roller.roll()
 
         assert_type(h + roller, SingleOutcomeRoller[int])
         assert_type(roller + h, SingleOutcomeRoller[int])
@@ -438,30 +442,107 @@ class TestHableAndRollerBinaryArithmetic:
         assert_type(p + roll, SingleOutcomeRoll[int])
         assert_type(roll + p, SingleOutcomeRoll[int])
 
-    def test_addition_with_h_and_p_produces_expected_rolls(self) -> None:
-        h = H({2: 1})
-        p = P(h)
-        roller = LiteralRoller(3)
-        roll = roller.roll()
+        assert_type(h - roller, SingleOutcomeRoller[int])
+        assert_type(roller - h, SingleOutcomeRoller[int])
+        assert_type(p - roller, SingleOutcomeRoller[int])
+        assert_type(roller - p, SingleOutcomeRoller[int])
+        assert_type(h - roll, SingleOutcomeRoll[int])
+        assert_type(roll - h, SingleOutcomeRoll[int])
+        assert_type(p - roll, SingleOutcomeRoll[int])
+        assert_type(roll - p, SingleOutcomeRoll[int])
 
-        for roller_result in (h + roller, roller + h, p + roller, roller + p):
-            assert isinstance(roller_result, SingleOutcomeRoller)
-            assert roller_result.h() == H({5: 1})
+        assert_type(h * roller, SingleOutcomeRoller[int])
+        assert_type(roller * h, SingleOutcomeRoller[int])
+        assert_type(p * roller, SingleOutcomeRoller[int])
+        assert_type(roller * p, SingleOutcomeRoller[int])
+        assert_type(h * roll, SingleOutcomeRoll[int])
+        assert_type(roll * h, SingleOutcomeRoll[int])
+        assert_type(p * roll, SingleOutcomeRoll[int])
+        assert_type(roll * p, SingleOutcomeRoll[int])
 
-        for roll_result in (h + roll, roll + h, p + roll, roll + p):
-            assert isinstance(roll_result, SingleOutcomeRoll)
-            assert roll_result.outcome == 5
+        assert_type(h / roller, SingleOutcomeRoller[float])
+        assert_type(roller / h, SingleOutcomeRoller[float])
+        assert_type(p / roller, SingleOutcomeRoller[float])
+        assert_type(roller / p, SingleOutcomeRoller[float])
+        assert_type(h / roll, SingleOutcomeRoll[float])
+        assert_type(roll / h, SingleOutcomeRoll[float])
+        assert_type(p / roll, SingleOutcomeRoll[float])
+        assert_type(roll / p, SingleOutcomeRoll[float])
 
-    def test_h_and_p_addition_methods_return_not_implemented_for_roll(self) -> None:
-        roll = LiteralRoller(1).roll()
+        assert_type(h // roller, SingleOutcomeRoller[int])
+        assert_type(roller // h, SingleOutcomeRoller[int])
+        assert_type(p // roller, SingleOutcomeRoller[int])
+        assert_type(roller // p, SingleOutcomeRoller[int])
+        assert_type(h // roll, SingleOutcomeRoll[int])
+        assert_type(roll // h, SingleOutcomeRoll[int])
+        assert_type(p // roll, SingleOutcomeRoll[int])
+        assert_type(roll // p, SingleOutcomeRoll[int])
 
-        assert H(6).__add__(roll) is NotImplemented
-        assert H(6).__radd__(roll) is NotImplemented
-        assert P(6).__add__(roll) is NotImplemented
-        assert P(6).__radd__(roll) is NotImplemented
+        assert_type(h % roller, SingleOutcomeRoller[int])
+        assert_type(roller % h, SingleOutcomeRoller[int])
+        assert_type(p % roller, SingleOutcomeRoller[int])
+        assert_type(roller % p, SingleOutcomeRoller[int])
+        assert_type(h % roll, SingleOutcomeRoll[int])
+        assert_type(roll % h, SingleOutcomeRoll[int])
+        assert_type(p % roll, SingleOutcomeRoll[int])
+        assert_type(roll % p, SingleOutcomeRoll[int])
+
+        assert_type(power_h**power_roller, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_roller**power_h, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_p**power_roller, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_roller**power_p, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_h**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_roll**power_h, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_p**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_roll**power_p, SingleOutcomeRoll[_PowerOutcome])
+
+        assert_type(h << roller, SingleOutcomeRoller[int])
+        assert_type(roller << h, SingleOutcomeRoller[int])
+        assert_type(p << roller, SingleOutcomeRoller[int])
+        assert_type(roller << p, SingleOutcomeRoller[int])
+        assert_type(h << roll, SingleOutcomeRoll[int])
+        assert_type(roll << h, SingleOutcomeRoll[int])
+        assert_type(p << roll, SingleOutcomeRoll[int])
+        assert_type(roll << p, SingleOutcomeRoll[int])
+
+        assert_type(h >> roller, SingleOutcomeRoller[int])
+        assert_type(roller >> h, SingleOutcomeRoller[int])
+        assert_type(p >> roller, SingleOutcomeRoller[int])
+        assert_type(roller >> p, SingleOutcomeRoller[int])
+        assert_type(h >> roll, SingleOutcomeRoll[int])
+        assert_type(roll >> h, SingleOutcomeRoll[int])
+        assert_type(p >> roll, SingleOutcomeRoll[int])
+        assert_type(roll >> p, SingleOutcomeRoll[int])
+
+        assert_type(h & roller, SingleOutcomeRoller[int])
+        assert_type(roller & h, SingleOutcomeRoller[int])
+        assert_type(p & roller, SingleOutcomeRoller[int])
+        assert_type(roller & p, SingleOutcomeRoller[int])
+        assert_type(h & roll, SingleOutcomeRoll[int])
+        assert_type(roll & h, SingleOutcomeRoll[int])
+        assert_type(p & roll, SingleOutcomeRoll[int])
+        assert_type(roll & p, SingleOutcomeRoll[int])
+
+        assert_type(h | roller, SingleOutcomeRoller[int])
+        assert_type(roller | h, SingleOutcomeRoller[int])
+        assert_type(p | roller, SingleOutcomeRoller[int])
+        assert_type(roller | p, SingleOutcomeRoller[int])
+        assert_type(h | roll, SingleOutcomeRoll[int])
+        assert_type(roll | h, SingleOutcomeRoll[int])
+        assert_type(p | roll, SingleOutcomeRoll[int])
+        assert_type(roll | p, SingleOutcomeRoll[int])
+
+        assert_type(h ^ roller, SingleOutcomeRoller[int])
+        assert_type(roller ^ h, SingleOutcomeRoller[int])
+        assert_type(p ^ roller, SingleOutcomeRoller[int])
+        assert_type(roller ^ p, SingleOutcomeRoller[int])
+        assert_type(h ^ roll, SingleOutcomeRoll[int])
+        assert_type(roll ^ h, SingleOutcomeRoll[int])
+        assert_type(p ^ roll, SingleOutcomeRoll[int])
+        assert_type(roll ^ p, SingleOutcomeRoll[int])
 
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_with_h_and_p_produce_expected_distributions(
+    def test_binary_operators_with_h_and_p_produce_expected_rollers_and_rolls(
         self,
         op: Callable[[Any, Any], Any],
         _name: str,
@@ -474,33 +555,57 @@ class TestHableAndRollerBinaryArithmetic:
         right_p = P(right_h)
         left_roller = LiteralRoller(lhs)
         right_roller = LiteralRoller(rhs)
+        left_roll = left_roller.roll()
+        right_roll = right_roller.roll()
         expected_h = H({op(lhs, rhs): 1})
+        expected_outcome = op(lhs, rhs)
 
-        results = (
+        roller_results = (
             op(left_roller, right_h),
             op(left_h, right_roller),
             op(left_roller, right_p),
             op(left_p, right_roller),
         )
+        roll_results = (
+            op(left_roll, right_h),
+            op(left_h, right_roll),
+            op(left_roll, right_p),
+            op(left_p, right_roll),
+        )
 
-        for result in results:
+        for result in roller_results:
             assert isinstance(result, SingleOutcomeRoller)
             assert result.h() == expected_h
+
+        for result in roll_results:
+            assert isinstance(result, SingleOutcomeRoll)
+            assert result.outcome == expected_outcome
 
     @pytest.mark.parametrize(
         "method_name",
         [
-            pytest.param(f"__{name}__", id=name)
+            pytest.param(method_name, id=f"{prefix}{name}")
             for _, name, _, _ in _BINARY_OPERATOR_CASES
+            for prefix, method_name in (
+                ("forward-", f"__{name}__"),
+                ("reflected-", f"__r{name}__"),
+            )
         ],
     )
-    def test_h_and_p_binary_operator_methods_return_not_implemented_for_roller(
-        self, method_name: str
+    @pytest.mark.parametrize(
+        "make_operand",
+        [
+            pytest.param(lambda: LiteralRoller(1), id="roller"),
+            pytest.param(lambda: LiteralRoller(1).roll(), id="roll"),
+        ],
+    )
+    def test_h_and_p_binary_operator_methods_return_not_implemented_for_rolls_and_rollers(
+        self, method_name: str, make_operand: Callable[[], object]
     ) -> None:
-        roller = LiteralRoller(1)
+        operand = make_operand()
 
-        assert getattr(H(6), method_name)(roller) is NotImplemented
-        assert getattr(P(6), method_name)(roller) is NotImplemented
+        assert getattr(H(6), method_name)(operand) is NotImplemented
+        assert getattr(P(6), method_name)(operand) is NotImplemented
 
     def test_hable_operand_is_wrapped_in_hable_roller_without_calling_h(self) -> None:
         hable = _Hable(H(6))
