@@ -29,14 +29,14 @@ from dyce.roller import (
     HableRoller,
     HRoller,
     LiteralRoller,
-    MultiOutcomeRoll,
-    MultiOutcomeRoller,
     PRoller,
+    Roll,
+    Roller,
     RollerPool,
     RollError,
     SingleOutcomeRoll,
     SingleOutcomeRoller,
-    _MultiOutcomeFactoryRoller,
+    _FactoryRoller,
     _SingleOutcomeFactoryRoller,
     roller_factory,
     trace,
@@ -88,7 +88,7 @@ class _PowerOutcome:
     value: int
 
     # Needed to ensure that _PowerOutcome satisfies CanAddSame, so it can be used with
-    # sum() methods from either MultiOutcomeRoller or MultiOutcomeRoll
+    # sum() methods from either Roller or Roll
     def __add__(self, rhs: "_PowerOutcome") -> "_PowerOutcome":
         return _PowerOutcome(self.value + rhs.value)
 
@@ -173,7 +173,7 @@ class TestTrace:
         # TODO(@posita): <https://github.com/zubanls/zuban/issues/561>
         assert args[0].outcome == 3  # zuban: ignore[comparison-overlap]
         assert args[0].roller is single  # zuban: ignore[comparison-overlap]
-        assert isinstance(args[1], MultiOutcomeRoll)
+        assert isinstance(args[1], Roll)
         assert args[1].outcomes == (2, 4)  # zuban: ignore[comparison-overlap]
         assert args[1].roller is multi
         assert kwargs == {"token": token}
@@ -186,19 +186,19 @@ class TestTrace:
 
         result = trace(callback)
 
-        assert_type(result, SingleOutcomeRoll[int])
-        assert result.outcome == 4
+        assert_type(result, Roll[int])
+        assert result.outcomes == (4,)
         assert result.operands == (roll,)
 
-    def test_callback_returns_multi_roll(self) -> None:
+    def test_callback_returns_roll_with_multiple_outcomes(self) -> None:
         returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
 
-        def callback() -> MultiOutcomeRoll[int]:
+        def callback() -> Roll[int]:
             return returned
 
         result = trace(callback)
 
-        assert_type(result, MultiOutcomeRoll[int])
+        assert_type(result, Roll[int])
         assert result.outcomes == (2, 3)
         assert result.operands == (returned,)
 
@@ -208,20 +208,20 @@ class TestTrace:
 
         result = trace(callback)
 
-        assert_type(result, SingleOutcomeRoll[int])
-        assert result.outcome == 8
+        assert_type(result, Roll[int])
+        assert result.outcomes == (8,)
         assert isinstance(result.operands[0], SingleOutcomeRoll)
         assert result.operands[0].outcome == 8
 
-    def test_callback_returns_multi_roller(self) -> None:
-        def callback() -> MultiOutcomeRoller[int]:
+    def test_callback_returns_roller_with_multiple_outcomes(self) -> None:
+        def callback() -> Roller[int]:
             return PRoller(P(H({2: 1}), H({3: 1})))
 
         result = trace(callback)
 
-        assert_type(result, MultiOutcomeRoll[int])
+        assert_type(result, Roll[int])
         assert result.outcomes == (2, 3)
-        assert isinstance(result.operands[0], MultiOutcomeRoll)
+        assert isinstance(result.operands[0], Roll)
         assert result.operands[0].outcomes == (2, 3)
 
     def test_callback_returns_literal_string(self) -> None:
@@ -232,8 +232,8 @@ class TestTrace:
 
         result = trace(callback, source)
 
-        assert_type(result, SingleOutcomeRoll[str])
-        assert result.outcome == "hit"
+        assert_type(result, Roll[str])
+        assert result.outcomes == ("hit",)
         assert len(result.operands) == 1
         assert isinstance(result.operands[0], SingleOutcomeRoll)
         assert result.operands[0].outcome == "hit"
@@ -263,7 +263,7 @@ class TestTrace:
         assert rolls["roll0"]["operands"] == ["roll1"]
         assert rolls["roll1"]["operands"] == ["roll2", "roll3"]
         assert rolls["roll2"]["outcome"] == 1
-        assert rolls["roll0"]["outcome"] == 1 + rolls["roll3"]["outcome"]
+        assert rolls["roll0"]["outcomes"] == [1 + rolls["roll3"]["outcome"]]
 
     def test_implicit_name_uses_callback_name(self) -> None:
         def callback() -> int:
@@ -313,8 +313,8 @@ class TestTrace:
 
         result = trace(explode, LiteralRoller(6))
 
-        assert_type(result, SingleOutcomeRoll[int])
-        assert result.outcome == 18
+        assert_type(result, Roll[int])
+        assert result.outcomes == (18,)
         rollers = result.trace()["rollers"]
         assert isinstance(rollers, dict)
         assert sum(data["kind"] == "trace" for data in rollers.values()) == 3
@@ -362,52 +362,37 @@ class TestTrace:
         assert caught.value.__cause__ is failure
 
     def test_mixed_parameter_type_inference(self) -> None:
-        def callback(
-            single: SingleOutcomeRoll[int], multi: MultiOutcomeRoll[str]
-        ) -> str:
+        def callback(single: SingleOutcomeRoll[int], multi: Roll[str]) -> str:
             return str(single.outcome) + multi.outcomes[0]
 
         result = trace(callback, LiteralRoller(3), PRoller(P(H({"a": 1}))))
 
-        assert_type(result, SingleOutcomeRoll[str])  # zuban: ignore[misc]
-        assert result.outcome == "3a"
+        assert_type(result, Roll[str])  # zuban: ignore[misc]
+        assert result.outcomes == ("3a",)
 
-    def test_single_outcome_reroll_preserves_trace_roller_and_records_new_callback_result(
-        self,
-    ) -> None:
-        first_roller = LiteralRoller(2)
-        second_roller = LiteralRoller(5)
-        callback = Mock(side_effect=[first_roller, second_roller])
-
-        result = trace(cast("Callable[[], SingleOutcomeRoller[int]]", callback))
-        trace_roller = result.roller
-        rerolled_result = trace_roller.roll()
-
-        assert trace_roller.operands == ()
-        assert result.operands[0].roller is first_roller
-        assert rerolled_result.roller is trace_roller
-        assert rerolled_result.operands[0].roller is second_roller
-
-    def test_multi_outcome_reroll_preserves_trace_roller_and_records_new_callback_result(
+    def test_reroll_can_change_number_of_outcomes_and_records_each_callback_result(
         self,
     ) -> None:
         first_roller = RollerPool(LiteralRoller(2))
         second_roller = RollerPool(LiteralRoller(5), LiteralRoller(8))
         callback = Mock(side_effect=[first_roller, second_roller])
 
-        result = trace(cast("Callable[[], MultiOutcomeRoller[int]]", callback))
+        result = trace(cast("Callable[[], Roller[int]]", callback))
         trace_roller = result.roller
         rerolled_result = trace_roller.roll()
 
+        assert_type(result, Roll[int])
         assert trace_roller.operands == ()
+        assert result.outcomes == (2,)
         assert result.operands[0].roller is first_roller
         assert rerolled_result.roller is trace_roller
+        assert rerolled_result.outcomes == (5, 8)
         assert rerolled_result.operands[0].roller is second_roller
 
     @pytest.mark.parametrize(
         ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
     )
-    def test_multi_outcome_roller_selection_calls_callback_again(
+    def test_selecting_trace_roller_calls_callback_again(
         self, selector: int | slice, expected: tuple[int, ...]
     ) -> None:
         callback = Mock(
@@ -417,7 +402,7 @@ class TestTrace:
             ]
         )
 
-        result = trace(cast("Callable[[], MultiOutcomeRoller[int]]", callback))
+        result = trace(cast("Callable[[], Roller[int]]", callback))
 
         assert result.roller.select(selector).roll().outcomes == expected
 
@@ -637,6 +622,11 @@ class TestHableAndRollerBinaryArithmetic:
 
 
 class TestSingleOutcomeRoller:
+    def test_sum_returns_self(self) -> None:
+        roller = LiteralRoller(3)
+
+        assert roller.sum() is roller
+
     def test_binary_operator_type_inference(self) -> None:
         d6 = HRoller(H(6), name="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
@@ -767,13 +757,16 @@ class TestLiteralRoller:
         roll = roller.roll()
 
         assert_type(roller, LiteralRoller[int])
+        assert_type(roll, SingleOutcomeRoll[int])
+        assert_type(roll.roller, SingleOutcomeRoller[int])
         assert roller.value == 3
         assert roller.metadata() == {"kind": "literal", "value": 3}
+        assert roll.outcomes == (3,)
         assert roll.outcome == 3
         assert roll.roller is roller
 
 
-class TestMultiOutcomeRoller:
+class TestRoller:
     def test_binary_operator_type_inference(self) -> None:
         left = PRoller(P(H({2: 1})), name="left")
         right = PRoller(P(H({3: 1})), name="right")
@@ -840,10 +833,10 @@ class TestMultiOutcomeRoller:
         roll = selection.roll()
         (parent_roll,) = roll.operands
 
-        assert_type(selection, MultiOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(selection, Roller[int])  # zuban: ignore[misc]
         assert selection.operands == (parent_selection,)
         assert roll.outcomes == (1,)
-        assert isinstance(parent_roll, MultiOutcomeRoll)
+        assert isinstance(parent_roll, Roll)
         assert parent_roll.outcomes == (3, 1)
 
     def test_at_returns_sum_of_selected_outcomes(self) -> None:
@@ -914,7 +907,7 @@ class TestPRoller:
         roll = pool.roll()
 
         assert_type(pool, PRoller[int])  # zuban: ignore[misc]
-        assert_type(roll, MultiOutcomeRoll[int])  # zuban: ignore[misc]
+        assert_type(roll, Roll[int])  # zuban: ignore[misc]
         assert pool.p is p
         assert pool.metadata()["name"] == "pool"
         assert pool.operands == ()
@@ -930,7 +923,7 @@ class TestPRoller:
         rollers = trace["rollers"]
         rolls = trace["rolls"]
 
-        assert_type(selected, MultiOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(selected, Roller[int])  # zuban: ignore[misc]
         assert roll.outcomes == (3, 1)
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
@@ -968,7 +961,7 @@ class TestRollerPool:
         roll = pool.roll()
 
         assert_type(pool, RollerPool[int])
-        assert isinstance(pool, MultiOutcomeRoller)
+        assert isinstance(pool, Roller)
         assert len(pool) == 2
         assert pool.rollers == (two, one)
         assert pool.operands == (two, one)
@@ -1058,43 +1051,43 @@ class TestSingleOutcomeFactoryRoller:
             return cast("Any", "not_a_roller")  # type: ignore[no-any-return]
 
         with pytest.raises(
-            TypeError, match="must return a SingleOutcomeRoller or MultiOutcomeRoller"
+            TypeError, match="must return a SingleOutcomeRoller or Roller"
         ):
             invalid_factory()
 
 
-class TestMultiOutcomeFactoryRoller:
+class TestFactoryRoller:
     def test_callables(self) -> None:
         class RollerFactories:
             @roller_factory()
-            def factory(self, n: int) -> MultiOutcomeRoller[int]:
+            def factory(self, n: int) -> Roller[int]:
                 return PRoller(n @ P(2))
 
-            def __call__(self, first: int, second: int) -> MultiOutcomeRoller[int]:
+            def __call__(self, first: int, second: int) -> Roller[int]:
                 return RollerPool(LiteralRoller(first), LiteralRoller(second))
 
         some_rollers = RollerFactories()
         returned_roller = some_rollers.factory(2)
-        assert_type(returned_roller, MultiOutcomeRoller[int])
-        assert isinstance(returned_roller, _MultiOutcomeFactoryRoller)
+        assert_type(returned_roller, Roller[int])
+        assert isinstance(returned_roller, _FactoryRoller)
         assert len(returned_roller.roll().outcomes) == 2
 
         callable_factory = roller_factory(some_rollers)
         callable_roller = callable_factory(3, 4)
-        assert_type(callable_roller, MultiOutcomeRoller[int])
-        assert isinstance(callable_roller, _MultiOutcomeFactoryRoller)
+        assert_type(callable_roller, Roller[int])
+        assert isinstance(callable_roller, _FactoryRoller)
         assert callable_roller.metadata()["name"] == "RollerFactories"
         assert callable_roller.roll().outcomes == (3, 4)
 
         bound_factory = roller_factory(partial(some_rollers, 5, 6), name="bound")
         bound_roller = bound_factory()
-        assert isinstance(bound_roller, _MultiOutcomeFactoryRoller)
+        assert isinstance(bound_roller, _FactoryRoller)
         assert bound_roller.metadata()["name"] == "bound"
         assert bound_roller.roll().outcomes == (5, 6)
 
     def test_implicit_name_uses_factory_name(self) -> None:
         @roller_factory
-        def factory() -> MultiOutcomeRoller[int]:
+        def factory() -> Roller[int]:
             return PRoller(P(2))
 
         assert factory().metadata()["name"] == factory.__name__
@@ -1102,7 +1095,7 @@ class TestMultiOutcomeFactoryRoller:
     @pytest.mark.parametrize("name", ["explicit_name", ""])
     def test_explicit_name_preserved(self, name: str) -> None:
         @roller_factory(name=name)
-        def factory() -> MultiOutcomeRoller[int]:
+        def factory() -> Roller[int]:
             return PRoller(P(2))
 
         assert factory().metadata()["name"] == name
@@ -1111,13 +1104,18 @@ class TestMultiOutcomeFactoryRoller:
         p_roller = PRoller(P(2))
 
         @roller_factory
-        def factory() -> MultiOutcomeRoller[int]:
+        def factory() -> Roller[int]:
             return p_roller
 
         assert factory().operands == (p_roller,)
 
 
 class TestSingleOutcomeRoll:
+    def test_sum_returns_self(self) -> None:
+        roll = LiteralRoller(3).roll()
+
+        assert roll.sum() is roll
+
     def test_binary_operator_type_inference(self) -> None:
         roll = LiteralRoller(2).roll()
         power_roll = HRoller(H({_PowerOutcome(2): 1})).roll()
@@ -1225,7 +1223,7 @@ class TestSingleOutcomeRoll:
         assert reused_rolls["roll0"]["operands"] == ["roll1", "roll1"]
 
 
-class TestMultiOutcomeRoll:
+class TestRoll:
     def test_sum_produces_single_outcome_roll(self) -> None:
         pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
         roll = pool_roll.sum()
@@ -1236,7 +1234,7 @@ class TestMultiOutcomeRoll:
 
     def test_empty_outcomes_raise(self) -> None:
         with pytest.raises(ValueError, match="at least one outcome"):
-            MultiOutcomeRoll((), PRoller(P()))
+            Roll((), PRoller(P()))
 
 
 class TestMixedRollBinaryArithmetic:
@@ -1529,8 +1527,8 @@ class TestMixedRollBinaryArithmetic:
         *,
         op: Callable[[Any, Any], Any],
         reverse: bool,
-        make_roller: Callable[[], SingleOutcomeRoller[int] | MultiOutcomeRoller[int]],
-        make_roll: Callable[[], SingleOutcomeRoll[int] | MultiOutcomeRoll[int]],
+        make_roller: Callable[[], Roller[int]],
+        make_roll: Callable[[], Roll[int]],
     ) -> None:
         roller = make_roller()
         roll = make_roll()
@@ -1682,9 +1680,7 @@ class TestRollerAndRollOperationEquivalence:
             lambda: PRoller(P(6)).select(0).select(slice(0)),
         ],
     )
-    def test_empty_pool_roll_raises(
-        self, make_pool: Callable[[], MultiOutcomeRoller[int]]
-    ) -> None:
+    def test_empty_pool_roll_raises(self, make_pool: Callable[[], Roller[int]]) -> None:
         pool = make_pool()
         with pytest.raises(RollError, match="no outcomes from an empty"):
             pool.roll()

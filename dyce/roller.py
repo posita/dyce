@@ -37,10 +37,10 @@ __all__ = (
     "HRoller",
     "HableRoller",
     "LiteralRoller",
-    "MultiOutcomeRoll",
-    "MultiOutcomeRoller",
     "PRoller",
+    "Roll",
     "RollError",
+    "Roller",
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
@@ -69,9 +69,7 @@ class RollError(Exception):
     def __init__(
         self,
         message: str,
-        path: tuple[
-            "SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any] | _TraceCall", ...
-        ],
+        path: tuple["Roller[Any] | _TraceCall", ...],
     ) -> None:
         super().__init__(message)
         self.path = path
@@ -128,1060 +126,514 @@ _ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
 _INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
 
-class SingleOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
-    r"""A computation capable of producing deferred, traceable samples."""
+class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
+    r"""A computation capable of producing a nonempty tuple of traceable outcomes."""
 
     __slots__ = ()
 
-    # Roll-aware overloads preserve asymmetric expression typing for static checkers
+    # This and the other Roll-aware overloads preserve asymmetric expression typing for
+    # static checkers. Runtime implementations defer Roll operands via NotImplemented.
     @overload
     def __add__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: _OtherT,
+        self: "Roller[ot.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __add__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _ADD)
 
     @overload
     def __sub__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: _OtherT,
+        self: "Roller[ot.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __sub__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _SUB)
 
     @overload
     def __mul__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanMul[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __mul__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _MUL)
 
     @overload
     def __truediv__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanTruediv[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __truediv__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _TRUEDIV)
 
     @overload
     def __floordiv__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanFloordiv[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _FLOORDIV)
 
     @overload
     def __mod__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanMod[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __mod__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _MOD)
 
     @overload
     def __pow__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __pow__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[_T_co]",
-        rhs: "SingleOutcomeRoll[ot.CanRPow[_T_co, _ResultT]] | MultiOutcomeRoll[ot.CanRPow[_T_co, _ResultT]]",
+        self: "Roller[_T_co]",
+        rhs: "Roll[ot.CanRPow[_T_co, _ResultT]]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __pow__(
-        self: "SingleOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __pow__(
-        self: "SingleOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanPow2[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __pow__(
-        self: "SingleOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __pow__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _POW)
 
     @overload
     def __lshift__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanLshift[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __lshift__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _LSHIFT)
 
     @overload
     def __rshift__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRshift[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rshift__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _RSHIFT)
 
     @overload
     def __and__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanAnd[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __and__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _AND)
 
     @overload
     def __or__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanOr[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __or__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _OR)
 
     @overload
     def __xor__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roller[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanXor[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roller[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __xor__(self, rhs: object) -> object:
         return _binary_roller(self, rhs, _XOR)
 
     @overload
     def __radd__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __radd__(
-        self: "SingleOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __radd__(
-        self: "SingleOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: _OtherT,
+        self: "Roller[ot.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __radd__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _ADD)
 
     @overload
     def __rsub__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rsub__(
-        self: "SingleOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRSub[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rsub__(
-        self: "SingleOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: _OtherT,
+        self: "Roller[ot.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rsub__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _SUB)
 
     @overload
     def __rmul__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRMul[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmul__(
-        self: "SingleOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRMul[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rmul__(
-        self: "SingleOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rmul__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _MUL)
 
     @overload
     def __rtruediv__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRTruediv[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rtruediv__(
-        self: "SingleOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRTruediv[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rtruediv__(
-        self: "SingleOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rtruediv__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _TRUEDIV)
 
     @overload
     def __rfloordiv__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rfloordiv__(
-        self: "SingleOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRFloordiv[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rfloordiv__(
-        self: "SingleOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rfloordiv__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _FLOORDIV)
 
     @overload
     def __rmod__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRMod[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmod__(
-        self: "SingleOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRMod[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rmod__(
-        self: "SingleOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rmod__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _MOD)
 
     @overload
     def __rpow__(  # type: ignore[overload-overlap]
-        self: "SingleOutcomeRoller[_T_co]",
-        lhs: "SingleOutcomeRoll[ot.CanPow2[_T_co, _ResultT]] | MultiOutcomeRoll[ot.CanPow2[_T_co, _ResultT]]",
+        self: "Roller[_T_co]",
+        lhs: "Roll[ot.CanPow2[_T_co, _ResultT]]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rpow__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRPow[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rpow__(
-        self: "SingleOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRPow[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rpow__(
-        self: "SingleOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rpow__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _POW)
 
     @overload
     def __rlshift__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRLshift[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rlshift__(
-        self: "SingleOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRLshift[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rlshift__(
-        self: "SingleOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rlshift__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _LSHIFT)
 
     @overload
     def __rrshift__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRRshift[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rrshift__(
-        self: "SingleOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRRshift[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rrshift__(
-        self: "SingleOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rrshift__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _RSHIFT)
 
     @overload
     def __rand__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRAnd[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rand__(
-        self: "SingleOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRAnd[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rand__(
-        self: "SingleOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rand__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _AND)
 
     @overload
     def __ror__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanROr[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __ror__(
-        self: "SingleOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanROr[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __ror__(
-        self: "SingleOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __ror__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _OR)
 
     @overload
     def __rxor__(  # type: ignore[misc]
-        self: "SingleOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roller[ot.CanRXor[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rxor__(
-        self: "SingleOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]",
+        self: "Roller[ot.CanRXor[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rxor__(
-        self: "SingleOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
+        self: "Roller[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rxor__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _XOR)
 
     def __neg__(
-        self: "SingleOutcomeRoller[ot.CanNeg[_ResultT]]",
-    ) -> "SingleOutcomeRoller[_ResultT]":
-        return cast("SingleOutcomeRoller[_ResultT]", _UnaryRoller(self, _NEG))
-
-    def __pos__(
-        self: "SingleOutcomeRoller[ot.CanPos[_ResultT]]",
-    ) -> "SingleOutcomeRoller[_ResultT]":
-        return cast("SingleOutcomeRoller[_ResultT]", _UnaryRoller(self, _POS))
-
-    def __abs__(
-        self: "SingleOutcomeRoller[ot.CanAbs[_ResultT]]",
-    ) -> "SingleOutcomeRoller[_ResultT]":
-        return cast("SingleOutcomeRoller[_ResultT]", _UnaryRoller(self, _ABS))
-
-    def __invert__(
-        self: "SingleOutcomeRoller[ot.CanInvert[_ResultT]]",
-    ) -> "SingleOutcomeRoller[_ResultT]":
-        return cast("SingleOutcomeRoller[_ResultT]", _UnaryRoller(self, _INVERT))
-
-    @property
-    def operands(
-        self,
-    ) -> tuple["MultiOutcomeRoller[object] | SingleOutcomeRoller[object]", ...]:
-        r"""The immediate rollers consumed by this roller, if any."""
-        return ()
-
-    @abstractmethod
-    def metadata(self) -> dict[str, object]:
-        r"""Returns JSON-compatible metadata describing this roller."""
-
-    @final
-    def roll(self) -> "SingleOutcomeRoll[_T_co]":
-        r"""
-        Produces a sample outcome trace, reporting failures as [`RollError`][dyce.roller.RollError].
-
-        Subclasses implement the [`_roll` method][dyce.roller.SingleOutcomeRoller._roll] instead of overriding this method.
-        """
-        try:
-            return self._roll()
-        except RollError as exc:
-            exc.path = (self, *exc.path)
-            raise
-        except Exception as exc:
-            raise RollError(str(exc), (self,)) from exc
-
-    @abstractmethod
-    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        r"""
-        Subclass implementation hook for producing a sample outcome trace.
-
-        Child rollers should be called via their public [`roll` methods][dyce.roller.SingleOutcomeRoller.roll].
-        """
-
-
-class MultiOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
-    r"""
-    A deferred, traceable computation producing a tuple of outcomes.
-    “Multi” describes the collection result, which may contain just one outcome.
-    """
-
-    __slots__ = ()
-
-    # This and the other Roll-aware overloads preserve asymmetric expression typing
-    # for static checkers; runtime implementations defer Roll operands via NotImplemented.
-    @overload
-    def __add__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __add__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _ADD)
-
-    @overload
-    def __sub__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __sub__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _SUB)
-
-    @overload
-    def __mul__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __mul__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _MUL)
-
-    @overload
-    def __truediv__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __truediv__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _TRUEDIV)
-
-    @overload
-    def __floordiv__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __floordiv__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _FLOORDIV)
-
-    @overload
-    def __mod__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __mod__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _MOD)
-
-    @overload
-    def __pow__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __pow__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[_T_co]",
-        rhs: "SingleOutcomeRoll[ot.CanRPow[_T_co, _ResultT]] | MultiOutcomeRoll[ot.CanRPow[_T_co, _ResultT]]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __pow__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _POW)
-
-    @overload
-    def __lshift__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __lshift__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _LSHIFT)
-
-    @overload
-    def __rshift__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rshift__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _RSHIFT)
-
-    @overload
-    def __and__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __and__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _AND)
-
-    @overload
-    def __or__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __or__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _OR)
-
-    @overload
-    def __xor__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __xor__(self, rhs: object) -> object:
-        return _binary_roller(self, rhs, _XOR)
-
-    @overload
-    def __radd__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __radd__(
-        self: "MultiOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __radd__(
-        self: "MultiOutcomeRoller[ot.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __radd__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _ADD)
-
-    @overload
-    def __rsub__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rsub__(
-        self: "MultiOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rsub__(
-        self: "MultiOutcomeRoller[ot.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rsub__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _SUB)
-
-    @overload
-    def __rmul__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rmul__(
-        self: "MultiOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rmul__(
-        self: "MultiOutcomeRoller[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rmul__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _MUL)
-
-    @overload
-    def __rtruediv__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rtruediv__(
-        self: "MultiOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rtruediv__(
-        self: "MultiOutcomeRoller[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rtruediv__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _TRUEDIV)
-
-    @overload
-    def __rfloordiv__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rfloordiv__(
-        self: "MultiOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rfloordiv__(
-        self: "MultiOutcomeRoller[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rfloordiv__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _FLOORDIV)
-
-    @overload
-    def __rmod__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rmod__(
-        self: "MultiOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rmod__(
-        self: "MultiOutcomeRoller[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rmod__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _MOD)
-
-    @overload
-    def __rpow__(  # type: ignore[overload-overlap]
-        self: "MultiOutcomeRoller[_T_co]",
-        lhs: "SingleOutcomeRoll[ot.CanPow2[_T_co, _ResultT]] | MultiOutcomeRoll[ot.CanPow2[_T_co, _ResultT]]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rpow__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rpow__(
-        self: "MultiOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rpow__(
-        self: "MultiOutcomeRoller[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rpow__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _POW)
-
-    @overload
-    def __rlshift__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rlshift__(
-        self: "MultiOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rlshift__(
-        self: "MultiOutcomeRoller[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rlshift__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _LSHIFT)
-
-    @overload
-    def __rrshift__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rrshift__(
-        self: "MultiOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rrshift__(
-        self: "MultiOutcomeRoller[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rrshift__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _RSHIFT)
-
-    @overload
-    def __rand__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rand__(
-        self: "MultiOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rand__(
-        self: "MultiOutcomeRoller[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rand__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _AND)
-
-    @overload
-    def __ror__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __ror__(
-        self: "MultiOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __ror__(
-        self: "MultiOutcomeRoller[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __ror__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _OR)
-
-    @overload
-    def __rxor__(  # type: ignore[misc]
-        self: "MultiOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> "SingleOutcomeRoll[_ResultT]": ...
-    @overload
-    def __rxor__(
-        self: "MultiOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    @overload
-    def __rxor__(
-        self: "MultiOutcomeRoller[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
-    ) -> "SingleOutcomeRoller[_ResultT]": ...
-    def __rxor__(self, lhs: object) -> object:
-        return _binary_roller(lhs, self, _XOR)
-
-    def __neg__(
-        self: "MultiOutcomeRoller[ot.CanNeg[_ResultT]]",
+        self: "Roller[ot.CanNeg[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _NEG)
         )
 
     def __pos__(
-        self: "MultiOutcomeRoller[ot.CanPos[_ResultT]]",
+        self: "Roller[ot.CanPos[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _POS)
         )
 
     def __abs__(
-        self: "MultiOutcomeRoller[ot.CanAbs[_ResultT]]",
+        self: "Roller[ot.CanAbs[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _ABS)
         )
 
     def __invert__(
-        self: "MultiOutcomeRoller[ot.CanInvert[_ResultT]]",
+        self: "Roller[ot.CanInvert[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _INVERT)
@@ -1190,26 +642,19 @@ class MultiOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple["MultiOutcomeRoller[object] | SingleOutcomeRoller[object]", ...]:
-        r"""The immediate rollers consumed by this multi roller, if any."""
+    ) -> tuple["Roller[object]", ...]:
+        r"""The immediate rollers consumed by this roller, if any."""
         return ()
-
-    def at(
-        self: "MultiOutcomeRoller[_CanAddSameT]", which: GetItemT, *more: GetItemT
-    ) -> SingleOutcomeRoller[_CanAddSameT]:
-        r"""Returns a roller summing the outcomes at the selected positions."""
-        return self.select(which, *more).sum()
 
     @abstractmethod
     def metadata(self) -> dict[str, object]:
-        r"""Returns JSON-compatible metadata describing this multi roller."""
+        r"""Returns JSON-compatible metadata describing this roller."""
 
-    @final
-    def roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def roll(self) -> "Roll[_T_co]":
         r"""
         Produces a sample outcome collection trace, reporting failures as [`RollError`][dyce.roller.RollError].
 
-        Subclasses implement the [`_roll` method][dyce.roller.MultiOutcomeRoller._roll] instead of overriding this method.
+        Subclasses implement the [`_roll` method][dyce.roller.Roller._roll] instead of overriding this method.
         """
         try:
             return self._roll()
@@ -1220,17 +665,23 @@ class MultiOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
             raise RollError(str(exc), (self,)) from exc
 
     @abstractmethod
-    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "Roll[_T_co]":
         r"""
         Subclass implementation hook for producing a nonempty sample outcome collection trace.
 
         Raises `ValueError` if no outcomes can be produced.
-        Child rollers should be called via their public [`roll` methods][dyce.roller.MultiOutcomeRoller.roll].
+        Child rollers should be called via their public [`roll` methods][dyce.roller.Roller.roll].
         """
 
-    def select(self, which: GetItemT, *more: GetItemT) -> "MultiOutcomeRoller[_T_co]":
+    def at(
+        self: "Roller[_CanAddSameT]", which: GetItemT, *more: GetItemT
+    ) -> "SingleOutcomeRoller[_CanAddSameT]":
+        r"""Returns a roller summing the outcomes at the selected positions."""
+        return self.select(which, *more).sum()
+
+    def select(self, which: GetItemT, *more: GetItemT) -> "Roller[_T_co]":
         r"""
-        Returns a multi roller selecting the specified positions.
+        Returns a roller selecting the specified positions.
 
         Selectors are resolved against each tuple produced when rolling.
         Invalid indices raise at that time rather than during construction.
@@ -1238,10 +689,30 @@ class MultiOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
         return _SelectedPoolRoller(self, (which, *more))
 
     def sum(
-        self: "MultiOutcomeRoller[_CanAddSameT]",
-    ) -> SingleOutcomeRoller[_CanAddSameT]:
+        self: "Roller[_CanAddSameT]",
+    ) -> "SingleOutcomeRoller[_CanAddSameT]":
         r"""Returns a roller summing every outcome."""
+        if isinstance(self, SingleOutcomeRoller):
+            return self
         return _PoolSumRoller(self)
+
+
+class SingleOutcomeRoller(Roller[_T_co], ABC):
+    r"""A roller that always produces one outcome."""
+
+    __slots__ = ()
+
+    @final
+    def roll(self) -> "SingleOutcomeRoll[_T_co]":
+        return cast("SingleOutcomeRoll[_T_co]", super().roll())
+
+    @abstractmethod
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
+        r"""
+        Subclass implementation hook for producing a one-outcome roll.
+
+        Child rollers should be called through their public [`roll` methods][dyce.roller.SingleOutcomeRoller.roll].
+        """
 
 
 class HRoller(SingleOutcomeRoller[_T_co]):
@@ -1315,8 +786,8 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
         return SingleOutcomeRoll(self._value, self)
 
 
-class PRoller(MultiOutcomeRoller[_T_co]):
-    r"""A multi roller backed by a [`P`][dyce.P]."""
+class PRoller(Roller[_T_co]):
+    r"""A roller backed by a [`P`][dyce.P]."""
 
     __slots__ = ("_name", "_p")
 
@@ -1330,7 +801,7 @@ class PRoller(MultiOutcomeRoller[_T_co]):
 
     @property
     def p(self) -> P[_T_co]:
-        r"""Returns this multi roller’s [`P`][dyce.P] source object."""
+        r"""Returns this roller’s [`P`][dyce.P] source object."""
         return self._p
 
     def metadata(self) -> dict[str, object]:
@@ -1339,13 +810,13 @@ class PRoller(MultiOutcomeRoller[_T_co]):
             "name": self._name,
         }
 
-    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "Roll[_T_co]":
         outcomes = self._p.roll()
-        return MultiOutcomeRoll(outcomes, self)
+        return Roll(outcomes, self)
 
 
-class RollerPool(MultiOutcomeRoller[_T_co]):
-    r"""A multi roller backed by one or more [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] objects."""
+class RollerPool(Roller[_T_co]):
+    r"""A roller backed by one or more [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] objects."""
 
     __slots__ = ("_name", "_rollers")
 
@@ -1362,15 +833,15 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
+    ) -> tuple[Roller[object], ...]:
         return cast(
-            "tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]",
+            "tuple[Roller[object], ...]",
             self._rollers,
         )
 
     @property
     def rollers(self) -> tuple[SingleOutcomeRoller[_T_co], ...]:
-        r"""This multi roller’s [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] source objects."""
+        r"""This roller’s [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] source objects."""
         return self._rollers
 
     def metadata(self) -> dict[str, object]:
@@ -1379,7 +850,7 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
             metadata["name"] = self._name
         return metadata
 
-    def _roll(self) -> "MultiOutcomeRoll[_T_co]":
+    def _roll(self) -> "Roll[_T_co]":
         if not self._rollers:
             raise ValueError("no outcomes from an empty pool")
         rolls = [roller.roll() for roller in self._rollers]
@@ -1394,506 +865,557 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
             rolls.sort(key=lambda roll: natural_key(roll.outcome))
         outcomes = tuple(roll.outcome for roll in rolls)
         operands = cast(
-            "tuple[MultiOutcomeRoll[object] | SingleOutcomeRoll[object], ...]",
+            "tuple[Roll[object], ...]",
             tuple(rolls),
         )
-        return MultiOutcomeRoll(outcomes, self, operands)
+        return Roll(outcomes, self, operands)
 
 
 @dataclass(frozen=True, slots=True, eq=False)
-class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
-    r"""
-    An immutable outcome trace.
-    """
+class Roll(_HableOpsOptOut, Generic[_T_co]):
+    r"""An immutable trace of one or more outcomes."""
 
-    outcome: _T_co
-    roller: SingleOutcomeRoller[_T_co] = field(repr=False)
-    operands: tuple["MultiOutcomeRoll[object] | SingleOutcomeRoll[object]", ...] = (
-        field(default=(), repr=False)
-    )
+    outcomes: tuple[_T_co, ...]
+    roller: Roller[_T_co] = field(repr=False)
+    operands: tuple["Roll[object]", ...] = field(default=(), repr=False)
+
+    def __post_init__(self) -> None:
+        if not self.outcomes:
+            raise ValueError("a roll must contain at least one outcome")
 
     @overload
     def __add__(
-        self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __add__(
-        self: "SingleOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanAdd[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __add__(
         self,
         rhs: object,
     ) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _ADD)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _ADD)
 
     @overload
     def __sub__(
-        self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __sub__(
-        self: "SingleOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanSub[_OtherT, _ResultT]]",
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __sub__(
         self,
         rhs: object,
     ) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _SUB)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _SUB)
 
     @overload
     def __mul__(
-        self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanMul[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mul__(
-        self: "SingleOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mul__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _MUL)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _MUL)
 
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanTruediv[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "SingleOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __truediv__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _TRUEDIV)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _TRUEDIV)
 
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanFloordiv[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "SingleOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _FLOORDIV)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _FLOORDIV)
 
     @overload
     def __mod__(
-        self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanMod[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __mod__(
-        self: "SingleOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mod__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _MOD)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _MOD)
 
     @overload
     def __pow__(
-        self: "SingleOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __pow__(
-        self: "SingleOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanPow2[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __pow__(
-        self: "SingleOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __pow__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _POW)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _POW)
 
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanLshift[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "SingleOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _LSHIFT)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _LSHIFT)
 
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRshift[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "SingleOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rshift__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _RSHIFT)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _RSHIFT)
 
     @overload
     def __and__(
-        self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanAnd[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __and__(
-        self: "SingleOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __and__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _AND)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _AND)
 
     @overload
     def __or__(
-        self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanOr[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __or__(
-        self: "SingleOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __or__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _OR)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _OR)
 
     @overload
     def __xor__(
-        self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
+        self: "Roll[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "Roller[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanXor[_OtherT, _ResultT]]",
         rhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __xor__(
-        self: "SingleOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
+        self: "Roll[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __xor__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return self._binary_operator(rhs, _XOR)
+        return _as_roll(cast("object", self))._binary_operator(rhs, _XOR)
 
     @overload
     def __radd__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRAdd[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __radd__(
-        self: "SingleOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __radd__(
-        self: "SingleOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRAdd[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __radd__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _ADD)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _ADD)
 
     @overload
     def __rsub__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRSub[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rsub__(
-        self: "SingleOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRSub[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rsub__(
-        self: "SingleOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRSub[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rsub__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _SUB)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _SUB)
 
     @overload
     def __rmul__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRMul[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmul__(
-        self: "SingleOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRMul[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmul__(
-        self: "SingleOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRMul[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rmul__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _MUL)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MUL)
 
     @overload
     def __rtruediv__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRTruediv[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rtruediv__(
-        self: "SingleOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRTruediv[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rtruediv__(
-        self: "SingleOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRTruediv[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rtruediv__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _TRUEDIV)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _TRUEDIV)
 
     @overload
     def __rfloordiv__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rfloordiv__(
-        self: "SingleOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRFloordiv[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rfloordiv__(
-        self: "SingleOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRFloordiv[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rfloordiv__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _FLOORDIV)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _FLOORDIV)
 
     @overload
     def __rmod__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRMod[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmod__(
-        self: "SingleOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRMod[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rmod__(
-        self: "SingleOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRMod[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rmod__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _MOD)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MOD)
 
     @overload
     def __rpow__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRPow[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rpow__(
-        self: "SingleOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRPow[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rpow__(
-        self: "SingleOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRPow[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rpow__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _POW)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _POW)
 
     @overload
     def __rlshift__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRLshift[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rlshift__(
-        self: "SingleOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRLshift[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rlshift__(
-        self: "SingleOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRLshift[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rlshift__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _LSHIFT)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _LSHIFT)
 
     @overload
     def __rrshift__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRRshift[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rrshift__(
-        self: "SingleOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRRshift[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rrshift__(
-        self: "SingleOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRRshift[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rrshift__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _RSHIFT)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _RSHIFT)
 
     @overload
     def __rand__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRAnd[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rand__(
-        self: "SingleOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRAnd[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rand__(
-        self: "SingleOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRAnd[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rand__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _AND)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _AND)
 
     @overload
     def __ror__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanROr[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __ror__(
-        self: "SingleOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanROr[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __ror__(
-        self: "SingleOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanROr[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __ror__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _OR)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _OR)
 
     @overload
     def __rxor__(  # type: ignore[misc]
-        self: "SingleOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
+        self: "Roll[ot.CanRXor[_OtherT, _ResultT]]",
+        lhs: "Roll[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rxor__(
-        self: "SingleOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRXor[_OtherT, _ResultT]]",
         lhs: "HableT[_OtherT]",
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     @overload
     def __rxor__(
-        self: "SingleOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
+        self: "Roll[ot.CanRXor[_OtherT, _ResultT]]",
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rxor__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return self._reflected_binary_operator(lhs, _XOR)
+        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _XOR)
+
+    def sum(self: "Roll[_CanAddSameT]") -> "SingleOutcomeRoll[_CanAddSameT]":
+        r"""
+        Returns the sum of this roll’s outcomes.
+
+        Raises `ValueError` if there are no outcomes.
+        """
+        if isinstance(self, SingleOutcomeRoll):
+            return self
+        roller = self.roller.sum()
+        outcome = _sum_outcomes(self.outcomes)
+        return SingleOutcomeRoll(outcome, roller, (cast("Roll[object]", self),))
+
+    def trace(self) -> dict[str, object]:
+        r"""
+        Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
+
+        The `root` entry identifies a record in `rolls`.
+        Each roll’s `roller` entry identifies its producing roller in `rollers`.
+        Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
+        """
+        return _trace_from_root_roll(cast("Roll[object]", self))
+
+
+@dataclass(frozen=True, slots=True, eq=False, init=False)
+class SingleOutcomeRoll(Roll[_T_co]):
+    r"""An immutable trace containing one outcome."""
+
+    roller: SingleOutcomeRoller[_T_co] = field(repr=False)
+
+    def __init__(
+        self,
+        outcome: _T_co,
+        roller: SingleOutcomeRoller[_T_co],
+        operands: tuple["Roll[object]", ...] = (),
+    ) -> None:
+        super(SingleOutcomeRoll, self).__init__((outcome,), roller, operands)
+
+    @property
+    def outcome(self) -> _T_co:
+        return self.outcomes[0]
 
     def __neg__(
         self: "SingleOutcomeRoll[ot.CanNeg[_ResultT]]",
@@ -1915,20 +1437,10 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]":
         return cast("SingleOutcomeRoll[_ResultT]", self._unary_operator(_INVERT))
 
-    def trace(self) -> dict[str, object]:
-        r"""
-        Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
-
-        The `root` entry identifies a record in `rolls`.
-        Each roll’s `roller` entry identifies its producing roller in `rollers`.
-        Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
-        """
-        return _trace_from_root_roll(cast("SingleOutcomeRoll[object]", self))
-
     def _binary_operator(
         self, rhs: object, operator: _BinaryOperator
     ) -> "SingleOutcomeRoll[object]":
-        if isinstance(rhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
+        if isinstance(rhs, Roller):
             rhs = rhs.roll()
         elif isinstance(rhs, HableT):
             rhs = _as_roller(rhs).roll()
@@ -1942,7 +1454,7 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
     def _reflected_binary_operator(
         self, lhs: object, operator: _BinaryOperator
     ) -> "SingleOutcomeRoll[object]":
-        if isinstance(lhs, (SingleOutcomeRoller, MultiOutcomeRoller)):
+        if isinstance(lhs, Roller):
             lhs = lhs.roll()
         elif isinstance(lhs, HableT):
             lhs = _as_roller(lhs).roll()
@@ -1957,536 +1469,6 @@ class SingleOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
         roller: SingleOutcomeRoller[object] = _UnaryRoller(self.roller, operator)
         outcome = operator(self.outcome)
         return SingleOutcomeRoll(outcome, roller, (self,))
-
-
-@dataclass(frozen=True, slots=True, eq=False)
-class MultiOutcomeRoll(_HableOpsOptOut, Generic[_T_co]):
-    r"""An immutable trace of a collection of outcomes."""
-
-    outcomes: tuple[_T_co, ...]
-    roller: MultiOutcomeRoller[_T_co] = field(repr=False)
-    operands: tuple["MultiOutcomeRoll[object] | SingleOutcomeRoll[object]", ...] = (
-        field(default=(), repr=False)
-    )
-
-    def __post_init__(self) -> None:
-        if not self.outcomes:
-            raise ValueError("a roll must contain at least one outcome")
-
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __add__(
-        self: "MultiOutcomeRoll[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __add__(
-        self,
-        rhs: object,
-    ) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _ADD)
-
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __sub__(
-        self: "MultiOutcomeRoll[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __sub__(
-        self,
-        rhs: object,
-    ) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _SUB)
-
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mul__(
-        self: "MultiOutcomeRoll[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __mul__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _MUL)
-
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __truediv__(
-        self: "MultiOutcomeRoll[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __truediv__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _TRUEDIV)
-
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __floordiv__(
-        self: "MultiOutcomeRoll[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __floordiv__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _FLOORDIV)
-
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __mod__(
-        self: "MultiOutcomeRoll[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __mod__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _MOD)
-
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __pow__(
-        self: "MultiOutcomeRoll[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __pow__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _POW)
-
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __lshift__(
-        self: "MultiOutcomeRoll[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __lshift__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _LSHIFT)
-
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rshift__(
-        self: "MultiOutcomeRoll[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rshift__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _RSHIFT)
-
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __and__(
-        self: "MultiOutcomeRoll[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __and__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _AND)
-
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __or__(
-        self: "MultiOutcomeRoll[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __or__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _OR)
-
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __xor__(
-        self: "MultiOutcomeRoll[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __xor__(self, rhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._binary_operator(rhs, _XOR)
-
-    @overload
-    def __radd__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __radd__(
-        self: "MultiOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __radd__(
-        self: "MultiOutcomeRoll[ot.CanRAdd[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __radd__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _ADD)
-
-    @overload
-    def __rsub__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rsub__(
-        self: "MultiOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rsub__(
-        self: "MultiOutcomeRoll[ot.CanRSub[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rsub__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _SUB)
-
-    @overload
-    def __rmul__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rmul__(
-        self: "MultiOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rmul__(
-        self: "MultiOutcomeRoll[ot.CanRMul[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rmul__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MUL)
-
-    @overload
-    def __rtruediv__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rtruediv__(
-        self: "MultiOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rtruediv__(
-        self: "MultiOutcomeRoll[ot.CanRTruediv[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rtruediv__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _TRUEDIV)
-
-    @overload
-    def __rfloordiv__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rfloordiv__(
-        self: "MultiOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rfloordiv__(
-        self: "MultiOutcomeRoll[ot.CanRFloordiv[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rfloordiv__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _FLOORDIV)
-
-    @overload
-    def __rmod__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rmod__(
-        self: "MultiOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rmod__(
-        self: "MultiOutcomeRoll[ot.CanRMod[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rmod__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MOD)
-
-    @overload
-    def __rpow__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rpow__(
-        self: "MultiOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rpow__(
-        self: "MultiOutcomeRoll[ot.CanRPow[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rpow__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _POW)
-
-    @overload
-    def __rlshift__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rlshift__(
-        self: "MultiOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rlshift__(
-        self: "MultiOutcomeRoll[ot.CanRLshift[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rlshift__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _LSHIFT)
-
-    @overload
-    def __rrshift__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rrshift__(
-        self: "MultiOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rrshift__(
-        self: "MultiOutcomeRoll[ot.CanRRshift[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rrshift__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _RSHIFT)
-
-    @overload
-    def __rand__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rand__(
-        self: "MultiOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rand__(
-        self: "MultiOutcomeRoll[ot.CanRAnd[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rand__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _AND)
-
-    @overload
-    def __ror__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __ror__(
-        self: "MultiOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __ror__(
-        self: "MultiOutcomeRoll[ot.CanROr[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __ror__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _OR)
-
-    @overload
-    def __rxor__(  # type: ignore[misc]
-        self: "MultiOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "SingleOutcomeRoll[_OtherT] | MultiOutcomeRoll[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rxor__(
-        self: "MultiOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: "HableT[_OtherT]",
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    @overload
-    def __rxor__(
-        self: "MultiOutcomeRoll[ot.CanRXor[_OtherT, _ResultT]]",
-        lhs: _OtherT,
-    ) -> SingleOutcomeRoll[_ResultT]: ...
-    def __rxor__(self, lhs: object) -> SingleOutcomeRoll[object]:
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _XOR)
-
-    def sum(self: "MultiOutcomeRoll[_CanAddSameT]") -> SingleOutcomeRoll[_CanAddSameT]:
-        r"""
-        Returns the sum of this multi roll’s outcomes.
-
-        Raises `ValueError` if there are no outcomes.
-        """
-        roller = self.roller.sum()
-        outcome = _sum_outcomes(self.outcomes)
-        return SingleOutcomeRoll(
-            outcome, roller, (cast("MultiOutcomeRoll[object]", self),)
-        )
-
-    def trace(self) -> dict[str, object]:
-        r"""
-        Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
-
-        The `root` entry identifies a record in `rolls`.
-        Each roll’s `roller` entry identifies its producing roller in `rollers`.
-        Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
-        """
-        return _trace_from_root_roll(cast("MultiOutcomeRoll[object]", self))
 
 
 class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
@@ -2545,15 +1527,15 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
 
     def __init__(
         self,
-        pool_roller: MultiOutcomeRoller[_CanAddSameT],
+        pool_roller: Roller[_CanAddSameT],
     ) -> None:
         self._pool_roller = pool_roller
 
     @property
     def operands(
         self,
-    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
-        return (cast("MultiOutcomeRoller[object]", self._pool_roller),)
+    ) -> tuple[Roller[object], ...]:
+        return (cast("Roller[object]", self._pool_roller),)
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-sum"}
@@ -2561,17 +1543,15 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
         outcome = _sum_outcomes(pool_roll.outcomes)
-        return SingleOutcomeRoll(
-            outcome, self, (cast("MultiOutcomeRoll[object]", pool_roll),)
-        )
+        return SingleOutcomeRoll(outcome, self, (cast("Roll[object]", pool_roll),))
 
 
-class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
+class _SelectedPoolRoller(Roller[_T_co]):
     __slots__ = ("_parent", "_selectors")
 
     def __init__(
         self,
-        parent: MultiOutcomeRoller[_T_co],
+        parent: Roller[_T_co],
         selectors: tuple[GetItemT, ...],
     ) -> None:
         self._parent = parent
@@ -2580,8 +1560,8 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
-        return (cast("MultiOutcomeRoller[object]", self._parent),)
+    ) -> tuple[Roller[object], ...]:
+        return (cast("Roller[object]", self._parent),)
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -2594,19 +1574,19 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
             ],
         }
 
-    def _roll(self) -> MultiOutcomeRoll[_T_co]:
+    def _roll(self) -> Roll[_T_co]:
         parent_roll = self._parent.roll()
         outcomes = tuple(getitems(parent_roll.outcomes, self._selectors))
         if not outcomes:
             raise ValueError("no outcomes from an empty selection")
-        operands = (cast("MultiOutcomeRoll[object]", parent_roll),)
-        return MultiOutcomeRoll(outcomes, self, operands)
+        operands = (cast("Roll[object]", parent_roll),)
+        return Roll(outcomes, self, operands)
 
 
 @dataclass(frozen=True)
 class _TraceCall:
     callback: Callable[..., object]
-    sources: tuple[SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any], ...]
+    sources: tuple[Roller[Any], ...]
     name: str
     state: dict[str, Any]
 
@@ -2614,38 +1594,20 @@ class _TraceCall:
         return {"kind": "trace", "name": self.name, "state": self.state}
 
 
-class _TraceRoller:
+class _TraceRoller(Roller[_T_co]):
     def __init__(self, call: _TraceCall) -> None:
         self._call = call
 
     @property
-    def operands(
-        self,
-    ) -> tuple[SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any], ...]:
+    def operands(self) -> tuple[Roller[Any], ...]:
         return self._call.sources
 
     def metadata(self) -> dict[str, object]:
         return self._call.metadata()
 
-
-class _SingleOutcomeTraceRoller(_TraceRoller, SingleOutcomeRoller[_T_co]):
-    def _roll(self) -> SingleOutcomeRoll[_T_co]:
+    def _roll(self) -> Roll[_T_co]:
         result = _eval_trace_call(self._call)
-        if not isinstance(result, SingleOutcomeRoll):  # pragma: no cover
-            raise TypeError(
-                f"trace callback did not produce a single outcome when called again ({result!r})"
-            )
-        return SingleOutcomeRoll(result.outcome, self, (result,))
-
-
-class _MultiOutcomeTraceRoller(_TraceRoller, MultiOutcomeRoller[_T_co]):
-    def _roll(self) -> MultiOutcomeRoll[_T_co]:
-        result = _eval_trace_call(self._call)
-        if not isinstance(result, MultiOutcomeRoll):  # pragma: no cover
-            raise TypeError(
-                f"trace callback did not produce multiple outcomes when called again ({result!r})"
-            )
-        return MultiOutcomeRoll(result.outcomes, self, (result,))
+        return Roll(result.outcomes, self, (result,))
 
 
 class _RollerFactoryDecorator(Protocol):
@@ -2655,25 +1617,25 @@ class _RollerFactoryDecorator(Protocol):
     ) -> Callable[_ParamsT, SingleOutcomeRoller[_T]]: ...
     @overload
     def __call__(
-        self, fn: Callable[_ParamsT, MultiOutcomeRoller[_T]], /
-    ) -> Callable[_ParamsT, MultiOutcomeRoller[_T]]: ...
+        self, fn: Callable[_ParamsT, Roller[_T]], /
+    ) -> Callable[_ParamsT, Roller[_T]]: ...
 
 
-class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
-    def __init__(self, expression: MultiOutcomeRoller[_T_co], name: str) -> None:
+class _FactoryRoller(Roller[_T_co]):
+    def __init__(self, expression: Roller[_T_co], name: str) -> None:
         self._expression = expression
         self._name = name
 
     @property
-    def operands(self) -> tuple[MultiOutcomeRoller[_T_co], ...]:
+    def operands(self) -> tuple[Roller[_T_co], ...]:
         return (self._expression,)
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
-    def _roll(self) -> MultiOutcomeRoll[_T_co]:
+    def _roll(self) -> Roll[_T_co]:
         result = self._expression.roll()
-        return MultiOutcomeRoll(result.outcomes, self, (result,))
+        return Roll(result.outcomes, self, (result,))
 
 
 class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
@@ -2699,11 +1661,11 @@ def roller_factory(
 ) -> Callable[_ParamsT, SingleOutcomeRoller[_T]]: ...
 @overload
 def roller_factory(
-    fn: Callable[_ParamsT, MultiOutcomeRoller[_T]],
+    fn: Callable[_ParamsT, Roller[_T]],
     /,
     *,
     name: str | None = None,
-) -> Callable[_ParamsT, MultiOutcomeRoller[_T]]: ...
+) -> Callable[_ParamsT, Roller[_T]]: ...
 @overload
 def roller_factory(
     fn: None = None, /, *, name: str | None = None
@@ -2712,7 +1674,7 @@ def roller_factory(
     fn: Callable[..., object] | None = None, /, *, name: str | None = None
 ) -> Any:
     r"""
-    Decorates *fn* to wrap its returned [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] or [`MultiOutcomeRoller`][dyce.roller.MultiOutcomeRoller] so that *name* appears in [`SingleOutcomeRoll`][dyce.roller.SingleOutcomeRoll] traces.
+    Decorates *fn* to wrap its returned [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] or [`Roller`][dyce.roller.Roller] so that *name* appears in [`SingleOutcomeRoll`][dyce.roller.SingleOutcomeRoll] traces.
 
     If not provided, *name* defaults to the *fn*’s `__name__` or its type’s `__name__`.
 
@@ -2752,16 +1714,14 @@ def roller_factory(
         )
 
         @wraps(factory)
-        def wrapped(
-            *args: object, **kwargs: object
-        ) -> SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any]:
+        def wrapped(*args: object, **kwargs: object) -> Roller[Any]:
             expression = factory(*args, **kwargs)
             if isinstance(expression, SingleOutcomeRoller):
                 return _SingleOutcomeFactoryRoller(expression, resolved_name)
-            if isinstance(expression, MultiOutcomeRoller):
-                return _MultiOutcomeFactoryRoller(expression, resolved_name)
+            if isinstance(expression, Roller):
+                return _FactoryRoller(expression, resolved_name)
             raise TypeError(
-                "roller factories must return a SingleOutcomeRoller or MultiOutcomeRoller"
+                "roller factories must return a SingleOutcomeRoller or Roller"
             )
 
         return wrapped
@@ -2771,47 +1731,29 @@ def roller_factory(
 
 @overload
 def trace(
-    callback: Callable[[], MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT]],
+    callback: Callable[[], Roll[_ResultT] | Roller[_ResultT]],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[[], SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT]],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[[], _ResultT],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: SingleOutcomeRoller[_T1],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[[SingleOutcomeRoll[_T1]], _ResultT],
@@ -2819,61 +1761,38 @@ def trace(
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
+    source1: Roller[_T1],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
+    callback: Callable[[Roll[_T1]], _ResultT],
+    source1: Roller[_T1],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[[MultiOutcomeRoll[_T1]], _ResultT],
-    source1: MultiOutcomeRoller[_T1],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: SingleOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[[SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
@@ -2882,111 +1801,75 @@ def trace(
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1], SingleOutcomeRoll[_T2]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
+    callback: Callable[[Roll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[[MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
-    source1: MultiOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [SingleOutcomeRoll[_T1], Roll[_T2]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source2: Roller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
+    callback: Callable[[SingleOutcomeRoll[_T1], Roll[_T2]], _ResultT],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source2: Roller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[[SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2]], _ResultT],
-    source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1], Roll[_T2]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    callback: Callable[[Roll[_T1], Roll[_T2]], _ResultT],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[[MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2]], _ResultT],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
@@ -2994,20 +1877,7 @@ def trace(
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: SingleOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    source3: SingleOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -3020,305 +1890,197 @@ def trace(
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    source3: SingleOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        [Roll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
         _ResultT,
     ],
-    source1: MultiOutcomeRoller[_T1],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [SingleOutcomeRoll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source2: Roller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: SingleOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
+        [SingleOutcomeRoll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
         _ResultT,
     ],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source2: Roller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
+    callback: Callable[[Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]], _ResultT],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
     source3: SingleOutcomeRoller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], SingleOutcomeRoll[_T3]], _ResultT
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: SingleOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: SingleOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
         _ResultT,
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: MultiOutcomeRoller[_T1],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
+    callback: Callable[[Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]], _ResultT],
+    source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [MultiOutcomeRoll[_T1], SingleOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: SingleOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
+        [SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source2: Roller[_T2],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
+    callback: Callable[[SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]], _ResultT],
     source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source2: Roller[_T2],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
-        [SingleOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
+        [Roll[_T1], Roll[_T2], Roll[_T3]],
+        Roll[_ResultT] | Roller[_ResultT],
     ],
-    source1: SingleOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
+    callback: Callable[[Roll[_T1], Roll[_T2], Roll[_T3]], _ResultT],
+    source1: Roller[_T1],
+    source2: Roller[_T2],
+    source3: Roller[_T3],
     *,
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]],
-        SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT],
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
-    *,
+    callback: Callable[..., Roll[_ResultT] | Roller[_ResultT]],
+    *sources: Roller[Any],
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        [MultiOutcomeRoll[_T1], MultiOutcomeRoll[_T2], MultiOutcomeRoll[_T3]], _ResultT
-    ],
-    source1: MultiOutcomeRoller[_T1],
-    source2: MultiOutcomeRoller[_T2],
-    source3: MultiOutcomeRoller[_T3],
-    *,
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[..., MultiOutcomeRoll[_ResultT] | MultiOutcomeRoller[_ResultT]],
-    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> MultiOutcomeRoll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[
-        ..., SingleOutcomeRoll[_ResultT] | SingleOutcomeRoller[_ResultT]
-    ],
-    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
-    name: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[..., _ResultT],
-    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    *sources: Roller[Any],
     name: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> SingleOutcomeRoll[_ResultT]: ...
+) -> Roll[_ResultT]: ...
 def trace(
     callback: Callable[..., object],
-    *sources: SingleOutcomeRoller[Any] | MultiOutcomeRoller[Any],
+    *sources: Roller[Any],
     name: str | None = None,
     **state: Any,
-) -> SingleOutcomeRoll[Any] | MultiOutcomeRoll[Any]:
+) -> Roll[Any]:
     r"""
     Rolls *sources*, calls *callback* with those rolls and *state*, and returns a named outcome trace.
 
@@ -3358,18 +2120,7 @@ def trace(
     )
     try:
         result = _eval_trace_call(call)
-        if isinstance(result, MultiOutcomeRoll):
-            return MultiOutcomeRoll(
-                result.outcomes,
-                _MultiOutcomeTraceRoller(call),
-                (result,),
-            )
-        else:
-            return SingleOutcomeRoll(
-                result.outcome,
-                _SingleOutcomeTraceRoller(call),
-                (result,),
-            )
+        return Roll(result.outcomes, _TraceRoller(call), (result,))
     except RollError as exc:
         exc.path = (call, *exc.path)
         raise
@@ -3378,32 +2129,26 @@ def trace(
 
 
 def _as_roll(
-    value: _T | SingleOutcomeRoll[_T] | MultiOutcomeRoll[_T],
+    value: _T | Roll[_T],
 ) -> SingleOutcomeRoll[_T]:
-    if isinstance(value, SingleOutcomeRoll):
-        return value
-    elif isinstance(value, MultiOutcomeRoll):
-        return cast("SingleOutcomeRoll[_T]", cast("MultiOutcomeRoll[Any]", value).sum())
+    if isinstance(value, Roll):
+        return cast("SingleOutcomeRoll[_T]", cast("Roll[Any]", value).sum())
     else:
         return LiteralRoller(value).roll()
 
 
 def _as_roller(
-    value: _T | HableT[_T] | MultiOutcomeRoller[_T] | SingleOutcomeRoller[_T],
+    value: _T | HableT[_T] | Roller[_T],
 ) -> SingleOutcomeRoller[_T]:
-    if isinstance(value, SingleOutcomeRoller):
-        return value
-    elif isinstance(value, MultiOutcomeRoller):
-        return cast(
-            "SingleOutcomeRoller[_T]", cast("MultiOutcomeRoller[Any]", value).sum()
-        )
+    if isinstance(value, Roller):
+        return cast("SingleOutcomeRoller[_T]", cast("Roller[Any]", value).sum())
     elif isinstance(value, H):
         return HRoller(value)
     elif isinstance(value, P):
         pool_roller = PRoller(value)
         return cast(
             "SingleOutcomeRoller[_T]",
-            cast("MultiOutcomeRoller[Any]", pool_roller).sum(),
+            cast("Roller[Any]", pool_roller).sum(),
         )
     elif isinstance(value, HableT):
         return HableRoller(value)
@@ -3416,28 +2161,23 @@ def _binary_roller(
     rhs: object,
     operator: _BinaryOperator,
 ) -> object:
-    if isinstance(lhs, (SingleOutcomeRoll, MultiOutcomeRoll)) or isinstance(
-        rhs, (SingleOutcomeRoll, MultiOutcomeRoll)
-    ):
+    if isinstance(lhs, Roll) or isinstance(rhs, Roll):
         return NotImplemented
     return _BinaryRoller(_as_roller(lhs), _as_roller(rhs), operator)
 
 
 def _eval_trace_call(
     call: _TraceCall,
-) -> SingleOutcomeRoll[Any] | MultiOutcomeRoll[Any]:
-    if any(
-        not isinstance(source, (SingleOutcomeRoller, MultiOutcomeRoller))
-        for source in call.sources
-    ):
+) -> Roll[Any]:
+    if any(not isinstance(source, Roller) for source in call.sources):
         # TODO(@posita): # ruff: ignore[missing-todo-link] - In theory, we might be able
         # to use a generic type alias to help reduce the number of overloads
         raise TypeError("trace sources must be rollers")
     inputs = tuple(source.roll() for source in call.sources)
     result = call.callback(*inputs, **call.state)
-    if isinstance(result, (SingleOutcomeRoller, MultiOutcomeRoller)):
+    if isinstance(result, Roller):
         result = result.roll()
-    elif not isinstance(result, (SingleOutcomeRoll, MultiOutcomeRoll)):
+    elif not isinstance(result, Roll):
         result = LiteralRoller(result).roll()
     return result
 
@@ -3447,16 +2187,14 @@ def _sum_outcomes(outcomes: tuple[_CanAddSameT, ...]) -> _CanAddSameT:
 
 
 def _trace_from_root_roll(
-    root_roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object],
+    root_roll: Roll[object],
 ) -> dict[str, object]:
     roller_ids: dict[int, str] = {}
     rollers: dict[str, dict[str, object]] = {}
     roll_ids: dict[int, str] = {}
     rolls: dict[str, dict[str, object]] = {}
 
-    def visit_roller(
-        roller: MultiOutcomeRoller[object] | SingleOutcomeRoller[object],
-    ) -> str:
+    def visit_roller(roller: Roller[object]) -> str:
         key = id(roller)
         if key in roller_ids:
             return roller_ids[key]
@@ -3471,7 +2209,7 @@ def _trace_from_root_roll(
         }
         return roller_id
 
-    def visit_roll(roll: MultiOutcomeRoll[object] | SingleOutcomeRoll[object]) -> str:
+    def visit_roll(roll: Roll[object]) -> str:
         key = id(roll)
         if key in roll_ids:
             return roll_ids[key]
@@ -3482,10 +2220,10 @@ def _trace_from_root_roll(
         roller_id = visit_roller(roll.roller)
         operand_ids = [visit_roll(operand) for operand in roll.operands]
         roll_data: dict[str, object]
-        if isinstance(roll, MultiOutcomeRoll):
-            roll_data = {"outcomes": list(roll.outcomes)}
-        else:
+        if isinstance(roll, SingleOutcomeRoll):
             roll_data = {"outcome": roll.outcome}
+        else:
+            roll_data = {"outcomes": list(roll.outcomes)}
         rolls[roll_id] = {
             "roller": roller_id,
             **roll_data,
