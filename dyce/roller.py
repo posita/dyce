@@ -20,8 +20,8 @@ Interfaces may change substantially or disappear.
 """
 
 import operator
-from abc import abstractmethod
-from collections.abc import Callable, Iterable, Iterator
+from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import reduce, wraps
 from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, final, overload
@@ -128,7 +128,7 @@ _ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
 _INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
 
-class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
+class SingleOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
     r"""A computation capable of producing deferred, traceable samples."""
 
     __slots__ = ()
@@ -142,7 +142,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __add__(
         self: "SingleOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __add__(
@@ -165,7 +165,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __sub__(
         self: "SingleOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __sub__(
@@ -188,7 +188,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __mul__(
         self: "SingleOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mul__(
@@ -210,7 +210,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __truediv__(
         self: "SingleOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __truediv__(
@@ -232,7 +232,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __floordiv__(
         self: "SingleOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __floordiv__(
@@ -254,7 +254,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __mod__(
         self: "SingleOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mod__(
@@ -281,7 +281,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __pow__(
         self: "SingleOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __pow__(
@@ -303,7 +303,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __lshift__(
         self: "SingleOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __lshift__(
@@ -325,7 +325,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __rshift__(
         self: "SingleOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rshift__(
@@ -347,7 +347,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __and__(
         self: "SingleOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __and__(
@@ -369,7 +369,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __or__(
         self: "SingleOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __or__(
@@ -391,7 +391,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __xor__(
         self: "SingleOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __xor__(
@@ -671,7 +671,7 @@ class SingleOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
         """
 
 
-class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
+class MultiOutcomeRoller(_HableOpsOptOut, ABC, Generic[_T_co]):
     r"""
     A deferred, traceable computation producing a tuple of outcomes.
     “Multi” describes the collection result, which may contain just one outcome.
@@ -689,7 +689,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __add__(
         self: "MultiOutcomeRoller[ot.CanAdd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __add__(
@@ -711,7 +711,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __sub__(
         self: "MultiOutcomeRoller[ot.CanSub[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __sub__(
@@ -733,7 +733,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __mul__(
         self: "MultiOutcomeRoller[ot.CanMul[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mul__(
@@ -755,7 +755,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __truediv__(
         self: "MultiOutcomeRoller[ot.CanTruediv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __truediv__(
@@ -777,7 +777,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __floordiv__(
         self: "MultiOutcomeRoller[ot.CanFloordiv[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __floordiv__(
@@ -799,7 +799,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __mod__(
         self: "MultiOutcomeRoller[ot.CanMod[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __mod__(
@@ -826,7 +826,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __pow__(
         self: "MultiOutcomeRoller[ot.CanPow2[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __pow__(
@@ -848,7 +848,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __lshift__(
         self: "MultiOutcomeRoller[ot.CanLshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __lshift__(
@@ -870,7 +870,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __rshift__(
         self: "MultiOutcomeRoller[ot.CanRshift[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __rshift__(
@@ -892,7 +892,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __and__(
         self: "MultiOutcomeRoller[ot.CanAnd[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __and__(
@@ -914,7 +914,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __or__(
         self: "MultiOutcomeRoller[ot.CanOr[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __or__(
@@ -936,7 +936,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     @overload
     def __xor__(
         self: "MultiOutcomeRoller[ot.CanXor[_OtherT, _ResultT]]",
-        rhs: "SingleOutcomeRoller[_OtherT]",
+        rhs: "SingleOutcomeRoller[_OtherT] | MultiOutcomeRoller[_OtherT]",
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     @overload
     def __xor__(
@@ -1200,19 +1200,6 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
         r"""Returns a roller summing the outcomes at the selected positions."""
         return self.select(which, *more).sum()
 
-    def h(self) -> H[_T_co]:
-        r"""Returns the distribution of the sum of this multi roller's outcomes."""
-        return cast(
-            "H[_T_co]",
-            H.from_counts(
-                (
-                    (_sum_outcomes(cast("Iterable[Any]", roll)), count)
-                    for roll, count in self.rolls_with_counts()
-                    if roll
-                )
-            ),
-        )
-
     @abstractmethod
     def metadata(self) -> dict[str, object]:
         r"""Returns JSON-compatible metadata describing this multi roller."""
@@ -1241,15 +1228,11 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
         Child rollers should be called via their public [`roll` methods][dyce.roller.MultiOutcomeRoller.roll].
         """
 
-    @abstractmethod
-    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        r"""Yields the possible pool outcomes and their weights."""
-
     def select(self, which: GetItemT, *more: GetItemT) -> "MultiOutcomeRoller[_T_co]":
         r"""
         Returns a multi roller selecting the specified positions.
 
-        Selectors are resolved against each tuple produced when rolling or enumerating outcomes.
+        Selectors are resolved against each tuple produced when rolling.
         Invalid indices raise at that time rather than during construction.
         """
         return _SelectedPoolRoller(self, (which, *more))
@@ -1257,11 +1240,7 @@ class MultiOutcomeRoller(_HableOpsOptOut, HableT[_T_co]):
     def sum(
         self: "MultiOutcomeRoller[_CanAddSameT]",
     ) -> SingleOutcomeRoller[_CanAddSameT]:
-        r"""
-        Returns a roller summing every outcome.
-
-        An empty pool or selection has an empty sum distribution and raises `ValueError` when rolled.
-        """
+        r"""Returns a roller summing every outcome."""
         return _PoolSumRoller(self)
 
 
@@ -1275,7 +1254,8 @@ class HRoller(SingleOutcomeRoller[_T_co]):
         self._h = h
         self._name = name if name is not None else str(h)
 
-    def h(self) -> H[_T_co]:
+    @property
+    def h(self) -> HableT[_T_co]:
         r"""Returns this roller’s [`H`][dyce.H] source object."""
         return self._h
 
@@ -1304,9 +1284,6 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
         r"""Returns this roller’s [`HableT`][dyce.HableT] source object."""
         return self._hable
 
-    def h(self) -> H[_T_co]:
-        return self._hable.h()
-
     def metadata(self) -> dict[str, object]:
         return {
             "kind": "source",
@@ -1314,7 +1291,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
         }
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        return SingleOutcomeRoll(self.h().roll(), self)
+        return SingleOutcomeRoll(self._hable.h().roll(), self)
 
 
 class LiteralRoller(SingleOutcomeRoller[_T]):
@@ -1330,9 +1307,6 @@ class LiteralRoller(SingleOutcomeRoller[_T]):
     def value(self) -> _T:
         r"""Returns this roller’s source value."""
         return self._value
-
-    def h(self) -> H[_T]:
-        return H({self._value: 1})
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "literal", "value": self._value}
@@ -1359,9 +1333,6 @@ class PRoller(MultiOutcomeRoller[_T_co]):
         r"""Returns this multi roller’s [`P`][dyce.P] source object."""
         return self._p
 
-    def h(self) -> H[_T_co]:
-        return self._p.h()
-
     def metadata(self) -> dict[str, object]:
         return {
             "kind": "pool-source",
@@ -1371,9 +1342,6 @@ class PRoller(MultiOutcomeRoller[_T_co]):
     def _roll(self) -> "MultiOutcomeRoll[_T_co]":
         outcomes = self._p.roll()
         return MultiOutcomeRoll(outcomes, self)
-
-    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        yield from self._p.rolls_with_counts()
 
 
 class RollerPool(MultiOutcomeRoller[_T_co]):
@@ -1405,9 +1373,6 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
         r"""This multi roller’s [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] source objects."""
         return self._rollers
 
-    def h(self) -> H[_T_co]:
-        return P(*(roller.h() for roller in self._rollers)).h()
-
     def metadata(self) -> dict[str, object]:
         metadata: dict[str, object] = {"kind": "pool"}
         if self._name is not None:
@@ -1433,9 +1398,6 @@ class RollerPool(MultiOutcomeRoller[_T_co]):
             tuple(rolls),
         )
         return MultiOutcomeRoll(outcomes, self, operands)
-
-    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        yield from P(*(roller.h() for roller in self._rollers)).rolls_with_counts()
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -2544,9 +2506,6 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._left, self._right)
 
-    def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", self._operator(self._left.h(), self._right.h()))
-
     def metadata(self) -> dict[str, object]:
         return {"kind": "binary", "operator": self._operator.name}
 
@@ -2572,9 +2531,6 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._operand,)
 
-    def h(self) -> H[_ResultT]:
-        return cast("H[_ResultT]", self._operator(self._operand.h()))
-
     def metadata(self) -> dict[str, object]:
         return {"kind": "unary", "operator": self._operator.name}
 
@@ -2598,9 +2554,6 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
         self,
     ) -> tuple[MultiOutcomeRoller[object] | SingleOutcomeRoller[object], ...]:
         return (cast("MultiOutcomeRoller[object]", self._pool_roller),)
-
-    def h(self) -> H[_CanAddSameT]:
-        return self._pool_roller.h()
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "pool-sum"}
@@ -2649,12 +2602,6 @@ class _SelectedPoolRoller(MultiOutcomeRoller[_T_co]):
         operands = (cast("MultiOutcomeRoll[object]", parent_roll),)
         return MultiOutcomeRoll(outcomes, self, operands)
 
-    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        yield from (
-            (tuple(getitems(roll, self._selectors)), count)
-            for roll, count in self._parent.rolls_with_counts()
-        )
-
 
 @dataclass(frozen=True)
 class _TraceCall:
@@ -2680,11 +2627,6 @@ class _TraceRoller:
     def metadata(self) -> dict[str, object]:
         return self._call.metadata()
 
-    def h(self) -> H[Any]:  # pragma: no cover
-        raise NotImplementedError(
-            "trace callbacks do not support distribution computation"
-        )
-
 
 class _SingleOutcomeTraceRoller(_TraceRoller, SingleOutcomeRoller[_T_co]):
     def _roll(self) -> SingleOutcomeRoll[_T_co]:
@@ -2704,13 +2646,6 @@ class _MultiOutcomeTraceRoller(_TraceRoller, MultiOutcomeRoller[_T_co]):
                 f"trace callback did not produce multiple outcomes when called again ({result!r})"
             )
         return MultiOutcomeRoll(result.outcomes, self, (result,))
-
-    def rolls_with_counts(
-        self,
-    ) -> Iterator[tuple[tuple[_T_co, ...], int]]:  # pragma: no cover
-        raise NotImplementedError(
-            "trace callbacks do not support distribution computation"
-        )
 
 
 class _RollerFactoryDecorator(Protocol):
@@ -2733,18 +2668,12 @@ class _MultiOutcomeFactoryRoller(MultiOutcomeRoller[_T_co]):
     def operands(self) -> tuple[MultiOutcomeRoller[_T_co], ...]:
         return (self._expression,)
 
-    def h(self) -> H[_T_co]:
-        return self._expression.h()
-
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
 
     def _roll(self) -> MultiOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return MultiOutcomeRoll(result.outcomes, self, (result,))
-
-    def rolls_with_counts(self) -> Iterator[tuple[tuple[_T_co, ...], int]]:
-        yield from self._expression.rolls_with_counts()
 
 
 class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
@@ -2755,9 +2684,6 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
     @property
     def operands(self) -> tuple[SingleOutcomeRoller[_T_co], ...]:
         return (self._expression,)
-
-    def h(self) -> H[_T_co]:
-        return self._expression.h()
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "factory", "name": self._name}
@@ -3516,13 +3442,8 @@ def _eval_trace_call(
     return result
 
 
-def _sum_outcomes(outcomes: Iterable[_CanAddSameT]) -> _CanAddSameT:
-    iterator = iter(outcomes)
-    try:
-        first = next(iterator)
-    except StopIteration:
-        raise ValueError("no outcomes to sum") from None
-    return reduce(operator.add, iterator, first)
+def _sum_outcomes(outcomes: tuple[_CanAddSameT, ...]) -> _CanAddSameT:
+    return reduce(operator.add, outcomes[1:], outcomes[0])
 
 
 def _trace_from_root_roll(
