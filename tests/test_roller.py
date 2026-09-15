@@ -557,7 +557,6 @@ class TestHableAndRollerBinaryArithmetic:
         right_roller = LiteralRoller(rhs)
         left_roll = left_roller.roll()
         right_roll = right_roller.roll()
-        expected_h = H({op(lhs, rhs): 1})
         expected_outcome = op(lhs, rhs)
 
         roller_results = (
@@ -575,7 +574,7 @@ class TestHableAndRollerBinaryArithmetic:
 
         for result in roller_results:
             assert isinstance(result, SingleOutcomeRoller)
-            assert result.h() == expected_h
+            assert result.roll().outcome == expected_outcome
 
         for result in roll_results:
             assert isinstance(result, SingleOutcomeRoll)
@@ -617,8 +616,6 @@ class TestHableAndRollerBinaryArithmetic:
             assert isinstance(wrapped, HableRoller)
             assert wrapped.hable is hable
             h_mock.assert_not_called()
-            assert combined.h() == H(6) + 1
-            h_mock.assert_called_once_with()
 
     def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
         h = H(8)
@@ -626,7 +623,6 @@ class TestHableAndRollerBinaryArithmetic:
         wrapped = combined.operands[1]
 
         assert isinstance(wrapped, HRoller)
-        assert wrapped.h() is h
         assert wrapped.metadata() == {"kind": "source", "name": str(h)}
 
     def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
@@ -685,7 +681,7 @@ class TestSingleOutcomeRoller:
         assert_type(~roller, SingleOutcomeRoller[int])
 
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_distributions_and_metadata(
+    def test_binary_operators_preserve_rolls_and_metadata(
         self,
         op: Callable[[Any, Any], Any],
         name: str,
@@ -695,14 +691,14 @@ class TestSingleOutcomeRoller:
         left_roller = LiteralRoller(lhs)
         right_roller = LiteralRoller(rhs)
         combined = op(left_roller, right_roller)
-        expected_h = H({op(lhs, rhs): 1})
+        expected_outcome = op(lhs, rhs)
 
-        assert combined.h() == expected_h
+        assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "binary", "operator": name}
         assert combined.operands == (left_roller, right_roller)
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_distributions_and_metadata(
+    def test_unary_operators_preserve_rolls_and_metadata(
         self,
         op: Callable[[Any], Any],
         name: str,
@@ -710,37 +706,27 @@ class TestSingleOutcomeRoller:
     ) -> None:
         roller = LiteralRoller(value)
         combined = op(roller)
-        expected_h = H({op(value): 1})
+        expected_outcome = op(value)
 
-        assert combined.h() == expected_h
+        assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "unary", "operator": name}
         assert combined.operands == (roller,)
 
 
 class TestHRoller:
-    def test_addition_preserves_distribution(self) -> None:
-        d6 = HRoller(H(6), name="d6")
+    def test_exposes_h_source(self) -> None:
+        h = H(6)
+        roller = HRoller(h, name="d6")
 
-        assert d6.metadata()["name"] == "d6"
-        assert (d6 + d6).h() == 2 @ H(6)
-        assert (d6 + H(6)).h() == 2 @ H(6)
-        assert (d6 + 2).h() == H(6) + 2
-        assert (2 + d6).h() == 2 + H(6)
+        assert_type(roller, HRoller[int])
+        assert roller.h is h
+        assert roller.metadata() == {"kind": "source", "name": "d6"}
 
-    def test_distribution_is_computed_lazily(self) -> None:
-        outcome = _AddableOutcome(1)
-        source = HRoller(H({outcome: 1}), name="source")
+    def test_uses_h_representation_as_default_name(self) -> None:
+        h = H(6)
+        roller = HRoller(h)
 
-        with patch.object(
-            _AddableOutcome,
-            "__add__",
-            autospec=True,
-            side_effect=_AddableOutcome.__add__,
-        ) as add:
-            combined = source + source
-            add.assert_not_called()
-            assert combined.h() == H({_AddableOutcome(2): 1})
-            add.assert_called_once_with(outcome, outcome)
+        assert roller.metadata() == {"kind": "source", "name": str(h)}
 
 
 class TestHableRoller:
@@ -750,7 +736,6 @@ class TestHableRoller:
 
         assert_type(roller, HableRoller[int])
         assert roller.hable is hable
-        assert roller.h() == H(6)
         assert roller.metadata() == {"kind": "source", "name": "d6"}
 
     def test_uses_hable_representation_as_default_name(self) -> None:
@@ -783,7 +768,6 @@ class TestLiteralRoller:
 
         assert_type(roller, LiteralRoller[int])
         assert roller.value == 3
-        assert roller.h() == H({3: 1})
         assert roller.metadata() == {"kind": "literal", "value": 3}
         assert roll.outcome == 3
         assert roll.roller is roller
@@ -846,7 +830,6 @@ class TestMultiOutcomeRoller:
         roll = summed.roll()
 
         assert_type(summed, SingleOutcomeRoller[str])  # zuban: ignore[misc]
-        assert summed.h() == H({"ab": 1})
         assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
         assert roll.outcome == "ab"
 
@@ -859,51 +842,19 @@ class TestMultiOutcomeRoller:
 
         assert_type(selection, MultiOutcomeRoller[int])  # zuban: ignore[misc]
         assert selection.operands == (parent_selection,)
-        assert list(selection.rolls_with_counts()) == [((1,), 1)]
         assert roll.outcomes == (1,)
         assert isinstance(parent_roll, MultiOutcomeRoll)
         assert parent_roll.outcomes == (3, 1)
-
-    def test_select_applies_selector_to_each_outcome_tuple_and_preserves_counts(
-        self,
-    ) -> None:
-        pool = PRoller(P(2))
-        with patch.object(
-            PRoller,
-            "rolls_with_counts",
-            return_value=iter(
-                [
-                    ((1, 2), 3),
-                    ((1, 2, 3), 4),
-                ]
-            ),
-        ):
-            assert list(pool.select(-1).rolls_with_counts()) == [((2,), 3), ((3,), 4)]
-
-    def test_h_excludes_empty_selection_results_from_distribution(self) -> None:
-        pool = PRoller(P(2))
-        with patch.object(
-            PRoller,
-            "rolls_with_counts",
-            return_value=iter(
-                [
-                    ((1,), 3),
-                    ((1, 2, 3), 4),
-                ]
-            ),
-        ):
-            assert pool.select(slice(1, None)).h() == H({5: 4})
 
     def test_at_returns_sum_of_selected_outcomes(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
         result = pool.at(-1, 0)
 
         assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert result.h() == H({4: 1})
         assert result.roll().outcome == 4
 
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_distributions_and_metadata(
+    def test_binary_operators_preserve_rolls_and_metadata(
         self,
         op: Callable[[Any, Any], Any],
         name: str,
@@ -913,23 +864,23 @@ class TestMultiOutcomeRoller:
         left = PRoller(P(H({lhs - 1: 1}), H({1: 1})), name="left")
         right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
         combined = op(left, right)
-        expected_h = H({op(lhs, rhs): 1})
+        expected_outcome = op(lhs, rhs)
         left_operand, right_operand = combined.operands
 
-        assert combined.h() == expected_h
+        assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "binary", "operator": name}
         assert left_operand.metadata() == {"kind": "pool-sum"}
         assert left_operand.operands == (left,)
         assert right_operand.metadata() == {"kind": "pool-sum"}
         assert right_operand.operands == (right,)
-        assert op(left, LiteralRoller(rhs)).h() == expected_h
-        assert op(LiteralRoller(lhs), right).h() == expected_h
-        assert op(lhs, right).h() == expected_h
-        assert op(P(H({lhs: 1})), right).h() == expected_h
-        assert op(left, P(H({rhs: 1}))).h() == expected_h
+        assert op(left, LiteralRoller(rhs)).roll().outcome == expected_outcome
+        assert op(LiteralRoller(lhs), right).roll().outcome == expected_outcome
+        assert op(lhs, right).roll().outcome == expected_outcome
+        assert op(P(H({lhs: 1})), right).roll().outcome == expected_outcome
+        assert op(left, P(H({rhs: 1}))).roll().outcome == expected_outcome
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_distributions_and_metadata(
+    def test_unary_operators_preserve_rolls_and_metadata(
         self,
         op: Callable[[Any], Any],
         name: str,
@@ -937,10 +888,10 @@ class TestMultiOutcomeRoller:
     ) -> None:
         pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
         combined = op(pool)
-        expected_h = H({op(value): 1})
+        expected_outcome = op(value)
         (operand,) = combined.operands
 
-        assert combined.h() == expected_h
+        assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "unary", "operator": name}
         assert operand.metadata() == {"kind": "pool-sum"}
         assert operand.operands == (pool,)
@@ -950,13 +901,6 @@ class TestPRoller:
     @pytest.mark.parametrize("size", [0, 1, 3])
     def test_length(self, size: int) -> None:
         assert len(PRoller(size @ P(6))) == size
-
-    def test_is_hable_as_aggregate_distribution(self) -> None:
-        p = P(H({1: 1}), H({2: 1}))
-        pool = PRoller(p, name="pool")
-
-        assert isinstance(pool, HableT)
-        assert pool.h() == p.h()
 
     def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
         p = P(H({2: 1}), H({1: 1}))
@@ -977,11 +921,6 @@ class TestPRoller:
         assert roll.outcomes == (1, 2)
         assert roll.roller is pool
         assert roll.operands == ()
-
-    def test_rolls_with_counts_matches_source_p(self) -> None:
-        p = P(H(2), H(3))
-
-        assert list(PRoller(p).rolls_with_counts()) == list(p.rolls_with_counts())
 
     def test_select_produces_multi_outcome_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
@@ -1012,20 +951,12 @@ class TestPRoller:
 
         assert isinstance(caught.value.__cause__, IndexError)
 
-    def test_empty_selection_has_empty_sum_distribution(self) -> None:
-        pool = PRoller(P(H({1: 1})), name="pool")
-
-        assert pool.select(slice(0)).sum().h() == H({})
-
-    def test_empty_p_produces_no_rolls(self) -> None:
+    def test_empty_p_sum_type_and_metadata(self) -> None:
         pool = PRoller(P())
         summed = pool.sum()
 
         assert_type(pool, PRoller[Never])  # zuban: ignore[misc]
         assert_type(summed, SingleOutcomeRoller[Never])  # zuban: ignore[misc]
-        assert list(pool.rolls_with_counts()) == []
-        assert pool.h() == H({})
-        assert summed.h() == H({})
         assert summed.metadata() == {"kind": "pool-sum"}
 
 
@@ -1041,8 +972,6 @@ class TestRollerPool:
         assert len(pool) == 2
         assert pool.rollers == (two, one)
         assert pool.operands == (two, one)
-        assert pool.h() == H({3: 1})
-        assert list(pool.rolls_with_counts()) == [((1, 2), 1)]
         assert roll.outcomes == (1, 2)
         assert tuple(operand.roller for operand in roll.operands) == (one, two)
         assert pool.metadata() == {"kind": "pool", "name": "pool"}
@@ -1061,15 +990,6 @@ class TestRollerPool:
         }
         assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
 
-    def test_selection_distribution_uses_each_source_roller_distribution(
-        self,
-    ) -> None:
-        d2 = HRoller(H(2), name="d2")
-        d3 = HRoller(H(3), name="d3")
-        pool = RollerPool(d2, d3)
-
-        assert pool.select(-1).sum().h() == H({1: 1, 2: 3, 3: 2})
-
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
         pool = RollerPool(
             HRoller(H({2j: 1})),
@@ -1077,23 +997,6 @@ class TestRollerPool:
         )
 
         assert pool.roll().outcomes == (1j, 2j)
-
-    def test_empty_pool_produces_no_rolls(self) -> None:
-        pool: RollerPool[Never] = RollerPool()
-
-        assert_type(pool, RollerPool[Never])
-        assert list(pool.rolls_with_counts()) == []
-        assert pool.h() == H({})
-        assert pool.sum().h() == H({})
-
-    def test_impossible_pool_produces_no_rolls_but_remains_an_empty_distribution(
-        self,
-    ) -> None:
-        impossible_pool = RollerPool(HRoller(H({}))).select(slice(0))
-
-        assert list(impossible_pool.rolls_with_counts()) == []
-        assert impossible_pool.h() == H({})
-        assert impossible_pool.sum().h() == H({})
 
 
 class TestSingleOutcomeFactoryRoller:
@@ -1148,15 +1051,6 @@ class TestSingleOutcomeFactoryRoller:
             return literal_roller
 
         assert factory().operands == (literal_roller,)
-
-    def test_h(self) -> None:
-        d6 = H(6)
-
-        @roller_factory
-        def factory() -> SingleOutcomeRoller[int]:
-            return HRoller(d6)
-
-        assert factory().h() == d6
 
     def test_returning_non_roller_raises(self) -> None:
         @roller_factory
@@ -1221,24 +1115,6 @@ class TestMultiOutcomeFactoryRoller:
             return p_roller
 
         assert factory().operands == (p_roller,)
-
-    def test_h(self) -> None:
-        p3d6 = 3 @ P(6)
-
-        @roller_factory
-        def factory() -> MultiOutcomeRoller[int]:
-            return PRoller(p3d6)
-
-        assert factory().h() == p3d6.h()
-
-    def test_rolls_with_counts(self) -> None:
-        p2d2 = 2 @ P(2)
-
-        @roller_factory
-        def factory() -> MultiOutcomeRoller[int]:
-            return PRoller(p2d2)
-
-        assert sorted(factory().rolls_with_counts()) == sorted(p2d2.rolls_with_counts())
 
 
 class TestSingleOutcomeRoll:
