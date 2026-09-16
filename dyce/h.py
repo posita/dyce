@@ -1345,9 +1345,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         r"""
         Returns a new [`H`][dyce.H] by applying *func* to outcomes.
 
-        If *operand* is provided, *func* should have two parameters, otherwise it should have one.
-        If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
-        If *operand* is a scalar, call `func(outcome, operand)` for each outcome, passing counts through unchanged.
+        If *other* is provided, *func* should have two parameters, otherwise it should have one.
+        If *other* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
+        If *other* is a scalar, call `func(outcome, other)` for each outcome, passing counts through unchanged.
 
         Resulting counts for duplicate outcomes are summed.
 
@@ -1387,7 +1387,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             >>> d6.apply(vs, d8)
             H({<Versus.LOSS: -1>: 27, <Versus.DRAW: 0>: 6, <Versus.WIN: 1>: 15})
 
-        Omitting *operand* allows examination of just the histogram.
+        Omitting *other* allows examination of just the histogram.
         One way to determine Apocalypse World outcomes with a modifier:
 
             >>> class PBTA(IntEnum):
