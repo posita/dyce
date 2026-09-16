@@ -116,12 +116,12 @@ class TestPlotBar:
     def test_no_args(self) -> None:
         ax = plot_bar()
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_empty_h(self) -> None:
         ax = plot_bar(d0)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
@@ -152,13 +152,13 @@ class TestPlotBar:
     def test_graph_type_at_most(self) -> None:
         ax = plot_bar(d6, graph_type=GraphType.AT_MOST)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether this affected
         # _values_for_graph_type's behavior
 
     def test_horizontal_graph_type_at_least(self) -> None:
         ax = plot_bar(d6, graph_type=GraphType.AT_LEAST, horizontal=True)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether this affected
         # _values_for_graph_type's behavior
 
 
@@ -166,7 +166,7 @@ class TestPlotBurst:
     def test_empty_h(self) -> None:
         ax = plot_burst(d0)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
@@ -177,7 +177,7 @@ class TestPlotBurst:
     def test_with_compare(self) -> None:
         ax = plot_burst(d8 + d12, h2d10)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for differing wedges
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for differing wedges
 
     def test_title(self) -> None:
         ax = plot_burst(d6, title="d6")
@@ -186,13 +186,13 @@ class TestPlotBurst:
     def test_custom_formatter(self) -> None:
         ax = plot_burst(d6, formatter=format_probability)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether formatter was
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether formatter was
         # actually used
 
     def test_custom_compare_formatter(self) -> None:
         ax = plot_burst(d6, d6, compare_formatter=format_outcome_name_probability)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether formatter was
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether formatter was
         # actually used
 
     def test_plot_burst(self) -> None:
@@ -271,12 +271,12 @@ class TestPlotLine:
     def test_no_args(self) -> None:
         ax = plot_line()
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_empty_h(self) -> None:
         ax = plot_line(d0)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
@@ -297,7 +297,7 @@ class TestPlotLine:
     def test_graph_type_at_most(self) -> None:
         ax = plot_line(d6, graph_type=GraphType.AT_MOST)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether this affected
         # _values_for_graph_type's behavior
 
     def test_markers_cycled(self) -> None:
@@ -310,12 +310,12 @@ class TestPlotRidge:
     def test_no_args(self) -> None:
         ax = plot_ridge()
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_empty_h(self) -> None:
         ax = plot_ridge(d0)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test for a blank graph
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test for a blank graph
 
     def test_respects_provided_ax(self) -> None:
         _, supplied = plt.subplots()
@@ -452,11 +452,11 @@ class TestPlotRidge:
     def test_graph_type_at_most(self) -> None:
         ax = plot_ridge(d6, graph_type=GraphType.AT_MOST)
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether this affected
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether this affected
         # _values_for_graph_type's behavior
 
     def test_cmap(self) -> None:
         ax = plot_ridge(d6, d8, cmap="plasma")
         assert ax is not None
-        # TODO(posita): # ruff: ignore[missing-todo-link] - test whether the color map
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether the color map
         # was used

@@ -69,11 +69,11 @@ class PlotSpec:
     )
 
     def as_dict(self) -> dict[str, Any]:
-        r"""Return the complete specification as plain mappings and lists."""
+        r"""Returns the complete specification as plain mappings and lists."""
         return {"data": self.data, "layout": self.layout, "config": self.config}
 
     def figure_dict(self) -> dict[str, Any]:
-        r"""Return the portion accepted by `plotly.graph_objects.Figure`."""
+        r"""Returns the portion accepted by `plotly.graph_objects.Figure`."""
         return {"data": self.data, "layout": self.layout}
 
 
@@ -88,12 +88,12 @@ def bar_spec(
     precision: int = _DEFAULT_PRECISION,
 ) -> PlotSpec:
     r"""
-    Return a portable Plotly figure specification for a grouped bar chart of one or more histograms.
+    Returns a portable Plotly figure specification for a grouped bar chart of one or more histograms.
 
-    Use *labels* to assign legend names to each histogram.
+    Uses *labels* to assign legend names to each histogram.
     Unmatched histograms receive an empty label.
 
-    *colors* assigns hues, cycling as needed.
+    *colors* assign hues, cycling as needed.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
@@ -165,12 +165,12 @@ def line_spec(
     precision: int = _DEFAULT_PRECISION,
 ) -> PlotSpec:
     r"""
-    Return a portable Plotly figure specification for a line graph of one or more histograms.
+    Returns a portable Plotly figure specification for a line graph of one or more histograms.
 
-    Use *labels* to assign legend names to each histogram.
+    Uses *labels* to assign legend names to each histogram.
     Unmatched histograms receive an empty label.
 
-    *colors* assigns hues, cycling as needed.
+    *colors* assign hues, cycling as needed.
 
     *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).
 
@@ -241,7 +241,7 @@ def ridge_spec(
     show_peak_labels: bool = True,
 ) -> PlotSpec:
     r"""
-    Return a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.
+    Returns a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.
 
     Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
     Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.

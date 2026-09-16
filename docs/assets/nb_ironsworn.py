@@ -53,7 +53,7 @@ from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
 style.use("bmh")
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %% editable=false
 from enum import IntEnum
@@ -116,7 +116,7 @@ data = [
     for result in results_by_action_mod.values()
 ]
 
-# TODO(posita): <https://github.com/pandas-dev/pandas/issues/54386>
+# TODO(@posita): <https://github.com/pandas-dev/pandas/issues/54386>
 df = pd.DataFrame(
     data,
     columns=[v.name for v in IronDramaticResult],

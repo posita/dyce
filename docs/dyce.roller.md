@@ -12,8 +12,11 @@
   Thank you!
   -->
 
-# `dyce.viz.plotly` package reference
+# `dyce.roller` package reference
 
-::: dyce.viz.plotly
+::: dyce.roller
     options:
+      filters:
+        - ""
+        - "^_roll$"
       members_order: source

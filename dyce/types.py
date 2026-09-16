@@ -97,7 +97,7 @@ GetItemT = SupportsIndex | slice
 
 def getitems(seq: Sequence[_T], keys: Iterable[GetItemT]) -> Iterator[_T]:
     r"""
-    Yield items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `slice`.
+    Yields items from *seq* selected by *keys*, where each key is either a [`SupportsIndex`][typing.SupportsIndex] or a `slice`.
 
         >>> from dyce.types import getitems
         >>> list(getitems([10, 20, 30, 40], [0, -1, slice(1, 3)]))
@@ -144,7 +144,7 @@ def lossless_int_or_not_implemented(candidate: SupportsInt) -> int | NotImplemen
 
 def natural_key(val: object) -> tuple[int | str, ...]:
     r"""
-    Return a sort key for *val* that orders embedded digit runs numerically.
+    Returns a sort key for *val* that orders embedded digit runs numerically.
 
     Splits `str(val)` on digit boundaries and converts each run of digits to an `int`, so that `"a10"` sorts after `"a2"`.
 

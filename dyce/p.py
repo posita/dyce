@@ -36,8 +36,7 @@ from typing import (
 
 import optype as ot
 
-from .h import H, aggregate_weighted, sum_h
-from .hable import HableOpsMixin
+from .h import H, HableOpsMixin, aggregate_weighted, sum_h
 from .lifecycle import ExperimentalWarning, experimental
 from .types import (
     GetItemT,
@@ -56,7 +55,10 @@ _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _StateT = TypeVar("_StateT")
-_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
+_AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
+_ParameterizedOutcomeT = TypeVar("_ParameterizedOutcomeT")
+_ParameterizedResultT = TypeVar("_ParameterizedResultT")
+_ParameterizedStateT = TypeVar("_ParameterizedStateT")
 
 RollT = tuple[_T, ...]
 RollCountT = tuple[RollT[_T], int]
@@ -64,13 +66,15 @@ RollProbT = tuple[RollT[_T], int, int]
 
 
 class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
-    r"""
-    Provides the four interfaces required for [`P.survey`][dyce.p.P.survey].
-    """
+    r"""Provides the four interfaces required for [`P.survey`][dyce.p.P.survey]."""
 
     @property
     def initial(self) -> _StateT | None:
-        r"By default, this is `None`."
+        r"""
+        Returns the initial state value for the first call to [`accumulate][dyce.p.SurveyorBase].
+
+        By default, this is `None`.
+        """
         return None
 
     @abstractmethod
@@ -81,9 +85,9 @@ class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
 
     def settle(self, state: _StateT) -> _ResultT:
         r"""
-        By default, this is *state* (i.e., the terminal states are themselves the outcomes).
+        Callback to finalize *state* after the last call to [`accumulate][dyce.p.SurveyorBase] if additional mutation is required.
 
-        This can be overridden if additional mutation is required.
+        By default, this returns *state* (i.e., the terminal states are themselves the outcomes).
         """
         return cast("_ResultT", state)
 
@@ -109,34 +113,44 @@ class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
 class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
     @overload
     def __init__(
-        self: "ParameterizedSurveyor[_T, _StateT, _StateT]",  # zuban: ignore[misc]
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        self: "ParameterizedSurveyor[_ParameterizedOutcomeT, _ParameterizedStateT, _ParameterizedStateT]",
+        accumulate: Callable[
+            [_ParameterizedStateT | None, _ParameterizedOutcomeT, int],
+            _ParameterizedStateT,
+        ],
+        order: Callable[
+            [Iterable[_ParameterizedOutcomeT]], Iterable[_ParameterizedOutcomeT]
+        ],
         *,
-        initial: _StateT | None = ...,
+        initial: _ParameterizedStateT | None = ...,
         settle: None = ...,
     ) -> None: ...
     @overload
     def __init__(
-        self: "ParameterizedSurveyor[_T, _StateT, _ResultT]",
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        self: "ParameterizedSurveyor[_ParameterizedOutcomeT, _ParameterizedStateT, _ParameterizedResultT]",
+        accumulate: Callable[
+            [_ParameterizedStateT | None, _ParameterizedOutcomeT, int],
+            _ParameterizedStateT,
+        ],
+        order: Callable[
+            [Iterable[_ParameterizedOutcomeT]], Iterable[_ParameterizedOutcomeT]
+        ],
         *,
-        initial: _StateT | None = ...,
-        settle: Callable[[_StateT], _ResultT],
+        initial: _ParameterizedStateT | None = ...,
+        settle: Callable[[_ParameterizedStateT], _ParameterizedResultT],
     ) -> None: ...
     def __init__(
         self,
-        accumulate: Callable[[_StateT | None, _T, int], _StateT],
-        order: Callable[[Iterable[_T]], Iterable[_T]],
+        accumulate: Callable[..., Any],
+        order: Callable[..., Any],
         *,
-        initial: _StateT | None = None,
-        settle: Callable[[_StateT], _ResultT] | None = None,
+        initial: Any = None,
+        settle: Callable[..., Any] | None = None,
     ) -> None:
-        self._accumulate = accumulate
-        self._order = order
-        self._initial = initial
-        self._settle = settle
+        self._accumulate: Callable[[_StateT | None, _T, int], _StateT] = accumulate
+        self._order: Callable[[Iterable[_T]], Iterable[_T]] = order
+        self._initial: _StateT | None = initial
+        self._settle: Callable[[_StateT], _ResultT] | None = settle
 
     @property
     def initial(self) -> _StateT | None:
@@ -184,23 +198,23 @@ class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
 
 
 class _WhichHSurveyor(
-    _WhichSurveyor[_ConvolvableT, tuple[_ConvolvableT | None, int], _ConvolvableT]
+    _WhichSurveyor[_AddableSameT, tuple[_AddableSameT | None, int], _AddableSameT]
 ):
-    def __init__(self, p: "P[_ConvolvableT]", selected: tuple[int, ...]) -> None:
+    def __init__(self, p: "P[_AddableSameT]", selected: tuple[int, ...]) -> None:
         super().__init__(p, selected)
         self._counts_by_index: Counter[int] = Counter(selected)
 
     @property
-    def initial(self) -> tuple[_ConvolvableT | None, int]:
+    def initial(self) -> tuple[_AddableSameT | None, int]:
         return None, (0 if self._ascending else self._p_len - 1)
 
-    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
+    @nobeartype  # triggers on P[~_AddableSameT].at(int), which technically works, because no addition is involved
     def accumulate(  # type: ignore[override] # ty: ignore[invalid-method-override]
         self,
-        state: tuple[_ConvolvableT | None, int],
-        outcome: _ConvolvableT,
+        state: tuple[_AddableSameT | None, int],
+        outcome: _AddableSameT,
         count: int,
-    ) -> tuple[_ConvolvableT | None, int]:
+    ) -> tuple[_AddableSameT | None, int]:
         sum_so_far, index_so_far = state
         selected_start, selected_stop = self._selected_bounds(index_so_far, count)
         for selected_pos in range(selected_start, selected_stop):
@@ -210,8 +224,8 @@ class _WhichHSurveyor(
         index_so_far += count if self._ascending else -count
         return sum_so_far, index_so_far
 
-    @nobeartype  # triggers on P[~_ConvolvableT].h(int), which technically works, because no addition is involved
-    def settle(self, state: tuple[_ConvolvableT | None, int]) -> _ConvolvableT:
+    @nobeartype  # triggers on P[~_AddableSameT].at(int), which technically works, because no addition is involved
+    def settle(self, state: tuple[_AddableSameT | None, int]) -> _AddableSameT:
         total, _ = state
         assert total is not None
         return total
@@ -275,7 +289,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         >>> p == P(4, 6, 8, 10, 12, 20)
         True
 
-    This class implements the [`HableT` protocol][dyce.HableT] and derives from the [`HableOpsMixin` class][dyce.HableOpsMixin], which means it can be “flattened” into a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
+    This class derives from [`HableT`][dyce.HableT] through [`HableOpsMixin`][dyce.HableOpsMixin], which means it can be “flattened” into a single histogram, either explicitly via the [`h` method][dyce.P.h], or implicitly by using arithmetic operations.
 
         >>> -p_d6
         H({-6: 1, -5: 1, -4: 1, -3: 1, -2: 1, -1: 1})
@@ -352,7 +366,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self,
         *init_vals: Any,
     ) -> None:
-        r"""Constructor."""
+        r"""
+        Constructs a [`P`][dyce.P] from zero or more *init_vals*, each of which can be a histogram, pool, or initializer shorthand value.
+        """
         super().__init__()
         self._h_groups: dict[H[_T_co], int]
         h_counts: Counter[H[_T_co]] = Counter()
@@ -455,7 +471,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             raise ValueError(
                 f"{type(self).__name__} requires non-negative operand for @ operator (found {n!r})"
             )
-        # TODO(posita): # ruff: ignore[missing-todo-link] - Put initialization logic in
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - Put initialization logic in
         # an _init helper method and have both this and __init__ use that helper method
         # The slow and safe way
         # return P(*chain.from_iterable(repeat(self, n)))  # ruff: ignore[commented-out-code]
@@ -479,9 +495,17 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     # ---- Properties ------------------------------------------------------------------
 
     @property
+    def is_homogeneous(self) -> int:
+        r"""
+        `True` if the number of distinct histograms in this pool is less than or equal to one.
+        """
+        return len(self._h_groups) <= 1
+
+    @property
     def total(self) -> int:
         r"""
         Equivalent to `prod(h.total for h in self)`.
+
         Consistent with the empty product, this is `1` for an empty pool.
         The result is cached to avoid redundant computation with multiple accesses.
         """
@@ -522,7 +546,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         apply_to_each: bool = False,
     ) -> "P[_ResultT]":
         r"""
-        Return a new [`P`][dyce.P] by applying *func* to each histogram via its [`H.apply`][dyce.H.apply] method.
+        Returns a new [`P`][dyce.P] by applying *func* to each histogram via its [`H.apply`][dyce.H.apply] method.
+
         If *other* is provided, *func* should have two parameters, otherwise it should have one.
 
         *func* is assumed to be idempotent, meaning that for each distinct histogram `h`, calling `h.apply(func, other)` should return the same result regardless of context.
@@ -552,7 +577,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         *which: GetItemT,
     ) -> H[_ResultT]:
         r"""
-        Return a new [`H`][dyce.H] by applying *func* to each roll.
+        Returns a new [`H`][dyce.H] by applying *func* to each roll.
+
         Shorthand for:
 
         ```python
@@ -573,7 +599,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         <!-- -- >
 
-            >>> best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))
+            >>> best_three_of_4d6 = (4 @ P(6)).at(slice(-3, None))
             >>> (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6
             True
 
@@ -593,32 +619,31 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         )
 
     @overload
-    def h(  # zuban: ignore[override]
-        self: "P[Never]", *which: GetItemT
-    ) -> H[Never]: ...
+    def at(self: "P[Never]", which: GetItemT, *more: GetItemT) -> H[Never]: ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def h(self: "P[ot.CanAddSame[int, int]]", *which: GetItemT) -> H[int]: ...
+    def at(
+        self: "P[ot.CanAddSame[int, int]]", which: GetItemT, *more: GetItemT
+    ) -> H[int]: ...
     @overload
-    def h(self: "P[_ConvolvableT]", *which: GetItemT) -> H[_ConvolvableT]: ...
+    def at(
+        self: "P[_AddableSameT]", which: GetItemT, *more: GetItemT
+    ) -> H[_AddableSameT]: ...
     @overload
-    def h(self: "P[_T]", which: int) -> H[_T]: ...
-    def h(self: "P[Any]", *which: GetItemT) -> H[Any]:  # type: ignore[misc] # ty: ignore[invalid-method-override]
+    def at(self: "P[_T]", which: int) -> H[_T]: ...
+    def at(self: "P[Any]", which: GetItemT, *more: GetItemT) -> H[Any]:
         r"""
-        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` protocol][dyce.HableT].
+        Returns a histogram representing the sum of the outcomes at the selected positions for each possible roll.
 
-            >>> (2 @ P(6)).h()
-            H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
-
-        When one or more optional *which* identifiers is provided, this is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(*which))` with optimizations.
+        This is roughly equivalent to `H((sum(roll), count) for roll, count in self.rolls_with_counts(which, *more))` with optimizations.
         Identifiers can be `int`s or `slice`s, and can be mixed.
 
         Taking the greatest of two six-sided dice can be modeled as:
 
             >>> p_2d6 = 2 @ P(6)
-            >>> p_2d6.h(-1)
+            >>> p_2d6.at(-1)
             H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
-            >>> print(p_2d6.h(-1).format(width=65))
+            >>> print(p_2d6.at(-1).format(width=65))
             avg |    4.47
             std |    1.40
               1 |   2.78% |#
@@ -631,9 +656,11 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         Taking the greatest two and least two faces of ten four-sided dice (`10d4`) can be modeled as:
 
             >>> p_10d4 = 10 @ P(4)
-            >>> p_10d4.h(slice(2), slice(-2, None))
+            >>> p_10d4.at(slice(2), slice(-2, None))
             H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
-            >>> print(p_10d4.h(slice(2), slice(-2, None)).format(width=65, scaled=True))
+            >>> print(
+            ...     p_10d4.at(slice(2), slice(-2, None)).format(width=65, scaled=True)
+            ... )
             avg |   10.00
             std |    0.91
               4 |   0.00% |
@@ -655,7 +682,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> d6 = H(6)
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
             >>> p = 2 @ P(d6, d6avg)
-            >>> p.h(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
+            >>> p.at(slice(None)) == p.h() == d6 + d6 + d6avg + d6avg
             True
 
         !!! note "On selection ordering"
@@ -664,7 +691,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             Where addition over the outcomes’ type is commutative, equivalence holds as expected:
 
                 >>> p_c = P(2, 3, 4)
-                >>> p_c.h(
+                >>> p_c.at(
                 ...     slice(None),  # select everything once
                 ...     slice(None),  # then select everything again
                 ... ) == 2 * p_c.h()
@@ -673,7 +700,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             Where outcomes define `__add__` as non-commutative (e.g., strings, sequences, etc.), ordering can affect construction under certain circumstances:
 
                 >>> p_nc = P(H(((1,), (2,))), H(((3,), (4,))), H(((5,), (6,))))
-                >>> p_nc.h(
+                >>> p_nc.at(
                 ...     slice(None),  # select everything once, then again, like above
                 ...     slice(None),  # pyright: ignore[reportCallIssue]
                 ... )
@@ -681,15 +708,13 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 >>> 2 * p_nc.h()  # type: ignore[operator]
                 H({(1, 3, 5, 1, 3, 5): 1, (1, 3, 6, 1, 3, 6): 1, ..., (2, 4, 5, 2, 4, 5): 1, (2, 4, 6, 2, 4, 6): 1})
         """
-        if not which:
-            return H({}) if len(self._h_groups) == 0 else sum_h(self)
         n = len(self)
         indices = tuple(range(n))
-        selected = tuple(getitems(indices, which or indices))
+        selected = tuple(getitems(indices, (which, *more)))
         if not selected:
             return H({})
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=ExperimentalWarning)
+            warnings.simplefilter("ignore", ExperimentalWarning)
             if len(selected) == 1 and len(self._h_groups) == 1:
                 h, count = next(iter(self._h_groups.items()))
                 return h.order_stat_for_n_at_pos(count, selected[0])
@@ -707,8 +732,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                         for h, count in self._h_groups.items()
                     )
                 )
-                return reduced.h(-1 if from_right else 0)
-            # Unlike rolls_with_counts, h can fold large selections directly without
+                return reduced.at(-1 if from_right else 0)
+            # Unlike rolls_with_counts, at can fold large selections directly without
             # materializing rolls, which becomes faster beyond roughly half the pool.
             if 1 < len(selected) <= n // 2:
                 h_groups = tuple(self._h_groups.items())
@@ -728,6 +753,28 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                     )
             return self.survey(_WhichHSurveyor(self, selected))
 
+    @overload
+    def h(self: "P[Never]") -> H[Never]: ...
+    @overload
+    # See <https://github.com/jorenham/optype/discussions/574>
+    def h(self: "P[ot.CanAddSame[int, int]]") -> H[int]: ...
+    @overload
+    def h(self: "P[_AddableSameT]") -> H[_AddableSameT]: ...
+    @overload
+    def h(self: "P[_T]") -> H[_T]: ...
+    def h(self: "P[Any]") -> H[Any]:
+        r"""
+        Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` abstract base][dyce.HableT].
+
+            >>> (2 @ P(6)).h()
+            H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
+        """
+        if len(self._h_groups) == 0:
+            return H({})
+        if self._len == 1:
+            return next(iter(self._h_groups))
+        return sum_h(self)
+
     @experimental
     def roll(self: "P[_T]") -> RollT[_T]:
         r"""
@@ -738,6 +785,8 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             This method “works” (i.e., falls back to a “natural” ordering of string representations) for outcomes whose relative values cannot be known (e.g., symbolic expressions).
             This is deliberate to allow random roll functionality where symbolic resolution is not needed or will happen later.
         """
+        if not self:
+            raise ValueError("no outcomes from an empty pool")
         roll = [h.roll() for h in self]
         try:
             roll.sort()  # pyright: ignore[reportCallIssue] # zuban: ignore[call-arg]
@@ -748,6 +797,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def rolls_with_counts(self: "P[_T]", *which: GetItemT) -> Iterator[RollCountT[_T]]:
         r"""
         Returns an iterator yielding `(roll, count)` pairs that collectively enumerate all distinct rolls of the pool.
+
         Each *roll* is a sorted tuple of outcomes (least to greatest); *count* is the number of ways that roll occurs.
 
         If one or more *which* arguments are provided (as `SupportsIndex` or `slice` values), each roll is filtered to the selected positions before yielding.
@@ -820,7 +870,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             )
             return
         if len(selected) == 1 and len(self._h_groups) > 1 and selected[0] in (0, n - 1):
-            extreme_h = self.h(-1 if selected[0] == n - 1 else 0)
+            extreme_h = self.at(-1 if selected[0] == n - 1 else 0)
             yield from (((outcome,), weight) for outcome, weight in extreme_h.items())
             return
         if 1 < len(selected) < n and (
@@ -875,7 +925,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         settle: Callable[[_StateT], _ResultT] | None = None,
     ) -> H[_StateT | _ResultT]:
         r"""
-        Return a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
+        Returns a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
 
         This implements a state-collapsing dynamic program similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
         Rather than enumerating every distinct roll (as [`apply_to_each_roll`][dyce.P.apply_to_each_roll] does), it sweeps the shared outcome axis once, and at each distinct outcome branches on how many dice show it.
@@ -889,11 +939,14 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         *accumulate* is called as `accumulate(state, outcome, count)` and returns the successor state.
         On the first (seed) call, *state* is `surveyor.initial`.
         *count* is the number of dice showing *outcome*, aggregated across all of the pool’s (possibly heterogeneous) histograms, and is always at least `1`.
-        *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
-        A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare successive *outcome* values rather than expecting to be notified of the absent ones.
         *state* must be hashable, since equal states are merged.
-
         *order* selects the sweep order over the shared outcome set.
+
+        !!! note "Only present outcomes are accumulated"
+
+            *accumulate* is invoked only for outcomes that at least one die shows, never for absent ones.
+            A mechanic that must reason about gaps in a sequence (e.g. the longest run of consecutive values) should therefore compare neighboring *outcome* values rather than expecting to be notified of the absent ones.
+
 
         If provided, *settle* maps each terminal state to the outcome recorded in the resulting [`H`][dyce.H].
         Otherwise, *accumulate*’s terminal states are themselves the outcomes.
@@ -925,7 +978,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             ...     order=survey_outcome_order_descending,
             ...     settle=lambda s: s[1],
             ... )
-            >>> keep == p_4d6.h(slice(-2, None))
+            >>> keep == p_4d6.at(slice(-2, None))
             True
         """
         if surveyor is None:
@@ -1080,6 +1133,30 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 # ---- Helpers -------------------------------------------------------------------------
 
 
+def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in ascending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort()  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
+    except TypeError:
+        result.sort(key=natural_key)
+    return result
+
+
+def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
+    r"""
+    Sorts *outcomes* in descending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
+    """
+    result = list(outcomes)
+    try:
+        result.sort(reverse=True)  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
+    except TypeError:
+        result.sort(key=natural_key, reverse=True)
+    return result
+
+
 def _rwc_heterogeneous_one_end(
     h_groups: tuple[tuple[H[_T], int], ...],
     k: int,
@@ -1087,7 +1164,8 @@ def _rwc_heterogeneous_one_end(
     from_right: bool,
 ) -> Iterator[RollCountT[_T]]:
     r"""
-    Yield the lowest or highest *k* outcomes from homogeneous groups.
+    Yields the lowest or highest *k* outcomes from homogeneous groups.
+
     Values outside each group’s own lowest or highest *k* cannot enter the combined selection, so group roll distributions can be merged and truncated incrementally.
     """
     if len(h_groups) == 1:
@@ -1121,7 +1199,8 @@ def _rwc_homogeneous_one_end(
     from_right: bool,
 ) -> Iterator[RollCountT[_T]]:
     r"""
-    Yield the lowest or highest *k* outcomes from *n* rolls of *h*.
+    Yields the lowest or highest *k* outcomes from *n* rolls of *h*.
+
     Once an outcome fills the remaining selected positions, a complementary binomial tail combines every possible assignment of the unselected dice.
     """
     ordered_outcomes = (
@@ -1177,27 +1256,3 @@ def _rwc_homogeneous_one_end(
             )
 
     yield from _generate(0, n, (), 1)
-
-
-def survey_outcome_order_ascending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Sorts *outcomes* in ascending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort()  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
-    except TypeError:
-        result.sort(key=natural_key)
-    return result
-
-
-def survey_outcome_order_descending(outcomes: Iterable[_T]) -> list[_T]:
-    r"""
-    Sorts *outcomes* in descending order using native comparison, falling back to [`natural_key`][dyce.types.natural_key] when outcomes are mutually incomparable.
-    """
-    result = list(outcomes)
-    try:
-        result.sort(reverse=True)  # pyright: ignore[reportCallIssue] # ty: ignore[invalid-argument-type] # zuban: ignore[call-arg]
-    except TypeError:
-        result.sort(key=natural_key, reverse=True)
-    return result

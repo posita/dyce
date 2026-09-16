@@ -19,8 +19,8 @@ def suppress_dyce_warnings() -> None:
     # before plugins (e.g,. coverage) can work their magic
     from dyce.lifecycle import ExperimentalWarning
 
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
-    warnings.filterwarnings("ignore", category=TruncationWarning)
+    warnings.simplefilter("ignore", ExperimentalWarning)
+    warnings.simplefilter("ignore", TruncationWarning)
 
 
 def pytest_ignore_collect(

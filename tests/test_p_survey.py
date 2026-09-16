@@ -17,6 +17,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
+from unittest.mock import Mock
 
 import pytest
 
@@ -209,7 +210,7 @@ def test_keep_highest_two_matches_native_h() -> None:
             order=survey_outcome_order_descending,
             settle=_keep_two_settle,
         )
-        assert got == pool.h(slice(-2, None))
+        assert got == pool.at(slice(-2, None))
 
 
 def test_keep_lowest_two_matches_native_h() -> None:
@@ -219,7 +220,7 @@ def test_keep_lowest_two_matches_native_h() -> None:
             order=survey_outcome_order_ascending,
             settle=_keep_two_settle,
         )
-        assert got == pool.h(slice(0, 2))
+        assert got == pool.at(slice(0, 2))
 
 
 def test_max_matches_native_h() -> None:
@@ -227,7 +228,7 @@ def test_max_matches_native_h() -> None:
         assert pool.survey(
             accumulate=_mech("max").accumulate,
             order=survey_outcome_order_ascending,
-        ) == pool.h(-1)
+        ) == pool.at(-1)
 
 
 def test_min_matches_native_h() -> None:
@@ -235,7 +236,7 @@ def test_min_matches_native_h() -> None:
         assert pool.survey(
             accumulate=_mech("min").accumulate,
             order=survey_outcome_order_ascending,
-        ) == pool.h(0)
+        ) == pool.at(0)
 
 
 def test_order_agnostic_mechanic_is_direction_invariant() -> None:
@@ -262,7 +263,7 @@ def test_count_blindness_is_safe_for_presence_but_not_multiplicity() -> None:
     assert pool.survey(
         accumulate=_max_next,
         order=survey_outcome_order_ascending,
-    ) == pool.h(-1)
+    ) == pool.at(-1)
 
     # ... but WRONG for a multiplicity mechanic: a count-blind sum adds each present
     # outcome once, dropping the extra dice on any doubled face.
@@ -287,19 +288,17 @@ def test_count_blindness_is_safe_for_presence_but_not_multiplicity() -> None:
 def test_accumulate_never_invoked_with_zero_count() -> None:
     # The positive-only contract: accumulate is called only for outcomes at least one
     # die shows, never for outcomes a branch places no dice on.
-    seen: list[tuple[int, int]] = []
-
-    def spy(state: int | None, outcome: int, count: int) -> int:
-        seen.append((outcome, count))
+    def accumulate(state: int | None, outcome: int, count: int) -> int:
         return (0 if state is None else state) + outcome * count
 
+    accumulate_mock = Mock(wraps=accumulate)
     (2 @ P(H({1: 1, 2: 1}))).survey(
-        accumulate=spy,
+        accumulate=accumulate_mock,
         initial=0,
         order=survey_outcome_order_ascending,
     )
-    assert seen  # it was called
-    assert all(count > 0 for _, count in seen)
+    accumulate_mock.assert_called()
+    assert all(invocation.args[2] > 0 for invocation in accumulate_mock.call_args_list)
 
 
 def test_empty_pool_returns_empty_h() -> None:
@@ -313,7 +312,7 @@ def test_empty_pool_returns_empty_h() -> None:
 def test_repeated_invocation_is_stable() -> None:
     # The memo is scoped per top-level call; repeated calls must be identical.
     pool = P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))
-    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
+    surveyor: ParameterizedSurveyor[int, int, int] = ParameterizedSurveyor(  # ty: ignore[invalid-assignment]
         accumulate=_largest_set_next,
         order=survey_outcome_order_ascending,
     )
@@ -329,7 +328,7 @@ def test_survey_without_surveyor_or_accumulate_raises() -> None:
 
 
 def test_survey_with_both_surveyor_and_kwargs_raises() -> None:
-    surveyor = ParameterizedSurveyor(  # zuban: ignore[var-annotated]
+    surveyor = ParameterizedSurveyor(
         accumulate=_sum_next, order=survey_outcome_order_ascending
     )
     survey: Any = P(6).survey
