@@ -131,8 +131,8 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
 
     __slots__ = ()
 
-    # This and the other Roll-aware overloads preserve asymmetric expression typing for
-    # static checkers. Runtime implementations defer Roll operands via NotImplemented.
+    # An operation with a Roll returns a Roll. These runtime methods return
+    # NotImplemented so the Roll operand handles it.
     @overload
     def __add__(  # type: ignore[overload-overlap]
         self: "Roller[ot.CanAdd[_OtherT, _ResultT]]",
@@ -726,7 +726,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
         self._name = name if name is not None else str(h)
 
     @property
-    def h(self) -> HableT[_T_co]:
+    def h(self) -> H[_T_co]:
         r"""Returns this roller’s [`H`][dyce.H] source object."""
         return self._h
 
@@ -765,24 +765,24 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
         return SingleOutcomeRoll(self._hable.h().roll(), self)
 
 
-class LiteralRoller(SingleOutcomeRoller[_T]):
+class LiteralRoller(SingleOutcomeRoller[_T_co]):
     r"""A deterministic roller for a single, literal value."""
 
     __slots__ = ("_value",)
 
     @experimental
-    def __init__(self, value: _T) -> None:
+    def __init__(self, value: _T_co) -> None:
         self._value = value
 
     @property
-    def value(self) -> _T:
+    def value(self) -> _T_co:
         r"""Returns this roller’s source value."""
         return self._value
 
     def metadata(self) -> dict[str, object]:
         return {"kind": "literal", "value": self._value}
 
-    def _roll(self) -> "SingleOutcomeRoll[_T]":
+    def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self._value, self)
 
 
