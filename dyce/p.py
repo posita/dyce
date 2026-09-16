@@ -630,7 +630,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self: "P[_AddableSameT]", which: GetItemT, *more: GetItemT
     ) -> H[_AddableSameT]: ...
     @overload
-    def at(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def at(self: "P[_T]", which: int) -> H[_T]: ...
     def at(self: "P[Any]", which: GetItemT, *more: GetItemT) -> H[Any]:
         r"""
         Returns a histogram representing the sum of the outcomes at the selected positions for each possible roll.
@@ -761,7 +761,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     @overload
     def h(self: "P[_AddableSameT]") -> H[_AddableSameT]: ...
     @overload
-    def h(self: "P[_T]") -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def h(self: "P[_T]") -> H[_T]: ...
     def h(self: "P[Any]") -> H[Any]:
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` abstract base][dyce.HableT].

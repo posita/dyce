@@ -32,6 +32,18 @@ if TYPE_CHECKING:
 __all__ = ()
 
 
+class TestResult:
+    def test_type_covariance(self) -> None:
+        h_result_int: HResult[int] = HResult(H(6), 1)
+        p_result_int: PResult[int] = PResult(P(6), (1,))
+
+        h_result_object: HResult[object] = h_result_int
+        p_result_object: PResult[object] = p_result_int
+
+        assert h_result_object is h_result_int
+        assert p_result_object is p_result_int
+
+
 class TestExpand:
     def test_h_and_p_sources(self) -> None:
         def _fn(

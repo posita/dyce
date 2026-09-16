@@ -33,6 +33,7 @@ from .types import natural_key, nobeartype
 __all__ = ("HResult", "PResult", "TruncationWarning", "expand", "explode_n")
 
 _T = TypeVar("_T")
+_T_co = TypeVar("_T_co", covariant=True)
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 _T3 = TypeVar("_T3")
@@ -46,22 +47,22 @@ class TruncationWarning(UserWarning):
     """
 
 
-class HResult(NamedTuple, Generic[_T]):
+class HResult(NamedTuple, Generic[_T_co]):
     r"""
     Container passed to an [`expand`][dyce.expand] callback when the corresponding source is an [`H`][dyce.H] object.
     """
 
-    h: H[_T]
-    outcome: _T
+    h: H[_T_co]
+    outcome: _T_co
 
 
-class PResult(NamedTuple, Generic[_T]):
+class PResult(NamedTuple, Generic[_T_co]):
     r"""
     Container passed to an [`expand`][dyce.expand] callback when the corresponding source is a [`P`][dyce.P] object.
     """
 
-    p: P[_T]
-    roll: tuple[_T, ...]
+    p: P[_T_co]
+    roll: tuple[_T_co, ...]
 
 
 class _ExpandContext(NamedTuple):
