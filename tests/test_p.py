@@ -28,6 +28,7 @@ from dyce import H, P
 from dyce.h import _ConvolveFallbackWarning
 from dyce.p import (
     RollT,
+    SurveyorBase,
     _rwc_heterogeneous_one_end,
     _rwc_homogeneous_one_end,
     _WhichHSurveyor,
@@ -46,6 +47,21 @@ from ._helpers import (
 __all__ = ()
 
 _T = TypeVar("_T")
+
+
+class TestSurveyor:
+    def test_result_type_covariance(self) -> None:
+        class IntSurveyor(SurveyorBase[int, int, int]):
+            def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+                return (state or 0) + outcome * count
+
+            def order(self, outcomes: Iterable[int]) -> Iterable[int]:
+                return outcomes
+
+        surveyor_int: SurveyorBase[int, int, int] = IntSurveyor()
+        surveyor_object: SurveyorBase[int, int, object] = surveyor_int
+
+        assert surveyor_object is surveyor_int
 
 
 class TestPInit:

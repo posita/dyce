@@ -54,6 +54,7 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
+_ResultT_co = TypeVar("_ResultT_co", covariant=True)
 _StateT = TypeVar("_StateT")
 _AddableSameT = TypeVar("_AddableSameT", bound=ot.CanAddSame)
 _ParameterizedOutcomeT = TypeVar("_ParameterizedOutcomeT")
@@ -65,7 +66,7 @@ RollCountT = tuple[RollT[_T], int]
 RollProbT = tuple[RollT[_T], int, int]
 
 
-class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
+class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT_co]):
     r"""Provides the four interfaces required for [`P.survey`][dyce.p.P.survey]."""
 
     @property
@@ -83,16 +84,16 @@ class SurveyorBase(ABC, Generic[_T, _StateT, _ResultT]):
     @abstractmethod
     def order(self, outcomes: Iterable[_T]) -> Iterable[_T]: ...
 
-    def settle(self, state: _StateT) -> _ResultT:
+    def settle(self, state: _StateT) -> _ResultT_co:
         r"""
         Callback to finalize *state* after the last call to [`accumulate][dyce.p.SurveyorBase] if additional mutation is required.
 
         By default, this returns *state* (i.e., the terminal states are themselves the outcomes).
         """
-        return cast("_ResultT", state)
+        return cast("_ResultT_co", state)
 
 
-class AscendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
+class AscendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT_co]):
     r"""
     Surveyor that uses [`survey_outcome_order_ascending`][dyce.p.survey_outcome_order_ascending] for ordering outcomes.
     """
@@ -101,7 +102,7 @@ class AscendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
         return survey_outcome_order_ascending(outcomes)
 
 
-class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
+class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT_co]):
     r"""
     Surveyor that uses [`survey_outcome_order_descending`][dyce.p.survey_outcome_order_descending] for ordering outcomes.
     """
@@ -110,7 +111,7 @@ class DescendingSurveyorBase(SurveyorBase[_T, _StateT, _ResultT]):
         return survey_outcome_order_descending(outcomes)
 
 
-class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
+class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT_co]):
     @overload
     def __init__(
         self: "ParameterizedSurveyor[_ParameterizedOutcomeT, _ParameterizedStateT, _ParameterizedStateT]",
@@ -150,7 +151,7 @@ class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
         self._accumulate: Callable[[_StateT | None, _T, int], _StateT] = accumulate
         self._order: Callable[[Iterable[_T]], Iterable[_T]] = order
         self._initial: _StateT | None = initial
-        self._settle: Callable[[_StateT], _ResultT] | None = settle
+        self._settle: Callable[[_StateT], _ResultT_co] | None = settle
 
     @property
     def initial(self) -> _StateT | None:
@@ -162,11 +163,11 @@ class ParameterizedSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
     def order(self, outcomes: Iterable[_T]) -> Iterable[_T]:
         return self._order(outcomes)
 
-    def settle(self, state: _StateT) -> _ResultT:
-        return self._settle(state) if self._settle else cast("_ResultT", state)
+    def settle(self, state: _StateT) -> _ResultT_co:
+        return self._settle(state) if self._settle else cast("_ResultT_co", state)
 
 
-class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT]):
+class _WhichSurveyor(SurveyorBase[_T, _StateT, _ResultT_co]):
     def __init__(self, p: "P[_T]", selected: tuple[int, ...]) -> None:
         if not selected:
             raise ValueError(f"{type(self).__name__} requires at least one selection")
@@ -582,7 +583,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         self: "P[_AddableSameT]", which: GetItemT, *more: GetItemT
     ) -> H[_AddableSameT]: ...
     @overload
-    def at(self: "P[_T]", which: int) -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def at(self: "P[_T]", which: int) -> H[_T]: ...
     def at(self: "P[Any]", which: GetItemT, *more: GetItemT) -> H[Any]:
         r"""
         Returns a histogram representing the sum of the outcomes at the selected positions for each possible roll.
@@ -713,7 +714,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     @overload
     def h(self: "P[_AddableSameT]") -> H[_AddableSameT]: ...
     @overload
-    def h(self: "P[_T]") -> H[_T]: ...  # pyrefly: ignore[inconsistent-overload]
+    def h(self: "P[_T]") -> H[_T]: ...
     def h(self: "P[Any]") -> H[Any]:
         r"""
         Combines (or “flattens”) all contained histograms into a single [`H`][dyce.H] in accordance with the [`HableT` abstract base][dyce.HableT].
