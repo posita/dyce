@@ -19,7 +19,7 @@ import random
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Never, assert_type, cast
+from typing import Any, Literal, Never, assert_type, cast
 from unittest.mock import Mock, patch
 
 import pytest
@@ -752,13 +752,30 @@ class TestHableRoller:
 
 
 class TestLiteralRoller:
+    def test_type_inference(self) -> None:
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+
+        assert_type(roller, LiteralRoller[int])  # ty: ignore[type-assertion-failure]
+        assert_type(roll, SingleOutcomeRoll[int])  # ty: ignore[type-assertion-failure]
+        assert_type(roll.roller, SingleOutcomeRoller[int])  # ty: ignore[type-assertion-failure]
+        # ty is special, apparently
+        assert_type(roller, LiteralRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+        assert_type(roll, SingleOutcomeRoll[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+        assert_type(roll.roller, SingleOutcomeRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+
+        # An explicit generic specialization works for all checkers
+        roller_int = LiteralRoller[int](3)
+        roll_int = roller_int.roll()
+
+        assert_type(roller_int, LiteralRoller[int])
+        assert_type(roll_int, SingleOutcomeRoll[int])
+        assert_type(roll_int.roller, SingleOutcomeRoller[int])
+
     def test_exposes_and_rolls_value(self) -> None:
         roller = LiteralRoller(3)
         roll = roller.roll()
 
-        assert_type(roller, LiteralRoller[int])
-        assert_type(roll, SingleOutcomeRoll[int])
-        assert_type(roll.roller, SingleOutcomeRoller[int])
         assert roller.value == 3
         assert roller.metadata() == {"kind": "literal", "value": 3}
         assert roll.outcomes == (3,)
@@ -960,7 +977,8 @@ class TestRollerPool:
         pool = RollerPool(two, one, name="pool")
         roll = pool.roll()
 
-        assert_type(pool, RollerPool[int])
+        pool_int: RollerPool[int] = pool
+        assert pool_int is pool
         assert isinstance(pool, Roller)
         assert len(pool) == 2
         assert pool.rollers == (two, one)
