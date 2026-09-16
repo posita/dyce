@@ -120,6 +120,12 @@ _RSHIFT = _BinaryOperator(
 _AND = _BinaryOperator("and", cast("Callable[[object, object], object]", operator.and_))
 _OR = _BinaryOperator("or", cast("Callable[[object, object], object]", operator.or_))
 _XOR = _BinaryOperator("xor", cast("Callable[[object, object], object]", operator.xor))
+_LT = _BinaryOperator("lt", cast("Callable[[object, object], object]", operator.lt))
+_LE = _BinaryOperator("le", cast("Callable[[object, object], object]", operator.le))
+_EQ = _BinaryOperator("eq", cast("Callable[[object, object], object]", operator.eq))
+_NE = _BinaryOperator("ne", cast("Callable[[object, object], object]", operator.ne))
+_GE = _BinaryOperator("ge", cast("Callable[[object, object], object]", operator.ge))
+_GT = _BinaryOperator("gt", cast("Callable[[object, object], object]", operator.gt))
 _NEG = _UnaryOperator("neg", cast("Callable[[object], object]", operator.neg))
 _POS = _UnaryOperator("pos", cast("Callable[[object], object]", operator.pos))
 _ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
@@ -610,6 +616,131 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
     ) -> "SingleOutcomeRoller[_ResultT]": ...
     def __rxor__(self, lhs: object) -> object:
         return _binary_roller(lhs, self, _XOR)
+
+    @overload
+    def lt(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanLt[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def lt(
+        self: "Roller[ot.CanLt[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def lt(
+        self: "Roller[ot.CanLt[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def lt(
+        self: "Roller[ot.CanLt[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def lt(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is less than *rhs*."""
+        return self._comparison(rhs, _LT)
+
+    @overload
+    def le(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanLe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def le(
+        self: "Roller[ot.CanLe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def le(
+        self: "Roller[ot.CanLe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def le(
+        self: "Roller[ot.CanLe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def le(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is less than or equal to *rhs*."""
+        return self._comparison(rhs, _LE)
+
+    @overload
+    def eq(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanEq[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def eq(
+        self: "Roller[ot.CanEq[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def eq(
+        self: "Roller[ot.CanEq[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def eq(
+        self: "Roller[ot.CanEq[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def eq(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is equal to *rhs*."""
+        return self._comparison(rhs, _EQ)
+
+    @overload
+    def ne(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanNe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ne(
+        self: "Roller[ot.CanNe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def ne(
+        self: "Roller[ot.CanNe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def ne(
+        self: "Roller[ot.CanNe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def ne(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is not equal to *rhs*."""
+        return self._comparison(rhs, _NE)
+
+    @overload
+    def ge(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanGe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ge(
+        self: "Roller[ot.CanGe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def ge(
+        self: "Roller[ot.CanGe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def ge(
+        self: "Roller[ot.CanGe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def ge(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is greater than or equal to *rhs*."""
+        return self._comparison(rhs, _GE)
+
+    @overload
+    def gt(  # type: ignore[overload-overlap]
+        self: "Roller[ot.CanGt[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def gt(
+        self: "Roller[ot.CanGt[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def gt(
+        self: "Roller[ot.CanGt[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoller[bool]": ...
+    @overload
+    def gt(
+        self: "Roller[ot.CanGt[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoller[bool]": ...
+    def gt(self, rhs: object) -> object:
+        r"""Returns a roller or roll testing whether this roller’s summed outcome is greater than *rhs*."""
+        return self._comparison(rhs, _GT)
+
+    def _comparison(self, rhs: object, comparison: _BinaryOperator) -> object:
+        if isinstance(rhs, Roll):
+            return _compare_roll(self.roll(), rhs, comparison)
+        return _binary_roller(self, rhs, comparison)
 
     def __neg__(
         self: "Roller[ot.CanNeg[_ResultT]]",
@@ -1375,6 +1506,126 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rxor__(self, lhs: object) -> "SingleOutcomeRoll[object]":
         return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _XOR)
+
+    @overload
+    def lt(
+        self: "Roll[ot.CanLt[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def lt(
+        self: "Roll[ot.CanLt[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def lt(
+        self: "Roll[ot.CanLt[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def lt(
+        self: "Roll[ot.CanLt[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def lt(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is less than *rhs*."""
+        return _compare_roll(self, rhs, _LT)
+
+    @overload
+    def le(
+        self: "Roll[ot.CanLe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def le(
+        self: "Roll[ot.CanLe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def le(
+        self: "Roll[ot.CanLe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def le(
+        self: "Roll[ot.CanLe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def le(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is less than or equal to *rhs*."""
+        return _compare_roll(self, rhs, _LE)
+
+    @overload
+    def eq(
+        self: "Roll[ot.CanEq[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def eq(
+        self: "Roll[ot.CanEq[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def eq(
+        self: "Roll[ot.CanEq[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def eq(
+        self: "Roll[ot.CanEq[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def eq(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is equal to *rhs*."""
+        return _compare_roll(self, rhs, _EQ)
+
+    @overload
+    def ne(
+        self: "Roll[ot.CanNe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ne(
+        self: "Roll[ot.CanNe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ne(
+        self: "Roll[ot.CanNe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ne(
+        self: "Roll[ot.CanNe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def ne(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is not equal to *rhs*."""
+        return _compare_roll(self, rhs, _NE)
+
+    @overload
+    def ge(
+        self: "Roll[ot.CanGe[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ge(
+        self: "Roll[ot.CanGe[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ge(
+        self: "Roll[ot.CanGe[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def ge(
+        self: "Roll[ot.CanGe[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def ge(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is greater than or equal to *rhs*."""
+        return _compare_roll(self, rhs, _GE)
+
+    @overload
+    def gt(
+        self: "Roll[ot.CanGt[_OtherT, bool]]", rhs: "Roller[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def gt(
+        self: "Roll[ot.CanGt[_OtherT, bool]]", rhs: "Roll[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def gt(
+        self: "Roll[ot.CanGt[_OtherT, bool]]", rhs: "HableT[_OtherT]"
+    ) -> "SingleOutcomeRoll[bool]": ...
+    @overload
+    def gt(
+        self: "Roll[ot.CanGt[_OtherT, bool]]", rhs: _OtherT
+    ) -> "SingleOutcomeRoll[bool]": ...
+    def gt(self, rhs: object) -> "SingleOutcomeRoll[bool]":
+        r"""Tests whether this roll’s summed outcome is greater than *rhs*."""
+        return _compare_roll(self, rhs, _GT)
 
     def sum(self: "Roll[_CanAddSameT]") -> "SingleOutcomeRoll[_CanAddSameT]":
         r"""
@@ -2164,6 +2415,22 @@ def _binary_roller(
     if isinstance(lhs, Roll) or isinstance(rhs, Roll):
         return NotImplemented
     return _BinaryRoller(_as_roller(lhs), _as_roller(rhs), operator)
+
+
+def _compare_roll(
+    lhs: Roll[object], rhs: object, comparison: _BinaryOperator
+) -> SingleOutcomeRoll[bool]:
+    lhs_roll: SingleOutcomeRoll[Any] = _as_roll(cast("Any", lhs))
+    if isinstance(rhs, Roller):
+        rhs = rhs.roll()
+    elif isinstance(rhs, HableT):
+        rhs = _as_roller(rhs).roll()
+    rhs_roll = _as_roll(rhs)
+    roller: SingleOutcomeRoller[bool] = _BinaryRoller(
+        lhs_roll.roller, rhs_roll.roller, comparison
+    )
+    outcome = comparison(lhs_roll.outcome, rhs_roll.outcome)
+    return SingleOutcomeRoll(cast("bool", outcome), roller, (lhs_roll, rhs_roll))
 
 
 def _eval_trace_call(

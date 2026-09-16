@@ -59,6 +59,14 @@ _BINARY_OPERATOR_CASES: tuple[tuple[Callable[[Any, Any], Any], str, int, int], .
     (operator.or_, "or", 4, 3),
     (operator.xor, "xor", 6, 3),
 )
+_COMPARISON_CASES: tuple[tuple[Callable[[Any, Any], bool], str, int, int], ...] = (
+    (operator.lt, "lt", 2, 3),
+    (operator.le, "le", 2, 2),
+    (operator.eq, "eq", 2, 2),
+    (operator.ne, "ne", 2, 3),
+    (operator.ge, "ge", 3, 3),
+    (operator.gt, "gt", 3, 2),
+)
 _UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
     (operator.neg, "neg", 3),
     (operator.pos, "pos", -3),
@@ -670,6 +678,19 @@ class TestSingleOutcomeRoller:
         assert_type(abs(roller), SingleOutcomeRoller[int])
         assert_type(~roller, SingleOutcomeRoller[int])
 
+    def test_comparison_type_inference(self) -> None:
+        roller = LiteralRoller(2)
+
+        assert_type(roller.lt(3), SingleOutcomeRoller[bool])
+        assert_type(roller.le(H(3)), SingleOutcomeRoller[bool])
+        assert_type(roller.eq(P(3, 2)), SingleOutcomeRoller[bool])
+        assert_type(roller.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
+        assert_type(
+            roller.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
+            SingleOutcomeRoller[bool],
+        )
+        assert_type(roller.gt(1), SingleOutcomeRoller[bool])
+
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators_preserve_rolls_and_metadata(
         self,
@@ -701,6 +722,22 @@ class TestSingleOutcomeRoller:
         assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "unary", "operator": name}
         assert combined.operands == (roller,)
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _COMPARISON_CASES)
+    def test_comparisons_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any, Any], bool],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+        combined = getattr(left_roller, name)(right_roller)
+
+        assert combined.roll().outcome is op(lhs, rhs)
+        assert combined.metadata() == {"kind": "binary", "operator": name}
+        assert combined.operands == (left_roller, right_roller)
 
 
 class TestHRoller:
@@ -833,6 +870,19 @@ class TestRoller:
         assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(abs(pool), SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+    def test_comparison_type_inference(self) -> None:
+        pool = PRoller(P(H({2: 1})), name="pool")
+
+        assert_type(pool.lt(3), SingleOutcomeRoller[bool])
+        assert_type(pool.le(H(3)), SingleOutcomeRoller[bool])
+        assert_type(pool.eq(P(3, 2)), SingleOutcomeRoller[bool])
+        assert_type(pool.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
+        assert_type(
+            pool.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
+            SingleOutcomeRoller[bool],
+        )
+        assert_type(pool.gt(1), SingleOutcomeRoller[bool])
 
     def test_sum_produces_single_outcome_roller(self) -> None:
         pool = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool")
@@ -1172,6 +1222,16 @@ class TestSingleOutcomeRoll:
         assert_type(abs(roll), SingleOutcomeRoll[int])
         assert_type(~roll, SingleOutcomeRoll[int])
 
+    def test_comparison_type_inference(self) -> None:
+        roll = LiteralRoller(2).roll()
+
+        assert_type(roll.lt(3), SingleOutcomeRoll[bool])
+        assert_type(roll.le(H(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.eq(P(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ne(LiteralRoller(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ge(LiteralRoller(3).roll()), SingleOutcomeRoll[bool])
+        assert_type(roll.gt(1), SingleOutcomeRoll[bool])
+
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
     def test_binary_operators_preserve_outcomes_and_trace(
         self,
@@ -1219,6 +1279,31 @@ class TestSingleOutcomeRoll:
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["operands"] == ["roll1"]
 
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _COMPARISON_CASES)
+    def test_comparisons_preserve_outcomes_and_trace(
+        self,
+        op: Callable[[Any, Any], bool],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roll = LiteralRoller(lhs).roll()
+        right_roll = LiteralRoller(rhs).roll()
+        combined = getattr(left_roll, name)(right_roll)
+        trace = combined.trace()
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
+
+        assert combined.outcome is op(lhs, rhs)
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {
+            "kind": "binary",
+            "operator": name,
+            "operands": ["roller1", "roller2"],
+        }
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
+
     def test_trace_is_json_serializable(self) -> None:
         roll = 2 + LiteralRoller(3).roll()
         trace = roll.trace()
@@ -1253,6 +1338,16 @@ class TestRoll:
     def test_empty_outcomes_raise(self) -> None:
         with pytest.raises(ValueError, match="at least one outcome"):
             Roll((), PRoller(P()))
+
+    def test_comparison_type_inference(self) -> None:
+        roll = PRoller(P(H({2: 1}))).roll()
+
+        assert_type(roll.lt(3), SingleOutcomeRoll[bool])
+        assert_type(roll.le(H(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.eq(P(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ne(LiteralRoller(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ge(LiteralRoller(3).roll()), SingleOutcomeRoll[bool])
+        assert_type(roll.gt(1), SingleOutcomeRoll[bool])
 
 
 class TestMixedRollBinaryArithmetic:
@@ -1679,6 +1774,22 @@ class TestRollerAndRollOperationEquivalence:
         roller = LiteralRoller(value)
 
         assert op(roller).roll().trace() == op(roller.roll()).trace()
+
+    @pytest.mark.parametrize(("_op", "name", "lhs", "rhs"), _COMPARISON_CASES)
+    def test_comparisons(
+        self,
+        _op: Callable[[Any, Any], bool],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+
+        roll_from_rollers = getattr(left_roller, name)(right_roller).roll()
+        roll_from_rolls = getattr(left_roller.roll(), name)(right_roller.roll())
+
+        assert roll_from_rollers.trace() == roll_from_rolls.trace()
 
     def test_pool_selection_and_sum(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
