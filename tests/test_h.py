@@ -26,7 +26,7 @@ from decimal import Decimal
 from enum import IntEnum
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Never, assert_type
+from typing import TYPE_CHECKING, Any, Never, SupportsFloat, assert_type
 from unittest.mock import patch
 
 import pytest
@@ -790,14 +790,12 @@ class TestHMean:
 
     def test_mean(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))
+            h: H[SupportsFloat] = 2 @ H(o_type(i) for i in range(10))
             h_mean = h.mean()
             stat_mean = statistics.mean(
-                itertools.chain(
-                    *(  # type: ignore[var-annotated]
-                        itertools.repeat(float(outcome), count)
-                        for outcome, count in h.items()
-                    )
+                itertools.chain.from_iterable(
+                    itertools.repeat(float(outcome), count)
+                    for outcome, count in h.items()
                 )
             )
             assert math.isclose(
@@ -981,14 +979,12 @@ class TestHStdev:
 
     def test_stdev(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))
+            h: H[SupportsFloat] = 2 @ H(o_type(i) for i in range(10))
             h_stdev = h.stdev()
             stat_stdev = statistics.pstdev(
-                itertools.chain(
-                    *(  # type: ignore[var-annotated]
-                        itertools.repeat(float(outcome), count)
-                        for outcome, count in h.items()
-                    )
+                itertools.chain.from_iterable(
+                    itertools.repeat(float(outcome), count)
+                    for outcome, count in h.items()
                 )
             )
             assert math.isclose(
