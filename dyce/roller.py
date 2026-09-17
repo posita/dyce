@@ -131,6 +131,38 @@ _POS = _UnaryOperator("pos", cast("Callable[[object], object]", operator.pos))
 _ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
 _INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
+_BINARY_FORMATS = {
+    "lt": ("<", 10),
+    "le": ("<=", 10),
+    "eq": ("==", 10),
+    "ne": ("!=", 10),
+    "ge": (">=", 10),
+    "gt": (">", 10),
+    "or": ("|", 20),
+    "xor": ("^", 30),
+    "and": ("&", 40),
+    "lshift": ("<<", 50),
+    "rshift": (">>", 50),
+    "add": ("+", 60),
+    "sub": ("-", 60),
+    "mul": ("*", 70),
+    "truediv": ("/", 70),
+    "floordiv": ("//", 70),
+    "mod": ("%", 70),
+    "pow": ("**", 90),
+}
+_UNARY_FORMATS = {"neg": "-", "pos": "+", "invert": "~"}
+_COMPARISON_NAMES = frozenset(("lt", "le", "eq", "ne", "ge", "gt"))
+_UNARY_PRECEDENCE = 80
+_CALL_PRECEDENCE = 100
+_ATOM_PRECEDENCE = 110
+
+
+@dataclass(frozen=True, slots=True)
+class _FormattedRoll:
+    text: str
+    precedence: int
+
 
 class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
     r"""A computation capable of producing a nonempty tuple of traceable outcomes."""
@@ -1627,6 +1659,16 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         r"""Tests whether this roll’s summed outcome is greater than *rhs*."""
         return _compare_roll(self, rhs, _GT)
 
+    def format(self) -> str:
+        r"""Formats this roll as a compact expression followed by its outcome or outcomes."""
+        expression = _ROLL_FORMATTER.format(self)
+        result = (
+            repr(cast("SingleOutcomeRoll[_T_co]", self).outcome)
+            if type(self) is SingleOutcomeRoll
+            else repr(self.outcomes)
+        )
+        return f"{expression.text} => {result}"
+
     def sum(self: "Roll[_CanAddSameT]") -> "SingleOutcomeRoll[_CanAddSameT]":
         r"""
         Returns the sum of this roll’s outcomes.
@@ -2333,6 +2375,15 @@ def trace(
     **state: Any,
 ) -> Roll[Any]:
     r"""
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes.
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1789600491)
+
+      -- END MONKEY PATCH -->
+
     Rolls *sources*, calls *callback* with those rolls and *state*, and returns a named outcome trace.
 
     A returned roller is rolled, a returned roll is retained, and any other return value is wrapped in a roll from a [`LiteralRoller`][dyce.roller.LiteralRoller].
@@ -2342,7 +2393,7 @@ def trace(
     *name* defaults to the callback’s `__name__` or its type’s `__name__`.
     Exceptions are reported as [`RollError`][dyce.roller.RollError] with the original exception as their cause.
 
-    Explode a six once, retaining both the initial roll and any additional roll:
+    Explode a d6 once, retaining both the initial roll and any additional roll:
 
         >>> from dyce.roller import (
         ...     HRoller,
@@ -2356,10 +2407,10 @@ def trace(
         ... ) -> SingleOutcomeRoll[int] | SingleOutcomeRoller[int]:
         ...     return roll + roll.roller if roll.outcome == 6 else roll
         >>> result = trace(explode_once, d6)
-        >>> result.roller.metadata()
-        {'kind': 'trace', 'name': 'explode_once', 'state': {}}
-        >>> result.operands[0].roller is d6
-        True
+        >>> result.outcomes
+        (10,)
+        >>> print(result.format())
+        explode_once(6 [d6] + 4 [d6]) => (10,)
     """
     call = _TraceCall(
         callback,
@@ -2377,6 +2428,156 @@ def trace(
         raise
     except Exception as exc:
         raise RollError(str(exc), (call,)) from exc
+
+
+class _RollFormatter:
+    def __init__(self) -> None:
+        self._handlers: dict[
+            str,
+            Callable[[Roll[object], dict[str, object]], _FormattedRoll],
+        ] = {
+            "binary": self._format_binary,
+            "factory": self._format_boundary,
+            "literal": self._format_source,
+            "pool": self._format_pool,
+            "pool-selection": self._format_pool_selection,
+            "pool-source": self._format_source,
+            "pool-sum": self._format_pool_sum,
+            "source": self._format_source,
+            "trace": self._format_boundary,
+            "unary": self._format_unary,
+        }
+
+    def format(self, roll: Roll[object]) -> _FormattedRoll:
+        metadata = roll.roller.metadata()
+        kind = metadata.get("kind")
+        handler = self._handlers.get(kind) if isinstance(kind, str) else None
+        return (
+            handler(roll, metadata)
+            if handler is not None
+            else self._format_unknown(roll, metadata)
+        )
+
+    def _format_binary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        operator_name = cast("str", metadata["operator"])
+        symbol, precedence = _BINARY_FORMATS[operator_name]
+        left = self.format(roll.operands[0])
+        right = self.format(roll.operands[1])
+        left_text = self._format_child(left, precedence, operator_name, right=False)
+        right_text = self._format_child(right, precedence, operator_name, right=True)
+        return _FormattedRoll(f"{left_text} {symbol} {right_text}", precedence)
+
+    def _format_boundary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        name = metadata.get("name", metadata.get("kind"))
+        operand = self.format(roll.operands[0])
+        return _FormattedRoll(f"{name}({operand.text})", _CALL_PRECEDENCE)
+
+    @staticmethod
+    def _format_child(
+        child: _FormattedRoll,
+        parent_precedence: int,
+        parent_operator: str,
+        *,
+        right: bool,
+    ) -> str:
+        parenthesize = child.precedence < parent_precedence
+        if child.precedence == parent_precedence:
+            if parent_operator in _COMPARISON_NAMES:
+                parenthesize = True
+            elif right:
+                parenthesize = parent_operator != "pow"
+            else:
+                parenthesize = parent_operator == "pow"
+        return f"({child.text})" if parenthesize else child.text
+
+    def _format_pool(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        items = ", ".join(self.format(operand).text for operand in roll.operands)
+        if len(roll.operands) == 1:
+            items += ","
+        text = f"({items})"
+        return self._format_source_name(text, metadata)
+
+    def _format_pool_selection(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        operand = self.format(roll.operands[0])
+        selectors = cast("list[object]", metadata.get("selectors", []))
+        selector_text = ", ".join(
+            self._format_selector(selector) for selector in selectors
+        )
+        suffix = f", {selector_text}" if selector_text else ""
+        return _FormattedRoll(f"select({operand.text}{suffix})", _CALL_PRECEDENCE)
+
+    def _format_pool_sum(
+        self, roll: Roll[object], _metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        operand = self.format(roll.operands[0])
+        return _FormattedRoll(f"sum({operand.text})", _CALL_PRECEDENCE)
+
+    @staticmethod
+    def _format_selector(selector: object) -> str:
+        if isinstance(selector, dict):
+            start = selector.get("start")
+            stop = selector.get("stop")
+            step = selector.get("step")
+            return f"slice({start!r}, {stop!r}, {step!r})"
+        return repr(selector)
+
+    def _format_source(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        text = (
+            repr(roll.outcome)
+            if isinstance(roll, SingleOutcomeRoll)
+            else repr(roll.outcomes)
+        )
+        return self._format_source_name(text, metadata)
+
+    @staticmethod
+    def _format_source_name(text: str, metadata: dict[str, object]) -> _FormattedRoll:
+        if "name" in metadata:
+            text += f" [{metadata['name']}]"
+        return _FormattedRoll(text, _ATOM_PRECEDENCE)
+
+    def _format_unary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        operator_name = cast("str", metadata["operator"])
+        operand = self.format(roll.operands[0])
+        if operator_name == "abs":
+            return _FormattedRoll(f"abs({operand.text})", _CALL_PRECEDENCE)
+        symbol = _UNARY_FORMATS[operator_name]
+        operand_text = (
+            f"({operand.text})"
+            if operand.precedence < _UNARY_PRECEDENCE
+            else operand.text
+        )
+        return _FormattedRoll(f"{symbol}{operand_text}", _UNARY_PRECEDENCE)
+
+    def _format_unknown(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _FormattedRoll:
+        name = metadata.get("name", metadata.get("kind"))
+        if roll.operands:
+            operands = ", ".join(self.format(operand).text for operand in roll.operands)
+            text = f"{name}({operands})"
+        else:
+            text = (
+                repr(roll.outcome)
+                if isinstance(roll, SingleOutcomeRoll)
+                else repr(roll.outcomes)
+            )
+            text += f" [{name}]"
+        return _FormattedRoll(text, _ATOM_PRECEDENCE)
+
+
+_ROLL_FORMATTER = _RollFormatter()
 
 
 def _as_roll(

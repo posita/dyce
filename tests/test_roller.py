@@ -1740,6 +1740,94 @@ class TestMixedRollBinaryArithmetic:
         assert rerolled_result.outcome == second + 2
         assert choices.call_count == 2
 
+    def test_format_binary_expression(self) -> None:
+        left = HRoller(H({2: 1}), name="d6")
+        right = HRoller(H({1: 1}), name="d6")
+
+        result = ((left + right) * 5).roll()
+
+        assert result.format() == "(2 [d6] + 1 [d6]) * 5 => 15"
+
+    def test_format_preserves_operator_precedence(self) -> None:
+        left = cast("Any", LiteralRoller(2))
+        right = cast("Any", LiteralRoller(3))
+        left_associative = ((left**3) ** 2).roll()
+        right_associative = (left ** (right**2)).roll()
+        unary = (-(LiteralRoller(2) + 3)).roll()
+
+        assert left_associative.format() == "(2 ** 3) ** 2 => 64"
+        assert right_associative.format() == "2 ** 3 ** 2 => 512"
+        assert unary.format() == "-(2 + 3) => -5"
+        assert abs(LiteralRoller(-2)).roll().format() == "abs(-2) => 2"
+
+    def test_format_comparison(self) -> None:
+        roller = HRoller(H({2: 1}), name="d6")
+        result = roller.lt(4).roll()
+        nested = roller.lt(3).lt(4).roll()
+        existing_roll = LiteralRoller(4).roll()
+
+        assert result.format() == "2 [d6] < 4 => True"
+        assert nested.format() == "(2 [d6] < 3) < 4 => True"
+        assert roller.lt(existing_roll).format() == "2 [d6] < 4 => True"
+
+    def test_format_named_boundary(self) -> None:
+        d6 = HRoller(H({2: 1}), name="d6")
+
+        @roller_factory(name="attack")
+        def attack() -> SingleOutcomeRoller[int]:
+            return d6 + 1
+
+        assert attack().roll().format() == "attack(2 [d6] + 1) => 3"
+
+    def test_format_pool_operations(self) -> None:
+        pool = RollerPool(
+            HRoller(H({2: 1}), name="d6"),
+            HRoller(H({1: 1}), name="d6"),
+            name="pool",
+        )
+
+        assert pool.roll().format() == "(1 [d6], 2 [d6]) [pool] => (1, 2)"
+        assert pool.sum().roll().format() == "sum((1 [d6], 2 [d6]) [pool]) => 3"
+        assert pool.select(-1).roll().format() == (
+            "select((1 [d6], 2 [d6]) [pool], -1) => (2,)"
+        )
+        assert pool.select(slice(None, None, 2)).roll().format() == (
+            "select((1 [d6], 2 [d6]) [pool], slice(None, None, 2)) => (1,)"
+        )
+        assert RollerPool(LiteralRoller(1), name="pool").roll().format() == (
+            "(1,) [pool] => (1,)"
+        )
+        assert PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll().format() == (
+            "(1, 2) [pool] => (1, 2)"
+        )
+
+    def test_format_customer_roller_fallback(self) -> None:
+        class CustomRoller(SingleOutcomeRoller[int]):
+            def __init__(self, operand: SingleOutcomeRoller[int] | None = None) -> None:
+                self._operand = operand
+
+            @property
+            def operands(self) -> tuple[Roller[object], ...]:
+                return () if self._operand is None else (self._operand,)
+
+            def metadata(self) -> dict[str, object]:
+                return {"kind": "custom", "name": "custom"}
+
+            def _roll(self) -> SingleOutcomeRoll[int]:
+                if self._operand is None:
+                    outcome: int = 2
+                    return SingleOutcomeRoll[int](outcome, self)
+                else:
+                    operand_roll = self._operand.roll()
+                    return SingleOutcomeRoll(
+                        operand_roll.outcome, self, (operand_roll,)
+                    )
+
+        source = CustomRoller()
+
+        assert source.roll().format() == "2 [custom] => 2"
+        assert CustomRoller(source).roll().format() == "custom(2 [custom]) => 2"
+
 
 class TestRollerAndRollOperationEquivalence:
     @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
