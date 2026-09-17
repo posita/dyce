@@ -805,13 +805,26 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
     @property
     def operands(
         self,
-    ) -> tuple["Roller[object]", ...]:
-        r"""The immediate rollers consumed by this roller, if any."""
-        return ()
+    ) -> tuple["Roller[object]", ...] | None:
+        r"""
+        The immediate rollers consumed by this roller.
+
+        `None` means operands do not apply to this roller.
+        An empty tuple means operands apply, but this roller has none.
+        """
+        return None
 
     @abstractmethod
     def metadata(self) -> dict[str, object]:
-        r"""Returns JSON-compatible metadata describing this roller."""
+        r"""
+        Returns JSON-compatible metadata describing this roller.
+
+        The metadata must contain a nonempty string `kind`.
+        Dyce kinds use the `dyce.` prefix.
+        Customer kinds should use a prefix controlled by the customer to avoid collisions.
+        Metadata describes only this roller.
+        [`operands`][dyce.roller.Roller.operands] describes its relationships to other rollers.
+        """
 
     def roll(self) -> "Roll[_T_co]":
         r"""
@@ -895,7 +908,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
 
     def metadata(self) -> dict[str, object]:
         return {
-            "kind": "source",
+            "kind": "dyce.source",
             "name": self._name,
         }
 
@@ -920,7 +933,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
 
     def metadata(self) -> dict[str, object]:
         return {
-            "kind": "source",
+            "kind": "dyce.source",
             "name": self._name,
         }
 
@@ -943,7 +956,7 @@ class LiteralRoller(SingleOutcomeRoller[_T_co]):
         return self._value
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "literal", "value": self._value}
+        return {"kind": "dyce.literal", "value": self._value}
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self._value, self)
@@ -969,7 +982,7 @@ class PRoller(Roller[_T_co]):
 
     def metadata(self) -> dict[str, object]:
         return {
-            "kind": "pool-source",
+            "kind": "dyce.pool-source",
             "name": self._name,
         }
 
@@ -1008,7 +1021,7 @@ class RollerPool(Roller[_T_co]):
         return self._rollers
 
     def metadata(self) -> dict[str, object]:
-        metadata: dict[str, object] = {"kind": "pool"}
+        metadata: dict[str, object] = {"kind": "dyce.pool"}
         if self._name is not None:
             metadata["name"] = self._name
         return metadata
@@ -1036,11 +1049,16 @@ class RollerPool(Roller[_T_co]):
 
 @dataclass(frozen=True, slots=True, eq=False)
 class Roll(_HableOpsOptOut, Generic[_T_co]):
-    r"""An immutable trace of one or more outcomes."""
+    r"""
+    An immutable trace of one or more outcomes.
+
+    `operands` is `None` when operands do not apply to this roll.
+    An empty operand tuple means operands apply, but this roll has none.
+    """
 
     outcomes: tuple[_T_co, ...]
     roller: Roller[_T_co] = field(repr=False)
-    operands: tuple["Roll[object]", ...] = field(default=(), repr=False)
+    operands: tuple["Roll[object]", ...] | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         if not self.outcomes:
@@ -1686,7 +1704,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
 
         The `root` entry identifies a record in `rolls`.
+        Each roller record contains its roller’s metadata and, when applicable, its operand roller references.
         Each roll’s `roller` entry identifies its producing roller in `rollers`.
+        Roll records contain operand roll references when operands apply.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
         return _trace_from_root_roll(cast("Roll[object]", self))
@@ -1702,7 +1722,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
         self,
         outcome: _T_co,
         roller: SingleOutcomeRoller[_T_co],
-        operands: tuple["Roll[object]", ...] = (),
+        operands: tuple["Roll[object]", ...] | None = None,
     ) -> None:
         super(SingleOutcomeRoll, self).__init__((outcome,), roller, operands)
 
@@ -1782,7 +1802,7 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
         return (self._left, self._right)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "binary", "operator": self._operator.name}
+        return {"kind": "dyce.binary", "operator": self._operator.name}
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
@@ -1807,7 +1827,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
         return (self._operand,)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "unary", "operator": self._operator.name}
+        return {"kind": "dyce.unary", "operator": self._operator.name}
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
@@ -1831,7 +1851,7 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
         return (cast("Roller[object]", self._pool_roller),)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "pool-sum"}
+        return {"kind": "dyce.pool-sum"}
 
     def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
@@ -1858,7 +1878,7 @@ class _SelectedPoolRoller(Roller[_T_co]):
 
     def metadata(self) -> dict[str, object]:
         return {
-            "kind": "pool-selection",
+            "kind": "dyce.pool-selection",
             "selectors": [
                 {"start": key.start, "stop": key.stop, "step": key.step}
                 if isinstance(key, slice)
@@ -1884,7 +1904,7 @@ class _TraceCall:
     state: dict[str, Any]
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "trace", "name": self.name, "state": self.state}
+        return {"kind": "dyce.trace", "name": self.name, "state": self.state}
 
 
 class _TraceRoller(Roller[_T_co]):
@@ -1924,7 +1944,7 @@ class _FactoryRoller(Roller[_T_co]):
         return (self._expression,)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "factory", "name": self._name}
+        return {"kind": "dyce.factory", "name": self._name}
 
     def _roll(self) -> Roll[_T_co]:
         result = self._expression.roll()
@@ -1941,7 +1961,7 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
         return (self._expression,)
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "factory", "name": self._name}
+        return {"kind": "dyce.factory", "name": self._name}
 
     def _roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
@@ -1985,9 +2005,9 @@ def roller_factory(
 
         >>> roll = damage_3_roller.roll()
         >>> roll.roller.metadata()
-        {'kind': 'factory', 'name': 'damage'}
+        {'kind': 'dyce.factory', 'name': 'damage'}
         >>> roll.operands[0].roller.metadata()
-        {'kind': 'binary', 'operator': 'add'}
+        {'kind': 'dyce.binary', 'operator': 'add'}
 
     Supply *name* to better distinguish *fn*:
 
@@ -1996,7 +2016,7 @@ def roller_factory(
         ... def melee_attack(modifier: int = 0) -> SingleOutcomeRoller[int]:
         ...     return d20 + modifier
         >>> melee_attack(modifier=-1).roll().roller.metadata()
-        {'kind': 'factory', 'name': 'my_game.melee_attack'}
+        {'kind': 'dyce.factory', 'name': 'my_game.melee_attack'}
     """
 
     def decorate(factory: Callable[..., object]) -> Callable[..., object]:
@@ -2436,16 +2456,16 @@ class _RollFormatter:
             str,
             Callable[[Roll[object], dict[str, object]], _FormattedRoll],
         ] = {
-            "binary": self._format_binary,
-            "factory": self._format_boundary,
-            "literal": self._format_source,
-            "pool": self._format_pool,
-            "pool-selection": self._format_pool_selection,
-            "pool-source": self._format_source,
-            "pool-sum": self._format_pool_sum,
-            "source": self._format_source,
-            "trace": self._format_boundary,
-            "unary": self._format_unary,
+            "dyce.binary": self._format_binary,
+            "dyce.factory": self._format_boundary,
+            "dyce.literal": self._format_source,
+            "dyce.pool": self._format_pool,
+            "dyce.pool-selection": self._format_pool_selection,
+            "dyce.pool-source": self._format_source,
+            "dyce.pool-sum": self._format_pool_sum,
+            "dyce.source": self._format_source,
+            "dyce.trace": self._format_boundary,
+            "dyce.unary": self._format_unary,
         }
 
     def format(self, roll: Roll[object]) -> _FormattedRoll:
@@ -2463,8 +2483,9 @@ class _RollFormatter:
     ) -> _FormattedRoll:
         operator_name = cast("str", metadata["operator"])
         symbol, precedence = _BINARY_FORMATS[operator_name]
-        left = self.format(roll.operands[0])
-        right = self.format(roll.operands[1])
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        left = self.format(operands[0])
+        right = self.format(operands[1])
         left_text = self._format_child(left, precedence, operator_name, right=False)
         right_text = self._format_child(right, precedence, operator_name, right=True)
         return _FormattedRoll(f"{left_text} {symbol} {right_text}", precedence)
@@ -2473,7 +2494,8 @@ class _RollFormatter:
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
         name = metadata.get("name", metadata.get("kind"))
-        operand = self.format(roll.operands[0])
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operand = self.format(operands[0])
         return _FormattedRoll(f"{name}({operand.text})", _CALL_PRECEDENCE)
 
     @staticmethod
@@ -2497,8 +2519,9 @@ class _RollFormatter:
     def _format_pool(
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
-        items = ", ".join(self.format(operand).text for operand in roll.operands)
-        if len(roll.operands) == 1:
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        items = ", ".join(self.format(operand).text for operand in operands)
+        if len(operands) == 1:
             items += ","
         text = f"({items})"
         return self._format_source_name(text, metadata)
@@ -2506,7 +2529,8 @@ class _RollFormatter:
     def _format_pool_selection(
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
-        operand = self.format(roll.operands[0])
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operand = self.format(operands[0])
         selectors = cast("list[object]", metadata.get("selectors", []))
         selector_text = ", ".join(
             self._format_selector(selector) for selector in selectors
@@ -2517,7 +2541,8 @@ class _RollFormatter:
     def _format_pool_sum(
         self, roll: Roll[object], _metadata: dict[str, object]
     ) -> _FormattedRoll:
-        operand = self.format(roll.operands[0])
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operand = self.format(operands[0])
         return _FormattedRoll(f"sum({operand.text})", _CALL_PRECEDENCE)
 
     @staticmethod
@@ -2549,7 +2574,8 @@ class _RollFormatter:
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
         operator_name = cast("str", metadata["operator"])
-        operand = self.format(roll.operands[0])
+        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operand = self.format(operands[0])
         if operator_name == "abs":
             return _FormattedRoll(f"abs({operand.text})", _CALL_PRECEDENCE)
         symbol = _UNARY_FORMATS[operator_name]
@@ -2670,11 +2696,15 @@ def _trace_from_root_roll(
         roller_id = f"roller{len(roller_ids)}"
         roller_ids[key] = roller_id
         rollers[roller_id] = {}
-        operand_ids = [visit_roller(operand) for operand in roller.operands]
-        rollers[roller_id] = {
-            **roller.metadata(),
-            **({"operands": operand_ids} if operand_ids else {}),
-        }
+        operands = roller.operands
+        operand_ids = (
+            None
+            if operands is None
+            else [visit_roller(operand) for operand in operands]
+        )
+        rollers[roller_id] = {"metadata": roller.metadata()}
+        if operand_ids is not None:
+            rollers[roller_id]["operands"] = operand_ids
         return roller_id
 
     def visit_roll(roll: Roll[object]) -> str:
@@ -2686,7 +2716,10 @@ def _trace_from_root_roll(
         roll_ids[key] = roll_id
         rolls[roll_id] = {}
         roller_id = visit_roller(roll.roller)
-        operand_ids = [visit_roll(operand) for operand in roll.operands]
+        operands = roll.operands
+        operand_ids = (
+            None if operands is None else [visit_roll(operand) for operand in operands]
+        )
         roll_data: dict[str, object]
         if isinstance(roll, SingleOutcomeRoll):
             roll_data = {"outcome": roll.outcome}
@@ -2695,8 +2728,9 @@ def _trace_from_root_roll(
         rolls[roll_id] = {
             "roller": roller_id,
             **roll_data,
-            "operands": operand_ids,
         }
+        if operand_ids is not None:
+            rolls[roll_id]["operands"] = operand_ids
         return roll_id
 
     root = visit_roll(root_roll)
