@@ -75,6 +75,20 @@ _UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
 )
 
 
+def _roll_operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
+    relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+    operands = relationships["operands"]
+    assert isinstance(operands, tuple)
+    return operands
+
+
+def _roller_operands(roller: Roller[object]) -> tuple[Roller[object], ...]:
+    relationships = roller._trace_relationships()  # ruff: ignore[private-member-access]
+    operands = relationships["operands"]
+    assert isinstance(operands, tuple)
+    return operands
+
+
 @dataclass(frozen=True)
 class _AddableOutcome:
     value: int
@@ -123,19 +137,18 @@ class TestRollError:
             return LiteralRoller(20) + damage
 
         roller = attack()
+        assert isinstance(roller, _SingleOutcomeFactoryRoller)
 
         with pytest.raises(RollError) as caught:
             roller.roll()
-        roller_operands = roller.operands
-        assert roller_operands is not None
-        attack_operands = roller_operands[0].operands
-        assert attack_operands is not None
-        assert caught.value.path == (
-            roller,
-            roller_operands[0],
-            attack_operands[1],
-            damage,
-        )
+        assert caught.value.path[0] is roller
+        assert [entry.metadata()["kind"] for entry in caught.value.path] == [
+            "dyce.factory",
+            "dyce.binary",
+            "dyce.pool-sum",
+            "dyce.pool-source",
+        ]
+        assert caught.value.path[-1] is damage
 
     def test_cause_preserved(self) -> None:
         failure = RuntimeError("source failure")
@@ -197,10 +210,17 @@ class TestTrace:
             return roll
 
         result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
 
         assert_type(result, Roll[int])
         assert result.outcomes == (4,)
-        assert result.operands == (roll,)
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
+        assert rolls["roll1"]["outcome"] == roll.outcome
 
     def test_callback_returns_roll_with_multiple_outcomes(self) -> None:
         returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
@@ -209,34 +229,51 @@ class TestTrace:
             return returned
 
         result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
 
         assert_type(result, Roll[int])
         assert result.outcomes == (2, 3)
-        assert result.operands == (returned,)
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
+        assert rolls["roll1"]["outcomes"] == list(returned.outcomes)
 
     def test_callback_returns_single_roller(self) -> None:
         def callback() -> SingleOutcomeRoller[int]:
             return LiteralRoller(8)
 
         result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
 
         assert_type(result, Roll[int])
         assert result.outcomes == (8,)
-        assert result.operands is not None
-        assert isinstance(result.operands[0], SingleOutcomeRoll)
-        assert result.operands[0].outcome == 8
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
+        assert rolls["roll1"]["outcome"] == 8
 
     def test_callback_returns_roller_with_multiple_outcomes(self) -> None:
         def callback() -> Roller[int]:
             return PRoller(P(H({2: 1}), H({3: 1})))
 
         result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
 
         assert_type(result, Roll[int])
         assert result.outcomes == (2, 3)
-        assert result.operands is not None
-        assert isinstance(result.operands[0], Roll)
-        assert result.operands[0].outcomes == (2, 3)
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
+        assert rolls["roll1"]["outcomes"] == [2, 3]
 
     def test_callback_returns_literal_string(self) -> None:
         source = LiteralRoller(3)
@@ -245,14 +282,18 @@ class TestTrace:
             return "hit" if roll.outcome == 3 else "miss"
 
         result = trace(callback, source)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
 
         assert_type(result, Roll[str])
         assert result.outcomes == ("hit",)
-        assert result.operands is not None
-        assert len(result.operands) == 1
-        assert isinstance(result.operands[0], SingleOutcomeRoll)
-        assert result.operands[0].outcome == "hit"
-        assert isinstance(result.operands[0].roller, LiteralRoller)
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": ["roll1"],
+            "result": "roll2",
+        }
+        assert rolls["roll1"]["outcome"] == 3
+        assert rolls["roll2"]["outcome"] == "hit"
 
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_nonroller_source_raises(self) -> None:
@@ -267,7 +308,35 @@ class TestTrace:
         with pytest.raises(BeartypeCallHintViolation):
             trace(Mock(), cast("Any", H(6)))
 
-    def test_binary_return_trace(self) -> None:
+    def test_trace_separates_argument_from_unrelated_result(self) -> None:
+        def callback(_roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoller[int]:
+            return LiteralRoller(3)
+
+        result = trace(callback, LiteralRoller(2))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": ["roll1"],
+            "result": "roll2",
+        }
+        assert rolls["roll1"]["outcome"] == 2
+        assert rolls["roll2"]["outcome"] == 3
+
+    def test_trace_reuses_id_when_argument_is_result(self) -> None:
+        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
+            return roll
+
+        result = trace(callback, LiteralRoller(2))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": ["roll1"],
+            "result": "roll1",
+        }
+
+    def test_trace_records_argument_reached_through_result(self) -> None:
         def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
             return 1 + roll
 
@@ -275,10 +344,13 @@ class TestTrace:
         rolls = result.trace()["rolls"]
 
         assert isinstance(rolls, dict)
-        assert rolls["roll0"]["operands"] == ["roll1"]
-        assert rolls["roll1"]["operands"] == ["roll2", "roll3"]
-        assert rolls["roll2"]["outcome"] == 1
-        assert rolls["roll0"]["outcomes"] == [1 + rolls["roll3"]["outcome"]]
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": ["roll1"],
+            "result": "roll2",
+        }
+        assert rolls["roll2"]["relationships"]["operands"] == ["roll3", "roll1"]
+        assert rolls["roll3"]["outcome"] == 1
+        assert rolls["roll0"]["outcomes"] == [1 + rolls["roll1"]["outcome"]]
 
     def test_implicit_name_uses_callback_name(self) -> None:
         def callback() -> int:
@@ -400,17 +472,26 @@ class TestTrace:
         rerolled_result = trace_roller.roll()
 
         assert_type(result, Roll[int])
-        assert trace_roller.operands == ()
         rollers = result.trace()["rollers"]
+        rolls = result.trace()["rolls"]
         assert isinstance(rollers, dict)
-        assert rollers["roller0"]["operands"] == []
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"]["relationships"]["sources"] == []
         assert result.outcomes == (2,)
-        assert result.operands is not None
-        assert result.operands[0].roller is first_roller
+        assert rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
+        assert rolls["roll1"]["roller"] == "roller1"
         assert rerolled_result.roller is trace_roller
         assert rerolled_result.outcomes == (5, 8)
-        assert rerolled_result.operands is not None
-        assert rerolled_result.operands[0].roller is second_roller
+        rerolled_trace = rerolled_result.trace()
+        rerolled_rolls = rerolled_trace["rolls"]
+        assert isinstance(rerolled_rolls, dict)
+        assert rerolled_rolls["roll0"]["relationships"] == {
+            "arguments": [],
+            "result": "roll1",
+        }
 
     @pytest.mark.parametrize(
         ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
@@ -619,8 +700,7 @@ class TestHableAndRollerBinaryArithmetic:
 
         with patch.object(hable, "h", wraps=hable.h) as h_mock:
             combined = LiteralRoller(1) + hable
-            operands = combined.operands
-            assert operands is not None
+            operands = _roller_operands(combined)
             wrapped = operands[1]
 
             assert isinstance(wrapped, HableRoller)
@@ -630,8 +710,7 @@ class TestHableAndRollerBinaryArithmetic:
     def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
         h = H(8)
         combined = LiteralRoller(1) + h
-        operands = combined.operands
-        assert operands is not None
+        operands = _roller_operands(combined)
         wrapped = operands[1]
 
         assert isinstance(wrapped, HRoller)
@@ -640,11 +719,9 @@ class TestHableAndRollerBinaryArithmetic:
     def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
         p = P(H({2: 1}), H({3: 1}))
         combined = LiteralRoller(1) + p
-        operands = combined.operands
-        assert operands is not None
+        operands = _roller_operands(combined)
         pool_sum_roller = operands[1]
-        pool_sum_operands = pool_sum_roller.operands
-        assert pool_sum_operands is not None
+        pool_sum_operands = _roller_operands(pool_sum_roller)
         (p_roller,) = pool_sum_operands
 
         assert pool_sum_roller.metadata() == {"kind": "dyce.pool-sum"}
@@ -813,7 +890,7 @@ class TestHableRoller:
         assert rollers["roller0"] == {
             "metadata": {"kind": "dyce.source", "name": "source"}
         }
-        assert "operands" not in rolls["roll0"]
+        assert "relationships" not in rolls["roll0"]
 
 
 class TestLiteralRoller:
@@ -926,11 +1003,10 @@ class TestRoller:
         parent_selection = pool.select(-1, 0)
         selection = parent_selection.select(1)
         roll = selection.roll()
-        assert roll.operands is not None
-        (parent_roll,) = roll.operands
+        (parent_roll,) = _roll_operands(roll)
 
         assert_type(selection, Roller[int])  # zuban: ignore[misc]
-        assert selection.operands == (parent_selection,)
+        assert _roller_operands(selection) == (parent_selection,)
         assert roll.outcomes == (1,)
         assert isinstance(parent_roll, Roll)
         assert parent_roll.outcomes == (3, 1)
@@ -954,14 +1030,14 @@ class TestRoller:
         right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
         combined = op(left, right)
         expected_outcome = op(lhs, rhs)
-        left_operand, right_operand = combined.operands
+        left_operand, right_operand = _roller_operands(combined)
 
         assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
         assert left_operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert left_operand.operands == (left,)
+        assert _roller_operands(left_operand) == (left,)
         assert right_operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert right_operand.operands == (right,)
+        assert _roller_operands(right_operand) == (right,)
         assert op(left, LiteralRoller(rhs)).roll().outcome == expected_outcome
         assert op(LiteralRoller(lhs), right).roll().outcome == expected_outcome
         assert op(lhs, right).roll().outcome == expected_outcome
@@ -978,12 +1054,12 @@ class TestRoller:
         pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
         combined = op(pool)
         expected_outcome = op(value)
-        (operand,) = combined.operands
+        (operand,) = _roller_operands(combined)
 
         assert combined.roll().outcome == expected_outcome
         assert combined.metadata() == {"kind": "dyce.unary", "operator": name}
         assert operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert operand.operands == (pool,)
+        assert _roller_operands(operand) == (pool,)
 
 
 class TestPRoller:
@@ -1006,10 +1082,8 @@ class TestPRoller:
         assert_type(roll, Roll[int])  # zuban: ignore[misc]
         assert pool.p is p
         assert pool.metadata()["name"] == "pool"
-        assert pool.operands is None
         assert roll.outcomes == (1, 2)
         assert roll.roller is pool
-        assert roll.operands is None
 
     def test_select_produces_multi_outcome_roller(self) -> None:
         pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
@@ -1027,11 +1101,11 @@ class TestPRoller:
                 "kind": "dyce.pool-selection",
                 "selectors": [-1, 0],
             },
-            "operands": ["roller1"],
+            "relationships": {"operands": ["roller1"]},
         }
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["outcomes"] == [3, 1]
-        assert rolls["roll0"]["operands"] == ["roll1"]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1"]
         assert rolls["roll1"]["outcomes"] == [1, 2, 3]
 
     def test_invalid_selection_fails_when_rolled(self) -> None:
@@ -1065,8 +1139,7 @@ class TestRollerPool:
         assert pool.rollers == (two, one)
         assert pool.operands == (two, one)
         assert roll.outcomes == (1, 2)
-        assert roll.operands is not None
-        assert tuple(operand.roller for operand in roll.operands) == (one, two)
+        assert tuple(operand.roller for operand in _roll_operands(roll)) == (one, two)
         assert pool.metadata() == {"kind": "dyce.pool", "name": "pool"}
 
     def test_reused_single_roller_produces_independent_rolls(self) -> None:
@@ -1079,9 +1152,9 @@ class TestRollerPool:
         assert isinstance(rolls, dict)
         assert rollers["roller0"] == {
             "metadata": {"kind": "dyce.pool"},
-            "operands": ["roller1", "roller1"],
+            "relationships": {"operands": ["roller1", "roller1"]},
         }
-        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll2"]
 
     def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
         pool = RollerPool(
@@ -1136,14 +1209,23 @@ class TestSingleOutcomeFactoryRoller:
 
         assert factory().metadata()["name"] == name
 
-    def test_operands(self) -> None:
+    def test_expression(self) -> None:
         literal_roller = LiteralRoller(3)
 
         @roller_factory
         def factory() -> SingleOutcomeRoller[int]:
             return literal_roller
 
-        assert factory().operands == (literal_roller,)
+        roller = factory()
+        assert isinstance(roller, _SingleOutcomeFactoryRoller)
+        assert roller.expression is literal_roller
+        roller_trace = roller.roll().trace()
+        rollers = roller_trace["rollers"]
+        rolls = roller_trace["rolls"]
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
+        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
 
     def test_returning_non_roller_raises(self) -> None:
         @roller_factory
@@ -1200,14 +1282,23 @@ class TestFactoryRoller:
 
         assert factory().metadata()["name"] == name
 
-    def test_operands(self) -> None:
+    def test_expression(self) -> None:
         p_roller = PRoller(P(2))
 
         @roller_factory
         def factory() -> Roller[int]:
             return p_roller
 
-        assert factory().operands == (p_roller,)
+        roller = factory()
+        assert isinstance(roller, _FactoryRoller)
+        assert roller.expression is p_roller
+        roller_trace = roller.roll().trace()
+        rollers = roller_trace["rollers"]
+        rolls = roller_trace["rolls"]
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
+        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
 
 
 class TestSingleOutcomeRoll:
@@ -1283,10 +1374,10 @@ class TestSingleOutcomeRoll:
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
             "metadata": {"kind": "dyce.binary", "operator": name},
-            "operands": ["roller1", "roller2"],
+            "relationships": {"operands": ["roller1", "roller2"]},
         }
         assert isinstance(rolls, dict)
-        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll2"]
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
     def test_unary_operators_preserve_outcomes_and_trace(
@@ -1304,10 +1395,10 @@ class TestSingleOutcomeRoll:
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
             "metadata": {"kind": "dyce.unary", "operator": name},
-            "operands": ["roller1"],
+            "relationships": {"operands": ["roller1"]},
         }
         assert isinstance(rolls, dict)
-        assert rolls["roll0"]["operands"] == ["roll1"]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1"]
 
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _COMPARISON_CASES)
     def test_comparisons_preserve_outcomes_and_trace(
@@ -1328,10 +1419,10 @@ class TestSingleOutcomeRoll:
         assert isinstance(rollers, dict)
         assert rollers["roller0"] == {
             "metadata": {"kind": "dyce.binary", "operator": name},
-            "operands": ["roller1", "roller2"],
+            "relationships": {"operands": ["roller1", "roller2"]},
         }
         assert isinstance(rolls, dict)
-        assert rolls["roll0"]["operands"] == ["roll1", "roll2"]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll2"]
 
     def test_trace_is_json_serializable(self) -> None:
         roll = 2 + LiteralRoller(3).roll()
@@ -1351,8 +1442,11 @@ class TestSingleOutcomeRoll:
 
         assert isinstance(separate_rolls, dict)
         assert isinstance(reused_rolls, dict)
-        assert separate_rolls["roll0"]["operands"] == ["roll1", "roll2"]
-        assert reused_rolls["roll0"]["operands"] == ["roll1", "roll1"]
+        assert separate_rolls["roll0"]["relationships"]["operands"] == [
+            "roll1",
+            "roll2",
+        ]
+        assert reused_rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll1"]
 
 
 class TestRoll:
@@ -1362,7 +1456,7 @@ class TestRoll:
 
         assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
         assert roll.outcome == "ab"
-        assert roll.operands == (pool_roll,)
+        assert _roll_operands(roll) == (pool_roll,)
 
     def test_empty_outcomes_raise(self) -> None:
         with pytest.raises(ValueError, match="at least one outcome"):
@@ -1762,11 +1856,10 @@ class TestMixedRollBinaryArithmetic:
         rerolled_result = result.roller.roll()
 
         assert result.outcome == first + 2
-        assert result.operands is not None
-        assert result.operands[0] is left_roll
-        assert result.operands[1].roller is right_roller
-        roller_operands = result.roller.operands
-        assert roller_operands is not None
+        roll_operands = _roll_operands(result)
+        assert roll_operands[0] is left_roll
+        assert roll_operands[1].roller is right_roller
+        roller_operands = _roller_operands(result.roller)
         assert roller_operands[0] is left_roller
         assert roller_operands[1] is right_roller
         assert rerolled_result.outcome == second + 2
@@ -1834,6 +1927,24 @@ class TestMixedRollBinaryArithmetic:
         )
 
     def test_format_customer_roller_fallback(self) -> None:
+        class CustomRoll(SingleOutcomeRoll[int]):
+            __slots__ = ("operands",)
+            operands: tuple[Roll[object], ...]
+
+            def __init__(
+                self,
+                outcome: int,
+                roller: SingleOutcomeRoller[int],
+                operands: tuple[Roll[object], ...],
+            ) -> None:
+                super().__init__(outcome, roller)
+                object.__setattr__(self, "operands", operands)
+
+            def _trace_relationships(
+                self,
+            ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+                return {"operands": self.operands}
+
         class CustomRoller(SingleOutcomeRoller[int]):
             def __init__(self, operand: SingleOutcomeRoller[int] | None = None) -> None:
                 self._operand = operand
@@ -1845,15 +1956,18 @@ class TestMixedRollBinaryArithmetic:
             def metadata(self) -> dict[str, object]:
                 return {"kind": "tests.custom", "name": "custom"}
 
+            def _trace_relationships(
+                self,
+            ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+                return {"operands": self.operands}
+
             def _roll(self) -> SingleOutcomeRoll[int]:
                 if self._operand is None:
                     outcome: int = 2
                     return SingleOutcomeRoll[int](outcome, self)
                 else:
                     operand_roll = self._operand.roll()
-                    return SingleOutcomeRoll(
-                        operand_roll.outcome, self, (operand_roll,)
-                    )
+                    return CustomRoll(operand_roll.outcome, self, (operand_roll,))
 
         source = CustomRoller()
 
