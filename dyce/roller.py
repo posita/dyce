@@ -55,6 +55,7 @@ _T3 = TypeVar("_T3")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
+_NodeT = TypeVar("_NodeT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
 _ParamsT = ParamSpec("_ParamsT")
 
@@ -156,12 +157,6 @@ _COMPARISON_NAMES = frozenset(("lt", "le", "eq", "ne", "ge", "gt"))
 _UNARY_PRECEDENCE = 80
 _CALL_PRECEDENCE = 100
 _ATOM_PRECEDENCE = 110
-
-
-@dataclass(frozen=True, slots=True)
-class _FormattedRoll:
-    text: str
-    precedence: int
 
 
 class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
@@ -802,18 +797,6 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
             "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _INVERT)
         )
 
-    @property
-    def operands(
-        self,
-    ) -> tuple["Roller[object]", ...] | None:
-        r"""
-        The immediate rollers consumed by this roller.
-
-        `None` means operands do not apply to this roller.
-        An empty tuple means operands apply, but this roller has none.
-        """
-        return None
-
     @abstractmethod
     def metadata(self) -> dict[str, object]:
         r"""
@@ -823,8 +806,13 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         Dyce kinds use the `dyce.` prefix.
         Customer kinds should use a prefix controlled by the customer to avoid collisions.
         Metadata describes only this roller.
-        [`operands`][dyce.roller.Roller.operands] describes its relationships to other rollers.
         """
+
+    def at(
+        self: "Roller[_CanAddSameT]", which: GetItemT, *more: GetItemT
+    ) -> "SingleOutcomeRoller[_CanAddSameT]":
+        r"""Returns a roller summing the outcomes at the selected positions."""
+        return self.select(which, *more).sum()
 
     def roll(self) -> "Roll[_T_co]":
         r"""
@@ -839,21 +827,6 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
             raise
         except Exception as exc:
             raise RollError(str(exc), (self,)) from exc
-
-    @abstractmethod
-    def _roll(self) -> "Roll[_T_co]":
-        r"""
-        Subclass implementation hook for producing a nonempty sample outcome collection trace.
-
-        Raises `ValueError` if no outcomes can be produced.
-        Child rollers should be called via their public [`roll` methods][dyce.roller.Roller.roll].
-        """
-
-    def at(
-        self: "Roller[_CanAddSameT]", which: GetItemT, *more: GetItemT
-    ) -> "SingleOutcomeRoller[_CanAddSameT]":
-        r"""Returns a roller summing the outcomes at the selected positions."""
-        return self.select(which, *more).sum()
 
     def select(self, which: GetItemT, *more: GetItemT) -> "Roller[_T_co]":
         r"""
@@ -871,6 +844,20 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         if isinstance(self, SingleOutcomeRoller):
             return self
         return _PoolSumRoller(self)
+
+    @abstractmethod
+    def _roll(self) -> "Roll[_T_co]":
+        r"""
+        Subclass implementation hook for producing a nonempty sample outcome collection trace.
+
+        Raises `ValueError` if no outcomes can be produced.
+        Child rollers should be called via their public [`roll` methods][dyce.roller.Roller.roll].
+        """
+
+    def _trace_relationships(
+        self,
+    ) -> "dict[str, Roller[object] | tuple[Roller[object], ...]]":
+        return {}
 
 
 class SingleOutcomeRoller(Roller[_T_co], ABC):
@@ -1026,6 +1013,11 @@ class RollerPool(Roller[_T_co]):
             metadata["name"] = self._name
         return metadata
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
     def _roll(self) -> "Roll[_T_co]":
         if not self._rollers:
             raise ValueError("no outcomes from an empty pool")
@@ -1044,25 +1036,24 @@ class RollerPool(Roller[_T_co]):
             "tuple[Roll[object], ...]",
             tuple(rolls),
         )
-        return Roll(outcomes, self, operands)
+        return _OperandRoll(outcomes, self, operands)
 
 
 @dataclass(frozen=True, slots=True, eq=False)
 class Roll(_HableOpsOptOut, Generic[_T_co]):
-    r"""
-    An immutable trace of one or more outcomes.
-
-    `operands` is `None` when operands do not apply to this roll.
-    An empty operand tuple means operands apply, but this roll has none.
-    """
+    r"""An immutable trace of one or more outcomes."""
 
     outcomes: tuple[_T_co, ...]
     roller: Roller[_T_co] = field(repr=False)
-    operands: tuple["Roll[object]", ...] | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         if not self.outcomes:
             raise ValueError("a roll must contain at least one outcome")
+
+    def _trace_relationships(
+        self,
+    ) -> "dict[str, Roll[object] | tuple[Roll[object], ...]]":
+        return {}
 
     @overload
     def __add__(
@@ -1682,7 +1673,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         expression = _ROLL_FORMATTER.format(self)
         result = (
             repr(cast("SingleOutcomeRoll[_T_co]", self).outcome)
-            if type(self) is SingleOutcomeRoll
+            if isinstance(cast("object", self), SingleOutcomeRoll)
             else repr(self.outcomes)
         )
         return f"{expression.text} => {result}"
@@ -1697,16 +1688,18 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
             return self
         roller = self.roller.sum()
         outcome = _sum_outcomes(self.outcomes)
-        return SingleOutcomeRoll(outcome, roller, (cast("Roll[object]", self),))
+        return _SingleOutcomeOperandRoll(outcome, roller, (cast("Roll[object]", self),))
 
     def trace(self) -> dict[str, object]:
         r"""
         Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
 
         The `root` entry identifies a record in `rolls`.
-        Each roller record contains its roller’s metadata and, when applicable, its operand roller references.
+        Each roller record contains its roller’s metadata and, when applicable, its named relationships to other rollers.
         Each roll’s `roller` entry identifies its producing roller in `rollers`.
-        Roll records contain operand roll references when operands apply.
+        Roll records contain named relationships to other rolls when applicable.
+        A singular relationship contains one ID.
+        A plural relationship contains a list of IDs.
         Outcomes and literal values must themselves be JSON-compatible for the complete trace to be serializable as JSON.
         """
         return _trace_from_root_roll(cast("Roll[object]", self))
@@ -1722,9 +1715,8 @@ class SingleOutcomeRoll(Roll[_T_co]):
         self,
         outcome: _T_co,
         roller: SingleOutcomeRoller[_T_co],
-        operands: tuple["Roll[object]", ...] | None = None,
     ) -> None:
-        super(SingleOutcomeRoll, self).__init__((outcome,), roller, operands)
+        super(SingleOutcomeRoll, self).__init__((outcome,), roller)
 
     @property
     def outcome(self) -> _T_co:
@@ -1762,7 +1754,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
             self.roller, rhs_roll.roller, operator
         )
         outcome = operator(self.outcome, rhs_roll.outcome)
-        return SingleOutcomeRoll(outcome, roller, (self, rhs_roll))
+        return _SingleOutcomeOperandRoll(outcome, roller, (self, rhs_roll))
 
     def _reflected_binary_operator(
         self, lhs: object, operator: _BinaryOperator
@@ -1776,12 +1768,12 @@ class SingleOutcomeRoll(Roll[_T_co]):
             lhs_roll.roller, self.roller, operator
         )
         outcome = operator(lhs_roll.outcome, self.outcome)
-        return SingleOutcomeRoll(outcome, roller, (lhs_roll, self))
+        return _SingleOutcomeOperandRoll(outcome, roller, (lhs_roll, self))
 
     def _unary_operator(self, operator: _UnaryOperator) -> "SingleOutcomeRoll[object]":
         roller: SingleOutcomeRoller[object] = _UnaryRoller(self.roller, operator)
         outcome = operator(self.outcome)
-        return SingleOutcomeRoll(outcome, roller, (self,))
+        return _SingleOutcomeOperandRoll(outcome, roller, (self,))
 
 
 class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
@@ -1804,11 +1796,16 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.binary", "operator": self._operator.name}
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
         outcome = self._operator(left_roll.outcome, right_roll.outcome)
-        return SingleOutcomeRoll(
+        return _SingleOutcomeOperandRoll(
             cast("_ResultT", outcome), self, (left_roll, right_roll)
         )
 
@@ -1829,10 +1826,17 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.unary", "operator": self._operator.name}
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
         outcome = self._operator(operand_roll.outcome)
-        return SingleOutcomeRoll(cast("_ResultT", outcome), self, (operand_roll,))
+        return _SingleOutcomeOperandRoll(
+            cast("_ResultT", outcome), self, (operand_roll,)
+        )
 
 
 class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
@@ -1853,10 +1857,17 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.pool-sum"}
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
     def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
         outcome = _sum_outcomes(pool_roll.outcomes)
-        return SingleOutcomeRoll(outcome, self, (cast("Roll[object]", pool_roll),))
+        return _SingleOutcomeOperandRoll(
+            outcome, self, (cast("Roll[object]", pool_roll),)
+        )
 
 
 class _SelectedPoolRoller(Roller[_T_co]):
@@ -1887,13 +1898,18 @@ class _SelectedPoolRoller(Roller[_T_co]):
             ],
         }
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
     def _roll(self) -> Roll[_T_co]:
         parent_roll = self._parent.roll()
         outcomes = tuple(getitems(parent_roll.outcomes, self._selectors))
         if not outcomes:
             raise ValueError("no outcomes from an empty selection")
         operands = (cast("Roll[object]", parent_roll),)
-        return Roll(outcomes, self, operands)
+        return _OperandRoll(outcomes, self, operands)
 
 
 @dataclass(frozen=True)
@@ -1912,15 +1928,165 @@ class _TraceRoller(Roller[_T_co]):
         self._call = call
 
     @property
-    def operands(self) -> tuple[Roller[Any], ...]:
+    def sources(self) -> tuple[Roller[Any], ...]:
         return self._call.sources
 
     def metadata(self) -> dict[str, object]:
         return self._call.metadata()
 
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
+
     def _roll(self) -> Roll[_T_co]:
-        result = _eval_trace_call(self._call)
-        return Roll(result.outcomes, self, (result,))
+        arguments, result = _eval_trace_call(self._call)
+        return _TraceRoll(result.outcomes, self, arguments, result)
+
+
+class _FactoryRoller(Roller[_T_co]):
+    def __init__(self, expression: Roller[_T_co], name: str) -> None:
+        self._expression = expression
+        self._name = name
+
+    @property
+    def expression(self) -> Roller[_T_co]:
+        return self._expression
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.factory", "name": self._name}
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"expression": cast("Roller[object]", self.expression)}
+
+    def _roll(self) -> Roll[_T_co]:
+        result = self._expression.roll()
+        return _FactoryRoll(result.outcomes, self, result)
+
+
+class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
+    def __init__(self, expression: SingleOutcomeRoller[_T_co], name: str) -> None:
+        self._expression = expression
+        self._name = name
+
+    @property
+    def expression(self) -> SingleOutcomeRoller[_T_co]:
+        return self._expression
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.factory", "name": self._name}
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"expression": cast("Roller[object]", self.expression)}
+
+    def _roll(self) -> SingleOutcomeRoll[_T_co]:
+        result = self._expression.roll()
+        return _SingleOutcomeFactoryRoll(result.outcome, self, result)
+
+
+class _OperandRoll(Roll[_T_co]):
+    __slots__ = ("operands",)
+    operands: tuple[Roll[object], ...]
+
+    def __init__(
+        self,
+        outcomes: tuple[_T_co, ...],
+        roller: Roller[_T_co],
+        operands: tuple[Roll[object], ...],
+    ) -> None:
+        super().__init__(outcomes, roller)
+        object.__setattr__(self, "operands", operands)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"operands": self.operands}
+
+
+class _SingleOutcomeOperandRoll(SingleOutcomeRoll[_T_co]):
+    __slots__ = ("operands",)
+    operands: tuple[Roll[object], ...]
+
+    def __init__(
+        self,
+        outcome: _T_co,
+        roller: SingleOutcomeRoller[_T_co],
+        operands: tuple[Roll[object], ...],
+    ) -> None:
+        super().__init__(outcome, roller)
+        object.__setattr__(self, "operands", operands)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"operands": self.operands}
+
+
+class _FactoryRoll(Roll[_T_co]):
+    __slots__ = ("result",)
+    result: Roll[object]
+
+    def __init__(
+        self,
+        outcomes: tuple[_T_co, ...],
+        roller: Roller[_T_co],
+        result: Roll[object],
+    ) -> None:
+        super().__init__(outcomes, roller)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"result": self.result}
+
+
+class _SingleOutcomeFactoryRoll(SingleOutcomeRoll[_T_co]):
+    __slots__ = ("result",)
+    result: SingleOutcomeRoll[_T_co]
+
+    def __init__(
+        self,
+        outcome: _T_co,
+        roller: SingleOutcomeRoller[_T_co],
+        result: SingleOutcomeRoll[_T_co],
+    ) -> None:
+        super().__init__(outcome, roller)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"result": cast("Roll[object]", self.result)}
+
+
+class _TraceRoll(Roll[_T_co]):
+    __slots__ = ("arguments", "result")
+    arguments: tuple[Roll[object], ...]
+    result: Roll[_T_co]
+
+    def __init__(
+        self,
+        outcomes: tuple[_T_co, ...],
+        roller: Roller[_T_co],
+        arguments: tuple[Roll[object], ...],
+        result: Roll[_T_co],
+    ) -> None:
+        super().__init__(outcomes, roller)
+        object.__setattr__(self, "arguments", arguments)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {
+            "arguments": self.arguments,
+            "result": cast("Roll[object]", self.result),
+        }
 
 
 class _RollerFactoryDecorator(Protocol):
@@ -1932,40 +2098,6 @@ class _RollerFactoryDecorator(Protocol):
     def __call__(
         self, fn: Callable[_ParamsT, Roller[_T]], /
     ) -> Callable[_ParamsT, Roller[_T]]: ...
-
-
-class _FactoryRoller(Roller[_T_co]):
-    def __init__(self, expression: Roller[_T_co], name: str) -> None:
-        self._expression = expression
-        self._name = name
-
-    @property
-    def operands(self) -> tuple[Roller[_T_co], ...]:
-        return (self._expression,)
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.factory", "name": self._name}
-
-    def _roll(self) -> Roll[_T_co]:
-        result = self._expression.roll()
-        return Roll(result.outcomes, self, (result,))
-
-
-class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
-    def __init__(self, expression: SingleOutcomeRoller[_T_co], name: str) -> None:
-        self._expression = expression
-        self._name = name
-
-    @property
-    def operands(self) -> tuple[SingleOutcomeRoller[_T_co], ...]:
-        return (self._expression,)
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.factory", "name": self._name}
-
-    def _roll(self) -> SingleOutcomeRoll[_T_co]:
-        result = self._expression.roll()
-        return SingleOutcomeRoll(result.outcome, self, (result,))
 
 
 @overload
@@ -2006,8 +2138,10 @@ def roller_factory(
         >>> roll = damage_3_roller.roll()
         >>> roll.roller.metadata()
         {'kind': 'dyce.factory', 'name': 'damage'}
-        >>> roll.operands[0].roller.metadata()
-        {'kind': 'dyce.binary', 'operator': 'add'}
+        >>> rollers = roll.trace()["rollers"]
+        >>> assert isinstance(rollers, dict)
+        >>> rollers["roller0"]["relationships"]
+        {'expression': 'roller1'}
 
     Supply *name* to better distinguish *fn*:
 
@@ -2407,7 +2541,7 @@ def trace(
     Rolls *sources*, calls *callback* with those rolls and *state*, and returns a named outcome trace.
 
     A returned roller is rolled, a returned roll is retained, and any other return value is wrapped in a roll from a [`LiteralRoller`][dyce.roller.LiteralRoller].
-    The enclosing roll has that roll as its sole operand.
+    The enclosing roll records the source rolls as arguments and the callback return as its result.
     Supplied *state* is included unchanged in the callback metadata.
     Its values must be JSON-compatible for JSON serialization of the trace.
     *name* defaults to the callback’s `__name__` or its type’s `__name__`.
@@ -2441,13 +2575,19 @@ def trace(
         state,
     )
     try:
-        result = _eval_trace_call(call)
-        return Roll(result.outcomes, _TraceRoller(call), (result,))
+        arguments, result = _eval_trace_call(call)
+        return _TraceRoll(result.outcomes, _TraceRoller(call), arguments, result)
     except RollError as exc:
         exc.path = (call, *exc.path)
         raise
     except Exception as exc:
         raise RollError(str(exc), (call,)) from exc
+
+
+@dataclass(frozen=True, slots=True)
+class _FormattedRoll:
+    text: str
+    precedence: int
 
 
 class _RollFormatter:
@@ -2483,7 +2623,7 @@ class _RollFormatter:
     ) -> _FormattedRoll:
         operator_name = cast("str", metadata["operator"])
         symbol, precedence = _BINARY_FORMATS[operator_name]
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operands = self._operands(roll)
         left = self.format(operands[0])
         right = self.format(operands[1])
         left_text = self._format_child(left, precedence, operator_name, right=False)
@@ -2494,9 +2634,14 @@ class _RollFormatter:
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
         name = metadata.get("name", metadata.get("kind"))
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
-        operand = self.format(operands[0])
-        return _FormattedRoll(f"{name}({operand.text})", _CALL_PRECEDENCE)
+        result = cast(
+            "_FactoryRoll[object] | _SingleOutcomeFactoryRoll[object] | _TraceRoll[object]",
+            roll,
+        ).result
+        return _FormattedRoll(
+            f"{name}({self.format(result).text})",
+            _CALL_PRECEDENCE,
+        )
 
     @staticmethod
     def _format_child(
@@ -2519,7 +2664,7 @@ class _RollFormatter:
     def _format_pool(
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operands = self._operands(roll)
         items = ", ".join(self.format(operand).text for operand in operands)
         if len(operands) == 1:
             items += ","
@@ -2529,7 +2674,7 @@ class _RollFormatter:
     def _format_pool_selection(
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operands = self._operands(roll)
         operand = self.format(operands[0])
         selectors = cast("list[object]", metadata.get("selectors", []))
         selector_text = ", ".join(
@@ -2541,9 +2686,15 @@ class _RollFormatter:
     def _format_pool_sum(
         self, roll: Roll[object], _metadata: dict[str, object]
     ) -> _FormattedRoll:
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operands = self._operands(roll)
         operand = self.format(operands[0])
         return _FormattedRoll(f"sum({operand.text})", _CALL_PRECEDENCE)
+
+    @staticmethod
+    def _operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
+        return cast(
+            "_OperandRoll[object] | _SingleOutcomeOperandRoll[object]", roll
+        ).operands
 
     @staticmethod
     def _format_selector(selector: object) -> str:
@@ -2574,7 +2725,7 @@ class _RollFormatter:
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
         operator_name = cast("str", metadata["operator"])
-        operands = cast("tuple[Roll[object], ...]", roll.operands)
+        operands = self._operands(roll)
         operand = self.format(operands[0])
         if operator_name == "abs":
             return _FormattedRoll(f"abs({operand.text})", _CALL_PRECEDENCE)
@@ -2590,8 +2741,12 @@ class _RollFormatter:
         self, roll: Roll[object], metadata: dict[str, object]
     ) -> _FormattedRoll:
         name = metadata.get("name", metadata.get("kind"))
-        if roll.operands:
-            operands = ", ".join(self.format(operand).text for operand in roll.operands)
+        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+        related_rolls: tuple[Roll[object], ...] = ()
+        for value in relationships.values():
+            related_rolls += value if isinstance(value, tuple) else (value,)
+        if related_rolls:
+            operands = ", ".join(self.format(operand).text for operand in related_rolls)
             text = f"{name}({operands})"
         else:
             text = (
@@ -2657,27 +2812,42 @@ def _compare_roll(
         lhs_roll.roller, rhs_roll.roller, comparison
     )
     outcome = comparison(lhs_roll.outcome, rhs_roll.outcome)
-    return SingleOutcomeRoll(cast("bool", outcome), roller, (lhs_roll, rhs_roll))
+    return _SingleOutcomeOperandRoll(
+        cast("bool", outcome), roller, (lhs_roll, rhs_roll)
+    )
 
 
 def _eval_trace_call(
     call: _TraceCall,
-) -> Roll[Any]:
+) -> tuple[tuple[Roll[object], ...], Roll[Any]]:
     if any(not isinstance(source, Roller) for source in call.sources):
         # TODO(@posita): # ruff: ignore[missing-todo-link] - In theory, we might be able
         # to use a generic type alias to help reduce the number of overloads
         raise TypeError("trace sources must be rollers")
-    inputs = tuple(source.roll() for source in call.sources)
-    result = call.callback(*inputs, **call.state)
+    arguments = tuple(source.roll() for source in call.sources)
+    result = call.callback(*arguments, **call.state)
     if isinstance(result, Roller):
         result = result.roll()
     elif not isinstance(result, Roll):
         result = LiteralRoller(result).roll()
-    return result
+    return cast("tuple[Roll[object], ...]", arguments), result
 
 
 def _sum_outcomes(outcomes: tuple[_CanAddSameT, ...]) -> _CanAddSameT:
     return reduce(operator.add, outcomes[1:], outcomes[0])
+
+
+def _trace_relationship_ids(
+    relationships: dict[str, _NodeT | tuple[_NodeT, ...]],
+    visit: Callable[[_NodeT], str],
+) -> dict[str, object]:
+    relationship_ids: dict[str, object] = {}
+    for name, value in relationships.items():
+        if isinstance(value, tuple):
+            relationship_ids[name] = [visit(related) for related in value]
+        else:
+            relationship_ids[name] = visit(value)
+    return relationship_ids
 
 
 def _trace_from_root_roll(
@@ -2696,15 +2866,11 @@ def _trace_from_root_roll(
         roller_id = f"roller{len(roller_ids)}"
         roller_ids[key] = roller_id
         rollers[roller_id] = {}
-        operands = roller.operands
-        operand_ids = (
-            None
-            if operands is None
-            else [visit_roller(operand) for operand in operands]
-        )
+        relationships = roller._trace_relationships()  # ruff: ignore[private-member-access]
+        relationship_ids = _trace_relationship_ids(relationships, visit_roller)
         rollers[roller_id] = {"metadata": roller.metadata()}
-        if operand_ids is not None:
-            rollers[roller_id]["operands"] = operand_ids
+        if relationship_ids:
+            rollers[roller_id]["relationships"] = relationship_ids
         return roller_id
 
     def visit_roll(roll: Roll[object]) -> str:
@@ -2716,10 +2882,8 @@ def _trace_from_root_roll(
         roll_ids[key] = roll_id
         rolls[roll_id] = {}
         roller_id = visit_roller(roll.roller)
-        operands = roll.operands
-        operand_ids = (
-            None if operands is None else [visit_roll(operand) for operand in operands]
-        )
+        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+        relationship_ids = _trace_relationship_ids(relationships, visit_roll)
         roll_data: dict[str, object]
         if isinstance(roll, SingleOutcomeRoll):
             roll_data = {"outcome": roll.outcome}
@@ -2729,8 +2893,8 @@ def _trace_from_root_roll(
             "roller": roller_id,
             **roll_data,
         }
-        if operand_ids is not None:
-            rolls[roll_id]["operands"] = operand_ids
+        if relationship_ids:
+            rolls[roll_id]["relationships"] = relationship_ids
         return roll_id
 
     root = visit_roll(root_roll)
