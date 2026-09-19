@@ -18,7 +18,6 @@ import operator
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
-from functools import partial
 from typing import Any, Literal, Never, assert_type, cast
 from unittest.mock import Mock, patch
 
@@ -36,9 +35,6 @@ from dyce.roller import (
     RollError,
     SingleOutcomeRoll,
     SingleOutcomeRoller,
-    _FactoryRoller,
-    _SingleOutcomeFactoryRoller,
-    roller_factory,
     trace,
 )
 from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
@@ -128,28 +124,6 @@ class TestRollError:
         with pytest.raises(RollError) as caught:
             roller.roll()
         assert caught.value.path == (roller,)
-
-    def test_sibling_failure(self) -> None:
-        damage = PRoller(P(), name="damage")
-
-        @roller_factory
-        def attack() -> SingleOutcomeRoller[int]:
-            # Will fail because damage produces no outcomes
-            return LiteralRoller(20) + damage
-
-        roller = attack()
-        assert isinstance(roller, _SingleOutcomeFactoryRoller)
-
-        with pytest.raises(RollError) as caught:
-            roller.roll()
-        assert caught.value.path[0] is roller
-        assert [entry.metadata()["kind"] for entry in caught.value.path] == [
-            "dyce.factory",
-            "dyce.binary",
-            "dyce.pool-sum",
-            "dyce.pool-source",
-        ]
-        assert caught.value.path[-1] is damage
 
     def test_cause_preserved(self) -> None:
         failure = RuntimeError("source failure")
@@ -1152,142 +1126,6 @@ class TestTrace:
         assert result.roller.select(selector).roll().outcomes == expected
 
 
-class TestFactoryRoller:
-    def test_callables(self) -> None:
-        class RollerFactories:
-            @roller_factory()
-            def factory(self, n: int) -> Roller[int]:
-                return PRoller(n @ P(2))
-
-            def __call__(self, first: int, second: int) -> Roller[int]:
-                return RollerPool(LiteralRoller(first), LiteralRoller(second))
-
-        some_rollers = RollerFactories()
-        returned_roller = some_rollers.factory(2)
-        assert_type(returned_roller, Roller[int])
-        assert isinstance(returned_roller, _FactoryRoller)
-        assert len(returned_roller.roll().outcomes) == 2
-
-        callable_factory = roller_factory(some_rollers)
-        callable_roller = callable_factory(3, 4)
-        assert_type(callable_roller, Roller[int])
-        assert isinstance(callable_roller, _FactoryRoller)
-        assert callable_roller.metadata()["name"] == "RollerFactories"
-        assert callable_roller.roll().outcomes == (3, 4)
-
-        bound_factory = roller_factory(partial(some_rollers, 5, 6), name="bound")
-        bound_roller = bound_factory()
-        assert isinstance(bound_roller, _FactoryRoller)
-        assert bound_roller.metadata()["name"] == "bound"
-        assert bound_roller.roll().outcomes == (5, 6)
-
-    def test_implicit_name_uses_factory_name(self) -> None:
-        @roller_factory
-        def factory() -> Roller[int]:
-            return PRoller(P(2))
-
-        assert factory().metadata()["name"] == factory.__name__
-
-    @pytest.mark.parametrize("name", ["explicit_name", ""])
-    def test_explicit_name_preserved(self, name: str) -> None:
-        @roller_factory(name=name)
-        def factory() -> Roller[int]:
-            return PRoller(P(2))
-
-        assert factory().metadata()["name"] == name
-
-    def test_expression(self) -> None:
-        p_roller = PRoller(P(2))
-
-        @roller_factory
-        def factory() -> Roller[int]:
-            return p_roller
-
-        roller = factory()
-        assert isinstance(roller, _FactoryRoller)
-        assert roller.expression is p_roller
-        roller_trace = roller.roll().trace()
-        rollers = roller_trace["rollers"]
-        rolls = roller_trace["rolls"]
-        assert isinstance(rollers, dict)
-        assert isinstance(rolls, dict)
-        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
-        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
-
-
-class TestSingleOutcomeFactoryRoller:
-    def test_callables(self) -> None:
-        class RollerFactories:
-            @roller_factory()
-            def factory(self, value: int) -> SingleOutcomeRoller[int]:
-                return LiteralRoller(value)
-
-            def __call__(self, value: int) -> SingleOutcomeRoller[int]:
-                return LiteralRoller(value)
-
-        some_rollers = RollerFactories()
-        returned_roller = some_rollers.factory(3)
-        assert_type(returned_roller, SingleOutcomeRoller[int])
-        assert isinstance(returned_roller, _SingleOutcomeFactoryRoller)
-        assert returned_roller.roll().outcome == 3
-
-        callable_factory = roller_factory(some_rollers)
-        callable_roller = callable_factory(4)
-        assert_type(callable_roller, SingleOutcomeRoller[int])
-        assert isinstance(callable_roller, _SingleOutcomeFactoryRoller)
-        assert callable_roller.metadata()["name"] == "RollerFactories"
-        assert callable_roller.roll().outcome == 4
-
-        bound_factory = roller_factory(partial(some_rollers, 5), name="bound")
-        bound_roller = bound_factory()
-        assert isinstance(bound_roller, _SingleOutcomeFactoryRoller)
-        assert bound_roller.metadata()["name"] == "bound"
-        assert bound_roller.roll().outcome == 5
-
-    def test_implicit_name_uses_factory_name(self) -> None:
-        @roller_factory
-        def factory() -> SingleOutcomeRoller[int]:
-            return LiteralRoller(3)
-
-        assert factory().metadata()["name"] == factory.__name__
-
-    @pytest.mark.parametrize("name", ["explicit_name", ""])
-    def test_explicit_name_preserved(self, name: str) -> None:
-        @roller_factory(name=name)
-        def factory() -> SingleOutcomeRoller[int]:
-            return LiteralRoller(3)
-
-        assert factory().metadata()["name"] == name
-
-    def test_expression(self) -> None:
-        literal_roller = LiteralRoller(3)
-
-        @roller_factory
-        def factory() -> SingleOutcomeRoller[int]:
-            return literal_roller
-
-        roller = factory()
-        assert isinstance(roller, _SingleOutcomeFactoryRoller)
-        assert roller.expression is literal_roller
-        roller_trace = roller.roll().trace()
-        rollers = roller_trace["rollers"]
-        rolls = roller_trace["rolls"]
-        assert isinstance(rollers, dict)
-        assert isinstance(rolls, dict)
-        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
-        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
-
-    def test_returning_non_roller_raises(self) -> None:
-        @roller_factory
-        def invalid_factory() -> SingleOutcomeRoller[int]:
-            return cast("Any", "not_a_roller")  # type: ignore[no-any-return]
-
-        with pytest.raises(
-            TypeError, match="must return a SingleOutcomeRoller or Roller"
-        ):
-            invalid_factory()
-
-
 class TestRoll:
     def test_sum_produces_single_outcome_roll(self) -> None:
         pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
@@ -1881,22 +1719,6 @@ class TestMixedRollBinaryArithmetic:
         assert result.format() == "2 [d6] < 4 => True"
         assert nested.format() == "(2 [d6] < 3) < 4 => True"
         assert roller.lt(existing_roll).format() == "2 [d6] < 4 => True"
-
-    def test_format_single_outcome_factory(self) -> None:
-        d6 = HRoller(H({2: 1}), name="d6")
-
-        @roller_factory(name="attack")
-        def attack() -> SingleOutcomeRoller[int]:
-            return d6 + 1
-
-        assert attack().roll().format() == "attack(2 [d6] + 1) => 3"
-
-    def test_format_multi_outcome_factory(self) -> None:
-        @roller_factory(name="pool")
-        def pool() -> Roller[int]:
-            return RollerPool(LiteralRoller(2), LiteralRoller(1))
-
-        assert pool().roll().format() == "pool((1, 2)) => (1, 2)"
 
     def test_format_pool_operations(self) -> None:
         pool = RollerPool(
