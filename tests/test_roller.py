@@ -71,18 +71,7 @@ _UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
 )
 
 
-def _roll_operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
-    relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
-    operands = relationships["operands"]
-    assert isinstance(operands, tuple)
-    return operands
-
-
-def _roller_operands(roller: Roller[object]) -> tuple[Roller[object], ...]:
-    relationships = roller._trace_relationships()  # ruff: ignore[private-member-access]
-    operands = relationships["operands"]
-    assert isinstance(operands, tuple)
-    return operands
+_RollMode = Literal["normal", "advantage", "disadvantage"]
 
 
 @dataclass(frozen=True)
@@ -487,6 +476,16 @@ class TestLabeledRoller:
 
 
 class TestHRoller:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_h(self) -> None:
+        with pytest.raises(TypeError, match="instance of H"):
+            HRoller(cast("Any", 6))
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_label(self) -> None:
+        with pytest.raises(TypeError, match="label"):
+            HRoller(H(6), label=cast("Any", 6))
+
     def test_exposes_h_source(self) -> None:
         h = H(6)
         roller = HRoller(h, label="d6")
@@ -503,6 +502,16 @@ class TestHRoller:
 
 
 class TestHableRoller:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_hable(self) -> None:
+        with pytest.raises(TypeError, match="instance of HableT"):
+            HableRoller(cast("Any", 6))
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_label(self) -> None:
+        with pytest.raises(TypeError, match="label"):
+            HableRoller(_Hable(H(6)), label=cast("Any", 6))
+
     def test_exposes_hable_source(self) -> None:
         hable = _Hable(H(6))
         roller = HableRoller(hable, label="d6")
@@ -540,6 +549,11 @@ class TestHableRoller:
 
 
 class TestLiteralRoller:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_label(self) -> None:
+        with pytest.raises(TypeError, match="label"):
+            LiteralRoller(6, label=cast("Any", 6))
+
     def test_type_inference(self) -> None:
         roller = LiteralRoller(3)
         roll = roller.roll()
@@ -572,6 +586,16 @@ class TestLiteralRoller:
 
 
 class TestPRoller:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_p(self) -> None:
+        with pytest.raises(TypeError, match="instance of P"):
+            PRoller(cast("Any", 6))
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_label(self) -> None:
+        with pytest.raises(TypeError, match="label"):
+            PRoller(P(6), label=cast("Any", 6))
+
     @pytest.mark.parametrize("size", [0, 1, 3])
     def test_length(self, size: int) -> None:
         assert len(PRoller(size @ P(6))) == size
@@ -635,6 +659,16 @@ class TestPRoller:
 
 
 class TestRollerPool:
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_nonroller(self) -> None:
+        with pytest.raises(TypeError, match="SingleOutcomeRoller"):
+            RollerPool(cast("Any", H(6)))
+
+    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+    def test_nonroller_triggers_beartype_violation(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            RollerPool(cast("Any", H(6)))
+
     def test_composes_single_rollers(self) -> None:
         two = LiteralRoller(2)
         one = LiteralRoller(1)
@@ -893,6 +927,33 @@ class TestHableAndRollerBinaryArithmetic:
 
 
 class TestTrace:
+    @pytest.mark.parametrize(
+        ("roll_mode", "rolls", "expected"),
+        [
+            ("normal", [7], 0),
+            ("normal", [15, 4], 6),
+            ("normal", [20, 4, 5], 11),
+            ("advantage", [4, 16, 5], 7),
+            ("disadvantage", [16, 4], 0),
+        ],
+    )
+    def test_attack_mechanic(
+        self, roll_mode: _RollMode, rolls: list[int], expected: int
+    ) -> None:
+        with patch.object(H, "roll", side_effect=rolls):
+            result = _attack(15, 1, 2, roll_mode)
+
+        assert result.outcomes == (expected,)
+        assert result.roller.metadata() == {
+            "kind": "dyce.trace",
+            "label": "attack",
+            "state": {
+                "dc": 15,
+                "dc_modifier": 1,
+                "damage_modifier": 2,
+            },
+        }
+
     def test_callback_called_with_rolls_from_source_rollers_and_state(self) -> None:
         single = LiteralRoller(3)
         multi = PRoller(P(H({2: 1}), H({4: 1})))
@@ -1978,3 +2039,61 @@ class TestRollerAndRollOperationEquivalence:
         rollers = roll_from_roller_arithmetic.trace()["rollers"]
         assert isinstance(rollers, dict)
         assert rollers["roller0"]["metadata"]["operator"] == "sub"
+
+
+def _attack(
+    dc: int,
+    dc_modifier: int,
+    damage_modifier: int,
+    roll_mode: _RollMode = "normal",
+) -> Roll[int]:
+    d20 = Roller.from_value(H(20), label="d20")
+    damage = Roller.from_value(H(8), label="d8")
+
+    if roll_mode == "advantage":
+        check_roller = RollerPool(d20, d20).at(-1).label("advantage")
+    elif roll_mode == "disadvantage":
+        check_roller = RollerPool(d20, d20).at(0).label("disadvantage")
+    else:
+        check_roller = d20
+
+    def resolve(
+        base_check_roll: SingleOutcomeRoll[int],
+        *,
+        dc: int,
+        dc_modifier: int,
+        damage_modifier: int,
+    ) -> int | SingleOutcomeRoller[int]:
+        modified_check_roll = base_check_roll + dc_modifier
+
+        if modified_check_roll.outcome < dc:
+            return 0
+        elif base_check_roll.outcome == 20:
+            # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+            return damage + damage + damage_modifier  # zuban: ignore[no-any-return]
+        else:
+            # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+            return damage + damage_modifier  # zuban: ignore[no-any-return]
+
+    return trace(
+        resolve,
+        check_roller,
+        label="attack",
+        dc=dc,
+        dc_modifier=dc_modifier,
+        damage_modifier=damage_modifier,
+    )
+
+
+def _roll_operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
+    relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+    operands = relationships["operands"]
+    assert isinstance(operands, tuple)
+    return operands
+
+
+def _roller_operands(roller: Roller[object]) -> tuple[Roller[object], ...]:
+    relationships = roller._trace_relationships()  # ruff: ignore[private-member-access]
+    operands = relationships["operands"]
+    assert isinstance(operands, tuple)
+    return operands
