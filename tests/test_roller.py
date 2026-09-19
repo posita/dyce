@@ -134,6 +134,7 @@ class TestRollError:
 
         @roller_factory
         def attack() -> SingleOutcomeRoller[int]:
+            # Will fail because damage produces no outcomes
             return LiteralRoller(20) + damage
 
         roller = attack()
@@ -181,6 +182,660 @@ class TestRollError:
             pytest.raises(KeyboardInterrupt),
         ):
             HRoller(H(6)).roll()
+
+
+class TestRoller:
+    def test_binary_operator_type_inference(self) -> None:
+        left = PRoller(P(H({2: 1})), name="left")
+        right = PRoller(P(H({3: 1})), name="right")
+        single = HRoller(H({5: 1}), name="single")
+        power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
+
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(left + right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left + single, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(single + left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            left + P(H({5: 1})), SingleOutcomeRoller[int]
+        )  # zuban: ignore[misc]
+        assert_type(left - right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(right - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(10 - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left * 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left / 2, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(left // 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left % 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            power_pool**2, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(left << 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left >> 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left & 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left | 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(left ^ 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+        assert_type(2 * left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 / left, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(12 // left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 % left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            2**power_pool, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(2 << left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 >> left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 & left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 | left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 ^ left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+    def test_unary_operator_type_inference(self) -> None:
+        pool = PRoller(P(H({-2: 1})), name="pool")
+
+        assert_type(-pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(abs(pool), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+    def test_comparison_type_inference(self) -> None:
+        pool = PRoller(P(H({2: 1})), name="pool")
+
+        assert_type(pool.lt(3), SingleOutcomeRoller[bool])
+        assert_type(pool.le(H(3)), SingleOutcomeRoller[bool])
+        assert_type(pool.eq(P(3, 2)), SingleOutcomeRoller[bool])
+        assert_type(pool.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
+        assert_type(
+            pool.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
+            SingleOutcomeRoller[bool],
+        )
+        assert_type(pool.gt(1), SingleOutcomeRoller[bool])
+
+    def test_sum_produces_single_outcome_roller(self) -> None:
+        pool = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool")
+        summed = pool.sum()
+        roll = summed.roll()
+
+        assert_type(summed, SingleOutcomeRoller[str])  # zuban: ignore[misc]
+        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
+        assert roll.outcome == "ab"
+
+    def test_select_on_selection_applies_selector_to_parent_selection(self) -> None:
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        parent_selection = pool.select(-1, 0)
+        selection = parent_selection.select(1)
+        roll = selection.roll()
+        (parent_roll,) = _roll_operands(roll)
+
+        assert_type(selection, Roller[int])  # zuban: ignore[misc]
+        assert _roller_operands(selection) == (parent_selection,)
+        assert roll.outcomes == (1,)
+        assert isinstance(parent_roll, Roll)
+        assert parent_roll.outcomes == (3, 1)
+
+    def test_at_returns_sum_of_selected_outcomes(self) -> None:
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        result = pool.at(-1, 0)
+
+        assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert result.roll().outcome == 4
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left = PRoller(P(H({lhs - 1: 1}), H({1: 1})), name="left")
+        right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
+        combined = op(left, right)
+        expected_outcome = op(lhs, rhs)
+        left_operand, right_operand = _roller_operands(combined)
+
+        assert combined.roll().outcome == expected_outcome
+        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
+        assert left_operand.metadata() == {"kind": "dyce.pool-sum"}
+        assert _roller_operands(left_operand) == (left,)
+        assert right_operand.metadata() == {"kind": "dyce.pool-sum"}
+        assert _roller_operands(right_operand) == (right,)
+        assert op(left, LiteralRoller(rhs)).roll().outcome == expected_outcome
+        assert op(LiteralRoller(lhs), right).roll().outcome == expected_outcome
+        assert op(lhs, right).roll().outcome == expected_outcome
+        assert op(P(H({lhs: 1})), right).roll().outcome == expected_outcome
+        assert op(left, P(H({rhs: 1}))).roll().outcome == expected_outcome
+
+    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any], Any],
+        name: str,
+        value: int,
+    ) -> None:
+        pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
+        combined = op(pool)
+        expected_outcome = op(value)
+        (operand,) = _roller_operands(combined)
+
+        assert combined.roll().outcome == expected_outcome
+        assert combined.metadata() == {"kind": "dyce.unary", "operator": name}
+        assert operand.metadata() == {"kind": "dyce.pool-sum"}
+        assert _roller_operands(operand) == (pool,)
+
+
+class TestSingleOutcomeRoller:
+    def test_sum_returns_self(self) -> None:
+        roller = LiteralRoller(3)
+
+        assert roller.sum() is roller
+
+    def test_binary_operator_type_inference(self) -> None:
+        d6 = HRoller(H(6), name="d6")
+        power_roller = HRoller(H({_PowerOutcome(2): 1}))
+
+        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
+        assert_type(d6 + H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 + P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 - H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 - P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 * H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 / H(2), SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(d6 // H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 % H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            power_roller**2, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(d6 << H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 >> H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 & H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 | H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(d6 ^ H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+        assert_type(2 * d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 / d6, SingleOutcomeRoller[float])  # zuban: ignore[misc]
+        assert_type(12 // d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 % d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(
+            2**power_roller, SingleOutcomeRoller[_PowerOutcome]
+        )  # zuban: ignore[misc]
+        assert_type(2 << d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(12 >> d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 & d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 | d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+        assert_type(2 ^ d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
+
+    def test_unary_operator_type_inference(self) -> None:
+        roller = LiteralRoller(-2)
+
+        assert_type(-roller, SingleOutcomeRoller[int])
+        assert_type(+roller, SingleOutcomeRoller[int])
+        assert_type(abs(roller), SingleOutcomeRoller[int])
+        assert_type(~roller, SingleOutcomeRoller[int])
+
+    def test_comparison_type_inference(self) -> None:
+        roller = LiteralRoller(2)
+
+        assert_type(roller.lt(3), SingleOutcomeRoller[bool])
+        assert_type(roller.le(H(3)), SingleOutcomeRoller[bool])
+        assert_type(roller.eq(P(3, 2)), SingleOutcomeRoller[bool])
+        assert_type(roller.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
+        assert_type(
+            roller.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
+            SingleOutcomeRoller[bool],
+        )
+        assert_type(roller.gt(1), SingleOutcomeRoller[bool])
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any, Any], Any],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+        combined = op(left_roller, right_roller)
+        expected_outcome = op(lhs, rhs)
+
+        assert combined.roll().outcome == expected_outcome
+        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
+        assert combined.operands == (left_roller, right_roller)
+
+    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
+    def test_unary_operators_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any], Any],
+        name: str,
+        value: int,
+    ) -> None:
+        roller = LiteralRoller(value)
+        combined = op(roller)
+        expected_outcome = op(value)
+
+        assert combined.roll().outcome == expected_outcome
+        assert combined.metadata() == {"kind": "dyce.unary", "operator": name}
+        assert combined.operands == (roller,)
+
+    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _COMPARISON_CASES)
+    def test_comparisons_preserve_rolls_and_metadata(
+        self,
+        op: Callable[[Any, Any], bool],
+        name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+        combined = getattr(left_roller, name)(right_roller)
+
+        assert combined.roll().outcome is op(lhs, rhs)
+        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
+        assert combined.operands == (left_roller, right_roller)
+
+
+class TestHRoller:
+    def test_exposes_h_source(self) -> None:
+        h = H(6)
+        roller = HRoller(h, name="d6")
+
+        assert_type(roller, HRoller[int])
+        assert roller.h is h
+        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
+
+    def test_uses_h_representation_as_default_name(self) -> None:
+        h = H(6)
+        roller = HRoller(h)
+
+        assert roller.metadata() == {"kind": "dyce.source", "name": str(h)}
+
+
+class TestHableRoller:
+    def test_exposes_hable_source(self) -> None:
+        hable = _Hable(H(6))
+        roller = HableRoller(hable, name="d6")
+
+        assert_type(roller, HableRoller[int])
+        assert roller.hable is hable
+        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
+
+    def test_uses_hable_representation_as_default_name(self) -> None:
+        hable = _Hable(H(6))
+        roller = HableRoller(hable)
+
+        assert roller.metadata() == {"kind": "dyce.source", "name": str(hable)}
+
+    def test_roll_calls_h_and_includes_source_metadata_in_trace(self) -> None:
+        hable = _Hable(H({4: 1}))
+        roller = HableRoller(hable, name="source")
+
+        with patch.object(hable, "h", wraps=hable.h) as h_mock:
+            roll = roller.roll()
+
+        trace = roll.trace()
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
+
+        h_mock.assert_called_once_with()
+        assert roll.outcome == 4
+        assert roll.roller is roller
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"] == {
+            "metadata": {"kind": "dyce.source", "name": "source"}
+        }
+        assert "relationships" not in rolls["roll0"]
+
+
+class TestLiteralRoller:
+    def test_type_inference(self) -> None:
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+
+        assert_type(roller, LiteralRoller[int])  # ty: ignore[type-assertion-failure]
+        assert_type(roll, SingleOutcomeRoll[int])  # ty: ignore[type-assertion-failure]
+        assert_type(roll.roller, SingleOutcomeRoller[int])  # ty: ignore[type-assertion-failure]
+        # ty is special, apparently
+        assert_type(roller, LiteralRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+        assert_type(roll, SingleOutcomeRoll[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+        assert_type(roll.roller, SingleOutcomeRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
+
+        # An explicit generic specialization works for all checkers
+        roller_int = LiteralRoller[int](3)
+        roll_int = roller_int.roll()
+
+        assert_type(roller_int, LiteralRoller[int])
+        assert_type(roll_int, SingleOutcomeRoll[int])
+        assert_type(roll_int.roller, SingleOutcomeRoller[int])
+
+    def test_exposes_and_rolls_value(self) -> None:
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+
+        assert roller.value == 3
+        assert roller.metadata() == {"kind": "dyce.literal", "value": 3}
+        assert roll.outcomes == (3,)
+        assert roll.outcome == 3
+        assert roll.roller is roller
+
+
+class TestPRoller:
+    @pytest.mark.parametrize("size", [0, 1, 3])
+    def test_length(self, size: int) -> None:
+        assert len(PRoller(size @ P(6))) == size
+
+    def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        p = P(H({2: 1}), H({1: 1}))
+
+        def p_roll(source: P[int]) -> tuple[int, ...]:
+            assert source is p
+            return (1, 2)
+
+        monkeypatch.setattr(P, "roll", p_roll)
+        pool = PRoller(p, name="pool")
+        roll = pool.roll()
+
+        assert_type(pool, PRoller[int])  # zuban: ignore[misc]
+        assert_type(roll, Roll[int])  # zuban: ignore[misc]
+        assert pool.p is p
+        assert pool.metadata()["name"] == "pool"
+        assert roll.outcomes == (1, 2)
+        assert roll.roller is pool
+
+    def test_select_produces_multi_outcome_roller(self) -> None:
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        selected = pool.select(-1, 0)
+        roll = selected.roll()
+        trace = roll.trace()
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
+
+        assert_type(selected, Roller[int])  # zuban: ignore[misc]
+        assert roll.outcomes == (3, 1)
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"] == {
+            "metadata": {
+                "kind": "dyce.pool-selection",
+                "selectors": [-1, 0],
+            },
+            "relationships": {"operands": ["roller1"]},
+        }
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["outcomes"] == [3, 1]
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1"]
+        assert rolls["roll1"]["outcomes"] == [1, 2, 3]
+
+    def test_invalid_selection_fails_when_rolled(self) -> None:
+        selected = PRoller(P(2)).select(1)
+
+        with pytest.raises(RollError) as caught:
+            selected.roll()
+
+        assert isinstance(caught.value.__cause__, IndexError)
+
+    def test_empty_p_sum_type_and_metadata(self) -> None:
+        pool = PRoller(P())
+        summed = pool.sum()
+
+        assert_type(pool, PRoller[Never])  # zuban: ignore[misc]
+        assert_type(summed, SingleOutcomeRoller[Never])  # zuban: ignore[misc]
+        assert summed.metadata() == {"kind": "dyce.pool-sum"}
+
+
+class TestRollerPool:
+    def test_composes_single_rollers(self) -> None:
+        two = LiteralRoller(2)
+        one = LiteralRoller(1)
+        pool = RollerPool(two, one, name="pool")
+        roll = pool.roll()
+
+        pool_int: RollerPool[int] = pool
+        assert pool_int is pool
+        assert isinstance(pool, Roller)
+        assert len(pool) == 2
+        assert pool.rollers == (two, one)
+        assert pool.operands == (two, one)
+        assert roll.outcomes == (1, 2)
+        assert tuple(operand.roller for operand in _roll_operands(roll)) == (one, two)
+        assert pool.metadata() == {"kind": "dyce.pool", "name": "pool"}
+
+    def test_reused_single_roller_produces_independent_rolls(self) -> None:
+        d6 = HRoller(H(6), name="d6")
+        trace = RollerPool(d6, d6).roll().trace()
+        rollers = trace["rollers"]
+        rolls = trace["rolls"]
+
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert rollers["roller0"] == {
+            "metadata": {"kind": "dyce.pool"},
+            "relationships": {"operands": ["roller1", "roller1"]},
+        }
+        assert rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll2"]
+
+    def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
+        pool = RollerPool(
+            HRoller(H({2j: 1})),
+            HRoller(H({1j: 1})),
+        )
+
+        assert pool.roll().outcomes == (1j, 2j)
+
+
+class TestHableAndRollerBinaryArithmetic:
+    def test_binary_operator_type_inference(self) -> None:
+        h = H({8: 1})
+        p = P(h)
+        roller = LiteralRoller(3)
+        roll = roller.roll()
+        power_h = H({2: 1})
+        power_p = P(power_h)
+        power_roller = LiteralRoller(_PowerOutcome(3))
+        power_roll = power_roller.roll()
+
+        assert_type(h + roller, SingleOutcomeRoller[int])
+        assert_type(roller + h, SingleOutcomeRoller[int])
+        assert_type(p + roller, SingleOutcomeRoller[int])
+        assert_type(roller + p, SingleOutcomeRoller[int])
+        assert_type(h + roll, SingleOutcomeRoll[int])
+        assert_type(roll + h, SingleOutcomeRoll[int])
+        assert_type(p + roll, SingleOutcomeRoll[int])
+        assert_type(roll + p, SingleOutcomeRoll[int])
+
+        assert_type(h - roller, SingleOutcomeRoller[int])
+        assert_type(roller - h, SingleOutcomeRoller[int])
+        assert_type(p - roller, SingleOutcomeRoller[int])
+        assert_type(roller - p, SingleOutcomeRoller[int])
+        assert_type(h - roll, SingleOutcomeRoll[int])
+        assert_type(roll - h, SingleOutcomeRoll[int])
+        assert_type(p - roll, SingleOutcomeRoll[int])
+        assert_type(roll - p, SingleOutcomeRoll[int])
+
+        assert_type(h * roller, SingleOutcomeRoller[int])
+        assert_type(roller * h, SingleOutcomeRoller[int])
+        assert_type(p * roller, SingleOutcomeRoller[int])
+        assert_type(roller * p, SingleOutcomeRoller[int])
+        assert_type(h * roll, SingleOutcomeRoll[int])
+        assert_type(roll * h, SingleOutcomeRoll[int])
+        assert_type(p * roll, SingleOutcomeRoll[int])
+        assert_type(roll * p, SingleOutcomeRoll[int])
+
+        assert_type(h / roller, SingleOutcomeRoller[float])
+        assert_type(roller / h, SingleOutcomeRoller[float])
+        assert_type(p / roller, SingleOutcomeRoller[float])
+        assert_type(roller / p, SingleOutcomeRoller[float])
+        assert_type(h / roll, SingleOutcomeRoll[float])
+        assert_type(roll / h, SingleOutcomeRoll[float])
+        assert_type(p / roll, SingleOutcomeRoll[float])
+        assert_type(roll / p, SingleOutcomeRoll[float])
+
+        assert_type(h // roller, SingleOutcomeRoller[int])
+        assert_type(roller // h, SingleOutcomeRoller[int])
+        assert_type(p // roller, SingleOutcomeRoller[int])
+        assert_type(roller // p, SingleOutcomeRoller[int])
+        assert_type(h // roll, SingleOutcomeRoll[int])
+        assert_type(roll // h, SingleOutcomeRoll[int])
+        assert_type(p // roll, SingleOutcomeRoll[int])
+        assert_type(roll // p, SingleOutcomeRoll[int])
+
+        assert_type(h % roller, SingleOutcomeRoller[int])
+        assert_type(roller % h, SingleOutcomeRoller[int])
+        assert_type(p % roller, SingleOutcomeRoller[int])
+        assert_type(roller % p, SingleOutcomeRoller[int])
+        assert_type(h % roll, SingleOutcomeRoll[int])
+        assert_type(roll % h, SingleOutcomeRoll[int])
+        assert_type(p % roll, SingleOutcomeRoll[int])
+        assert_type(roll % p, SingleOutcomeRoll[int])
+
+        assert_type(power_h**power_roller, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_roller**power_h, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_p**power_roller, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_roller**power_p, SingleOutcomeRoller[_PowerOutcome])
+        assert_type(power_h**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_roll**power_h, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_p**power_roll, SingleOutcomeRoll[_PowerOutcome])
+        assert_type(power_roll**power_p, SingleOutcomeRoll[_PowerOutcome])
+
+        assert_type(h << roller, SingleOutcomeRoller[int])
+        assert_type(roller << h, SingleOutcomeRoller[int])
+        assert_type(p << roller, SingleOutcomeRoller[int])
+        assert_type(roller << p, SingleOutcomeRoller[int])
+        assert_type(h << roll, SingleOutcomeRoll[int])
+        assert_type(roll << h, SingleOutcomeRoll[int])
+        assert_type(p << roll, SingleOutcomeRoll[int])
+        assert_type(roll << p, SingleOutcomeRoll[int])
+
+        assert_type(h >> roller, SingleOutcomeRoller[int])
+        assert_type(roller >> h, SingleOutcomeRoller[int])
+        assert_type(p >> roller, SingleOutcomeRoller[int])
+        assert_type(roller >> p, SingleOutcomeRoller[int])
+        assert_type(h >> roll, SingleOutcomeRoll[int])
+        assert_type(roll >> h, SingleOutcomeRoll[int])
+        assert_type(p >> roll, SingleOutcomeRoll[int])
+        assert_type(roll >> p, SingleOutcomeRoll[int])
+
+        assert_type(h & roller, SingleOutcomeRoller[int])
+        assert_type(roller & h, SingleOutcomeRoller[int])
+        assert_type(p & roller, SingleOutcomeRoller[int])
+        assert_type(roller & p, SingleOutcomeRoller[int])
+        assert_type(h & roll, SingleOutcomeRoll[int])
+        assert_type(roll & h, SingleOutcomeRoll[int])
+        assert_type(p & roll, SingleOutcomeRoll[int])
+        assert_type(roll & p, SingleOutcomeRoll[int])
+
+        assert_type(h | roller, SingleOutcomeRoller[int])
+        assert_type(roller | h, SingleOutcomeRoller[int])
+        assert_type(p | roller, SingleOutcomeRoller[int])
+        assert_type(roller | p, SingleOutcomeRoller[int])
+        assert_type(h | roll, SingleOutcomeRoll[int])
+        assert_type(roll | h, SingleOutcomeRoll[int])
+        assert_type(p | roll, SingleOutcomeRoll[int])
+        assert_type(roll | p, SingleOutcomeRoll[int])
+
+        assert_type(h ^ roller, SingleOutcomeRoller[int])
+        assert_type(roller ^ h, SingleOutcomeRoller[int])
+        assert_type(p ^ roller, SingleOutcomeRoller[int])
+        assert_type(roller ^ p, SingleOutcomeRoller[int])
+        assert_type(h ^ roll, SingleOutcomeRoll[int])
+        assert_type(roll ^ h, SingleOutcomeRoll[int])
+        assert_type(p ^ roll, SingleOutcomeRoll[int])
+        assert_type(roll ^ p, SingleOutcomeRoll[int])
+
+    @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
+    def test_binary_operators_with_h_and_p_produce_expected_rollers_and_rolls(
+        self,
+        op: Callable[[Any, Any], Any],
+        _name: str,
+        lhs: int,
+        rhs: int,
+    ) -> None:
+        left_h = H({lhs: 1})
+        right_h = H({rhs: 1})
+        left_p = P(left_h)
+        right_p = P(right_h)
+        left_roller = LiteralRoller(lhs)
+        right_roller = LiteralRoller(rhs)
+        left_roll = left_roller.roll()
+        right_roll = right_roller.roll()
+        expected_outcome = op(lhs, rhs)
+
+        roller_results = (
+            op(left_roller, right_h),
+            op(left_h, right_roller),
+            op(left_roller, right_p),
+            op(left_p, right_roller),
+        )
+        roll_results = (
+            op(left_roll, right_h),
+            op(left_h, right_roll),
+            op(left_roll, right_p),
+            op(left_p, right_roll),
+        )
+
+        for result in roller_results:
+            assert isinstance(result, SingleOutcomeRoller)
+            assert result.roll().outcome == expected_outcome
+
+        for result in roll_results:
+            assert isinstance(result, SingleOutcomeRoll)
+            assert result.outcome == expected_outcome
+
+    @pytest.mark.parametrize(
+        "method_name",
+        [
+            pytest.param(method_name, id=f"{prefix}{name}")
+            for _, name, _, _ in _BINARY_OPERATOR_CASES
+            for prefix, method_name in (
+                ("forward-", f"__{name}__"),
+                ("reflected-", f"__r{name}__"),
+            )
+        ],
+    )
+    @pytest.mark.parametrize(
+        "make_operand",
+        [
+            pytest.param(lambda: LiteralRoller(1), id="roller"),
+            pytest.param(lambda: LiteralRoller(1).roll(), id="roll"),
+        ],
+    )
+    def test_h_and_p_binary_operator_methods_return_not_implemented_for_rolls_and_rollers(
+        self, method_name: str, make_operand: Callable[[], object]
+    ) -> None:
+        operand = make_operand()
+
+        assert getattr(H(6), method_name)(operand) is NotImplemented
+        assert getattr(P(6), method_name)(operand) is NotImplemented
+
+    def test_hable_operand_is_wrapped_in_hable_roller_without_calling_h(self) -> None:
+        hable = _Hable(H(6))
+
+        with patch.object(hable, "h", wraps=hable.h) as h_mock:
+            combined = LiteralRoller(1) + hable
+            operands = _roller_operands(combined)
+            wrapped = operands[1]
+
+            assert isinstance(wrapped, HableRoller)
+            assert wrapped.hable is hable
+            h_mock.assert_not_called()
+
+    def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
+        h = H(8)
+        combined = LiteralRoller(1) + h
+        operands = _roller_operands(combined)
+        wrapped = operands[1]
+
+        assert isinstance(wrapped, HRoller)
+        assert wrapped.metadata() == {"kind": "dyce.source", "name": str(h)}
+
+    def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
+        p = P(H({2: 1}), H({3: 1}))
+        combined = LiteralRoller(1) + p
+        operands = _roller_operands(combined)
+        pool_sum_roller = operands[1]
+        pool_sum_operands = _roller_operands(pool_sum_roller)
+        (p_roller,) = pool_sum_operands
+
+        assert pool_sum_roller.metadata() == {"kind": "dyce.pool-sum"}
+        assert isinstance(p_roller, PRoller)
+        assert p_roller.p is p
 
 
 class TestTrace:
@@ -511,658 +1166,67 @@ class TestTrace:
         assert result.roller.select(selector).roll().outcomes == expected
 
 
-class TestHableAndRollerBinaryArithmetic:
-    def test_binary_operator_type_inference(self) -> None:
-        h = H({8: 1})
-        p = P(h)
-        roller = LiteralRoller(3)
-        roll = roller.roll()
-        power_h = H({2: 1})
-        power_p = P(power_h)
-        power_roller = LiteralRoller(_PowerOutcome(3))
-        power_roll = power_roller.roll()
+class TestFactoryRoller:
+    def test_callables(self) -> None:
+        class RollerFactories:
+            @roller_factory()
+            def factory(self, n: int) -> Roller[int]:
+                return PRoller(n @ P(2))
 
-        assert_type(h + roller, SingleOutcomeRoller[int])
-        assert_type(roller + h, SingleOutcomeRoller[int])
-        assert_type(p + roller, SingleOutcomeRoller[int])
-        assert_type(roller + p, SingleOutcomeRoller[int])
-        assert_type(h + roll, SingleOutcomeRoll[int])
-        assert_type(roll + h, SingleOutcomeRoll[int])
-        assert_type(p + roll, SingleOutcomeRoll[int])
-        assert_type(roll + p, SingleOutcomeRoll[int])
+            def __call__(self, first: int, second: int) -> Roller[int]:
+                return RollerPool(LiteralRoller(first), LiteralRoller(second))
 
-        assert_type(h - roller, SingleOutcomeRoller[int])
-        assert_type(roller - h, SingleOutcomeRoller[int])
-        assert_type(p - roller, SingleOutcomeRoller[int])
-        assert_type(roller - p, SingleOutcomeRoller[int])
-        assert_type(h - roll, SingleOutcomeRoll[int])
-        assert_type(roll - h, SingleOutcomeRoll[int])
-        assert_type(p - roll, SingleOutcomeRoll[int])
-        assert_type(roll - p, SingleOutcomeRoll[int])
+        some_rollers = RollerFactories()
+        returned_roller = some_rollers.factory(2)
+        assert_type(returned_roller, Roller[int])
+        assert isinstance(returned_roller, _FactoryRoller)
+        assert len(returned_roller.roll().outcomes) == 2
 
-        assert_type(h * roller, SingleOutcomeRoller[int])
-        assert_type(roller * h, SingleOutcomeRoller[int])
-        assert_type(p * roller, SingleOutcomeRoller[int])
-        assert_type(roller * p, SingleOutcomeRoller[int])
-        assert_type(h * roll, SingleOutcomeRoll[int])
-        assert_type(roll * h, SingleOutcomeRoll[int])
-        assert_type(p * roll, SingleOutcomeRoll[int])
-        assert_type(roll * p, SingleOutcomeRoll[int])
+        callable_factory = roller_factory(some_rollers)
+        callable_roller = callable_factory(3, 4)
+        assert_type(callable_roller, Roller[int])
+        assert isinstance(callable_roller, _FactoryRoller)
+        assert callable_roller.metadata()["name"] == "RollerFactories"
+        assert callable_roller.roll().outcomes == (3, 4)
 
-        assert_type(h / roller, SingleOutcomeRoller[float])
-        assert_type(roller / h, SingleOutcomeRoller[float])
-        assert_type(p / roller, SingleOutcomeRoller[float])
-        assert_type(roller / p, SingleOutcomeRoller[float])
-        assert_type(h / roll, SingleOutcomeRoll[float])
-        assert_type(roll / h, SingleOutcomeRoll[float])
-        assert_type(p / roll, SingleOutcomeRoll[float])
-        assert_type(roll / p, SingleOutcomeRoll[float])
+        bound_factory = roller_factory(partial(some_rollers, 5, 6), name="bound")
+        bound_roller = bound_factory()
+        assert isinstance(bound_roller, _FactoryRoller)
+        assert bound_roller.metadata()["name"] == "bound"
+        assert bound_roller.roll().outcomes == (5, 6)
 
-        assert_type(h // roller, SingleOutcomeRoller[int])
-        assert_type(roller // h, SingleOutcomeRoller[int])
-        assert_type(p // roller, SingleOutcomeRoller[int])
-        assert_type(roller // p, SingleOutcomeRoller[int])
-        assert_type(h // roll, SingleOutcomeRoll[int])
-        assert_type(roll // h, SingleOutcomeRoll[int])
-        assert_type(p // roll, SingleOutcomeRoll[int])
-        assert_type(roll // p, SingleOutcomeRoll[int])
+    def test_implicit_name_uses_factory_name(self) -> None:
+        @roller_factory
+        def factory() -> Roller[int]:
+            return PRoller(P(2))
 
-        assert_type(h % roller, SingleOutcomeRoller[int])
-        assert_type(roller % h, SingleOutcomeRoller[int])
-        assert_type(p % roller, SingleOutcomeRoller[int])
-        assert_type(roller % p, SingleOutcomeRoller[int])
-        assert_type(h % roll, SingleOutcomeRoll[int])
-        assert_type(roll % h, SingleOutcomeRoll[int])
-        assert_type(p % roll, SingleOutcomeRoll[int])
-        assert_type(roll % p, SingleOutcomeRoll[int])
+        assert factory().metadata()["name"] == factory.__name__
 
-        assert_type(power_h**power_roller, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_roller**power_h, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_p**power_roller, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_roller**power_p, SingleOutcomeRoller[_PowerOutcome])
-        assert_type(power_h**power_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(power_roll**power_h, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(power_p**power_roll, SingleOutcomeRoll[_PowerOutcome])
-        assert_type(power_roll**power_p, SingleOutcomeRoll[_PowerOutcome])
+    @pytest.mark.parametrize("name", ["explicit_name", ""])
+    def test_explicit_name_preserved(self, name: str) -> None:
+        @roller_factory(name=name)
+        def factory() -> Roller[int]:
+            return PRoller(P(2))
 
-        assert_type(h << roller, SingleOutcomeRoller[int])
-        assert_type(roller << h, SingleOutcomeRoller[int])
-        assert_type(p << roller, SingleOutcomeRoller[int])
-        assert_type(roller << p, SingleOutcomeRoller[int])
-        assert_type(h << roll, SingleOutcomeRoll[int])
-        assert_type(roll << h, SingleOutcomeRoll[int])
-        assert_type(p << roll, SingleOutcomeRoll[int])
-        assert_type(roll << p, SingleOutcomeRoll[int])
+        assert factory().metadata()["name"] == name
 
-        assert_type(h >> roller, SingleOutcomeRoller[int])
-        assert_type(roller >> h, SingleOutcomeRoller[int])
-        assert_type(p >> roller, SingleOutcomeRoller[int])
-        assert_type(roller >> p, SingleOutcomeRoller[int])
-        assert_type(h >> roll, SingleOutcomeRoll[int])
-        assert_type(roll >> h, SingleOutcomeRoll[int])
-        assert_type(p >> roll, SingleOutcomeRoll[int])
-        assert_type(roll >> p, SingleOutcomeRoll[int])
+    def test_expression(self) -> None:
+        p_roller = PRoller(P(2))
 
-        assert_type(h & roller, SingleOutcomeRoller[int])
-        assert_type(roller & h, SingleOutcomeRoller[int])
-        assert_type(p & roller, SingleOutcomeRoller[int])
-        assert_type(roller & p, SingleOutcomeRoller[int])
-        assert_type(h & roll, SingleOutcomeRoll[int])
-        assert_type(roll & h, SingleOutcomeRoll[int])
-        assert_type(p & roll, SingleOutcomeRoll[int])
-        assert_type(roll & p, SingleOutcomeRoll[int])
+        @roller_factory
+        def factory() -> Roller[int]:
+            return p_roller
 
-        assert_type(h | roller, SingleOutcomeRoller[int])
-        assert_type(roller | h, SingleOutcomeRoller[int])
-        assert_type(p | roller, SingleOutcomeRoller[int])
-        assert_type(roller | p, SingleOutcomeRoller[int])
-        assert_type(h | roll, SingleOutcomeRoll[int])
-        assert_type(roll | h, SingleOutcomeRoll[int])
-        assert_type(p | roll, SingleOutcomeRoll[int])
-        assert_type(roll | p, SingleOutcomeRoll[int])
-
-        assert_type(h ^ roller, SingleOutcomeRoller[int])
-        assert_type(roller ^ h, SingleOutcomeRoller[int])
-        assert_type(p ^ roller, SingleOutcomeRoller[int])
-        assert_type(roller ^ p, SingleOutcomeRoller[int])
-        assert_type(h ^ roll, SingleOutcomeRoll[int])
-        assert_type(roll ^ h, SingleOutcomeRoll[int])
-        assert_type(p ^ roll, SingleOutcomeRoll[int])
-        assert_type(roll ^ p, SingleOutcomeRoll[int])
-
-    @pytest.mark.parametrize(("op", "_name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_with_h_and_p_produce_expected_rollers_and_rolls(
-        self,
-        op: Callable[[Any, Any], Any],
-        _name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left_h = H({lhs: 1})
-        right_h = H({rhs: 1})
-        left_p = P(left_h)
-        right_p = P(right_h)
-        left_roller = LiteralRoller(lhs)
-        right_roller = LiteralRoller(rhs)
-        left_roll = left_roller.roll()
-        right_roll = right_roller.roll()
-        expected_outcome = op(lhs, rhs)
-
-        roller_results = (
-            op(left_roller, right_h),
-            op(left_h, right_roller),
-            op(left_roller, right_p),
-            op(left_p, right_roller),
-        )
-        roll_results = (
-            op(left_roll, right_h),
-            op(left_h, right_roll),
-            op(left_roll, right_p),
-            op(left_p, right_roll),
-        )
-
-        for result in roller_results:
-            assert isinstance(result, SingleOutcomeRoller)
-            assert result.roll().outcome == expected_outcome
-
-        for result in roll_results:
-            assert isinstance(result, SingleOutcomeRoll)
-            assert result.outcome == expected_outcome
-
-    @pytest.mark.parametrize(
-        "method_name",
-        [
-            pytest.param(method_name, id=f"{prefix}{name}")
-            for _, name, _, _ in _BINARY_OPERATOR_CASES
-            for prefix, method_name in (
-                ("forward-", f"__{name}__"),
-                ("reflected-", f"__r{name}__"),
-            )
-        ],
-    )
-    @pytest.mark.parametrize(
-        "make_operand",
-        [
-            pytest.param(lambda: LiteralRoller(1), id="roller"),
-            pytest.param(lambda: LiteralRoller(1).roll(), id="roll"),
-        ],
-    )
-    def test_h_and_p_binary_operator_methods_return_not_implemented_for_rolls_and_rollers(
-        self, method_name: str, make_operand: Callable[[], object]
-    ) -> None:
-        operand = make_operand()
-
-        assert getattr(H(6), method_name)(operand) is NotImplemented
-        assert getattr(P(6), method_name)(operand) is NotImplemented
-
-    def test_hable_operand_is_wrapped_in_hable_roller_without_calling_h(self) -> None:
-        hable = _Hable(H(6))
-
-        with patch.object(hable, "h", wraps=hable.h) as h_mock:
-            combined = LiteralRoller(1) + hable
-            operands = _roller_operands(combined)
-            wrapped = operands[1]
-
-            assert isinstance(wrapped, HableRoller)
-            assert wrapped.hable is hable
-            h_mock.assert_not_called()
-
-    def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
-        h = H(8)
-        combined = LiteralRoller(1) + h
-        operands = _roller_operands(combined)
-        wrapped = operands[1]
-
-        assert isinstance(wrapped, HRoller)
-        assert wrapped.metadata() == {"kind": "dyce.source", "name": str(h)}
-
-    def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
-        p = P(H({2: 1}), H({3: 1}))
-        combined = LiteralRoller(1) + p
-        operands = _roller_operands(combined)
-        pool_sum_roller = operands[1]
-        pool_sum_operands = _roller_operands(pool_sum_roller)
-        (p_roller,) = pool_sum_operands
-
-        assert pool_sum_roller.metadata() == {"kind": "dyce.pool-sum"}
-        assert isinstance(p_roller, PRoller)
-        assert p_roller.p is p
-
-
-class TestSingleOutcomeRoller:
-    def test_sum_returns_self(self) -> None:
-        roller = LiteralRoller(3)
-
-        assert roller.sum() is roller
-
-    def test_binary_operator_type_inference(self) -> None:
-        d6 = HRoller(H(6), name="d6")
-        power_roller = HRoller(H({_PowerOutcome(2): 1}))
-
-        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
-        assert_type(d6 + H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 + P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 - H(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 - P(6), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 * H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 / H(2), SingleOutcomeRoller[float])  # zuban: ignore[misc]
-        assert_type(d6 // H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 % H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(
-            power_roller**2, SingleOutcomeRoller[_PowerOutcome]
-        )  # zuban: ignore[misc]
-        assert_type(d6 << H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 >> H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 & H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 | H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(d6 ^ H(2), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-
-        assert_type(2 * d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 / d6, SingleOutcomeRoller[float])  # zuban: ignore[misc]
-        assert_type(12 // d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 % d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(
-            2**power_roller, SingleOutcomeRoller[_PowerOutcome]
-        )  # zuban: ignore[misc]
-        assert_type(2 << d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 >> d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 & d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 | d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 ^ d6, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-
-    def test_unary_operator_type_inference(self) -> None:
-        roller = LiteralRoller(-2)
-
-        assert_type(-roller, SingleOutcomeRoller[int])
-        assert_type(+roller, SingleOutcomeRoller[int])
-        assert_type(abs(roller), SingleOutcomeRoller[int])
-        assert_type(~roller, SingleOutcomeRoller[int])
-
-    def test_comparison_type_inference(self) -> None:
-        roller = LiteralRoller(2)
-
-        assert_type(roller.lt(3), SingleOutcomeRoller[bool])
-        assert_type(roller.le(H(3)), SingleOutcomeRoller[bool])
-        assert_type(roller.eq(P(3, 2)), SingleOutcomeRoller[bool])
-        assert_type(roller.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
-        assert_type(
-            roller.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
-            SingleOutcomeRoller[bool],
-        )
-        assert_type(roller.gt(1), SingleOutcomeRoller[bool])
-
-    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any, Any], Any],
-        name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left_roller = LiteralRoller(lhs)
-        right_roller = LiteralRoller(rhs)
-        combined = op(left_roller, right_roller)
-        expected_outcome = op(lhs, rhs)
-
-        assert combined.roll().outcome == expected_outcome
-        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
-        assert combined.operands == (left_roller, right_roller)
-
-    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any], Any],
-        name: str,
-        value: int,
-    ) -> None:
-        roller = LiteralRoller(value)
-        combined = op(roller)
-        expected_outcome = op(value)
-
-        assert combined.roll().outcome == expected_outcome
-        assert combined.metadata() == {"kind": "dyce.unary", "operator": name}
-        assert combined.operands == (roller,)
-
-    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _COMPARISON_CASES)
-    def test_comparisons_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any, Any], bool],
-        name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left_roller = LiteralRoller(lhs)
-        right_roller = LiteralRoller(rhs)
-        combined = getattr(left_roller, name)(right_roller)
-
-        assert combined.roll().outcome is op(lhs, rhs)
-        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
-        assert combined.operands == (left_roller, right_roller)
-
-
-class TestHRoller:
-    def test_exposes_h_source(self) -> None:
-        h = H(6)
-        roller = HRoller(h, name="d6")
-
-        assert_type(roller, HRoller[int])
-        assert roller.h is h
-        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
-
-    def test_uses_h_representation_as_default_name(self) -> None:
-        h = H(6)
-        roller = HRoller(h)
-
-        assert roller.metadata() == {"kind": "dyce.source", "name": str(h)}
-
-
-class TestHableRoller:
-    def test_exposes_hable_source(self) -> None:
-        hable = _Hable(H(6))
-        roller = HableRoller(hable, name="d6")
-
-        assert_type(roller, HableRoller[int])
-        assert roller.hable is hable
-        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
-
-    def test_uses_hable_representation_as_default_name(self) -> None:
-        hable = _Hable(H(6))
-        roller = HableRoller(hable)
-
-        assert roller.metadata() == {"kind": "dyce.source", "name": str(hable)}
-
-    def test_roll_calls_h_and_includes_source_metadata_in_trace(self) -> None:
-        hable = _Hable(H({4: 1}))
-        roller = HableRoller(hable, name="source")
-
-        with patch.object(hable, "h", wraps=hable.h) as h_mock:
-            roll = roller.roll()
-
-        trace = roll.trace()
-        rollers = trace["rollers"]
-        rolls = trace["rolls"]
-
-        h_mock.assert_called_once_with()
-        assert roll.outcome == 4
-        assert roll.roller is roller
+        roller = factory()
+        assert isinstance(roller, _FactoryRoller)
+        assert roller.expression is p_roller
+        roller_trace = roller.roll().trace()
+        rollers = roller_trace["rollers"]
+        rolls = roller_trace["rolls"]
         assert isinstance(rollers, dict)
         assert isinstance(rolls, dict)
-        assert rollers["roller0"] == {
-            "metadata": {"kind": "dyce.source", "name": "source"}
-        }
-        assert "relationships" not in rolls["roll0"]
-
-
-class TestLiteralRoller:
-    def test_type_inference(self) -> None:
-        roller = LiteralRoller(3)
-        roll = roller.roll()
-
-        assert_type(roller, LiteralRoller[int])  # ty: ignore[type-assertion-failure]
-        assert_type(roll, SingleOutcomeRoll[int])  # ty: ignore[type-assertion-failure]
-        assert_type(roll.roller, SingleOutcomeRoller[int])  # ty: ignore[type-assertion-failure]
-        # ty is special, apparently
-        assert_type(roller, LiteralRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
-        assert_type(roll, SingleOutcomeRoll[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
-        assert_type(roll.roller, SingleOutcomeRoller[Literal[3]])  # type: ignore[assert-type] # zuban: ignore[misc]
-
-        # An explicit generic specialization works for all checkers
-        roller_int = LiteralRoller[int](3)
-        roll_int = roller_int.roll()
-
-        assert_type(roller_int, LiteralRoller[int])
-        assert_type(roll_int, SingleOutcomeRoll[int])
-        assert_type(roll_int.roller, SingleOutcomeRoller[int])
-
-    def test_exposes_and_rolls_value(self) -> None:
-        roller = LiteralRoller(3)
-        roll = roller.roll()
-
-        assert roller.value == 3
-        assert roller.metadata() == {"kind": "dyce.literal", "value": 3}
-        assert roll.outcomes == (3,)
-        assert roll.outcome == 3
-        assert roll.roller is roller
-
-
-class TestRoller:
-    def test_binary_operator_type_inference(self) -> None:
-        left = PRoller(P(H({2: 1})), name="left")
-        right = PRoller(P(H({3: 1})), name="right")
-        single = HRoller(H({5: 1}), name="single")
-        power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
-
-        # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
-        assert_type(left + right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left + single, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(single + left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(
-            left + P(H({5: 1})), SingleOutcomeRoller[int]
-        )  # zuban: ignore[misc]
-        assert_type(left - right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(right - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(10 - left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left * 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left / 2, SingleOutcomeRoller[float])  # zuban: ignore[misc]
-        assert_type(left // 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left % 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(
-            power_pool**2, SingleOutcomeRoller[_PowerOutcome]
-        )  # zuban: ignore[misc]
-        assert_type(left << 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left >> 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left & 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left | 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(left ^ 2, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-
-        assert_type(2 * left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 / left, SingleOutcomeRoller[float])  # zuban: ignore[misc]
-        assert_type(12 // left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 % left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(
-            2**power_pool, SingleOutcomeRoller[_PowerOutcome]
-        )  # zuban: ignore[misc]
-        assert_type(2 << left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(12 >> left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 & left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 | left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(2 ^ left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-
-    def test_unary_operator_type_inference(self) -> None:
-        pool = PRoller(P(H({-2: 1})), name="pool")
-
-        assert_type(-pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(abs(pool), SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-
-    def test_comparison_type_inference(self) -> None:
-        pool = PRoller(P(H({2: 1})), name="pool")
-
-        assert_type(pool.lt(3), SingleOutcomeRoller[bool])
-        assert_type(pool.le(H(3)), SingleOutcomeRoller[bool])
-        assert_type(pool.eq(P(3, 2)), SingleOutcomeRoller[bool])
-        assert_type(pool.ne(LiteralRoller(3)), SingleOutcomeRoller[bool])
-        assert_type(
-            pool.ge(RollerPool(LiteralRoller(2), LiteralRoller(3))),
-            SingleOutcomeRoller[bool],
-        )
-        assert_type(pool.gt(1), SingleOutcomeRoller[bool])
-
-    def test_sum_produces_single_outcome_roller(self) -> None:
-        pool = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool")
-        summed = pool.sum()
-        roll = summed.roll()
-
-        assert_type(summed, SingleOutcomeRoller[str])  # zuban: ignore[misc]
-        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
-        assert roll.outcome == "ab"
-
-    def test_select_on_selection_applies_selector_to_parent_selection(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
-        parent_selection = pool.select(-1, 0)
-        selection = parent_selection.select(1)
-        roll = selection.roll()
-        (parent_roll,) = _roll_operands(roll)
-
-        assert_type(selection, Roller[int])  # zuban: ignore[misc]
-        assert _roller_operands(selection) == (parent_selection,)
-        assert roll.outcomes == (1,)
-        assert isinstance(parent_roll, Roll)
-        assert parent_roll.outcomes == (3, 1)
-
-    def test_at_returns_sum_of_selected_outcomes(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
-        result = pool.at(-1, 0)
-
-        assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
-        assert result.roll().outcome == 4
-
-    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any, Any], Any],
-        name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left = PRoller(P(H({lhs - 1: 1}), H({1: 1})), name="left")
-        right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
-        combined = op(left, right)
-        expected_outcome = op(lhs, rhs)
-        left_operand, right_operand = _roller_operands(combined)
-
-        assert combined.roll().outcome == expected_outcome
-        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
-        assert left_operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert _roller_operands(left_operand) == (left,)
-        assert right_operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert _roller_operands(right_operand) == (right,)
-        assert op(left, LiteralRoller(rhs)).roll().outcome == expected_outcome
-        assert op(LiteralRoller(lhs), right).roll().outcome == expected_outcome
-        assert op(lhs, right).roll().outcome == expected_outcome
-        assert op(P(H({lhs: 1})), right).roll().outcome == expected_outcome
-        assert op(left, P(H({rhs: 1}))).roll().outcome == expected_outcome
-
-    @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
-    def test_unary_operators_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any], Any],
-        name: str,
-        value: int,
-    ) -> None:
-        pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
-        combined = op(pool)
-        expected_outcome = op(value)
-        (operand,) = _roller_operands(combined)
-
-        assert combined.roll().outcome == expected_outcome
-        assert combined.metadata() == {"kind": "dyce.unary", "operator": name}
-        assert operand.metadata() == {"kind": "dyce.pool-sum"}
-        assert _roller_operands(operand) == (pool,)
-
-
-class TestPRoller:
-    @pytest.mark.parametrize("size", [0, 1, 3])
-    def test_length(self, size: int) -> None:
-        assert len(PRoller(size @ P(6))) == size
-
-    def test_roll_delegates_to_p(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        p = P(H({2: 1}), H({1: 1}))
-
-        def p_roll(source: P[int]) -> tuple[int, ...]:
-            assert source is p
-            return (1, 2)
-
-        monkeypatch.setattr(P, "roll", p_roll)
-        pool = PRoller(p, name="pool")
-        roll = pool.roll()
-
-        assert_type(pool, PRoller[int])  # zuban: ignore[misc]
-        assert_type(roll, Roll[int])  # zuban: ignore[misc]
-        assert pool.p is p
-        assert pool.metadata()["name"] == "pool"
-        assert roll.outcomes == (1, 2)
-        assert roll.roller is pool
-
-    def test_select_produces_multi_outcome_roller(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
-        selected = pool.select(-1, 0)
-        roll = selected.roll()
-        trace = roll.trace()
-        rollers = trace["rollers"]
-        rolls = trace["rolls"]
-
-        assert_type(selected, Roller[int])  # zuban: ignore[misc]
-        assert roll.outcomes == (3, 1)
-        assert isinstance(rollers, dict)
-        assert rollers["roller0"] == {
-            "metadata": {
-                "kind": "dyce.pool-selection",
-                "selectors": [-1, 0],
-            },
-            "relationships": {"operands": ["roller1"]},
-        }
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["outcomes"] == [3, 1]
-        assert rolls["roll0"]["relationships"]["operands"] == ["roll1"]
-        assert rolls["roll1"]["outcomes"] == [1, 2, 3]
-
-    def test_invalid_selection_fails_when_rolled(self) -> None:
-        selected = PRoller(P(2)).select(1)
-
-        with pytest.raises(RollError) as caught:
-            selected.roll()
-
-        assert isinstance(caught.value.__cause__, IndexError)
-
-    def test_empty_p_sum_type_and_metadata(self) -> None:
-        pool = PRoller(P())
-        summed = pool.sum()
-
-        assert_type(pool, PRoller[Never])  # zuban: ignore[misc]
-        assert_type(summed, SingleOutcomeRoller[Never])  # zuban: ignore[misc]
-        assert summed.metadata() == {"kind": "dyce.pool-sum"}
-
-
-class TestRollerPool:
-    def test_composes_single_rollers(self) -> None:
-        two = LiteralRoller(2)
-        one = LiteralRoller(1)
-        pool = RollerPool(two, one, name="pool")
-        roll = pool.roll()
-
-        pool_int: RollerPool[int] = pool
-        assert pool_int is pool
-        assert isinstance(pool, Roller)
-        assert len(pool) == 2
-        assert pool.rollers == (two, one)
-        assert pool.operands == (two, one)
-        assert roll.outcomes == (1, 2)
-        assert tuple(operand.roller for operand in _roll_operands(roll)) == (one, two)
-        assert pool.metadata() == {"kind": "dyce.pool", "name": "pool"}
-
-    def test_reused_single_roller_produces_independent_rolls(self) -> None:
-        d6 = HRoller(H(6), name="d6")
-        trace = RollerPool(d6, d6).roll().trace()
-        rollers = trace["rollers"]
-        rolls = trace["rolls"]
-
-        assert isinstance(rollers, dict)
-        assert isinstance(rolls, dict)
-        assert rollers["roller0"] == {
-            "metadata": {"kind": "dyce.pool"},
-            "relationships": {"operands": ["roller1", "roller1"]},
-        }
-        assert rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll2"]
-
-    def test_roll_uses_natural_order_for_incomparable_outcomes(self) -> None:
-        pool = RollerPool(
-            HRoller(H({2j: 1})),
-            HRoller(H({1j: 1})),
-        )
-
-        assert pool.roll().outcomes == (1j, 2j)
+        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
+        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
 
 
 class TestSingleOutcomeFactoryRoller:
@@ -1238,67 +1302,28 @@ class TestSingleOutcomeFactoryRoller:
             invalid_factory()
 
 
-class TestFactoryRoller:
-    def test_callables(self) -> None:
-        class RollerFactories:
-            @roller_factory()
-            def factory(self, n: int) -> Roller[int]:
-                return PRoller(n @ P(2))
+class TestRoll:
+    def test_sum_produces_single_outcome_roll(self) -> None:
+        pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
+        roll = pool_roll.sum()
 
-            def __call__(self, first: int, second: int) -> Roller[int]:
-                return RollerPool(LiteralRoller(first), LiteralRoller(second))
+        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
+        assert roll.outcome == "ab"
+        assert _roll_operands(roll) == (pool_roll,)
 
-        some_rollers = RollerFactories()
-        returned_roller = some_rollers.factory(2)
-        assert_type(returned_roller, Roller[int])
-        assert isinstance(returned_roller, _FactoryRoller)
-        assert len(returned_roller.roll().outcomes) == 2
+    def test_empty_outcomes_raise(self) -> None:
+        with pytest.raises(ValueError, match="at least one outcome"):
+            Roll((), PRoller(P()))
 
-        callable_factory = roller_factory(some_rollers)
-        callable_roller = callable_factory(3, 4)
-        assert_type(callable_roller, Roller[int])
-        assert isinstance(callable_roller, _FactoryRoller)
-        assert callable_roller.metadata()["name"] == "RollerFactories"
-        assert callable_roller.roll().outcomes == (3, 4)
+    def test_comparison_type_inference(self) -> None:
+        roll = PRoller(P(H({2: 1}))).roll()
 
-        bound_factory = roller_factory(partial(some_rollers, 5, 6), name="bound")
-        bound_roller = bound_factory()
-        assert isinstance(bound_roller, _FactoryRoller)
-        assert bound_roller.metadata()["name"] == "bound"
-        assert bound_roller.roll().outcomes == (5, 6)
-
-    def test_implicit_name_uses_factory_name(self) -> None:
-        @roller_factory
-        def factory() -> Roller[int]:
-            return PRoller(P(2))
-
-        assert factory().metadata()["name"] == factory.__name__
-
-    @pytest.mark.parametrize("name", ["explicit_name", ""])
-    def test_explicit_name_preserved(self, name: str) -> None:
-        @roller_factory(name=name)
-        def factory() -> Roller[int]:
-            return PRoller(P(2))
-
-        assert factory().metadata()["name"] == name
-
-    def test_expression(self) -> None:
-        p_roller = PRoller(P(2))
-
-        @roller_factory
-        def factory() -> Roller[int]:
-            return p_roller
-
-        roller = factory()
-        assert isinstance(roller, _FactoryRoller)
-        assert roller.expression is p_roller
-        roller_trace = roller.roll().trace()
-        rollers = roller_trace["rollers"]
-        rolls = roller_trace["rolls"]
-        assert isinstance(rollers, dict)
-        assert isinstance(rolls, dict)
-        assert rollers["roller0"]["relationships"] == {"expression": "roller1"}
-        assert rolls["roll0"]["relationships"] == {"result": "roll1"}
+        assert_type(roll.lt(3), SingleOutcomeRoll[bool])
+        assert_type(roll.le(H(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.eq(P(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ne(LiteralRoller(3)), SingleOutcomeRoll[bool])
+        assert_type(roll.ge(LiteralRoller(3).roll()), SingleOutcomeRoll[bool])
+        assert_type(roll.gt(1), SingleOutcomeRoll[bool])
 
 
 class TestSingleOutcomeRoll:
@@ -1447,30 +1472,6 @@ class TestSingleOutcomeRoll:
             "roll2",
         ]
         assert reused_rolls["roll0"]["relationships"]["operands"] == ["roll1", "roll1"]
-
-
-class TestRoll:
-    def test_sum_produces_single_outcome_roll(self) -> None:
-        pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
-        roll = pool_roll.sum()
-
-        assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
-        assert roll.outcome == "ab"
-        assert _roll_operands(roll) == (pool_roll,)
-
-    def test_empty_outcomes_raise(self) -> None:
-        with pytest.raises(ValueError, match="at least one outcome"):
-            Roll((), PRoller(P()))
-
-    def test_comparison_type_inference(self) -> None:
-        roll = PRoller(P(H({2: 1}))).roll()
-
-        assert_type(roll.lt(3), SingleOutcomeRoll[bool])
-        assert_type(roll.le(H(3)), SingleOutcomeRoll[bool])
-        assert_type(roll.eq(P(3)), SingleOutcomeRoll[bool])
-        assert_type(roll.ne(LiteralRoller(3)), SingleOutcomeRoll[bool])
-        assert_type(roll.ge(LiteralRoller(3).roll()), SingleOutcomeRoll[bool])
-        assert_type(roll.gt(1), SingleOutcomeRoll[bool])
 
 
 class TestMixedRollBinaryArithmetic:
