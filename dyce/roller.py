@@ -24,7 +24,17 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import reduce, wraps
-from typing import Any, Generic, ParamSpec, Protocol, TypeVar, cast, final, overload
+from typing import (
+    Any,
+    Generic,
+    Literal,
+    ParamSpec,
+    Protocol,
+    TypeVar,
+    cast,
+    final,
+    overload,
+)
 
 import optype as ot
 
@@ -61,77 +71,115 @@ _ParamsT = ParamSpec("_ParamsT")
 
 
 @dataclass(frozen=True, slots=True)
-class _BinaryOperator:
+class _RollFormat:
+    text: str
+    precedence: int
+
+
+@dataclass(frozen=True, slots=True)
+class _BinaryOperation:
     name: str
     function: Callable[[object, object], object]
+    symbol: str
+    precedence: int
+    associativity: Literal["left", "right", "none"] = "left"
+
+    @classmethod
+    def create(
+        cls,
+        name: str,
+        function: Callable[..., object],
+        symbol: str,
+        precedence: int,
+        associativity: Literal["left", "right", "none"] = "left",
+    ) -> "_BinaryOperation":
+        return cls(
+            name,
+            cast("Callable[[object, object], object]", function),
+            symbol,
+            precedence,
+            associativity,
+        )
 
     def __call__(self, lhs: object, rhs: object) -> object:
         return self.function(lhs, rhs)
 
+    def format(self, left: _RollFormat, right: _RollFormat) -> _RollFormat:
+        left_text = self._format_child(left, right=False)
+        right_text = self._format_child(right, right=True)
+        return _RollFormat(f"{left_text} {self.symbol} {right_text}", self.precedence)
+
+    def _format_child(self, child: _RollFormat, *, right: bool) -> str:
+        parenthesize = child.precedence < self.precedence
+        if child.precedence == self.precedence:
+            if self.associativity == "none":
+                parenthesize = True
+            elif right:
+                parenthesize = self.associativity != "right"
+            else:
+                parenthesize = self.associativity == "right"
+        return f"({child.text})" if parenthesize else child.text
+
 
 @dataclass(frozen=True, slots=True)
-class _UnaryOperator:
+class _UnaryOperation:
     name: str
     function: Callable[[object], object]
+    symbol: str | None
+    precedence: int
+
+    @classmethod
+    def create(
+        cls,
+        name: str,
+        function: Callable[..., object],
+        symbol: str | None,
+        precedence: int,
+    ) -> "_UnaryOperation":
+        return cls(
+            name,
+            cast("Callable[[object], object]", function),
+            symbol,
+            precedence,
+        )
 
     def __call__(self, operand: object) -> object:
         return self.function(operand)
 
+    def format(self, operand: _RollFormat) -> _RollFormat:
+        if self.symbol is None:
+            return _RollFormat(f"{self.name}({operand.text})", self.precedence)
+        operand_text = (
+            f"({operand.text})"
+            if operand.precedence < self.precedence
+            else operand.text
+        )
+        return _RollFormat(f"{self.symbol}{operand_text}", self.precedence)
 
-_ADD = _BinaryOperator("add", cast("Callable[[object, object], object]", operator.add))
-_SUB = _BinaryOperator("sub", cast("Callable[[object, object], object]", operator.sub))
-_MUL = _BinaryOperator("mul", cast("Callable[[object, object], object]", operator.mul))
-_TRUEDIV = _BinaryOperator(
-    "truediv", cast("Callable[[object, object], object]", operator.truediv)
-)
-_FLOORDIV = _BinaryOperator(
-    "floordiv", cast("Callable[[object, object], object]", operator.floordiv)
-)
-_MOD = _BinaryOperator("mod", cast("Callable[[object, object], object]", operator.mod))
-_POW = _BinaryOperator("pow", cast("Callable[[object, object], object]", operator.pow))
-_LSHIFT = _BinaryOperator(
-    "lshift", cast("Callable[[object, object], object]", operator.lshift)
-)
-_RSHIFT = _BinaryOperator(
-    "rshift", cast("Callable[[object, object], object]", operator.rshift)
-)
-_AND = _BinaryOperator("and", cast("Callable[[object, object], object]", operator.and_))
-_OR = _BinaryOperator("or", cast("Callable[[object, object], object]", operator.or_))
-_XOR = _BinaryOperator("xor", cast("Callable[[object, object], object]", operator.xor))
-_LT = _BinaryOperator("lt", cast("Callable[[object, object], object]", operator.lt))
-_LE = _BinaryOperator("le", cast("Callable[[object, object], object]", operator.le))
-_EQ = _BinaryOperator("eq", cast("Callable[[object, object], object]", operator.eq))
-_NE = _BinaryOperator("ne", cast("Callable[[object, object], object]", operator.ne))
-_GE = _BinaryOperator("ge", cast("Callable[[object, object], object]", operator.ge))
-_GT = _BinaryOperator("gt", cast("Callable[[object, object], object]", operator.gt))
-_NEG = _UnaryOperator("neg", cast("Callable[[object], object]", operator.neg))
-_POS = _UnaryOperator("pos", cast("Callable[[object], object]", operator.pos))
-_ABS = _UnaryOperator("abs", cast("Callable[[object], object]", operator.abs))
-_INVERT = _UnaryOperator("invert", cast("Callable[[object], object]", operator.invert))
 
-_BINARY_FORMATS = {
-    "lt": ("<", 10),
-    "le": ("<=", 10),
-    "eq": ("==", 10),
-    "ne": ("!=", 10),
-    "ge": (">=", 10),
-    "gt": (">", 10),
-    "or": ("|", 20),
-    "xor": ("^", 30),
-    "and": ("&", 40),
-    "lshift": ("<<", 50),
-    "rshift": (">>", 50),
-    "add": ("+", 60),
-    "sub": ("-", 60),
-    "mul": ("*", 70),
-    "truediv": ("/", 70),
-    "floordiv": ("//", 70),
-    "mod": ("%", 70),
-    "pow": ("**", 90),
-}
-_UNARY_FORMATS = {"neg": "-", "pos": "+", "invert": "~"}
-_COMPARISON_NAMES = frozenset(("lt", "le", "eq", "ne", "ge", "gt"))
-_UNARY_PRECEDENCE = 80
+_ADD = _BinaryOperation.create("add", operator.add, "+", 60)
+_SUB = _BinaryOperation.create("sub", operator.sub, "-", 60)
+_MUL = _BinaryOperation.create("mul", operator.mul, "*", 70)
+_TRUEDIV = _BinaryOperation.create("truediv", operator.truediv, "/", 70)
+_FLOORDIV = _BinaryOperation.create("floordiv", operator.floordiv, "//", 70)
+_MOD = _BinaryOperation.create("mod", operator.mod, "%", 70)
+_POW = _BinaryOperation.create("pow", operator.pow, "**", 90, "right")
+_LSHIFT = _BinaryOperation.create("lshift", operator.lshift, "<<", 50)
+_RSHIFT = _BinaryOperation.create("rshift", operator.rshift, ">>", 50)
+_AND = _BinaryOperation.create("and", operator.and_, "&", 40)
+_OR = _BinaryOperation.create("or", operator.or_, "|", 20)
+_XOR = _BinaryOperation.create("xor", operator.xor, "^", 30)
+_LT = _BinaryOperation.create("lt", operator.lt, "<", 10, "none")
+_LE = _BinaryOperation.create("le", operator.le, "<=", 10, "none")
+_EQ = _BinaryOperation.create("eq", operator.eq, "==", 10, "none")
+_NE = _BinaryOperation.create("ne", operator.ne, "!=", 10, "none")
+_GE = _BinaryOperation.create("ge", operator.ge, ">=", 10, "none")
+_GT = _BinaryOperation.create("gt", operator.gt, ">", 10, "none")
+_NEG = _UnaryOperation.create("neg", operator.neg, "-", 80)
+_POS = _UnaryOperation.create("pos", operator.pos, "+", 80)
+_ABS = _UnaryOperation.create("abs", operator.abs, None, 100)
+_INVERT = _UnaryOperation.create("invert", operator.invert, "~", 80)
+
 _CALL_PRECEDENCE = 100
 _ATOM_PRECEDENCE = 110
 _ROLL_FORMATTER: "_RollFormatter"
@@ -765,7 +813,7 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         r"""Returns a roller or roll testing whether this roller’s summed outcome is greater than *rhs*."""
         return self._comparison(rhs, _GT)
 
-    def _comparison(self, rhs: object, comparison: _BinaryOperator) -> object:
+    def _comparison(self, rhs: object, comparison: _BinaryOperation) -> object:
         if isinstance(rhs, Roll):
             return _compare_roll(self.roll(), rhs, comparison)
         return _binary_roller(self, rhs, comparison)
@@ -1776,7 +1824,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
         return cast("SingleOutcomeRoll[_ResultT]", self._unary_operator(_INVERT))
 
     def _binary_operator(
-        self, rhs: object, operator: _BinaryOperator
+        self, rhs: object, operation: _BinaryOperation
     ) -> "SingleOutcomeRoll[object]":
         if isinstance(rhs, Roller):
             rhs = rhs.roll()
@@ -1784,13 +1832,13 @@ class SingleOutcomeRoll(Roll[_T_co]):
             rhs = _as_roller(rhs).roll()
         rhs_roll = _as_single_outcome_roll(rhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
-            self.roller, rhs_roll.roller, operator
+            self.roller, rhs_roll.roller, operation
         )
-        outcome = operator(self.outcome, rhs_roll.outcome)
+        outcome = operation(self.outcome, rhs_roll.outcome)
         return _SingleOutcomeOperandRoll(outcome, roller, (self, rhs_roll))
 
     def _reflected_binary_operator(
-        self, lhs: object, operator: _BinaryOperator
+        self, lhs: object, operation: _BinaryOperation
     ) -> "SingleOutcomeRoll[object]":
         if isinstance(lhs, Roller):
             lhs = lhs.roll()
@@ -1798,36 +1846,42 @@ class SingleOutcomeRoll(Roll[_T_co]):
             lhs = _as_roller(lhs).roll()
         lhs_roll = _as_single_outcome_roll(lhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
-            lhs_roll.roller, self.roller, operator
+            lhs_roll.roller, self.roller, operation
         )
-        outcome = operator(lhs_roll.outcome, self.outcome)
+        outcome = operation(lhs_roll.outcome, self.outcome)
         return _SingleOutcomeOperandRoll(outcome, roller, (lhs_roll, self))
 
-    def _unary_operator(self, operator: _UnaryOperator) -> "SingleOutcomeRoll[object]":
-        roller: SingleOutcomeRoller[object] = _UnaryRoller(self.roller, operator)
-        outcome = operator(self.outcome)
+    def _unary_operator(
+        self, operation: _UnaryOperation
+    ) -> "SingleOutcomeRoll[object]":
+        roller: SingleOutcomeRoller[object] = _UnaryRoller(self.roller, operation)
+        outcome = operation(self.outcome)
         return _SingleOutcomeOperandRoll(outcome, roller, (self,))
 
 
 class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
-    __slots__ = ("_left", "_operator", "_right")
+    __slots__ = ("_left", "_operation", "_right")
 
     def __init__(
         self,
         left: SingleOutcomeRoller[object],
         right: SingleOutcomeRoller[object],
-        operator: _BinaryOperator,
+        operation: _BinaryOperation,
     ) -> None:
         self._left = left
         self._right = right
-        self._operator = operator
+        self._operation = operation
 
     @property
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._left, self._right)
 
+    @property
+    def operation(self) -> _BinaryOperation:
+        return self._operation
+
     def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.binary", "operator": self._operator.name}
+        return {"kind": "dyce.binary", "operator": self._operation.name}
 
     def _trace_relationships(
         self,
@@ -1837,27 +1891,31 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
         right_roll = self._right.roll()
-        outcome = self._operator(left_roll.outcome, right_roll.outcome)
+        outcome = self._operation(left_roll.outcome, right_roll.outcome)
         return _SingleOutcomeOperandRoll(
             cast("_ResultT", outcome), self, (left_roll, right_roll)
         )
 
 
 class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
-    __slots__ = ("_operand", "_operator")
+    __slots__ = ("_operand", "_operation")
 
     def __init__(
-        self, operand: SingleOutcomeRoller[object], operator: _UnaryOperator
+        self, operand: SingleOutcomeRoller[object], operation: _UnaryOperation
     ) -> None:
         self._operand = operand
-        self._operator = operator
+        self._operation = operation
 
     @property
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._operand,)
 
+    @property
+    def operation(self) -> _UnaryOperation:
+        return self._operation
+
     def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.unary", "operator": self._operator.name}
+        return {"kind": "dyce.unary", "operator": self._operation.name}
 
     def _trace_relationships(
         self,
@@ -1866,7 +1924,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
-        outcome = self._operator(operand_roll.outcome)
+        outcome = self._operation(operand_roll.outcome)
         return _SingleOutcomeOperandRoll(
             cast("_ResultT", outcome), self, (operand_roll,)
         )
@@ -2122,12 +2180,6 @@ class _TraceRoll(Roll[_T_co]):
         }
 
 
-@dataclass(frozen=True, slots=True)
-class _RollFormat:
-    text: str
-    precedence: int
-
-
 class _RollFormatter:
     def __init__(self) -> None:
         self._handlers: dict[
@@ -2157,16 +2209,13 @@ class _RollFormatter:
         )
 
     def _format_binary(
-        self, roll: Roll[object], metadata: dict[str, object]
+        self, roll: Roll[object], _metadata: dict[str, object]
     ) -> _RollFormat:
-        operator_name = cast("str", metadata["operator"])
-        symbol, precedence = _BINARY_FORMATS[operator_name]
+        operation = cast("_BinaryRoller[object]", roll.roller).operation
         operands = self._operands(roll)
         left = self.format(operands[0])
         right = self.format(operands[1])
-        left_text = self._format_child(left, precedence, operator_name, right=False)
-        right_text = self._format_child(right, precedence, operator_name, right=True)
-        return _RollFormat(f"{left_text} {symbol} {right_text}", precedence)
+        return operation.format(left, right)
 
     def _format_boundary(
         self, roll: Roll[object], metadata: dict[str, object]
@@ -2180,24 +2229,6 @@ class _RollFormatter:
             f"{name}({self.format(result).text})",
             _CALL_PRECEDENCE,
         )
-
-    @staticmethod
-    def _format_child(
-        child: _RollFormat,
-        parent_precedence: int,
-        parent_operator: str,
-        *,
-        right: bool,
-    ) -> str:
-        parenthesize = child.precedence < parent_precedence
-        if child.precedence == parent_precedence:
-            if parent_operator in _COMPARISON_NAMES:
-                parenthesize = True
-            elif right:
-                parenthesize = parent_operator != "pow"
-            else:
-                parenthesize = parent_operator == "pow"
-        return f"({child.text})" if parenthesize else child.text
 
     def _format_pool(
         self, roll: Roll[object], metadata: dict[str, object]
@@ -2260,20 +2291,12 @@ class _RollFormatter:
         return _RollFormat(text, _ATOM_PRECEDENCE)
 
     def _format_unary(
-        self, roll: Roll[object], metadata: dict[str, object]
+        self, roll: Roll[object], _metadata: dict[str, object]
     ) -> _RollFormat:
-        operator_name = cast("str", metadata["operator"])
+        operation = cast("_UnaryRoller[object]", roll.roller).operation
         operands = self._operands(roll)
         operand = self.format(operands[0])
-        if operator_name == "abs":
-            return _RollFormat(f"abs({operand.text})", _CALL_PRECEDENCE)
-        symbol = _UNARY_FORMATS[operator_name]
-        operand_text = (
-            f"({operand.text})"
-            if operand.precedence < _UNARY_PRECEDENCE
-            else operand.text
-        )
-        return _RollFormat(f"{symbol}{operand_text}", _UNARY_PRECEDENCE)
+        return operation.format(operand)
 
     def _format_unknown(
         self, roll: Roll[object], metadata: dict[str, object]
@@ -2825,15 +2848,15 @@ def _as_single_outcome_roll(
 def _binary_roller(
     lhs: object,
     rhs: object,
-    operator: _BinaryOperator,
+    operation: _BinaryOperation,
 ) -> object:
     if isinstance(lhs, Roll) or isinstance(rhs, Roll):
         return NotImplemented
-    return _BinaryRoller(_as_roller(lhs), _as_roller(rhs), operator)
+    return _BinaryRoller(_as_roller(lhs), _as_roller(rhs), operation)
 
 
 def _compare_roll(
-    lhs: Roll[object], rhs: object, comparison: _BinaryOperator
+    lhs: Roll[object], rhs: object, comparison: _BinaryOperation
 ) -> SingleOutcomeRoll[bool]:
     lhs_roll: SingleOutcomeRoll[Any] = _as_single_outcome_roll(cast("Any", lhs))
     if isinstance(rhs, Roller):
