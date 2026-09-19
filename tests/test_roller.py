@@ -1061,7 +1061,7 @@ class TestTrace:
         assert rolls["roll3"]["outcome"] == 1
         assert rolls["roll0"]["outcomes"] == [1 + rolls["roll1"]["outcome"]]
 
-    def test_implicit_name_uses_callback_name(self) -> None:
+    def test_implicit_label_uses_callback_name(self) -> None:
         def callback() -> int:
             return 4
 
@@ -1069,20 +1069,20 @@ class TestTrace:
 
         assert result.roller.metadata() == {
             "kind": "dyce.trace",
-            "name": "callback",
+            "label": "callback",
             "state": {},
         }
 
-    @pytest.mark.parametrize("name", ["trace.custom", ""])
-    def test_explicit_name_preserved(self, name: str) -> None:
+    @pytest.mark.parametrize("label", ["trace.custom", ""])
+    def test_explicit_label_preserved(self, label: str) -> None:
         def callback() -> int:
             return 4
 
-        result = trace(callback, name=name)
+        result = trace(callback, label=label)
 
         assert result.roller.metadata() == {
             "kind": "dyce.trace",
-            "name": name,
+            "label": label,
             "state": {},
         }
 
@@ -1121,31 +1121,31 @@ class TestTrace:
     def test_parameter_roller_failure_path(self) -> None:
         source = PRoller(P())
         with pytest.raises(RollError) as caught:
-            trace(lambda roll: roll, source, name="custom")
+            trace(lambda roll: roll, source, label="custom")
 
         assert caught.value.path[0].metadata() == {
             "kind": "dyce.trace",
-            "name": "custom",
+            "label": "custom",
             "state": {},
         }
         assert caught.value.path[1:] == (source,)
 
     def test_callback_failure_path(self) -> None:
         with pytest.raises(RollError) as caught:
-            trace(Mock(side_effect=ValueError("callback")), name="custom")
+            trace(Mock(side_effect=ValueError("callback")), label="custom")
 
         assert [entry.metadata() for entry in caught.value.path] == [
-            {"kind": "dyce.trace", "name": "custom", "state": {}}
+            {"kind": "dyce.trace", "label": "custom", "state": {}}
         ]
 
     def test_returned_roller_failure_path(self) -> None:
         returned = PRoller(P())
         with pytest.raises(RollError) as caught:
-            trace(lambda: returned, name="custom")
+            trace(lambda: returned, label="custom")
 
         assert caught.value.path[0].metadata() == {
             "kind": "dyce.trace",
-            "name": "custom",
+            "label": "custom",
             "state": {},
         }
         assert caught.value.path[1:] == (returned,)
@@ -1864,7 +1864,7 @@ class TestMixedRollBinaryArithmetic:
                 return () if self._operand is None else (self._operand,)
 
             def metadata(self) -> dict[str, object]:
-                return {"kind": "tests.custom", "name": "custom"}
+                return {"kind": "tests.custom", "label": "custom"}
 
             def _trace_relationships(
                 self,
