@@ -137,7 +137,7 @@ class TestRollError:
         assert caught.value.__cause__ is failure
 
     def test_message_formatting(self) -> None:
-        source = PRoller(P(), name="damage")
+        source = PRoller(P(), label="damage")
         parent = source.sum()
         grandparent = RollerPool(parent)
 
@@ -147,7 +147,7 @@ class TestRollError:
             "no outcomes from an empty pool\nRoller path:\n"
             "  {'kind': 'dyce.pool'}\n"
             "  → {'kind': 'dyce.pool-sum'}\n"
-            "  → {'kind': 'dyce.pool-source', 'name': 'damage'}"
+            "  → {'kind': 'dyce.pool-source', 'label': 'damage'}"
         )
 
     def test_base_exception_propagates(self) -> None:
@@ -160,10 +160,10 @@ class TestRollError:
 
 class TestRoller:
     def test_binary_operator_type_inference(self) -> None:
-        left = PRoller(P(H({2: 1})), name="left")
-        right = PRoller(P(H({3: 1})), name="right")
-        single = HRoller(H({5: 1}), name="single")
-        power_pool = PRoller(P(H({_PowerOutcome(2): 1})), name="power_pool")
+        left = PRoller(P(H({2: 1})), label="left")
+        right = PRoller(P(H({3: 1})), label="right")
+        single = HRoller(H({5: 1}), label="single")
+        power_pool = PRoller(P(H({_PowerOutcome(2): 1})), label="power_pool")
 
         # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
         assert_type(left + right, SingleOutcomeRoller[int])  # zuban: ignore[misc]
@@ -202,7 +202,7 @@ class TestRoller:
         assert_type(2 ^ left, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
     def test_unary_operator_type_inference(self) -> None:
-        pool = PRoller(P(H({-2: 1})), name="pool")
+        pool = PRoller(P(H({-2: 1})), label="pool")
 
         assert_type(-pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert_type(+pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
@@ -210,7 +210,7 @@ class TestRoller:
         assert_type(~pool, SingleOutcomeRoller[int])  # zuban: ignore[misc]
 
     def test_comparison_type_inference(self) -> None:
-        pool = PRoller(P(H({2: 1})), name="pool")
+        pool = PRoller(P(H({2: 1})), label="pool")
 
         assert_type(pool.lt(3), SingleOutcomeRoller[bool])
         assert_type(pool.le(H(3)), SingleOutcomeRoller[bool])
@@ -223,7 +223,7 @@ class TestRoller:
         assert_type(pool.gt(1), SingleOutcomeRoller[bool])
 
     def test_sum_produces_single_outcome_roller(self) -> None:
-        pool = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool")
+        pool = PRoller(P(H({"a": 1}), H({"b": 1})), label="pool")
         summed = pool.sum()
         roll = summed.roll()
 
@@ -232,7 +232,7 @@ class TestRoller:
         assert roll.outcome == "ab"
 
     def test_select_on_selection_applies_selector_to_parent_selection(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), label="pool")
         parent_selection = pool.select(-1, 0)
         selection = parent_selection.select(1)
         roll = selection.roll()
@@ -245,15 +245,15 @@ class TestRoller:
         assert parent_roll.outcomes == (3, 1)
 
     def test_at_returns_sum_of_selected_outcomes(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), label="pool")
         result = pool.at(-1, 0)
 
         assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert result.roll().outcome == 4
 
     def test_binary_operator_sums_multi_outcome_operands(self) -> None:
-        left = PRoller(P(H({2: 1}), H({1: 1})), name="left")
-        right = PRoller(P(H({3: 1}), H({1: 1})), name="right")
+        left = PRoller(P(H({2: 1}), H({1: 1})), label="left")
+        right = PRoller(P(H({3: 1}), H({1: 1})), label="right")
         combined = left + right
         left_operand, right_operand = _roller_operands(combined)
 
@@ -270,7 +270,7 @@ class TestRoller:
         name: str,
         value: int,
     ) -> None:
-        pool = PRoller(P(H({value - 1: 1}), H({1: 1})), name="pool")
+        pool = PRoller(P(H({value - 1: 1}), H({1: 1})), label="pool")
         combined = op(pool)
         expected_outcome = op(value)
         (operand,) = _roller_operands(combined)
@@ -281,6 +281,57 @@ class TestRoller:
         assert _roller_operands(operand) == (pool,)
 
 
+class TestRollerFromValue:
+    def test_type_inference(self) -> None:
+        hable = _Hable(H(6))
+
+        assert_type(Roller.from_value(H(6)), HRoller[int])  # zuban: ignore[misc]
+        assert_type(Roller.from_value(P(6)), PRoller[int])  # zuban: ignore[misc]
+        assert_type(Roller.from_value(hable), HableRoller[int])
+        assert_type(Roller.from_value(3), LiteralRoller[int])  # ty: ignore[type-assertion-failure]
+        assert_type(Roller.from_value(LiteralRoller(3)), SingleOutcomeRoller[int])  # ty: ignore[type-assertion-failure]
+        assert_type(
+            Roller.from_value(PRoller(P(6))), Roller[int]
+        )  # zuban: ignore[misc]
+
+    def test_wraps_supported_values(self) -> None:
+        h = H(6)
+        p = P(6)
+        hable = _Hable(H(6))
+
+        h_roller = Roller.from_value(h)
+        p_roller = Roller.from_value(p)
+        hable_roller = Roller.from_value(hable)
+        literal_roller = Roller.from_value(3)
+
+        assert h_roller.h is h
+        assert p_roller.p is p
+        assert hable_roller.hable is hable
+        assert literal_roller.value == 3
+
+    def test_labels_new_leaf_rollers(self) -> None:
+        h_roller = Roller.from_value(H({3: 1}), label="d6")
+        p_roller = Roller.from_value(P(H({2: 1}), H({3: 1})), label="pool")
+        literal_roller = Roller.from_value(4, label="modifier")
+
+        assert h_roller.metadata()["label"] == "d6"
+        assert p_roller.metadata()["label"] == "pool"
+        assert literal_roller.metadata()["label"] == "modifier"
+        assert literal_roller.roll().format() == "4 [modifier] => 4"
+
+    def test_returns_existing_unlabeled_roller(self) -> None:
+        roller = PRoller(P(6))
+
+        assert Roller.from_value(roller) is roller
+
+    def test_labels_existing_roller(self) -> None:
+        roller = PRoller(P(6))
+        labeled = Roller.from_value(roller, label="pool")
+
+        assert labeled is not roller
+        assert labeled.metadata() == {"kind": "dyce.label", "label": "pool"}
+
+
 class TestSingleOutcomeRoller:
     def test_sum_returns_self(self) -> None:
         roller = LiteralRoller(3)
@@ -288,7 +339,7 @@ class TestSingleOutcomeRoller:
         assert roller.sum() is roller
 
     def test_binary_operator_type_inference(self) -> None:
-        d6 = HRoller(H(6), name="d6")
+        d6 = HRoller(H(6), label="d6")
         power_roller = HRoller(H({_PowerOutcome(2): 1}))
 
         # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
@@ -392,40 +443,83 @@ class TestSingleOutcomeRoller:
         assert combined.operands == (left_roller, right_roller)
 
 
+class TestLabeledRoller:
+    def test_single_outcome_label(self) -> None:
+        roller = LiteralRoller(3)
+        labeled = roller.label("damage")
+        roll = labeled.roll()
+        result = roll._trace_relationships()[  # ruff: ignore[private-member-access]
+            "result"
+        ]
+
+        assert_type(labeled, SingleOutcomeRoller[int])  # ty: ignore[type-assertion-failure]
+        assert labeled is not roller
+        assert labeled.metadata() == {"kind": "dyce.label", "label": "damage"}
+        assert (
+            labeled._trace_relationships()[  # ruff: ignore[private-member-access]
+                "roller"
+            ]
+            is roller
+        )
+        assert isinstance(result, Roll)
+        assert result.roller is roller
+        assert roll.format() == "damage(3) => 3"
+
+    def test_multi_outcome_label(self) -> None:
+        roller = RollerPool(LiteralRoller(2), LiteralRoller(1))
+        labeled = roller.label("pool")
+        roll = labeled.roll()
+        result = roll._trace_relationships()[  # ruff: ignore[private-member-access]
+            "result"
+        ]
+
+        assert_type(labeled, Roller[int])  # ty: ignore[type-assertion-failure]
+        assert labeled.metadata() == {"kind": "dyce.label", "label": "pool"}
+        assert (
+            labeled._trace_relationships()[  # ruff: ignore[private-member-access]
+                "roller"
+            ]
+            is roller
+        )
+        assert isinstance(result, Roll)
+        assert result.roller is roller
+        assert roll.format() == "pool((1, 2)) => (1, 2)"
+
+
 class TestHRoller:
     def test_exposes_h_source(self) -> None:
         h = H(6)
-        roller = HRoller(h, name="d6")
+        roller = HRoller(h, label="d6")
 
         assert_type(roller, HRoller[int])
         assert roller.h is h
-        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
+        assert roller.metadata() == {"kind": "dyce.source", "label": "d6"}
 
-    def test_uses_h_representation_as_default_name(self) -> None:
+    def test_uses_h_representation_as_default_label(self) -> None:
         h = H(6)
         roller = HRoller(h)
 
-        assert roller.metadata() == {"kind": "dyce.source", "name": str(h)}
+        assert roller.metadata() == {"kind": "dyce.source", "label": str(h)}
 
 
 class TestHableRoller:
     def test_exposes_hable_source(self) -> None:
         hable = _Hable(H(6))
-        roller = HableRoller(hable, name="d6")
+        roller = HableRoller(hable, label="d6")
 
         assert_type(roller, HableRoller[int])
         assert roller.hable is hable
-        assert roller.metadata() == {"kind": "dyce.source", "name": "d6"}
+        assert roller.metadata() == {"kind": "dyce.source", "label": "d6"}
 
-    def test_uses_hable_representation_as_default_name(self) -> None:
+    def test_uses_hable_representation_as_default_label(self) -> None:
         hable = _Hable(H(6))
         roller = HableRoller(hable)
 
-        assert roller.metadata() == {"kind": "dyce.source", "name": str(hable)}
+        assert roller.metadata() == {"kind": "dyce.source", "label": str(hable)}
 
     def test_roll_calls_h_and_includes_source_metadata_in_trace(self) -> None:
         hable = _Hable(H({4: 1}))
-        roller = HableRoller(hable, name="source")
+        roller = HableRoller(hable, label="source")
 
         with patch.object(hable, "h", wraps=hable.h) as h_mock:
             roll = roller.roll()
@@ -440,7 +534,7 @@ class TestHableRoller:
         assert isinstance(rollers, dict)
         assert isinstance(rolls, dict)
         assert rollers["roller0"] == {
-            "metadata": {"kind": "dyce.source", "name": "source"}
+            "metadata": {"kind": "dyce.source", "label": "source"}
         }
         assert "relationships" not in rolls["roll0"]
 
@@ -490,18 +584,18 @@ class TestPRoller:
             return (1, 2)
 
         monkeypatch.setattr(P, "roll", p_roll)
-        pool = PRoller(p, name="pool")
+        pool = PRoller(p, label="pool")
         roll = pool.roll()
 
         assert_type(pool, PRoller[int])  # zuban: ignore[misc]
         assert_type(roll, Roll[int])  # zuban: ignore[misc]
         assert pool.p is p
-        assert pool.metadata()["name"] == "pool"
+        assert pool.metadata()["label"] == "pool"
         assert roll.outcomes == (1, 2)
         assert roll.roller is pool
 
     def test_select_produces_multi_outcome_roller(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), label="pool")
         selected = pool.select(-1, 0)
         roll = selected.roll()
         trace = roll.trace()
@@ -544,7 +638,7 @@ class TestRollerPool:
     def test_composes_single_rollers(self) -> None:
         two = LiteralRoller(2)
         one = LiteralRoller(1)
-        pool = RollerPool(two, one, name="pool")
+        pool = RollerPool(two, one)
         roll = pool.roll()
 
         pool_int: RollerPool[int] = pool
@@ -555,10 +649,10 @@ class TestRollerPool:
         assert pool.operands == (two, one)
         assert roll.outcomes == (1, 2)
         assert tuple(operand.roller for operand in _roll_operands(roll)) == (one, two)
-        assert pool.metadata() == {"kind": "dyce.pool", "name": "pool"}
+        assert pool.metadata() == {"kind": "dyce.pool"}
 
     def test_reused_single_roller_produces_independent_rolls(self) -> None:
-        d6 = HRoller(H(6), name="d6")
+        d6 = HRoller(H(6), label="d6")
         trace = RollerPool(d6, d6).roll().trace()
         rollers = trace["rollers"]
         rolls = trace["rolls"]
@@ -783,7 +877,7 @@ class TestHableAndRollerBinaryArithmetic:
         wrapped = operands[1]
 
         assert isinstance(wrapped, HRoller)
-        assert wrapped.metadata() == {"kind": "dyce.source", "name": str(h)}
+        assert wrapped.metadata() == {"kind": "dyce.source", "label": str(h)}
 
     def test_p_operand_conversion(self) -> None:
         p = P(H({2: 1}), H({3: 1}))
@@ -955,7 +1049,7 @@ class TestTrace:
         def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
             return 1 + roll
 
-        result = trace(callback, HRoller(H(6), name="d6"))
+        result = trace(callback, HRoller(H(6), label="d6"))
         rolls = result.trace()["rolls"]
 
         assert isinstance(rolls, dict)
@@ -1128,7 +1222,7 @@ class TestTrace:
 
 class TestRoll:
     def test_sum_produces_single_outcome_roll(self) -> None:
-        pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), name="pool").roll()
+        pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), label="pool").roll()
         roll = pool_roll.sum()
 
         assert_type(roll, SingleOutcomeRoll[str])  # zuban: ignore[misc]
@@ -1282,7 +1376,7 @@ class TestSingleOutcomeRoll:
     def test_trace_uses_distinct_ids_for_separate_rolls_and_same_id_for_reused_roll(
         self,
     ) -> None:
-        d6 = HRoller(H(6), name="d6")
+        d6 = HRoller(H(6), label="d6")
         separate = d6.roll() + d6.roll()
         reused_operand = d6.roll()
         reused = reused_operand + reused_operand
@@ -1691,8 +1785,8 @@ class TestMixedRollBinaryArithmetic:
         assert choices.call_count == 2
 
     def test_format_binary_expression(self) -> None:
-        left = HRoller(H({2: 1}), name="d6")
-        right = HRoller(H({1: 1}), name="d6")
+        left = HRoller(H({2: 1}), label="d6")
+        right = HRoller(H({1: 1}), label="d6")
 
         result = ((left + right) * 5).roll()
 
@@ -1711,7 +1805,7 @@ class TestMixedRollBinaryArithmetic:
         assert abs(LiteralRoller(-2)).roll().format() == "abs(-2) => 2"
 
     def test_format_comparison(self) -> None:
-        roller = HRoller(H({2: 1}), name="d6")
+        roller = HRoller(H({2: 1}), label="d6")
         result = roller.lt(4).roll()
         nested = roller.lt(3).lt(4).roll()
         existing_roll = LiteralRoller(4).roll()
@@ -1722,24 +1816,23 @@ class TestMixedRollBinaryArithmetic:
 
     def test_format_pool_operations(self) -> None:
         pool = RollerPool(
-            HRoller(H({2: 1}), name="d6"),
-            HRoller(H({1: 1}), name="d6"),
-            name="pool",
-        )
+            HRoller(H({2: 1}), label="d6"),
+            HRoller(H({1: 1}), label="d6"),
+        ).label("pool")
 
-        assert pool.roll().format() == "(1 [d6], 2 [d6]) [pool] => (1, 2)"
-        assert pool.sum().roll().format() == "sum((1 [d6], 2 [d6]) [pool]) => 3"
+        assert pool.roll().format() == "pool((1 [d6], 2 [d6])) => (1, 2)"
+        assert pool.sum().roll().format() == "sum(pool((1 [d6], 2 [d6]))) => 3"
         assert pool.select(-1).roll().format() == (
-            "select((1 [d6], 2 [d6]) [pool], -1) => (2,)"
+            "select(pool((1 [d6], 2 [d6])), -1) => (2,)"
         )
         assert pool.select(slice(None, None, 2)).roll().format() == (
-            "select((1 [d6], 2 [d6]) [pool], slice(None, None, 2)) => (1,)"
+            "select(pool((1 [d6], 2 [d6])), slice(None, None, 2)) => (1,)"
         )
-        assert RollerPool(LiteralRoller(1), name="pool").roll().format() == (
-            "(1,) [pool] => (1,)"
+        assert RollerPool(LiteralRoller(1)).label("pool").roll().format() == (
+            "pool((1,)) => (1,)"
         )
         assert RollerPool(LiteralRoller(1)).roll().format() == "(1,) => (1,)"
-        assert PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll().format() == (
+        assert PRoller(P(H({1: 1}), H({2: 1})), label="pool").roll().format() == (
             "(1, 2) [pool] => (1, 2)"
         )
 
@@ -1843,7 +1936,7 @@ class TestRollerAndRollOperationEquivalence:
         assert roll_from_rollers.trace() == roll_from_rolls.trace()
 
     def test_pool_selection_and_sum(self) -> None:
-        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), name="pool")
+        pool = PRoller(P(H({1: 1}), H({2: 1}), H({3: 1})), label="pool")
 
         roll_from_roller_sum = pool.select(-1, 0).sum().roll()
         roll_from_roll_sum = pool.select(-1, 0).roll().sum()
@@ -1872,8 +1965,8 @@ class TestRollerAndRollOperationEquivalence:
     def test_roller_subtraction_and_roll_subtraction_produce_equivalent_rolls(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        d6 = HRoller(H(6), name="d6")
-        d4 = HRoller(H(4), name="d4")
+        d6 = HRoller(H(6), label="d6")
+        d4 = HRoller(H(4), label="d4")
 
         monkeypatch.setattr(rng, "RNG", random.Random(1774583876))
         roll_from_roller_arithmetic = (d6 - d4).roll()
