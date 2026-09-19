@@ -2059,6 +2059,43 @@ class _SelectedPoolRoller(Roller[_T_co]):
         return _OperandRoll(outcomes, self, operands)
 
 
+@dataclass(frozen=True)
+class _TraceCall:
+    callback: Callable[..., object]
+    sources: tuple[Roller[Any], ...]
+    name: str
+    state: dict[str, Any]
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.trace", "name": self.name, "state": self.state}
+
+
+class _TraceRoller(Roller[_T_co]):
+    def __init__(self, call: _TraceCall) -> None:
+        self._call = call
+
+    @property
+    def sources(self) -> tuple[Roller[Any], ...]:
+        return self._call.sources
+
+    def metadata(self) -> dict[str, object]:
+        return self._call.metadata()
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_TraceRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._call.name}({expression.text})", _CALL_PRECEDENCE)
+
+    def _roll(self) -> Roll[_T_co]:
+        arguments, result = _eval_trace_call(self._call)
+        return _TraceRoll(result.outcomes, self, arguments, result)
+
+
 class _FactoryRoller(Roller[_T_co]):
     def __init__(self, expression: Roller[_T_co], name: str) -> None:
         self._expression = expression
@@ -2113,43 +2150,6 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
         return _SingleOutcomeFactoryRoll(result.outcome, self, result)
 
 
-@dataclass(frozen=True)
-class _TraceCall:
-    callback: Callable[..., object]
-    sources: tuple[Roller[Any], ...]
-    name: str
-    state: dict[str, Any]
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.trace", "name": self.name, "state": self.state}
-
-
-class _TraceRoller(Roller[_T_co]):
-    def __init__(self, call: _TraceCall) -> None:
-        self._call = call
-
-    @property
-    def sources(self) -> tuple[Roller[Any], ...]:
-        return self._call.sources
-
-    def metadata(self) -> dict[str, object]:
-        return self._call.metadata()
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
-        return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
-
-    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
-        result = cast("_TraceRoll[object]", roll).result
-        expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._call.name}({expression.text})", _CALL_PRECEDENCE)
-
-    def _roll(self) -> Roll[_T_co]:
-        arguments, result = _eval_trace_call(self._call)
-        return _TraceRoll(result.outcomes, self, arguments, result)
-
-
 class _OperandRoll(Roll[_T_co]):
     __slots__ = ("operands",)
     operands: tuple[Roll[object], ...]
@@ -2188,6 +2188,31 @@ class _SingleOutcomeOperandRoll(SingleOutcomeRoll[_T_co]):
         return {"operands": self.operands}
 
 
+class _TraceRoll(Roll[_T_co]):
+    __slots__ = ("arguments", "result")
+    arguments: tuple[Roll[object], ...]
+    result: Roll[_T_co]
+
+    def __init__(
+        self,
+        outcomes: tuple[_T_co, ...],
+        roller: Roller[_T_co],
+        arguments: tuple[Roll[object], ...],
+        result: Roll[_T_co],
+    ) -> None:
+        super().__init__(outcomes, roller)
+        object.__setattr__(self, "arguments", arguments)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {
+            "arguments": self.arguments,
+            "result": cast("Roll[object]", self.result),
+        }
+
+
 class _FactoryRoll(Roll[_T_co]):
     __slots__ = ("result",)
     result: Roll[object]
@@ -2224,31 +2249,6 @@ class _SingleOutcomeFactoryRoll(SingleOutcomeRoll[_T_co]):
         self,
     ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
         return {"result": cast("Roll[object]", self.result)}
-
-
-class _TraceRoll(Roll[_T_co]):
-    __slots__ = ("arguments", "result")
-    arguments: tuple[Roll[object], ...]
-    result: Roll[_T_co]
-
-    def __init__(
-        self,
-        outcomes: tuple[_T_co, ...],
-        roller: Roller[_T_co],
-        arguments: tuple[Roll[object], ...],
-        result: Roll[_T_co],
-    ) -> None:
-        super().__init__(outcomes, roller)
-        object.__setattr__(self, "arguments", arguments)
-        object.__setattr__(self, "result", result)
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
-        return {
-            "arguments": self.arguments,
-            "result": cast("Roll[object]", self.result),
-        }
 
 
 class _RollerFactoryDecorator(Protocol):
