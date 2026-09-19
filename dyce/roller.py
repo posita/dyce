@@ -60,29 +60,6 @@ _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
 _ParamsT = ParamSpec("_ParamsT")
 
 
-class RollError(Exception):
-    r"""
-    A failure during rolling, with the original exception in `__cause__`.
-
-    *path* contains the participating rollers from the outermost call to the failing call.
-    """
-
-    def __init__(
-        self,
-        message: str,
-        path: tuple["Roller[Any] | _TraceCall", ...],
-    ) -> None:
-        super().__init__(message)
-        self.path = path
-
-    def __str__(self) -> str:
-        labels = []
-        for roller in self.path:
-            label = repr(roller.metadata())
-            labels.append(label)
-        return super().__str__() + "\nRoller path:\n  " + "\n  → ".join(labels)
-
-
 @dataclass(frozen=True, slots=True)
 class _BinaryOperator:
     name: str
@@ -157,6 +134,30 @@ _COMPARISON_NAMES = frozenset(("lt", "le", "eq", "ne", "ge", "gt"))
 _UNARY_PRECEDENCE = 80
 _CALL_PRECEDENCE = 100
 _ATOM_PRECEDENCE = 110
+_ROLL_FORMATTER: "_RollFormatter"
+
+
+class RollError(Exception):
+    r"""
+    A failure during rolling, with the original exception in `__cause__`.
+
+    *path* contains the participating rollers from the outermost call to the failing call.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        path: tuple["Roller[Any] | _TraceCall", ...],
+    ) -> None:
+        super().__init__(message)
+        self.path = path
+
+    def __str__(self) -> str:
+        labels = []
+        for roller in self.path:
+            label = repr(roller.metadata())
+            labels.append(label)
+        return super().__str__() + "\nRoller path:\n  " + "\n  → ".join(labels)
 
 
 class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
@@ -1079,7 +1080,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         self,
         rhs: object,
     ) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _ADD)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _ADD)
 
     @overload
     def __sub__(
@@ -1105,7 +1106,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         self,
         rhs: object,
     ) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _SUB)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _SUB)
 
     @overload
     def __mul__(
@@ -1128,7 +1129,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mul__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _MUL)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _MUL)
 
     @overload
     def __truediv__(
@@ -1151,7 +1152,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __truediv__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _TRUEDIV)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(
+            rhs, _TRUEDIV
+        )
 
     @overload
     def __floordiv__(
@@ -1174,7 +1177,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _FLOORDIV)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(
+            rhs, _FLOORDIV
+        )
 
     @overload
     def __mod__(
@@ -1197,7 +1202,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __mod__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _MOD)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _MOD)
 
     @overload
     def __pow__(
@@ -1215,7 +1220,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __pow__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _POW)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _POW)
 
     @overload
     def __lshift__(
@@ -1238,7 +1243,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _LSHIFT)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(
+            rhs, _LSHIFT
+        )
 
     @overload
     def __rshift__(
@@ -1261,7 +1268,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rshift__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _RSHIFT)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(
+            rhs, _RSHIFT
+        )
 
     @overload
     def __and__(
@@ -1284,7 +1293,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __and__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _AND)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _AND)
 
     @overload
     def __or__(
@@ -1307,7 +1316,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __or__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _OR)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _OR)
 
     @overload
     def __xor__(
@@ -1330,7 +1339,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         rhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __xor__(self, rhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._binary_operator(rhs, _XOR)
+        return _as_single_outcome_roll(cast("object", self))._binary_operator(rhs, _XOR)
 
     @overload
     def __radd__(  # type: ignore[misc]
@@ -1348,7 +1357,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __radd__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _ADD)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _ADD
+        )
 
     @overload
     def __rsub__(  # type: ignore[misc]
@@ -1366,7 +1377,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rsub__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _SUB)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _SUB
+        )
 
     @overload
     def __rmul__(  # type: ignore[misc]
@@ -1384,7 +1397,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rmul__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MUL)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _MUL
+        )
 
     @overload
     def __rtruediv__(  # type: ignore[misc]
@@ -1402,7 +1417,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rtruediv__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _TRUEDIV)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _TRUEDIV
+        )
 
     @overload
     def __rfloordiv__(  # type: ignore[misc]
@@ -1420,7 +1437,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rfloordiv__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _FLOORDIV)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _FLOORDIV
+        )
 
     @overload
     def __rmod__(  # type: ignore[misc]
@@ -1438,7 +1457,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rmod__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _MOD)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _MOD
+        )
 
     @overload
     def __rpow__(  # type: ignore[misc]
@@ -1456,7 +1477,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rpow__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _POW)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _POW
+        )
 
     @overload
     def __rlshift__(  # type: ignore[misc]
@@ -1474,7 +1497,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rlshift__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _LSHIFT)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _LSHIFT
+        )
 
     @overload
     def __rrshift__(  # type: ignore[misc]
@@ -1492,7 +1517,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rrshift__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _RSHIFT)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _RSHIFT
+        )
 
     @overload
     def __rand__(  # type: ignore[misc]
@@ -1510,7 +1537,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rand__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _AND)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _AND
+        )
 
     @overload
     def __ror__(  # type: ignore[misc]
@@ -1528,7 +1557,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __ror__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _OR)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _OR
+        )
 
     @overload
     def __rxor__(  # type: ignore[misc]
@@ -1546,7 +1577,9 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         lhs: _OtherT,
     ) -> "SingleOutcomeRoll[_ResultT]": ...
     def __rxor__(self, lhs: object) -> "SingleOutcomeRoll[object]":
-        return _as_roll(cast("object", self))._reflected_binary_operator(lhs, _XOR)
+        return _as_single_outcome_roll(cast("object", self))._reflected_binary_operator(
+            lhs, _XOR
+        )
 
     @overload
     def lt(
@@ -1749,7 +1782,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
             rhs = rhs.roll()
         elif isinstance(rhs, HableT):
             rhs = _as_roller(rhs).roll()
-        rhs_roll = _as_roll(rhs)
+        rhs_roll = _as_single_outcome_roll(rhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             self.roller, rhs_roll.roller, operator
         )
@@ -1763,7 +1796,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
             lhs = lhs.roll()
         elif isinstance(lhs, HableT):
             lhs = _as_roller(lhs).roll()
-        lhs_roll = _as_roll(lhs)
+        lhs_roll = _as_single_outcome_roll(lhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             lhs_roll.roller, self.roller, operator
         )
@@ -1912,38 +1945,6 @@ class _SelectedPoolRoller(Roller[_T_co]):
         return _OperandRoll(outcomes, self, operands)
 
 
-@dataclass(frozen=True)
-class _TraceCall:
-    callback: Callable[..., object]
-    sources: tuple[Roller[Any], ...]
-    name: str
-    state: dict[str, Any]
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.trace", "name": self.name, "state": self.state}
-
-
-class _TraceRoller(Roller[_T_co]):
-    def __init__(self, call: _TraceCall) -> None:
-        self._call = call
-
-    @property
-    def sources(self) -> tuple[Roller[Any], ...]:
-        return self._call.sources
-
-    def metadata(self) -> dict[str, object]:
-        return self._call.metadata()
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
-        return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
-
-    def _roll(self) -> Roll[_T_co]:
-        arguments, result = _eval_trace_call(self._call)
-        return _TraceRoll(result.outcomes, self, arguments, result)
-
-
 class _FactoryRoller(Roller[_T_co]):
     def __init__(self, expression: Roller[_T_co], name: str) -> None:
         self._expression = expression
@@ -1986,6 +1987,38 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
     def _roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
         return _SingleOutcomeFactoryRoll(result.outcome, self, result)
+
+
+@dataclass(frozen=True)
+class _TraceCall:
+    callback: Callable[..., object]
+    sources: tuple[Roller[Any], ...]
+    name: str
+    state: dict[str, Any]
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.trace", "name": self.name, "state": self.state}
+
+
+class _TraceRoller(Roller[_T_co]):
+    def __init__(self, call: _TraceCall) -> None:
+        self._call = call
+
+    @property
+    def sources(self) -> tuple[Roller[Any], ...]:
+        return self._call.sources
+
+    def metadata(self) -> dict[str, object]:
+        return self._call.metadata()
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
+
+    def _roll(self) -> Roll[_T_co]:
+        arguments, result = _eval_trace_call(self._call)
+        return _TraceRoll(result.outcomes, self, arguments, result)
 
 
 class _OperandRoll(Roll[_T_co]):
@@ -2087,6 +2120,183 @@ class _TraceRoll(Roll[_T_co]):
             "arguments": self.arguments,
             "result": cast("Roll[object]", self.result),
         }
+
+
+@dataclass(frozen=True, slots=True)
+class _RollFormat:
+    text: str
+    precedence: int
+
+
+class _RollFormatter:
+    def __init__(self) -> None:
+        self._handlers: dict[
+            str,
+            Callable[[Roll[object], dict[str, object]], _RollFormat],
+        ] = {
+            "dyce.binary": self._format_binary,
+            "dyce.factory": self._format_boundary,
+            "dyce.literal": self._format_source,
+            "dyce.pool": self._format_pool,
+            "dyce.pool-selection": self._format_pool_selection,
+            "dyce.pool-source": self._format_source,
+            "dyce.pool-sum": self._format_pool_sum,
+            "dyce.source": self._format_source,
+            "dyce.trace": self._format_boundary,
+            "dyce.unary": self._format_unary,
+        }
+
+    def format(self, roll: Roll[object]) -> _RollFormat:
+        metadata = roll.roller.metadata()
+        kind = metadata.get("kind")
+        handler = self._handlers.get(kind) if isinstance(kind, str) else None
+        return (
+            handler(roll, metadata)
+            if handler is not None
+            else self._format_unknown(roll, metadata)
+        )
+
+    def _format_binary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        operator_name = cast("str", metadata["operator"])
+        symbol, precedence = _BINARY_FORMATS[operator_name]
+        operands = self._operands(roll)
+        left = self.format(operands[0])
+        right = self.format(operands[1])
+        left_text = self._format_child(left, precedence, operator_name, right=False)
+        right_text = self._format_child(right, precedence, operator_name, right=True)
+        return _RollFormat(f"{left_text} {symbol} {right_text}", precedence)
+
+    def _format_boundary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        name = metadata.get("name", metadata.get("kind"))
+        result = cast(
+            "_FactoryRoll[object] | _SingleOutcomeFactoryRoll[object] | _TraceRoll[object]",
+            roll,
+        ).result
+        return _RollFormat(
+            f"{name}({self.format(result).text})",
+            _CALL_PRECEDENCE,
+        )
+
+    @staticmethod
+    def _format_child(
+        child: _RollFormat,
+        parent_precedence: int,
+        parent_operator: str,
+        *,
+        right: bool,
+    ) -> str:
+        parenthesize = child.precedence < parent_precedence
+        if child.precedence == parent_precedence:
+            if parent_operator in _COMPARISON_NAMES:
+                parenthesize = True
+            elif right:
+                parenthesize = parent_operator != "pow"
+            else:
+                parenthesize = parent_operator == "pow"
+        return f"({child.text})" if parenthesize else child.text
+
+    def _format_pool(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        operands = self._operands(roll)
+        items = ", ".join(self.format(operand).text for operand in operands)
+        if len(operands) == 1:
+            items += ","
+        text = f"({items})"
+        return self._format_source_name(text, metadata)
+
+    def _format_pool_selection(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        operands = self._operands(roll)
+        operand = self.format(operands[0])
+        selectors = cast("list[object]", metadata.get("selectors", []))
+        selector_text = ", ".join(
+            self._format_selector(selector) for selector in selectors
+        )
+        suffix = f", {selector_text}" if selector_text else ""
+        return _RollFormat(f"select({operand.text}{suffix})", _CALL_PRECEDENCE)
+
+    def _format_pool_sum(
+        self, roll: Roll[object], _metadata: dict[str, object]
+    ) -> _RollFormat:
+        operands = self._operands(roll)
+        operand = self.format(operands[0])
+        return _RollFormat(f"sum({operand.text})", _CALL_PRECEDENCE)
+
+    @staticmethod
+    def _operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
+        return cast(
+            "_OperandRoll[object] | _SingleOutcomeOperandRoll[object]", roll
+        ).operands
+
+    @staticmethod
+    def _format_selector(selector: object) -> str:
+        if isinstance(selector, dict):
+            start = selector.get("start")
+            stop = selector.get("stop")
+            step = selector.get("step")
+            return f"slice({start!r}, {stop!r}, {step!r})"
+        return repr(selector)
+
+    def _format_source(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        text = (
+            repr(roll.outcome)
+            if isinstance(roll, SingleOutcomeRoll)
+            else repr(roll.outcomes)
+        )
+        return self._format_source_name(text, metadata)
+
+    @staticmethod
+    def _format_source_name(text: str, metadata: dict[str, object]) -> _RollFormat:
+        if "name" in metadata:
+            text += f" [{metadata['name']}]"
+        return _RollFormat(text, _ATOM_PRECEDENCE)
+
+    def _format_unary(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        operator_name = cast("str", metadata["operator"])
+        operands = self._operands(roll)
+        operand = self.format(operands[0])
+        if operator_name == "abs":
+            return _RollFormat(f"abs({operand.text})", _CALL_PRECEDENCE)
+        symbol = _UNARY_FORMATS[operator_name]
+        operand_text = (
+            f"({operand.text})"
+            if operand.precedence < _UNARY_PRECEDENCE
+            else operand.text
+        )
+        return _RollFormat(f"{symbol}{operand_text}", _UNARY_PRECEDENCE)
+
+    def _format_unknown(
+        self, roll: Roll[object], metadata: dict[str, object]
+    ) -> _RollFormat:
+        name = metadata.get("name", metadata.get("kind"))
+        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+        related_rolls: tuple[Roll[object], ...] = ()
+        for value in relationships.values():
+            related_rolls += value if isinstance(value, tuple) else (value,)
+        if related_rolls:
+            operands = ", ".join(self.format(operand).text for operand in related_rolls)
+            text = f"{name}({operands})"
+        else:
+            text = (
+                repr(roll.outcome)
+                if isinstance(roll, SingleOutcomeRoll)
+                else repr(roll.outcomes)
+            )
+            text += f" [{name}]"
+        return _RollFormat(text, _ATOM_PRECEDENCE)
+
+
+_ROLL_FORMATTER = _RollFormatter()
 
 
 class _RollerFactoryDecorator(Protocol):
@@ -2584,192 +2794,6 @@ def trace(
         raise RollError(str(exc), (call,)) from exc
 
 
-@dataclass(frozen=True, slots=True)
-class _FormattedRoll:
-    text: str
-    precedence: int
-
-
-class _RollFormatter:
-    def __init__(self) -> None:
-        self._handlers: dict[
-            str,
-            Callable[[Roll[object], dict[str, object]], _FormattedRoll],
-        ] = {
-            "dyce.binary": self._format_binary,
-            "dyce.factory": self._format_boundary,
-            "dyce.literal": self._format_source,
-            "dyce.pool": self._format_pool,
-            "dyce.pool-selection": self._format_pool_selection,
-            "dyce.pool-source": self._format_source,
-            "dyce.pool-sum": self._format_pool_sum,
-            "dyce.source": self._format_source,
-            "dyce.trace": self._format_boundary,
-            "dyce.unary": self._format_unary,
-        }
-
-    def format(self, roll: Roll[object]) -> _FormattedRoll:
-        metadata = roll.roller.metadata()
-        kind = metadata.get("kind")
-        handler = self._handlers.get(kind) if isinstance(kind, str) else None
-        return (
-            handler(roll, metadata)
-            if handler is not None
-            else self._format_unknown(roll, metadata)
-        )
-
-    def _format_binary(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        operator_name = cast("str", metadata["operator"])
-        symbol, precedence = _BINARY_FORMATS[operator_name]
-        operands = self._operands(roll)
-        left = self.format(operands[0])
-        right = self.format(operands[1])
-        left_text = self._format_child(left, precedence, operator_name, right=False)
-        right_text = self._format_child(right, precedence, operator_name, right=True)
-        return _FormattedRoll(f"{left_text} {symbol} {right_text}", precedence)
-
-    def _format_boundary(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        name = metadata.get("name", metadata.get("kind"))
-        result = cast(
-            "_FactoryRoll[object] | _SingleOutcomeFactoryRoll[object] | _TraceRoll[object]",
-            roll,
-        ).result
-        return _FormattedRoll(
-            f"{name}({self.format(result).text})",
-            _CALL_PRECEDENCE,
-        )
-
-    @staticmethod
-    def _format_child(
-        child: _FormattedRoll,
-        parent_precedence: int,
-        parent_operator: str,
-        *,
-        right: bool,
-    ) -> str:
-        parenthesize = child.precedence < parent_precedence
-        if child.precedence == parent_precedence:
-            if parent_operator in _COMPARISON_NAMES:
-                parenthesize = True
-            elif right:
-                parenthesize = parent_operator != "pow"
-            else:
-                parenthesize = parent_operator == "pow"
-        return f"({child.text})" if parenthesize else child.text
-
-    def _format_pool(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        operands = self._operands(roll)
-        items = ", ".join(self.format(operand).text for operand in operands)
-        if len(operands) == 1:
-            items += ","
-        text = f"({items})"
-        return self._format_source_name(text, metadata)
-
-    def _format_pool_selection(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        selectors = cast("list[object]", metadata.get("selectors", []))
-        selector_text = ", ".join(
-            self._format_selector(selector) for selector in selectors
-        )
-        suffix = f", {selector_text}" if selector_text else ""
-        return _FormattedRoll(f"select({operand.text}{suffix})", _CALL_PRECEDENCE)
-
-    def _format_pool_sum(
-        self, roll: Roll[object], _metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        return _FormattedRoll(f"sum({operand.text})", _CALL_PRECEDENCE)
-
-    @staticmethod
-    def _operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
-        return cast(
-            "_OperandRoll[object] | _SingleOutcomeOperandRoll[object]", roll
-        ).operands
-
-    @staticmethod
-    def _format_selector(selector: object) -> str:
-        if isinstance(selector, dict):
-            start = selector.get("start")
-            stop = selector.get("stop")
-            step = selector.get("step")
-            return f"slice({start!r}, {stop!r}, {step!r})"
-        return repr(selector)
-
-    def _format_source(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        text = (
-            repr(roll.outcome)
-            if isinstance(roll, SingleOutcomeRoll)
-            else repr(roll.outcomes)
-        )
-        return self._format_source_name(text, metadata)
-
-    @staticmethod
-    def _format_source_name(text: str, metadata: dict[str, object]) -> _FormattedRoll:
-        if "name" in metadata:
-            text += f" [{metadata['name']}]"
-        return _FormattedRoll(text, _ATOM_PRECEDENCE)
-
-    def _format_unary(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        operator_name = cast("str", metadata["operator"])
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        if operator_name == "abs":
-            return _FormattedRoll(f"abs({operand.text})", _CALL_PRECEDENCE)
-        symbol = _UNARY_FORMATS[operator_name]
-        operand_text = (
-            f"({operand.text})"
-            if operand.precedence < _UNARY_PRECEDENCE
-            else operand.text
-        )
-        return _FormattedRoll(f"{symbol}{operand_text}", _UNARY_PRECEDENCE)
-
-    def _format_unknown(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _FormattedRoll:
-        name = metadata.get("name", metadata.get("kind"))
-        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
-        related_rolls: tuple[Roll[object], ...] = ()
-        for value in relationships.values():
-            related_rolls += value if isinstance(value, tuple) else (value,)
-        if related_rolls:
-            operands = ", ".join(self.format(operand).text for operand in related_rolls)
-            text = f"{name}({operands})"
-        else:
-            text = (
-                repr(roll.outcome)
-                if isinstance(roll, SingleOutcomeRoll)
-                else repr(roll.outcomes)
-            )
-            text += f" [{name}]"
-        return _FormattedRoll(text, _ATOM_PRECEDENCE)
-
-
-_ROLL_FORMATTER = _RollFormatter()
-
-
-def _as_roll(
-    value: _T | Roll[_T],
-) -> SingleOutcomeRoll[_T]:
-    if isinstance(value, Roll):
-        return cast("SingleOutcomeRoll[_T]", cast("Roll[Any]", value).sum())
-    else:
-        return LiteralRoller(value).roll()
-
-
 def _as_roller(
     value: _T | HableT[_T] | Roller[_T],
 ) -> SingleOutcomeRoller[_T]:
@@ -2789,6 +2813,15 @@ def _as_roller(
         return LiteralRoller(value)
 
 
+def _as_single_outcome_roll(
+    value: _T | Roll[_T],
+) -> SingleOutcomeRoll[_T]:
+    if isinstance(value, Roll):
+        return cast("SingleOutcomeRoll[_T]", cast("Roll[Any]", value).sum())
+    else:
+        return LiteralRoller(value).roll()
+
+
 def _binary_roller(
     lhs: object,
     rhs: object,
@@ -2802,12 +2835,12 @@ def _binary_roller(
 def _compare_roll(
     lhs: Roll[object], rhs: object, comparison: _BinaryOperator
 ) -> SingleOutcomeRoll[bool]:
-    lhs_roll: SingleOutcomeRoll[Any] = _as_roll(cast("Any", lhs))
+    lhs_roll: SingleOutcomeRoll[Any] = _as_single_outcome_roll(cast("Any", lhs))
     if isinstance(rhs, Roller):
         rhs = rhs.roll()
     elif isinstance(rhs, HableT):
         rhs = _as_roller(rhs).roll()
-    rhs_roll = _as_roll(rhs)
+    rhs_roll = _as_single_outcome_roll(rhs)
     roller: SingleOutcomeRoller[bool] = _BinaryRoller(
         lhs_roll.roller, rhs_roll.roller, comparison
     )
