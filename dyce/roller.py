@@ -182,7 +182,6 @@ _INVERT = _UnaryOperation.create("invert", operator.invert, "~", 80)
 
 _CALL_PRECEDENCE = 100
 _ATOM_PRECEDENCE = 110
-_ROLL_FORMATTER: "_RollFormatter"
 
 
 class RollError(Exception):
@@ -857,6 +856,23 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         Metadata describes only this roller.
         """
 
+    def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
+        metadata = self.metadata()
+        name = metadata.get("name", metadata.get("kind"))
+        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
+        related_rolls: tuple[Roll[object], ...] = ()
+        for value in relationships.values():
+            related_rolls += value if isinstance(value, tuple) else (value,)
+        if related_rolls:
+            arguments = ", ".join(
+                related._format_expression().text  # ruff: ignore[private-member-access]
+                for related in related_rolls
+            )
+            text = f"{name}({arguments})"
+        else:
+            text = f"{roll._format_result()} [{name}]"  # ruff: ignore[private-member-access]
+        return _RollFormat(text, _ATOM_PRECEDENCE)
+
     def at(
         self: "Roller[_CanAddSameT]", which: GetItemT, *more: GetItemT
     ) -> "SingleOutcomeRoller[_CanAddSameT]":
@@ -994,6 +1010,12 @@ class LiteralRoller(SingleOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.literal", "value": self._value}
 
+    def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
+        return _RollFormat(
+            roll._format_result(),  # ruff: ignore[private-member-access]
+            _ATOM_PRECEDENCE,
+        )
+
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         return SingleOutcomeRoll(self._value, self)
 
@@ -1066,6 +1088,19 @@ class RollerPool(Roller[_T_co]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"operands": self.operands}
+
+    def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
+        operands = cast("_OperandRoll[object]", roll).operands
+        items = ", ".join(
+            operand._format_expression().text  # ruff: ignore[private-member-access]
+            for operand in operands
+        )
+        if len(operands) == 1:
+            items += ","
+        text = f"({items})"
+        if self._name is not None:
+            text += f" [{self._name}]"
+        return _RollFormat(text, _ATOM_PRECEDENCE)
 
     def _roll(self) -> "Roll[_T_co]":
         if not self._rollers:
@@ -1751,13 +1786,14 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
 
     def format(self) -> str:
         r"""Formats this roll as a compact expression followed by its outcome or outcomes."""
-        expression = _ROLL_FORMATTER.format(self)
-        result = (
-            repr(cast("SingleOutcomeRoll[_T_co]", self).outcome)
-            if isinstance(cast("object", self), SingleOutcomeRoll)
-            else repr(self.outcomes)
-        )
-        return f"{expression.text} => {result}"
+        expression = self._format_expression()
+        return f"{expression.text} => {self._format_result()}"
+
+    def _format_expression(self) -> _RollFormat:
+        return self.roller._format_roll(cast("Roll[object]", self))  # ruff: ignore[private-member-access]
+
+    def _format_result(self) -> str:
+        return repr(self.outcomes)
 
     def sum(self: "Roll[_CanAddSameT]") -> "SingleOutcomeRoll[_CanAddSameT]":
         r"""
@@ -1802,6 +1838,9 @@ class SingleOutcomeRoll(Roll[_T_co]):
     @property
     def outcome(self) -> _T_co:
         return self.outcomes[0]
+
+    def _format_result(self) -> str:
+        return repr(self.outcome)
 
     def __neg__(
         self: "SingleOutcomeRoll[ot.CanNeg[_ResultT]]",
@@ -1876,10 +1915,6 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._left, self._right)
 
-    @property
-    def operation(self) -> _BinaryOperation:
-        return self._operation
-
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.binary", "operator": self._operation.name}
 
@@ -1887,6 +1922,13 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"operands": self.operands}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        left, right = cast("_SingleOutcomeOperandRoll[object]", roll).operands
+        return self._operation.format(
+            left._format_expression(),  # ruff: ignore[private-member-access]
+            right._format_expression(),  # ruff: ignore[private-member-access]
+        )
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         left_roll = self._left.roll()
@@ -1910,10 +1952,6 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
     def operands(self) -> tuple[SingleOutcomeRoller[object], ...]:
         return (self._operand,)
 
-    @property
-    def operation(self) -> _UnaryOperation:
-        return self._operation
-
     def metadata(self) -> dict[str, object]:
         return {"kind": "dyce.unary", "operator": self._operation.name}
 
@@ -1921,6 +1959,12 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"operands": self.operands}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
+        return self._operation.format(
+            operand._format_expression()  # ruff: ignore[private-member-access]
+        )
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
         operand_roll = self._operand.roll()
@@ -1952,6 +1996,11 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"operands": self.operands}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
+        expression = operand._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"sum({expression.text})", _CALL_PRECEDENCE)
 
     def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
@@ -1994,6 +2043,13 @@ class _SelectedPoolRoller(Roller[_T_co]):
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"operands": self.operands}
 
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        (operand,) = cast("_OperandRoll[object]", roll).operands
+        expression = operand._format_expression()  # ruff: ignore[private-member-access]
+        selectors = ", ".join(repr(selector) for selector in self._selectors)
+        suffix = f", {selectors}" if selectors else ""
+        return _RollFormat(f"select({expression.text}{suffix})", _CALL_PRECEDENCE)
+
     def _roll(self) -> Roll[_T_co]:
         parent_roll = self._parent.roll()
         outcomes = tuple(getitems(parent_roll.outcomes, self._selectors))
@@ -2020,6 +2076,11 @@ class _FactoryRoller(Roller[_T_co]):
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"expression": cast("Roller[object]", self.expression)}
 
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_FactoryRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._name}({expression.text})", _CALL_PRECEDENCE)
+
     def _roll(self) -> Roll[_T_co]:
         result = self._expression.roll()
         return _FactoryRoll(result.outcomes, self, result)
@@ -2041,6 +2102,11 @@ class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"expression": cast("Roller[object]", self.expression)}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_SingleOutcomeFactoryRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._name}({expression.text})", _CALL_PRECEDENCE)
 
     def _roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._expression.roll()
@@ -2073,6 +2139,11 @@ class _TraceRoller(Roller[_T_co]):
         self,
     ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
         return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_TraceRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._call.name}({expression.text})", _CALL_PRECEDENCE)
 
     def _roll(self) -> Roll[_T_co]:
         arguments, result = _eval_trace_call(self._call)
@@ -2178,148 +2249,6 @@ class _TraceRoll(Roll[_T_co]):
             "arguments": self.arguments,
             "result": cast("Roll[object]", self.result),
         }
-
-
-class _RollFormatter:
-    def __init__(self) -> None:
-        self._handlers: dict[
-            str,
-            Callable[[Roll[object], dict[str, object]], _RollFormat],
-        ] = {
-            "dyce.binary": self._format_binary,
-            "dyce.factory": self._format_boundary,
-            "dyce.literal": self._format_source,
-            "dyce.pool": self._format_pool,
-            "dyce.pool-selection": self._format_pool_selection,
-            "dyce.pool-source": self._format_source,
-            "dyce.pool-sum": self._format_pool_sum,
-            "dyce.source": self._format_source,
-            "dyce.trace": self._format_boundary,
-            "dyce.unary": self._format_unary,
-        }
-
-    def format(self, roll: Roll[object]) -> _RollFormat:
-        metadata = roll.roller.metadata()
-        kind = metadata.get("kind")
-        handler = self._handlers.get(kind) if isinstance(kind, str) else None
-        return (
-            handler(roll, metadata)
-            if handler is not None
-            else self._format_unknown(roll, metadata)
-        )
-
-    def _format_binary(
-        self, roll: Roll[object], _metadata: dict[str, object]
-    ) -> _RollFormat:
-        operation = cast("_BinaryRoller[object]", roll.roller).operation
-        operands = self._operands(roll)
-        left = self.format(operands[0])
-        right = self.format(operands[1])
-        return operation.format(left, right)
-
-    def _format_boundary(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _RollFormat:
-        name = metadata.get("name", metadata.get("kind"))
-        result = cast(
-            "_FactoryRoll[object] | _SingleOutcomeFactoryRoll[object] | _TraceRoll[object]",
-            roll,
-        ).result
-        return _RollFormat(
-            f"{name}({self.format(result).text})",
-            _CALL_PRECEDENCE,
-        )
-
-    def _format_pool(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _RollFormat:
-        operands = self._operands(roll)
-        items = ", ".join(self.format(operand).text for operand in operands)
-        if len(operands) == 1:
-            items += ","
-        text = f"({items})"
-        return self._format_source_name(text, metadata)
-
-    def _format_pool_selection(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _RollFormat:
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        selectors = cast("list[object]", metadata.get("selectors", []))
-        selector_text = ", ".join(
-            self._format_selector(selector) for selector in selectors
-        )
-        suffix = f", {selector_text}" if selector_text else ""
-        return _RollFormat(f"select({operand.text}{suffix})", _CALL_PRECEDENCE)
-
-    def _format_pool_sum(
-        self, roll: Roll[object], _metadata: dict[str, object]
-    ) -> _RollFormat:
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        return _RollFormat(f"sum({operand.text})", _CALL_PRECEDENCE)
-
-    @staticmethod
-    def _operands(roll: Roll[object]) -> tuple[Roll[object], ...]:
-        return cast(
-            "_OperandRoll[object] | _SingleOutcomeOperandRoll[object]", roll
-        ).operands
-
-    @staticmethod
-    def _format_selector(selector: object) -> str:
-        if isinstance(selector, dict):
-            start = selector.get("start")
-            stop = selector.get("stop")
-            step = selector.get("step")
-            return f"slice({start!r}, {stop!r}, {step!r})"
-        return repr(selector)
-
-    def _format_source(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _RollFormat:
-        text = (
-            repr(roll.outcome)
-            if isinstance(roll, SingleOutcomeRoll)
-            else repr(roll.outcomes)
-        )
-        return self._format_source_name(text, metadata)
-
-    @staticmethod
-    def _format_source_name(text: str, metadata: dict[str, object]) -> _RollFormat:
-        if "name" in metadata:
-            text += f" [{metadata['name']}]"
-        return _RollFormat(text, _ATOM_PRECEDENCE)
-
-    def _format_unary(
-        self, roll: Roll[object], _metadata: dict[str, object]
-    ) -> _RollFormat:
-        operation = cast("_UnaryRoller[object]", roll.roller).operation
-        operands = self._operands(roll)
-        operand = self.format(operands[0])
-        return operation.format(operand)
-
-    def _format_unknown(
-        self, roll: Roll[object], metadata: dict[str, object]
-    ) -> _RollFormat:
-        name = metadata.get("name", metadata.get("kind"))
-        relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
-        related_rolls: tuple[Roll[object], ...] = ()
-        for value in relationships.values():
-            related_rolls += value if isinstance(value, tuple) else (value,)
-        if related_rolls:
-            operands = ", ".join(self.format(operand).text for operand in related_rolls)
-            text = f"{name}({operands})"
-        else:
-            text = (
-                repr(roll.outcome)
-                if isinstance(roll, SingleOutcomeRoll)
-                else repr(roll.outcomes)
-            )
-            text += f" [{name}]"
-        return _RollFormat(text, _ATOM_PRECEDENCE)
-
-
-_ROLL_FORMATTER = _RollFormatter()
 
 
 class _RollerFactoryDecorator(Protocol):
