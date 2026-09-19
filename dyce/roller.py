@@ -23,13 +23,11 @@ import operator
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from functools import reduce, wraps
+from functools import reduce
 from typing import (
     Any,
     Generic,
     Literal,
-    ParamSpec,
-    Protocol,
     TypeVar,
     cast,
     final,
@@ -54,7 +52,6 @@ __all__ = (
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
-    "roller_factory",
     "trace",
 )
 
@@ -67,7 +64,6 @@ _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
 _NodeT = TypeVar("_NodeT")
 _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
-_ParamsT = ParamSpec("_ParamsT")
 
 
 @dataclass(frozen=True, slots=True)
@@ -2096,60 +2092,6 @@ class _TraceRoller(Roller[_T_co]):
         return _TraceRoll(result.outcomes, self, arguments, result)
 
 
-class _FactoryRoller(Roller[_T_co]):
-    def __init__(self, expression: Roller[_T_co], name: str) -> None:
-        self._expression = expression
-        self._name = name
-
-    @property
-    def expression(self) -> Roller[_T_co]:
-        return self._expression
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.factory", "name": self._name}
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
-        return {"expression": cast("Roller[object]", self.expression)}
-
-    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
-        result = cast("_FactoryRoll[object]", roll).result
-        expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._name}({expression.text})", _CALL_PRECEDENCE)
-
-    def _roll(self) -> Roll[_T_co]:
-        result = self._expression.roll()
-        return _FactoryRoll(result.outcomes, self, result)
-
-
-class _SingleOutcomeFactoryRoller(SingleOutcomeRoller[_T_co]):
-    def __init__(self, expression: SingleOutcomeRoller[_T_co], name: str) -> None:
-        self._expression = expression
-        self._name = name
-
-    @property
-    def expression(self) -> SingleOutcomeRoller[_T_co]:
-        return self._expression
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.factory", "name": self._name}
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
-        return {"expression": cast("Roller[object]", self.expression)}
-
-    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
-        result = cast("_SingleOutcomeFactoryRoll[object]", roll).result
-        expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._name}({expression.text})", _CALL_PRECEDENCE)
-
-    def _roll(self) -> SingleOutcomeRoll[_T_co]:
-        result = self._expression.roll()
-        return _SingleOutcomeFactoryRoll(result.outcome, self, result)
-
-
 class _OperandRoll(Roll[_T_co]):
     __slots__ = ("operands",)
     operands: tuple[Roll[object], ...]
@@ -2211,131 +2153,6 @@ class _TraceRoll(Roll[_T_co]):
             "arguments": self.arguments,
             "result": cast("Roll[object]", self.result),
         }
-
-
-class _FactoryRoll(Roll[_T_co]):
-    __slots__ = ("result",)
-    result: Roll[object]
-
-    def __init__(
-        self,
-        outcomes: tuple[_T_co, ...],
-        roller: Roller[_T_co],
-        result: Roll[object],
-    ) -> None:
-        super().__init__(outcomes, roller)
-        object.__setattr__(self, "result", result)
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
-        return {"result": self.result}
-
-
-class _SingleOutcomeFactoryRoll(SingleOutcomeRoll[_T_co]):
-    __slots__ = ("result",)
-    result: SingleOutcomeRoll[_T_co]
-
-    def __init__(
-        self,
-        outcome: _T_co,
-        roller: SingleOutcomeRoller[_T_co],
-        result: SingleOutcomeRoll[_T_co],
-    ) -> None:
-        super().__init__(outcome, roller)
-        object.__setattr__(self, "result", result)
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
-        return {"result": cast("Roll[object]", self.result)}
-
-
-class _RollerFactoryDecorator(Protocol):
-    @overload
-    def __call__(
-        self, fn: Callable[_ParamsT, SingleOutcomeRoller[_T]], /
-    ) -> Callable[_ParamsT, SingleOutcomeRoller[_T]]: ...
-    @overload
-    def __call__(
-        self, fn: Callable[_ParamsT, Roller[_T]], /
-    ) -> Callable[_ParamsT, Roller[_T]]: ...
-
-
-@overload
-def roller_factory(
-    fn: Callable[_ParamsT, SingleOutcomeRoller[_T]], /, *, name: str | None = None
-) -> Callable[_ParamsT, SingleOutcomeRoller[_T]]: ...
-@overload
-def roller_factory(
-    fn: Callable[_ParamsT, Roller[_T]],
-    /,
-    *,
-    name: str | None = None,
-) -> Callable[_ParamsT, Roller[_T]]: ...
-@overload
-def roller_factory(
-    fn: None = None, /, *, name: str | None = None
-) -> _RollerFactoryDecorator: ...
-def roller_factory(
-    fn: Callable[..., object] | None = None, /, *, name: str | None = None
-) -> Any:
-    r"""
-    Decorates *fn* to wrap its returned [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] or [`Roller`][dyce.roller.Roller] so that *name* appears in [`SingleOutcomeRoll`][dyce.roller.SingleOutcomeRoll] traces.
-
-    If not provided, *name* defaults to the *fn*’s `__name__` or its type’s `__name__`.
-
-    Create a factory that accepts a modifier and uses it to produce a named roller:
-
-        >>> from dyce import H
-        >>> from dyce.roller import HRoller, SingleOutcomeRoller, roller_factory
-        >>> d8 = HRoller(H(8), name="d8")
-        >>> @roller_factory
-        ... def damage(modifier: int = 0) -> SingleOutcomeRoller[int]:
-        ...     return d8 + modifier
-        >>> damage_3_roller = damage(modifier=3)
-
-    Now use the roller to produce rolls:
-
-        >>> roll = damage_3_roller.roll()
-        >>> roll.roller.metadata()
-        {'kind': 'dyce.factory', 'name': 'damage'}
-        >>> rollers = roll.trace()["rollers"]
-        >>> assert isinstance(rollers, dict)
-        >>> rollers["roller0"]["relationships"]
-        {'expression': 'roller1'}
-
-    Supply *name* to better distinguish *fn*:
-
-        >>> d20 = HRoller(H(20), name="d20")
-        >>> @roller_factory(name="my_game.melee_attack")
-        ... def melee_attack(modifier: int = 0) -> SingleOutcomeRoller[int]:
-        ...     return d20 + modifier
-        >>> melee_attack(modifier=-1).roll().roller.metadata()
-        {'kind': 'dyce.factory', 'name': 'my_game.melee_attack'}
-    """
-
-    def decorate(factory: Callable[..., object]) -> Callable[..., object]:
-        resolved_name = (
-            name
-            if name is not None
-            else getattr(factory, "__name__", type(factory).__name__)
-        )
-
-        @wraps(factory)
-        def wrapped(*args: object, **kwargs: object) -> Roller[Any]:
-            expression = factory(*args, **kwargs)
-            if isinstance(expression, SingleOutcomeRoller):
-                return _SingleOutcomeFactoryRoller(expression, resolved_name)
-            if isinstance(expression, Roller):
-                return _FactoryRoller(expression, resolved_name)
-            raise TypeError(
-                "roller factories must return a SingleOutcomeRoller or Roller"
-            )
-
-        return wrapped
-
-    return decorate if fn is None else decorate(fn)
 
 
 @overload
@@ -2711,6 +2528,7 @@ def trace(
 
     Explode a d6 once, retaining both the initial roll and any additional roll:
 
+        >>> from dyce import H
         >>> from dyce.roller import (
         ...     HRoller,
         ...     SingleOutcomeRoll,
