@@ -1000,6 +1000,10 @@ class HRoller(SingleOutcomeRoller[_T_co]):
 
     @experimental
     def __init__(self, h: H[_T_co], *, label: str | None = None) -> None:
+        if not isinstance(h, H):
+            raise TypeError("h must be an instance of H")
+        if label is not None and not isinstance(label, str):
+            raise TypeError("label must be a str or None")
         self._h = h
         self._label = label if label is not None else str(h)
 
@@ -1025,6 +1029,10 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
 
     @experimental
     def __init__(self, hable: HableT[_T_co], *, label: str | None = None) -> None:
+        if not isinstance(hable, HableT):
+            raise TypeError("hable must be an instance of HableT")
+        if label is not None and not isinstance(label, str):
+            raise TypeError("label must be a str or None")
         self._hable = hable
         self._label = label if label is not None else str(hable)
 
@@ -1050,6 +1058,8 @@ class LiteralRoller(SingleOutcomeRoller[_T_co]):
 
     @experimental
     def __init__(self, value: _T_co, *, label: str | None = None) -> None:
+        if label is not None and not isinstance(label, str):
+            raise TypeError("label must be a str or None")
         self._value = value
         self._label = label
 
@@ -1087,6 +1097,10 @@ class PRoller(Roller[_T_co]):
 
     @experimental
     def __init__(self, p: P[_T_co], *, label: str | None = None) -> None:
+        if not isinstance(p, P):
+            raise TypeError("p must be an instance of P")
+        if label is not None and not isinstance(label, str):
+            raise TypeError("label must be a str or None")
         self._p = p
         self._label = label if label is not None else str(p)
 
@@ -1116,6 +1130,8 @@ class RollerPool(Roller[_T_co]):
 
     @experimental
     def __init__(self, *rollers: SingleOutcomeRoller[_T_co]) -> None:
+        if any(not isinstance(roller, SingleOutcomeRoller) for roller in rollers):
+            raise TypeError("rollers must be SingleOutcomeRoller instances")
         self._rollers = rollers
 
     def __len__(self) -> int:
@@ -2303,7 +2319,7 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[], _ResultT],
+    callback: Callable[[], _ResultT | Roll[_ResultT] | Roller[_ResultT]],
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
@@ -2321,7 +2337,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[SingleOutcomeRoll[_T1]], _ResultT],
+    callback: Callable[
+        [SingleOutcomeRoll[_T1]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: SingleOutcomeRoller[_T1],
     *,
     label: str | None = ...,
@@ -2340,7 +2359,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1]], _ResultT],
+    callback: Callable[
+        [Roll[_T1]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     *,
     label: str | None = ...,
@@ -2360,7 +2382,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
     *,
@@ -2381,7 +2406,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1], SingleOutcomeRoll[_T2]], _ResultT],
+    callback: Callable[
+        [Roll[_T1], SingleOutcomeRoll[_T2]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     *,
@@ -2402,7 +2430,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[SingleOutcomeRoll[_T1], Roll[_T2]], _ResultT],
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], Roll[_T2]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: SingleOutcomeRoller[_T1],
     source2: Roller[_T2],
     *,
@@ -2423,7 +2454,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1], Roll[_T2]], _ResultT],
+    callback: Callable[
+        [Roll[_T1], Roll[_T2]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     source2: Roller[_T2],
     *,
@@ -2447,7 +2481,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT,
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
@@ -2473,7 +2507,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT,
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
@@ -2499,7 +2533,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT,
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: Roller[_T2],
@@ -2523,7 +2557,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]], _ResultT],
+    callback: Callable[
+        [Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     source2: Roller[_T2],
     source3: SingleOutcomeRoller[_T3],
@@ -2548,7 +2585,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
-        _ResultT,
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
     ],
     source1: SingleOutcomeRoller[_T1],
     source2: SingleOutcomeRoller[_T2],
@@ -2572,7 +2609,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]], _ResultT],
+    callback: Callable[
+        [Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     source2: SingleOutcomeRoller[_T2],
     source3: Roller[_T3],
@@ -2595,7 +2635,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]], _ResultT],
+    callback: Callable[
+        [SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: SingleOutcomeRoller[_T1],
     source2: Roller[_T2],
     source3: Roller[_T3],
@@ -2618,7 +2661,10 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[Roll[_T1], Roll[_T2], Roll[_T3]], _ResultT],
+    callback: Callable[
+        [Roll[_T1], Roll[_T2], Roll[_T3]],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+    ],
     source1: Roller[_T1],
     source2: Roller[_T2],
     source3: Roller[_T3],
@@ -2628,14 +2674,7 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[..., Roll[_ResultT] | Roller[_ResultT]],
-    *sources: Roller[Any],
-    label: str | None = ...,
-    **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
-@overload
-def trace(
-    callback: Callable[..., _ResultT],
+    callback: Callable[..., _ResultT | Roll[_ResultT] | Roller[_ResultT]],
     *sources: Roller[Any],
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
