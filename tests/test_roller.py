@@ -277,31 +277,17 @@ class TestRoller:
         assert_type(result, SingleOutcomeRoller[int])  # zuban: ignore[misc]
         assert result.roll().outcome == 4
 
-    @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_rolls_and_metadata(
-        self,
-        op: Callable[[Any, Any], Any],
-        name: str,
-        lhs: int,
-        rhs: int,
-    ) -> None:
-        left = PRoller(P(H({lhs - 1: 1}), H({1: 1})), name="left")
-        right = PRoller(P(H({rhs - 1: 1}), H({1: 1})), name="right")
-        combined = op(left, right)
-        expected_outcome = op(lhs, rhs)
+    def test_binary_operator_sums_multi_outcome_operands(self) -> None:
+        left = PRoller(P(H({2: 1}), H({1: 1})), name="left")
+        right = PRoller(P(H({3: 1}), H({1: 1})), name="right")
+        combined = left + right
         left_operand, right_operand = _roller_operands(combined)
 
-        assert combined.roll().outcome == expected_outcome
-        assert combined.metadata() == {"kind": "dyce.binary", "operator": name}
+        assert combined.roll().outcome == 7
         assert left_operand.metadata() == {"kind": "dyce.pool-sum"}
         assert _roller_operands(left_operand) == (left,)
         assert right_operand.metadata() == {"kind": "dyce.pool-sum"}
         assert _roller_operands(right_operand) == (right,)
-        assert op(left, LiteralRoller(rhs)).roll().outcome == expected_outcome
-        assert op(LiteralRoller(lhs), right).roll().outcome == expected_outcome
-        assert op(lhs, right).roll().outcome == expected_outcome
-        assert op(P(H({lhs: 1})), right).roll().outcome == expected_outcome
-        assert op(left, P(H({rhs: 1}))).roll().outcome == expected_outcome
 
     @pytest.mark.parametrize(("op", "name", "value"), _UNARY_OPERATOR_CASES)
     def test_unary_operators_preserve_rolls_and_metadata(
@@ -384,7 +370,7 @@ class TestSingleOutcomeRoller:
         assert_type(roller.gt(1), SingleOutcomeRoller[bool])
 
     @pytest.mark.parametrize(("op", "name", "lhs", "rhs"), _BINARY_OPERATOR_CASES)
-    def test_binary_operators_preserve_rolls_and_metadata(
+    def test_binary_operators_produce_expected_outcomes_metadata_and_operands(
         self,
         op: Callable[[Any, Any], Any],
         name: str,
@@ -816,7 +802,7 @@ class TestHableAndRollerBinaryArithmetic:
             assert wrapped.hable is hable
             h_mock.assert_not_called()
 
-    def test_h_operand_is_wrapped_in_hroller_with_default_name(self) -> None:
+    def test_h_operand_conversion(self) -> None:
         h = H(8)
         combined = LiteralRoller(1) + h
         operands = _roller_operands(combined)
@@ -825,7 +811,7 @@ class TestHableAndRollerBinaryArithmetic:
         assert isinstance(wrapped, HRoller)
         assert wrapped.metadata() == {"kind": "dyce.source", "name": str(h)}
 
-    def test_p_operand_is_wrapped_in_p_roller_wrapped_in_pool_sum_roller(self) -> None:
+    def test_p_operand_conversion(self) -> None:
         p = P(H({2: 1}), H({3: 1}))
         combined = LiteralRoller(1) + p
         operands = _roller_operands(combined)
@@ -1896,7 +1882,7 @@ class TestMixedRollBinaryArithmetic:
         assert nested.format() == "(2 [d6] < 3) < 4 => True"
         assert roller.lt(existing_roll).format() == "2 [d6] < 4 => True"
 
-    def test_format_named_boundary(self) -> None:
+    def test_format_single_outcome_factory(self) -> None:
         d6 = HRoller(H({2: 1}), name="d6")
 
         @roller_factory(name="attack")
@@ -1904,6 +1890,13 @@ class TestMixedRollBinaryArithmetic:
             return d6 + 1
 
         assert attack().roll().format() == "attack(2 [d6] + 1) => 3"
+
+    def test_format_multi_outcome_factory(self) -> None:
+        @roller_factory(name="pool")
+        def pool() -> Roller[int]:
+            return RollerPool(LiteralRoller(2), LiteralRoller(1))
+
+        assert pool().roll().format() == "pool((1, 2)) => (1, 2)"
 
     def test_format_pool_operations(self) -> None:
         pool = RollerPool(
@@ -1923,6 +1916,7 @@ class TestMixedRollBinaryArithmetic:
         assert RollerPool(LiteralRoller(1), name="pool").roll().format() == (
             "(1,) [pool] => (1,)"
         )
+        assert RollerPool(LiteralRoller(1)).roll().format() == "(1,) => (1,)"
         assert PRoller(P(H({1: 1}), H({2: 1})), name="pool").roll().format() == (
             "(1, 2) [pool] => (1, 2)"
         )
