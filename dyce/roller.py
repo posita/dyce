@@ -813,32 +813,73 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
             return _compare_roll(self.roll(), rhs, comparison)
         return _binary_roller(self, rhs, comparison)
 
+    @staticmethod
+    @overload
+    def from_value(  # type: ignore[overload-overlap]
+        value: "SingleOutcomeRoller[_T]", *, label: str | None = None
+    ) -> "SingleOutcomeRoller[_T]": ...
+    @staticmethod
+    @overload
+    def from_value(  # type: ignore[overload-overlap]
+        value: "Roller[_T]", *, label: str | None = None
+    ) -> "Roller[_T]": ...
+    @staticmethod
+    @overload
+    def from_value(  # type: ignore[overload-overlap]
+        value: H[_T], *, label: str | None = None
+    ) -> "HRoller[_T]": ...
+    @staticmethod
+    @overload
+    def from_value(  # type: ignore[overload-overlap]
+        value: P[_T], *, label: str | None = None
+    ) -> "PRoller[_T]": ...
+    @staticmethod
+    @overload
+    def from_value(  # type: ignore[overload-overlap]
+        value: HableT[_T], *, label: str | None = None
+    ) -> "HableRoller[_T]": ...
+    @staticmethod
+    @overload
+    def from_value(value: _T, *, label: str | None = None) -> "LiteralRoller[_T]": ...
+    @staticmethod
+    def from_value(value: object, *, label: str | None = None) -> "Roller[Any]":
+        r"""Returns a roller for *value*, optionally labeled with *label*."""
+        return _roller_from_value(value, label=label)
+
+    def label(self, label: str) -> "Roller[_T_co]":
+        r"""Returns a roller that labels this roller without changing it."""
+        return _LabeledRoller(self, label)
+
     def __neg__(
         self: "Roller[ot.CanNeg[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
-            "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _NEG)
+            "SingleOutcomeRoller[_ResultT]",
+            _UnaryRoller(_as_single_outcome_roller(self), _NEG),
         )
 
     def __pos__(
         self: "Roller[ot.CanPos[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
-            "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _POS)
+            "SingleOutcomeRoller[_ResultT]",
+            _UnaryRoller(_as_single_outcome_roller(self), _POS),
         )
 
     def __abs__(
         self: "Roller[ot.CanAbs[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
-            "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _ABS)
+            "SingleOutcomeRoller[_ResultT]",
+            _UnaryRoller(_as_single_outcome_roller(self), _ABS),
         )
 
     def __invert__(
         self: "Roller[ot.CanInvert[_ResultT]]",
     ) -> "SingleOutcomeRoller[_ResultT]":
         return cast(
-            "SingleOutcomeRoller[_ResultT]", _UnaryRoller(_as_roller(self), _INVERT)
+            "SingleOutcomeRoller[_ResultT]",
+            _UnaryRoller(_as_single_outcome_roller(self), _INVERT),
         )
 
     @abstractmethod
@@ -854,7 +895,7 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
 
     def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
         metadata = self.metadata()
-        name = metadata.get("name", metadata.get("kind"))
+        label = metadata.get("label", metadata.get("name", metadata.get("kind")))
         relationships = roll._trace_relationships()  # ruff: ignore[private-member-access]
         related_rolls: tuple[Roll[object], ...] = ()
         for value in relationships.values():
@@ -864,9 +905,9 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
                 related._format_expression().text  # ruff: ignore[private-member-access]
                 for related in related_rolls
             )
-            text = f"{name}({arguments})"
+            text = f"{label}({arguments})"
         else:
-            text = f"{roll._format_result()} [{name}]"  # ruff: ignore[private-member-access]
+            text = f"{roll._format_result()} [{label}]"  # ruff: ignore[private-member-access]
         return _RollFormat(text, _ATOM_PRECEDENCE)
 
     def at(
@@ -930,6 +971,9 @@ class SingleOutcomeRoller(Roller[_T_co], ABC):
     def roll(self) -> "SingleOutcomeRoll[_T_co]":
         return cast("SingleOutcomeRoll[_T_co]", super().roll())
 
+    def label(self, label: str) -> "SingleOutcomeRoller[_T_co]":
+        return _LabeledSingleOutcomeRoller(self, label)
+
     @abstractmethod
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
         r"""
@@ -942,12 +986,12 @@ class SingleOutcomeRoller(Roller[_T_co], ABC):
 class HRoller(SingleOutcomeRoller[_T_co]):
     r"""A roller backed by [`H.roll`][dyce.H.roll]."""
 
-    __slots__ = ("_h", "_name")
+    __slots__ = ("_h", "_label")
 
     @experimental
-    def __init__(self, h: H[_T_co], *, name: str | None = None) -> None:
+    def __init__(self, h: H[_T_co], *, label: str | None = None) -> None:
         self._h = h
-        self._name = name if name is not None else str(h)
+        self._label = label if label is not None else str(h)
 
     @property
     def h(self) -> H[_T_co]:
@@ -957,7 +1001,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {
             "kind": "dyce.source",
-            "name": self._name,
+            "label": self._label,
         }
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
@@ -967,12 +1011,12 @@ class HRoller(SingleOutcomeRoller[_T_co]):
 class HableRoller(SingleOutcomeRoller[_T_co]):
     r"""A roller backed by a [`HableT`][dyce.HableT]."""
 
-    __slots__ = ("_hable", "_name")
+    __slots__ = ("_hable", "_label")
 
     @experimental
-    def __init__(self, hable: HableT[_T_co], *, name: str | None = None) -> None:
+    def __init__(self, hable: HableT[_T_co], *, label: str | None = None) -> None:
         self._hable = hable
-        self._name = name if name is not None else str(hable)
+        self._label = label if label is not None else str(hable)
 
     @property
     def hable(self) -> HableT[_T_co]:
@@ -982,7 +1026,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {
             "kind": "dyce.source",
-            "name": self._name,
+            "label": self._label,
         }
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
@@ -992,11 +1036,12 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
 class LiteralRoller(SingleOutcomeRoller[_T_co]):
     r"""A deterministic roller for a single, literal value."""
 
-    __slots__ = ("_value",)
+    __slots__ = ("_label", "_value")
 
     @experimental
-    def __init__(self, value: _T_co) -> None:
+    def __init__(self, value: _T_co, *, label: str | None = None) -> None:
         self._value = value
+        self._label = label
 
     @property
     def value(self) -> _T_co:
@@ -1004,11 +1049,17 @@ class LiteralRoller(SingleOutcomeRoller[_T_co]):
         return self._value
 
     def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.literal", "value": self._value}
+        metadata: dict[str, object] = {"kind": "dyce.literal", "value": self._value}
+        if self._label is not None:
+            metadata["label"] = self._label
+        return metadata
 
     def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
+        text = roll._format_result()  # ruff: ignore[private-member-access]
+        if self._label is not None:
+            text += f" [{self._label}]"
         return _RollFormat(
-            roll._format_result(),  # ruff: ignore[private-member-access]
+            text,
             _ATOM_PRECEDENCE,
         )
 
@@ -1019,12 +1070,12 @@ class LiteralRoller(SingleOutcomeRoller[_T_co]):
 class PRoller(Roller[_T_co]):
     r"""A roller backed by a [`P`][dyce.P]."""
 
-    __slots__ = ("_name", "_p")
+    __slots__ = ("_label", "_p")
 
     @experimental
-    def __init__(self, p: P[_T_co], *, name: str | None = None) -> None:
+    def __init__(self, p: P[_T_co], *, label: str | None = None) -> None:
         self._p = p
-        self._name = name if name is not None else str(p)
+        self._label = label if label is not None else str(p)
 
     def __len__(self) -> int:
         return len(self._p)
@@ -1037,7 +1088,7 @@ class PRoller(Roller[_T_co]):
     def metadata(self) -> dict[str, object]:
         return {
             "kind": "dyce.pool-source",
-            "name": self._name,
+            "label": self._label,
         }
 
     def _roll(self) -> "Roll[_T_co]":
@@ -1048,14 +1099,11 @@ class PRoller(Roller[_T_co]):
 class RollerPool(Roller[_T_co]):
     r"""A roller backed by one or more [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] objects."""
 
-    __slots__ = ("_name", "_rollers")
+    __slots__ = ("_rollers",)
 
     @experimental
-    def __init__(
-        self, *rollers: SingleOutcomeRoller[_T_co], name: str | None = None
-    ) -> None:
+    def __init__(self, *rollers: SingleOutcomeRoller[_T_co]) -> None:
         self._rollers = rollers
-        self._name = name
 
     def __len__(self) -> int:
         return len(self._rollers)
@@ -1075,10 +1123,7 @@ class RollerPool(Roller[_T_co]):
         return self._rollers
 
     def metadata(self) -> dict[str, object]:
-        metadata: dict[str, object] = {"kind": "dyce.pool"}
-        if self._name is not None:
-            metadata["name"] = self._name
-        return metadata
+        return {"kind": "dyce.pool"}
 
     def _trace_relationships(
         self,
@@ -1093,10 +1138,7 @@ class RollerPool(Roller[_T_co]):
         )
         if len(operands) == 1:
             items += ","
-        text = f"({items})"
-        if self._name is not None:
-            text += f" [{self._name}]"
-        return _RollFormat(text, _ATOM_PRECEDENCE)
+        return _RollFormat(f"({items})", _ATOM_PRECEDENCE)
 
     def _roll(self) -> "Roll[_T_co]":
         if not self._rollers:
@@ -1864,7 +1906,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
         if isinstance(rhs, Roller):
             rhs = rhs.roll()
         elif isinstance(rhs, HableT):
-            rhs = _as_roller(rhs).roll()
+            rhs = _as_single_outcome_roller(rhs).roll()
         rhs_roll = _as_single_outcome_roll(rhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             self.roller, rhs_roll.roller, operation
@@ -1878,7 +1920,7 @@ class SingleOutcomeRoll(Roll[_T_co]):
         if isinstance(lhs, Roller):
             lhs = lhs.roll()
         elif isinstance(lhs, HableT):
-            lhs = _as_roller(lhs).roll()
+            lhs = _as_single_outcome_roller(lhs).roll()
         lhs_roll = _as_single_outcome_roll(lhs)
         roller: SingleOutcomeRoller[object] = _BinaryRoller(
             lhs_roll.roller, self.roller, operation
@@ -1892,6 +1934,52 @@ class SingleOutcomeRoll(Roll[_T_co]):
         roller: SingleOutcomeRoller[object] = _UnaryRoller(self.roller, operation)
         outcome = operation(self.outcome)
         return _SingleOutcomeOperandRoll(outcome, roller, (self,))
+
+
+class _LabeledRoller(Roller[_T_co]):
+    def __init__(self, roller: Roller[_T_co], label: str) -> None:
+        self._roller = roller
+        self._label = label
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.label", "label": self._label}
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"roller": cast("Roller[object]", self._roller)}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_LabeledRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._label}({expression.text})", _CALL_PRECEDENCE)
+
+    def _roll(self) -> Roll[_T_co]:
+        result = self._roller.roll()
+        return _LabeledRoll(result.outcomes, self, result)
+
+
+class _LabeledSingleOutcomeRoller(SingleOutcomeRoller[_T_co]):
+    def __init__(self, roller: SingleOutcomeRoller[_T_co], label: str) -> None:
+        self._roller = roller
+        self._label = label
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.label", "label": self._label}
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"roller": cast("Roller[object]", self._roller)}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        result = cast("_LabeledSingleOutcomeRoll[object]", roll).result
+        expression = result._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(f"{self._label}({expression.text})", _CALL_PRECEDENCE)
+
+    def _roll(self) -> SingleOutcomeRoll[_T_co]:
+        result = self._roller.roll()
+        return _LabeledSingleOutcomeRoll(result.outcome, self, result)
 
 
 class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
@@ -2153,6 +2241,44 @@ class _TraceRoll(Roll[_T_co]):
             "arguments": self.arguments,
             "result": cast("Roll[object]", self.result),
         }
+
+
+class _LabeledRoll(Roll[_T_co]):
+    __slots__ = ("result",)
+    result: Roll[object]
+
+    def __init__(
+        self,
+        outcomes: tuple[_T_co, ...],
+        roller: Roller[_T_co],
+        result: Roll[object],
+    ) -> None:
+        super().__init__(outcomes, roller)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"result": self.result}
+
+
+class _LabeledSingleOutcomeRoll(SingleOutcomeRoll[_T_co]):
+    __slots__ = ("result",)
+    result: SingleOutcomeRoll[_T_co]
+
+    def __init__(
+        self,
+        outcome: _T_co,
+        roller: SingleOutcomeRoller[_T_co],
+        result: SingleOutcomeRoll[_T_co],
+    ) -> None:
+        super().__init__(outcome, roller)
+        object.__setattr__(self, "result", result)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
+        return {"result": cast("Roll[object]", self.result)}
 
 
 @overload
@@ -2535,7 +2661,7 @@ def trace(
         ...     SingleOutcomeRoller,
         ...     trace,
         ... )
-        >>> d6 = HRoller(H(6), name="d6")
+        >>> d6 = HRoller(H(6), label="d6")
         >>> def explode_once(
         ...     roll: SingleOutcomeRoll[int],
         ... ) -> SingleOutcomeRoll[int] | SingleOutcomeRoller[int]:
@@ -2564,7 +2690,20 @@ def trace(
         raise RollError(str(exc), (call,)) from exc
 
 
-def _as_roller(
+def _roller_from_value(value: object, *, label: str | None) -> Roller[Any]:
+    if isinstance(value, Roller):
+        return value if label is None else value.label(label)
+    elif isinstance(value, H):
+        return HRoller(value, label=label)
+    elif isinstance(value, P):
+        return PRoller(value, label=label)
+    elif isinstance(value, HableT):
+        return HableRoller(value, label=label)
+    else:
+        return LiteralRoller(value, label=label)
+
+
+def _as_single_outcome_roller(
     value: _T | HableT[_T] | Roller[_T],
 ) -> SingleOutcomeRoller[_T]:
     if isinstance(value, Roller):
@@ -2599,7 +2738,11 @@ def _binary_roller(
 ) -> object:
     if isinstance(lhs, Roll) or isinstance(rhs, Roll):
         return NotImplemented
-    return _BinaryRoller(_as_roller(lhs), _as_roller(rhs), operation)
+    return _BinaryRoller(
+        _as_single_outcome_roller(lhs),
+        _as_single_outcome_roller(rhs),
+        operation,
+    )
 
 
 def _compare_roll(
@@ -2609,7 +2752,7 @@ def _compare_roll(
     if isinstance(rhs, Roller):
         rhs = rhs.roll()
     elif isinstance(rhs, HableT):
-        rhs = _as_roller(rhs).roll()
+        rhs = _as_single_outcome_roller(rhs).roll()
     rhs_roll = _as_single_outcome_roll(rhs)
     roller: SingleOutcomeRoller[bool] = _BinaryRoller(
         lhs_roll.roller, rhs_roll.roller, comparison
