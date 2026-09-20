@@ -2229,10 +2229,16 @@ class _TraceRoller(Roller[_T_co]):
         return {"sources": cast("tuple[Roller[object], ...]", self.sources)}
 
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
-        result = cast("_TraceRoll[object]", roll).result
+        trace_roll = cast("_TraceRoll[object]", roll)
+        arguments = ", ".join(
+            argument._format_expression().text  # ruff: ignore[private-member-access]
+            for argument in trace_roll.arguments
+        )
+        result = trace_roll.result
         expression = result._format_expression()  # ruff: ignore[private-member-access]
         return _RollFormat(
-            f"{self._call.label}({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            f"{self._call.label}({arguments}) -> {expression.text}"
+            f" => {roll._format_result()}",  # ruff: ignore[private-member-access]
             _CALL_PRECEDENCE,
             has_result_suffix=True,
         )
@@ -2755,7 +2761,7 @@ def trace(
         >>> result.outcomes
         (10,)
         >>> print(result.format())
-        explode_once(6 [d6] + 4 [d6] => 10) => (10,)
+        explode_once(6 [d6]) -> 6 [d6] + 4 [d6] => 10 => (10,)
     """
     call = _TraceCall(
         callback,
