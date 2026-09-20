@@ -86,6 +86,9 @@ class _Hable(HableT[int]):
     def __init__(self, h: H[int]) -> None:
         self._h = h
 
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self._h!r})"
+
     def h(self) -> H[int]:
         return self._h
 
@@ -211,6 +214,24 @@ class TestRoller:
         )
         assert_type(pool.gt(1), SingleOutcomeRoller[bool])
 
+    def test_select_repr(self) -> None:
+        pool = RollerPool(LiteralRoller(1), LiteralRoller(2))
+
+        assert repr(pool.select(-1)) == (
+            "_SelectedPoolRoller("
+            "RollerPool(LiteralRoller(1, label=None), "
+            "LiteralRoller(2, label=None), label=None), (-1,))"
+        )
+
+    def test_sum_repr(self) -> None:
+        pool = RollerPool(LiteralRoller(2), LiteralRoller(3))
+
+        assert repr(pool.sum()) == (
+            "_PoolSumRoller("
+            "RollerPool(LiteralRoller(2, label=None), "
+            "LiteralRoller(3, label=None), label=None))"
+        )
+
     def test_sum_produces_single_outcome_roller(self) -> None:
         pool = PRoller(P(H({"a": 1}), H({"b": 1})), label="pool")
         summed = pool.sum()
@@ -322,6 +343,25 @@ class TestRollerFromValue:
 
 
 class TestSingleOutcomeRoller:
+    def test_binary_repr(self) -> None:
+        roller = LiteralRoller(2) + LiteralRoller(3)
+
+        assert repr(roller) == (
+            "_BinaryRoller(LiteralRoller(2, label=None), "
+            "LiteralRoller(3, label=None), "
+            f"_BinaryOperation(name='add', function={operator.add!r}, "
+            "symbol='+', precedence=60, associativity='left'))"
+        )
+
+    def test_unary_repr(self) -> None:
+        roller = -LiteralRoller(3)
+
+        assert repr(roller) == (
+            "_UnaryRoller(LiteralRoller(3, label=None), "
+            f"_UnaryOperation(name='neg', function={operator.neg!r}, "
+            "symbol='-', precedence=80))"
+        )
+
     def test_sum_returns_self(self) -> None:
         roller = LiteralRoller(3)
 
@@ -433,6 +473,15 @@ class TestSingleOutcomeRoller:
 
 
 class TestLabeledRoller:
+    def test_repr(self) -> None:
+        assert repr(LiteralRoller(3).label("damage")) == (
+            "_LabeledSingleOutcomeRoller(LiteralRoller(3, label=None), label='damage')"
+        )
+        assert repr(RollerPool(LiteralRoller(2)).label("pool")) == (
+            "_LabeledRoller("
+            "RollerPool(LiteralRoller(2, label=None), label=None), label='pool')"
+        )
+
     def test_single_outcome_label(self) -> None:
         roller = LiteralRoller(3)
         labeled = roller.label("damage")
@@ -476,6 +525,11 @@ class TestLabeledRoller:
 
 
 class TestHRoller:
+    def test_repr(self) -> None:
+        assert repr(HRoller(H({3: 1}), label="d6")) == (
+            "HRoller(H({3: 1}), label='d6')"
+        )
+
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_invalid_h(self) -> None:
         with pytest.raises(TypeError, match="instance of H"):
@@ -502,6 +556,13 @@ class TestHRoller:
 
 
 class TestHableRoller:
+    def test_repr(self) -> None:
+        hable = _Hable(H({3: 1}))
+
+        assert repr(HableRoller(hable, label="d6")) == (
+            "HableRoller(_Hable(H({3: 1})), label='d6')"
+        )
+
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_invalid_hable(self) -> None:
         with pytest.raises(TypeError, match="instance of HableT"):
@@ -549,6 +610,11 @@ class TestHableRoller:
 
 
 class TestLiteralRoller:
+    def test_repr(self) -> None:
+        assert repr(LiteralRoller(3, label="modifier")) == (
+            "LiteralRoller(3, label='modifier')"
+        )
+
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_invalid_label(self) -> None:
         with pytest.raises(TypeError, match="label"):
@@ -586,6 +652,11 @@ class TestLiteralRoller:
 
 
 class TestPRoller:
+    def test_repr(self) -> None:
+        roller = PRoller(P(H({2: 1}), H({3: 1})), label="pool")
+
+        assert repr(roller) == ("PRoller(P(H({2: 1}), H({3: 1})), label='pool')")
+
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_invalid_p(self) -> None:
         with pytest.raises(TypeError, match="instance of P"):
@@ -659,10 +730,24 @@ class TestPRoller:
 
 
 class TestRollerPool:
+    def test_repr(self) -> None:
+        pool = RollerPool(LiteralRoller(2), LiteralRoller(1), label="pool")
+
+        assert repr(pool) == (
+            "RollerPool(LiteralRoller(2, label=None), "
+            "LiteralRoller(1, label=None), label='pool')"
+        )
+        assert pool.metadata() == {"kind": "dyce.pool", "label": "pool"}
+
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_nonroller(self) -> None:
         with pytest.raises(TypeError, match="SingleOutcomeRoller"):
             RollerPool(cast("Any", H(6)))
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_rejects_invalid_label(self) -> None:
+        with pytest.raises(TypeError, match="label"):
+            RollerPool(label=cast("Any", 6))
 
     @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
     def test_nonroller_triggers_beartype_violation(self) -> None:
@@ -927,6 +1012,14 @@ class TestHableAndRollerBinaryArithmetic:
 
 
 class TestTrace:
+    def test_repr(self) -> None:
+        def callback() -> int:
+            return 3
+
+        roller = trace(callback, label="custom").roller
+
+        assert repr(roller) == f"_TraceRoller({callback!r}, (), 'custom', {{}})"
+
     @pytest.mark.parametrize(
         ("roll_mode", "rolls", "expected"),
         [
