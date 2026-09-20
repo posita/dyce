@@ -70,6 +70,7 @@ _CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
 class _RollFormat:
     text: str
     precedence: int
+    has_result_suffix: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,14 +107,15 @@ class _BinaryOperation:
         return _RollFormat(f"{left_text} {self.symbol} {right_text}", self.precedence)
 
     def _format_child(self, child: _RollFormat, *, right: bool) -> str:
-        parenthesize = child.precedence < self.precedence
+        parenthesize = right and child.has_result_suffix
+        parenthesize |= child.precedence < self.precedence
         if child.precedence == self.precedence:
             if self.associativity == "none":
                 parenthesize = True
             elif right:
-                parenthesize = self.associativity != "right"
+                parenthesize |= self.associativity != "right"
             else:
-                parenthesize = self.associativity == "right"
+                parenthesize |= self.associativity == "right"
         return f"({child.text})" if parenthesize else child.text
 
 
@@ -147,7 +149,7 @@ class _UnaryOperation:
             return _RollFormat(f"{self.name}({operand.text})", self.precedence)
         operand_text = (
             f"({operand.text})"
-            if operand.precedence < self.precedence
+            if operand.has_result_suffix or operand.precedence < self.precedence
             else operand.text
         )
         return _RollFormat(f"{self.symbol}{operand_text}", self.precedence)
@@ -915,10 +917,12 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
                 related._format_expression().text  # ruff: ignore[private-member-access]
                 for related in related_rolls
             )
-            text = f"{label}({arguments})"
+            text = f"{label}({arguments}) => {roll._format_result()}"  # ruff: ignore[private-member-access]
+            has_result_suffix = True
         else:
             text = f"{roll._format_result()} [{label}]"  # ruff: ignore[private-member-access]
-        return _RollFormat(text, _ATOM_PRECEDENCE)
+            has_result_suffix = False
+        return _RollFormat(text, _ATOM_PRECEDENCE, has_result_suffix)
 
     def at(
         self: "Roller[_CanAddSameT]", which: GetItemT, *more: GetItemT
@@ -1853,8 +1857,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
 
     def format(self) -> str:
         r"""Formats this roll as a compact expression followed by its outcome or outcomes."""
-        expression = self._format_expression()
-        return f"{expression.text} => {self._format_result()}"
+        return self._format_expression().text
 
     def _format_expression(self) -> _RollFormat:
         return self.roller._format_roll(cast("Roll[object]", self))  # ruff: ignore[private-member-access]
@@ -1981,7 +1984,11 @@ class _LabeledRoller(Roller[_T_co]):
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         result = cast("_LabeledRoll[object]", roll).result
         expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._label}({expression.text})", _CALL_PRECEDENCE)
+        return _RollFormat(
+            f"{self._label}({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
 
     def _roll(self) -> Roll[_T_co]:
         result = self._roller.roll()
@@ -2004,7 +2011,11 @@ class _LabeledSingleOutcomeRoller(SingleOutcomeRoller[_T_co]):
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         result = cast("_LabeledSingleOutcomeRoll[object]", roll).result
         expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._label}({expression.text})", _CALL_PRECEDENCE)
+        return _RollFormat(
+            f"{self._label}({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
 
     def _roll(self) -> SingleOutcomeRoll[_T_co]:
         result = self._roller.roll()
@@ -2038,9 +2049,14 @@ class _BinaryRoller(SingleOutcomeRoller[_ResultT]):
 
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         left, right = cast("_SingleOutcomeOperandRoll[object]", roll).operands
-        return self._operation.format(
+        expression = self._operation.format(
             left._format_expression(),  # ruff: ignore[private-member-access]
             right._format_expression(),  # ruff: ignore[private-member-access]
+        )
+        return _RollFormat(
+            f"{expression.text} => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            expression.precedence,
+            has_result_suffix=True,
         )
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
@@ -2075,8 +2091,13 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
 
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
-        return self._operation.format(
+        expression = self._operation.format(
             operand._format_expression()  # ruff: ignore[private-member-access]
+        )
+        return _RollFormat(
+            f"{expression.text} => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            expression.precedence,
+            has_result_suffix=True,
         )
 
     def _roll(self) -> SingleOutcomeRoll[_ResultT]:
@@ -2113,7 +2134,11 @@ class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
         expression = operand._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"sum({expression.text})", _CALL_PRECEDENCE)
+        return _RollFormat(
+            f"sum({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
 
     def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
         pool_roll = self._pool_roller.roll()
@@ -2161,7 +2186,11 @@ class _SelectedPoolRoller(Roller[_T_co]):
         expression = operand._format_expression()  # ruff: ignore[private-member-access]
         selectors = ", ".join(repr(selector) for selector in self._selectors)
         suffix = f", {selectors}" if selectors else ""
-        return _RollFormat(f"select({expression.text}{suffix})", _CALL_PRECEDENCE)
+        return _RollFormat(
+            f"select({expression.text}{suffix}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
 
     def _roll(self) -> Roll[_T_co]:
         parent_roll = self._parent.roll()
@@ -2202,7 +2231,11 @@ class _TraceRoller(Roller[_T_co]):
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         result = cast("_TraceRoll[object]", roll).result
         expression = result._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(f"{self._call.label}({expression.text})", _CALL_PRECEDENCE)
+        return _RollFormat(
+            f"{self._call.label}({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
 
     def _roll(self) -> Roll[_T_co]:
         arguments, result = _eval_trace_call(self._call)
@@ -2722,7 +2755,7 @@ def trace(
         >>> result.outcomes
         (10,)
         >>> print(result.format())
-        explode_once(6 [d6] + 4 [d6]) => (10,)
+        explode_once(6 [d6] + 4 [d6] => 10) => (10,)
     """
     call = _TraceCall(
         callback,
