@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://posita.github.io/dyce/"
+Homepage = "https://dycelib.org/"
 "Source Repository" = "https://github.com/posita/dyce/"
 
 [project.optional-dependencies]

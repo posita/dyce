@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## [`dyce`](https://posita.github.io/dyce/) translation of the accepted answer to "[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)"
+# ## [`dyce`](https://dycelib.org/) translation of the accepted answer to "[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)"
 #
 # Select `Run All Cells` from the `Run` menu above.
 

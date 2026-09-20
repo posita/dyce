@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Taking the lowest or highest die of 2d6 in [`dyce`](https://posita.github.io/dyce/)
+# ## Taking the lowest or highest die of 2d6 in [`dyce`](https://dycelib.org/)
 #
 # Select `Run All Cells` from the `Run` menu above.
 

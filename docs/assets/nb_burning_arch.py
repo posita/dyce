@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## [`dyce`](https://posita.github.io/dyce/) translation of one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
+# ## [`dyce`](https://dycelib.org/) translation of one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
 #
 # Select `Run All Cells` from the `Run` menu above.
 

@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## [`dyce`](https://posita.github.io/dyce/) modeling of [*Ironsworn*](https://www.ironswornrpg.com/)'s core mechanic
+# ## [`dyce`](https://dycelib.org/) modeling of [*Ironsworn*](https://www.ironswornrpg.com/)'s core mechanic
 #
 # Select `Run All Cells` from the `Run` menu above.
 

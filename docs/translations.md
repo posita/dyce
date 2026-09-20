@@ -1031,4 +1031,4 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 *Phew!*
 What a journey!
 Hopefully this highlights some of `dyce`’s flexibility and capabilities.
-If you’d like help using `dyce` with modeling your own complicated mechanics, [drop me a line](https://posita.github.io/dyce/latest/contrib/#starting-discussions-and-filing-issues)!
+If you’d like help using `dyce` with modeling your own complicated mechanics, [drop me a line](https://dycelib.org/latest/contrib/#starting-discussions-and-filing-issues)!
