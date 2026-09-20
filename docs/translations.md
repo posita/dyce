@@ -182,7 +182,11 @@ We can also deploy a counting trick with the two d10s.
     ...     return 2 @ d10.lt(action.outcome)
 
     >>> iron_distributions_by_action_mod = {
-    ...     action_mod: expand(iron_dependent_term, d6 + action_mod).zero_fill(IronResult)
+    ...     action_mod: H.from_counts(
+    ...         expand(iron_dependent_term, d6 + action_mod),
+    ...         dict.fromkeys(IronResult, 0),
+    ...         preserve_zero_counts=True,
+    ...     )
     ...     for action_mod in action_mods
     ... }
     >>> for action_mod, iron_distribution in iron_distributions_by_action_mod.items():

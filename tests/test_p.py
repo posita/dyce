@@ -199,7 +199,7 @@ class TestPEq:
         d4 = H(4)
         d6 = H(6)
         p = P(d4, d6)
-        assert hash(p) == hash(P(d4.merge(d4), d6.merge(d6)))
+        assert hash(p) == hash(P(H.from_counts(d4, d4), H.from_counts(d6, d6)))
         assert hash(p) == p._hash  # ruff: ignore[private-member-access]
 
     def test_eq_sanity_check(self) -> None:
@@ -697,29 +697,6 @@ class TestPApplyEachH:
             H({19: 1, 20: 1, 21: 1, 22: 1, 23: 1, 24: 1}),
             H({25: 1, 26: 1, 27: 1, 28: 1, 29: 1, 30: 1, 31: 1, 32: 1}),
         )
-
-
-class TestPApplyEachRoll:
-    def test_sum(self) -> None:
-        p = 3 @ P(6)
-        assert p.h() == p.apply_to_each_roll(sum)
-
-    def test_sum_which(self) -> None:
-        p = 3 @ P(6)
-        for m in range(len(p)):
-            for n in range(m + 1, len(p) + 1):
-                which = slice(m, n)
-                assert p.h(which) == p.apply_to_each_roll(sum, which)
-
-    def test_sum_which_multi(self) -> None:
-        p = 4 @ P(6)
-        for m in range(len(p)):
-            for n in range(m + 1, len(p) + 1):
-                which = slice(m, n)
-                assert p.h(slice(None), which, slice(None)) == p.apply_to_each_roll(
-                    sum, slice(None), which, slice(None)
-                )
-        assert p.h(slice(0, 0)) == p.apply_to_each_roll(sum, slice(0, 0))
 
 
 class TestPH:

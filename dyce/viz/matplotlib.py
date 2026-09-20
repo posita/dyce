@@ -175,7 +175,7 @@ def plot_bar(
     When *horizontal* is `True`, bars are drawn horizontally with outcomes on the y-axis and probabilities on the x-axis.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
-    Returns the axes so the caller can further customise the plot.
+    Returns the axes so the caller can further customize the plot.
 
     === "Vertical bars (default)"
 
@@ -336,7 +336,7 @@ def plot_burst(
     If `None`, `mpl.rcParams["image.cmap"]` is used.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
-    Returns the axes so the caller can further customise the plot.
+    Returns the axes so the caller can further customize the plot.
 
         --8<-- "docs/assets/plot_viz_plot_burst.py:viz"
 
@@ -430,7 +430,7 @@ def plot_line(
     *markers* is a string whose characters are cycled across histograms (e.g. `"oX^"` produces circle, cross, triangle, circle, …).
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
-    Returns the axes so the caller can further customise the plot.
+    Returns the axes so the caller can further customize the plot.
 
     === "`graph_type=GraphType.NORMAL` (default)"
 
@@ -537,7 +537,7 @@ def plot_ridge(
     If *show_peak_labels* is `True`, each ridge’s maximum point is labeled with its probability.
 
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
-    Returns the axes so the caller can further customise the plot.
+    Returns the axes so the caller can further customize the plot.
 
         --8<-- "docs/assets/plot_viz_plot_ridge.py:viz"
 

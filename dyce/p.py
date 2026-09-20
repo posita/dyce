@@ -545,53 +545,6 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
 
         return P(*_applied_hs())
 
-    @experimental
-    def apply_to_each_roll(
-        self: "P[_T]",
-        func: Callable[[RollT[_T]], H[_ResultT] | _ResultT],
-        *which: GetItemT,
-    ) -> H[_ResultT]:
-        r"""
-        Return a new [`H`][dyce.H] by applying *func* to each roll.
-        Shorthand for:
-
-        ```python
-        aggregate_weighted(
-            (func(roll), count) for roll, count in self.rolls_with_counts(*which)
-        )
-        ```
-
-        Note that there are often other, much more efficient ways to arrive at desired computations, but for a handful of small dice, this can be a more expressive way to get the job done.
-        For example:
-
-            >>> from dyce import P, H, RollT
-            >>> d6 = H(6)
-            >>> h3d6 = 3 @ d6
-            >>> p3d6 = 3 @ P(d6)
-            >>> p3d6.apply_to_each_roll(sum) == h3d6
-            True
-
-        <!-- -- >
-
-            >>> best_three_of_4d6 = (4 @ P(6)).h(slice(-3, None))
-            >>> (4 @ P(6)).apply_to_each_roll(sum, slice(-3, None)) == best_three_of_4d6
-            True
-
-        <!-- -- >
-
-            >>> ones_rolled_in_3d6 = 3 @ (d6.eq(1))
-            >>> def count_ones_in_roll(roll: RollT[int]) -> int:
-            ...     return sum(1 for outcome in roll if outcome == 1)
-            >>> p3d6.apply_to_each_roll(count_ones_in_roll) == ones_rolled_in_3d6
-            True
-        """
-        return cast(  # zuban: ignore[redundant-cast]
-            "H[_ResultT]",
-            aggregate_weighted(
-                (func(roll), count) for roll, count in self.rolls_with_counts(*which)
-            ),
-        )
-
     @overload
     def h(  # zuban: ignore[override]
         self: "P[Never]", *which: GetItemT
@@ -878,7 +831,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         Return a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
 
         This implements a state-collapsing dynamic program similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
-        Rather than enumerating every distinct roll (as [`apply_to_each_roll`][dyce.P.apply_to_each_roll] does), it sweeps the shared outcome axis once, and at each distinct outcome branches on how many dice show it.
+        Rather than enumerating every distinct roll, it sweeps the shared outcome axis once, and branches on how many dice show each distinct outcome.
         Equivalent partial rolls that reach the same state are merged, so the cost scales with the number of reachable states rather than the number of rolls.
 
         If provided, *surveyor* bundles the *accumulate*, *order*, and *settle* methods as well as the *initial* property.

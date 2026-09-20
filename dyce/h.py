@@ -443,12 +443,14 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         If *preserve_zero_counts* is `True`, entries with zero counts make it into the final `H` object.
         Otherwise, they are omitted.
 
-            >>> H.from_counts([(1, 0), (2, 2), (1, 1), (64, 0)])
+            >>> H.from_counts([(2, 2), (1, 1), (3, 0)], H({1: 0, 64: 0}))
             H({1: 1, 2: 2})
             >>> H.from_counts(
-            ...     [(1, 0), (2, 2), (1, 1), (64, 0)], preserve_zero_counts=True
+            ...     [(2, 2), (1, 1), (3, 0)],
+            ...     {1: 0, 64: 0},
+            ...     preserve_zero_counts=True,
             ... )
-            H({1: 1, 2: 2, 64: 0})
+            H({1: 1, 2: 2, 3: 0, 64: 0})
         """
         c: Counter[_T] = Counter()
         for source in sources:
@@ -1223,21 +1225,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     # ---- Methods ---------------------------------------------------------------------
 
-    def merge(
-        self: "H[_T]", other: "H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]"
-    ) -> "H[_T]":
-        r"""
-        Merges counts.
-
-            >>> H(4).merge(H(6))
-            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
-        """
-        result: dict[_T, int] = dict(self)
-        other_h = other if isinstance(other, H) else H(other)
-        for outcome, count in other_h.items():
-            result[outcome] = result.get(outcome, 0) + count
-        return H(result)
-
     @overload
     def apply(
         self: "H[_T]",
@@ -1392,7 +1379,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
                 True
                 >>> Fraction(h.exactly_k_times_in_n(outcome=3, n=n, k=k), h.total**n)
                 Fraction(2, 9)
-                >>> h_not_lowest_terms = h.merge(h)
+                >>> h_not_lowest_terms = H.from_counts(h, h)
                 >>> h == h_not_lowest_terms
                 True
                 >>> h_not_lowest_terms
@@ -1429,9 +1416,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
 
             >>> print(
-            ...     (2 @ H(6))
-            ...     .zero_fill(range(1, 21))
-            ...     .format(precision=4, tick="@", width=65)
+            ...     H.from_counts(
+            ...         (2 @ H(6)),
+            ...         dict.fromkeys(range(1, 21), 0),
+            ...         preserve_zero_counts=True,
+            ...     ).format(precision=4, tick="@", width=65)
             ... )
             avg |    7.0000
             std |    2.4152
@@ -1749,68 +1738,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         return self if quantized is self else type(self)(quantized)
 
     @experimental
-    def replace(self: "H[_T]", existing_outcome: _T, repl: "H[_T] | _T") -> "H[_T]":
-        r"""
-        Returns a new histogram with a possibly substituted outcome.
-        If *repl* is a single outcome, it will replace *existing_outcome* directly (if *existing_outcome* exists in the original histogram).
-        If *repl* is a histogram, its outcomes will be “folded in”, together making up the same proportion of the total as the replaced outcome.
-
-            >>> d6 = H(6)
-            >>> d6.replace(6, 1_000)
-            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 1000: 1})
-            >>> d6.replace(7, "never used") == d6  # type: ignore[arg-type]
-            True
-
-            >>> H({1: 1, 2: 2, 3: 3}).replace(2, H({3: 1, 4: 2, 5: 3}))
-            H({1: 6, 3: 20, 4: 4, 5: 6})
-
-            >>> once_exploded_d6 = d6.replace(6, d6 + 6)
-            >>> once_exploded_d6
-            H({1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1})
-
-        One way to “explode” a die `#!math n` times:
-
-            >>> def explode_n_by_replacement(h: H[int], n: int) -> H[int]:
-            ...     max_h = max(h)
-            ...     exploded_h = h
-            ...     for _ in range(n):
-            ...         exploded_h = h.replace(max_h, exploded_h + max_h)
-            ...     return exploded_h  # ty: ignore[invalid-return-type]
-
-            >>> explode_n_by_replacement(d6, 0) == d6
-            True
-            >>> explode_n_by_replacement(d6, 1) == once_exploded_d6
-            True
-            >>> explode_n_by_replacement(d6, 2)
-            H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
-            >>> explode_n_by_replacement(d6, 15)
-            H({1: 470184984576, 2: 470184984576, 3: 470184984576, ..., 94: 1, 95: 1, 96: 1})
-        """
-        if existing_outcome not in self:
-            return self
-        existing_outcome_count = self[existing_outcome]
-        d: dict[_T, int]
-        if isinstance(repl, H):
-            repl_total = repl.total
-            d = {
-                outcome: count * repl_total
-                for outcome, count in self.items()
-                if outcome != existing_outcome
-            }
-            for repl_outcome, repl_count in repl.items():
-                d[repl_outcome] = (
-                    d.get(repl_outcome, 0) + repl_count * existing_outcome_count
-                )
-        else:
-            d = {
-                outcome: count
-                for outcome, count in self.items()
-                if outcome != existing_outcome
-            }
-            d[repl] = d.get(repl, 0) + existing_outcome_count
-        return H(d)
-
-    @experimental
     def roll(self: "H[_T]") -> _T:
         r"""
         <!-- BEGIN MONKEY PATCH --
@@ -1870,15 +1797,6 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             )
             - self.mean() ** 2
         )
-
-    def zero_fill(self: "H[_T]", outcomes: Iterable[_T]) -> "H[_T]":
-        r"""
-        Shorthand for `self.merge(dict.fromkeys(outcomes, 0))`.
-
-            >>> H(4).zero_fill(H(8).outcomes())
-            H({1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0})
-        """
-        return self.merge(dict.fromkeys(outcomes, 0))
 
     def _order_stat_func_for_n(self: "H[_T]", n: int) -> "Callable[[int], H[_T]]":
         cumulative = 0

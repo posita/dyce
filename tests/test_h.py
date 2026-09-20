@@ -169,6 +169,11 @@ class TestHFromCounts:
     def test_non_int_outcomes(self) -> None:
         assert H.from_counts([("a", 2), ("b", 1), ("a", 3)]) == H({"a": 5, "b": 1})
 
+    def test_from_counts_does_not_invoke_lowest_terms(self) -> None:
+        base = H(range(10))
+        assert base == H.from_counts(base, base)
+        assert dict(base) != dict(H.from_counts(base, base))
+
 
 class TestHRepr:
     def test_repr(self) -> None:
@@ -662,10 +667,13 @@ class TestHExactlyKTimesInN:
     def test_exactly_k_times_in_n(self) -> None:
         for h in (
             H(20),
-            H(20).merge(H(20)).merge(H(20)),
+            H.from_counts(H(20), H(20), H(20)),
             H({i: i for i in range(10)}),
             H({9 - i: i for i in range(10)}),
-            H({i: i for i in range(1, 6)}).merge(H({i: 11 - i for i in range(6, 11)})),
+            H.from_counts(
+                {i: i for i in range(1, 6)},
+                {i: 11 - i for i in range(6, 11)},
+            ),
         ):
             for n in range(10, 0, -1):
                 for outcome in h:
@@ -730,9 +738,9 @@ class TestHLowestTerms:
 
     def test_equality_uses_lowest_terms(self) -> None:
         base = H(range(10))
-        assert base == base.merge(base)
-        assert base == base.merge(base).merge(base)
-        assert hash(base) == hash(base.merge(base).merge(base).lowest_terms())
+        assert base == H.from_counts(base, base)
+        assert base == H.from_counts(base, base, base)
+        assert hash(base) == hash(H.from_counts(base, base, base).lowest_terms())
 
 
 class TestHMean:
@@ -756,13 +764,6 @@ class TestHMean:
                 h_mean,
                 stat_mean,
             ), f"o_type: {o_type}"
-
-
-class TestHMerge:
-    def test_merge_does_not_invoke_lowest_terms(self) -> None:
-        base = H(range(10))
-        assert base == base.merge(base)
-        assert dict(base) != dict(base.merge(base))
 
 
 class TestHOrderStatForNAtPos:
