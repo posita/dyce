@@ -954,6 +954,18 @@ class TestTrace:
             },
         }
 
+    def test_format_includes_argument_and_result_rolls(self) -> None:
+        source = LiteralRoller(2) + 3
+
+        def increment(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
+            return roll + 1
+
+        result = trace(increment, source)
+
+        assert result.format() == (
+            "increment(2 + 3 => 5) -> 2 + 3 => 5 + 1 => 6 => (6,)"
+        )
+
     def test_callback_called_with_rolls_from_source_rollers_and_state(self) -> None:
         single = LiteralRoller(3)
         multi = PRoller(P(H({2: 1}), H({4: 1})))
