@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Modeling *[Risus](http://risusiverse.com/)* in [`dyce`](https://posita.github.io/dyce/)
+# ## Modeling *[Risus](http://risusiverse.com/)* in [`dyce`](https://dycelib.org/)
 #
 # Select `Run All Cells` from the `Run` menu above.
 

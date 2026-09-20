@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Modeling "[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)" in [`dyce`](https://posita.github.io/dyce/)
+# ## Modeling "[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)" in [`dyce`](https://dycelib.org/)
 #
 # Select `Run All Cells` from the `Run` menu above.
 

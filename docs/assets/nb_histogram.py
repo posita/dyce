@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Basic visualization in [`dyce`](https://posita.github.io/dyce/)
+# ## Basic visualization in [`dyce`](https://dycelib.org/)
 #
 # Select `Run All Cells` from the `Run` menu above.
 

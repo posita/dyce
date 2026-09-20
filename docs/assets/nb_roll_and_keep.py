@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## [`dyce`](https://posita.github.io/dyce/) translation of "[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)"
+# ## [`dyce`](https://dycelib.org/) translation of "[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)"
 #
 # Select `Run All Cells` from the `Run` menu above.
 

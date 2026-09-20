@@ -62,8 +62,8 @@ def on_pre_build(**_kwargs: object) -> None:
     )
     # Replace 'latest' with the docs version in docs site URLs
     index = index.replace(
-        "https://posita.github.io/dyce/latest/",
-        f"https://posita.github.io/dyce/{_DOCS_VERSION}/",
+        "https://dycelib.org/latest/",
+        f"https://dycelib.org/{_DOCS_VERSION}/",
     )
     # For release builds, restore version-specific shields.io badge URLs and PyPI link
     if _IS_RELEASE:

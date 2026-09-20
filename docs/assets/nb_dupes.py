@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## [`dyce`](https://posita.github.io/dyce/) translation of the accepted answer to "[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)"
+# ## [`dyce`](https://dycelib.org/) translation of the accepted answer to "[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)"
 #
 # Select `Run All Cells` from the `Run` menu above.
 
