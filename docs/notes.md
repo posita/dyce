@@ -25,23 +25,21 @@
 - Fixes embarrassingly long-running logical error in 4d6 variants example.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
 - Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
-- Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`H.apply`][dyce.H.apply].
-- Removes `H.is_even` and `H.is_odd`, whose functionality can be trivially reintroduced using [`H.apply`][dyce.H.apply].
+- Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`expand`][dyce.expand] and [`H.apply`][dyce.H.apply].
+- Removes `H.accumulate` and `H.zero_fill` in favor of [`H.from_counts`][dyce.H.from_counts].
+- Removes `H.is_even` and `H.is_odd`, whose functionality can be trivially reintroduced using `(H(...) + 1) % 2` and  `H(...) % 2`, respectively.
 - Removes `H.__reversed__`.
+- Removes `H.draw`.
 - Removes `H.vs` and `H.within`.
-- Renames `H.accumulate` to [`H.merge`][dyce.H.merge].
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
 - Removes `P.is_homogeneous`.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
 - Adds experimental [`H.quantile`][dyce.H.quantile] method.
 - Adds experimental [`H.quantize` method][dyce.H.quantize] and [`quantize_hs` context manager][dyce.quantize_hs].
-- Adds experimental (and somewhat inefficient) [`H.replace`][dyce.H.replace] method.
-- Adds experimental [`P.apply_to_each_roll`][dyce.P.apply_to_each_roll] method.
 - Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
 - Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
 - Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
-- Moves [`HableOpsMixin`][dyce.HableOpsMixin] to its own module.
 - *(Finally!)* removes deprecated interfaces:
     - `H.explode`
     - `H.foreach`
@@ -84,7 +82,7 @@
 - Deprecates `P.foreach`, `H.foreach`, and `H.substitute`.
 - Allows outcomes with zero counts in non-normalized [`H` objects][dyce.H].
   Outcomes with zero counts are dropped when calling [`H.lowest_terms`][dyce.H.lowest_terms].
-  Adds the [`H.zero_fill`][dyce.H.zero_fill] convenience method.
+  Adds the `H.zero_fill` convenience method.
 - Fixes memoization in [Risus multi-round combat translation](translations.md#modeling-entire-multi-round-combats).
 - Migrates from [`setuptools_scm`](https://pypi.org/project/setuptools-scm/) to [`versioningit`](https://pypi.org/project/versioningit/) for more flexible version number formatting.
 - Allows deployments to PyPI from CI based on tags.

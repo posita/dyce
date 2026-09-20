@@ -58,7 +58,7 @@ warnings.filterwarnings("ignore", category=ExperimentalWarning)
 # %% editable=false
 from enum import IntEnum
 
-from dyce import HResult, PResult, expand
+from dyce import H, HResult, PResult, expand
 from dyce.d import d6, p2d10
 
 
@@ -111,7 +111,9 @@ import pandas as pd
 data = [
     {
         outcome.name: float(prob)
-        for outcome, prob in result.zero_fill(IronDramaticResult).probability_items()
+        for outcome, prob in H.from_counts(
+            result, dict.fromkeys(IronDramaticResult, 0), preserve_zero_counts=True
+        ).probability_items()
     }
     for result in results_by_action_mod.values()
 ]
