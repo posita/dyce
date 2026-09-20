@@ -306,7 +306,7 @@ class TestRollerFromValue:
         assert h_roller.metadata()["label"] == "d6"
         assert p_roller.metadata()["label"] == "pool"
         assert literal_roller.metadata()["label"] == "modifier"
-        assert literal_roller.roll().format() == "4 [modifier] => 4"
+        assert literal_roller.roll().format() == "4 [modifier]"
 
     def test_returns_existing_unlabeled_roller(self) -> None:
         roller = PRoller(P(6))
@@ -1851,7 +1851,14 @@ class TestMixedRollBinaryArithmetic:
 
         result = ((left + right) * 5).roll()
 
-        assert result.format() == "(2 [d6] + 1 [d6]) * 5 => 15"
+        assert result.format() == "(2 [d6] + 1 [d6] => 3) * 5 => 15"
+
+    def test_format_binary_expression_with_intermediate_results_on_both_sides(
+        self,
+    ) -> None:
+        result = ((LiteralRoller(2) + 3) + (LiteralRoller(4) + 5)).roll()
+
+        assert result.format() == "2 + 3 => 5 + (4 + 5 => 9) => 14"
 
     def test_format_preserves_operator_precedence(self) -> None:
         left = cast("Any", LiteralRoller(2))
@@ -1860,9 +1867,9 @@ class TestMixedRollBinaryArithmetic:
         right_associative = (left ** (right**2)).roll()
         unary = (-(LiteralRoller(2) + 3)).roll()
 
-        assert left_associative.format() == "(2 ** 3) ** 2 => 64"
-        assert right_associative.format() == "2 ** 3 ** 2 => 512"
-        assert unary.format() == "-(2 + 3) => -5"
+        assert left_associative.format() == "(2 ** 3 => 8) ** 2 => 64"
+        assert right_associative.format() == "2 ** (3 ** 2 => 9) => 512"
+        assert unary.format() == "-(2 + 3 => 5) => -5"
         assert abs(LiteralRoller(-2)).roll().format() == "abs(-2) => 2"
 
     def test_format_comparison(self) -> None:
@@ -1872,7 +1879,7 @@ class TestMixedRollBinaryArithmetic:
         existing_roll = LiteralRoller(4).roll()
 
         assert result.format() == "2 [d6] < 4 => True"
-        assert nested.format() == "(2 [d6] < 3) < 4 => True"
+        assert nested.format() == "(2 [d6] < 3 => True) < 4 => True"
         assert roller.lt(existing_roll).format() == "2 [d6] < 4 => True"
 
     def test_format_pool_operations(self) -> None:
@@ -1882,19 +1889,21 @@ class TestMixedRollBinaryArithmetic:
         ).label("pool")
 
         assert pool.roll().format() == "pool((1 [d6], 2 [d6])) => (1, 2)"
-        assert pool.sum().roll().format() == "sum(pool((1 [d6], 2 [d6]))) => 3"
+        assert pool.sum().roll().format() == (
+            "sum(pool((1 [d6], 2 [d6])) => (1, 2)) => 3"
+        )
         assert pool.select(-1).roll().format() == (
-            "select(pool((1 [d6], 2 [d6])), -1) => (2,)"
+            "select(pool((1 [d6], 2 [d6])) => (1, 2), -1) => (2,)"
         )
         assert pool.select(slice(None, None, 2)).roll().format() == (
-            "select(pool((1 [d6], 2 [d6])), slice(None, None, 2)) => (1,)"
+            "select(pool((1 [d6], 2 [d6])) => (1, 2), slice(None, None, 2)) => (1,)"
         )
         assert RollerPool(LiteralRoller(1)).label("pool").roll().format() == (
             "pool((1,)) => (1,)"
         )
-        assert RollerPool(LiteralRoller(1)).roll().format() == "(1,) => (1,)"
+        assert RollerPool(LiteralRoller(1)).roll().format() == "(1,)"
         assert PRoller(P(H({1: 1}), H({2: 1})), label="pool").roll().format() == (
-            "(1, 2) [pool] => (1, 2)"
+            "(1, 2) [pool]"
         )
 
     def test_format_customer_roller_fallback(self) -> None:
@@ -1942,7 +1951,7 @@ class TestMixedRollBinaryArithmetic:
 
         source = CustomRoller()
 
-        assert source.roll().format() == "2 [custom] => 2"
+        assert source.roll().format() == "2 [custom]"
         assert CustomRoller(source).roll().format() == "custom(2 [custom]) => 2"
 
 
