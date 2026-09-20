@@ -95,6 +95,7 @@ lint = [
     "pytest-benchmark",
     "ruff",
     "ty",
+    "types-jsonschema",
     "zuban",
     {include-group = "docs"},
 ]
@@ -115,9 +116,11 @@ test-beartype = [
 test-pypy = [
     "griffe-warnings-deprecated",
     "ipdb",
+    "jsonschema",
     "pytest",
     "pytest-benchmark",
     "sympy",
+    "types-jsonschema",
 ]
 # Only what's needed for uv run tox [-e ...]
 tox = [
