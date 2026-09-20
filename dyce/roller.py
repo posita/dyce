@@ -903,7 +903,7 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
 
         The metadata must contain a nonempty string `kind`.
         Dyce kinds use the `dyce.` prefix.
-        Customer kinds should use a prefix controlled by the customer to avoid collisions.
+        Custom kinds should use a prefix controlled by their author to avoid collisions.
         Metadata describes only this roller.
         """
 
@@ -995,7 +995,7 @@ class SingleOutcomeRoller(Roller[_T_co], ABC):
         r"""
         Subclass implementation hook for producing a one-outcome roll.
 
-        Child rollers should be called through their public [`roll` methods][dyce.roller.SingleOutcomeRoller.roll].
+        Child rollers should be called through their public [`roll` methods][dyce.roller.Roller.roll].
         """
 
 
@@ -1892,6 +1892,7 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
         r"""
         Returns the execution trace rooted at this roll, composed of JSON-compatible containers.
 
+        The `format` and `version` entries identify the trace format.
         The `root` entry identifies a record in `rolls`.
         Each roller record contains its roller’s metadata and, when applicable, its named relationships to other rollers.
         Each roll’s `roller` entry identifies its producing roller in `rollers`.
@@ -1954,7 +1955,13 @@ class Roll(_HableOpsOptOut, Generic[_T_co]):
             return roll_id
 
         root = visit_roll(cast("Roll[object]", self))
-        return {"root": root, "rollers": rollers, "rolls": rolls}
+        return {
+            "format": "dyce.roll-trace",
+            "version": 1,
+            "root": root,
+            "rollers": rollers,
+            "rolls": rolls,
+        }
 
     def _compare(
         self, rhs: object, comparison: _BinaryOperation
