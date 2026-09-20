@@ -751,7 +751,8 @@ Thanks to ~~[`numerary`](https://pypi.org/project/numerary/)~~ *[`optype`](https
     H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y + 19: 3, 2*x + y + 20: 1})
 
 
-[![Miss you, Doris!](assets/doris.png)](https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186)
+[![Miss you, Doris!](assets/doris.png)](https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8)
+<!-- Original source: https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186 -->
 
 !!! note
 
