@@ -18,10 +18,12 @@ import operator
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Literal, Never, assert_type, cast
 from unittest.mock import Mock, patch
 
 import pytest
+from jsonschema import Draft202012Validator
 
 from dyce import H, HableT, P, rng
 from dyce.roller import (
@@ -68,6 +70,10 @@ _UNARY_OPERATOR_CASES: tuple[tuple[Callable[[Any], Any], str, int], ...] = (
     (operator.pos, "pos", -3),
     (operator.abs, "abs", -3),
     (operator.invert, "invert", 3),
+)
+
+_ROLL_TRACE_SCHEMA = json.loads(
+    (Path(__file__).parents[1] / "docs/schema/roll-trace-1.schema.json").read_text()
 )
 
 
@@ -1387,6 +1393,47 @@ class TestTrace:
 
 
 class TestRoll:
+    @pytest.mark.parametrize(
+        "roller_factory",
+        [
+            lambda: HRoller(H({1: 1}), label="source"),
+            lambda: LiteralRoller(1),
+            lambda: PRoller(P(H({1: 1})), label="pool source"),
+            lambda: RollerPool(LiteralRoller(1), label="pool"),
+            lambda: LiteralRoller(1).label("labeled"),
+            lambda: LiteralRoller(1) + LiteralRoller(2),
+            lambda: -LiteralRoller(1),
+            lambda: PRoller(P(H({1: 1}))).sum(),
+            lambda: PRoller(P(H({1: 1}))).select(slice(None)),
+            lambda: trace(lambda roll: roll, LiteralRoller(1), label="trace").roller,
+        ],
+    )
+    def test_trace_matches_schema(
+        self, roller_factory: Callable[[], Roller[Any]]
+    ) -> None:
+        roller = roller_factory()
+        serialized_trace = json.loads(json.dumps(roller.roll().trace()))
+
+        Draft202012Validator(_ROLL_TRACE_SCHEMA).validate(serialized_trace)
+
+    def test_trace_schema_accepts_custom_metadata(self) -> None:
+        class CustomRoller(LiteralRoller[int]):
+            def metadata(self) -> dict[str, object]:
+                return {"kind": "example.custom", "detail": "custom"}
+
+        trace = CustomRoller(1).roll().trace()
+
+        Draft202012Validator(_ROLL_TRACE_SCHEMA).validate(trace)
+
+    def test_trace_schema_is_valid(self) -> None:
+        Draft202012Validator.check_schema(_ROLL_TRACE_SCHEMA)
+
+    def test_trace_identifies_format_and_version(self) -> None:
+        trace = LiteralRoller(1).roll().trace()
+
+        assert trace["format"] == "dyce.roll-trace"
+        assert trace["version"] == 1
+
     def test_sum_produces_single_outcome_roll(self) -> None:
         pool_roll = PRoller(P(H({"a": 1}), H({"b": 1})), label="pool").roll()
         roll = pool_roll.sum()
@@ -2011,7 +2058,7 @@ class TestMixedRollBinaryArithmetic:
             "(1, 2) [pool]"
         )
 
-    def test_format_customer_roller_fallback(self) -> None:
+    def test_format_custom_roller_fallback(self) -> None:
         class CustomRoll(SingleOutcomeRoll[int]):
             __slots__ = ("operands",)
             operands: tuple[Roll[object], ...]
