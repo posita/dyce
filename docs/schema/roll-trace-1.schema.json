@@ -160,8 +160,7 @@
       "type": "object",
       "required": ["kind"],
       "properties": {
-        "kind": {"const": "dyce.pool"},
-        "label": {"type": "string"}
+        "kind": {"const": "dyce.pool"}
       },
       "additionalProperties": false
     },

@@ -1141,44 +1141,27 @@ class PRoller(Roller[_T_co]):
 class RollerPool(Roller[_T_co]):
     r"""A roller backed by one or more [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] objects."""
 
-    __slots__ = ("_label", "_rollers")
+    __slots__ = ("_rollers",)
 
     @experimental
-    def __init__(
-        self, *rollers: SingleOutcomeRoller[_T_co], label: str | None = None
-    ) -> None:
+    def __init__(self, *rollers: SingleOutcomeRoller[_T_co]) -> None:
         if any(not isinstance(roller, SingleOutcomeRoller) for roller in rollers):
             raise TypeError("rollers must be SingleOutcomeRoller instances")
-        if label is not None and not isinstance(label, str):
-            raise TypeError("label must be a str or None")
         self._rollers = rollers
-        self._label = label
 
     def __repr__(self) -> str:
-        return f"{type(self).__name__}({', '.join(repr(roller) for roller in self._rollers)}, label={self._label!r})"
+        return f"{type(self).__name__}({', '.join(repr(roller) for roller in self._rollers)})"
 
     def __len__(self) -> int:
         return len(self._rollers)
 
     @property
-    def operands(
-        self,
-    ) -> tuple[Roller[object], ...]:
-        return cast(
-            "tuple[Roller[object], ...]",
-            self._rollers,
-        )
-
-    @property
-    def rollers(self) -> tuple[SingleOutcomeRoller[_T_co], ...]:
-        r"""This roller’s [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] source objects."""
+    def operands(self) -> tuple[SingleOutcomeRoller[_T_co], ...]:
+        r"""This roller’s [`SingleOutcomeRoller`][dyce.roller.SingleOutcomeRoller] operands."""
         return self._rollers
 
     def metadata(self) -> dict[str, object]:
-        metadata: dict[str, object] = {"kind": "dyce.pool"}
-        if self._label is not None:
-            metadata["label"] = self._label
-        return metadata
+        return {"kind": "dyce.pool"}
 
     def _format_roll(self, roll: "Roll[object]") -> _RollFormat:
         operands = cast("_OperandRoll[object]", roll).operands

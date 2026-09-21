@@ -226,7 +226,7 @@ class TestRoller:
         assert repr(pool.select(-1)) == (
             "_SelectedPoolRoller("
             "RollerPool(LiteralRoller(1, label=None), "
-            "LiteralRoller(2, label=None), label=None), (-1,))"
+            "LiteralRoller(2, label=None)), (-1,))"
         )
 
     def test_sum_repr(self) -> None:
@@ -235,7 +235,7 @@ class TestRoller:
         assert repr(pool.sum()) == (
             "_PoolSumRoller("
             "RollerPool(LiteralRoller(2, label=None), "
-            "LiteralRoller(3, label=None), label=None))"
+            "LiteralRoller(3, label=None)))"
         )
 
     def test_sum_produces_single_outcome_roller(self) -> None:
@@ -484,8 +484,7 @@ class TestLabeledRoller:
             "_LabeledSingleOutcomeRoller(LiteralRoller(3, label=None), label='damage')"
         )
         assert repr(RollerPool(LiteralRoller(2)).label("pool")) == (
-            "_LabeledRoller("
-            "RollerPool(LiteralRoller(2, label=None), label=None), label='pool')"
+            "_LabeledRoller(RollerPool(LiteralRoller(2, label=None)), label='pool')"
         )
 
     def test_single_outcome_label(self) -> None:
@@ -737,23 +736,17 @@ class TestPRoller:
 
 class TestRollerPool:
     def test_repr(self) -> None:
-        pool = RollerPool(LiteralRoller(2), LiteralRoller(1), label="pool")
+        pool = RollerPool(LiteralRoller(2), LiteralRoller(1))
 
         assert repr(pool) == (
-            "RollerPool(LiteralRoller(2, label=None), "
-            "LiteralRoller(1, label=None), label='pool')"
+            "RollerPool(LiteralRoller(2, label=None), LiteralRoller(1, label=None))"
         )
-        assert pool.metadata() == {"kind": "dyce.pool", "label": "pool"}
+        assert pool.metadata() == {"kind": "dyce.pool"}
 
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
     def test_rejects_nonroller(self) -> None:
         with pytest.raises(TypeError, match="SingleOutcomeRoller"):
             RollerPool(cast("Any", H(6)))
-
-    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
-    def test_rejects_invalid_label(self) -> None:
-        with pytest.raises(TypeError, match="label"):
-            RollerPool(label=cast("Any", 6))
 
     @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
     def test_nonroller_triggers_beartype_violation(self) -> None:
@@ -770,7 +763,6 @@ class TestRollerPool:
         assert pool_int is pool
         assert isinstance(pool, Roller)
         assert len(pool) == 2
-        assert pool.rollers == (two, one)
         assert pool.operands == (two, one)
         assert roll.outcomes == (1, 2)
         assert tuple(operand.roller for operand in _roll_operands(roll)) == (one, two)
@@ -1399,7 +1391,7 @@ class TestRoll:
             lambda: HRoller(H({1: 1}), label="source"),
             lambda: LiteralRoller(1),
             lambda: PRoller(P(H({1: 1})), label="pool source"),
-            lambda: RollerPool(LiteralRoller(1), label="pool"),
+            lambda: RollerPool(LiteralRoller(1)),
             lambda: LiteralRoller(1).label("labeled"),
             lambda: LiteralRoller(1) + LiteralRoller(2),
             lambda: -LiteralRoller(1),
