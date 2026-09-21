@@ -17,7 +17,7 @@ import math
 import operator
 import os
 import warnings
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections import Counter
 from collections.abc import (
     Callable,
@@ -38,16 +38,15 @@ from itertools import product as iproduct
 from types import NotImplementedType
 from typing import (
     Any,
+    Generic,
     Literal,
     NamedTuple,
     Never,
-    Protocol,
     SupportsFloat,
     SupportsInt,
     TypeVar,
     cast,
     overload,
-    runtime_checkable,
 )
 
 import optype as ot
@@ -62,7 +61,7 @@ from .types import (
     nobeartype,
 )
 
-__all__ = ("H", "HableT", "quantize_hs")
+__all__ = ("H", "HableOpsMixin", "HableT", "quantize_hs")
 
 DEFAULT_PRECISION = 2
 DEFAULT_QUANTIZATION_BIT_WIDTH = 256
@@ -70,7 +69,8 @@ _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _OtherT = TypeVar("_OtherT")
 _ResultT = TypeVar("_ResultT")
-_ConvolvableT = TypeVar("_ConvolvableT", bound=ot.CanAddSame)
+_CanAddSameT = TypeVar("_CanAddSameT", bound=ot.CanAddSame)
+_HableOpsMixinT = TypeVar("_HableOpsMixinT", bound="HableOpsMixin[Any]")
 
 
 class _QuantizeContext(NamedTuple):
@@ -90,53 +90,35 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-@experimental
-@contextmanager
-# The type of the return of the undecorated function is Generator, but after the
-# @contextmanager decorator is applied, it's AbstractContextManager. By refusing to
-# commit, we don't confuse beartype who will otherwise complain because
-# issubclass(AbstractContextManager, Generator) is False. I'm not quite sure why
-# beartype is confused because
-# https://github.com/python/typeshed/blob/main/stdlib/contextlib.pyi provides a hint
-# that the contextmanager-wrapped function should return a Callable[_P,
-# _GeneratorContextManager[_T_co]].
-def quantize_hs(
-    *,
-    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
-    preserve_zero_counts: bool = True,
-) -> Any:  # ruff: ignore[any-type]
+@nobeartype  # not decoratable by beartype (avoids warning)
+class HableT(ABC, Generic[_T_co]):
     r"""
-    Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
-    If nested, the innermost context controls.
+    An abstract base whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
 
-        >>> from dyce import H, quantize_hs
-        >>> from dyce.d import d20
-        >>> h20d20_full = 20 @ d20
-        >>> h20d20_full
-        H({20: 1, 21: 20, 22: 210, ..., 200: 1496580006525694242666523, ..., 398: 210, 399: 20, 400: 1})
-        >>> with quantize_hs(bit_width=16):
-        ...     h20d20_16bit = 20 @ d20
-        >>> h20d20_16bit
-        H({20: 0, 21: 0, 22: 0, ..., 199: 39947, 200: 40565, 201: 41131, ..., 398: 0, 399: 0, 400: 0})
-        >>> with quantize_hs(bit_width=8):
-        ...     h20d20_8bit = 20 @ d20
-        >>> h20d20_8bit
-        H({20: 0, 21: 0, 22: 0, ..., 199: 156, 200: 158, 201: 161, ..., 398: 0, 399: 0, 400: 0})
-        >>> with quantize_hs(bit_width=8):
-        ...     with quantize_hs(bit_width=16):
-        ...         assert 20 @ d20 == h20d20_16bit
-        ...     assert 20 @ d20 == h20d20_8bit
+    !!! info
+
+        The intended pronunciation of `Hable` is *AYCH-uh-BUL*[^1] (i.e., [`H`][dyce.H]-able).
+        Yes, that is a clumsy attempt at [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25).
+        (You could *totally* [`H`][dyce.H] that, dude!)
+        However, if you prefer something else (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you.
+        (Well, they *might*, but they *shouldn’t*.)
+        We all know what you mean.
+
+    [^1]:
+
+        World Book Online (WBO) style [pronunciation respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
     """
-    token = _quantize_ctxt.set(
-        _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
-    )
-    try:
-        yield
-    finally:
-        _quantize_ctxt.reset(token)
+
+    __slots__ = ()
+
+    @abstractmethod
+    def h(self: "HableT[_T]") -> "H[_T]":
+        r"""Expresses its implementer as an [`H` object][dyce.H]."""
 
 
-class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
+# H is immutable and intentionally covariant in its outcome type, even though Mapping's
+# key type is invariant
+class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[type-var] # ty: ignore[invalid-generic-class]
     r"""
     <!-- BEGIN MONKEY PATCH --
     For typing.
@@ -184,7 +166,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1})
         >>> H(0)
         H({})
-        >>> H(-4.0)  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+        >>> H(-4.0)  # type: ignore[call-overload]
         Traceback (most recent call last):
           ...
         TypeError: scalar init_val must be int; use explicit Mapping or Iterable for 'float' outcomes
@@ -367,7 +349,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     @overload
     def __init__(self: "H[int]", init_val: int, /) -> None: ...
     def __init__(self, init_val: Any, /) -> None:  # ruff: ignore[complex-structure]
-        r"""Constructor."""
+        r"""
+        Constructs an [`H`][dyce.H] from *init_val*, which can be a mapping, iterable, or an integer shorthand.
+        """
         self._h: dict[_T_co, int]
         self._hash: int | None = None
         self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}
@@ -425,7 +409,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         preserve_zero_counts: bool = False,
     ) -> "H[_T]":
         r"""
-        Construct an [`H`][dyce.H] by accumulating counts from one or more *sources*.
+        Constructs an [`H`][dyce.H] by accumulating counts from one or more *sources*.
 
         Each source may be a mapping of outcomes to counts, or an iterable of `(outcome, count)` pairs.
         Counts for the same outcome across all sources are summed.
@@ -478,7 +462,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __eq__(self, other: object) -> bool:
         if isinstance(other, H):
             return bool(self.lowest_terms()._h == other.lowest_terms()._h)
-        if isinstance(other, HableT):
+        if isinstance(other, HableOpsMixin):
             return self.__eq__(other.h())
         return super().__eq__(other)
 
@@ -497,16 +481,18 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         return len(self._h)
 
     def counts(self) -> ValuesView[int]:
-        r"""
-        More descriptive synonym for the `values` mapping method.
-        """
+        r"""A more descriptive synonym for the `values` mapping method."""
         return self._h.values()
 
     def outcomes(self: "H[_T]") -> KeysView[_T]:
-        r"""
-        More descriptive synonym for the `keys` mapping method.
-        """
+        r"""A more descriptive synonym for the `keys` mapping method."""
         return self._h.keys()
+
+    # ---- HableT abstract methods -----------------------------------------------------
+
+    def h(self: "H[_T]") -> "H[_T]":
+        r"""Returns `self`."""
+        return self
 
     # ---- Forward operators -----------------------------------------------------------
 
@@ -516,13 +502,19 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __matmul__(self: "H[Any]", rhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __matmul__(
-        self: "H[ot.CanAddSame[int, int]]", rhs: SupportsInt
-    ) -> "H[int]": ...
+    def __matmul__(self: "H[ot.CanAdd[int, int]]", rhs: SupportsInt) -> "H[int]": ...
+    @overload
+    def __matmul__(self: "H[_CanAddSameT]", rhs: SupportsInt) -> "H[_CanAddSameT]": ...
+    # Keep the narrower Literal[1] case first so all type checkers preserve the
+    # concrete HableOpsMixin subtype.
     @overload
     def __matmul__(
-        self: "H[_ConvolvableT]", rhs: SupportsInt
-    ) -> "H[_ConvolvableT]": ...
+        self: "H[_HableOpsMixinT]", rhs: Literal[1]
+    ) -> "H[_HableOpsMixinT]": ...
+    @overload
+    def __matmul__(
+        self: "H[HableOpsMixin[_CanAddSameT]]", rhs: SupportsInt
+    ) -> "H[HableOpsMixin[_CanAddSameT] | H[_CanAddSameT]]": ...
     @overload
     def __matmul__(self: "H[_T]", rhs: Literal[1]) -> "H[_T]": ...
     def __matmul__(self: "H[Any]", rhs: SupportsInt) -> "H[Any]":
@@ -538,11 +530,21 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __add__(
+        self: "H[HableOpsMixin[ot.CanAdd[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __add__(self: "H[int]", rhs: "H[int]") -> "H[int]": ...
+    @overload
+    # See <https://github.com/astral-sh/ty/issues/3234>.
+    def __add__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
+    @overload
+    def __add__(
         self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(
-        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanAdd[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(
@@ -552,11 +554,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __add__(self: "H[_T]", rhs: "H[ot.CanAdd[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __add__(
-        self: "H[_T]", rhs: "HableT[ot.CanAdd[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanAdd[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __add__(self: "H[_T]", rhs: ot.CanAdd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __add__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -570,11 +574,21 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __sub__(
+        self: "H[HableOpsMixin[ot.CanSub[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __sub__(self: "H[int]", rhs: "H[int]") -> "H[int]": ...
+    @overload
+    # See <https://github.com/astral-sh/ty/issues/3234>.
+    def __sub__(self: "H[float]", rhs: "H[float]") -> "H[float]": ...
+    @overload
+    def __sub__(
         self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(
-        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanSub[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(
@@ -584,11 +598,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __sub__(self: "H[_T]", rhs: "H[ot.CanSub[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __sub__(
-        self: "H[_T]", rhs: "HableT[ot.CanSub[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanSub[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __sub__(self: "H[_T]", rhs: ot.CanSub[_T, _ResultT]) -> "H[_ResultT]": ...
     def __sub__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -602,11 +618,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __mul__(
+        self: "H[HableOpsMixin[ot.CanMul[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __mul__(
         self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mul__(
-        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanMul[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mul__(
@@ -616,11 +637,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __mul__(self: "H[_T]", rhs: "H[ot.CanMul[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __mul__(
-        self: "H[_T]", rhs: "HableT[ot.CanMul[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanMul[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mul__(self: "H[_T]", rhs: ot.CanMul[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mul__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -634,11 +657,17 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __truediv__(
+        self: "H[HableOpsMixin[ot.CanTruediv[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __truediv__(
         self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[ot.CanTruediv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "HableOpsMixin[_OtherT]",
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
@@ -650,13 +679,15 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
-        self: "H[_T]", rhs: "HableT[ot.CanTruediv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanTruediv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __truediv__(
         self: "H[_T]", rhs: ot.CanTruediv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __truediv__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -670,11 +701,17 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __floordiv__(
+        self: "H[HableOpsMixin[ot.CanFloordiv[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __floordiv__(
         self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "HableOpsMixin[_OtherT]",
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
@@ -686,13 +723,15 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
-        self: "H[_T]", rhs: "HableT[ot.CanFloordiv[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanFloordiv[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __floordiv__(
         self: "H[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
     ) -> "H[_ResultT]": ...
     def __floordiv__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -708,11 +747,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __mod__(
+        self: "H[HableOpsMixin[ot.CanMod[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __mod__(
         self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mod__(
-        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanMod[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mod__(
@@ -722,11 +766,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __mod__(self: "H[_T]", rhs: "H[ot.CanMod[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __mod__(
-        self: "H[_T]", rhs: "HableT[ot.CanMod[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanMod[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __mod__(self: "H[_T]", rhs: ot.CanMod[_T, _ResultT]) -> "H[_ResultT]": ...
     def __mod__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -740,11 +786,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __pow__(
+        self: "H[HableOpsMixin[ot.CanPow2[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __pow__(
         self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __pow__(
-        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanPow2[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __pow__(
@@ -754,11 +805,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __pow__(self: "H[_T]", rhs: "H[ot.CanPow2[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __pow__(
-        self: "H[_T]", rhs: "HableT[ot.CanPow2[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanPow2[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __pow__(self: "H[_T]", rhs: ot.CanPow2[_T, _ResultT]) -> "H[_ResultT]": ...
     def __pow__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -772,11 +825,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __lshift__(
+        self: "H[HableOpsMixin[ot.CanLshift[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __lshift__(
         self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanLshift[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
@@ -788,11 +846,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(
-        self: "H[_T]", rhs: "HableT[ot.CanLshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanLshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __lshift__(self: "H[_T]", rhs: ot.CanLshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __lshift__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -806,11 +866,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __rshift__(
+        self: "H[HableOpsMixin[ot.CanRshift[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __rshift__(
         self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanRshift[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
@@ -822,11 +887,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(
-        self: "H[_T]", rhs: "HableT[ot.CanRshift[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanRshift[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __rshift__(self: "H[_T]", rhs: ot.CanRshift[_T, _ResultT]) -> "H[_ResultT]": ...
     def __rshift__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -840,11 +907,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __and__(
+        self: "H[HableOpsMixin[ot.CanAnd[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __and__(
         self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __and__(
-        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanAnd[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __and__(
@@ -854,11 +926,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __and__(self: "H[_T]", rhs: "H[ot.CanAnd[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __and__(
-        self: "H[_T]", rhs: "HableT[ot.CanAnd[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanAnd[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __and__(self: "H[_T]", rhs: ot.CanAnd[_T, _ResultT]) -> "H[_ResultT]": ...
     def __and__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -872,11 +946,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __or__(
+        self: "H[HableOpsMixin[ot.CanOr[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __or__(
         self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __or__(
-        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanOr[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __or__(
@@ -886,11 +965,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __or__(self: "H[_T]", rhs: "H[ot.CanOr[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __or__(
-        self: "H[_T]", rhs: "HableT[ot.CanOr[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanOr[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __or__(self: "H[_T]", rhs: ot.CanOr[_T, _ResultT]) -> "H[_ResultT]": ...
     def __or__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -904,11 +985,16 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     @overload
     def __xor__(
+        self: "H[HableOpsMixin[ot.CanXor[_OtherT, _ResultT]]]",
+        rhs: "H[HableOpsMixin[_OtherT]]",
+    ) -> "H[H[_ResultT]]": ...
+    @overload
+    def __xor__(
         self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "H[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __xor__(
-        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "HableT[_OtherT]"
+        self: "H[ot.CanXor[_OtherT, _ResultT]]", rhs: "HableOpsMixin[_OtherT]"
     ) -> "H[_ResultT]": ...
     @overload
     def __xor__(
@@ -918,11 +1004,13 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __xor__(self: "H[_T]", rhs: "H[ot.CanXor[_T, _ResultT]]") -> "H[_ResultT]": ...
     @overload
     def __xor__(
-        self: "H[_T]", rhs: "HableT[ot.CanXor[_T, _ResultT]]"
+        self: "H[_T]", rhs: "HableOpsMixin[ot.CanXor[_T, _ResultT]]"
     ) -> "H[_ResultT]": ...
     @overload
     def __xor__(self: "H[_T]", rhs: ot.CanXor[_T, _ResultT]) -> "H[_ResultT]": ...
     def __xor__(self, rhs: object) -> "H[object]":
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
         rhs = _flatten_to_h(rhs)
         if isinstance(rhs, H):
             result = _h_binary_callable(
@@ -942,13 +1030,19 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def __rmatmul__(self: "H[Any]", lhs: Literal[0]) -> "H[Never]": ...
     @overload
     # See <https://github.com/jorenham/optype/discussions/574>
-    def __rmatmul__(
-        self: "H[ot.CanAddSame[int, int]]", lhs: SupportsInt
-    ) -> "H[int]": ...
+    def __rmatmul__(self: "H[ot.CanAdd[int, int]]", lhs: SupportsInt) -> "H[int]": ...
+    @overload
+    def __rmatmul__(self: "H[_CanAddSameT]", lhs: SupportsInt) -> "H[_CanAddSameT]": ...
+    # Keep the narrower Literal[1] case first so all type checkers preserve the
+    # concrete HableOpsMixin subtype.
     @overload
     def __rmatmul__(
-        self: "H[_ConvolvableT]", lhs: SupportsInt
-    ) -> "H[_ConvolvableT]": ...
+        self: "H[_HableOpsMixinT]", lhs: Literal[1]
+    ) -> "H[_HableOpsMixinT]": ...
+    @overload
+    def __rmatmul__(
+        self: "H[HableOpsMixin[_CanAddSameT]]", lhs: SupportsInt
+    ) -> "H[HableOpsMixin[_CanAddSameT] | H[_CanAddSameT]]": ...
     @overload
     def __rmatmul__(self: "H[_T]", lhs: Literal[1]) -> "H[_T]": ...
     def __rmatmul__(self: "H[Any]", lhs: SupportsInt) -> "H[Any]":
@@ -1212,6 +1306,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def total(self) -> int:
         r"""
         Equivalent to `sum(self.counts())`.
+
         The result is cached to avoid redundant computation with multiple accesses.
 
             >>> H({4: 2, 5: 3, 6: 1}).total
@@ -1248,12 +1343,11 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
     ) -> "H[_ResultT]":
         r"""
-        Return a new [`H`][dyce.H] by applying *func* to outcomes.
-        If *operand* is provided, *func* should have two parameters, otherwise it should have one.
+        Returns a new [`H`][dyce.H] by applying *func* to outcomes.
 
-        If *operand* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
-
-        If *operand* is a scalar, call `func(outcome, operand)` for each outcome, passing counts through unchanged.
+        If *other* is provided, *func* should have two parameters, otherwise it should have one.
+        If *other* is an [`H`][dyce.H], take the Cartesian product of both histograms’ items: call `func(h_outcome, other_outcome)` for each pair and accumulate `h_count * other_count`.
+        If *other* is a scalar, call `func(outcome, other)` for each outcome, passing counts through unchanged.
 
         Resulting counts for duplicate outcomes are summed.
 
@@ -1293,7 +1387,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
             >>> d6.apply(vs, d8)
             H({<Versus.LOSS: -1>: 27, <Versus.DRAW: 0>: 6, <Versus.WIN: 1>: 15})
 
-        Omitting *operand* allows examination of just the histogram.
+        Omitting *other* allows examination of just the histogram.
         One way to determine Apocalypse World outcomes with a modifier:
 
             >>> class PBTA(IntEnum):
@@ -1356,6 +1450,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> int:
         r"""
         Computes and returns (in constant time) the number of ways *outcome* appears exactly *k* times among *n* like histograms.
+
         Uses the binomial coefficient as a more efficient alternative to `(n @ self.eq(outcome))[k]`.
 
             >>> H(6).exactly_k_times_in_n(outcome=5, n=4, k=2)
@@ -1411,6 +1506,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> str:
         r"""
         Returns a formatted string representation of the histogram.
+
         *precision* is the number of decimal places to use and defaults to `2`.
         *tick* is used as the bar character and defaults to `"#"`.
         *width* must be positive and is the maximum width of the horizontal bar ASCII graph.
@@ -1540,7 +1636,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     def lowest_terms(self: "H[_T]", *, preserve_zero_counts: bool = False) -> "H[_T]":
         r"""
-        Return a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
+        Returns a new [`H`][dyce.H] with zero-count outcomes removed and all counts divided by their GCD.
 
             >>> H({1: 2, 2: 4, 3: 6, 4: 0}).lowest_terms()
             H({1: 1, 2: 2, 3: 3})
@@ -1568,7 +1664,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     def mean(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the mean (expected value) of the weighted outcomes.
+        Returns the mean (expected value) of the weighted outcomes.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).mean()
@@ -1584,6 +1681,21 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         )
         return float(reduce(operator.add, weighted_outcomes) / self.total)
 
+    def merge(
+        self: "H[_T]", other: "H[_T] | Mapping[_T, SupportsInt] | Iterable[_T]"
+    ) -> "H[_T]":
+        r"""
+        Merges counts.
+
+            >>> H(4).merge(H(6))
+            H({1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 1})
+        """
+        result: dict[_T, int] = dict(self)
+        other_h = other if isinstance(other, H) else H(other)
+        for outcome, count in other_h.items():
+            result[outcome] = result.get(outcome, 0) + count
+        return H(result)
+
     @experimental
     def order_stat_for_n_at_pos(
         self: "H[_T]",
@@ -1592,6 +1704,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     ) -> "H[_T]":
         r"""
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
+
         *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
 
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
@@ -1633,7 +1746,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         self: "H[_T]", rational_t: Callable[[int, int], _OtherT] | None = None
     ) -> Iterator[tuple[_T, _OtherT]]:
         r"""
-        Yield `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
+        Yields `(outcome, probability)` pairs where each probability is computed as `rational_t(count, total)`.
 
         *rational_t* defaults to `fractions.Fraction`, giving exact rational probabilities.
         Pass any two-argument callable to get a different representation (e.g. `float` division via `lambda n, d: n / d`).
@@ -1660,6 +1773,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
     def quantile(self: "H[_T]", numerator: SupportsInt, denominator: SupportsInt) -> _T:
         r"""
         Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.
+
         It matches NumPy's [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
         Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.
 
@@ -1696,36 +1810,37 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         )  # pragma: no cover
 
     @overload
-    def quantize(
+    def quantize_counts(
         self: "H[Never]",
         bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[Never]": ...
     @overload
-    def quantize(
+    def quantize_counts(
         self: "H[_T]",
         bit_width: int = ...,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[_T]": ...
     @experimental
-    def quantize(
+    def quantize_counts(
         self,
         bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
         *,
         preserve_zero_counts: bool = False,
     ) -> "H[Any]":
         r"""
-        Construct an [`H`][dyce.H] by “quantizing” counts such that none are occupy more bits than *bit_width* and proportions are retained.
+        Constructs an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits and proportions are retained.
+
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
 
-            >>> H.quantize(
+            >>> H.quantize_counts(
             ...     H({1: 0x100, 2: 0x400, 3: 0x200, 4: 0x80, 5: 0xFFFF, 6: 0x7F}),
             ...     bit_width=8,
             ... )
             H({1: 1, 2: 4, 3: 2, 4: 1, 5: 255})
-            >>> H.quantize(
+            >>> H.quantize_counts(
             ...     H({1: 0x400, 2: 0x1000, 3: 0xF, 4: 0x10, 5: 0}),
             ...     bit_width=8,
             ...     preserve_zero_counts=True,
@@ -1767,7 +1882,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     def stdev(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the standard deviation of the weighted outcomes as a `float`.
+        Returns the standard deviation of the weighted outcomes as a `float`.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).stdev()
@@ -1779,7 +1895,8 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
 
     def variance(self: "H[SupportsFloat]") -> float:
         r"""
-        Return the variance of the weighted outcomes as a `float`.
+        Returns the variance of the weighted outcomes as a `float`.
+
         Raises `ValueError` if the histogram is empty.
 
             >>> H(6).variance()
@@ -1940,32 +2057,440 @@ class H(Mapping[_T_co, int], Iterable[_T_co]):  # type: ignore[type-var] # ty: i
         return _order_stat_at_pos
 
 
-@nobeartype  # not decoratable by beartype (avoids warning)
-@runtime_checkable
-class HableT(Protocol[_T_co]):
+class HableOpsMixin(HableT[_T_co]):
     r"""
-    A protocol whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
-    Currently, no class implements this protocol, but this affords an integration point for.
+    An abstract mixin that provides [`H`][dyce.H] math operators to its subclasses.
 
-    !!! info
-
-        The intended pronunciation of `Hable` is *AYCH-uh-BUL*[^1] (i.e., [`H`][dyce.H]-able).
-        Yes, that is a clumsy attempt at [verbing](https://www.gocomics.com/calvinandhobbes/1993/01/25).
-        (You could *totally* [`H`][dyce.H] that, dude!)
-        However, if you prefer something else (e.g. *HAY-bul* or *AYCH-AY-bul*), no one is going to judge you.
-        (Well, they *might*, but they *shouldn’t*.)
-        We all know what you mean.
-
-    [^1]:
-
-        World Book Online (WBO) style [pronunciation respelling](https://en.wikipedia.org/wiki/Pronunciation_respelling_for_English#Traditional_respelling_systems).
+    Each operator delegates to the [`H`][dyce.H] object returned by subclass-defined [`h()`][dyce.HableT.h].
     """
 
     __slots__ = ()
 
-    @abstractmethod
-    def h(self: "HableT[_T]") -> H[_T]:
-        r"""Express its implementer as an [`H` object][dyce.H]."""
+    # ---- Forward operators -----------------------------------------------------------
+
+    @overload
+    def __add__(
+        self: "HableOpsMixin[ot.CanAdd[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __add__(
+        self: "HableOpsMixin[ot.CanAdd[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __add__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanAdd[_T, _ResultT]] | HableOpsMixin[ot.CanAdd[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __add__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanAdd[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __add__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __sub__(
+        self: "HableOpsMixin[ot.CanSub[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __sub__(
+        self: "HableOpsMixin[ot.CanSub[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __sub__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanSub[_T, _ResultT]] | HableOpsMixin[ot.CanSub[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __sub__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanSub[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __sub__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __mul__(
+        self: "HableOpsMixin[ot.CanMul[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mul__(
+        self: "HableOpsMixin[ot.CanMul[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mul__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanMul[_T, _ResultT]] | HableOpsMixin[ot.CanMul[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mul__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanMul[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __mul__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __truediv__(
+        self: "HableOpsMixin[ot.CanTruediv[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __truediv__(
+        self: "HableOpsMixin[ot.CanTruediv[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __truediv__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanTruediv[_T, _ResultT]] | HableOpsMixin[ot.CanTruediv[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __truediv__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanTruediv[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __truediv__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __floordiv__(
+        self: "HableOpsMixin[ot.CanFloordiv[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __floordiv__(
+        self: "HableOpsMixin[ot.CanFloordiv[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __floordiv__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanFloordiv[_T, _ResultT]] | HableOpsMixin[ot.CanFloordiv[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __floordiv__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanFloordiv[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __floordiv__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __mod__(
+        self: "HableOpsMixin[ot.CanMod[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mod__(
+        self: "HableOpsMixin[ot.CanMod[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mod__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanMod[_T, _ResultT]] | HableOpsMixin[ot.CanMod[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __mod__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanMod[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __mod__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __pow__(
+        self: "HableOpsMixin[ot.CanPow2[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __pow__(
+        self: "HableOpsMixin[ot.CanPow2[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __pow__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanPow2[_T, _ResultT]] | HableOpsMixin[ot.CanPow2[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __pow__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanPow2[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __pow__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __lshift__(
+        self: "HableOpsMixin[ot.CanLshift[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __lshift__(
+        self: "HableOpsMixin[ot.CanLshift[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __lshift__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanLshift[_T, _ResultT]] | HableOpsMixin[ot.CanLshift[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __lshift__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanLshift[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __lshift__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __rshift__(
+        self: "HableOpsMixin[ot.CanRshift[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rshift__(
+        self: "HableOpsMixin[ot.CanRshift[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rshift__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanRshift[_T, _ResultT]] | HableOpsMixin[ot.CanRshift[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rshift__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanRshift[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rshift__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __and__(
+        self: "HableOpsMixin[ot.CanAnd[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __and__(
+        self: "HableOpsMixin[ot.CanAnd[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __and__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanAnd[_T, _ResultT]] | HableOpsMixin[ot.CanAnd[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __and__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanAnd[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __and__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __or__(
+        self: "HableOpsMixin[ot.CanOr[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __or__(
+        self: "HableOpsMixin[ot.CanOr[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __or__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanOr[_T, _ResultT]] | HableOpsMixin[ot.CanOr[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __or__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanOr[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __or__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    @overload
+    def __xor__(
+        self: "HableOpsMixin[ot.CanXor[_OtherT, _ResultT]]",
+        rhs: "H[_OtherT] | HableOpsMixin[_OtherT]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __xor__(
+        self: "HableOpsMixin[ot.CanXor[_OtherT, _ResultT]]", rhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __xor__(
+        self: "HableOpsMixin[_T]",
+        rhs: "H[ot.CanXor[_T, _ResultT]] | HableOpsMixin[ot.CanXor[_T, _ResultT]]",
+    ) -> H[_ResultT]: ...
+    @overload
+    def __xor__(
+        self: "HableOpsMixin[_T]", rhs: ot.CanXor[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __xor__(self, rhs: object) -> H[object]:
+        if _should_defer_hable_operator(rhs):
+            return NotImplemented
+        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[no-any-return,operator] # zuban: ignore[call-overload]
+
+    # ---- Reflected operators ---------------------------------------------------------
+
+    @overload
+    def __radd__(
+        self: "HableOpsMixin[ot.CanRAdd[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __radd__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRAdd[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __radd__(self, lhs: object) -> H[object]:
+        return self.h().__radd__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rsub__(
+        self: "HableOpsMixin[ot.CanRSub[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rsub__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRSub[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rsub__(self, lhs: object) -> H[object]:
+        return self.h().__rsub__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rmul__(
+        self: "HableOpsMixin[ot.CanRMul[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rmul__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRMul[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rmul__(self, lhs: object) -> H[object]:
+        return self.h().__rmul__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rtruediv__(
+        self: "HableOpsMixin[ot.CanRTruediv[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rtruediv__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRTruediv[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rtruediv__(self, lhs: object) -> H[object]:
+        return self.h().__rtruediv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rfloordiv__(
+        self: "HableOpsMixin[ot.CanRFloordiv[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rfloordiv__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRFloordiv[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rfloordiv__(self, lhs: object) -> H[object]:
+        return self.h().__rfloordiv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rmod__(
+        self: "HableOpsMixin[ot.CanRMod[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rmod__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRMod[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rmod__(self, lhs: object) -> H[object]:
+        return self.h().__rmod__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rpow__(
+        self: "HableOpsMixin[ot.CanRPow[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rpow__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRPow[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rpow__(self, lhs: object) -> H[object]:
+        return self.h().__rpow__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rlshift__(
+        self: "HableOpsMixin[ot.CanRLshift[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rlshift__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRLshift[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rlshift__(self, lhs: object) -> H[object]:
+        return self.h().__rlshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rrshift__(
+        self: "HableOpsMixin[ot.CanRRshift[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rrshift__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRRshift[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rrshift__(self, lhs: object) -> H[object]:
+        return self.h().__rrshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rand__(
+        self: "HableOpsMixin[ot.CanRAnd[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rand__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRAnd[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rand__(self, lhs: object) -> H[object]:
+        return self.h().__rand__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __ror__(
+        self: "HableOpsMixin[ot.CanROr[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __ror__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanROr[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __ror__(self, lhs: object) -> H[object]:
+        return self.h().__ror__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    @overload
+    def __rxor__(
+        self: "HableOpsMixin[ot.CanRXor[_OtherT, _ResultT]]", lhs: _OtherT
+    ) -> H[_ResultT]: ...
+    @overload
+    def __rxor__(
+        self: "HableOpsMixin[_T]", lhs: ot.CanRXor[_T, _ResultT]
+    ) -> H[_ResultT]: ...
+    def __rxor__(self, lhs: object) -> H[object]:
+        return self.h().__rxor__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+
+    # ---- Unary operators -------------------------------------------------------------
+
+    def __neg__(self: "HableOpsMixin[ot.CanNeg[_ResultT]]") -> H[_ResultT]:
+        return self.h().__neg__()
+
+    def __pos__(self: "HableOpsMixin[ot.CanPos[_ResultT]]") -> H[_ResultT]:
+        return self.h().__pos__()
+
+    def __abs__(self: "HableOpsMixin[ot.CanAbs[_ResultT]]") -> H[_ResultT]:
+        return self.h().__abs__()
+
+    def __invert__(self: "HableOpsMixin[ot.CanInvert[_ResultT]]") -> H[_ResultT]:
+        return self.h().__invert__()
 
 
 # ---- Helpers -------------------------------------------------------------------------
@@ -1981,7 +2506,7 @@ def aggregate_weighted(
     weighted_sources: Iterable[tuple[Any, int]],
 ) -> H[Any]:
     r"""
-    Aggregate *weighted_sources* into an [`H`][dyce.H] object.
+    Aggregates *weighted_sources* into an [`H`][dyce.H] object.
 
     Each element of *weighted_sources* is a two-tuple of either an `(outcome, count)` pair or an `(H, count)` pair.
     When a source is an [`H`][dyce.H], its total takes on the weight of *count*.
@@ -2033,19 +2558,68 @@ def aggregate_weighted(
     return H.from_counts(outcome_counts, preserve_zero_counts=True)
 
 
-def sum_h(hs: Iterable[H[_T]]) -> H[_T]:
+@experimental
+@contextmanager
+# The type of the return of the undecorated function is Generator, but after the
+# @contextmanager decorator is applied, it's AbstractContextManager. By refusing to
+# commit, we don't confuse beartype who will otherwise complain because
+# issubclass(AbstractContextManager, Generator) is False. I'm not quite sure why
+# beartype is confused because
+# https://github.com/python/typeshed/blob/main/stdlib/contextlib.pyi provides a hint
+# that the contextmanager-wrapped function should return a Callable[_P,
+# _GeneratorContextManager[_T_co]].
+def quantize_hs(
+    *,
+    bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH,
+    preserve_zero_counts: bool = True,
+) -> Any:  # ruff: ignore[any-type]
+    r"""
+    Context manager to quantize [`H`][dyce.H] counts to a maximal bit width on construction.
+
+    If nested, the innermost context controls.
+
+        >>> from dyce import H, quantize_hs
+        >>> from dyce.d import d20
+        >>> h20d20_full = 20 @ d20
+        >>> h20d20_full
+        H({20: 1, 21: 20, 22: 210, ..., 200: 1496580006525694242666523, ..., 398: 210, 399: 20, 400: 1})
+        >>> with quantize_hs(bit_width=16):
+        ...     h20d20_16bit = 20 @ d20
+        >>> h20d20_16bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 39947, 200: 40565, 201: 41131, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     h20d20_8bit = 20 @ d20
+        >>> h20d20_8bit
+        H({20: 0, 21: 0, 22: 0, ..., 199: 156, 200: 158, 201: 161, ..., 398: 0, 399: 0, 400: 0})
+        >>> with quantize_hs(bit_width=8):
+        ...     with quantize_hs(bit_width=16):
+        ...         assert 20 @ d20 == h20d20_16bit
+        ...     assert 20 @ d20 == h20d20_8bit
+    """
+    token = _quantize_ctxt.set(
+        _QuantizeContext(bit_width=bit_width, preserve_zero_counts=preserve_zero_counts)
+    )
+    try:
+        yield
+    finally:
+        _quantize_ctxt.reset(token)
+
+
+def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
     r"""
     Sums zero or more histograms, returning `H({})` for an empty iterable.
-    This ensures callers never have to special-case the empty collection.
 
-    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools like those produced by `P.h()` are convolved efficiently.
+    This ensures callers never have to special-case the empty collection.
+    Outcomes must support addition with outcomes of the same type and produce that same type.
+
+    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools are convolved efficiently when flattened by `P.h()`.
     """
-    result: H[_T] | None = None
+    result: H[_CanAddSameT] | None = None
     for h, group in groupby(hs):
         n = sum(1 for _ in group)
-        batch = h @ n if n > 1 else h  # pyright: ignore[reportOperatorIssue] # ty: ignore[unsupported-operator] # zuban: ignore[operator]
+        batch = h @ n if n > 1 else h
         result = batch if result is None else result + batch  # type: ignore[operator]
-    return cast("H[_T]", H({})) if result is None else result
+    return cast("H[_CanAddSameT]", H({})) if result is None else result
 
 
 class _ConvolveFallbackWarning(UserWarning):
@@ -2060,9 +2634,7 @@ def _apply_opname(
     rop_name: str,
     r_val: object,
 ) -> object:
-    r"""
-    Try `l_val.op_name(r_val)`; if `NotImplemented`, try `r_val.rop_name(l_val)`.
-    """
+    r"""Try `l_val.op_name(r_val)`; if `NotImplemented`, try `r_val.rop_name(l_val)`."""
     op = getattr(l_val, op_name, None)
     result = op(r_val) if op is not None else NotImplemented
     if result is NotImplemented:
@@ -2072,11 +2644,11 @@ def _apply_opname(
 
 
 def _convolve(
-    mapping: Mapping[_ConvolvableT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_ConvolvableT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     r"""
-    Sum *n* independent copies of *mapping* (*n*-fold additive convolution).
+    Sums *n* independent copies of *mapping* (*n*-fold additive convolution).
 
     Tries `#!math O\left( \log n \right)` exponentiation by squaring first, falling back to the `#!math O\left( n \right)` linear approach if squaring fails.
     (Some outcome types may only support addition with the original outcome type, not with evolved sums.)
@@ -2097,14 +2669,14 @@ def _convolve(
 
 
 def _convolve_fast(
-    mapping: Mapping[_ConvolvableT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_ConvolvableT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     #     mapping: Mapping[Any, int],
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Compute n-fold additive convolution in `#!math O\left( \log n \right)` steps.
+    Computes n-fold additive convolution in `#!math O\left( \log n \right)` steps.
 
     This is the classic "exponentiation by squaring" algorithm, generalized from multiplication to any associative binary operation.
     Additive convolution of histograms is associative, so it qualifies.
@@ -2154,9 +2726,9 @@ def _convolve_fast(
 
 
 def _convolve_linear(
-    mapping: Mapping[_ConvolvableT, int],
+    mapping: Mapping[_CanAddSameT, int],
     n: int,
-) -> dict[_ConvolvableT, int] | NotImplementedType:
+) -> dict[_CanAddSameT, int] | NotImplementedType:
     #     mapping: Mapping[Any, int],
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
@@ -2178,15 +2750,13 @@ def _convolve_linear(
 
 def _flatten_to_h(rhs: object) -> object:
     r"""
-    If *rhs* is an `HableT` but not already an `H`, coerce it to `H` via `.h()`.
-    Otherwise return *rhs* unchanged.
+    Coerces *rhs* it to [`H`][dyce.H] via [`.h()`][dyce.HableT.h] is an [`HableOpsMixin`][dyce.HableOpsMixin].
+    Otherwise returns *rhs* unchanged.
 
     Used in forward binary operators so that `H(…) + P(…)` is treated as `H(…) + P(…).h()` rather than using `P` as a scalar outcome.
-    Also imported by [`dyce.hable`][dyce.hable] for use in [`HableOpsMixin`][dyce.HableOpsMixin] forward operators.
+    Also used by [`HableOpsMixin`][dyce.HableOpsMixin] forward operators.
     """
-    if isinstance(rhs, H):
-        return rhs
-    if isinstance(rhs, HableT):
+    if isinstance(rhs, HableOpsMixin):
         return rhs.h()
     return rhs
 
@@ -2197,7 +2767,7 @@ def _h_binary_callable(
     func: Callable[[Any, Any], Any],
 ) -> "dict[Any, int] | NotImplementedType":
     r"""
-    Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulate `lhs_count * rhs_count`.
+    Computes and returns the Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulates `lhs_count * rhs_count`.
     Returns `NotImplemented` immediately if *func* does.
     """
     result: dict[Any, int] = {}
@@ -2215,7 +2785,7 @@ def _h_unary_opname(
     mapping: Mapping[Any, int],
     op_name: str,
 ) -> dict[Any, int] | NotImplementedType:
-    r"""Apply a unary op to each outcome key, preserving counts."""
+    r"""Applis a unary op to each outcome key, preserving counts."""
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
         op_fn = getattr(outcome, op_name, None)
@@ -2230,7 +2800,7 @@ def _map_opname_fwd(
     mapping: Mapping[Any, int], op_name: str, rop_name: str, scalar: object
 ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Forward op with scalar rhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    Applies [`_apply_opname`][dyce.h._apply_opname] as a forward operator across all outcome keys.
     """
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
@@ -2248,7 +2818,7 @@ def _map_opname_ref(
     scalar: object,
 ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Reflected op with scalar lhs: apply [`_apply_opname`][dyce.h._apply_opname] across all outcome keys.
+    Applies [`_apply_opname`][dyce.h._apply_opname] as a reflected operator across all outcome keys.
     """
     result: dict[Any, int] = {}
     for outcome, count in mapping.items():
@@ -2281,3 +2851,13 @@ def _quantize_counts(
         )
         or preserve_zero_counts
     }
+
+
+def _should_defer_hable_operator(rhs: object) -> bool:
+    r"""
+    Returns whether an eager histogram operator should defer to *rhs*.
+
+    [`H`][dyce.H] and [`HableOpsMixin`][dyce.HableOpsMixin] operands participate in eager histogram operations.
+    Other [`HableT`][dyce.HableT] implementations own their expression structure and receive control through their reflected operator.
+    """
+    return isinstance(rhs, HableT) and not isinstance(rhs, (H, HableOpsMixin))

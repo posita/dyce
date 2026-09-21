@@ -58,38 +58,12 @@ all : \
 	snippets/plotly_viz_plot_line_at_most.html \
 	snippets/plotly_viz_plot_ridge.html
 
-# \
-# 	assets/graph_classes_dyce_r_dark.svg \
-# 	assets/graph_classes_dyce_r_light.svg \
-# 	assets/graph_filter_dark.svg \
-# 	assets/graph_filter_light.svg \
-# 	assets/graph_rollin_value_dark.svg \
-# 	assets/graph_rollin_value_light.svg \
-# 	assets/graph_rollin_expr_dark.svg \
-# 	assets/graph_rollin_expr_light.svg \
-# 	assets/graph_rollin_pool_dark.svg \
-# 	assets/graph_rollin_pool_light.svg \
-# 	assets/graph_rollin_select_1_dark.svg \
-# 	assets/graph_rollin_select_1_light.svg \
-# 	assets/graph_rollin_select_2_dark.svg \
-# 	assets/graph_rollin_select_2_light.svg \
-# 	assets/graph_substitute_append_dark.svg \
-# 	assets/graph_substitute_append_light.svg \
-# 	assets/graph_substitute_replace_dark.svg \
-# 	assets/graph_substitute_replace_light.svg
-
 perf : \
 	assets/perf_expand.txt \
 	assets/perf_rolls_with_counts.txt
 
 # \
  # 	assets/perf_pools_vs_rollers.txt
-
-# assets/graph_%_dark.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py ../dyce/*/*.py
-# 	"$${PYTHON:-python3}" assets/graph.py --style=dark $*
-
-# assets/graph_%_light.svg : assets/graph_%.py assets/Makefile assets/graph.py ../dyce/*.py ../dyce/*/*.py
-# 	"$${PYTHON:-python3}" assets/graph.py --style=light $*
 
 assets/plot_risus_first_round_dark.svg \
 assets/plot_risus_multi_round_standard_dark.svg \

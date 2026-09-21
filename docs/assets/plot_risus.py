@@ -23,7 +23,7 @@ from dyce import H
 from dyce.d import d6
 from dyce.lifecycle import ExperimentalWarning
 
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.simplefilter("ignore", ExperimentalWarning)
 
 VersusFuncT = Callable[[int, int], H["Versus"]]
 
@@ -107,7 +107,7 @@ def vs_scenarios_dataframes(  # type: ignore[no-redef]
     their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
-    h_vs: H[Versus] = H(Versus)  # ty: ignore[invalid-assignment]
+    h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
@@ -323,7 +323,7 @@ def single_round_goliath(
 
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
+        HResult(h=H(Versus), outcome=Versus.DRAW),
         our_pool_size=1,
         their_pool_size=2,
     )
@@ -331,7 +331,7 @@ assert (
 )
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
+        HResult(h=H(Versus), outcome=Versus.DRAW),
         our_pool_size=2,
         their_pool_size=1,
     )
@@ -339,7 +339,7 @@ assert (
 )
 assert (
     single_round_goliath(
-        HResult(h=H(Versus), outcome=Versus.DRAW),  # ty: ignore[invalid-argument-type]
+        HResult(h=H(Versus), outcome=Versus.DRAW),
         our_pool_size=2,
         their_pool_size=2,
     )
@@ -359,8 +359,8 @@ def best_of_set_single_round_us_vs_them(
     *,
     with_goliath_rule: bool,
 ) -> H[Versus]:
-    our_best = (our_pool_size @ P(6)).h(-1)
-    their_best = (their_pool_size @ P(6)).h(-1)
+    our_best = (our_pool_size @ P(6)).at(-1)
+    their_best = (their_pool_size @ P(6)).at(-1)
     raw_result = our_best.apply(Versus.raw_vs, their_best)
 
     return (

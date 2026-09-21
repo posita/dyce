@@ -33,6 +33,7 @@ from .types import natural_key, nobeartype
 __all__ = ("HResult", "PResult", "TruncationWarning", "expand", "explode_n")
 
 _T = TypeVar("_T")
+_T_co = TypeVar("_T_co", covariant=True)
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 _T3 = TypeVar("_T3")
@@ -46,22 +47,22 @@ class TruncationWarning(UserWarning):
     """
 
 
-class HResult(NamedTuple, Generic[_T]):
+class HResult(NamedTuple, Generic[_T_co]):
     r"""
     Container passed to an [`expand`][dyce.expand] callback when the corresponding source is an [`H`][dyce.H] object.
     """
 
-    h: H[_T]
-    outcome: _T
+    h: H[_T_co]
+    outcome: _T_co
 
 
-class PResult(NamedTuple, Generic[_T]):
+class PResult(NamedTuple, Generic[_T_co]):
     r"""
     Container passed to an [`expand`][dyce.expand] callback when the corresponding source is a [`P`][dyce.P] object.
     """
 
-    p: P[_T]
-    roll: tuple[_T, ...]
+    p: P[_T_co]
+    roll: tuple[_T_co, ...]
 
 
 class _ExpandContext(NamedTuple):
@@ -244,9 +245,9 @@ def expand(  # ruff: ignore[complex-structure]
 
         `expand` is experimental; its interface may change or it may be removed in a future release.
 
-    Evaluate *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
+    Evaluates *callback* over the Cartesian product of all *sources*, accumulating the results into an [`H`][dyce.H] object.
 
-    For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument pe [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
+    For each combination of outcomes drawn from *sources*, *callback* is called with one positional [`HResult`][dyce.HResult] or [`PResult`][dyce.PResult] argument per [`H`][dyce.H] or [`P`][dyce.P] source, respectively, plus any provided keyword arguments.
     The return value controls how the branch contributes to the accumulation:
 
     - **Scalar** - The outcome is recorded directly.
@@ -400,14 +401,14 @@ def expand(  # ruff: ignore[complex-structure]
         >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
         H({0: 71, 1: 38, 2: 11})
     """
-    # TODO(posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
+    # TODO(@posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
     # and document them above
     if not sources:
         raise ValueError("expand requires at least one source")
     try:
         cur_ctxt = _expand_ctxt.get()
     except LookupError:
-        # TODO(posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
+        # TODO(@posita): <https://github.com/astral-sh/ty/issues/2278> - Try the
         # @experimental decorator instead once that issue is fixed
         warnings.warn(experimental_msg % "expand", ExperimentalWarning, stacklevel=2)
         # We're at the top level, so create a new context
@@ -530,6 +531,7 @@ def explode_n(
        -- END MONKEY PATCH -->
 
     Convenience wrapper around [`expand`][dyce.expand] for exploding dice.
+
     *resolver* can return either a histogram to indicate the next die to be rolled and accumulated (up to *n* times) or an outcome.
     The default *resolver* explodes on the maximum face.
 
@@ -543,10 +545,10 @@ def explode_n(
         >>> import sympy
         >>> x = sympy.sympify("x")
         >>> # Zero explosions is the starting roll
-        >>> explode_n(H({x: 1}), n=0)  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
+        >>> explode_n(H({x: 1}), n=0)  # pyright: ignore[reportArgumentType]
         H({x: 1})
         >>> # Starting roll with up to two explosions
-        >>> explode_n(H({x: 1}), n=2)  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
+        >>> explode_n(H({x: 1}), n=2)  # pyright: ignore[reportArgumentType]
         H({3*x: 1})
 
     *precision* is forwarded to the outermost [`expand`][dyce.expand] call.
@@ -567,13 +569,10 @@ def explode_n(
         >>> caught and all(w.category is TruncationWarning for w in caught)
         True
 
-        >>> from typing import TypeVar
-        >>> T = TypeVar("T")
-
         >>> def explode_on_even_resolver(
-        ...     result: HResult[T], n_left: int, n_done: int
-        ... ) -> H[T] | T:
-        ...     return result.h if result.outcome % 2 == 0 else result.outcome  # type: ignore[operator] # ty: ignore[unsupported-operator]
+        ...     result: HResult[int], n_left: int, n_done: int
+        ... ) -> H[int] | int:
+        ...     return result.h if result.outcome % 2 == 0 else result.outcome
 
         >>> with warnings.catch_warnings(record=True) as caught:
         ...     warnings.simplefilter("always", TruncationWarning)
@@ -602,9 +601,7 @@ def explode_n(
             )
         return next_h_or_outcome
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=ExperimentalWarning)
-        return expand(_callback, source, n_left=n, precision=precision)
+    return expand(_callback, source, n_left=n, precision=precision)
 
 
 # ---- Helpers -------------------------------------------------------------------------

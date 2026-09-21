@@ -13,7 +13,7 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-# TODO(posita): <https://github.com/ionelmc/pytest-benchmark/issues/212>
+# TODO(@posita): <https://github.com/ionelmc/pytest-benchmark/issues/212>
 
 from collections.abc import Callable
 from typing import ParamSpec, TypeVar

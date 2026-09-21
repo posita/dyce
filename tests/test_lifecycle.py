@@ -17,7 +17,7 @@ import warnings
 
 import pytest
 
-from dyce.lifecycle import experimental
+from dyce.lifecycle import ExperimentalWarning, experimental
 
 __all__ = ()
 
@@ -71,3 +71,21 @@ class TestExperimental:
 
         with pytest.warns(UserWarning, match=r"fn"):
             _fn()
+
+    def test_suppresses_nested_experimental_warnings(self) -> None:
+        @experimental
+        def _inner() -> None:
+            pass
+
+        @experimental
+        def _outer() -> None:
+            _inner()
+            warnings.warn("manual nested warning", ExperimentalWarning, stacklevel=2)
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            _outer()
+
+        assert len(caught) == 1
+        assert caught[0].category is ExperimentalWarning
+        assert "_outer" in str(caught[0].message)

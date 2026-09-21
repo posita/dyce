@@ -23,14 +23,15 @@ import warnings
 from collections import defaultdict
 from collections.abc import Iterable
 from decimal import Decimal
+from enum import IntEnum
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Never, SupportsFloat, assert_type
 from unittest.mock import patch
 
 import pytest
 
-from dyce import H, TruncationWarning, explode_n
+from dyce import H, HableOpsMixin, P, TruncationWarning, explode_n
 from dyce.h import (
     _convolve_fast,
     _convolve_linear,
@@ -128,7 +129,7 @@ class TestHInit:
             "natural_key",
             side_effect=h_module.natural_key,  # type: ignore[attr-defined]
         ) as mock:
-            # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+            # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
             # ignore comments
             h_of_hs = H((H(1), H(2), H(3), H(4))) ** 2  # type: ignore[operator]
             mock.assert_called()
@@ -257,6 +258,33 @@ class TestHMapping:
 
 
 class TestHMatmul:
+    def test_convolution_outcome_type_inference(self) -> None:
+        class IntOutcome(IntEnum):
+            ONE = 1
+
+        decimal_h = H({Decimal("1.0"): 1})
+        fraction_h = H({Fraction(1, 2): 1})
+        int_outcome_h = H({IntOutcome.ONE: 1})
+
+        assert_type(decimal_h @ 3, H[Decimal])
+        assert_type(3 @ decimal_h, H[Decimal])
+        assert_type(fraction_h @ 3, H[Fraction])
+        assert_type(3 @ fraction_h, H[Fraction])
+        assert_type(int_outcome_h @ 3, H[int])
+        assert_type(3 @ int_outcome_h, H[int])
+
+    def test_zero(self) -> None:
+        result = H({1: 1, 2: 1}) @ 0
+        assert result == H({})
+
+    def test_one(self) -> None:
+        result = H({1: 1, 2: 1}) @ 1
+        assert result == H({1: 1, 2: 1})
+
+    def test_two(self) -> None:
+        result = H({1: 1, 2: 1}) @ 2
+        assert result == H({2: 1, 3: 2, 4: 1})
+
     def test_fwd(self) -> None:
         # 3-fold convolution of {1:1, 2:1} (fair d2)
         result = H({1: 1, 2: 1}) @ 3
@@ -271,32 +299,56 @@ class TestHMatmul:
         h = H({1: 1, 2: 1})
         assert h @ 3 == 3 @ h
 
-    def test_zero(self) -> None:
-        result = H({1: 1, 2: 1}) @ 0
-        assert result == H({})
-
-    def test_one(self) -> None:
-        result = H({1: 1, 2: 1}) @ 1
-        assert result == H({1: 1, 2: 1})
-
-    def test_two(self) -> None:
-        result = H({1: 1, 2: 1}) @ 2
-        assert result == H({2: 1, 3: 2, 4: 1})
-
-    def test_lossless_float_rhs(self) -> None:
+    def test_lossless_float(self) -> None:
         # Integer results only, even with floats
         assert H({1: 1, 2: 1}) @ 3.0 == H({1: 1, 2: 1}) @ 3  # ruff: ignore[float-equality-comparison]
         assert 3.0 @ H({1: 1, 2: 1}) == 3 @ H({1: 1, 2: 1})  # ruff: ignore[float-equality-comparison]
 
-    def test_matmul_negative_rhs(self) -> None:
+    def test_negative(self) -> None:
+        with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
+            _ = H({1: 1}) @ -1
         with pytest.raises(ValueError, match=r"\brequires non-negative operand\b"):
             _ = -1 @ H({1: 1})
 
-    def test_rmatmul_non_int_rhs(self) -> None:
-        result = H({1: 1}).__rmatmul__(1.5)
-        assert result is NotImplemented
+    def test_non_int(self) -> None:
+        assert H({1: 1}).__matmul__(1.5) is NotImplemented
+        assert H({1: 1}).__rmatmul__(1.5) is NotImplemented
+        with pytest.raises(TypeError):
+            _ = H({1: 1}) @ 1.5
         with pytest.raises(TypeError):
             _ = 1.5 @ H({1: 1})
+
+    def test_non_addable_outcomes(self) -> None:
+        # Use catch_warnings directly because pytest.warns will fail if short-circuited
+        # by call to __matmul__ raising BeartypeCallHintViolation when beartype is
+        # enabled
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", category=_ConvolveFallbackWarning)
+            try:
+                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
+                assert result is NotImplemented
+                assert any(
+                    issubclass(w.category, _ConvolveFallbackWarning) for w in caught
+                )
+            except BeartypeCallHintViolation:
+                # beartype pre-check preempts __matmul__ before it can warn or return
+                # NotImplemented
+                pass
+            # Call to __rmatmul__ raises one of BeartypeCallHintViolation and TypeError
+            # (from NotImplemented), depending on whether beartype is enabled
+            with pytest.raises((TypeError, BeartypeCallHintViolation)):
+                _ = 2 @ H({frozenset({"incompatible"}): 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
+
+    def test_hable_ops_mixin_outcome_types(self) -> None:
+        n: int = 2
+        hp = H({P(2): 1})  # zuban: ignore[arg-type]
+
+        assert_type(0 @ hp, H[Never])
+        assert_type(1 @ hp, H[P[int]])  # zuban: ignore[misc]
+        assert_type(n @ hp, H[HableOpsMixin[int] | H[int]])  # zuban: ignore[misc]
+        assert_type(hp @ 0, H[Never])
+        assert_type(hp @ 1, H[P[int]])  # zuban: ignore[misc]
+        assert_type(hp @ n, H[HableOpsMixin[int] | H[int]])  # zuban: ignore[misc]
 
 
 class TestHAdd:
@@ -304,12 +356,12 @@ class TestHAdd:
         result = H({2: 3, 4: 1}) + 10
         assert result == H({12: 3, 14: 1})
 
-        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
         # ignore comments
         frac_int_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1  # type: ignore[operator]
         assert frac_int_result == H({Fraction(3, 2): 2, Fraction(5, 2): 1})
 
-        # TODO(posita): # ruff: ignore[missing-todo-link] - This should not need any
+        # TODO(@posita): # ruff: ignore[missing-todo-link] - This should not need any
         # ignore comments
         frac_float_result = H({Fraction(1, 2): 2, Fraction(3, 2): 1}) + 1.5  # type: ignore[operator]
         assert frac_float_result == H({Fraction(2): 2, Fraction(3): 1})
@@ -330,6 +382,19 @@ class TestHAdd:
         result = H({1: 1, 2: 1, 3: 1}) + H({4: 2, 5: 3})
         assert result == H({5: 2, 6: 5, 7: 5, 8: 3})
 
+        float_result = H({1.0: 1, 2.0: 1}) + H({0.5: 1, 1.5: 1})
+        assert float_result == H({1.5: 1, 2.5: 2, 3.5: 1})
+
+    def test_unsupported_fwd(self) -> None:
+        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
+        with pytest.raises(TypeError):
+            H({3: 1}) + "incompatible"  # type: ignore[operator] # ty: ignore[unsupported-operator]
+
+    def test_unsupported_ref(self) -> None:
+        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
+        with pytest.raises(TypeError):
+            frozenset({"incompatible"}) + H({3: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
+
 
 class TestHSub:
     def test_scalar_fwd(self) -> None:
@@ -341,7 +406,7 @@ class TestHSub:
         assert result == H({7: 1, 6: 2})
 
     def test_histogram(self) -> None:
-        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})  # ty: ignore[unsupported-operator]
+        result = H({1.0: 1, 2.0: 1}) - H({0.5: 1, 1.5: 1})
         # (1.0-0.5)=0.5, (1.0-1.5)=-0.5, (2.0-0.5)=1.5, (2.0-1.5)=0.5
         assert result == H({0.5: 2, -0.5: 1, 1.5: 1})
 
@@ -361,6 +426,18 @@ class TestHMul:
     def test_histogram(self) -> None:
         result = H({2: 1, 3: 1}) * H({4: 1, 5: 1})
         assert result == H({8: 1, 10: 1, 12: 1, 15: 1})
+
+    def test_unsupported_fwd(self) -> None:
+        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
+        assert result is NotImplemented
+        with pytest.raises(TypeError):
+            H({3.0: 1}) * Decimal("3.0")  # type: ignore[operator] # ty: ignore[unsupported-operator]
+
+    def test_unsupported_ref(self) -> None:
+        result = H({3.0: 1}).__rmul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
+        assert result is NotImplemented
+        with pytest.raises(TypeError):
+            Decimal("3.0") * H({3.0: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
 
 class TestHTruediv:
@@ -531,43 +608,6 @@ class TestHUnary:
         # ~1=-2, ~2=-3
         assert result == H({-2: 1, -3: 1})
 
-    def test_matmul_on_non_addable_outcomes(self) -> None:
-        # Use catch_warnings directly because pytest.warns will fail if short-circuited
-        # by call to __matmul__ raising BeartypeCallHintViolation when beartype is
-        # enabled
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always", category=_ConvolveFallbackWarning)
-            try:
-                result = H({frozenset({"incompatible"}): 1}).__matmul__(2)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
-                assert result is NotImplemented
-                assert any(
-                    issubclass(w.category, _ConvolveFallbackWarning) for w in caught
-                )
-            except BeartypeCallHintViolation:
-                # beartype pre-check preempts __matmul__ before it can warn or return
-                # NotImplemented
-                pass
-            # Call to __rmatmul__ raises one of BeartypeCallHintViolation and TypeError
-            # (from NotImplemented), depending on whether beartype is enabled
-            with pytest.raises((TypeError, BeartypeCallHintViolation)):
-                _ = 2 @ H({frozenset({"incompatible"}): 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
-
-    def test_add_unsupported(self) -> None:
-        assert H({3: 1}).__add__("incompatible") is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
-        with pytest.raises(TypeError):
-            H({3: 1}) + "incompatible"  # type: ignore[operator] # ty: ignore[unsupported-operator]
-
-    def test_radd_unsupported(self) -> None:
-        assert H({3: 1}).__radd__(frozenset({"incompatible"})) is NotImplemented  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
-        with pytest.raises(TypeError):
-            frozenset({"incompatible"}) + H({3: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
-
-    def test_mul_unsupported(self) -> None:
-        result = H({3.0: 1}).__mul__(Decimal("3.0"))  # type: ignore[operator,var-annotated] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
-        assert result is NotImplemented
-        with pytest.raises(TypeError):
-            H({3.0: 1}) * Decimal("3.0")  # type: ignore[operator] # ty: ignore[unsupported-operator]
-
 
 @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
 class TestHUnaryWithoutBeartype:
@@ -624,14 +664,14 @@ class TestHUnaryWithBeartype:
 
 
 class TestHTotal:
+    def test_empty(self) -> None:
+        assert H({}).total == 0
+
     def test_sum_of_counts(self) -> None:
         d6_d8 = H(6) + H(8)
         assert d6_d8.total == sum(d6_d8.counts())
         assert d6_d8.total == 48
         assert (d6_d8 + d6_d8).total == 2_304
-
-    def test_empty(self) -> None:
-        assert H({}).total == 0
 
     def test_memoized(self) -> None:
         h = H({1: 2, 2: 3})
@@ -750,14 +790,12 @@ class TestHMean:
 
     def test_mean(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))
+            h: H[SupportsFloat] = 2 @ H(o_type(i) for i in range(10))
             h_mean = h.mean()
             stat_mean = statistics.mean(
-                itertools.chain(
-                    *(  # type: ignore[var-annotated]
-                        itertools.repeat(float(outcome), count)
-                        for outcome, count in h.items()
-                    )
+                itertools.chain.from_iterable(
+                    itertools.repeat(float(outcome), count)
+                    for outcome, count in h.items()
                 )
             )
             assert math.isclose(
@@ -914,14 +952,14 @@ class TestHQuantile:
                 )
 
 
-class TestHQuantize:
-    def test_quantize_empty(self) -> None:
+class TestHQuantizeCounts:
+    def test_empty(self) -> None:
         h = H({})
-        assert h.quantize() is h
+        assert h.quantize_counts() is h
 
-    def test_quantize_nothing_to_do(self) -> None:
+    def test_nothing_to_do(self) -> None:
         h = H(20)
-        assert h.quantize() is h
+        assert h.quantize_counts() is h
 
 
 class TestHRoll:
@@ -941,14 +979,12 @@ class TestHStdev:
 
     def test_stdev(self) -> None:
         for o_type in SAMPLE_OUTCOME_TYPES:
-            h = 2 @ H(o_type(i) for i in range(10))
+            h: H[SupportsFloat] = 2 @ H(o_type(i) for i in range(10))
             h_stdev = h.stdev()
             stat_stdev = statistics.pstdev(
-                itertools.chain(
-                    *(  # type: ignore[var-annotated]
-                        itertools.repeat(float(outcome), count)
-                        for outcome, count in h.items()
-                    )
+                itertools.chain.from_iterable(
+                    itertools.repeat(float(outcome), count)
+                    for outcome, count in h.items()
                 )
             )
             assert math.isclose(
