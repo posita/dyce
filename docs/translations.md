@@ -244,17 +244,13 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 
 [`expand`][dyce.expand] is especially useful where there are multiple independent terms.
 
-```python
---8<-- "docs/assets/plot_ironsworn.py:core"
-```
+    --8<-- "docs/assets/plot_ironsworn.py:core"
 
 By defining our dependent term function to include `mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
 
 Table:
 
-```python
---8<-- "docs/assets/plot_ironsworn.py:table"
-```
+    --8<-- "docs/assets/plot_ironsworn.py:table"
 
 <style type="text/css">
 </style>
@@ -323,9 +319,7 @@ Table:
 
 Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_ironsworn.py:viz"
-```
+    --8<-- "docs/assets/plot_ironsworn.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -336,15 +330,11 @@ Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
-```python
---8<-- "docs/assets/plot_4d6_variants.py:core"
-```
+    --8<-- "docs/assets/plot_4d6_variants.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_4d6_variants.py:viz"
-```
+    --8<-- "docs/assets/plot_4d6_variants.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -369,15 +359,11 @@ Source:
 
 Translation:
 
-```python
---8<-- "docs/assets/plot_burning_arch.py:core"
-```
+    --8<-- "docs/assets/plot_burning_arch.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_burning_arch.py:viz"
-```
+    --8<-- "docs/assets/plot_burning_arch.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -480,9 +466,7 @@ Example 1 source:
 
 Example 1 translation:
 
-```python
---8<-- "docs/assets/plot_great_weapon_fighting.py:core"
-```
+    --8<-- "docs/assets/plot_great_weapon_fighting.py:core"
 
 Example 1 table:
 
@@ -491,9 +475,7 @@ Example 1 table:
   Table source code
 </summary>
 
-```python
---8<-- "docs/assets/plot_great_weapon_fighting.py:table"
-```
+    --8<-- "docs/assets/plot_great_weapon_fighting.py:table"
 </details>
 
 <style type="text/css">
@@ -563,9 +545,7 @@ Example 1 table:
 
 Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_great_weapon_fighting.py:viz"
-```
+    --8<-- "docs/assets/plot_great_weapon_fighting.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -594,15 +574,11 @@ Example 2 source:
 
 Example 2 translation:
 
-```python
---8<-- "docs/assets/plot_advantage.py:core"
-```
+    --8<-- "docs/assets/plot_advantage.py:core"
 
 Example 2 visualization: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_advantage.py:viz"
-```
+    --8<-- "docs/assets/plot_advantage.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -622,9 +598,7 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 
 Translation:
 
-```python
---8<-- "docs/assets/plot_d10_explode.py:core"
-```
+    --8<-- "docs/assets/plot_d10_explode.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
@@ -633,9 +607,7 @@ Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https:
   Visualization source code
 </summary>
 
-```python
---8<-- "docs/assets/plot_d10_explode.py:viz"
-```
+    --8<-- "docs/assets/plot_d10_explode.py:viz"
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
@@ -661,15 +633,11 @@ function: dupes in DICE:s {
 
 Translation:
 
-```python
---8<-- "docs/assets/plot_dupes.py:core"
-```
+    --8<-- "docs/assets/plot_dupes.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_dupes.py:viz"
-```
+    --8<-- "docs/assets/plot_dupes.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -706,9 +674,7 @@ loop N over {K+1..K+8} {
 
 Translation:
 
-```python
---8<-- "docs/assets/plot_roll_and_keep.py:core"
-```
+    --8<-- "docs/assets/plot_roll_and_keep.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
@@ -717,9 +683,7 @@ Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="http
   Visualization source code
 </summary>
 
-```python
---8<-- "docs/assets/plot_roll_and_keep.py:viz"
-```
+    --8<-- "docs/assets/plot_roll_and_keep.py:viz"
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
@@ -840,9 +804,7 @@ Rudimentary visualization using built-in methods:
 We can easily model the first round of its opposed combat system for various starting configurations.
 Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head-to-head contest of values:
 
-```python
---8<-- "docs/assets/plot_risus.py:base"
-```
+    --8<-- "docs/assets/plot_risus.py:base"
 
 !!! note
 
@@ -858,9 +820,7 @@ Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head
 
 Example use for a single round of combat:
 
-```python
---8<-- "docs/assets/plot_risus.py:base-use"
-```
+    --8<-- "docs/assets/plot_risus.py:base-use"
 
 ```linenums="0"
 --8<-- "docs/assets/plot_risus_evens_up_base_use.txt"
@@ -868,25 +828,19 @@ Example use for a single round of combat:
 
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
 
-```python
---8<-- "docs/assets/plot_risus.py:display"
-```
+    --8<-- "docs/assets/plot_risus.py:display"
 
 <details>
 <summary>
   Visualization source code
 </summary>
 
-```python
---8<-- "docs/assets/plot_risus.py:display-detail"
-```
+    --8<-- "docs/assets/plot_risus.py:display-detail"
 </details>
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-first-round"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-first-round"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -899,9 +853,7 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 
 With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerless gloves and even model how various starting conditions affect combat completion (in this case, applying dynamic programming to avoid redundant computations).
 
-```python
---8<-- "docs/assets/plot_risus.py:driver"
-```
+    --8<-- "docs/assets/plot_risus.py:driver"
 
 There’s lot going on there.
 Thankfully, it’s heavily annotated.
@@ -919,9 +871,7 @@ This means we can use it directly with our `vs_scenarios_dataframes` helper to e
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-multi-round-standard"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-multi-round-standard"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -935,38 +885,28 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 Using our `risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://i.4pcdn.org/tg/1366392953060.pdf)* (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
 
 
-```python
---8<-- "docs/assets/plot_risus.py:goliath-rule"
-```
+    --8<-- "docs/assets/plot_risus.py:goliath-rule"
 
-```python
---8<-- "docs/assets/plot_risus.py:vs-best-of-set"
-```
+    --8<-- "docs/assets/plot_risus.py:vs-best-of-set"
 
 Python’s [`functools.partial`](https://docs.python.org/3/library/functools.html#functools.partial) allows us to override individual function details, but still leverage our current callback machinery.
 This pattern will come up again below, so we’ll capture it in a helper function.
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper"
 
 <details>
 <summary>
   Visualization Goliath Rule helper source code
 </summary>
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper-detail"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper-detail"
 </details>
 
 We’ll use that Goliath Rule helper to approximate a complete “Best-of-Set” combat and compare it to a “standard” one.
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-multi-round-best-of-set"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-multi-round-best-of-set"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
@@ -991,9 +931,7 @@ Further, we can observe that every “run” will be zero or more exploding hits
 
 If we choose our values carefully, we can encode how many times we’ve encountered relevant events as we explode.
 
-```python
---8<-- "docs/assets/plot_risus.py:evens-up-base"
-```
+    --8<-- "docs/assets/plot_risus.py:evens-up-base"
 
 ```linenums="0"
 --8<-- "docs/assets/plot_risus_evens_up_base.txt"
@@ -1003,9 +941,7 @@ For every value that is even, we ended in a miss.
 For every value that is odd, we ended in a hit that will need to be tallied.
 Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
-```python
---8<-- "docs/assets/plot_risus.py:evens-up-decode-hits"
-```
+    --8<-- "docs/assets/plot_risus.py:evens-up-decode-hits"
 
 ```linenums="0"
 --8<-- "docs/assets/plot_risus_evens_up_decode_hits.txt"
@@ -1013,17 +949,13 @@ Dividing by two and ignoring any remainder will tell us how many exploding hits 
 
 Now we can craft an “Evens Up” implementation suitable for passing to our `risus_combat_driver`.
 
-```python
---8<-- "docs/assets/plot_risus.py:evens-up"
-```
+    --8<-- "docs/assets/plot_risus.py:evens-up"
 
 We’ll use that to approximate a complete “Evens Up” combat, continuing to leveraging our Goliath Rule helper from above.
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_risus.py:viz-multi-round-evens-up"
-```
+    --8<-- "docs/assets/plot_risus.py:viz-multi-round-evens-up"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>

@@ -729,9 +729,7 @@ For something more sophisticated, [`anydyce`](https://github.com/posita/anydyce/
 
 Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-```python
---8<-- "docs/assets/plot_histogram.py:viz"
-```
+    --8<-- "docs/assets/plot_histogram.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
