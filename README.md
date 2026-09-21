@@ -228,16 +228,11 @@ std |    1.40
 [`dyce.viz.plotly`](https://dycelib.org/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
 [`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
 
-```python
---8<-- "docs/assets/plot_2d6_lo_hi.py:core"
-```
+    --8<-- "docs/assets/plot_2d6_lo_hi.py:core"
 
 Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-
-```python
---8<-- "docs/assets/plot_2d6_lo_hi.py:viz"
-```
+    --8<-- "docs/assets/plot_2d6_lo_hi.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>

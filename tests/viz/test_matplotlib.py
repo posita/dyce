@@ -45,7 +45,7 @@ from dyce.viz.matplotlib import (
 __all__ = ()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # ruff: ignore[pytest-fixture-autouse]
 def _close_figures() -> Generator[None]:
     yield
     plt.close("all")
