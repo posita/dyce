@@ -953,7 +953,7 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         Selectors are resolved against each tuple produced when rolling.
         Invalid indices raise at that time rather than during construction.
         """
-        return _SelectedPoolRoller(self, (which, *more))
+        return _PoolSelectionRoller(self, (which, *more))
 
     def sum(
         self: "Roller[_CanAddSameT]",
@@ -2203,50 +2203,7 @@ class _UnaryRoller(SingleOutcomeRoller[_ResultT]):
         return {"operands": self.operands}
 
 
-class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
-    __slots__ = ("_pool_roller",)
-
-    def __init__(
-        self,
-        pool_roller: Roller[_CanAddSameT],
-    ) -> None:
-        self._pool_roller = pool_roller
-
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self._pool_roller!r})"
-
-    @property
-    def operands(
-        self,
-    ) -> tuple[Roller[object], ...]:
-        return (cast("Roller[object]", self._pool_roller),)
-
-    def metadata(self) -> dict[str, object]:
-        return {"kind": "dyce.pool-sum"}
-
-    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
-        (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
-        expression = operand._format_expression()  # ruff: ignore[private-member-access]
-        return _RollFormat(
-            f"sum({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
-            _CALL_PRECEDENCE,
-            has_result_suffix=True,
-        )
-
-    def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
-        pool_roll = self._pool_roller.roll()
-        outcome = _sum_outcomes(pool_roll.outcomes)
-        return _SingleOutcomeOperandRoll(
-            outcome, self, (cast("Roll[object]", pool_roll),)
-        )
-
-    def _trace_relationships(
-        self,
-    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
-        return {"operands": self.operands}
-
-
-class _SelectedPoolRoller(Roller[_T_co]):
+class _PoolSelectionRoller(Roller[_T_co]):
     __slots__ = ("_parent", "_selectors")
 
     def __init__(
@@ -2295,6 +2252,49 @@ class _SelectedPoolRoller(Roller[_T_co]):
             raise ValueError("no outcomes from an empty selection")
         operands = (cast("Roll[object]", parent_roll),)
         return _OperandRoll(outcomes, self, operands)
+
+    def _trace_relationships(
+        self,
+    ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+        return {"operands": self.operands}
+
+
+class _PoolSumRoller(SingleOutcomeRoller[_CanAddSameT]):
+    __slots__ = ("_pool_roller",)
+
+    def __init__(
+        self,
+        pool_roller: Roller[_CanAddSameT],
+    ) -> None:
+        self._pool_roller = pool_roller
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self._pool_roller!r})"
+
+    @property
+    def operands(
+        self,
+    ) -> tuple[Roller[object], ...]:
+        return (cast("Roller[object]", self._pool_roller),)
+
+    def metadata(self) -> dict[str, object]:
+        return {"kind": "dyce.pool-sum"}
+
+    def _format_roll(self, roll: Roll[object]) -> _RollFormat:
+        (operand,) = cast("_SingleOutcomeOperandRoll[object]", roll).operands
+        expression = operand._format_expression()  # ruff: ignore[private-member-access]
+        return _RollFormat(
+            f"sum({expression.text}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            _CALL_PRECEDENCE,
+            has_result_suffix=True,
+        )
+
+    def _roll(self) -> SingleOutcomeRoll[_CanAddSameT]:
+        pool_roll = self._pool_roller.roll()
+        outcome = _sum_outcomes(pool_roll.outcomes)
+        return _SingleOutcomeOperandRoll(
+            outcome, self, (cast("Roll[object]", pool_roll),)
+        )
 
     def _trace_relationships(
         self,
