@@ -224,7 +224,7 @@ class TestRoller:
         pool = RollerPool(LiteralRoller(1), LiteralRoller(2))
 
         assert repr(pool.select(-1)) == (
-            "_SelectedPoolRoller("
+            "_PoolSelectionRoller("
             "RollerPool(LiteralRoller(1, label=None), "
             "LiteralRoller(2, label=None)), (-1,))"
         )
