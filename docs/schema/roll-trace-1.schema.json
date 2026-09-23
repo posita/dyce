@@ -72,19 +72,11 @@
         }
       ]
     },
-    "one-roller": {
+    "one-child": {
       "type": "object",
-      "required": ["roller"],
+      "required": ["children"],
       "properties": {
-        "roller": {"$ref": "#/$defs/roller-id"}
-      },
-      "additionalProperties": false
-    },
-    "one-operand": {
-      "type": "object",
-      "required": ["operands"],
-      "properties": {
-        "operands": {
+        "children": {
           "type": "array",
           "items": {"$ref": "#/$defs/roller-id"},
           "minItems": 1,
@@ -93,11 +85,11 @@
       },
       "additionalProperties": false
     },
-    "two-operands": {
+    "two-children": {
       "type": "object",
-      "required": ["operands"],
+      "required": ["children"],
       "properties": {
-        "operands": {
+        "children": {
           "type": "array",
           "items": {"$ref": "#/$defs/roller-id"},
           "minItems": 2,
@@ -106,13 +98,14 @@
       },
       "additionalProperties": false
     },
-    "many-operands": {
+    "many-children": {
       "type": "object",
-      "required": ["operands"],
+      "required": ["children"],
       "properties": {
-        "operands": {
+        "children": {
           "type": "array",
-          "items": {"$ref": "#/$defs/roller-id"}
+          "items": {"$ref": "#/$defs/roller-id"},
+          "minItems": 1
         }
       },
       "additionalProperties": false
@@ -128,16 +121,25 @@
       },
       "additionalProperties": false
     },
-    "source-metadata": {
+    "h-attributes": {
       "type": "object",
       "required": ["kind", "label"],
       "properties": {
-        "kind": {"const": "dyce.source"},
+        "kind": {"const": "dyce.h"},
         "label": {"type": "string"}
       },
       "additionalProperties": false
     },
-    "literal-metadata": {
+    "hable-attributes": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"const": "dyce.hable"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "literal-attributes": {
       "type": "object",
       "required": ["kind", "value"],
       "properties": {
@@ -147,16 +149,16 @@
       },
       "additionalProperties": false
     },
-    "pool-source-metadata": {
+    "p-attributes": {
       "type": "object",
       "required": ["kind", "label"],
       "properties": {
-        "kind": {"const": "dyce.pool-source"},
+        "kind": {"const": "dyce.p"},
         "label": {"type": "string"}
       },
       "additionalProperties": false
     },
-    "pool-metadata": {
+    "pool-attributes": {
       "type": "object",
       "required": ["kind"],
       "properties": {
@@ -164,7 +166,7 @@
       },
       "additionalProperties": false
     },
-    "label-metadata": {
+    "label-attributes": {
       "type": "object",
       "required": ["kind", "label"],
       "properties": {
@@ -173,7 +175,7 @@
       },
       "additionalProperties": false
     },
-    "binary-metadata": {
+    "binary-attributes": {
       "type": "object",
       "required": ["kind", "operator"],
       "properties": {
@@ -188,7 +190,7 @@
       },
       "additionalProperties": false
     },
-    "unary-metadata": {
+    "unary-attributes": {
       "type": "object",
       "required": ["kind", "operator"],
       "properties": {
@@ -197,7 +199,7 @@
       },
       "additionalProperties": false
     },
-    "pool-sum-metadata": {
+    "pool-sum-attributes": {
       "type": "object",
       "required": ["kind"],
       "properties": {
@@ -215,7 +217,7 @@
       },
       "additionalProperties": false
     },
-    "pool-selection-metadata": {
+    "pool-selection-attributes": {
       "type": "object",
       "required": ["kind", "selectors"],
       "properties": {
@@ -233,7 +235,7 @@
       },
       "additionalProperties": false
     },
-    "trace-metadata": {
+    "trace-attributes": {
       "type": "object",
       "required": ["kind", "label", "state"],
       "properties": {
@@ -246,7 +248,7 @@
       },
       "additionalProperties": false
     },
-    "custom-metadata": {
+    "custom-attributes": {
       "type": "object",
       "required": ["kind"],
       "properties": {
@@ -262,90 +264,96 @@
       "oneOf": [
         {
           "type": "object",
-          "required": ["metadata"],
-          "properties": {"metadata": {"$ref": "#/$defs/source-metadata"}},
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/h-attributes"}},
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata"],
-          "properties": {"metadata": {"$ref": "#/$defs/literal-metadata"}},
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/hable-attributes"}},
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata"],
-          "properties": {"metadata": {"$ref": "#/$defs/pool-source-metadata"}},
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/literal-attributes"}},
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/p-attributes"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/pool-metadata"},
-            "relationships": {"$ref": "#/$defs/many-operands"}
+            "attributes": {"$ref": "#/$defs/pool-attributes"},
+            "relationships": {"$ref": "#/$defs/many-children"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/label-metadata"},
-            "relationships": {"$ref": "#/$defs/one-roller"}
+            "attributes": {"$ref": "#/$defs/label-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/binary-metadata"},
-            "relationships": {"$ref": "#/$defs/two-operands"}
+            "attributes": {"$ref": "#/$defs/binary-attributes"},
+            "relationships": {"$ref": "#/$defs/two-children"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/unary-metadata"},
-            "relationships": {"$ref": "#/$defs/one-operand"}
+            "attributes": {"$ref": "#/$defs/unary-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/pool-sum-metadata"},
-            "relationships": {"$ref": "#/$defs/one-operand"}
+            "attributes": {"$ref": "#/$defs/pool-sum-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/pool-selection-metadata"},
-            "relationships": {"$ref": "#/$defs/one-operand"}
+            "attributes": {"$ref": "#/$defs/pool-selection-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata", "relationships"],
+          "required": ["attributes", "relationships"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/trace-metadata"},
+            "attributes": {"$ref": "#/$defs/trace-attributes"},
             "relationships": {"$ref": "#/$defs/sources"}
           },
           "additionalProperties": false
         },
         {
           "type": "object",
-          "required": ["metadata"],
+          "required": ["attributes"],
           "properties": {
-            "metadata": {"$ref": "#/$defs/custom-metadata"},
+            "attributes": {"$ref": "#/$defs/custom-attributes"},
             "relationships": {"$ref": "#/$defs/roller-relationships"}
           },
           "additionalProperties": false
