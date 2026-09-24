@@ -1031,7 +1031,7 @@ class TestTrace:
             },
         }
 
-    def test_format_includes_argument_and_result_rolls(self) -> None:
+    def test_format_includes_child_and_derivation_rolls(self) -> None:
         source = LiteralRoller(2) + 3
 
         def increment(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
@@ -1043,22 +1043,23 @@ class TestTrace:
             "increment(2 + 3 => 5) -> 2 + 3 => 5 + 1 => 6 => (6,)"
         )
 
-    def test_callback_called_with_rolls_from_source_rollers_and_state(self) -> None:
+    def test_children_are_rolled_and_passed_to_callback_with_state(self) -> None:
         single = LiteralRoller(3)
         multi = PRoller(P(H({2: 1}), H({4: 1})))
         token = object()
         callback = Mock(return_value=0)
 
-        trace(callback, single, multi, token=token)
+        result = trace(callback, single, multi, token=token)
 
         callback.assert_called_once()
         args, kwargs = callback.call_args
+        assert result.roller.children == (single, multi)
+        assert result.children == args
         assert isinstance(args[0], SingleOutcomeRoll)
-        # TODO(@posita): <https://github.com/zubanls/zuban/issues/561>
-        assert args[0].outcome == 3  # zuban: ignore[comparison-overlap]
-        assert args[0].roller is single  # zuban: ignore[comparison-overlap]
+        assert args[0].outcome == 3
+        assert args[0].roller is single
         assert isinstance(args[1], Roll)
-        assert args[1].outcomes == (2, 4)  # zuban: ignore[comparison-overlap]
+        assert args[1].outcomes == (2, 4)
         assert args[1].roller is multi
         assert kwargs == {"token": token}
 
@@ -1076,8 +1077,7 @@ class TestTrace:
         assert result.outcomes == (4,)
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
         assert rolls["roll1"]["outcome"] == roll.outcome
 
@@ -1095,8 +1095,7 @@ class TestTrace:
         assert result.outcomes == (2, 3)
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
         assert rolls["roll1"]["outcomes"] == list(returned.outcomes)
 
@@ -1112,8 +1111,7 @@ class TestTrace:
         assert result.outcomes == (8,)
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
         assert rolls["roll1"]["outcome"] == 8
 
@@ -1129,8 +1127,7 @@ class TestTrace:
         assert result.outcomes == (2, 3)
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
         assert rolls["roll1"]["outcomes"] == [2, 3]
 
@@ -1148,26 +1145,26 @@ class TestTrace:
         assert result.outcomes == ("hit",)
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": ["roll1"],
-            "result": "roll2",
+            "children": ["roll1"],
+            "derivation": "roll2",
         }
         assert rolls["roll1"]["outcome"] == 3
         assert rolls["roll2"]["outcome"] == "hit"
 
     @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
-    def test_nonroller_source_raises(self) -> None:
+    def test_nonroller_child_raises(self) -> None:
         with pytest.raises(RollError) as caught:
             trace(Mock(), cast("Any", H(6)))
 
         assert isinstance(caught.value.__cause__, TypeError)
-        assert str(caught.value.__cause__) == "trace sources must be rollers"
+        assert str(caught.value.__cause__) == "trace children must be rollers"
 
     @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
-    def test_nonroller_source_triggers_beartype_violation(self) -> None:
+    def test_nonroller_child_triggers_beartype_violation(self) -> None:
         with pytest.raises(BeartypeCallHintViolation):
             trace(Mock(), cast("Any", H(6)))
 
-    def test_trace_separates_argument_from_unrelated_result(self) -> None:
+    def test_trace_separates_child_from_unrelated_derivation(self) -> None:
         def callback(_roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoller[int]:
             return LiteralRoller(3)
 
@@ -1176,13 +1173,13 @@ class TestTrace:
 
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": ["roll1"],
-            "result": "roll2",
+            "children": ["roll1"],
+            "derivation": "roll2",
         }
         assert rolls["roll1"]["outcome"] == 2
         assert rolls["roll2"]["outcome"] == 3
 
-    def test_trace_reuses_id_when_argument_is_result(self) -> None:
+    def test_trace_reuses_id_when_child_is_derivation(self) -> None:
         def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
             return roll
 
@@ -1191,11 +1188,11 @@ class TestTrace:
 
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": ["roll1"],
-            "result": "roll1",
+            "children": ["roll1"],
+            "derivation": "roll1",
         }
 
-    def test_trace_records_argument_reached_through_result(self) -> None:
+    def test_trace_records_child_reached_through_derivation(self) -> None:
         def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
             return 1 + roll
 
@@ -1204,8 +1201,8 @@ class TestTrace:
 
         assert isinstance(rolls, dict)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": ["roll1"],
-            "result": "roll2",
+            "children": ["roll1"],
+            "derivation": "roll2",
         }
         assert rolls["roll2"]["relationships"]["children"] == ["roll3", "roll1"]
         assert rolls["roll3"]["outcome"] == 1
@@ -1238,16 +1235,16 @@ class TestTrace:
 
     def test_state_attributes(self) -> None:
         token = object()
-
-        def callback(*, token: object) -> object:
-            return token
+        callback = Mock(return_value=1)
 
         result = trace(callback, token=token)
 
-        assert result.roller.attributes()["state"] == {"token": token}
+        callback.assert_called_once_with(token=token)
+        assert result.roller.attributes()["state"] == {"token": repr(token)}
         rollers = result.trace()["rollers"]
         assert isinstance(rollers, dict)
-        assert rollers["roller0"]["attributes"]["state"] == {"token": token}
+        assert rollers["roller0"]["attributes"]["state"] == {"token": repr(token)}
+        json.dumps(result.trace())
 
     def test_recursive_callback_with_state(self) -> None:
         def explode(
@@ -1319,7 +1316,7 @@ class TestTrace:
         assert_type(result, Roll[str])  # zuban: ignore[misc]
         assert result.outcomes == ("3a",)
 
-    def test_reroll_can_change_number_of_outcomes_and_records_each_callback_result(
+    def test_reroll_can_change_number_of_outcomes_and_records_each_derivation(
         self,
     ) -> None:
         first_roller = RollerPool(LiteralRoller(2))
@@ -1335,11 +1332,10 @@ class TestTrace:
         rolls = result.trace()["rolls"]
         assert isinstance(rollers, dict)
         assert isinstance(rolls, dict)
-        assert rollers["roller0"]["relationships"]["sources"] == []
+        assert "relationships" not in rollers["roller0"]
         assert result.outcomes == (2,)
         assert rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
         assert rolls["roll1"]["roller"] == "roller1"
         assert rerolled_result.roller is trace_roller
@@ -1348,8 +1344,7 @@ class TestTrace:
         rerolled_rolls = rerolled_trace["rolls"]
         assert isinstance(rerolled_rolls, dict)
         assert rerolled_rolls["roll0"]["relationships"] == {
-            "arguments": [],
-            "result": "roll1",
+            "derivation": "roll1",
         }
 
     @pytest.mark.parametrize(
@@ -2184,14 +2179,14 @@ def _attack(
     ) -> int | SingleOutcomeRoller[int]:
         modified_check_roll = base_check_roll + dc_modifier
 
-        if modified_check_roll.outcome < dc:
-            return 0
-        elif base_check_roll.outcome == 20:
+        if base_check_roll.outcome == 20:
             # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
             return damage + damage + damage_modifier  # zuban: ignore[no-any-return]
-        else:
+        elif modified_check_roll.outcome != 1 and modified_check_roll.outcome >= dc:
             # TODO(@posita): <https://github.com/zubanls/zuban/issues/560>
             return damage + damage_modifier  # zuban: ignore[no-any-return]
+        else:
+            return 0
 
     return trace(
         resolve,
