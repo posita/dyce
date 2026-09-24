@@ -168,7 +168,8 @@ However, if we recognize that our problem involves a [dependent probability](cou
 We can also deploy a counting trick with the two d10s.
 
     >>> from dyce import H, HResult, expand
-    >>> from enum import IntEnum, auto
+    >>> from enum import IntEnum
+    >>> from typing import cast
     >>> d6 = H(6)
     >>> d10 = H(10)
     >>> action_mods = list(range(-1, 4))
@@ -184,7 +185,7 @@ We can also deploy a counting trick with the two d10s.
     >>> iron_distributions_by_action_mod = {
     ...     action_mod: H.from_counts(
     ...         expand(iron_dependent_term, d6 + action_mod),
-    ...         dict.fromkeys(IronResult, 0),
+    ...         cast("dict[int, int]", dict.fromkeys(IronResult, 0)),
     ...         preserve_zero_counts=True,
     ...     )
     ...     for action_mod in action_mods

@@ -60,7 +60,8 @@ try:
             return (self._generator.bit_generator.state,)
 
         def randbytes(self, n: int) -> bytes:
-            return self._generator.bytes(n)
+            # TODO(@posita): <https://github.com/zubanls/zuban/issues/578>
+            return self._generator.bytes(n)  # zuban: ignore[no-any-return]
 
         def random(self) -> float:
             return self._generator.random()
