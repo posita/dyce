@@ -110,17 +110,6 @@
       },
       "additionalProperties": false
     },
-    "sources": {
-      "type": "object",
-      "required": ["sources"],
-      "properties": {
-        "sources": {
-          "type": "array",
-          "items": {"$ref": "#/$defs/roller-id"}
-        }
-      },
-      "additionalProperties": false
-    },
     "h-attributes": {
       "type": "object",
       "required": ["kind", "label"],
@@ -342,10 +331,10 @@
         },
         {
           "type": "object",
-          "required": ["attributes", "relationships"],
+          "required": ["attributes"],
           "properties": {
             "attributes": {"$ref": "#/$defs/trace-attributes"},
-            "relationships": {"$ref": "#/$defs/sources"}
+            "relationships": {"$ref": "#/$defs/many-children"}
           },
           "additionalProperties": false
         },
