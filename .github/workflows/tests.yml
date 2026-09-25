@@ -33,7 +33,7 @@ jobs:
           python-version: ${{ matrix.python }}
           cache-python: true
       - run: uv sync --no-dev --group tox
-      - run: uv run tox -e ${{ matrix.tox-env }}
+      - run: uv run --no-sync tox -e ${{ matrix.tox-env }}
 
   coverage:
     runs-on: ubuntu-latest
@@ -45,8 +45,8 @@ jobs:
         with:
           cache-python: true
       - run: uv sync --no-dev --group test
-      - run: uv run pytest --cov --cov-report=xml
-      - run: uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+      - run: uv run --no-sync pytest --cov --cov-report=xml
+      - run: uv run --no-sync coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
       - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
         with:
           cache-python: true
       - run: uv sync --no-dev --group lint
-      - run: uv run pre-commit run --all-files --hook-stage pre-push
+      - run: uv run --no-sync pre-commit run --all-files --hook-stage pre-push
       - run: git diff --quiet HEAD --  # fails if any tracked files have changed
 
   docs-idempotent:
@@ -74,7 +74,7 @@ jobs:
         with:
           cache-python: true
       - run: uv sync --no-dev --group docs
-      - run: uv run mkdocs build
+      - run: uv run --no-sync mkdocs build
         # Files can be excluded by adding, e.g.
         # ':(exclude)docs/assets/perf_*.txt' to the pathspecs
       - run: git diff --exit-code -- docs/notebooks docs/assets

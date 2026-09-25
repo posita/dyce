@@ -93,6 +93,7 @@ lint = [
     "pre-commit-uv",
     "pyright",
     "pytest",
+    "pytest-benchmark",
     "ruff",
     "ty",
     "zuban",
