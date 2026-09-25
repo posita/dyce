@@ -35,7 +35,7 @@ import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tempfile
 import tomllib
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from functools import partial
 from pathlib import Path
 from types import FrameType
@@ -651,7 +651,7 @@ def _build_parser() -> tuple[
     return p, {"check": check_p, "format": format_p}
 
 
-def _enum_src_files(paths: Iterable[Path], suffixes: frozenset[str]) -> list[Path]:
+def _enum_src_files(paths: Sequence[Path], suffixes: frozenset[str]) -> list[Path]:
     dirs: list[Path] = []
     files: list[Path] = []
     if paths:
