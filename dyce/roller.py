@@ -2230,10 +2230,14 @@ class _PoolSelectionRoller(Roller[_T_co]):
     def _format_roll(self, roll: Roll[object]) -> _RollFormat:
         (child,) = roll.children
         expression = child._format_expression()  # ruff: ignore[private-member-access]
+        parent = (
+            f"({expression.text})"
+            if expression.has_result_suffix or expression.precedence < _CALL_PRECEDENCE
+            else expression.text
+        )
         selectors = ", ".join(repr(selector) for selector in self._selectors)
-        suffix = f", {selectors}" if selectors else ""
         return _RollFormat(
-            f"select({expression.text}{suffix}) => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            f"{parent}[{selectors}] => {roll._format_result()}",  # ruff: ignore[private-member-access]
             _CALL_PRECEDENCE,
             has_result_suffix=True,
         )
