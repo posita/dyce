@@ -524,7 +524,7 @@ class TestPOp:
         p_d10 = P(10)
         p1 = P(H(range(100, 0, -10)))
         # Integer results only, even with truediv
-        assert p_d10 == p1 / 10  # ruff: ignore[float-equality-comparison]
+        assert p_d10 == p1 / 10
         lcm_of_1_to_10 = 2 * 2 * 2 * 3 * 3 * 5 * 7
         assert lcm_of_1_to_10 / p_d10 == H(
             {
