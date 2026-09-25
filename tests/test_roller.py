@@ -2008,6 +2008,7 @@ class TestMixedRollBinaryArithmetic:
         assert roller.lt(existing_roll).format() == "2 [d6] < 4 => True"
 
     def test_format_pool_operations(self) -> None:
+        unlabeled_pool = RollerPool(LiteralRoller(1), LiteralRoller(2))
         pool = RollerPool(
             HRoller(H({2: 1}), label="d6"),
             HRoller(H({1: 1}), label="d6"),
@@ -2018,11 +2019,15 @@ class TestMixedRollBinaryArithmetic:
             "sum(pool((1 [d6], 2 [d6])) => (1, 2)) => 3"
         )
         assert pool.select(-1).roll().format() == (
-            "select(pool((1 [d6], 2 [d6])) => (1, 2), -1) => (2,)"
+            "(pool((1 [d6], 2 [d6])) => (1, 2))[-1] => (2,)"
         )
         assert pool.select(slice(None, None, 2)).roll().format() == (
-            "select(pool((1 [d6], 2 [d6])) => (1, 2), slice(None, None, 2)) => (1,)"
+            "(pool((1 [d6], 2 [d6])) => (1, 2))[slice(None, None, 2)] => (1,)"
         )
+        assert pool.select(-1, 0).roll().format() == (
+            "(pool((1 [d6], 2 [d6])) => (1, 2))[-1, 0] => (2, 1)"
+        )
+        assert unlabeled_pool.select(-1).roll().format() == "(1, 2)[-1] => (2,)"
         assert RollerPool(LiteralRoller(1)).label("pool").roll().format() == (
             "pool((1,)) => (1,)"
         )
