@@ -183,22 +183,22 @@ def plot_bar(
 
     === "Vertical bars (default)"
 
-            --8<-- "docs/assets/plot_viz_plot_bar.py:viz"
+            --8<-- "docs-src/plot_viz_plot_bar.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_bar_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_bar_light.svg">
-            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../assets/plot_viz_plot_bar_light.svg">
+            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_bar_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_bar_light.svg">
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_bar_light.svg">
         </picture>
 
     === "Horizontal bars (`horizontal=True`)"
 
-            --8<-- "docs/assets/plot_viz_plot_hbar.py:viz"
+            --8<-- "docs-src/plot_viz_plot_hbar.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_hbar_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_hbar_light.svg">
-            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../assets/plot_viz_plot_hbar_light.svg">
+            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_hbar_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_hbar_light.svg">
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_hbar_light.svg">
         </picture>
     """
     hs_list = _labeled_hs(hs, labels)
@@ -342,12 +342,12 @@ def plot_burst(
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customize the plot.
 
-        --8<-- "docs/assets/plot_viz_plot_burst.py:viz"
+        --8<-- "docs-src/plot_viz_plot_burst.py:viz"
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_burst_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_burst_light.svg">
-        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_burst_light.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_burst_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_burst_light.svg">
+        <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_burst_light.svg">
     </picture>
     """
     ax = _get_ax(ax)
@@ -438,32 +438,32 @@ def plot_line(
 
     === "`graph_type=GraphType.NORMAL` (default)"
 
-            --8<-- "docs/assets/plot_viz_plot_line.py:viz"
+            --8<-- "docs-src/plot_viz_plot_line.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_light.svg">
+            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_light.svg">
         </picture>
 
     === "`graph_type=GraphType.AT_MOST`"
 
-            --8<-- "docs/assets/plot_viz_plot_line_at_most.py:viz"
+            --8<-- "docs-src/plot_viz_plot_line_at_most.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_most_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_at_most_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_at_most_light.svg">
+            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_most_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_most_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_most_light.svg">
         </picture>
 
     === "`graph_type=GraphType.AT_LEAST`"
 
-            --8<-- "docs/assets/plot_viz_plot_line_at_least.py:viz"
+            --8<-- "docs-src/plot_viz_plot_line_at_least.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_line_at_least_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_line_at_least_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_line_at_least_light.svg">
+            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_least_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_least_light.svg">
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_least_light.svg">
         </picture>
     """
     hs_list = _labeled_hs(hs, labels)
@@ -543,12 +543,12 @@ def plot_ridge(
     If *ax* is `None`, `matplotlib.pyplot.gca()` is used.
     Returns the axes so the caller can further customize the plot.
 
-        --8<-- "docs/assets/plot_viz_plot_ridge.py:viz"
+        --8<-- "docs-src/plot_viz_plot_ridge.py:viz"
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_viz_plot_ridge_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../assets/plot_viz_plot_ridge_light.svg">
-        <img alt="Plot: 2d10 vs. d8 + d12" src="../assets/plot_viz_plot_ridge_light.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_ridge_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_ridge_light.svg">
+        <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_ridge_light.svg">
     </picture>
     """
     hs_list = _labeled_hs(hs, labels)

@@ -80,5 +80,5 @@ jobs:
       - run: uv sync --no-dev --group docs
       - run: uv run --no-sync mkdocs build
         # Files can be excluded by adding, e.g.
-        # ':(exclude)docs/assets/perf_*.txt' to the pathspecs
-      - run: git diff --exit-code -- docs/notebooks docs/assets
+        # ':(exclude)docs-src/perf_*.txt' to the pathspecs
+      - run: git diff --exit-code -- docs/notebooks docs/images docs-src

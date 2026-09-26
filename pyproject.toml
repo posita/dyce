@@ -83,6 +83,7 @@ docs = [
     "plotly",
     "pymdown-extensions",
     "sympy",
+    "zensical",
     {include-group = "viz-mpl"},
 ]
 # Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
@@ -140,9 +141,9 @@ branch = true
 show_missing = true
 
 [tool.mypy]
-files = ["docs", "dyce", "helpers", "tests", "*.py"]
+files = ["docs", "docs-src", "dyce", "helpers", "tests", "*.py"]
 # exclude = """(?x)(
-#     ^docs/assets/nb_.*\\.py$
+#     ^docs-src/nb_.*\\.py$
 # )"""
 exclude_gitignore = true
 python_version = "3.11"
@@ -156,7 +157,7 @@ warn_unreachable = true
 unused-ignore = true
 
 [tool.pyright]
-include = ["docs", "dyce", "helpers", "tests", "*.py"]
+include = ["docs", "docs-src", "dyce", "helpers", "tests", "*.py"]
 pythonVersion = "3.11"
 reportUnnecessaryTypeIgnoreComment = "warning"
 typeCheckingMode = "basic"
@@ -176,14 +177,14 @@ doctest_optionflags = [
   # See also <https://docs.pytest.org/en/stable/how-to/doctest.html#using-doctest-options>
   "NUMBER",
 ]
-testpaths = ["README.md", "docs", "dyce", "helpers", "tests", "*.py"]
+testpaths = ["README.md", "docs", "docs-src", "dyce", "helpers", "tests", "*.py"]
 
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.ruff.lint.per-file-ignores]
-"docs/assets/nb_*.py" = [
+"docs-src/nb_*.py" = [
   # Cells support `await` statements
   "await-outside-async",
   "yield-outside-function",
@@ -197,7 +198,7 @@ docstring-code-line-length = "dynamic"
   # Catch-all for things that are only ignored in these files
   "unused-noqa",
 ]
-"docs/assets/plot_*.py" = [
+"docs-src/plot_*.py" = [
   # Allow co-mingled imports for snippets
   "module-import-not-at-top-of-file",
   # Useful for cell display
@@ -247,13 +248,13 @@ extend-immutable-calls = [
 ]
 
 [tool.ty.src]
-include = ["docs", "dyce", "helpers", "tests", "*.py"]
-exclude = ["docs/assets/nb_*.py"]
+include = ["docs", "docs-src", "dyce", "helpers", "tests", "*.py"]
+exclude = ["docs-src/nb_*.py"]
 
 [tool.zuban]
-files = ["docs", "dyce", "helpers", "tests", "*.py"]
+files = ["docs", "docs-src", "dyce", "helpers", "tests", "*.py"]
 # exclude = """(?x)(
-#     ^docs/assets/nb_.*\\.py$
+#     ^docs-src/nb_.*\\.py$
 # )"""
 exclude_gitignore = true
 python_version = "3.11"

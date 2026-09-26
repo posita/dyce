@@ -245,13 +245,13 @@ The key to mapping that to `dyce` internals is recognizing that we have a depend
 
 [`expand`][dyce.expand] is especially useful where there are multiple independent terms.
 
-    --8<-- "docs/assets/plot_ironsworn.py:core"
+    --8<-- "docs-src/plot_ironsworn.py:core"
 
 By defining our dependent term function to include `mod` as a keyword-only parameter, we can pass values to it via [`expand`][dyce.expand], which is helpful for visualization.
 
 Table:
 
-    --8<-- "docs/assets/plot_ironsworn.py:table"
+    --8<-- "docs-src/plot_ironsworn.py:table"
 
 <style type="text/css">
 </style>
@@ -320,28 +320,28 @@ Table:
 
 Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_ironsworn.py:viz"
+    --8<-- "docs-src/plot_ironsworn.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_ironsworn_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_ironsworn_light.svg">
-  <img alt="Plot: Ironsworn distributions" src="../assets/plot_ironsworn_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_ironsworn_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_ironsworn_light.svg">
+  <img alt="Plot: Ironsworn distributions" src="../images/plot_ironsworn_light.svg">
 </picture>
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
-    --8<-- "docs/assets/plot_4d6_variants.py:core"
+    --8<-- "docs-src/plot_4d6_variants.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_4d6_variants.py:viz"
+    --8<-- "docs-src/plot_4d6_variants.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_4d6_variants_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_4d6_variants_light.svg">
-  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../assets/plot_4d6_variants_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_4d6_variants_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_4d6_variants_light.svg">
+  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../images/plot_4d6_variants_light.svg">
 </picture>
 
 ## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
@@ -360,17 +360,17 @@ Source:
 
 Translation:
 
-    --8<-- "docs/assets/plot_burning_arch.py:core"
+    --8<-- "docs-src/plot_burning_arch.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_burning_arch.py:viz"
+    --8<-- "docs-src/plot_burning_arch.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_burning_arch_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_burning_arch_light.svg">
-  <img alt="Plot: Attack with saving throw for half damage" src="../assets/plot_burning_arch_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_burning_arch_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_burning_arch_light.svg">
+  <img alt="Plot: Attack with saving throw for half damage" src="../images/plot_burning_arch_light.svg">
 </picture>
 
 An alternative using [`expand`][dyce.expand]:
@@ -467,7 +467,7 @@ Example 1 source:
 
 Example 1 translation:
 
-    --8<-- "docs/assets/plot_great_weapon_fighting.py:core"
+    --8<-- "docs-src/plot_great_weapon_fighting.py:core"
 
 Example 1 table:
 
@@ -476,7 +476,7 @@ Example 1 table:
   Table source code
 </summary>
 
-    --8<-- "docs/assets/plot_great_weapon_fighting.py:table"
+    --8<-- "docs-src/plot_great_weapon_fighting.py:table"
 </details>
 
 <style type="text/css">
@@ -546,13 +546,13 @@ Example 1 table:
 
 Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_great_weapon_fighting.py:viz"
+    --8<-- "docs-src/plot_great_weapon_fighting.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_great_weapon_fighting_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_great_weapon_fighting_light.svg">
-  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../assets/plot_great_weapon_fighting_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_great_weapon_fighting_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_great_weapon_fighting_light.svg">
+  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../images/plot_great_weapon_fighting_light.svg">
 </picture>
 
 Example 2 source:
@@ -575,17 +575,17 @@ Example 2 source:
 
 Example 2 translation:
 
-    --8<-- "docs/assets/plot_advantage.py:core"
+    --8<-- "docs-src/plot_advantage.py:core"
 
 Example 2 visualization: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_advantage.py:viz"
+    --8<-- "docs-src/plot_advantage.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_advantage_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_advantage_light.svg">
-  <img alt="Plot: Advantage-weighted attack with critical hits" src="../assets/plot_advantage_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_advantage_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_advantage_light.svg">
+  <img alt="Plot: Advantage-weighted attack with critical hits" src="../images/plot_advantage_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
@@ -599,7 +599,7 @@ output [highest 3 of 10d [explode d10]] named "10k3"
 
 Translation:
 
-    --8<-- "docs/assets/plot_d10_explode.py:core"
+    --8<-- "docs-src/plot_d10_explode.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
@@ -608,14 +608,14 @@ Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https:
   Visualization source code
 </summary>
 
-    --8<-- "docs/assets/plot_d10_explode.py:viz"
+    --8<-- "docs-src/plot_d10_explode.py:viz"
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_d10_explode_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_d10_explode_light.svg">
-  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="../assets/plot_d10_explode_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_d10_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_d10_explode_light.svg">
+  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="../images/plot_d10_explode_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
@@ -634,17 +634,17 @@ function: dupes in DICE:s {
 
 Translation:
 
-    --8<-- "docs/assets/plot_dupes.py:core"
+    --8<-- "docs-src/plot_dupes.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_dupes.py:viz"
+    --8<-- "docs-src/plot_dupes.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_dupes_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_dupes_light.svg">
-  <img alt="Plot: Chances of rolling *n* duplicates" src="../assets/plot_dupes_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_dupes_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_dupes_light.svg">
+  <img alt="Plot: Chances of rolling *n* duplicates" src="../images/plot_dupes_light.svg">
 </picture>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
@@ -675,7 +675,7 @@ loop N over {K+1..K+8} {
 
 Translation:
 
-    --8<-- "docs/assets/plot_roll_and_keep.py:core"
+    --8<-- "docs-src/plot_roll_and_keep.py:core"
 
 Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
@@ -684,14 +684,14 @@ Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="http
   Visualization source code
 </summary>
 
-    --8<-- "docs/assets/plot_roll_and_keep.py:viz"
+    --8<-- "docs-src/plot_roll_and_keep.py:viz"
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_roll_and_keep_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_roll_and_keep_light.svg">
-  <img alt="Plot: Roll-and-keep mechanic comparison" src="../assets/plot_roll_and_keep_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_roll_and_keep_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_roll_and_keep_light.svg">
+  <img alt="Plot: Roll-and-keep mechanic comparison" src="../images/plot_roll_and_keep_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[Modelling opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
@@ -805,7 +805,7 @@ Rudimentary visualization using built-in methods:
 We can easily model the first round of its opposed combat system for various starting configurations.
 Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head-to-head contest of values:
 
-    --8<-- "docs/assets/plot_risus.py:base"
+    --8<-- "docs-src/plot_risus.py:base"
 
 !!! note
 
@@ -821,40 +821,40 @@ Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head
 
 Example use for a single round of combat:
 
-    --8<-- "docs/assets/plot_risus.py:base-use"
+    --8<-- "docs-src/plot_risus.py:base-use"
 
 ```linenums="0"
---8<-- "docs/assets/plot_risus_evens_up_base_use.txt"
+--8<-- "docs-src/plot_risus_evens_up_base_use.txt"
 ```
 
 This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.
 
-    --8<-- "docs/assets/plot_risus.py:display"
+    --8<-- "docs-src/plot_risus.py:display"
 
 <details>
 <summary>
   Visualization source code
 </summary>
 
-    --8<-- "docs/assets/plot_risus.py:display-detail"
+    --8<-- "docs-src/plot_risus.py:display-detail"
 </details>
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_risus.py:viz-first-round"
+    --8<-- "docs-src/plot_risus.py:viz-first-round"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_risus_first_round_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_risus_first_round_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../assets/plot_risus_first_round_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_first_round_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_first_round_light.svg">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_first_round_light.svg">
 </picture>
 
 ### Modeling entire multi-round combats
 
 With a little ~~elbow~~ *finger* grease, we can roll up our … erm … fingerless gloves and even model how various starting conditions affect combat completion (in this case, applying dynamic programming to avoid redundant computations).
 
-    --8<-- "docs/assets/plot_risus.py:driver"
+    --8<-- "docs-src/plot_risus.py:driver"
 
 There’s lot going on there.
 Thankfully, it’s heavily annotated.
@@ -872,13 +872,13 @@ This means we can use it directly with our `vs_scenarios_dataframes` helper to e
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_risus.py:viz-multi-round-standard"
+    --8<-- "docs-src/plot_risus.py:viz-multi-round-standard"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_risus_multi_round_standard_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_risus_multi_round_standard_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../assets/plot_risus_multi_round_standard_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_standard_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_standard_light.svg">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_standard_light.svg">
 </picture>
 
 ### Modeling different combat resolution methods
@@ -886,34 +886,34 @@ Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupy
 Using our `risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://i.4pcdn.org/tg/1366392953060.pdf)* (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
 
 
-    --8<-- "docs/assets/plot_risus.py:goliath-rule"
+    --8<-- "docs-src/plot_risus.py:goliath-rule"
 
-    --8<-- "docs/assets/plot_risus.py:vs-best-of-set"
+    --8<-- "docs-src/plot_risus.py:vs-best-of-set"
 
 Python’s [`functools.partial`](https://docs.python.org/3/library/functools.html#functools.partial) allows us to override individual function details, but still leverage our current callback machinery.
 This pattern will come up again below, so we’ll capture it in a helper function.
 
-    --8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper"
+    --8<-- "docs-src/plot_risus.py:viz-multi-round-goliath-helper"
 
 <details>
 <summary>
   Visualization Goliath Rule helper source code
 </summary>
 
-    --8<-- "docs/assets/plot_risus.py:viz-multi-round-goliath-helper-detail"
+    --8<-- "docs-src/plot_risus.py:viz-multi-round-goliath-helper-detail"
 </details>
 
 We’ll use that Goliath Rule helper to approximate a complete “Best-of-Set” combat and compare it to a “standard” one.
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_risus.py:viz-multi-round-best-of-set"
+    --8<-- "docs-src/plot_risus.py:viz-multi-round-best-of-set"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_risus_multi_round_best_of_set_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_risus_multi_round_best_of_set_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../assets/plot_risus_multi_round_best_of_set_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_best_of_set_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_best_of_set_light.svg">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_best_of_set_light.svg">
 </picture>
 
 The “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
@@ -932,37 +932,37 @@ Further, we can observe that every “run” will be zero or more exploding hits
 
 If we choose our values carefully, we can encode how many times we’ve encountered relevant events as we explode.
 
-    --8<-- "docs/assets/plot_risus.py:evens-up-base"
+    --8<-- "docs-src/plot_risus.py:evens-up-base"
 
 ```linenums="0"
---8<-- "docs/assets/plot_risus_evens_up_base.txt"
+--8<-- "docs-src/plot_risus_evens_up_base.txt"
 ```
 
 For every value that is even, we ended in a miss.
 For every value that is odd, we ended in a hit that will need to be tallied.
 Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
 
-    --8<-- "docs/assets/plot_risus.py:evens-up-decode-hits"
+    --8<-- "docs-src/plot_risus.py:evens-up-decode-hits"
 
 ```linenums="0"
---8<-- "docs/assets/plot_risus_evens_up_decode_hits.txt"
+--8<-- "docs-src/plot_risus_evens_up_decode_hits.txt"
 ```
 
 Now we can craft an “Evens Up” implementation suitable for passing to our `risus_combat_driver`.
 
-    --8<-- "docs/assets/plot_risus.py:evens-up"
+    --8<-- "docs-src/plot_risus.py:evens-up"
 
 We’ll use that to approximate a complete “Evens Up” combat, continuing to leveraging our Goliath Rule helper from above.
 
 Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_risus.py:viz-multi-round-evens-up"
+    --8<-- "docs-src/plot_risus.py:viz-multi-round-evens-up"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_risus_multi_round_evens_up_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_risus_multi_round_evens_up_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../assets/plot_risus_multi_round_evens_up_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_evens_up_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_evens_up_light.svg">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_evens_up_light.svg">
 </picture>
 
 *Phew!*

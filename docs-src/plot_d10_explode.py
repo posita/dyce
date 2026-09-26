@@ -15,7 +15,7 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_d10_explode.py
     # --8<-- [start:core]
     from dyce import H, P, explode_n
 
@@ -30,7 +30,7 @@ def fig_callback() -> None:
 
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_d10_explode.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_d10_explode.py
     # --8<-- [start:viz]
     from matplotlib import pyplot as plt
     from matplotlib import ticker

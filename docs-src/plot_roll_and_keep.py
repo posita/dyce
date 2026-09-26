@@ -15,7 +15,7 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_roll_and_keep.py
     # --8<-- [start:core]
     from collections.abc import Iterator
 
@@ -46,7 +46,7 @@ def fig_callback() -> None:
 
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_roll_and_keep.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_roll_and_keep.py
     # --8<-- [start:viz]
     from matplotlib import pyplot as plt
 

@@ -15,7 +15,7 @@ If it changed, re-read it and preserve the newer work.
 After editing, inspect the diff and limit it to the requested regions.
 Do not stage changes unless the user asks.
 
-Generated documentation assets can change during `make -C docs`.
+Generated documentation files can change during `make -C docs-src`.
 Edit their source scripts rather than generated SVG or HTML files, and verify hashes around generation when another process may be touching the tree.
 
 ## Layout
@@ -27,7 +27,8 @@ Edit their source scripts rather than generated SVG or HTML files, and verify ha
 - `dyce/viz/` contains shared graph types plus separate `matplotlib` and portable `plotly` backends.
   `dyce.viz.plotly` produces plain Plotly specifications and does not require Plotly at runtime.
 - `tests/` mirrors the package; visualization tests are under `tests/viz/`.
-- `docs/` contains MkDocs sources, generated examples, and release notes.
+- `docs/` contains site pages, published images, generated notebooks, and release notes.
+- `docs-src/` contains documentation generators and snippets used during site builds.
 
 Avoid exhaustive module inventories here.
 Use the package tree, `README.md`, and `docs/` for current detail.
@@ -41,7 +42,7 @@ uv run pytest --cov --cov-report=term-missing
 uv run tox -e py313
 uv run pre-commit run --all-files --hook-stage pre-push
 uv run mkdocs build
-make -C docs
+make -C docs-src
 ```
 
 The pre-push hooks run Ruff, doctest normalization checks, and all four static type checkers: mypy, pyright, ty, and zuban.

@@ -65,9 +65,9 @@ If you find it lacking in any way, please don’t hesitate to [bring it to my at
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
-  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
+  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
 </picture>
 
 ## Installation
@@ -228,17 +228,17 @@ std |    1.40
 [`dyce.viz.plotly`](https://dycelib.org/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
 [`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
 
-    --8<-- "docs/assets/plot_2d6_lo_hi.py:core"
+    --8<-- "docs-src/plot_2d6_lo_hi.py:core"
 
 Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_2d6_lo_hi.py:viz"
+    --8<-- "docs-src/plot_2d6_lo_hi.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
 </picture>
 
 [`H` objects](https://dycelib.org/latest/dyce/#dyce.H) and [`P` objects](https://dycelib.org/latest/dyce/#dyce.P) can generate random rolls.

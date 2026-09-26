@@ -15,7 +15,7 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:core]
     from enum import IntEnum
 
@@ -69,7 +69,7 @@ def fig_callback() -> None:
 
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:table]
     import pandas as pd
 
@@ -95,10 +95,10 @@ def fig_callback() -> None:
     # Display df as table
     import jinja2  # ruff: ignore[unused-import]
 
-    # NOTE: Translates to df.style.format("{:.2%}") in docs/assets/nb_ironsworn.py
+    # NOTE: Translates to df.style.format("{:.2%}") in docs-src/nb_ironsworn.py
     print(df.style.format("{:.2%}").to_html())
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:viz]
     from matplotlib import ticker
 

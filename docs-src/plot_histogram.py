@@ -15,25 +15,13 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_burning_arch.py
-    # --8<-- [start:core]
-    from dyce import H
-
-    save_roll = H(20)
-    burning_arch_damage = 10 @ H(6) + 10
-    pass_save = save_roll.ge(10)
-    damage_half_on_save = burning_arch_damage // (pass_save + 1)
-    # --8<-- [end:core]
-
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_burning_arch.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_histogram.py
     # --8<-- [start:viz]
-    from matplotlib import ticker
+    from dyce.d import h3d6
+    from dyce.viz.matplotlib import plot_bar
 
-    from dyce.viz.matplotlib import plot_line
-
-    ax = plot_line(damage_half_on_save)
-    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))
-    ax.set_title("Attack with saving throw for half damage")
+    ax = plot_bar(h3d6)
+    ax.set_title("Distribution for 3d6")
     # --8<-- [end:viz]
 
 

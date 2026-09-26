@@ -15,7 +15,7 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_dupes.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_dupes.py
     # --8<-- [start:core]
     from dyce import H, P
 
@@ -29,7 +29,7 @@ def fig_callback() -> None:
     res_8d10 = count_dupes(8 @ P(10))
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_dupes.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_dupes.py
     # --8<-- [start:viz]
     from dyce.viz.matplotlib import plot_bar
 

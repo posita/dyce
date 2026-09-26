@@ -729,13 +729,13 @@ For something more sophisticated, [`dyceum`](https://github.com/posita/dyceum/) 
 
 Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_histogram.py:viz"
+    --8<-- "docs-src/plot_histogram.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_histogram_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_histogram_light.svg">
-  <img alt="Plot: Distribution for 3d6" src="../assets/plot_histogram_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_histogram_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_histogram_light.svg">
+  <img alt="Plot: Distribution for 3d6" src="../images/plot_histogram_light.svg">
 </picture>
 
 ## Time to get meta-evil on those outcomes!
@@ -749,7 +749,7 @@ Thanks to ~~[`numerary`](https://pypi.org/project/numerary/)~~ *[`optype`](https
     H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y + 19: 3, 2*x + y + 20: 1})
 
 
-[![Miss you, Doris!](assets/doris.png)](https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8)
+[![Miss you, Doris!](images/doris.png)](https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8)
 <!-- Original source: https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186 -->
 
 !!! note

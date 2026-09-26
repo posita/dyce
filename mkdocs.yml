@@ -72,13 +72,6 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tilde
 
-exclude_docs: |
-  Makefile
-  __pycache__/
-  assets/_*.py
-  assets/nb_*.py
-  snippets/
-
 extra:
   version:
     provider: mike
@@ -109,6 +102,7 @@ watch:
   - _griffe_ext.py
   - _mkdocs_hooks.py
   - docs
+  - docs-src
   - dyce
   - jupyter-lite.json
   - jupyter_lite_config.json
