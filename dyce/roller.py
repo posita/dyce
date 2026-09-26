@@ -22,7 +22,7 @@ Interfaces may change substantially or disappear.
 import json
 import operator
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from functools import reduce
 from typing import (
@@ -53,6 +53,7 @@ __all__ = (
     "RollerPool",
     "SingleOutcomeRoll",
     "SingleOutcomeRoller",
+    "TraceReturn",
     "trace",
 )
 
@@ -2058,6 +2059,36 @@ class SingleOutcomeRoll(Roll[_T_co]):
         return SingleOutcomeRoll(outcome, roller, (self,))
 
 
+@dataclass(frozen=True, slots=True, init=False)
+class TraceReturn(Generic[_T]):
+    r"""
+    Identifies the value and derivation rolls returned from a [`trace`][dyce.roller.trace] callback.
+
+    The container is optional.
+    Return a value, roll, or roller directly when the trace does not need derivation rolls.
+    """
+
+    value: _T | Roll[_T] | Roller[_T]
+    derivations: tuple[Roll[object], ...] = ()
+
+    @overload
+    def __init__(
+        self, value: Roll[_T], derivations: Iterable[Roll[object]] = ()
+    ) -> None: ...
+    @overload
+    def __init__(
+        self, value: Roller[_T], derivations: Iterable[Roll[object]] = ()
+    ) -> None: ...
+    @overload
+    def __init__(self, value: _T, derivations: Iterable[Roll[object]] = ()) -> None: ...
+    def __init__(self, value: object, derivations: Iterable[Roll[object]] = ()) -> None:
+        derivations_tuple = tuple(derivations)
+        if any(not isinstance(derivation, Roll) for derivation in derivations_tuple):
+            raise TypeError("TraceReturn derivations must be rolls")
+        object.__setattr__(self, "value", value)
+        object.__setattr__(self, "derivations", derivations_tuple)
+
+
 class _LabeledRoller(Roller[_T_co]):
     def __init__(self, roller: Roller[_T_co], label: str) -> None:
         self._roller = roller
@@ -2320,10 +2351,18 @@ class _TraceRoller(Roller[_T_co]):
             child._format_expression().text  # ruff: ignore[private-member-access]
             for child in trace_roll.children
         )
-        expression = trace_roll.derivation._format_expression()  # ruff: ignore[private-member-access]
+        derivations = tuple(
+            derivation._format_expression().text  # ruff: ignore[private-member-access]
+            for derivation in trace_roll.derivations
+        )
+        if len(derivations) == 1:
+            derivation_text = f" -> {derivations[0]}"
+        elif derivations:
+            derivation_text = f" -> ({', '.join(derivations)})"
+        else:
+            derivation_text = ""
         return _RollFormat(
-            f"{self._label}({children}) -> {expression.text}"
-            f" => {roll._format_result()}",  # ruff: ignore[private-member-access]
+            f"{self._label}({children}){derivation_text} => {roll._format_result()}",  # ruff: ignore[private-member-access]
             _CALL_PRECEDENCE,
             has_result_suffix=True,
         )
@@ -2333,51 +2372,67 @@ class _TraceRoller(Roller[_T_co]):
             raise TypeError("trace children must be rollers")
         children = tuple(child.roll() for child in self._children)
         result = self._callback(*children, **self._state)
-        if isinstance(result, Roller):
-            result = result.roll()
-        elif not isinstance(result, Roll):
-            result = LiteralRoller(result).roll()
-        derivation = cast("Roll[_T_co]", result)
+        if isinstance(result, TraceReturn):
+            value = result.value
+            derivations = result.derivations
+            if isinstance(value, Roller):
+                value = value.roll()
+            if isinstance(value, Roll):
+                derivations = (*derivations, cast("Roll[object]", value))
+                outcomes = cast("tuple[_T_co, ...]", value.outcomes)
+            else:
+                outcomes = (cast("_T_co", value),)
+        else:
+            derivations = ()
+            if isinstance(result, Roller):
+                result = result.roll()
+            if isinstance(result, Roll):
+                outcomes = cast("tuple[_T_co, ...]", result.outcomes)
+            else:
+                outcomes = (cast("_T_co", result),)
         return _TraceRoll(
-            derivation.outcomes,
+            outcomes,
             self,
             cast("tuple[Roll[object], ...]", children),
-            derivation,
+            derivations,
         )
 
 
 class _TraceRoll(Roll[_T_co]):
-    __slots__ = ("derivation",)
-    derivation: Roll[_T_co]
+    __slots__ = ("derivations",)
+    derivations: tuple[Roll[object], ...]
 
     def __init__(
         self,
         outcomes: tuple[_T_co, ...],
         roller: Roller[_T_co],
         children: tuple[Roll[object], ...],
-        derivation: Roll[_T_co],
+        derivations: tuple[Roll[object], ...],
     ) -> None:
         super().__init__(outcomes, roller, children)
-        object.__setattr__(self, "derivation", derivation)
+        object.__setattr__(self, "derivations", derivations)
 
     def _trace_relationships(
         self,
     ) -> dict[str, Roll[object] | tuple[Roll[object], ...]]:
         relationships = super()._trace_relationships()
-        relationships["derivation"] = cast("Roll[object]", self.derivation)
+        if self.derivations:
+            relationships["derivations"] = self.derivations
         return relationships
 
 
 @overload
 def trace(
-    callback: Callable[[], Roll[_ResultT] | Roller[_ResultT]],
+    callback: Callable[[], Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT]],
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[[], _ResultT | Roll[_ResultT] | Roller[_ResultT]],
+    callback: Callable[
+        [], _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT]
+    ],
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
@@ -2386,7 +2441,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     *,
@@ -2397,7 +2452,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     *,
@@ -2408,7 +2463,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     *,
@@ -2419,7 +2474,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     *,
@@ -2430,7 +2485,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2442,7 +2497,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2454,7 +2509,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2466,7 +2521,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2478,7 +2533,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2490,7 +2545,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2502,7 +2557,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2514,7 +2569,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2526,7 +2581,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2539,7 +2594,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2552,7 +2607,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2565,7 +2620,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2578,7 +2633,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2591,7 +2646,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2604,7 +2659,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2617,7 +2672,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2], SingleOutcomeRoll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2630,7 +2685,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2643,7 +2698,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2656,7 +2711,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2669,7 +2724,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], SingleOutcomeRoll[_T2], Roll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: SingleOutcomeRoller[_T2],
@@ -2682,7 +2737,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2695,7 +2750,7 @@ def trace(
 def trace(
     callback: Callable[
         [SingleOutcomeRoll[_T1], Roll[_T2], Roll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: SingleOutcomeRoller[_T1],
     child2: Roller[_T2],
@@ -2708,7 +2763,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2], Roll[_T3]],
-        Roll[_ResultT] | Roller[_ResultT],
+        Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2721,7 +2776,7 @@ def trace(
 def trace(
     callback: Callable[
         [Roll[_T1], Roll[_T2], Roll[_T3]],
-        _ResultT | Roll[_ResultT] | Roller[_ResultT],
+        _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT],
     ],
     child1: Roller[_T1],
     child2: Roller[_T2],
@@ -2732,7 +2787,9 @@ def trace(
 ) -> Roll[_ResultT]: ...
 @overload
 def trace(
-    callback: Callable[..., _ResultT | Roll[_ResultT] | Roller[_ResultT]],
+    callback: Callable[
+        ..., _ResultT | Roll[_ResultT] | Roller[_ResultT] | TraceReturn[_ResultT]
+    ],
     *children: Roller[Any],
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
@@ -2749,39 +2806,96 @@ def trace(
 
     >>> import random
     >>> from dyce import rng
-    >>> rng.RNG = random.Random(1789600491)
+    >>> rng.RNG = random.Random(1790432721)
 
       -- END MONKEY PATCH -->
 
-    Rolls *children*, calls *callback* with those rolls and *state*, and returns a labeled outcome trace.
+    Rolls *children*, calls *callback* with the produced [`Roll`s][dyce.roller.Roll], and returns a labeled outcome trace `Roll` whose children are derived from *children*.
 
-    A returned roller is rolled, a returned roll is retained, and any other return value is wrapped in a roll from a [`LiteralRoller`][dyce.roller.LiteralRoller].
-    The enclosing roll records the rolls passed to *callback* as its children.
-    Its derivation is the roll whose outcomes were copied to the enclosing roll.
     Supplied *state* is passed unchanged to *callback*.
-    The trace attributes preserve JSON-compatible state values and replace other values with their representations.
     *label* defaults to the callback’s `__name__` or its type’s `__name__`.
-    Exceptions are reported as [`RollError`][dyce.roller.RollError] with the original exception as their cause.
+    An exception raised from *callback* is wrapped as a [`RollError`][dyce.roller.RollError] with the original as its cause.
 
-    Explode a d6 once, retaining both the initial roll and any additional roll:
+    In its most basic form, *callback* can return a plain value.
 
         >>> from dyce import H
-        >>> from dyce.roller import (
-        ...     HRoller,
-        ...     SingleOutcomeRoll,
-        ...     SingleOutcomeRoller,
-        ...     trace,
-        ... )
+        >>> from dyce.roller import HRoller, SingleOutcomeRoll, trace
         >>> d6 = HRoller(H(6), label="d6")
-        >>> def explode_once(
-        ...     roll: SingleOutcomeRoll[int],
-        ... ) -> SingleOutcomeRoll[int] | SingleOutcomeRoller[int]:
-        ...     return roll + roll.roller if roll.outcome == 6 else roll
-        >>> result = trace(explode_once, d6)
-        >>> result.outcomes
-        (10,)
+        >>> def did_i_roll_a_six(d6_roll: SingleOutcomeRoll[int]) -> str:
+        ...     return "yup" if d6_roll.outcome == 6 else "nope"
+        >>> print(trace(did_i_roll_a_six, d6).format())
+        did_i_roll_a_six(6 [d6]) => ('yup',)
+
+    *callback* can also return a Roll.
+    That `Roll`’s outcomes are captured by the returned `Roll`, but its children and [`Roller`][dyce.roller.Roller] are not preserved.
+
+        >>> def add_another_d6(
+        ...     d6_roll: SingleOutcomeRoll[int],
+        ... ) -> SingleOutcomeRoll[int]:
+        ...     return d6_roll + d6
+        >>> print(trace(add_another_d6, d6).format())
+        add_another_d6(6 [d6]) => (7,)
+
+    Similarly, *callback* can return a `Roller`.
+    This is shorthand for constructing a `Roller`, rolling it, and returning the produced `Roll`.
+
+        >>> from dyce.roller import SingleOutcomeRoller
+        >>> d8 = HRoller(H(8), label="d8")
+        >>> def on_a_one_roll_a_d8_instead(
+        ...     d6_roll: SingleOutcomeRoll[int],
+        ... ) -> SingleOutcomeRoller[int]:
+        ...     if d6_roll.outcome == 1:
+        ...         return d8
+        ...     else:
+        ...         raise ValueError("I only deal with ones")
+        >>> result = trace(on_a_one_roll_a_d8_instead, d6)
         >>> print(result.format())
-        explode_once(6 [d6]) -> 6 [d6] + 4 [d6] => 10 => (10,)
+        on_a_one_roll_a_d8_instead(1 [d6]) => (8,)
+
+    <!-- BEGIN MONKEY PATCH --
+    For deterministic outcomes.
+
+    >>> import random
+    >>> from dyce import rng
+    >>> rng.RNG = random.Random(1790431326)
+
+      -- END MONKEY PATCH -->
+
+    To preserve visibility into intermediary `Roll`s used to produce the final outcome, return a [`TraceReturn`][dyce.roller.TraceReturn] including the desired result value and zero or more derivation `Roll`s.
+    The result value carried by `TraceReturn` has similar semantics as if returned directly from *callback*.
+    If the `TraceReturn`’s value is a `Roll`, that `Roll` is appended to the `TraceReturn`’s derivations.
+    If the `TraceReturn`’s value is a `Roller`, that `Roller` is rolled, and its produced `Roll` is appended to the `TraceReturn`’s derivations.
+
+    For example, consider retaining visibility into the initial `Roll` and any interior `Roll`s when exploding a d6 once if a coin toss comes up heads.
+
+        >>> from enum import IntEnum
+        >>> class Coin(IntEnum):
+        ...     HEADS = 0
+        ...     TAILS = 1
+        >>> coin = HRoller(H(Coin), label="coin")
+        >>> from dyce.roller import TraceReturn
+        >>> def explode_once_on_max_and_heads(
+        ...     initial_roll: SingleOutcomeRoll[int],
+        ... ) -> SingleOutcomeRoll[int] | TraceReturn[int]:
+        ...     assert isinstance(initial_roll.roller, HRoller)
+        ...     if initial_roll.outcome == max(initial_roll.roller.h):
+        ...         # We maxed out! Flip our coin to see if we get another die roll!
+        ...         coin_toss = coin.roll()
+        ...         return TraceReturn(
+        ...             initial_roll + initial_roll.roller
+        ...             if coin_toss.outcome == Coin.HEADS
+        ...             else initial_roll,
+        ...             (coin_toss,),
+        ...         )
+        ...     else:
+        ...         # We didn't roll the die max, so there's no additional work to show
+        ...         return initial_roll
+        >>> print(trace(explode_once_on_max_and_heads, d6).format())
+        explode_once_on_max_and_heads(6 [d6]) -> (<Coin.TAILS: 1> [coin], 6 [d6]) => (6,)
+        >>> print(trace(explode_once_on_max_and_heads, d6).format())
+        explode_once_on_max_and_heads(6 [d6]) -> (<Coin.HEADS: 0> [coin], 6 [d6] + 5 [d6] => 11) => (11,)
+        >>> print(trace(explode_once_on_max_and_heads, d6).format())
+        explode_once_on_max_and_heads(3 [d6]) => (3,)
     """
     trace_roller = _TraceRoller[Any](
         callback,

@@ -37,6 +37,7 @@ from dyce.roller import (
     RollError,
     SingleOutcomeRoll,
     SingleOutcomeRoller,
+    TraceReturn,
     trace,
 )
 from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
@@ -995,376 +996,6 @@ class TestHableAndRollerBinaryArithmetic:
         assert p_roller.p is p
 
 
-class TestTrace:
-    def test_repr(self) -> None:
-        def callback() -> int:
-            return 3
-
-        roller = trace(callback, label="custom").roller
-
-        assert repr(roller) == f"_TraceRoller({callback!r}, (), 'custom', {{}})"
-
-    @pytest.mark.parametrize(
-        ("roll_mode", "rolls", "expected"),
-        [
-            ("normal", [7], 0),
-            ("normal", [15, 4], 6),
-            ("normal", [20, 4, 5], 11),
-            ("advantage", [4, 16, 5], 7),
-            ("disadvantage", [16, 4], 0),
-        ],
-    )
-    def test_attack_mechanic(
-        self, roll_mode: _RollMode, rolls: list[int], expected: int
-    ) -> None:
-        with patch.object(H, "roll", side_effect=rolls):
-            result = _attack(15, 1, 2, roll_mode)
-
-        assert result.outcomes == (expected,)
-        assert result.roller.attributes() == {
-            "kind": "dyce.trace",
-            "label": "attack",
-            "state": {
-                "dc": 15,
-                "dc_modifier": 1,
-                "damage_modifier": 2,
-            },
-        }
-
-    def test_format_includes_child_and_derivation_rolls(self) -> None:
-        source = LiteralRoller(2) + 3
-
-        def increment(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
-            return roll + 1
-
-        result = trace(increment, source)
-
-        assert result.format() == (
-            "increment(2 + 3 => 5) -> 2 + 3 => 5 + 1 => 6 => (6,)"
-        )
-
-    def test_children_are_rolled_and_passed_to_callback_with_state(self) -> None:
-        single = LiteralRoller(3)
-        multi = PRoller(P(H({2: 1}), H({4: 1})))
-        token = object()
-        callback = Mock(return_value=0)
-
-        result = trace(callback, single, multi, token=token)
-
-        callback.assert_called_once()
-        args, kwargs = callback.call_args
-        assert result.roller.children == (single, multi)
-        assert result.children == args
-        assert isinstance(args[0], SingleOutcomeRoll)
-        assert args[0].outcome == 3
-        assert args[0].roller is single
-        assert isinstance(args[1], Roll)
-        assert args[1].outcomes == (2, 4)
-        assert args[1].roller is multi
-        assert kwargs == {"token": token}
-
-    def test_callback_returns_single_roll(self) -> None:
-        roll = LiteralRoller(4).roll()
-
-        def callback() -> SingleOutcomeRoll[int]:
-            return roll
-
-        result = trace(callback)
-        result_trace = result.trace()
-        rolls = result_trace["rolls"]
-
-        assert_type(result, Roll[int])
-        assert result.outcomes == (4,)
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-        assert rolls["roll1"]["outcome"] == roll.outcome
-
-    def test_callback_returns_roll_with_multiple_outcomes(self) -> None:
-        returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
-
-        def callback() -> Roll[int]:
-            return returned
-
-        result = trace(callback)
-        result_trace = result.trace()
-        rolls = result_trace["rolls"]
-
-        assert_type(result, Roll[int])
-        assert result.outcomes == (2, 3)
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-        assert rolls["roll1"]["outcomes"] == list(returned.outcomes)
-
-    def test_callback_returns_single_roller(self) -> None:
-        def callback() -> SingleOutcomeRoller[int]:
-            return LiteralRoller(8)
-
-        result = trace(callback)
-        result_trace = result.trace()
-        rolls = result_trace["rolls"]
-
-        assert_type(result, Roll[int])
-        assert result.outcomes == (8,)
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-        assert rolls["roll1"]["outcome"] == 8
-
-    def test_callback_returns_roller_with_multiple_outcomes(self) -> None:
-        def callback() -> Roller[int]:
-            return PRoller(P(H({2: 1}), H({3: 1})))
-
-        result = trace(callback)
-        result_trace = result.trace()
-        rolls = result_trace["rolls"]
-
-        assert_type(result, Roll[int])
-        assert result.outcomes == (2, 3)
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-        assert rolls["roll1"]["outcomes"] == [2, 3]
-
-    def test_callback_returns_literal_string(self) -> None:
-        source = LiteralRoller(3)
-
-        def callback(roll: SingleOutcomeRoll[int]) -> str:
-            return "hit" if roll.outcome == 3 else "miss"
-
-        result = trace(callback, source)
-        result_trace = result.trace()
-        rolls = result_trace["rolls"]
-
-        assert_type(result, Roll[str])
-        assert result.outcomes == ("hit",)
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "children": ["roll1"],
-            "derivation": "roll2",
-        }
-        assert rolls["roll1"]["outcome"] == 3
-        assert rolls["roll2"]["outcome"] == "hit"
-
-    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
-    def test_nonroller_child_raises(self) -> None:
-        with pytest.raises(RollError) as caught:
-            trace(Mock(), cast("Any", H(6)))
-
-        assert isinstance(caught.value.__cause__, TypeError)
-        assert str(caught.value.__cause__) == "trace children must be rollers"
-
-    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
-    def test_nonroller_child_triggers_beartype_violation(self) -> None:
-        with pytest.raises(BeartypeCallHintViolation):
-            trace(Mock(), cast("Any", H(6)))
-
-    def test_trace_separates_child_from_unrelated_derivation(self) -> None:
-        def callback(_roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoller[int]:
-            return LiteralRoller(3)
-
-        result = trace(callback, LiteralRoller(2))
-        rolls = result.trace()["rolls"]
-
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "children": ["roll1"],
-            "derivation": "roll2",
-        }
-        assert rolls["roll1"]["outcome"] == 2
-        assert rolls["roll2"]["outcome"] == 3
-
-    def test_trace_reuses_id_when_child_is_derivation(self) -> None:
-        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
-            return roll
-
-        result = trace(callback, LiteralRoller(2))
-        rolls = result.trace()["rolls"]
-
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "children": ["roll1"],
-            "derivation": "roll1",
-        }
-
-    def test_trace_records_child_reached_through_derivation(self) -> None:
-        def callback(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
-            return 1 + roll
-
-        result = trace(callback, HRoller(H(6), label="d6"))
-        rolls = result.trace()["rolls"]
-
-        assert isinstance(rolls, dict)
-        assert rolls["roll0"]["relationships"] == {
-            "children": ["roll1"],
-            "derivation": "roll2",
-        }
-        assert rolls["roll2"]["relationships"]["children"] == ["roll3", "roll1"]
-        assert rolls["roll3"]["outcome"] == 1
-        assert rolls["roll0"]["outcomes"] == [1 + rolls["roll1"]["outcome"]]
-
-    def test_implicit_label_uses_callback_name(self) -> None:
-        def callback() -> int:
-            return 4
-
-        result = trace(callback)
-
-        assert result.roller.attributes() == {
-            "kind": "dyce.trace",
-            "label": "callback",
-            "state": {},
-        }
-
-    @pytest.mark.parametrize("label", ["trace.custom", ""])
-    def test_explicit_label_preserved(self, label: str) -> None:
-        def callback() -> int:
-            return 4
-
-        result = trace(callback, label=label)
-
-        assert result.roller.attributes() == {
-            "kind": "dyce.trace",
-            "label": label,
-            "state": {},
-        }
-
-    def test_state_attributes(self) -> None:
-        token = object()
-        callback = Mock(return_value=1)
-
-        result = trace(callback, token=token)
-
-        callback.assert_called_once_with(token=token)
-        assert result.roller.attributes()["state"] == {"token": repr(token)}
-        rollers = result.trace()["rollers"]
-        assert isinstance(rollers, dict)
-        assert rollers["roller0"]["attributes"]["state"] == {"token": repr(token)}
-        json.dumps(result.trace())
-
-    def test_recursive_callback_with_state(self) -> None:
-        def explode(
-            roll: SingleOutcomeRoll[int], remaining: int = 2
-        ) -> SingleOutcomeRoll[int]:
-            if remaining:
-                return roll + trace(explode, roll.roller, remaining=remaining - 1)
-            return roll
-
-        result = trace(explode, LiteralRoller(6))
-
-        assert_type(result, Roll[int])
-        assert result.outcomes == (18,)
-        rollers = result.trace()["rollers"]
-        assert isinstance(rollers, dict)
-        assert (
-            sum(data["attributes"]["kind"] == "dyce.trace" for data in rollers.values())
-            == 3
-        )
-
-    def test_parameter_roller_failure_path(self) -> None:
-        source = PRoller(P())
-        with pytest.raises(RollError) as caught:
-            trace(lambda roll: roll, source, label="custom")
-
-        assert caught.value.path[0].attributes() == {
-            "kind": "dyce.trace",
-            "label": "custom",
-            "state": {},
-        }
-        assert caught.value.path[1:] == (source,)
-
-    def test_callback_failure_path(self) -> None:
-        with pytest.raises(RollError) as caught:
-            trace(Mock(side_effect=ValueError("callback")), label="custom")
-
-        assert [entry.attributes() for entry in caught.value.path] == [
-            {"kind": "dyce.trace", "label": "custom", "state": {}}
-        ]
-
-    def test_returned_roller_failure_path(self) -> None:
-        returned = PRoller(P())
-        with pytest.raises(RollError) as caught:
-            trace(lambda: returned, label="custom")
-
-        assert caught.value.path[0].attributes() == {
-            "kind": "dyce.trace",
-            "label": "custom",
-            "state": {},
-        }
-        assert caught.value.path[1:] == (returned,)
-
-    @pytest.mark.parametrize("exception_type", [ValueError, RecursionError])
-    def test_original_exception_preserved_as_cause(
-        self, exception_type: type[Exception]
-    ) -> None:
-        failure = exception_type("callback failure")
-        with pytest.raises(RollError) as caught:
-            trace(Mock(side_effect=failure))
-
-        assert caught.value.__cause__ is failure
-
-    def test_mixed_parameter_type_inference(self) -> None:
-        def callback(single: SingleOutcomeRoll[int], multi: Roll[str]) -> str:
-            return str(single.outcome) + multi.outcomes[0]
-
-        result = trace(callback, LiteralRoller(3), PRoller(P(H({"a": 1}))))
-
-        assert_type(result, Roll[str])  # zuban: ignore[misc]
-        assert result.outcomes == ("3a",)
-
-    def test_reroll_can_change_number_of_outcomes_and_records_each_derivation(
-        self,
-    ) -> None:
-        first_roller = RollerPool(LiteralRoller(2))
-        second_roller = RollerPool(LiteralRoller(5), LiteralRoller(8))
-        callback = Mock(side_effect=[first_roller, second_roller])
-
-        result = trace(cast("Callable[[], Roller[int]]", callback))
-        trace_roller = result.roller
-        rerolled_result = trace_roller.roll()
-
-        assert_type(result, Roll[int])
-        rollers = result.trace()["rollers"]
-        rolls = result.trace()["rolls"]
-        assert isinstance(rollers, dict)
-        assert isinstance(rolls, dict)
-        assert "relationships" not in rollers["roller0"]
-        assert result.outcomes == (2,)
-        assert rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-        assert rolls["roll1"]["roller"] == "roller1"
-        assert rerolled_result.roller is trace_roller
-        assert rerolled_result.outcomes == (5, 8)
-        rerolled_trace = rerolled_result.trace()
-        rerolled_rolls = rerolled_trace["rolls"]
-        assert isinstance(rerolled_rolls, dict)
-        assert rerolled_rolls["roll0"]["relationships"] == {
-            "derivation": "roll1",
-        }
-
-    @pytest.mark.parametrize(
-        ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
-    )
-    def test_selecting_trace_roller_calls_callback_again(
-        self, selector: int | slice, expected: tuple[int, ...]
-    ) -> None:
-        callback = Mock(
-            side_effect=[
-                RollerPool(LiteralRoller(1)),
-                RollerPool(LiteralRoller(1), LiteralRoller(2), LiteralRoller(3)),
-            ]
-        )
-
-        result = trace(cast("Callable[[], Roller[int]]", callback))
-
-        assert result.roller.select(selector).roll().outcomes == expected
-
-
 class TestRoll:
     @pytest.mark.parametrize(
         "roller_factory",
@@ -1397,6 +1028,20 @@ class TestRoll:
         trace = CustomRoller(1).roll().trace()
 
         Draft202012Validator(_ROLL_TRACE_SCHEMA).validate(trace)
+
+    def test_trace_serializes_singular_relationship(self) -> None:
+        child = LiteralRoller(1)
+
+        class CustomRoller(LiteralRoller[int]):
+            def _trace_relationships(
+                self,
+            ) -> dict[str, Roller[object] | tuple[Roller[object], ...]]:
+                return {"subject": child}
+
+        rollers = CustomRoller(2).roll().trace()["rollers"]
+
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"]["relationships"] == {"subject": "roller1"}
 
     def test_trace_schema_is_valid(self) -> None:
         Draft202012Validator.check_schema(_ROLL_TRACE_SCHEMA)
@@ -2157,6 +1802,407 @@ class TestRollerAndRollOperationEquivalence:
         rollers = roll_from_roller_arithmetic.trace()["rollers"]
         assert isinstance(rollers, dict)
         assert rollers["roller0"]["attributes"]["operator"] == "sub"
+
+
+class TestTrace:
+    def test_repr(self) -> None:
+        def callback() -> int:
+            return 3
+
+        roller = trace(callback, label="custom").roller
+
+        assert repr(roller) == f"_TraceRoller({callback!r}, (), 'custom', {{}})"
+
+    def test_format_single_outcome_roll(self) -> None:
+        source = LiteralRoller(2) + 3
+
+        def increment(roll: SingleOutcomeRoll[int]) -> SingleOutcomeRoll[int]:
+            return roll + 1
+
+        result = trace(increment, source)
+
+        assert result.format() == "increment(2 + 3 => 5) => (6,)"
+
+    def test_children_are_rolled_and_passed_to_callback_with_state(self) -> None:
+        single = LiteralRoller(3)
+        multi = PRoller(P(H({2: 1}), H({4: 1})))
+        token = object()
+        callback = Mock(return_value=0)
+
+        result = trace(callback, single, multi, token=token)
+
+        callback.assert_called_once()
+        args, kwargs = callback.call_args
+        assert result.roller.children == (single, multi)
+        assert result.children == args
+        assert isinstance(args[0], SingleOutcomeRoll)
+        assert args[0].outcome == 3
+        assert args[0].roller is single
+        assert isinstance(args[1], Roll)
+        assert args[1].outcomes == (2, 4)
+        assert args[1].roller is multi
+        assert kwargs == {"token": token}
+
+    def test_callback_returns_single_roll(self) -> None:
+        roll = LiteralRoller(4).roll()
+
+        def callback() -> SingleOutcomeRoll[int]:
+            return roll
+
+        result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (4,)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rolls["roll0"]
+        assert len(rolls) == 1
+
+    def test_callback_returns_roll_with_multiple_outcomes(self) -> None:
+        returned = PRoller(P(H({2: 1}), H({3: 1}))).roll()
+
+        def callback() -> Roll[int]:
+            return returned
+
+        result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (2, 3)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rolls["roll0"]
+        assert len(rolls) == 1
+
+    def test_callback_returns_single_roller(self) -> None:
+        def callback() -> SingleOutcomeRoller[int]:
+            return LiteralRoller(8)
+
+        result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (8,)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rolls["roll0"]
+        assert len(rolls) == 1
+
+    def test_callback_returns_roller_with_multiple_outcomes(self) -> None:
+        def callback() -> Roller[int]:
+            return PRoller(P(H({2: 1}), H({3: 1})))
+
+        result = trace(callback)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (2, 3)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rolls["roll0"]
+        assert len(rolls) == 1
+
+    def test_callback_returns_literal_string(self) -> None:
+        source = LiteralRoller(3)
+
+        def callback(roll: SingleOutcomeRoll[int]) -> str:
+            return "hit" if roll.outcome == 3 else "miss"
+
+        result = trace(callback, source)
+        result_trace = result.trace()
+        rolls = result_trace["rolls"]
+
+        assert_type(result, Roll[str])
+        assert result.outcomes == ("hit",)
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "children": ["roll1"],
+        }
+        assert rolls["roll1"]["outcome"] == 3
+        assert len(rolls) == 2
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_nonroller_child_raises(self) -> None:
+        with pytest.raises(RollError) as caught:
+            trace(Mock(), cast("Any", H(6)))
+
+        assert isinstance(caught.value.__cause__, TypeError)
+        assert str(caught.value.__cause__) == "trace children must be rollers"
+
+    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+    def test_nonroller_child_triggers_beartype_violation(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            trace(Mock(), cast("Any", H(6)))
+
+    def test_trace_return_separates_child_from_derivations(self) -> None:
+        derivation = LiteralRoller(3).roll()
+
+        def callback(_roll: SingleOutcomeRoll[int]) -> TraceReturn[int]:
+            return TraceReturn(4, (derivation,))
+
+        result = trace(callback, LiteralRoller(2))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "children": ["roll1"],
+            "derivations": ["roll2"],
+        }
+        assert rolls["roll1"]["outcome"] == 2
+        assert rolls["roll2"]["outcome"] == 3
+        assert rolls["roll0"]["outcomes"] == [4]
+
+    def test_trace_return_reuses_id_when_child_is_derivation(self) -> None:
+        def callback(roll: SingleOutcomeRoll[int]) -> TraceReturn[int]:
+            return TraceReturn(2, (roll,))
+
+        result = trace(callback, LiteralRoller(2))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "children": ["roll1"],
+            "derivations": ["roll1"],
+        }
+
+    def test_trace_return_appends_roll_value_to_derivations(self) -> None:
+        def callback(roll: SingleOutcomeRoll[int]) -> TraceReturn[int]:
+            return TraceReturn(1 + roll, (roll,))
+
+        result = trace(callback, HRoller(H(6), label="d6"))
+        rolls = result.trace()["rolls"]
+
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {
+            "children": ["roll1"],
+            "derivations": ["roll1", "roll2"],
+        }
+        assert rolls["roll2"]["relationships"]["children"] == ["roll3", "roll1"]
+        assert rolls["roll3"]["outcome"] == 1
+        assert rolls["roll0"]["outcomes"] == [1 + rolls["roll1"]["outcome"]]
+
+    def test_trace_return_appends_roll_from_roller_value_to_derivations(self) -> None:
+        result = trace(lambda: TraceReturn(LiteralRoller(4)))
+        rolls = result.trace()["rolls"]
+
+        assert_type(result, Roll[int])
+        assert isinstance(rolls, dict)
+        assert rolls["roll0"]["relationships"] == {"derivations": ["roll1"]}
+        assert rolls["roll1"]["outcome"] == 4
+        assert result.format() == "<lambda>() -> 4 => (4,)"
+
+    def test_trace_return_plain_value_does_not_add_derivation(self) -> None:
+        result = trace(lambda: TraceReturn(4))
+        rolls = result.trace()["rolls"]
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (4,)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rolls["roll0"]
+
+    @pytest.mark.skipif(DYCE_IS_BEARIFIED, reason="we are ***BEARIFIED***")
+    def test_trace_return_non_roll_derivation_raises(self) -> None:
+        with pytest.raises(TypeError, match="TraceReturn derivations must be rolls"):
+            TraceReturn(4, cast("Any", (3,)))
+
+    @pytest.mark.skipif(not DYCE_IS_BEARIFIED, reason="we are ***NOT*** bearified")
+    def test_trace_return_non_roll_derivation_triggers_beartype_violation(self) -> None:
+        with pytest.raises(BeartypeCallHintViolation):
+            TraceReturn(4, cast("Any", (3,)))
+
+    def test_trace_return_copies_list_derivations(self) -> None:
+        roll = LiteralRoller(3).roll()
+        derivations = [roll]
+        result = TraceReturn(4, derivations)
+        derivations.clear()
+
+        assert result.derivations == (roll,)
+
+    def test_trace_return_consumes_generator_derivations(self) -> None:
+        rolls = (LiteralRoller(1).roll(), LiteralRoller(2).roll())
+        result = TraceReturn(4, (roll for roll in rolls))
+
+        assert result.derivations == rolls
+
+    def test_implicit_label_uses_callback_name(self) -> None:
+        def callback() -> int:
+            return 4
+
+        result = trace(callback)
+
+        assert result.roller.attributes() == {
+            "kind": "dyce.trace",
+            "label": "callback",
+            "state": {},
+        }
+
+    @pytest.mark.parametrize("label", ["trace.custom", ""])
+    def test_explicit_label_preserved(self, label: str) -> None:
+        def callback() -> int:
+            return 4
+
+        result = trace(callback, label=label)
+
+        assert result.roller.attributes() == {
+            "kind": "dyce.trace",
+            "label": label,
+            "state": {},
+        }
+
+    def test_state_attributes(self) -> None:
+        token = object()
+        callback = Mock(return_value=1)
+
+        result = trace(callback, token=token)
+
+        callback.assert_called_once_with(token=token)
+        assert result.roller.attributes()["state"] == {"token": repr(token)}
+        rollers = result.trace()["rollers"]
+        assert isinstance(rollers, dict)
+        assert rollers["roller0"]["attributes"]["state"] == {"token": repr(token)}
+        json.dumps(result.trace())
+
+    def test_recursive_callback_with_state(self) -> None:
+        def explode(
+            roll: SingleOutcomeRoll[int], remaining: int = 2
+        ) -> TraceReturn[int]:
+            if remaining:
+                result = roll + trace(explode, roll.roller, remaining=remaining - 1)
+                return TraceReturn(result)
+            return TraceReturn(roll)
+
+        result = trace(explode, LiteralRoller(6))
+
+        assert_type(result, Roll[int])
+        assert result.outcomes == (18,)
+        rollers = result.trace()["rollers"]
+        assert isinstance(rollers, dict)
+        assert (
+            sum(data["attributes"]["kind"] == "dyce.trace" for data in rollers.values())
+            == 3
+        )
+
+    def test_parameter_roller_failure_path(self) -> None:
+        source = PRoller(P())
+        with pytest.raises(RollError) as caught:
+            trace(lambda roll: roll, source, label="custom")
+
+        assert caught.value.path[0].attributes() == {
+            "kind": "dyce.trace",
+            "label": "custom",
+            "state": {},
+        }
+        assert caught.value.path[1:] == (source,)
+
+    def test_callback_failure_path(self) -> None:
+        with pytest.raises(RollError) as caught:
+            trace(Mock(side_effect=ValueError("callback")), label="custom")
+
+        assert [entry.attributes() for entry in caught.value.path] == [
+            {"kind": "dyce.trace", "label": "custom", "state": {}}
+        ]
+
+    def test_returned_roller_failure_path(self) -> None:
+        returned = PRoller(P())
+        with pytest.raises(RollError) as caught:
+            trace(lambda: returned, label="custom")
+
+        assert caught.value.path[0].attributes() == {
+            "kind": "dyce.trace",
+            "label": "custom",
+            "state": {},
+        }
+        assert caught.value.path[1:] == (returned,)
+
+    @pytest.mark.parametrize("exception_type", [ValueError, RecursionError])
+    def test_original_exception_preserved_as_cause(
+        self, exception_type: type[Exception]
+    ) -> None:
+        failure = exception_type("callback failure")
+        with pytest.raises(RollError) as caught:
+            trace(Mock(side_effect=failure))
+
+        assert caught.value.__cause__ is failure
+
+    def test_mixed_parameter_type_inference(self) -> None:
+        def callback(single: SingleOutcomeRoll[int], multi: Roll[str]) -> str:
+            return str(single.outcome) + multi.outcomes[0]
+
+        result = trace(callback, LiteralRoller(3), PRoller(P(H({"a": 1}))))
+
+        assert_type(result, Roll[str])  # zuban: ignore[misc]
+        assert result.outcomes == ("3a",)
+
+    def test_reroll_can_change_number_of_outcomes(self) -> None:
+        first_roller = RollerPool(LiteralRoller(2))
+        second_roller = RollerPool(LiteralRoller(5), LiteralRoller(8))
+        callback = Mock(side_effect=[first_roller, second_roller])
+
+        result = trace(cast("Callable[[], Roller[int]]", callback))
+        trace_roller = result.roller
+        rerolled_result = trace_roller.roll()
+
+        assert_type(result, Roll[int])
+        rollers = result.trace()["rollers"]
+        rolls = result.trace()["rolls"]
+        assert isinstance(rollers, dict)
+        assert isinstance(rolls, dict)
+        assert "relationships" not in rollers["roller0"]
+        assert result.outcomes == (2,)
+        assert "relationships" not in rolls["roll0"]
+        assert len(rolls) == 1
+        assert rerolled_result.roller is trace_roller
+        assert rerolled_result.outcomes == (5, 8)
+        rerolled_trace = rerolled_result.trace()
+        rerolled_rolls = rerolled_trace["rolls"]
+        assert isinstance(rerolled_rolls, dict)
+        assert "relationships" not in rerolled_rolls["roll0"]
+        assert len(rerolled_rolls) == 1
+
+    @pytest.mark.parametrize(
+        ("selector", "expected"), [(-1, (3,)), (slice(1, None), (2, 3))]
+    )
+    def test_selecting_trace_roller_calls_callback_again(
+        self, selector: int | slice, expected: tuple[int, ...]
+    ) -> None:
+        callback = Mock(
+            side_effect=[
+                RollerPool(LiteralRoller(1)),
+                RollerPool(LiteralRoller(1), LiteralRoller(2), LiteralRoller(3)),
+            ]
+        )
+
+        result = trace(cast("Callable[[], Roller[int]]", callback))
+
+        assert result.roller.select(selector).roll().outcomes == expected
+
+    @pytest.mark.parametrize(
+        ("roll_mode", "rolls", "expected"),
+        [
+            ("normal", [7], 0),
+            ("normal", [15, 4], 6),
+            ("normal", [20, 4, 5], 11),
+            ("advantage", [4, 16, 5], 7),
+            ("disadvantage", [16, 4], 0),
+        ],
+    )
+    def test_attack_mechanic(
+        self, roll_mode: _RollMode, rolls: list[int], expected: int
+    ) -> None:
+        with patch.object(H, "roll", side_effect=rolls):
+            result = _attack(15, 1, 2, roll_mode)
+
+        assert result.outcomes == (expected,)
+        assert result.roller.attributes() == {
+            "kind": "dyce.trace",
+            "label": "attack",
+            "state": {
+                "dc": 15,
+                "dc_modifier": 1,
+                "damage_modifier": 2,
+            },
+        }
 
 
 def _attack(
