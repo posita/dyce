@@ -43,9 +43,34 @@ repos:
           )$
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.17
+    rev: 0.12.19
     hooks:
       - id: uv-lock
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/google/osv-scanner
+    rev: v2.6.0
+    hooks:
+      - id: osv-scanner
+
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.178.0
+    hooks:
+      - id: semgrep-ci
+
+  # - repo: https://github.com/mxab/pre-commit-trivy
+  #   rev: 0.74.0
+  #   hooks:
+  #     - id: trivyfs-docker
+  #       entry: docker.io/aquasec/trivy:0.74.0 fs --cache-dir /src/.pre-commit-trivy-cache --exit-code 1
+  #       args: [.]
+  #     - id: trivyconfig-docker
+  #       entry: docker.io/aquasec/trivy:0.74.0 config --cache-dir /src/.pre-commit-trivy-cache --exit-code 1
+  #       args: [.]
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
@@ -56,7 +81,7 @@ repos:
           - tomli
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
+    rev: v0.16.9
     hooks:
       - id: ruff-check
         entry: ruff check

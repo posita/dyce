@@ -2,6 +2,7 @@
 *.egg-info
 *.py[oc]
 .cache/
+.*-cache/
 .*_cache/
 __pycache__/
 build/
