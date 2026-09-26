@@ -15,68 +15,16 @@
 
 import logging
 import os
-import re
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
-import tomllib
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from mkdocs.config.defaults import MkDocsConfig
 
 _LOGGER = logging.getLogger("mkdocs.hooks")
-
-_BUNDLED_PKG_NAMES = ("optype",)
 
 
 def on_pre_build(**_kwargs: object) -> None:
     _uv_run(("make", "-C", "docs-src", "-j", "4"))
-
-
-def on_post_build(config: "MkDocsConfig", **_kwargs: object) -> None:
-    cmd = ["uv", "build", "--wheel"]
-    _LOGGER.info("running %s", " ".join(cmd))
-    subprocess.run(cmd, check=True)  # ruff: ignore[subprocess-without-shell-equals-true]
-
-    cmd = [
-        "jupyter",
-        "lite",
-        "build",
-        "--debug",
-        "--output-dir",
-        f"{config.site_dir}/jupyter",
-    ]
-    wheels: list[Path | str] = [_get_latest_pkg_wheel_from_dist()]
-    wheels.extend(_bundled_wheel_urls(_BUNDLED_PKG_NAMES))
-    # Fuck you, Jupyter Lite, for costing me hours to work through your lies. (See
-    # <https://github.com/jupyterlite/jupyterlite/issues/1563>.)
-    for wheel in wheels:
-        cmd.extend(("--piplite-wheels", str(wheel)))
-    _uv_run(cmd)
-
-
-def _bundled_wheel_urls(pkg_names: Iterable[str]) -> Iterator[str]:
-    uv_lock_path = Path("uv.lock")
-    for pkg_name in pkg_names:
-        with uv_lock_path.open("rb") as f:
-            uv_lock = tomllib.load(f)
-        pkg = next(p for p in uv_lock["package"] if p["name"] == pkg_name)
-        try:
-            yield next(
-                w["url"]
-                for w in pkg.get("wheels", [])
-                if re.search(r"\bnone-any\b", w["url"])
-            )
-        except StopIteration:
-            raise RuntimeError(
-                f"no none-any wheel for {pkg!r} found in {uv_lock_path}"
-            ) from None
-
-
-def _get_latest_pkg_wheel_from_dist() -> Path:
-    return max(Path("dist").glob("dyce*-none-any.whl"), key=os.path.getmtime)
 
 
 def _uv_run(cmd: Sequence[str]) -> None:
