@@ -127,6 +127,7 @@ nav:
     # The following are internal and intentionally excluded from the
     # published API navigation: dyce.lifecycle, dyce.rng, and
     # dyce.types
+    - Traceable Rollers: dyce.roller.md
     - Visualization:
       - Shared structures: dyce.viz.md
       - Matplotlib (optional): dyce.viz.matplotlib.md

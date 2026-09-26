@@ -1072,8 +1072,9 @@ class TestPAt:
 
 
 class TestPRoll:
-    def test_roll_empty(self) -> None:
-        assert P().roll() == ()
+    def test_roll_empty_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty pool\b"):
+            P().roll()
 
     def test_roll(self) -> None:
         d10 = H(10)
@@ -1083,6 +1084,9 @@ class TestPRoll:
             roll = p_6d10.roll()
             assert len(roll) == len(p_6d10)
             assert all(v in d10 for v in roll)
+
+    def test_incomparable_outcomes_use_natural_order(self) -> None:
+        assert P(H({2j: 1}), H({1j: 1})).roll() == (1j, 2j)
 
     def test_roll_symbols(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")

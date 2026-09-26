@@ -220,7 +220,8 @@ class TestHableOpsMixin:
 
 class TestHableH:
     def test_does_not_use_hable_ops_mixin(self) -> None:
-        assert not isinstance(H({1: 1}), HableOpsMixin)
+        h: object = H(1)
+        assert not isinstance(h, HableOpsMixin)
 
     def test_satisfies_hable_t(self) -> None:
         assert isinstance(H({1: 1}), HableT)
