@@ -58,7 +58,7 @@
   ([`H`][dyce.H] and [`P`][dyce.P] still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)
 - Re-introduces low-level [Matplotlib](https://matplotlib.org/) plotting functions in [`dyce.viz.matplotlib`][dyce.viz.matplotlib].
 - Adds portable [Plotly](https://plotly.com/) figure specifications in [`dyce.viz.plotly`][dyce.viz.plotly].
-  (High-level, interactive visualization functionality still lives in [`anydyce`](https://github.com/posita/anydyce/).)
+  (High-level, interactive visualization functionality still lives in [`dyceum`](https://github.com/posita/dyceum/).)
 - Stabilizes Jupyter Lite installation.
 - Defaults to collapsed installation cells in notebooks.
 - Modernizes `setup.cfg` -> `pyproject.toml` (and `tox.ini`).
