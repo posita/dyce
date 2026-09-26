@@ -41,7 +41,6 @@ def fig_callback() -> None:
     )
     ax.tick_params(axis="x", labelrotation=60)
     ax.set_title("Various quantities of d4s")
-    ax.legend()
     # --8<-- [end:viz]
 
 
