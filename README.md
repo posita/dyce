@@ -226,7 +226,7 @@ std |    1.40
 [`H` objects](https://dycelib.org/latest/dyce/#dyce.H) provides a [`probability_items` method](https://dycelib.org/latest/dyce/#dyce.H.probability_items) to ease integration with plotting packages.
 [`dyce.viz.matplotlib`](https://dycelib.org/latest/dyce.viz.matplotlib/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
 [`dyce.viz.plotly`](https://dycelib.org/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
-[`anydyce`](https://github.com/posita/anydyce/) provides additional interactive visualization tools.
+[`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
 
     --8<-- "docs/assets/plot_2d6_lo_hi.py:core"
 
