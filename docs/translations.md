@@ -318,7 +318,7 @@ Table:
   </tbody>
 </table>
 
-Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=ironsworn.ipynb)
 
     --8<-- "docs-src/plot_ironsworn.py:viz"
 
@@ -333,7 +333,7 @@ Visualization: <a href="../jupyter/lab/?path=ironsworn.ipynb"><img src="https://
 
     --8<-- "docs-src/plot_4d6_variants.py:core"
 
-Visualization: <a href="../jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=4d6_variants.ipynb)
 
     --8<-- "docs-src/plot_4d6_variants.py:viz"
 
@@ -362,7 +362,7 @@ Translation:
 
     --8<-- "docs-src/plot_burning_arch.py:core"
 
-Visualization: <a href="../jupyter/lab/?path=burning_arch.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=burning_arch.ipynb)
 
     --8<-- "docs-src/plot_burning_arch.py:viz"
 
@@ -544,7 +544,7 @@ Example 1 table:
   </tbody>
 </table>
 
-Example 1 visualization: <a href="../jupyter/lab/?path=great_weapon_fighting.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Example 1 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=great_weapon_fighting.ipynb)
 
     --8<-- "docs-src/plot_great_weapon_fighting.py:viz"
 
@@ -577,7 +577,7 @@ Example 2 translation:
 
     --8<-- "docs-src/plot_advantage.py:core"
 
-Example 2 visualization: <a href="../jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Example 2 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=advantage.ipynb)
 
     --8<-- "docs-src/plot_advantage.py:viz"
 
@@ -601,7 +601,7 @@ Translation:
 
     --8<-- "docs-src/plot_d10_explode.py:core"
 
-Visualization: <a href="../jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=d10_explode.ipynb)
 
 <details>
 <summary>
@@ -636,7 +636,7 @@ Translation:
 
     --8<-- "docs-src/plot_dupes.py:core"
 
-Visualization: <a href="../jupyter/lab/?path=dupes.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=dupes.ipynb)
 
     --8<-- "docs-src/plot_dupes.py:viz"
 
@@ -677,7 +677,7 @@ Translation:
 
     --8<-- "docs-src/plot_roll_and_keep.py:core"
 
-Visualization: <a href="../jupyter/lab/?path=roll_and_keep.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=roll_and_keep.ipynb)
 
 <details>
 <summary>
@@ -839,7 +839,7 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
     --8<-- "docs-src/plot_risus.py:display-detail"
 </details>
 
-Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=risus.ipynb)
 
     --8<-- "docs-src/plot_risus.py:viz-first-round"
 
@@ -870,7 +870,7 @@ It’s worth going back and dissecting as a fairly nuanced application of [`expa
 When called with its default arguments, `risus_combat_driver` satisfies the `VersusFuncT` interface.
 This means we can use it directly with our `vs_scenarios_dataframes` helper to enumerate resolution outcomes from various starting positions.
 
-Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=risus.ipynb)
 
     --8<-- "docs-src/plot_risus.py:viz-multi-round-standard"
 
@@ -905,7 +905,7 @@ This pattern will come up again below, so we’ll capture it in a helper functio
 
 We’ll use that Goliath Rule helper to approximate a complete “Best-of-Set” combat and compare it to a “standard” one.
 
-Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=risus.ipynb)
 
     --8<-- "docs-src/plot_risus.py:viz-multi-round-best-of-set"
 
@@ -954,7 +954,7 @@ Now we can craft an “Evens Up” implementation suitable for passing to our `r
 
 We’ll use that to approximate a complete “Evens Up” combat, continuing to leveraging our Goliath Rule helper from above.
 
-Visualization: <a href="../jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=risus.ipynb)
 
     --8<-- "docs-src/plot_risus.py:viz-multi-round-evens-up"
 

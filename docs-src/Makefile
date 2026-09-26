@@ -2,17 +2,7 @@ all : \
 	../docs/dyce-powered.svg \
 	../docs/index.md \
 	../docs/license.md \
-	../docs/notebooks/2d6_lo_hi.ipynb \
-	../docs/notebooks/4d6_variants.ipynb \
-	../docs/notebooks/advantage.ipynb \
-	../docs/notebooks/burning_arch.ipynb \
-	../docs/notebooks/d10_explode.ipynb \
-	../docs/notebooks/dupes.ipynb \
-	../docs/notebooks/great_weapon_fighting.ipynb \
-	../docs/notebooks/histogram.ipynb \
-	../docs/notebooks/ironsworn.ipynb \
-	../docs/notebooks/risus.ipynb \
-	../docs/notebooks/roll_and_keep.ipynb \
+	jupyterlite \
 	../docs/images/plot_2d6_lo_hi_dark.svg \
 	../docs/images/plot_2d6_lo_hi_light.svg \
 	../docs/images/plot_4d6_variants_dark.svg \
@@ -66,6 +56,26 @@ FORCE:
 perf : \
 	perf_expand.txt \
 	perf_rolls_with_counts.txt
+
+jupyterlite: FORCE \
+	../docs/notebooks/2d6_lo_hi.ipynb \
+	../docs/notebooks/4d6_variants.ipynb \
+	../docs/notebooks/advantage.ipynb \
+	../docs/notebooks/burning_arch.ipynb \
+	../docs/notebooks/d10_explode.ipynb \
+	../docs/notebooks/dupes.ipynb \
+	../docs/notebooks/great_weapon_fighting.ipynb \
+	../docs/notebooks/histogram.ipynb \
+	../docs/notebooks/ironsworn.ipynb \
+	../docs/notebooks/risus.ipynb \
+	../docs/notebooks/roll_and_keep.ipynb
+	cd .. && uv build --wheel
+	@cd .. && set -eu; \
+		dyce_wheel=$$(ls -t dist/dyce*-none-any.whl | head -n 1); \
+		test -f "$$dyce_wheel"; \
+		optype_wheel=$$("$${PYTHON:-python3}" -c 'import tomllib; packages = tomllib.load(open("uv.lock", "rb"))["package"]; print(next(w["url"] for p in packages if p["name"] == "optype" for w in p.get("wheels", []) if "none-any" in w["url"]))'); \
+		jupyter lite build --debug --output-dir docs/jupyter \
+			--piplite-wheels "$$dyce_wheel" --piplite-wheels "$$optype_wheel"
 
 ../docs/index.md : ../README.md FORCE
 	@set -eu; \

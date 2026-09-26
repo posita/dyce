@@ -727,7 +727,7 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
 If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed [`dyce.viz.matplotlib`][dyce.viz.matplotlib] provides plotting conveniences.
 For something more sophisticated, [`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
 
-Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=histogram.ipynb)
 
     --8<-- "docs-src/plot_histogram.py:viz"
 
