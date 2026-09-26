@@ -1,5 +1,7 @@
 all : \
 	../docs/dyce-powered.svg \
+	../docs/index.md \
+	../docs/license.md \
 	../docs/notebooks/2d6_lo_hi.ipynb \
 	../docs/notebooks/4d6_variants.ipynb \
 	../docs/notebooks/advantage.ipynb \
@@ -58,9 +60,40 @@ all : \
 	snippets/plotly_viz_plot_line_at_most.html \
 	snippets/plotly_viz_plot_ridge.html
 
+.PHONY: FORCE
+FORCE:
+
 perf : \
 	perf_expand.txt \
 	perf_rolls_with_counts.txt
+
+../docs/index.md : ../README.md FORCE
+	@set -eu; \
+	raw_version=$$("$${PYTHON:-python3}" -c 'import importlib.metadata; print(importlib.metadata.version("dyce"))'); \
+	case "$$raw_version" in \
+		*+*|*.dev*) git_ref=main; docs_version=latest; release=;; \
+		*) git_ref="v$$raw_version"; docs_version=$$(printf '%s' "$$raw_version" | cut -d. -f1,2); release=1;; \
+	esac; \
+	temp_file=$$(mktemp ../docs/.index.md.XXXXXX); \
+	trap 'rm -f "$$temp_file" "$$temp_file.release"' 0; \
+	sed \
+		-e '/<!-- docs:hide:start -->/,/<!-- docs:hide:end -->/d' \
+		-e "s#raw.githubusercontent.com/posita/dyce/main/#raw.githubusercontent.com/posita/dyce/$$git_ref/#g" \
+		-e "s#github.com/posita/dyce/blob/main/#github.com/posita/dyce/blob/$$git_ref/#g" \
+		-e "s#github.com/posita/dyce/tree/main/#github.com/posita/dyce/tree/$$git_ref/#g" \
+		-e "s#https://dycelib.org/latest/#https://dycelib.org/$$docs_version/#g" \
+		../README.md > "$$temp_file"; \
+	if [ -n "$$release" ]; then \
+		sed -E \
+			-e "s#(https://img\.shields\.io/pypi/[^/]+/dyce)\.svg#\1/$$raw_version.svg#g" \
+			-e "s#(https://pypi\.org/project/dyce/)\)#\1$$raw_version/)#g" \
+			"$$temp_file" > "$$temp_file.release"; \
+		mv "$$temp_file.release" "$$temp_file"; \
+	fi; \
+	if ! cmp -s "$$temp_file" "$@"; then \
+		chmod 644 "$$temp_file"; \
+		mv "$$temp_file" "$@"; \
+	fi
 
 # \
  # 	perf_pools_vs_rollers.txt
@@ -77,10 +110,14 @@ perf : \
 ../docs/images/plot_risus_multi_round_evens_up_light.svg &: plot_risus.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_risus.py --log-level INFO --style light --output-dir ../docs/images
 
+../docs/license.md : ../LICENSE
+	cp -p $< $@
+
 ../docs/notebooks/%.ipynb : nb_%.py
 	jupytext --to notebook --update $< --output $@
 	ruff check --fix $@
 	ruff format $@
+	touch $@
 
 ../docs/images/plot_%_dark.svg : plot_%.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_$*.py --log-level INFO --style dark --output-file $@
