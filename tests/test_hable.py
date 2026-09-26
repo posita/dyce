@@ -121,6 +121,21 @@ class TestHableT:
             is NotImplemented
         )
 
+    @pytest.mark.parametrize("operator_name", _BINARY_OPERATOR_NAMES)
+    def test_reflected_operators_defer_to_non_operator_hables(
+        self, operator_name: str
+    ) -> None:
+        hable = _HableImplementation(H({2: 1}))
+        reflected_operator_name = f"__r{operator_name[2:]}"
+
+        assert getattr(H({1: 1}), reflected_operator_name)(hable) is NotImplemented
+        assert (
+            getattr(_HableImplementationWithOps(H({1: 1})), reflected_operator_name)(
+                hable
+            )
+            is NotImplemented
+        )
+
 
 class TestHableOpsMixin:
     def test_binary_operator_types_flatten_operator_owning_operands(self) -> None:
