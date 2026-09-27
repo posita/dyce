@@ -27,11 +27,16 @@ def pytest_ignore_collect(
     collection_path: Path,
     config: pytest.Config,  # ruff: ignore[unused-function-argument]
 ) -> bool:
-    # nb_*.py are jupytext notebook sources. Their top-level await makes them
-    # unimportable. plot_*.py have some doc-specific imports (e.g., jinja2) that aren't
-    # (and as-of-yet shouldn't) matter for testing.
-    if collection_path.match("docs-src/nb_*.py") or collection_path.match(
-        "docs-src/plot_*.py"
+    if (
+        # Auto-generated doc-specific files
+        collection_path.match("docs/index.md")
+        or collection_path.match("docs/license.md")
+        or collection_path.match("docs/jupyter")
+        # The top-level await makes nb_*.py unimportable
+        or collection_path.match("docs-src/nb_*.py")
+        # plot_*.py have some doc-specific imports (e.g., jinja2) that aren't (and
+        # as-of-yet shouldn't) matter for testing
+        or collection_path.match("docs-src/plot_*.py")
     ):
         return True
     if platform.python_implementation() == "PyPy":

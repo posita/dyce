@@ -16,7 +16,7 @@ jobs:
       - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:
           cache-python: true
-      - run: uv sync --no-dev --group docs
+      - run: uv run --no-dev --group docs make -C docs-src -j 4
       - run: git config user.name "github-actions[bot]"
       - run: git config user.email "github-actions[bot]@users.noreply.github.com"
       - run: |
@@ -25,4 +25,4 @@ jobs:
           v = '$FULL_VERSION'.split('.')
           print(f'{v[0]}.{v[1]}')
           ")
-          uv run mike deploy --push --update-aliases "$MINOR_VERSION" latest
+          uv run --no-dev --group docs mike deploy --push --update-aliases "$MINOR_VERSION" latest

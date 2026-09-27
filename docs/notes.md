@@ -66,6 +66,7 @@
 - Migrates to `ruff` for linting.
   Who let the dogs out?
   *We* let dogs out.
+- Migrates docs to Zensical to avoid the fallout from this [dumpster fire](https://fpgmaas.com/blog/collapse-of-mkdocs/) (surreptitious discovery credited to an [unrelated effort](https://github.com/beartype/beartype/pull/647#issuecomment-4523977543)).
 
 ## [0.6.2](https://github.com/posita/dyce/releases/tag/v0.6.2)
 

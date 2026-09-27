@@ -36,7 +36,7 @@ How do we do compute these results using `dyce`?
 
     >>> from dyce import H
     >>> one_in_d6 = H(6).eq(1)
-    >>> for n in range(1, 7):
+    >>> for n in range(1, 7):  # (1)!
     ...     ones_in_nd6 = n @ one_in_d6
     ...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
     ...     print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
@@ -46,6 +46,8 @@ How do we do compute these results using `dyce`?
     4: 51.77%
     5: 59.81%
     6: 66.51%
+
+1. Iterates `n` over the range ${1..6}$
 
 So far so good.
 Let’s keep going.
@@ -152,7 +154,7 @@ Now let’s put everything together.
     5 -> {'NONE': '40.2%', 'COMMON': '24.9%', 'UNCOMMON': '16.2%', 'RARE': '11.2%', 'VERY_RARE': ' 7.5%'}
     6 -> {'NONE': '33.5%', 'COMMON': '27.7%', 'UNCOMMON': '18.0%', 'RARE': '12.5%', 'VERY_RARE': ' 8.3%'}
 
-Well butter my butt, and call me a biscuit!
+Well butter my butt, and call me a biscuit! 🤠
 That Angry guy sure knows his math!
 
 ## Modeling *Ironsworn*’s core mechanic
@@ -181,6 +183,11 @@ We can also deploy a counting trick with the two d10s.
 
     >>> def iron_dependent_term(action: HResult[int]) -> H[int]:
     ...     return 2 @ d10.lt(action.outcome)
+
+    >>> expand(iron_dependent_term, d6 + 1)  # expected results for an action modifier of +1
+    H({0: 271, 1: 238, 2: 91})
+
+<!-- -->
 
     >>> iron_distributions_by_action_mod = {
     ...     action_mod: H.from_counts(
@@ -323,13 +330,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_ironsworn.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_ironsworn_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_ironsworn_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Ironsworn distributions" src="images/plot_ironsworn_light.svg">
 </picture>
 
@@ -342,13 +349,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_4d6_variants.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_4d6_variants_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_4d6_variants_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Comparing various take-three-of-4d6 methods" src="images/plot_4d6_variants_light.svg">
 </picture>
 
@@ -375,13 +382,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_burning_arch.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_burning_arch_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_burning_arch_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Attack with saving throw for half damage" src="images/plot_burning_arch_light.svg">
 </picture>
 
@@ -561,13 +568,13 @@ Example 1 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/late
     --8<-- "docs-src/plot_great_weapon_fighting.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_great_weapon_fighting_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_great_weapon_fighting_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Comparing a normal attack to an enhanced one" src="images/plot_great_weapon_fighting_light.svg">
 </picture>
 
@@ -598,13 +605,13 @@ Example 2 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/late
     --8<-- "docs-src/plot_advantage.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_advantage_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_advantage_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Advantage-weighted attack with critical hits" src="images/plot_advantage_light.svg">
 </picture>
 
@@ -632,13 +639,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_d10_explode_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_d10_explode_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="images/plot_d10_explode_light.svg">
 </picture>
 
@@ -665,13 +672,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_dupes.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_dupes_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_dupes_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Chances of rolling *n* duplicates" src="images/plot_dupes_light.svg">
 </picture>
 
@@ -716,13 +723,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 </details>
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_roll_and_keep_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_roll_and_keep_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Roll-and-keep mechanic comparison" src="images/plot_roll_and_keep_light.svg">
 </picture>
 
@@ -876,13 +883,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_risus.py:viz-first-round"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_first_round_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_first_round_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_first_round_light.svg">
 </picture>
 
@@ -911,13 +918,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_risus.py:viz-multi-round-standard"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_standard_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_standard_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_standard_light.svg">
 </picture>
 
@@ -950,13 +957,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_risus.py:viz-multi-round-best-of-set"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_best_of_set_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_best_of_set_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_best_of_set_light.svg">
 </picture>
 
@@ -1003,13 +1010,13 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
     --8<-- "docs-src/plot_risus.py:viz-multi-round-evens-up"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_evens_up_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_evens_up_light.svg">
-  <!--
-    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-    img[src] should be "../images/...".
-    -->
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_evens_up_light.svg">
 </picture>
 

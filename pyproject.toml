@@ -73,7 +73,7 @@ docs = [
     "jupyterlite",
     "jupyterlite-pyodide-kernel",
     "markdown-pycon",  # syntax highlighting for doctests
-    "mike",
+    "mike @ git+https://github.com/squidfunk/mike.git",
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings[python]",

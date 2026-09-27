@@ -261,7 +261,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         >>> lo_var_d6
         H({2: 1, 3: 2, 4: 2, 5: 1})
 
-    If *init_val* is an `int` (and ***only*** an `int`) ,it is shorthand for creating a sequential range `#!math \left[ {1} .. {init\_val} \right]` (or `#!math \left[ {init\_val} .. {-1} \right]` if *init_val* is negative).
+    If *init_val* is an `int` (and ***only*** an `int`) ,it is shorthand for creating a sequential range $\left[ {1} .. {init\_val} \right]$ (or $\left[ {init\_val} .. {-1} \right]$ if *init_val* is negative).
 
         >>> H(8)
         H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1})
@@ -328,7 +328,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
          11 |   5.56% |##
          12 |   2.78% |#
 
-    To sum `#!math {n}` identical histograms, the matrix multiplication operator (`@`) provides a shorthand.
+    To sum ${n}$ identical histograms, the matrix multiplication operator (`@`) provides a shorthand.
 
         >>> 3 @ d6 == d6 + d6 + d6
         True
@@ -1878,7 +1878,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         r"""
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
 
-        *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
+        *pos* is a zero-based index analogous to $k$ in the `#!k`th order statistic this method implements.
 
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
             >>> d6avg.order_stat_for_n_at_pos(5, 3)
@@ -1948,7 +1948,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         Returns the smallest outcome whose cumulative probability (i.e., including all smaller weighted outcomes) is at least *numerator* / *denominator*.
 
         It matches NumPy's [`numpy.quantile(outcomes, numerator / denominator, weights=counts, method="inverted_cdf")`](https://numpy.org/doc/stable/reference/generated/numpy.quantile.html) (the step-function quantile appropriate to a discrete distribution), but stays integer-exact rather than rounding through `float`.
-        Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval `#!math \left[ 0, 1 \right]`.
+        Raises `ValueError` if the histogram is empty, if *denominator* is not positive, or if *numerator* / *denominator* lies outside the closed interval $\left[ 0, 1 \right]$.
 
             >>> (2 @ H(10)).quantile(1, 3)
             9
@@ -2869,7 +2869,7 @@ def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
     This ensures callers never have to special-case the empty collection.
     Outcomes must support addition with outcomes of the same type and produce that same type.
 
-    Consecutive equal histograms are batched via `@` (which uses `#!math O\left( \log n \right)` exponentiation by squaring), so homogeneous pools are convolved efficiently when flattened by `P.h()`.
+    Consecutive equal histograms are batched via `@` (which uses $O\left( \log n \right)$ exponentiation by squaring), so homogeneous pools are convolved efficiently when flattened by `P.h()`.
     """
     result: H[_CanAddSameT] | None = None
     for h, group in groupby(hs):
@@ -2881,7 +2881,7 @@ def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
 
 class _ConvolveFallbackWarning(UserWarning):
     r"""
-    Issued when [`_convolve_fast`][dyce.h._convolve_fast] falls back to the `#!math O \left( n \right)` linear approach.
+    Issued when [`_convolve_fast`][dyce.h._convolve_fast] falls back to the $O \left( n \right)$ linear approach.
     """
 
 
@@ -2907,7 +2907,7 @@ def _convolve(
     r"""
     Sums *n* independent copies of *mapping* (*n*-fold additive convolution).
 
-    Tries `#!math O\left( \log n \right)` exponentiation by squaring first, falling back to the `#!math O\left( n \right)` linear approach if squaring fails.
+    Tries $O\left( \log n \right)$ exponentiation by squaring first, falling back to the $O\left( n \right)$ linear approach if squaring fails.
     (Some outcome types may only support addition with the original outcome type, not with evolved sums.)
     """
     if n == 0:
@@ -2933,7 +2933,7 @@ def _convolve_fast(
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Computes n-fold additive convolution in `#!math O\left( \log n \right)` steps.
+    Computes n-fold additive convolution in $O\left( \log n \right)$ steps.
 
     This is the classic "exponentiation by squaring" algorithm, generalized from multiplication to any associative binary operation.
     Additive convolution of histograms is associative, so it qualifies.
@@ -2942,7 +2942,7 @@ def _convolve_fast(
 
         n copies = (n//2 copies) convolved with (n//2 copies)   [+ 1 extra if n is odd]
 
-    So instead of accumulating one copy at a time (`#!math O\left( n \right)` steps), we repeatedly double `base`—convolving it with itself—and accumulate it into `acc` only for the bits of `n` that are set.
+    So instead of accumulating one copy at a time ($O\left( n \right)$ steps), we repeatedly double `base`—convolving it with itself—and accumulate it into `acc` only for the bits of `n` that are set.
     Each bit of `n` corresponds to a power-of-two number of copies (1, 2, 4, 8, …), and the set bits tell us which powers to combine, exactly as binary addition works.
 
     Example: n=6 (binary 110)
@@ -2990,7 +2990,7 @@ def _convolve_linear(
     #     n: int,
     # ) -> dict[Any, int] | NotImplementedType:
     r"""
-    Linear fallback: `#!math O \left( n \right)` steps, always adding the original mapping.
+    Linear fallback: $O \left( n \right)$ steps, always adding the original mapping.
     """
     result: dict[Any, int] = dict(mapping)
     for _ in range(1, n):

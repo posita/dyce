@@ -1063,7 +1063,7 @@ dev = [
     { name = "markdown-pycon" },
     { name = "matplotlib" },
     { name = "matplotlib-inline" },
-    { name = "mike" },
+    { name = "mike", git = "https://github.com/squidfunk/mike.git" },
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extras = ["python"] },
@@ -1098,7 +1098,7 @@ docs = [
     { name = "jupytext" },
     { name = "markdown-pycon" },
     { name = "matplotlib" },
-    { name = "mike" },
+    { name = "mike", git = "https://github.com/squidfunk/mike.git" },
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extras = ["python"] },
@@ -1122,7 +1122,7 @@ lint = [
     { name = "markdown-pycon" },
     { name = "matplotlib" },
     { name = "matplotlib-inline" },
-    { name = "mike" },
+    { name = "mike", git = "https://github.com/squidfunk/mike.git" },
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extras = ["python"] },
@@ -2141,19 +2141,13 @@ wheels = [
 
 [[package]]
 name = "mike"
-version = "2.2.0"
-source = { registry = "https://pypi.org/simple" }
+version = "2.2.0+zensical.0.1.0"
+source = { git = "https://github.com/squidfunk/mike.git#2d4ad799442f4592db8ad53b179bfb33db8c69ac" }
 dependencies = [
     { name = "jinja2" },
-    { name = "mkdocs" },
     { name = "pyparsing" },
-    { name = "pyyaml" },
-    { name = "pyyaml-env-tag" },
     { name = "verspec" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b4/47/fa87e9d56bef16cdfe34b059a437e8c6f7ec6f1b9c378871c3cf95ebea9c/mike-2.2.0.tar.gz", hash = "sha256:1e3858e32c0f125aac14432fc7848434358f9ae0962c5c5cde387ad47f6ad25e", size = 38450, upload-time = "2026-04-14T04:59:03.944Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/76/8e/56ccb09c7232a55403a7637caa21922f3b65901a37f5e8bdb405d0de0946/mike-2.2.0-py3-none-any.whl", hash = "sha256:e1f4981c1152eec7c2490a3401142292cc47d686194188416db2648fdfe1d040", size = 34026, upload-time = "2026-04-14T04:59:02.602Z" },
+    { name = "zensical" },
 ]
 
 [[package]]
