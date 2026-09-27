@@ -188,7 +188,11 @@ def plot_bar(
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_bar_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_bar_light.svg">
-            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_bar_light.svg">
+            <!--
+              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+              img[src] should be "../images/...".
+              -->
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="images/plot_viz_plot_bar_light.svg">
         </picture>
 
     === "Horizontal bars (`horizontal=True`)"
@@ -198,7 +202,11 @@ def plot_bar(
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_hbar_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_hbar_light.svg">
-            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_hbar_light.svg">
+            <!--
+              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+              img[src] should be "../images/...".
+              -->
+            <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="images/plot_viz_plot_hbar_light.svg">
         </picture>
     """
     hs_list = _labeled_hs(hs, labels)
@@ -347,7 +355,11 @@ def plot_burst(
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_burst_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_burst_light.svg">
-        <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_burst_light.svg">
+        <!--
+          TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+          img[src] should be "../images/...".
+          -->
+        <img alt="Plot: 2d10 vs. d8 + d12" src="images/plot_viz_plot_burst_light.svg">
     </picture>
     """
     ax = _get_ax(ax)
@@ -443,7 +455,11 @@ def plot_line(
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_light.svg">
+            <!--
+              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+              img[src] should be "../images/...".
+              -->
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_viz_plot_line_light.svg">
         </picture>
 
     === "`graph_type=GraphType.AT_MOST`"
@@ -453,7 +469,11 @@ def plot_line(
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_most_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_most_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_most_light.svg">
+            <!--
+              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+              img[src] should be "../images/...".
+              -->
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_viz_plot_line_at_most_light.svg">
         </picture>
 
     === "`graph_type=GraphType.AT_LEAST`"
@@ -463,7 +483,11 @@ def plot_line(
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_least_dark.svg">
             <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_least_light.svg">
-            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_least_light.svg">
+            <!--
+              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+              img[src] should be "../images/...".
+              -->
+            <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_viz_plot_line_at_least_light.svg">
         </picture>
     """
     hs_list = _labeled_hs(hs, labels)
@@ -548,7 +572,11 @@ def plot_ridge(
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_ridge_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_ridge_light.svg">
-        <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_ridge_light.svg">
+        <!--
+          TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+          img[src] should be "../images/...".
+          -->
+        <img alt="Plot: 2d10 vs. d8 + d12" src="images/plot_viz_plot_ridge_light.svg">
     </picture>
     """
     hs_list = _labeled_hs(hs, labels)

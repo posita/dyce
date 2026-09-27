@@ -735,7 +735,11 @@ Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotli
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_histogram_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_histogram_light.svg">
-  <img alt="Plot: Distribution for 3d6" src="../images/plot_histogram_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Distribution for 3d6" src="images/plot_histogram_light.svg">
 </picture>
 
 ## Time to get meta-evil on those outcomes!

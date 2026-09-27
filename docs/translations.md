@@ -326,7 +326,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_ironsworn_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_ironsworn_light.svg">
-  <img alt="Plot: Ironsworn distributions" src="../images/plot_ironsworn_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Ironsworn distributions" src="images/plot_ironsworn_light.svg">
 </picture>
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
@@ -341,7 +345,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_4d6_variants_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_4d6_variants_light.svg">
-  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../images/plot_4d6_variants_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="images/plot_4d6_variants_light.svg">
 </picture>
 
 ## Translating one example from [`markbrockettrobson/python_dice`](https://github.com/markbrockettrobson/python_dice#usage)
@@ -370,7 +378,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_burning_arch_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_burning_arch_light.svg">
-  <img alt="Plot: Attack with saving throw for half damage" src="../images/plot_burning_arch_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Attack with saving throw for half damage" src="images/plot_burning_arch_light.svg">
 </picture>
 
 An alternative using [`expand`][dyce.expand]:
@@ -552,7 +564,11 @@ Example 1 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/late
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_great_weapon_fighting_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_great_weapon_fighting_light.svg">
-  <img alt="Plot: Comparing a normal attack to an enhanced one" src="../images/plot_great_weapon_fighting_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Comparing a normal attack to an enhanced one" src="images/plot_great_weapon_fighting_light.svg">
 </picture>
 
 Example 2 source:
@@ -585,7 +601,11 @@ Example 2 visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/late
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_advantage_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_advantage_light.svg">
-  <img alt="Plot: Advantage-weighted attack with critical hits" src="../images/plot_advantage_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Advantage-weighted attack with critical hits" src="images/plot_advantage_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
@@ -615,7 +635,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_d10_explode_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_d10_explode_light.svg">
-  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="../images/plot_d10_explode_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="images/plot_d10_explode_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[How do I count the number of duplicates in anydice?](https://rpg.stackexchange.com/a/111421)”
@@ -644,7 +668,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_dupes_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_dupes_light.svg">
-  <img alt="Plot: Chances of rolling *n* duplicates" src="../images/plot_dupes_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Chances of rolling *n* duplicates" src="images/plot_dupes_light.svg">
 </picture>
 
 ## Translation of “[How do I implement this specialized roll-and-keep mechanic in AnyDice?](https://rpg.stackexchange.com/a/190806)”
@@ -691,7 +719,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_roll_and_keep_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_roll_and_keep_light.svg">
-  <img alt="Plot: Roll-and-keep mechanic comparison" src="../images/plot_roll_and_keep_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Roll-and-keep mechanic comparison" src="images/plot_roll_and_keep_light.svg">
 </picture>
 
 ## Translation of the accepted answer to “[Modelling opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
@@ -847,7 +879,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_first_round_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_first_round_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_first_round_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_first_round_light.svg">
 </picture>
 
 ### Modeling entire multi-round combats
@@ -878,7 +914,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_standard_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_standard_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_standard_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_standard_light.svg">
 </picture>
 
 ### Modeling different combat resolution methods
@@ -913,7 +953,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_best_of_set_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_best_of_set_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_best_of_set_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_best_of_set_light.svg">
 </picture>
 
 The “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
@@ -962,7 +1006,11 @@ Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/plot_risus_multi_round_evens_up_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../images/plot_risus_multi_round_evens_up_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_risus_multi_round_evens_up_light.svg">
+  <!--
+    TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
+    img[src] should be "../images/...".
+    -->
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_risus_multi_round_evens_up_light.svg">
 </picture>
 
 *Phew!*
