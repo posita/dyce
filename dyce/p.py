@@ -740,7 +740,9 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         """
         if not self:
             raise ValueError("no outcomes from an empty pool")
-        roll = [h.roll() for h in self]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ExperimentalWarning)
+            roll = [h.roll() for h in self]
         try:
             roll.sort()  # pyright: ignore[reportCallIssue] # zuban: ignore[call-arg]
         except TypeError:
