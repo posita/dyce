@@ -2,7 +2,7 @@
   "jupyter-config-data": {
     "appName": "dyce",
     "appUrl": "./lab",
-    "appVersion": "0.8.1",
+    "appVersion": "0.8.3",
     "baseUrl": "./",
     "collaborative": false,
     "contentStorageDrivers": [
@@ -16,12 +16,12 @@
     "federated_extensions": [
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.9077b3d2deaffb329dfc.js",
+        "load": "static/remoteEntry.c8c9eed2cdefdeac.js",
         "name": "@jupyter-widgets/jupyterlab-manager"
       },
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.aa04e0a5a4304ac1.js",
+        "load": "static/remoteEntry.abcac41d5ca77040.js",
         "name": "@jupyterlite/pyodide-kernel-extension"
       },
       {
@@ -30,7 +30,7 @@
         "name": "jupyterlab-jupytext"
       },
       {
-        "load": "static/remoteEntry.58c394332ed33325ffe5.js",
+        "load": "static/remoteEntry.1dda3c8f6e5cd2a3.js",
         "mimeExtension": "./mimeExtension",
         "name": "jupyterlab-plotly"
       },
@@ -420,8 +420,8 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=08a1bd2768fe94b857dd578fd7490130d5612efee6c2704f5cfd85d98d8f2268",
-          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=f67dd037f0a3fd732fb23ec94f0f1578b5bd12ea0bafcff420696664e732559f"
+          "./pypi/all.json?sha256=66098e397fb2f90cf35a5f2b2ea68c80d4ac3adaba9ae16da165d191f8f5707f",
+          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=94e75a51d1c49df7d0c23591188ff4a7ca5475efe7332814b3e5c4b980ef5a71"
         ]
       }
     },
@@ -436,11 +436,11 @@
     "versionInfo": {
       "@jupyter-notebook/application": {
         "label": "Jupyter Notebook",
-        "version": "7.6.0"
+        "version": "7.6.2"
       },
       "@jupyterlab/application": {
         "label": "JupyterLab",
-        "version": "4.6.0"
+        "version": "4.6.3"
       }
     }
   },

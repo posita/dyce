@@ -14,25 +14,30 @@
       
       
       
-        <link rel="next" href="countin/">
+        <link rel="next" href="./countin/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <link rel="icon" href="./assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.65">
     
     
       
-        <title>dyce</title>
+        <title>Introduction - dyce</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.40d3fdbb.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="./assets/stylesheets/modern/palette.812a03bb.min.css">
       
       
 
@@ -43,21 +48,19 @@
       
     
   <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
-  <script src="javascripts/plotly-theme.js"></script>
+  <script src="./javascripts/plotly-theme.js"></script>
 
     
       
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
-    
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL(".",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -78,7 +81,7 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
         
@@ -102,15 +105,15 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="" title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer">
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -172,57 +175,30 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search">
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
         </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
 </div>
       
     
-    
-      <div class="md-header__source">
+    <div class="md-header__source">
+      
         <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
   </div>
 </a>
-      </div>
-    
+      
+    </div>
   </nav>
   
 </header>
@@ -248,10 +224,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="" title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
     dyce
@@ -261,7 +237,7 @@
       <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -281,7 +257,7 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
       
       
         
@@ -294,8 +270,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
-  
+  Introduction
 
     
   </span>
@@ -305,15 +280,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
-  
+  Introduction
 
     
   </span>
@@ -324,7 +298,8 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -333,16 +308,16 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Installation
-      
+      </span>
     </span>
   </a>
   
@@ -352,9 +327,9 @@
           <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Requirements
-      
+      </span>
     </span>
   </a>
   
@@ -368,9 +343,9 @@
         <li class="md-nav__item">
   <a href="#design-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Design philosophy
-      
+      </span>
     </span>
   </a>
   
@@ -379,9 +354,9 @@
         <li class="md-nav__item">
   <a href="#a-taste" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         A taste
-      
+      </span>
     </span>
   </a>
   
@@ -390,9 +365,9 @@
         <li class="md-nav__item">
   <a href="#other-efforts" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Other efforts
-      
+      </span>
     </span>
   </a>
   
@@ -401,9 +376,9 @@
         <li class="md-nav__item">
   <a href="#donors" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Donors
-      
+      </span>
     </span>
   </a>
   
@@ -412,9 +387,9 @@
         <li class="md-nav__item">
   <a href="#customers" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Customers
-      
+      <span class="md-typeset">
+        Customers 
+      </span>
     </span>
   </a>
   
@@ -423,9 +398,9 @@
         <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         License
-      
+      </span>
     </span>
   </a>
   
@@ -446,15 +421,14 @@
   
   
     <li class="md-nav__item">
-      <a href="countin/" class="md-nav__link">
+      <a href="./countin/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Countin’ with histograms and pools
-  
+  Countin’ with histograms and pools
 
     
   </span>
@@ -473,15 +447,14 @@
   
   
     <li class="md-nav__item">
-      <a href="translations/" class="md-nav__link">
+      <a href="./translations/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Applications and translations
-  
+  Applications and translations
 
     
   </span>
@@ -500,15 +473,14 @@
   
   
     <li class="md-nav__item">
-      <a href="notes/" class="md-nav__link">
+      <a href="./notes/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Release notes
-  
+  Release notes
 
     
   </span>
@@ -527,15 +499,14 @@
   
   
     <li class="md-nav__item">
-      <a href="contrib/" class="md-nav__link">
+      <a href="./contrib/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Contributing
-  
+  Contributing
 
     
   </span>
@@ -554,15 +525,14 @@
   
   
     <li class="md-nav__item">
-      <a href="license/" class="md-nav__link">
+      <a href="./license/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -606,8 +576,7 @@
   <span class="md-ellipsis">
     
   
-    API
-  
+  API
 
     
   </span>
@@ -617,33 +586,32 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    API
-  
+  API
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
   
     <li class="md-nav__item">
-      <a href="dyce/" class="md-nav__link">
+      <a href="./dyce/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Core
-  
+  Core
 
     
   </span>
@@ -654,24 +622,23 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
   
     <li class="md-nav__item">
-      <a href="dyce.d/" class="md-nav__link">
+      <a href="./dyce.d/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Conveniences
-  
+  Conveniences
 
     
   </span>
@@ -682,10 +649,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -713,8 +680,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization
-  
+  Visualization
 
     
   </span>
@@ -724,33 +690,32 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7_3">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Visualization
-  
+  Visualization
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
   
     <li class="md-nav__item">
-      <a href="dyce.viz/" class="md-nav__link">
+      <a href="./dyce.viz/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Shared structures
-  
+  Shared structures
 
     
   </span>
@@ -761,24 +726,23 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
   
     <li class="md-nav__item">
-      <a href="dyce.viz.matplotlib/" class="md-nav__link">
+      <a href="./dyce.viz.matplotlib/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Matplotlib (optional)
-  
+  Matplotlib (optional)
 
     
   </span>
@@ -789,24 +753,23 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
   
     <li class="md-nav__item">
-      <a href="dyce.viz.plotly/" class="md-nav__link">
+      <a href="./dyce.viz.plotly/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Plotly
-  
+  Plotly
 
     
   </span>
@@ -817,18 +780,20 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -844,10 +809,24 @@
               
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -856,16 +835,16 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Installation
-      
+      </span>
     </span>
   </a>
   
@@ -875,9 +854,9 @@
           <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Requirements
-      
+      </span>
     </span>
   </a>
   
@@ -891,9 +870,9 @@
         <li class="md-nav__item">
   <a href="#design-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Design philosophy
-      
+      </span>
     </span>
   </a>
   
@@ -902,9 +881,9 @@
         <li class="md-nav__item">
   <a href="#a-taste" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         A taste
-      
+      </span>
     </span>
   </a>
   
@@ -913,9 +892,9 @@
         <li class="md-nav__item">
   <a href="#other-efforts" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Other efforts
-      
+      </span>
     </span>
   </a>
   
@@ -924,9 +903,9 @@
         <li class="md-nav__item">
   <a href="#donors" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Donors
-      
+      </span>
     </span>
   </a>
   
@@ -935,9 +914,9 @@
         <li class="md-nav__item">
   <a href="#customers" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Customers
-      
+      <span class="md-typeset">
+        Customers 
+      </span>
     </span>
   </a>
   
@@ -946,9 +925,9 @@
         <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         License
-      
+      </span>
     </span>
   </a>
   
@@ -968,8 +947,6 @@
               <article class="md-content__inner md-typeset">
                 
                   
-
-
   
   
 
@@ -990,15 +967,15 @@
 
 <p><a href="https://github.com/posita/dyce/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg" /></a>
 <a href="https://app.codecov.io/gh/posita/dyce"><img alt="Coverage" src="https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg" /></a>
-<a href="https://pypi.org/project/dyce/0.7.0rc10/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc10.svg" /></a>
-<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc10.svg" />
-<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc10.svg" /></a>
-<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc10.svg" />
-<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc10.svg" />
+<a href="https://pypi.org/project/dyce/0.7.0rc11/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc11.svg" /></a>
+<img alt="Development Stage" src="https://img.shields.io/pypi/status/dyce/0.7.0rc11.svg" />
+<a href="http://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc11.svg" /></a>
+<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc11.svg" />
+<img alt="Supported Python Implementations" src="https://img.shields.io/pypi/implementation/dyce/0.7.0rc11.svg" />
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
 <a href="https://beartype.rtfd.io/"><img alt="Bear-ified™" src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a></p>
 <p>Now you’re playing with …</p>
-<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/dyce.svg" alt="dyce logo"></p>
+<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/dyce.svg" alt="dyce logo"></p>
 <h1 id="dyce-simple-python-tools-for-exploring-dice-outcomes-and-other-finite-discrete-probabilities"><code>dyce</code> – Simple Python tools for exploring dice outcomes and other finite discrete probabilities</h1>
 <p><code>dyce</code> is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for <strong><em>compact expression</em></strong> and <strong><em>efficient computation</em></strong>, especially for the most common cases.
@@ -1019,19 +996,19 @@ Its primary applications are:</p>
 While not as compact as a dedicated grammar, <code>dyce</code>’s Python-based primitives are quite sufficient, and often more expressive.
 Those familiar with various <a href="https://en.wikipedia.org/wiki/Dice_notation">game notations</a> should be able to adapt quickly.
 If you’re looking at something on which to build your own grammar or interface, <code>dyce</code> can serve you well.</p>
-<p><code>dyce</code> should be able to replicate or replace most other dice probability modeling tools.
-It strives to be <a href="https://posita.github.io/dyce/0.7/">fully documented</a> and relies heavily on examples to develop understanding.</p>
+<p><code>dyce</code> is intended to model a broad range of dice probability problems.
+The documentation combines API reference material with examples to help you understand and use <code>dyce</code>.</p>
 <p><code>dyce</code> is licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.
 See the accompanying <code>LICENSE</code> file for details.
-Non-experimental features should be considered stable (but an unquenchable thirst to increase performance remains).
-See the <a href="https://posita.github.io/dyce/0.7/notes/">release notes</a> for a summary of version-to-version changes.
+Experimental features are marked in the API documentation and may change or be removed in a future release.
+See the <a href="https://dycelib.org/0.7/notes/">release notes</a> for a summary of version-to-version changes.
 Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.</p>
-<p>If you find it lacking in any way, please don’t hesitate to <a href="https://posita.github.io/dyce/0.7/contrib/">bring it to my attention</a>.</p>
+<p>If you find it lacking in any way, please don’t hesitate to <a href="https://dycelib.org/0.7/contrib/">bring it to my attention</a>.</p>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_light.svg">
-  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_d4s_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_d4s_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_d4s_light.svg">
+  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_d4s_light.svg">
 </picture></p>
 <h2 id="installation">Installation</h2>
 <p>Installation can be performed via <a href="https://pypi.python.org/pypi/dyce/">PyPI</a>.</p>
@@ -1047,7 +1024,7 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 <span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>%<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/posita/dyce.git
 ...
 %<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dyce
-%<span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="w">  </span><span class="c1"># -or- python3 -c &#39;from setuptools import setup ; setup()&#39; install .</span>
+%<span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="w">  </span><span class="c1"># -or- python3 -c 'from setuptools import setup ; setup()' install .</span>
 ...
 </code></pre></div></td></tr></table></div>
 <h3 id="requirements">Requirements</h3>
@@ -1066,7 +1043,7 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 <li><a href="https://matplotlib.org/">Matplotlib</a> for basic visualization helpers via <code>dyce.viz.matplotlib</code></li>
 <li><a href="https://numpy.org/">NumPy</a> to supply <code>dyce</code> with an alternate random number generator implementation</li>
 </ul>
-<p>See the <a href="https://posita.github.io/dyce/0.7/contrib/#hacking-quick-start">hacking quick-start</a> for additional development and testing dependencies.</p>
+<p>See the <a href="https://dycelib.org/0.7/contrib/#hacking-quick-start">hacking quick-start</a> for additional development and testing dependencies.</p>
 <p><code>dyce</code> is proudly 100% <a href="https://beartype.rtfd.io/">Bear-ified™</a>! 👌🏾🐻</p>
 <h2 id="design-philosophy">Design philosophy</h2>
 <p><code>dyce</code> is fairly low-level by design, prioritizing ergonomics and composability.
@@ -1083,15 +1060,15 @@ Which, if we possess a modicum of humility, it often is.</p>
 It can be installed and run anywhere<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and modified as desired.
 On its own, <code>dyce</code> is completely adequate for casual tinkering.
 However, it really shines when used in larger contexts such as with <a href="https://matplotlib.org/">Matplotlib</a>, <a href="https://plotly.com/">Plotly</a>, or <a href="https://jupyter.org/">Jupyter</a> or embedded in a special-purpose application.</p>
-<p>In an intentional departure from <a href="https://datatracker.ietf.org/doc/html/rfc1925#section-2">RFC 1925, § 2.2</a>, <code>dyce</code> includes some conveniences, such as minor computation optimizations (e.g., the <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code> method</a>, various other shorthands, etc.) and formatting conveniences (e.g., the <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.format"><code>H.format</code></a> methods).</p>
+<p>In an intentional departure from <a href="https://datatracker.ietf.org/doc/html/rfc1925#section-2">RFC 1925, § 2.2</a>, <code>dyce</code> includes some conveniences, such as minor computation optimizations (e.g., the <a href="https://dycelib.org/0.7/dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code> method</a>, various other shorthands, etc.) and formatting conveniences (e.g., the <a href="https://dycelib.org/0.7/dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and <a href="https://dycelib.org/0.7/dyce/#dyce.H.format"><code>H.format</code></a> methods).</p>
 <h2 id="a-taste">A taste</h2>
-<p><code>dyce</code> provides several core primitives.
-<a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> represent histograms for modeling finite discrete outcomes, like individual dice.
-<a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P"><code>P</code> objects</a> represent pools (ordered sequences) of histograms.
-<a href="https://posita.github.io/dyce/0.7/dyce/#expand"><code>expand</code></a> for mechanics that include dependent variables.</p>
-<!-- TODO(posita): Figure out what we're doing with dyce.r -->
+<p><code>dyce</code> provides two core primitives and tools for dependent computations.
+<a href="https://dycelib.org/0.7/dyce/#dyce.H"><code>H</code> objects</a> represent histograms for modeling finite discrete outcomes, like individual dice.
+<a href="https://dycelib.org/0.7/dyce/#dyce.P"><code>P</code> objects</a> represent pools (ordered sequences) of histograms.
+<a href="https://dycelib.org/0.7/dyce/#expand"><code>expand</code></a> handles mechanics that include dependent variables.</p>
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
 <!--
-[`R` objects](https://posita.github.io/dyce/0.7/dyce/#dyce.R) (covered [elsewhere](https://posita.github.io/dyce/0.7/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
+[`R` objects](https://dycelib.org/0.7/dyce/#dyce.R) (covered [elsewhere](https://dycelib.org/0.7/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
 All support a variety of operations.
   -->
 
@@ -1141,8 +1118,8 @@ All support a variety of operations.
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span> <span class="o">==</span> <span class="n">h2d6</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">d6</span>  <span class="c1"># pools and histograms are comparable</span>
 <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
-<p>By providing an optional argument to the <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P.h"><code>P.h</code> method</a>, one can “take” individual dice from pools, ordered least to greatest.
-(The <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.format"><code>H.format</code> method</a> provides rudimentary visualization for convenience.)</p>
+<p>By providing one or more index arguments to the <a href="https://dycelib.org/0.7/dyce/#dyce.P.at"><code>P.at</code> method</a>, one can “take” individual dice from pools, ordered least to greatest.
+(The <a href="https://dycelib.org/0.7/dyce/#dyce.H.format"><code>H.format</code> method</a> provides rudimentary visualization for convenience.)</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1153,9 +1130,9 @@ All support a variety of operations.
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># take the lowest die of 2d6</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># take the lowest die of 2d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.53</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
   <span class="mi">1</span> <span class="o">|</span>  <span class="mf">30.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############</span>
@@ -1175,9 +1152,9 @@ All support a variety of operations.
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># take the highest die of 2d6</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># take the highest die of 2d6</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.47</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.40</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
@@ -1187,19 +1164,19 @@ All support a variety of operations.
   <span class="mi">5</span> <span class="o">|</span>  <span class="mf">25.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
   <span class="mi">6</span> <span class="o">|</span>  <span class="mf">30.56</span><span class="o">%</span> <span class="o">|</span><span class="c1">###############</span>
 </code></pre></div></td></tr></table></div>
-<p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> provides a <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H.probability_items"><code>probability_items</code> method</a> to ease integration with plotting packages.
-<a href="https://posita.github.io/dyce/0.7/dyce.viz.matplotlib/"><code>dyce.viz.matplotlib</code></a> provides <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>-based visualization conveniences.
-<a href="https://posita.github.io/dyce/0.7/dyce.viz.plotly/"><code>dyce.viz.plotly</code></a> does likewise for <a href="https://plotly.com/python-api-reference/">Plotly</a>.
-<a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
+<p><a href="https://dycelib.org/0.7/dyce/#dyce.H"><code>H</code> objects</a> provides a <a href="https://dycelib.org/0.7/dyce/#dyce.H.probability_items"><code>probability_items</code> method</a> to ease integration with plotting packages.
+<a href="https://dycelib.org/0.7/dyce.viz.matplotlib/"><code>dyce.viz.matplotlib</code></a> provides <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>-based visualization conveniences.
+<a href="https://dycelib.org/0.7/dyce.viz.plotly/"><code>dyce.viz.plotly</code></a> does likewise for <a href="https://plotly.com/python-api-reference/">Plotly</a>.
+<a href="https://github.com/posita/dyceum/"><code>dyceum</code></a> provides additional interactive visualization tools.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">p2d6</span>
 
-<span class="n">h2d6_lowest</span> <span class="o">=</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">h2d6_highest</span> <span class="o">=</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">h2d6_lowest</span> <span class="o">=</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">h2d6_highest</span> <span class="o">=</span> <span class="n">p2d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>Visualization: <a href="https://posita.github.io/dyce/0.7/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
+<p>Visualization: <a href="https://dycelib.org/0.7/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1213,18 +1190,18 @@ All support a variety of operations.
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_bar</span><span class="p">(</span>
     <span class="n">h2d6_lowest</span><span class="p">,</span>
     <span class="n">h2d6_highest</span><span class="p">,</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Lowest&quot;</span><span class="p">,</span> <span class="s2">&quot;Highest&quot;</span><span class="p">),</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s2">"Lowest"</span><span class="p">,</span> <span class="s2">"Highest"</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Taking the lowest or highest die of 2d6&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Taking the lowest or highest die of 2d6"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc10/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc11/docs/images/plot_2d6_lo_hi_light.svg">
 </picture></p>
-<p><a href="https://posita.github.io/dyce/0.7/dyce/#dyce.H"><code>H</code> objects</a> and <a href="https://posita.github.io/dyce/0.7/dyce/#dyce.P"><code>P</code> objects</a> can generate random rolls.</p>
+<p><a href="https://dycelib.org/0.7/dyce/#dyce.H"><code>H</code> objects</a> and <a href="https://dycelib.org/0.7/dyce/#dyce.P"><code>P</code> objects</a> can generate random rolls.</p>
 <!-- BEGIN MONKEY PATCH --
 For deterministic outcomes.
 
@@ -1248,10 +1225,10 @@ For deterministic outcomes.
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p6d0to9</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
 <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>See the tutorials on <a href="https://posita.github.io/dyce/0.7/countin/">counting</a> <!-- and <a href="https://posita.github.io/dyce/0.7/rollin/">rolling</a>, --> as well as the <a href="https://posita.github.io/dyce/0.7/dyce/">API guide</a> for much more thorough treatments, including detailed examples.</p>
+<p>See the tutorials on <a href="https://dycelib.org/0.7/countin/">counting</a> <!-- and <a href="https://dycelib.org/0.7/rollin/">rolling</a>, --> as well as the <a href="https://dycelib.org/0.7/dyce/">API guide</a> for much more thorough treatments, including detailed examples.</p>
 <h2 id="other-efforts">Other efforts</h2>
 <p><code>dyce</code>’s goal is to provide ergonomic and idiomatic Python interfaces to reasonably efficient discrete probability computations useful for gaming with minimal dependencies.
-Consider exploring the <a href="https://posita.github.io/dyce/0.7/translations/">applications and translations</a> for added color.
+Consider exploring the <a href="https://dycelib.org/0.7/translations/">applications and translations</a> for added color.
 But <code>dyce</code> does not stand alone.
 Other works include:</p>
 <ul>
@@ -1268,21 +1245,21 @@ Other works include:</p>
 <li><a href="https://github.com/LordSembor/DnDice">DnDice</a> by “LordSembor”</li>
 <li><a href="https://anydice.com/">AnyDice</a> (closed source) by Jasper Flick</li>
 </ul>
-<p>Please consider <a href="https://posita.github.io/dyce/0.7/contrib/">contributing an issue</a> if you observe discrepancies or think something should be added to the list.</p>
+<p>Please consider <a href="https://dycelib.org/0.7/contrib/">contributing an issue</a> if you observe discrepancies or think something should be added to the list.</p>
 <h2 id="donors">Donors</h2>
 <p>When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.</p>
 <ul>
 <li><a href="https://eykd.net/about/">David Eyk</a> not only <a href="https://eykd.net/blog/">inspires others to explore creative writing</a>, but has graciously ceded his PyPI project dedicated to <a href="https://code.google.com/archive/p/dyce/">his own prior work under a similar name</a>.
-  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc10/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
+  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc11/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
   Thanks to his generosity, <del>millions</del> <em>dozens</em> of future <code>dyce</code> users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡</li>
 </ul>
-<h2 id="customers">Customers <a href="https://posita.github.io/dyce/"><img alt="dyce-powered!" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg" /></a></h2>
+<h2 id="customers">Customers <a href="https://dycelib.org/"><img alt="dyce-powered!" src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg" /></a></h2>
 <ul>
 <li>This could be <em>you</em>! 👋</li>
 </ul>
 <p>Do you have a project that uses <code>dyce</code>?
-<a href="https://posita.github.io/dyce/0.7/contrib/#starting-discussions-and-filing-issues">Let me know</a>, and I’ll promote it here!</p>
+<a href="https://dycelib.org/0.7/contrib/#starting-discussions-and-filing-issues">Let me know</a>, and I’ll promote it here!</p>
 <p>And don’t forget to do your part in perpetuating gratuitous badge-ification!</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -1290,7 +1267,7 @@ Other works include:</p>
 <span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code>&lt;!-- Markdown --&gt;
 As of version 1.1, HighRollin is
 [<span class="nt">![dyce-powered</span>](<span class="na">https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg</span>)][dyce-powered]!
-[<span class="nl">dyce-powered</span>]: <span class="na">https://posita.github.io/dyce/ &quot;dyce-powered!&quot;</span>
+[<span class="nl">dyce-powered</span>]: <span class="na">https://dycelib.org/ "dyce-powered!"</span>
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
@@ -1307,7 +1284,7 @@ As of version 1.1, HighRollin is |dyce-powered|!
 
 <span class="p">..</span> <span class="nt">|dyce-powered|</span> <span class="ow">image</span><span class="p">::</span> https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg
    <span class="nc">:align:</span> top
-   <span class="nc">:target:</span> https://posita.github.io/dyce/
+   <span class="nc">:target:</span> https://dycelib.org/
    <span class="nc">:alt:</span> dyce-powered
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -1315,14 +1292,14 @@ As of version 1.1, HighRollin is |dyce-powered|!
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="cm">&lt;!-- HTML --&gt;</span>
-As of version 1.1, HighRollin is <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;https://posita.github.io/dyce/&quot;</span><span class="p">&gt;&lt;</span><span class="nt">img</span>
-  <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg&quot;</span>
-  <span class="na">alt</span><span class="o">=</span><span class="s">&quot;dyce-powered&quot;</span>
-  <span class="na">style</span><span class="o">=</span><span class="s">&quot;vertical-align: middle;&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>!
+As of version 1.1, HighRollin is <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"https://dycelib.org/"</span><span class="p">&gt;&lt;</span><span class="nt">img</span>
+  <span class="na">src</span><span class="o">=</span><span class="s">"https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg"</span>
+  <span class="na">alt</span><span class="o">=</span><span class="s">"dyce-powered"</span>
+  <span class="na">style</span><span class="o">=</span><span class="s">"vertical-align: middle;"</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>!
 </code></pre></div></td></tr></table></div>
 <h2 id="license">License</h2>
 <p><code>dyce</code> is licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.
-See the included <a href="https://posita.github.io/dyce/0.7/license/"><code>LICENSE</code></a> file for details.
+See the included <a href="https://dycelib.org/0.7/license/"><code>LICENSE</code></a> file for details.
 Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.</p>
 <div class="footnote">
 <hr />
@@ -1331,8 +1308,8 @@ Source code is <a href="https://github.com/posita/dyce">available on GitHub</a>.
 <p>You won’t find any lexers, parsers, or tokenizers in <code>dyce</code>’s core, other than straight-up Python.
 That being said, you can always “roll” your own (see what we did there?) and lean on <code>dyce</code> underneath.
 It doesn’t mind.
-<!-- TODO(posita): Figure out what we're doing with dyce.r -->
-<!-- It actually <a href="https://posita.github.io/dyce/0.7/rollin/">kind of <em>likes</em> it</a>. -->&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
+<!-- It actually <a href="https://dycelib.org/0.7/rollin/">kind of <em>likes</em> it</a>. -->&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
 <p><!-- Was: https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/ -->
@@ -1343,6 +1320,8 @@ Void where prohibited.
 </li>
 </ol>
 </div>
+
+
 
 
 
@@ -1375,7 +1354,7 @@ Void where prohibited.
         
         
           
-          <a href="countin/" class="md-footer__link md-footer__link--next" aria-label="Next: Countin’ with histograms and pools">
+          <a href="./countin/" class="md-footer__link md-footer__link--next" aria-label="Next: Countin’ with histograms and pools">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
@@ -1386,7 +1365,7 @@ Void where prohibited.
             </div>
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </div>
           </a>
         
@@ -1398,13 +1377,16 @@ Void where prohibited.
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
     </div>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
     </a>
   
 </div>
@@ -1422,10 +1404,14 @@ Void where prohibited.
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":".","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"./assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="./assets/javascripts/bundle.c04ba553.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

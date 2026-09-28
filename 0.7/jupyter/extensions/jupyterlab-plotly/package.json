@@ -1,7 +1,7 @@
 {
   "name": "jupyterlab-plotly",
   "main": "lib/mimeExtension.js",
-  "version": "6.9.0",
+  "version": "7.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/plotly/plotly.py"
@@ -12,28 +12,28 @@
   "scripts": {
     "build:widget": "esbuild --bundle --alias:plotly.js=plotly.js/dist/plotly --format=esm --minify --outfile=../plotly/package_data/widgetbundle.js src/widget.ts",
     "build:mimerenderer": "esbuild --bundle --alias:plotly.js=plotly.js/dist/plotly --format=esm --minify --outfile=lib/mimeExtension.js src/mimeExtension.ts",
-    "build:labextension": "jupyter labextension build .",
+    "build:labextension": "jupyter-builder build .",
     "build": "npm run build:widget && npm run build:mimerenderer && npm run build:labextension",
     "watch": "npm run build -- --watch --sourcemap=inline",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "plotly.js": "3.7.0",
-    "@lumino/widgets": "~2.4.0"
+    "plotly.js": "4.1.1",
+    "@lumino/widgets": "~2.9.0"
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^4.3.6 || ^3.6.8",
-    "@types/plotly.js": "^2.33.4",
-    "esbuild": "^0.23.1",
-    "typescript": "^5.6.2"
+    "@jupyter/builder": "^1.2.2",
+    "@types/plotly.js": "^3.0.13",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
   },
   "jupyterlab": {
     "mimeExtension": true,
     "outputDir": "../plotly/labextension",
     "webpackConfig": "./webpack.config.js",
     "_build": {
-      "load": "static/remoteEntry.58c394332ed33325ffe5.js",
+      "load": "static/remoteEntry.1dda3c8f6e5cd2a3.js",
       "mimeExtension": "./mimeExtension"
     }
   }

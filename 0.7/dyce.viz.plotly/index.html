@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="zensical-0.0.65">
     
     
       
@@ -29,10 +29,15 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
       
       
 
@@ -50,14 +55,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -78,11 +81,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
         
-        <a href="#dyce.viz.plotly" class="md-skip">
+        <a href="#dycevizplotly-package-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -102,15 +105,15 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer">
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -172,57 +175,30 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search">
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
         </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
 </div>
       
     
-    
-      <div class="md-header__source">
+    <div class="md-header__source">
+      
         <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
   </div>
 </a>
-      </div>
-    
+      
+    </div>
   </nav>
   
 </header>
@@ -248,10 +224,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
     dyce
@@ -261,7 +237,7 @@
       <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -278,15 +254,14 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="./.." class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
-  
+  Introduction
 
     
   </span>
@@ -312,8 +287,7 @@
   <span class="md-ellipsis">
     
   
-    Countin’ with histograms and pools
-  
+  Countin’ with histograms and pools
 
     
   </span>
@@ -339,8 +313,7 @@
   <span class="md-ellipsis">
     
   
-    Applications and translations
-  
+  Applications and translations
 
     
   </span>
@@ -366,8 +339,7 @@
   <span class="md-ellipsis">
     
   
-    Release notes
-  
+  Release notes
 
     
   </span>
@@ -393,8 +365,7 @@
   <span class="md-ellipsis">
     
   
-    Contributing
-  
+  Contributing
 
     
   </span>
@@ -420,8 +391,7 @@
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -465,8 +435,7 @@
   <span class="md-ellipsis">
     
   
-    API
-  
+  API
 
     
   </span>
@@ -476,19 +445,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    API
-  
+  API
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -501,8 +470,7 @@
   <span class="md-ellipsis">
     
   
-    Core
-  
+  Core
 
     
   </span>
@@ -513,10 +481,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -529,8 +497,7 @@
   <span class="md-ellipsis">
     
   
-    Conveniences
-  
+  Conveniences
 
     
   </span>
@@ -541,10 +508,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
     
@@ -572,8 +539,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization
-  
+  Visualization
 
     
   </span>
@@ -583,19 +549,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_7_3">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Visualization
-  
+  Visualization
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -608,8 +574,7 @@
   <span class="md-ellipsis">
     
   
-    Shared structures
-  
+  Shared structures
 
     
   </span>
@@ -620,10 +585,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -636,8 +601,7 @@
   <span class="md-ellipsis">
     
   
-    Matplotlib (optional)
-  
+  Matplotlib (optional)
 
     
   </span>
@@ -648,10 +612,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
     
@@ -660,8 +624,10 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
+      
+      
+        
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
@@ -671,8 +637,7 @@
   <span class="md-ellipsis">
     
   
-    Plotly
-  
+  Plotly
 
     
   </span>
@@ -682,15 +647,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Plotly
-  
+  Plotly
 
     
   </span>
@@ -701,23 +665,26 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         plotly
-      
+      </span>
     </span>
   </a>
   
@@ -726,9 +693,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         PlotSpec
-      
+      </span>
     </span>
   </a>
   
@@ -738,9 +705,9 @@
           <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec.as_dict" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         as_dict
-      
+      </span>
     </span>
   </a>
   
@@ -749,9 +716,9 @@
           <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec.figure_dict" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         figure_dict
-      
+      </span>
     </span>
   </a>
   
@@ -765,9 +732,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.bar_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bar_spec
-      
+      </span>
     </span>
   </a>
   
@@ -776,9 +743,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.line_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         line_spec
-      
+      </span>
     </span>
   </a>
   
@@ -787,9 +754,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.ridge_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         ridge_spec
-      
+      </span>
     </span>
   </a>
   
@@ -802,18 +769,20 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -829,26 +798,42 @@
               
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         plotly
-      
+      </span>
     </span>
   </a>
   
@@ -857,9 +842,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         PlotSpec
-      
+      </span>
     </span>
   </a>
   
@@ -869,9 +854,9 @@
           <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec.as_dict" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         as_dict
-      
+      </span>
     </span>
   </a>
   
@@ -880,9 +865,9 @@
           <li class="md-nav__item">
   <a href="#dyce.viz.plotly.PlotSpec.figure_dict" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         figure_dict
-      
+      </span>
     </span>
   </a>
   
@@ -896,9 +881,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.bar_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bar_spec
-      
+      </span>
     </span>
   </a>
   
@@ -907,9 +892,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.line_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         line_spec
-      
+      </span>
     </span>
   </a>
   
@@ -918,9 +903,9 @@
         <li class="md-nav__item">
   <a href="#dyce.viz.plotly.ridge_spec" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         ridge_spec
-      
+      </span>
     </span>
   </a>
   
@@ -940,13 +925,26 @@
               <article class="md-content__inner md-typeset">
                 
                   
-
-
   
   
 
 
-  <h1>Plotly</h1>
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+  -->
+
+<h1 id="dycevizplotly-package-reference"><code>dyce.viz.plotly</code> package reference</h1>
+
 
 <div class="doc doc-object doc-module">
 
@@ -961,7 +959,7 @@
 
   
       dataclass
-  " href="#dyce.viz.plotly.PlotSpec"><code>PlotSpec</code></a> containing plain mappings and lists.
+  " href="./#dyce.viz.plotly.PlotSpec"><code>PlotSpec</code></a> containing plain mappings and lists.
 Neither Plotly nor Matplotlib is required.
 Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spec.config</code> to <code>Plotly.newPlot</code>, or pass <code>spec.figure_dict()</code> to <code>plotly.graph_objects.Figure</code>.</p>
 
@@ -1006,7 +1004,7 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
         <p>Portable structural description of a Plotly figure.</p>
 <p><em>data</em> and <em>layout</em> are accepted by both Plotly.py and Plotly.js.
 <em>config</em> contains renderer options used by Plotly.js and by HTML generated with Plotly.py.
-<a class="autorefs autorefs-internal" title="as_dict() -> dict[str, Any]" href="#dyce.viz.plotly.PlotSpec.as_dict"><code>as_dict</code></a> returns a plain, JSON-serializable representation suitable for crossing a worker boundary.</p>
+<a class="autorefs autorefs-internal" title="as_dict() -&gt; dict[str, Any]" href="./#dyce.viz.plotly.PlotSpec.as_dict"><code>as_dict</code></a> returns a plain, JSON-serializable representation suitable for crossing a worker boundary.</p>
 
 
 
@@ -1045,31 +1043,31 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
 <span class="normal">76</span>
 <span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PlotSpec</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Portable structural description of a Plotly figure.</span>
 
 <span class="sd">    *data* and *layout* are accepted by both Plotly.py and Plotly.js.</span>
 <span class="sd">    *config* contains renderer options used by Plotly.js and by HTML generated with Plotly.py.</span>
 <span class="sd">    [`as_dict`][dyce.viz.plotly.PlotSpec.as_dict] returns a plain, JSON-serializable representation suitable for crossing a worker boundary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="n">layout</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;responsive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;displaylogo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;modeBarButtonsToRemove&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;lasso2d&quot;</span><span class="p">,</span> <span class="s2">&quot;select2d&quot;</span><span class="p">],</span>
+            <span class="s2">"responsive"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"displaylogo"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"modeBarButtonsToRemove"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"lasso2d"</span><span class="p">,</span> <span class="s2">"select2d"</span><span class="p">],</span>
         <span class="p">}</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the complete specification as plain mappings and lists.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">}</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the complete specification as plain mappings and lists."""</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">"layout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">figure_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the portion accepted by `plotly.graph_objects.Figure`.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">}</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the portion accepted by `plotly.graph_objects.Figure`."""</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">"layout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -1097,7 +1095,7 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
 
     <div class="doc doc-contents ">
 
-        <p>Return the complete specification as plain mappings and lists.</p>
+        <p>Returns the complete specification as plain mappings and lists.</p>
 
 
             <details class="mkdocstrings-source">
@@ -1105,8 +1103,8 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the complete specification as plain mappings and lists.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">}</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Returns the complete specification as plain mappings and lists."""</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">"layout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1124,7 +1122,7 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
 
     <div class="doc doc-contents ">
 
-        <p>Return the portion accepted by <code>plotly.graph_objects.Figure</code>.</p>
+        <p>Returns the portion accepted by <code>plotly.graph_objects.Figure</code>.</p>
 
 
             <details class="mkdocstrings-source">
@@ -1132,8 +1130,8 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">figure_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the portion accepted by `plotly.graph_objects.Figure`.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">}</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Returns the portion accepted by `plotly.graph_objects.Figure`."""</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">"layout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1153,7 +1151,7 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
 
 
 <h2 id="dyce.viz.plotly.bar_spec" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">bar_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">horizontal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">max_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
+            <code class="highlight language-python"><span class="n">bar_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">horizontal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">max_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
 
 </h2>
 
@@ -1164,10 +1162,10 @@ Callers can pass <code>spec.data</code>, <code>spec.layout</code>, and <code>spe
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plotly.bar_spec</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Return a portable Plotly figure specification for a grouped bar chart of one or more histograms.</p>
-<p>Use <em>labels</em> to assign legend names to each histogram.
+<p>Returns a portable Plotly figure specification for a grouped bar chart of one or more histograms.</p>
+<p>Uses <em>labels</em> to assign legend names to each histogram.
 Unmatched histograms receive an empty label.</p>
-<p><em>colors</em> assigns hues, cycling as needed.</p>
+<p><em>colors</em> assign hues, cycling as needed.</p>
 <p><em>graph_type</em> controls which variant of the distribution is plotted (see <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz.GraphType"><code>GraphType</code></a>).</p>
 <p>When <em>horizontal</em> is <code>True</code>, outcomes appear on the y-axis and probabilities on the x-axis.</p>
 <p><em>max_percent</em> fixes the probability-axis maximum, which is useful for keeping several separately rendered figures comparable.</p>
@@ -1197,15 +1195,15 @@ Unmatched histograms receive an empty label.</p>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">bar_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;2d10 vs. d8 + d12&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"2d10 vs. d8 + d12"</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1237,16 +1235,16 @@ Unmatched histograms receive an empty label.</p>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">bar_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
     <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;2d10 vs. d8 + d12&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"2d10 vs. d8 + d12"</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1338,7 +1336,7 @@ Unmatched histograms receive an empty label.</p>
 <span class="normal">155</span>
 <span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">bar_spec</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span>
     <span class="n">horizontal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1346,13 +1344,13 @@ Unmatched histograms receive an empty label.</p>
     <span class="n">max_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a portable Plotly figure specification for a grouped bar chart of one or more histograms.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Returns a portable Plotly figure specification for a grouped bar chart of one or more histograms.</span>
 
-<span class="sd">    Use *labels* to assign legend names to each histogram.</span>
+<span class="sd">    Uses *labels* to assign legend names to each histogram.</span>
 <span class="sd">    Unmatched histograms receive an empty label.</span>
 
-<span class="sd">    *colors* assigns hues, cycling as needed.</span>
+<span class="sd">    *colors* assign hues, cycling as needed.</span>
 
 <span class="sd">    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).</span>
 
@@ -1362,55 +1360,55 @@ Unmatched histograms receive an empty label.</p>
 
 <span class="sd">    *precision* is the number of decimal places tooltips show.</span>
 
-<span class="sd">    === &quot;Vertical bars (default)&quot;</span>
+<span class="sd">    === "Vertical bars (default)"</span>
 
-<span class="sd">            --8&lt;-- &quot;docs/assets/plotly_viz_plot_bar.py:viz&quot;</span>
+<span class="sd">            --8&lt;-- "docs-src/plotly_viz_plot_bar.py:viz"</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/snippets/plotly_viz_plot_bar.html&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/snippets/plotly_viz_plot_bar.html"</span>
 
-<span class="sd">    === &quot;Horizontal bars (`horizontal=True`)&quot;</span>
+<span class="sd">    === "Horizontal bars (`horizontal=True`)"</span>
 
-<span class="sd">            --8&lt;-- &quot;docs/assets/plotly_viz_plot_hbar.py:viz&quot;</span>
+<span class="sd">            --8&lt;-- "docs-src/plotly_viz_plot_hbar.py:viz"</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/snippets/plotly_viz_plot_hbar.html&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/snippets/plotly_viz_plot_hbar.html"</span>
+<span class="sd">    """</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hs</span><span class="p">):</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
         <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="n">values_for_graph_type</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
         <span class="n">outcomes_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)</span>
         <span class="n">percents</span> <span class="o">=</span> <span class="p">[</span><span class="n">probability</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">]</span>
-        <span class="n">outcome_ref</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="s2">&quot;x&quot;</span>
+        <span class="n">outcome_ref</span> <span class="o">=</span> <span class="s2">"y"</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="s2">"x"</span>
         <span class="n">trace</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">percents</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">outcomes_list</span><span class="p">,</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">outcomes_list</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">percents</span><span class="p">,</span>
-            <span class="s2">&quot;customdata&quot;</span><span class="p">:</span> <span class="n">percents</span><span class="p">,</span>
-            <span class="s2">&quot;hovertemplate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="si">{</span><span class="n">outcome_ref</span><span class="si">}</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;texttemplate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;%</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;textposition&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;series&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">},</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+            <span class="s2">"orientation"</span><span class="p">:</span> <span class="s2">"h"</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="s2">"v"</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="n">percents</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">outcomes_list</span><span class="p">,</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">outcomes_list</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">percents</span><span class="p">,</span>
+            <span class="s2">"customdata"</span><span class="p">:</span> <span class="n">percents</span><span class="p">,</span>
+            <span class="s2">"hovertemplate"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="si">{</span><span class="n">outcome_ref</span><span class="si">}</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+            <span class="s2">"texttemplate"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"%</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%"</span><span class="p">,</span>
+            <span class="s2">"textposition"</span><span class="p">:</span> <span class="s2">"auto"</span><span class="p">,</span>
+            <span class="s2">"meta"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"series"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">},</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">colors</span><span class="p">:</span>
-            <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;marker&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]}</span>
+            <span class="n">trace</span><span class="p">[</span><span class="s2">"marker"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]}</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
 
     <span class="n">probability_axis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Probability (%)&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;rangemode&quot;</span><span class="p">:</span> <span class="s2">&quot;tozero&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Probability (%)"</span><span class="p">},</span>
+        <span class="s2">"rangemode"</span><span class="p">:</span> <span class="s2">"tozero"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">max_percent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">probability_axis</span><span class="p">[</span><span class="s2">&quot;range&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_percent</span><span class="p">]</span>
-    <span class="n">outcome_axis</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">},</span> <span class="s2">&quot;zeroline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="n">probability_axis</span><span class="p">[</span><span class="s2">"range"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_percent</span><span class="p">]</span>
+    <span class="n">outcome_axis</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Outcome"</span><span class="p">},</span> <span class="s2">"zeroline"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">PlotSpec</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;barmode&quot;</span><span class="p">:</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">probability_axis</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">outcome_axis</span><span class="p">,</span>
-            <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="n">outcome_axis</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">probability_axis</span><span class="p">,</span>
+            <span class="s2">"barmode"</span><span class="p">:</span> <span class="s2">"group"</span><span class="p">,</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"xaxis"</span><span class="p">:</span> <span class="n">probability_axis</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">outcome_axis</span><span class="p">,</span>
+            <span class="s2">"yaxis"</span><span class="p">:</span> <span class="n">outcome_axis</span> <span class="k">if</span> <span class="n">horizontal</span> <span class="k">else</span> <span class="n">probability_axis</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1423,7 +1421,7 @@ Unmatched histograms receive an empty label.</p>
 
 
 <h2 id="dyce.viz.plotly.line_spec" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">line_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
+            <code class="highlight language-python"><span class="n">line_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
 
 </h2>
 
@@ -1434,10 +1432,10 @@ Unmatched histograms receive an empty label.</p>
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plotly.line_spec</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Return a portable Plotly figure specification for a line graph of one or more histograms.</p>
-<p>Use <em>labels</em> to assign legend names to each histogram.
+<p>Returns a portable Plotly figure specification for a line graph of one or more histograms.</p>
+<p>Uses <em>labels</em> to assign legend names to each histogram.
 Unmatched histograms receive an empty label.</p>
-<p><em>colors</em> assigns hues, cycling as needed.</p>
+<p><em>colors</em> assign hues, cycling as needed.</p>
 <p><em>graph_type</em> controls which variant of the distribution is plotted (see <a class="autorefs autorefs-internal" href="../dyce.viz/#dyce.viz.GraphType"><code>GraphType</code></a>).</p>
 <p><em>precision</em> is the number of decimal places tooltips show.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="dyce.viz.plotly.line_spec--__tabbed_1_1" name="dyce.viz.plotly.line_spec--__tabbed_1" type="radio" /><input id="dyce.viz.plotly.line_spec--__tabbed_1_2" name="dyce.viz.plotly.line_spec--__tabbed_1" type="radio" /><input id="dyce.viz.plotly.line_spec--__tabbed_1_3" name="dyce.viz.plotly.line_spec--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="dyce.viz.plotly.line_spec--__tabbed_1_1"><code>graph_type=GraphType.NORMAL</code> (default)</label><label for="dyce.viz.plotly.line_spec--__tabbed_1_2"><code>graph_type=GraphType.AT_MOST</code></label><label for="dyce.viz.plotly.line_spec--__tabbed_1_3"><code>graph_type=GraphType.AT_LEAST</code></label></div>
@@ -1465,15 +1463,15 @@ Unmatched histograms receive an empty label.</p>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">line_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;2d10 vs. d8 + d12&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"2d10 vs. d8 + d12"</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1507,16 +1505,16 @@ Unmatched histograms receive an empty label.</p>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">line_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
     <span class="n">graph_type</span><span class="o">=</span><span class="n">GraphType</span><span class="o">.</span><span class="n">AT_MOST</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s1">&#39;2d10 vs. d8 + d12 (&quot;at most&quot;)&#39;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s1">'2d10 vs. d8 + d12 ("at most")'</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1550,16 +1548,16 @@ Unmatched histograms receive an empty label.</p>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">line_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
     <span class="n">graph_type</span><span class="o">=</span><span class="n">GraphType</span><span class="o">.</span><span class="n">AT_LEAST</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s1">&#39;2d10 vs. d8 + d12 (&quot;at least&quot;)&#39;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s1">'2d10 vs. d8 + d12 ("at least")'</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">45</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1644,71 +1642,71 @@ Unmatched histograms receive an empty label.</p>
 <span class="normal">227</span>
 <span class="normal">228</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">line_spec</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a portable Plotly figure specification for a line graph of one or more histograms.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Returns a portable Plotly figure specification for a line graph of one or more histograms.</span>
 
-<span class="sd">    Use *labels* to assign legend names to each histogram.</span>
+<span class="sd">    Uses *labels* to assign legend names to each histogram.</span>
 <span class="sd">    Unmatched histograms receive an empty label.</span>
 
-<span class="sd">    *colors* assigns hues, cycling as needed.</span>
+<span class="sd">    *colors* assign hues, cycling as needed.</span>
 
 <span class="sd">    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).</span>
 
 <span class="sd">    *precision* is the number of decimal places tooltips show.</span>
 
-<span class="sd">    === &quot;`graph_type=GraphType.NORMAL` (default)&quot;</span>
+<span class="sd">    === "`graph_type=GraphType.NORMAL` (default)"</span>
 
-<span class="sd">            --8&lt;-- &quot;docs/assets/plotly_viz_plot_line.py:viz&quot;</span>
+<span class="sd">            --8&lt;-- "docs-src/plotly_viz_plot_line.py:viz"</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/snippets/plotly_viz_plot_line.html&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/snippets/plotly_viz_plot_line.html"</span>
 
-<span class="sd">    === &quot;`graph_type=GraphType.AT_MOST`&quot;</span>
+<span class="sd">    === "`graph_type=GraphType.AT_MOST`"</span>
 
-<span class="sd">            --8&lt;-- &quot;docs/assets/plotly_viz_plot_line_at_most.py:viz&quot;</span>
+<span class="sd">            --8&lt;-- "docs-src/plotly_viz_plot_line_at_most.py:viz"</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/snippets/plotly_viz_plot_line_at_most.html&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/snippets/plotly_viz_plot_line_at_most.html"</span>
 
-<span class="sd">    === &quot;`graph_type=GraphType.AT_LEAST`&quot;</span>
+<span class="sd">    === "`graph_type=GraphType.AT_LEAST`"</span>
 
-<span class="sd">            --8&lt;-- &quot;docs/assets/plotly_viz_plot_line_at_least.py:viz&quot;</span>
+<span class="sd">            --8&lt;-- "docs-src/plotly_viz_plot_line_at_least.py:viz"</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/snippets/plotly_viz_plot_line_at_least.html&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/snippets/plotly_viz_plot_line_at_least.html"</span>
+<span class="sd">    """</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hs</span><span class="p">):</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
         <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="n">values_for_graph_type</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]</span> <span class="k">if</span> <span class="n">colors</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">marker</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+        <span class="n">marker</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
         <span class="n">trace</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;lines+markers&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">outcomes</span><span class="p">),</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">probability</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">],</span>
-            <span class="s2">&quot;hovertemplate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">y:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="n">marker</span><span class="p">,</span>
-            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;series&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;line&quot;</span><span class="p">},</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"scatter"</span><span class="p">,</span>
+            <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"lines+markers"</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">outcomes</span><span class="p">),</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="p">[</span><span class="n">probability</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">],</span>
+            <span class="s2">"hovertemplate"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">y:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+            <span class="s2">"marker"</span><span class="p">:</span> <span class="n">marker</span><span class="p">,</span>
+            <span class="s2">"meta"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"series"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"line"</span><span class="p">},</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">marker</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
-            <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;line&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">}</span>
+            <span class="n">marker</span><span class="p">[</span><span class="s2">"color"</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">trace</span><span class="p">[</span><span class="s2">"line"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">color</span><span class="p">}</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">PlotSpec</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;hovermode&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">},</span> <span class="s2">&quot;zeroline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
-            <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Probability (%)&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;rangemode&quot;</span><span class="p">:</span> <span class="s2">&quot;tozero&quot;</span><span class="p">,</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"hovermode"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>
+            <span class="s2">"xaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Outcome"</span><span class="p">},</span> <span class="s2">"zeroline"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="s2">"yaxis"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Probability (%)"</span><span class="p">},</span>
+                <span class="s2">"rangemode"</span><span class="p">:</span> <span class="s2">"tozero"</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">)</span>
@@ -1722,7 +1720,7 @@ Unmatched histograms receive an empty label.</p>
 
 
 <h2 id="dyce.viz.plotly.ridge_spec" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ridge_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">label_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">overlap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_OVERLAP</span><span class="p">,</span> <span class="n">peak</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span> <span class="n">show_peak_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
+            <code class="highlight language-python"><span class="n">ridge_spec</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">label_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="n">overlap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_OVERLAP</span><span class="p">,</span> <span class="n">peak</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span> <span class="n">show_peak_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span></code>
 
 </h2>
 
@@ -1733,7 +1731,7 @@ Unmatched histograms receive an empty label.</p>
 <p class="admonition-title">Experimental</p>
 <p><code>dyce.viz.plotly.ridge_spec</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
-<p>Return a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.</p>
+<p>Returns a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.</p>
 <p>Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.
 Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.</p>
 <p>Each ridge covers only its own outcomes.
@@ -1777,16 +1775,16 @@ Pass the largest across several figures to put them all on one scale, so ridges 
 <span class="n">spec</span> <span class="o">=</span> <span class="n">ridge_spec</span><span class="p">(</span>
     <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="n">H</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2d10&quot;</span><span class="p">,</span> <span class="s2">&quot;d8 + d12&quot;</span><span class="p">],</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#d62728&quot;</span><span class="p">],</span>
-    <span class="n">label_bgcolor</span><span class="o">=</span><span class="s2">&quot;rgba(255,255,255,0.72)&quot;</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"2d10"</span><span class="p">,</span> <span class="s2">"d8 + d12"</span><span class="p">],</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"#d62728"</span><span class="p">],</span>
+    <span class="n">label_bgcolor</span><span class="o">=</span><span class="s2">"rgba(255,255,255,0.72)"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">spec</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;2d10 vs. d8 + d12&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
-        <span class="s2">&quot;paper_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;plot_bgcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"2d10 vs. d8 + d12"</span><span class="p">},</span>
+        <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+        <span class="s2">"paper_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
+        <span class="s2">"plot_bgcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,0,0,0)"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1978,7 +1976,7 @@ Pass the largest across several figures to put them all on one scale, so ridges 
 <span class="normal">409</span>
 <span class="normal">410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">ridge_spec</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">colors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">graph_type</span><span class="p">:</span> <span class="n">GraphType</span> <span class="o">=</span> <span class="n">GraphType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span>
     <span class="n">label_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1988,8 +1986,8 @@ Pass the largest across several figures to put them all on one scale, so ridges 
     <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_PRECISION</span><span class="p">,</span>
     <span class="n">show_peak_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotSpec</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Returns a portable Plotly figure specification for a ridgeline (“joyplot”) of one or more histograms.</span>
 
 <span class="sd">    Each histogram becomes its own filled ridge, stacked vertically and offset so that neighbors overlap.</span>
 <span class="sd">    Ridges appear top-to-bottom in argument order, and lower ridges are drawn in front of higher ones.</span>
@@ -2012,7 +2010,7 @@ Pass the largest across several figures to put them all on one scale, so ridges 
 <span class="sd">    *graph_type* controls which variant of the distribution is plotted (see [`GraphType`][dyce.viz.GraphType]).</span>
 
 <span class="sd">    *overlap* is how many rows tall a ridge at *peak* stands.</span>
-<span class="sd">    At `1.0`, such a ridge just reaches the next row&#39;s baseline.</span>
+<span class="sd">    At `1.0`, such a ridge just reaches the next row's baseline.</span>
 
 <span class="sd">    *peak* overrides the percentage drawn at full height, which is otherwise the largest among *hs*.</span>
 <span class="sd">    Pass the largest across several figures to put them all on one scale, so ridges stay comparable between subplots.</span>
@@ -2021,16 +2019,16 @@ Pass the largest across several figures to put them all on one scale, so ridges 
 
 <span class="sd">    *precision* is the number of decimal places tooltips show.</span>
 
-<span class="sd">        --8&lt;-- &quot;docs/assets/plotly_viz_plot_ridge.py:viz&quot;</span>
+<span class="sd">        --8&lt;-- "docs-src/plotly_viz_plot_ridge.py:viz"</span>
 
-<span class="sd">    --8&lt;-- &quot;docs/snippets/plotly_viz_plot_ridge.html&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    --8&lt;-- "docs-src/snippets/plotly_viz_plot_ridge.html"</span>
+<span class="sd">    """</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hs</span><span class="p">):</span>
         <span class="n">outcomes</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="n">values_for_graph_type</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
         <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">(</span>
-                <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">,</span>
                 <span class="nb">list</span><span class="p">(</span><span class="n">outcomes</span><span class="p">),</span>
                 <span class="p">[</span><span class="n">probability</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">],</span>
             <span class="p">)</span>
@@ -2047,61 +2045,61 @@ Pass the largest across several figures to put them all on one scale, so ridges 
         <span class="n">crests</span> <span class="o">=</span> <span class="p">[</span><span class="n">baseline</span> <span class="o">+</span> <span class="n">percent</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">percent</span> <span class="ow">in</span> <span class="n">percents</span><span class="p">]</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]</span> <span class="k">if</span> <span class="n">colors</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">fill</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;lines&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"scatter"</span><span class="p">,</span>
+            <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"lines"</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="p">[</span>
                 <span class="n">row_outcomes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">_RIDGE_FILL_FOOT</span><span class="p">,</span>
                 <span class="o">*</span><span class="n">row_outcomes</span><span class="p">,</span>
                 <span class="n">row_outcomes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">_RIDGE_FILL_FOOT</span><span class="p">,</span>
             <span class="p">]</span>
             <span class="k">if</span> <span class="n">row_outcomes</span>
             <span class="k">else</span> <span class="p">[],</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">baseline</span><span class="p">,</span> <span class="o">*</span><span class="n">crests</span><span class="p">,</span> <span class="n">baseline</span><span class="p">]</span> <span class="k">if</span> <span class="n">row_outcomes</span> <span class="k">else</span> <span class="p">[],</span>
-            <span class="s2">&quot;fill&quot;</span><span class="p">:</span> <span class="s2">&quot;toself&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;line&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-            <span class="s2">&quot;hoverinfo&quot;</span><span class="p">:</span> <span class="s2">&quot;skip&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ridge&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;fill&quot;</span><span class="p">},</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="p">[</span><span class="n">baseline</span><span class="p">,</span> <span class="o">*</span><span class="n">crests</span><span class="p">,</span> <span class="n">baseline</span><span class="p">]</span> <span class="k">if</span> <span class="n">row_outcomes</span> <span class="k">else</span> <span class="p">[],</span>
+            <span class="s2">"fill"</span><span class="p">:</span> <span class="s2">"toself"</span><span class="p">,</span>
+            <span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+            <span class="s2">"hoverinfo"</span><span class="p">:</span> <span class="s2">"skip"</span><span class="p">,</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"meta"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ridge"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"fill"</span><span class="p">},</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fill</span><span class="p">[</span><span class="s2">&quot;fillcolor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_with_alpha</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">_RIDGE_FILL_ALPHA</span><span class="p">)</span>
+            <span class="n">fill</span><span class="p">[</span><span class="s2">"fillcolor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_with_alpha</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">_RIDGE_FILL_ALPHA</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
-        <span class="n">marker</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+        <span class="n">marker</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
         <span class="c1"># The plotted y is offset and scaled, so tooltips read the true</span>
         <span class="c1"># percentages out of customdata instead.</span>
         <span class="n">line</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;lines+markers&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_outcomes</span><span class="p">),</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">crests</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-            <span class="s2">&quot;customdata&quot;</span><span class="p">:</span> <span class="n">percents</span><span class="p">,</span>
-            <span class="s2">&quot;hovertemplate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="n">marker</span><span class="p">,</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ridge&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;line&quot;</span><span class="p">},</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"scatter"</span><span class="p">,</span>
+            <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"lines+markers"</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_outcomes</span><span class="p">),</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">crests</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+            <span class="s2">"customdata"</span><span class="p">:</span> <span class="n">percents</span><span class="p">,</span>
+            <span class="s2">"hovertemplate"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">: %</span><span class="se">{{</span><span class="s2">customdata:.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">%&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+            <span class="s2">"marker"</span><span class="p">:</span> <span class="n">marker</span><span class="p">,</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"meta"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ridge"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"line"</span><span class="p">},</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">marker</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
-            <span class="n">line</span><span class="p">[</span><span class="s2">&quot;line&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">}</span>
+            <span class="n">marker</span><span class="p">[</span><span class="s2">"color"</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">line</span><span class="p">[</span><span class="s2">"line"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">}</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="n">annotation</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ridge-label&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;xref&quot;</span><span class="p">:</span> <span class="s2">&quot;paper&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;xshift&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-            <span class="s2">&quot;yref&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">baseline</span><span class="p">,</span>
-            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;yshift&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-            <span class="s2">&quot;showarrow&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;borderpad&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"ridge-label"</span><span class="p">,</span>
+            <span class="s2">"xref"</span><span class="p">:</span> <span class="s2">"paper"</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"xanchor"</span><span class="p">:</span> <span class="s2">"left"</span><span class="p">,</span>
+            <span class="s2">"xshift"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">"yref"</span><span class="p">:</span> <span class="s2">"y"</span><span class="p">,</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">baseline</span><span class="p">,</span>
+            <span class="s2">"yanchor"</span><span class="p">:</span> <span class="s2">"bottom"</span><span class="p">,</span>
+            <span class="s2">"yshift"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"text"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+            <span class="s2">"showarrow"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"align"</span><span class="p">:</span> <span class="s2">"left"</span><span class="p">,</span>
+            <span class="s2">"borderpad"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">label_bgcolor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">annotation</span><span class="p">[</span><span class="s2">&quot;bgcolor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_bgcolor</span>
+            <span class="n">annotation</span><span class="p">[</span><span class="s2">"bgcolor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_bgcolor</span>
         <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">show_peak_labels</span> <span class="ow">and</span> <span class="n">percents</span><span class="p">:</span>
             <span class="n">ridge_peak</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">percents</span><span class="p">)</span>
@@ -2111,43 +2109,43 @@ Pass the largest across several figures to put them all on one scale, so ridges 
             <span class="n">peak_index</span> <span class="o">=</span> <span class="n">peak_indices</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
             <span class="n">peak_on_left</span> <span class="o">=</span> <span class="n">peak_index</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_outcomes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
             <span class="n">peak_annotation</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ridge-peak-label&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;xref&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">row_outcomes</span><span class="p">[</span><span class="n">peak_index</span><span class="p">],</span>
-                <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="mi">8</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span>
-                <span class="s2">&quot;ay&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;yref&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">crests</span><span class="p">[</span><span class="n">peak_index</span><span class="p">],</span>
-                <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;middle&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">_format_percentage</span><span class="p">(</span><span class="n">ridge_peak</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">),</span>
-                <span class="s2">&quot;showarrow&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;arrowhead&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;arrowwidth&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
-                <span class="s2">&quot;borderpad&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"ridge-peak-label"</span><span class="p">,</span>
+                <span class="s2">"xref"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="n">row_outcomes</span><span class="p">[</span><span class="n">peak_index</span><span class="p">],</span>
+                <span class="s2">"xanchor"</span><span class="p">:</span> <span class="s2">"left"</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="s2">"right"</span><span class="p">,</span>
+                <span class="s2">"ax"</span><span class="p">:</span> <span class="mi">8</span> <span class="k">if</span> <span class="n">peak_on_left</span> <span class="k">else</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span>
+                <span class="s2">"ay"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"yref"</span><span class="p">:</span> <span class="s2">"y"</span><span class="p">,</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="n">crests</span><span class="p">[</span><span class="n">peak_index</span><span class="p">],</span>
+                <span class="s2">"yanchor"</span><span class="p">:</span> <span class="s2">"middle"</span><span class="p">,</span>
+                <span class="s2">"text"</span><span class="p">:</span> <span class="n">_format_percentage</span><span class="p">(</span><span class="n">ridge_peak</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">),</span>
+                <span class="s2">"showarrow"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"arrowhead"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"arrowwidth"</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
+                <span class="s2">"borderpad"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">peak_annotation</span><span class="p">[</span><span class="s2">&quot;arrowcolor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_with_alpha</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
+                <span class="n">peak_annotation</span><span class="p">[</span><span class="s2">"arrowcolor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_with_alpha</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">label_bgcolor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">peak_annotation</span><span class="p">[</span><span class="s2">&quot;bgcolor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_bgcolor</span>
+                <span class="n">peak_annotation</span><span class="p">[</span><span class="s2">"bgcolor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_bgcolor</span>
             <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peak_annotation</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">PlotSpec</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="c1"># Not &quot;x unified&quot;: one tooltip per ridge at the outcome nearest the</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="c1"># Not "x unified": one tooltip per ridge at the outcome nearest the</span>
             <span class="c1"># cursor, all at once. The fills skip hover, so that is exactly one</span>
             <span class="c1"># apiece.</span>
-            <span class="s2">&quot;hovermode&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;annotations&quot;</span><span class="p">:</span> <span class="n">annotations</span><span class="p">,</span>
-            <span class="s2">&quot;shapes&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">},</span> <span class="s2">&quot;zeroline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
-            <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;showticklabels&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;showgrid&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;zeroline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"hovermode"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>
+            <span class="s2">"annotations"</span><span class="p">:</span> <span class="n">annotations</span><span class="p">,</span>
+            <span class="s2">"shapes"</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">"xaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Outcome"</span><span class="p">},</span> <span class="s2">"zeroline"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="s2">"yaxis"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"showticklabels"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"showgrid"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"zeroline"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"range"</span><span class="p">:</span> <span class="p">[</span>
                     <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span><span class="p">,</span>
                     <span class="p">(</span><span class="n">num_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">_RIDGE_ROW_STEP</span>
                     <span class="o">+</span> <span class="n">peak_height</span>
@@ -2169,6 +2167,8 @@ Pass the largest across several figures to put them all on one scale, so ridges 
     </div>
 
 </div>
+
+
 
 
 
@@ -2203,7 +2203,7 @@ Pass the largest across several figures to put them all on one scale, so ridges 
           <a href="../dyce.viz.matplotlib/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Matplotlib (optional)">
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
@@ -2224,13 +2224,16 @@ Pass the largest across several figures to put them all on one scale, so ridges 
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
     </div>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
     </a>
   
 </div>
@@ -2248,10 +2251,14 @@ Pass the largest across several figures to put them all on one scale, so ridges 
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

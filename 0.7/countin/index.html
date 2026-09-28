@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="./..">
       
       
         <link rel="next" href="../translations/">
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="zensical-0.0.65">
     
     
       
@@ -31,10 +31,15 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
       
       
 
@@ -52,14 +57,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -80,7 +83,7 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
         
@@ -104,15 +107,15 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer">
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -174,57 +177,30 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search">
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
         </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
 </div>
       
     
-    
-      <div class="md-header__source">
+    <div class="md-header__source">
+      
         <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
   </div>
 </a>
-      </div>
-    
+      
+    </div>
   </nav>
   
 </header>
@@ -250,10 +226,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
     dyce
@@ -263,7 +239,7 @@
       <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -280,15 +256,14 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="./.." class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
-  
+  Introduction
 
     
   </span>
@@ -310,7 +285,7 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
       
       
       
@@ -321,8 +296,7 @@
   <span class="md-ellipsis">
     
   
-    Countin’ with histograms and pools
-  
+  Countin’ with histograms and pools
 
     
   </span>
@@ -332,15 +306,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Countin’ with histograms and pools
-  
+  Countin’ with histograms and pools
 
     
   </span>
@@ -351,23 +324,24 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#basic-examples" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Basic examples
-      
+      </span>
     </span>
   </a>
   
@@ -376,9 +350,9 @@
         <li class="md-nav__item">
   <a href="#dependent-probabilities" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Dependent probabilities
-      
+      </span>
     </span>
   </a>
   
@@ -388,9 +362,9 @@
           <li class="md-nav__item">
   <a href="#expansion-and-recursion" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Expansion and recursion
-      
+      </span>
     </span>
   </a>
   
@@ -404,9 +378,9 @@
         <li class="md-nav__item">
   <a href="#visualization" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Visualization
-      
+      </span>
     </span>
   </a>
   
@@ -415,9 +389,9 @@
         <li class="md-nav__item">
   <a href="#time-to-get-meta-evil-on-those-outcomes" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Time to get meta-evil on those outcomes!
-      
+      </span>
     </span>
   </a>
   
@@ -426,9 +400,9 @@
         <li class="md-nav__item">
   <a href="#further-exploration" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Further exploration
-      
+      </span>
     </span>
   </a>
   
@@ -456,8 +430,7 @@
   <span class="md-ellipsis">
     
   
-    Applications and translations
-  
+  Applications and translations
 
     
   </span>
@@ -483,8 +456,7 @@
   <span class="md-ellipsis">
     
   
-    Release notes
-  
+  Release notes
 
     
   </span>
@@ -510,8 +482,7 @@
   <span class="md-ellipsis">
     
   
-    Contributing
-  
+  Contributing
 
     
   </span>
@@ -537,8 +508,7 @@
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -582,8 +552,7 @@
   <span class="md-ellipsis">
     
   
-    API
-  
+  API
 
     
   </span>
@@ -593,19 +562,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    API
-  
+  API
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -618,8 +587,7 @@
   <span class="md-ellipsis">
     
   
-    Core
-  
+  Core
 
     
   </span>
@@ -630,10 +598,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -646,8 +614,7 @@
   <span class="md-ellipsis">
     
   
-    Conveniences
-  
+  Conveniences
 
     
   </span>
@@ -658,10 +625,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -689,8 +656,7 @@
   <span class="md-ellipsis">
     
   
-    Visualization
-  
+  Visualization
 
     
   </span>
@@ -700,19 +666,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7_3">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Visualization
-  
+  Visualization
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -725,8 +691,7 @@
   <span class="md-ellipsis">
     
   
-    Shared structures
-  
+  Shared structures
 
     
   </span>
@@ -737,10 +702,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -753,8 +718,7 @@
   <span class="md-ellipsis">
     
   
-    Matplotlib (optional)
-  
+  Matplotlib (optional)
 
     
   </span>
@@ -765,10 +729,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -781,8 +745,7 @@
   <span class="md-ellipsis">
     
   
-    Plotly
-  
+  Plotly
 
     
   </span>
@@ -793,18 +756,20 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -820,26 +785,38 @@
               
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#basic-examples" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Basic examples
-      
+      </span>
     </span>
   </a>
   
@@ -848,9 +825,9 @@
         <li class="md-nav__item">
   <a href="#dependent-probabilities" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Dependent probabilities
-      
+      </span>
     </span>
   </a>
   
@@ -860,9 +837,9 @@
           <li class="md-nav__item">
   <a href="#expansion-and-recursion" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Expansion and recursion
-      
+      </span>
     </span>
   </a>
   
@@ -876,9 +853,9 @@
         <li class="md-nav__item">
   <a href="#visualization" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Visualization
-      
+      </span>
     </span>
   </a>
   
@@ -887,9 +864,9 @@
         <li class="md-nav__item">
   <a href="#time-to-get-meta-evil-on-those-outcomes" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Time to get meta-evil on those outcomes!
-      
+      </span>
     </span>
   </a>
   
@@ -898,9 +875,9 @@
         <li class="md-nav__item">
   <a href="#further-exploration" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Further exploration
-      
+      </span>
     </span>
   </a>
   
@@ -920,13 +897,11 @@
               <article class="md-content__inner md-typeset">
                 
                   
-
-
   
   
 
 
-  <h1>Countin’ with histograms and pools</h1>
+  <h1 id="__skip">Countin’ with histograms and pools</h1>
 
 <!---
   Copyright and other protections apply.
@@ -951,8 +926,8 @@ For typing:
 
   -- END MONKEY PATCH -->
 
-<p><code>dyce</code> provides two core primitives for enumeration.</p>
-<!-- TODO(posita): Figure out what we're doing with dyce.r -->
+<p><code>dyce</code> provides two core primitives for finite discrete probability computations.</p>
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
 <!--
 [^1].
 
@@ -962,8 +937,8 @@ For typing:
     These are covered [separately](rollin.md).
   -->
 
-<p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a> represent histograms for modeling discrete outcomes.
-They encode finite discrete probability distributions as integer counts without any denominator.
+<p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a> represent finite discrete probability distributions as histograms.
+They encode outcomes as integer counts without any denominator.
 <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code> objects</a> represent pools (ordered sequences) of histograms.
 If all you need is to aggregate outcomes (sums) from rolling a bunch of dice (or perform calculations on aggregate outcomes), <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a> are probably sufficient.
 If you need to <em>select</em> certain histograms from a group prior to computing aggregate outcomes (e.g., taking the highest and lowest of each possible roll of <em>n</em> dice), that’s where <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code> objects</a> come in.</p>
@@ -1152,7 +1127,7 @@ The above can be expressed more succinctly.</p>
 </code></pre></div></td></tr></table></div>
 <p>Histograms should be sufficient for most calculations.
 However, pools are useful for “keeping” or “taking” (selecting) only some of each roll’s outcomes.
-This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="h(*which: GetItemT) -> H" href="../dyce/#dyce.P.h"><code>P.h</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -> Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
+This is done by providing one or more index arguments to the <a class="autorefs autorefs-internal" title="at(which: GetItemT, *more: GetItemT) -&gt; H[Any]" href="../dyce/#dyce.P.at"><code>P.at</code> method</a> or the <a class="autorefs autorefs-internal" title="rolls_with_counts(*which: GetItemT) -&gt; Iterator[RollCountT[_T]]" href="../dyce/#dyce.P.rolls_with_counts"><code>P.rolls_with_counts</code> method</a>.
 Indices can be integers, slices, or a mix thereof.
 Outcome indices in rolls are ordered from least to greatest with negative values counting from the right, as one would expect (i.e., <code>[0]</code>, <code>[1]</code>, …, <code>[-2]</code>, <code>[-1]</code>).
 Summing the least two faces when rolling three six-sided dice would be:</p>
@@ -1161,7 +1136,7 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">3</span>
 <span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 <span class="mi">3</span><span class="nd">@P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># see warning below about parentheses</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># see warning below about parentheses</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <div class="admonition bug">
@@ -1172,11 +1147,11 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span>
-<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># equivalent to 2@(P(6).h(1))</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># equivalent to 2@(P(6).at(1))</span>
     <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
     <span class="o">...</span>
     <span class="ne">IndexError</span><span class="p">:</span> <span class="nb">tuple</span> <span class="n">index</span> <span class="n">out</span> <span class="n">of</span> <span class="nb">range</span>
-    <span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">11</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 </div>
@@ -1193,9 +1168,9 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">10</span>
 <span class="normal">11</span>
 <span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># least</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># least</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.04</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
   <span class="mi">1</span> <span class="o">|</span>  <span class="mf">42.13</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####################</span>
@@ -1217,9 +1192,9 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># middle</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># middle</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">3.50</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.37</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">7.41</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
@@ -1241,9 +1216,9 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># greatest (p3d6.h(-1) would also work)</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># greatest (p3d6.at(-1) would also work)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">91</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">p3d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.96</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">1.14</span>
   <span class="mi">1</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span>
@@ -1287,7 +1262,7 @@ Summing the least two faces when rolling three six-sided dice would be:</p>
 <span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d10</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">d10</span>  <span class="c1"># a common “d10” with faces [0 .. 9]</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">d10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">d10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="n">avg</span> <span class="o">|</span>   <span class="mf">13.48</span>
 <span class="n">std</span> <span class="o">|</span>    <span class="mf">4.40</span>
@@ -1361,7 +1336,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 <span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">number_of_evens_in_nd6</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">d6_even</span>
 <span class="o">...</span>     <span class="n">all_even</span> <span class="o">=</span> <span class="n">number_of_evens_in_nd6</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">all_even</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">all_even</span><span class="o">.</span><span class="n">total</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6: </span><span class="si">{</span><span class="n">all_even</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">all_even</span><span class="o">.</span><span class="n">total</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
  <span class="mi">6</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">1.56</span><span class="o">%</span>
  <span class="mi">5</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">3.12</span><span class="o">%</span>
  <span class="mi">4</span><span class="n">d6</span><span class="p">:</span>  <span class="mf">6.25</span><span class="o">%</span>
@@ -1369,7 +1344,7 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
  <span class="mi">2</span><span class="n">d6</span><span class="p">:</span> <span class="mf">25.00</span><span class="o">%</span>
  <span class="mi">1</span><span class="n">d6</span><span class="p">:</span> <span class="mf">50.00</span><span class="o">%</span>
 </code></pre></div></td></tr></table></div>
-<p>The odds of scoring at least one nine or higher for any one of <span class="arithmatex">\(n\)</span> “<a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n">exploding</a>” six-sided dice, for <span class="arithmatex">\(n\)</span> in <span class="arithmatex">\([1 .. 10]\)</span> is:</p>
+<p>The odds of scoring at least one nine or higher for any one of <span class="arithmatex">\(n\)</span> “<a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n">exploding</a>” six-sided dice, for <span class="arithmatex">\(n\)</span> in <span class="arithmatex">\([1 .. 10]\)</span> is:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1389,14 +1364,14 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
 <span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">explode_n</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="c1"># By the time we&#39;re exploding to a third die, we&#39;re guaranteed</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="c1"># a nine or higher, so we don&#39;t need to explode past that</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># By the time we're exploding to a third die, we're guaranteed</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># a nine or higher, so we don't need to explode past that</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">exploding_d6</span> <span class="o">=</span> <span class="n">explode_n</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">d6e_ge_9</span> <span class="o">=</span> <span class="n">exploding_d6</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">number_of_nines_or_higher_in_nd6e</span> <span class="o">=</span> <span class="n">n</span> <span class="o">@</span> <span class="n">d6e_ge_9</span>
 <span class="o">...</span>     <span class="n">at_least_one_9</span> <span class="o">=</span> <span class="n">number_of_nines_or_higher_in_nd6e</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6-exploding: </span><span class="si">{</span><span class="n">at_least_one_9</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">at_least_one_9</span><span class="o">.</span><span class="n">total</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2"> &gt;2</span><span class="si">}</span><span class="s2">d6-exploding: </span><span class="si">{</span><span class="n">at_least_one_9</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">at_least_one_9</span><span class="o">.</span><span class="n">total</span><span class="si">:</span><span class="s2"> &gt;6.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="mi">10</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">69.21</span><span class="o">%</span>
  <span class="mi">9</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">65.36</span><span class="o">%</span>
  <span class="mi">8</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">61.03</span><span class="o">%</span>
@@ -1409,12 +1384,12 @@ The odds of observing all even faces when rolling <span class="arithmatex">\(n\)
  <span class="mi">1</span><span class="n">d6</span><span class="o">-</span><span class="n">exploding</span><span class="p">:</span> <span class="mf">11.11</span><span class="o">%</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="dependent-probabilities">Dependent probabilities</h2>
-<p>Probabilities involving dependent terms can be expressed via a callback passed to <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>.
+<p>Probabilities involving dependent terms can be expressed via a callback passed to <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.
 First, we express independent terms as histograms or pools.
 Second, we express the dependent term as a function that will be called once for each of the Cartesian product of the results from each independent term.
 Outcomes from independent histogram terms are passed to the dependent function as <a class="autorefs autorefs-internal" href="../dyce/#dyce.HResult"><code>HResult</code> objects</a>.
 Rolls from independent pool terms are passed as <a class="autorefs autorefs-internal" href="../dyce/#dyce.PResult"><code>PResult</code> objects</a>.
-Finally, we pass the dependent function to <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>, along with the independent terms.</p>
+Finally, we pass the dependent function to <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>, along with the independent terms.</p>
 <p>To illustrate, say we want to roll a six-sided die and compare whether the result is strictly greater than its distance from some constant.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1472,7 +1447,7 @@ We’ll roll a four-sided die (d4) and a six-sided die and compare whether the s
 <span class="kc">False</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
  <span class="kc">True</span> <span class="o">|</span>  <span class="mf">83.33</span><span class="o">%</span> <span class="o">|</span><span class="c1">########################################</span>
 </code></pre></div></td></tr></table></div>
-<p>In the alternative, one could nest the <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> call, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
+<p>In the alternative, one could nest the <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> call, where the innermost holds the dependent term, and the outer functions each establish the scope of their respective independent outcomes.
 However, this isn’t very readable, and is often less efficient than using a single function.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -1547,7 +1522,7 @@ Let’s compare how three six-sided dice fair against two four-sided dice.</p>
   <span class="o">&lt;</span><span class="n">DupeVs</span><span class="o">.</span><span class="n">FIRST_WINS</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">|</span>  <span class="mf">13.89</span><span class="o">%</span> <span class="o">|</span><span class="c1">####</span>
 </code></pre></div></td></tr></table></div>
 <h3 id="expansion-and-recursion">Expansion and recursion</h3>
-<p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
+<p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
 One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
 This framing is intuitive because it maps to well to reality.
 We might start with the following implementation:</p>
@@ -1594,7 +1569,7 @@ We might start with the following implementation:</p>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">naive_explode</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
 <span class="o">...</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
-<span class="o">...</span>         <span class="c1"># If we&#39;ve rolled the max for this die, add another die roll</span>
+<span class="o">...</span>         <span class="c1"># If we've rolled the max for this die, add another die roll</span>
 <span class="o">...</span>         <span class="c1"># to our existing outcome</span>
 <span class="o">...</span>         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 <span class="o">...</span>     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
@@ -1638,8 +1613,8 @@ It appears that we went no further than eight rolls (a first roll plus up to sev
 Folks familiar with this domain might recognize the distribution looks <em>mostly</em> correct, but the counts are a bit…<em>off</em>.
 We’re also missing the final outcome of <code>48</code>.
 We also got a <a class="autorefs autorefs-internal" href="../dyce/#dyce.TruncationWarning"><code>TruncationWarning</code></a>, which provides a hint.</p>
-<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code>H({})</code> from our function.
-(See the <code>#!always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
+<p>The way to eliminate a branch from consideration when recursing with <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> is to explicitly return the empty histogram <code>H({})</code> from our function.
+(See the <code>always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
 We’re not explicitly returning <code>H({})</code> in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:</p>
@@ -1663,11 +1638,11 @@ And the second is when we’ve exhausted the call stack:</p>
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="n">whose</span> <span class="n">recursion</span> <span class="n">depth</span> <span class="n">exceeded</span> <span class="mi">1000</span> <span class="n">were</span> <span class="n">truncated</span>
 </code></pre></div>
-<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>.
+<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>.
 Let’s take a closer look at our implementation now that we know that might happen:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code>       <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>, our function will also return <code>H({})</code> for that branch.
+<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>, our function will also return <code>H({})</code> for that branch.
 This is because adding <code>H({})</code> to anything is <code>H({})</code>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">({})</span> <span class="o">+</span> <span class="mi">1024</span>
@@ -1699,7 +1674,7 @@ We can check.</p>
 <span class="o">...</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
 <span class="o">...</span>         <span class="n">inner</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 <span class="o">...</span>         <span class="k">if</span> <span class="n">inner</span><span class="p">:</span>
-<span class="o">...</span>             <span class="c1"># Only return another histogram if we weren&#39;t truncated</span>
+<span class="o">...</span>             <span class="c1"># Only return another histogram if we weren't truncated</span>
 <span class="o">...</span>             <span class="c1"># somewhere down the line</span>
 <span class="o">...</span>             <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">inner</span>
 <span class="o">...</span>     <span class="c1"># Every other case returns our current outcome</span>
@@ -1711,7 +1686,7 @@ We can check.</p>
 <p><em>Much</em> better.
 We can now recognize the counts as powers of our maximum face.</p>
 <p>But how can we control the number of explosions?
-Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code>precision</code> parameter.</p>
+Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code>precision</code> parameter.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -1729,7 +1704,7 @@ Sure, we <em>could</em> do some math and fiddle with <a class="autorefs autorefs
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <p>But that’s fragile and highly domain-specific.
-Instead, we can take advantage of <a class="autorefs autorefs-internal" title="expand(callback: Callable, *sources: H | P, precision: Fraction = _DEFAULT_PRECISION, **state: Any) -> H" href="../dyce/#dyce.expand"><code>expand</code></a>’s ability to pass down arbitrary keyword arguments to make our depth counting explicit.</p>
+Instead, we can take advantage of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s ability to pass down arbitrary keyword arguments to make our depth counting explicit.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1781,7 +1756,7 @@ If we wanted to make that the default, we could create a simple wrapper.</p>
 <span class="normal">23</span>
 <span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">proper_explode_n</span><span class="p">(</span>
 <span class="o">...</span>     <span class="n">source</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
@@ -1791,7 +1766,7 @@ If we wanted to make that the default, we could create a simple wrapper.</p>
 <span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
 <span class="o">...</span>
 <span class="o">...</span>     <span class="k">def</span><span class="w"> </span><span class="nf">_callback</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">T</span><span class="p">:</span>
-<span class="o">...</span>         <span class="k">if</span> <span class="n">n_left</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>  <span class="c1"># type: ignore[type-var]</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="n">n_left</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>  <span class="c1"># type: ignore[type-var] # zuban: ignore[arg-type]</span>
 <span class="o">...</span>             <span class="n">inner</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">_callback</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="n">n_left</span><span class="o">=</span><span class="n">n_left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 <span class="o">...</span>             <span class="k">if</span> <span class="n">inner</span><span class="p">:</span>
 <span class="o">...</span>                 <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">inner</span>
@@ -1804,7 +1779,7 @@ If we wanted to make that the default, we could create a simple wrapper.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">proper_explode_n</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
 <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
-<p>The above is very nearly the implementation for <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -> H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a>, which offers an additional <code>resolver</code> parameter that allows for some additional flexibility.</p>
+<p>The above is very nearly the implementation for <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a>, which offers an additional <code>resolver</code> parameter that allows for some additional flexibility.</p>
 <p>Let’s say we’re considering a new exploding mechanic where, to explode, one must roll the highest outcome on a given die.
 However, on the second explosion, re-explosion occurs if either the highest or second highest outcome is rolled.
 On the third explosion, anything greater than or equal to the third highest outcome will re-explode, etc.
@@ -1882,15 +1857,15 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
 <span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">T</span><span class="p">:</span>
 <span class="o">...</span>     <span class="k">return</span> <span class="p">(</span>
 <span class="o">...</span>         <span class="n">result</span><span class="o">.</span><span class="n">h</span>
-<span class="o">...</span>         <span class="c1"># Explode only maximum value if we haven&#39;t exploded yet,</span>
-<span class="o">...</span>         <span class="c1"># on [max - 1..max] if we&#39;ve already exploded once, on</span>
-<span class="o">...</span>         <span class="c1"># [max - 2..max] if we&#39;ve already exploded twice, etc.</span>
+<span class="o">...</span>         <span class="c1"># Explode only maximum value if we haven't exploded yet,</span>
+<span class="o">...</span>         <span class="c1"># on [max - 1..max] if we've already exploded once, on</span>
+<span class="o">...</span>         <span class="c1"># [max - 2..max] if we've already exploded twice, etc.</span>
 <span class="o">...</span>         <span class="c1"># ...</span>
 <span class="o">...</span>         <span class="k">if</span> <span class="p">(</span>
-<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">n_done</span>  <span class="c1"># type: ignore[operator,type-var]</span>
+<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">n_done</span>  <span class="c1"># type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]</span>
 <span class="o">...</span>             <span class="ow">and</span>
 <span class="o">...</span>             <span class="c1"># ... but never explode on the minimum</span>
-<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>  <span class="c1"># type: ignore[operator,type-var]</span>
+<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>  <span class="c1"># type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]</span>
 <span class="o">...</span>         <span class="p">)</span>
 <span class="o">...</span>         <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
 <span class="o">...</span>     <span class="p">)</span>
@@ -1987,7 +1962,7 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
 <span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">T</span><span class="p">:</span>
 <span class="o">...</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span> <span class="ow">in</span> <span class="n">pool</span><span class="p">:</span>
 <span class="o">...</span>         <span class="n">which</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
-<span class="o">...</span>         <span class="k">if</span> <span class="n">which</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>  <span class="c1"># type: ignore[type-var]</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="n">which</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>  <span class="c1"># type: ignore[type-var] # zuban: ignore[arg-type,operator]</span>
 <span class="o">...</span>             <span class="k">return</span> <span class="n">pool</span><span class="p">[</span><span class="n">which</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 <span class="o">...</span>     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
 
@@ -2009,10 +1984,10 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
 <span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">23040</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">23040</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">31</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">43</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">49</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">51</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">55</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">57</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">60</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="visualization">Visualization</h2>
-<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -> Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
+<p><a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -&gt; Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> eases integration with plotting packages.
 If <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a> is installed <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a> provides plotting conveniences.
-For something more sophisticated, <a href="https://github.com/posita/anydyce/"><code>anydyce</code></a> provides additional interactive visualization tools.</p>
-<p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a></p>
+For something more sophisticated, <a href="https://github.com/posita/dyceum/"><code>dyceum</code></a> provides additional interactive visualization tools.</p>
+<p>Visualization using <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a> with <a href="https://matplotlib.org/stable/api/index.html">Matplotlib</a>: <a href="../jupyter/lab/index.html?path=histogram.ipynb"><img alt="Try dyce" src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" /></a></p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -2021,13 +1996,17 @@ For something more sophisticated, <a href="https://github.com/posita/anydyce/"><
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_bar</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_bar</span><span class="p">(</span><span class="n">h3d6</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution for 3d6&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Distribution for 3d6"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_histogram_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_histogram_light.svg">
-  <img alt="Plot: Distribution for 3d6" src="../assets/plot_histogram_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_histogram_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_histogram_light.svg">
+  <img alt="Plot: Distribution for 3d6" src="../images/plot_histogram_light.svg">
 </picture></p>
 <h2 id="time-to-get-meta-evil-on-those-outcomes">Time to get meta-evil on those outcomes!</h2>
 <p>Thanks to <del><a href="https://pypi.org/project/numerary/"><code>numerary</code></a></del> <em><a href="https://jorenham.github.io/optype/"><code>optype</code></a></em>, <code>dyce</code> offers typing support for arbitrary number-like outcomes, including primitives from symbolic expression packages such as <a href="https://www.sympy.org/">SymPy</a>.</p>
@@ -2041,7 +2020,9 @@ For something more sophisticated, <a href="https://github.com/posita/anydyce/"><
 <span class="o">&gt;&gt;&gt;</span> <span class="n">P</span><span class="p">(</span><span class="n">d6x</span><span class="p">,</span> <span class="n">d8y</span><span class="p">,</span> <span class="n">d6x</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">18</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">20</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-<p><a href="https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186"><img alt="Miss you, Doris!" src="../assets/doris.png" /></a></p>
+<p><a href="https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8"><img alt="Miss you, Doris!" src="../images/doris.png" /></a></p>
+<!-- Original source: https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186 -->
+
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Be aware that, depending on implementation, performance can suffer quite a bit when using symbolic primitives.</p>
@@ -2078,7 +2059,7 @@ Instead, it relies on the caller to invoke its proprietary solver APIs.</p>
   <span class="o">...</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">determine</span> <span class="n">truth</span> <span class="n">value</span> <span class="n">of</span> <span class="n">Relational</span><span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">sympy.solvers.inequalities</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">inequalities</span><span class="o">.</span><span class="n">reduce_inequalities</span><span class="p">(</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">inequalities</span><span class="o">.</span><span class="n">reduce_inequalities</span><span class="p">(</span>  <span class="c1"># zuban: ignore[no-untyped-call]</span>
 <span class="o">...</span>     <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span><span class="p">]</span>
 <span class="o">...</span> <span class="p">)</span>
 <span class="kc">True</span>
@@ -2101,12 +2082,12 @@ In practice, that means that certain operations won’t work with symbolic expre
 </code></pre></div></td></tr></table></div>
 <p>Selecting the “lowest” die works</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <p>Selecting all dice works, since it’s equivalent to flattening (no sorting is required).</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <p>Enumerating rolls works.</p>
@@ -2114,7 +2095,7 @@ In practice, that means that certain operations won’t work with symbolic expre
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">rolls_with_counts</span><span class="p">())</span>
 <span class="p">[((</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="o">...</span><span class="p">,</span> <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">((</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">)]</span>
 </code></pre></div></td></tr></table></div>
-<p><a class="autorefs autorefs-internal" title="roll() -> RollT[_T]" href="../dyce/#dyce.P.roll"><code>P.roll</code></a> “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.</p>
+<p><a class="autorefs autorefs-internal" title="roll() -&gt; RollT[_T]" href="../dyce/#dyce.P.roll"><code>P.roll</code></a> “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.</p>
 <!-- BEGIN MONKEY PATCH --
 For deterministic outcomes.
 
@@ -2128,7 +2109,7 @@ For deterministic outcomes.
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
 <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p><a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -> P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a> can help pave the way back to concrete outcomes.</p>
+<p><a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -&gt; P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a> can help pave the way back to concrete outcomes.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
@@ -2136,13 +2117,15 @@ For deterministic outcomes.
 <span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">outcome</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">sympy</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">x</span><span class="p">:</span> <span class="n">sympy</span><span class="o">.</span><span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">apply_to_each_h</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">4</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">H</span><span class="p">({</span><span class="mi">7</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">apply_to_each_h</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">apply_to_each_h</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">H</span><span class="p">({</span><span class="mi">7</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="o">/</span><span class="mi">9</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">9</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="further-exploration">Further exploration</h2>
 <p>Consider delving into some <a href="../translations/">applications and translations</a> for more sophisticated examples, or jump right into the <a href="../dyce/">API</a>.</p>
 <p>Anywhere you see a JupyterLite logo <img alt="JupyterLite" src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" />, you can click on it to immediately start tinkering with a temporal instance of that example.
 Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.</p>
+
+
 
 
 
@@ -2174,10 +2157,10 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
+          <a href="./.." class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
@@ -2202,7 +2185,7 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
             </div>
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </div>
           </a>
         
@@ -2214,13 +2197,16 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      <i>Copyright and other protections apply. Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software. All rights not expressly waived or licensed are reserved. If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
     </div>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
     </a>
   
 </div>
@@ -2238,10 +2224,14 @@ Just be aware that changes are stored in browser memory, so make sure to downloa
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.tabs.link", "navigation.footer", "navigation.expand", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
