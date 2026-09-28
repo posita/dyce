@@ -63,6 +63,8 @@ jobs:
         with:
           cache-python: true
       - run: uv run --no-dev --group lint pre-commit run --all-files --hook-stage pre-push
+        env:
+          SKIP: gitleaks,osv-scanner,semgrep,trivyfs-docker,trivyconfig-docker
       - run: git diff --quiet HEAD --  # fails if any tracked files have changed
 
   docs-idempotent:

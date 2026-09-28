@@ -1,0 +1,51 @@
+name: gitleaks
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '11 4 * * 3'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    name: Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          archive=gitleaks_8.30.0_linux_x64.tar.gz
+          curl --fail --silent --show-error --location --output "$archive" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/$archive"
+          echo "79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e  $archive" | sha256sum --check
+          tar --extract --gzip --file "$archive" gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+
+      # "detect" scans every ref by default. That includes the orphan gh-pages
+      # branch, which contains built JupyterLite files. Limit the scan to
+      # commits reachable from HEAD.
+      - name: Scan
+        run: gitleaks detect --source . --log-opts=HEAD --redact --report-format sarif --report-path gitleaks.sarif --exit-code 1
+
+      - name: Upload gitleaks scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+        with:
+          sarif_file: gitleaks.sarif

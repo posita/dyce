@@ -38,6 +38,27 @@ repos:
             docs-src/perf_.*\.txt
           )$
 
+  - repo: meta
+    hooks:
+    - id: check-useless-excludes
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+        args: [--toml, pyproject.toml]
+        additional_dependencies:
+          - tomli
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        entry: ruff check
+        args: [--fix]
+      - id: ruff-format
+        entry: ruff format
+
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.12.19
     hooks:
@@ -67,27 +88,6 @@ repos:
   #     - id: trivyconfig-docker
   #       entry: docker.io/aquasec/trivy:0.74.0 config --cache-dir /src/.pre-commit-trivy-cache --exit-code 1
   #       args: [.]
-
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.3
-    hooks:
-      - id: codespell
-        args: [--toml, pyproject.toml]
-        additional_dependencies:
-          - tomli
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.9
-    hooks:
-      - id: ruff-check
-        entry: ruff check
-        args: [--fix]
-      - id: ruff-format
-        entry: ruff format
-
-  - repo: meta
-    hooks:
-    - id: check-useless-excludes
 
   - repo: local
     hooks:
