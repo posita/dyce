@@ -12,12 +12,12 @@
   There is no guarantee that other docs/resources will be available where this content is displayed.
   -->
 
-<!-- mkdocs:hide:start -->
+<!-- docs:hide:start -->
 *Copyright and other protections apply.
 Please see the accompanying `LICENSE` file for rights and restrictions governing use of this software.
 All rights not expressly waived or licensed are reserved.
 If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.*
-<!-- mkdocs:hide:end -->
+<!-- docs:hide:end -->
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg)](https://github.com/posita/dyce/actions/workflows/tests.yml)
 [![Coverage](https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg)](https://app.codecov.io/gh/posita/dyce)
@@ -65,9 +65,9 @@ If you find it lacking in any way, please don’t hesitate to [bring it to my at
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
-  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_d4s_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
+  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
 </picture>
 
 ## Installation
@@ -228,17 +228,17 @@ std |    1.40
 [`dyce.viz.plotly`](https://dycelib.org/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
 [`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
 
-    --8<-- "docs/assets/plot_2d6_lo_hi.py:core"
+    --8<-- "docs-src/plot_2d6_lo_hi.py:core"
 
 Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
 
-    --8<-- "docs/assets/plot_2d6_lo_hi.py:viz"
+    --8<-- "docs-src/plot_2d6_lo_hi.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/assets/plot_2d6_lo_hi_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
+  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
 </picture>
 
 [`H` objects](https://dycelib.org/latest/dyce/#dyce.H) and [`P` objects](https://dycelib.org/latest/dyce/#dyce.P) can generate random rolls.

@@ -72,13 +72,6 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tilde
 
-exclude_docs: |
-  Makefile
-  __pycache__/
-  assets/_*.py
-  assets/nb_*.py
-  snippets/
-
 extra:
   version:
     provider: mike
@@ -99,16 +92,13 @@ plugins:
               - griffe_warnings_deprecated
               - _griffe_ext.py:LifecycleExtension
             show_signature_annotations: true
-hooks:
-  # For copying LICENSE -> docs/license.md and README.md -> docs/index.md
-  - _mkdocs_hooks.py
 
 watch:
   - LICENSE
   - README.md
   - _griffe_ext.py
-  - _mkdocs_hooks.py
   - docs
+  - docs-src
   - dyce
   - jupyter-lite.json
   - jupyter_lite_config.json

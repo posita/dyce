@@ -44,7 +44,7 @@ So with that illuminating (or perhaps impenetrable) introduction out of the way,
 
 ## Basic examples
 
-`H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
+`H(n)` is shorthand for explicitly enumerating outcomes $[{ {1} .. {n} }]$, each with a frequency of 1.
 A normal, six-sided die (d6) can be modeled as:
 
     >>> from dyce import H
@@ -295,7 +295,7 @@ An inefficient way to enumerate all possible rolls is:
 
 
 Both histograms and pools support various comparison operations.
-The odds of observing all even faces when rolling `#!math n` six-sided dice, for `#!math n` in `#!math [1 .. 6]` is:
+The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in $[1 .. 6]$ is:
 
     >>> d6_even = H(6).apply(lambda outcome: outcome % 2 == 0)
     >>> d6_even  # basically a fair coin whose sides are False and True
@@ -312,7 +312,7 @@ The odds of observing all even faces when rolling `#!math n` six-sided dice, for
      1d6: 50.00%
 
 
-The odds of scoring at least one nine or higher for any one of `#!math n` “[exploding][dyce.explode_n]” six-sided dice, for `#!math n` in `#!math [1 .. 10]` is:
+The odds of scoring at least one nine or higher for any one of $n$ “[exploding][dyce.explode_n]” six-sided dice, for $n$ in $[1 .. 10]$ is:
 
     >>> from dyce import explode_n
     >>> # By the time we're exploding to a third die, we're guaranteed
@@ -486,7 +486,7 @@ We’re also missing the final outcome of `48`.
 We also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hint.
 
 The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `H({})` from our function.
-(See the `#!always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
+(See the `always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
 We’re not explicitly returning `H({})` in our function, but there are two scenarios where that is done automatically.
 The first is when we’ve exhausted our precision budget (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:
@@ -727,15 +727,19 @@ Now let’s consider a “diminishing returns” explosion mechanic, where stand
 If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed [`dyce.viz.matplotlib`][dyce.viz.matplotlib] provides plotting conveniences.
 For something more sophisticated, [`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
 
-Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): <a href="../jupyter/lab/?path=histogram.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
+Visualization using [`dyce.viz.matplotlib`][dyce.viz.matplotlib] with [Matplotlib](https://matplotlib.org/stable/api/index.html): [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=histogram.ipynb)
 
-    --8<-- "docs/assets/plot_histogram.py:viz"
+    --8<-- "docs-src/plot_histogram.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
+<!--
+  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
+  source[srcset] should be "images/..."
+  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/plot_histogram_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/plot_histogram_light.svg">
-  <img alt="Plot: Distribution for 3d6" src="../assets/plot_histogram_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_histogram_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_histogram_light.svg">
+  <img alt="Plot: Distribution for 3d6" src="images/plot_histogram_light.svg">
 </picture>
 
 ## Time to get meta-evil on those outcomes!
@@ -749,7 +753,7 @@ Thanks to ~~[`numerary`](https://pypi.org/project/numerary/)~~ *[`optype`](https
     H({2*x + y + 3: 1, 2*x + y + 4: 3, 2*x + y + 5: 6, ..., 2*x + y + 18: 6, 2*x + y + 19: 3, 2*x + y + 20: 1})
 
 
-[![Miss you, Doris!](assets/doris.png)](https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8)
+[![Miss you, Doris!](images/doris.png)](https://ifunny.co/picture/shnomf-nomf-hormf-hom-i-ve-gots-to-get-my-4itlmF3P8)
 <!-- Original source: https://me.me/i/shnomf-nomf-hormf-hom-ive-gots-to-get-my-rib-22441186 -->
 
 !!! note

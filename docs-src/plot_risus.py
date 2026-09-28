@@ -13,7 +13,7 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:base]
 import warnings
 from collections.abc import Callable, Sequence
@@ -52,7 +52,7 @@ class Versus(IntEnum):
 
 # --8<-- [end:base]
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:base-use]
 our_pool_size = 2
 their_pool_size = 3
@@ -64,7 +64,7 @@ assert single_round_us_vs_them == H(
     {Versus.LOSE: 1009, Versus.DRAW: 90, Versus.WIN: 197}
 )
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:display]
 from typing import TYPE_CHECKING
 
@@ -90,7 +90,7 @@ if TYPE_CHECKING:
     ) -> list[Axes]: ...
 # --8<-- [end:display]
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:display-detail]
 from typing import cast
 
@@ -178,7 +178,7 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
 
 
 def fig_callback_first_round() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:viz-first-round]
     vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
     us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
@@ -186,7 +186,7 @@ def fig_callback_first_round() -> None:
     # --8<-- [end:viz-first-round]
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:driver]
 from fractions import Fraction
 from functools import cache
@@ -289,7 +289,7 @@ def risus_combat_driver(
 
 
 def fig_callback_multi_round_standard() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-standard]
     vs_dfs = vs_scenarios_dataframes(
         risus_combat_driver,
@@ -301,7 +301,7 @@ def fig_callback_multi_round_standard() -> None:
     # --8<-- [end:viz-multi-round-standard]
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:goliath-rule]
 def single_round_goliath(
     h_result: HResult[Versus], *, our_pool_size: int, their_pool_size: int
@@ -348,7 +348,7 @@ assert (
 # --8<-- [end:goliath-rule]
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:vs-best-of-set]
 from dyce import P
 
@@ -377,7 +377,7 @@ def best_of_set_single_round_us_vs_them(
 
 # --8<-- [end:vs-best-of-set]
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:viz-multi-round-goliath-helper]
 from typing import Protocol
 
@@ -400,7 +400,7 @@ if TYPE_CHECKING:
 # --8<-- [end:viz-multi-round-goliath-helper]
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:viz-multi-round-goliath-helper-detail]
 # See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
 def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
@@ -473,7 +473,7 @@ def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
 
 
 def fig_callback_multi_round_best_of_set() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-best-of-set]
     viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
     fig = plt.gcf()
@@ -487,7 +487,7 @@ def fig_callback_multi_round_best_of_set() -> None:
     # --8<-- [end:viz-multi-round-best-of-set]
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:evens-up-base]
 from dyce import explode_n
 
@@ -523,7 +523,7 @@ assert d_evens_up_raw_exploded == H(
 )
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:evens-up-decode-hits]
 def evens_up_decode_hits(outcome: int) -> int:
     # Clever math that is equivalent to:
@@ -539,7 +539,7 @@ print(d_evens_up.format(width=65, scaled=True))
 assert d_evens_up == H({0: 216, 1: 180, 2: 30, 3: 5, 4: 1})
 
 
-# NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:evens-up]
 def evens_up_single_round_us_vs_them(
     our_pool_size: int,
@@ -568,7 +568,7 @@ def evens_up_single_round_us_vs_them(
 
 def fig_callback_multi_round_evens_up() -> None:
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
     # --8<-- [start:viz-multi-round-evens-up]
     viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
     fig = plt.gcf()
@@ -605,21 +605,22 @@ if __name__ == "__main__":
             args.output_file = would_be_output_file
             main(fig_callback, args)
 
-    would_be_output_file = args.output_dir.resolve().joinpath(
+    snippet_output_dir = Path(__file__).parent.resolve()
+    would_be_output_file = snippet_output_dir.joinpath(
         Path(f"{Path(sys.argv[0]).stem}_evens_up_base.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
             f.write(repr(d_evens_up_raw_exploded) + os.linesep)
 
-    would_be_output_file = args.output_dir.resolve().joinpath(
+    would_be_output_file = snippet_output_dir.joinpath(
         Path(f"{Path(sys.argv[0]).stem}_evens_up_base_use.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
             f.write(single_round_us_vs_them.format(width=65, scaled=True) + os.linesep)
 
-    would_be_output_file = args.output_dir.resolve().joinpath(
+    would_be_output_file = snippet_output_dir.joinpath(
         Path(f"{Path(sys.argv[0]).stem}_evens_up_decode_hits.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:

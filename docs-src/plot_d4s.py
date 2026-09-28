@@ -15,25 +15,32 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_d4s.py
     # --8<-- [start:core]
-    from dyce.d import p2d6
+    from dyce import H
 
-    h2d6_lowest = p2d6.at(0)
-    h2d6_highest = p2d6.at(-1)
+    d4 = H(4)
+    h6d4p15 = 6 @ d4 + 15
+    h8d4p10 = 8 @ d4 + 10
+    h10d4p5 = 10 @ d4 + 5
+    h12d4 = 12 @ d4
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_2d6_lo_hi.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_d4s.py
     # --8<-- [start:viz]
-    from dyce.viz.matplotlib import plot_bar
+    from dyce.viz.matplotlib import plot_ridge
 
-    ax = plot_bar(
-        h2d6_lowest,
-        h2d6_highest,
-        labels=("Lowest", "Highest"),
+    ax = plot_ridge(
+        h6d4p15,
+        h8d4p10,
+        h10d4p5,
+        h12d4,
+        labels=("6d4+15", "8d4+10", "10d4+5", "12d4"),
+        cmap="plasma",
+        overlap=4.0,
     )
-    ax.set_title("Taking the lowest or highest die of 2d6")
-    ax.legend()
+    ax.tick_params(axis="x", labelrotation=60)
+    ax.set_title("Various quantities of d4s")
     # --8<-- [end:viz]
 
 

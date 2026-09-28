@@ -15,7 +15,7 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_great_weapon_fighting.py
     # --8<-- [start:core]
     from dyce import H, HResult, expand
 
@@ -33,7 +33,7 @@ def fig_callback() -> None:
     h_gwf_2024 = 2 @ expand(gwf_2024, H(6)) + 5
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_great_weapon_fighting.py
     # --8<-- [start:table]
     import pandas as pd
 
@@ -50,10 +50,10 @@ def fig_callback() -> None:
     # Display df as table
     import jinja2  # ruff: ignore[unused-import]
 
-    # NOTE: Translates to df.style.format("{:.0%}") in docs/assets/nb_great_weapon_fighting.py
+    # NOTE: Translates to df.style.format("{:.0%}") in docs-src/nb_great_weapon_fighting.py
     print(df.style.format("{:.0%}").to_html())
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_great_weapon_fighting.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_great_weapon_fighting.py
     # --8<-- [start:viz]
 
     from dyce.viz.matplotlib import plot_ridge

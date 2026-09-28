@@ -38,8 +38,8 @@ class GraphType(StrEnum):
     Controls which variant of the distribution is plotted.
 
     - *NORMAL*: raw probability for each outcome
-    - *AT_MOST*: cumulative probability `#!math P(X \le k)`
-    - *AT_LEAST*: survival probability `#!math P(X \ge k)`
+    - *AT_MOST*: cumulative probability $P(X \le k)$
+    - *AT_LEAST*: survival probability $P(X \ge k)$
     """
 
     NORMAL = auto()

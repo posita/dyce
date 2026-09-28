@@ -105,15 +105,15 @@ def bar_spec(
 
     === "Vertical bars (default)"
 
-            --8<-- "docs/assets/plotly_viz_plot_bar.py:viz"
+            --8<-- "docs-src/plotly_viz_plot_bar.py:viz"
 
-        --8<-- "docs/snippets/plotly_viz_plot_bar.html"
+        --8<-- "docs-src/snippets/plotly_viz_plot_bar.html"
 
     === "Horizontal bars (`horizontal=True`)"
 
-            --8<-- "docs/assets/plotly_viz_plot_hbar.py:viz"
+            --8<-- "docs-src/plotly_viz_plot_hbar.py:viz"
 
-        --8<-- "docs/snippets/plotly_viz_plot_hbar.html"
+        --8<-- "docs-src/snippets/plotly_viz_plot_hbar.html"
     """
     data: list[dict[str, Any]] = []
     for i, h in enumerate(hs):
@@ -178,21 +178,21 @@ def line_spec(
 
     === "`graph_type=GraphType.NORMAL` (default)"
 
-            --8<-- "docs/assets/plotly_viz_plot_line.py:viz"
+            --8<-- "docs-src/plotly_viz_plot_line.py:viz"
 
-        --8<-- "docs/snippets/plotly_viz_plot_line.html"
+        --8<-- "docs-src/snippets/plotly_viz_plot_line.html"
 
     === "`graph_type=GraphType.AT_MOST`"
 
-            --8<-- "docs/assets/plotly_viz_plot_line_at_most.py:viz"
+            --8<-- "docs-src/plotly_viz_plot_line_at_most.py:viz"
 
-        --8<-- "docs/snippets/plotly_viz_plot_line_at_most.html"
+        --8<-- "docs-src/snippets/plotly_viz_plot_line_at_most.html"
 
     === "`graph_type=GraphType.AT_LEAST`"
 
-            --8<-- "docs/assets/plotly_viz_plot_line_at_least.py:viz"
+            --8<-- "docs-src/plotly_viz_plot_line_at_least.py:viz"
 
-        --8<-- "docs/snippets/plotly_viz_plot_line_at_least.html"
+        --8<-- "docs-src/snippets/plotly_viz_plot_line_at_least.html"
     """
     data: list[dict[str, Any]] = []
     for i, h in enumerate(hs):
@@ -273,9 +273,9 @@ def ridge_spec(
 
     *precision* is the number of decimal places tooltips show.
 
-        --8<-- "docs/assets/plotly_viz_plot_ridge.py:viz"
+        --8<-- "docs-src/plotly_viz_plot_ridge.py:viz"
 
-    --8<-- "docs/snippets/plotly_viz_plot_ridge.html"
+    --8<-- "docs-src/snippets/plotly_viz_plot_ridge.html"
     """
     rows = []
     for i, h in enumerate(hs):

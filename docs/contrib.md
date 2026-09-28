@@ -107,7 +107,7 @@ There are only a few additional guidelines:
 - Provide tests where feasible and appropriate.
   At the very least, existing tests should not fail.
   (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in [`tests`](https://github.com/posita/dyce/tree/v{dyce_git_ref}/tests).
+  Unit tests live in [`tests`](https://github.com/posita/dyce/tree/main/tests).
 
 - If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
   Consider prefixing your pull request’s title with something like, “`NEED FEEDBACK – `”.

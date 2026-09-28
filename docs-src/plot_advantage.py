@@ -15,13 +15,40 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_histogram.py
-    # --8<-- [start:viz]
-    from dyce.d import h3d6
-    from dyce.viz.matplotlib import plot_bar
+    # NOTE: Changes to this section should be propagated to docs-src/nb_advantage.py
+    # --8<-- [start:core]
+    from dyce import H, HResult, P, expand
 
-    ax = plot_bar(h3d6)
-    ax.set_title("Distribution for 3d6")
+    normal_hit = H(12) + 5
+    critical_hit = 3 @ H(12) + 5
+    advantage = (2 @ P(20)).at(-1)
+
+    def crit(result: HResult[int]) -> H[int] | int:
+        if result.outcome == 20:
+            return critical_hit
+        elif result.outcome + 5 >= 14:
+            return normal_hit
+        else:
+            return 0
+
+    advantage_weighted = expand(crit, advantage)
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs-src/nb_advantage.py
+    # --8<-- [start:viz]
+    from matplotlib import ticker
+
+    from dyce.viz.matplotlib import plot_line
+
+    ax = plot_line(
+        normal_hit,
+        critical_hit,
+        advantage_weighted,
+        labels=["Normal hit", "Critical hit", "Advantage-weighted"],
+    )
+    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
+    ax.set_title("Advantage-weighted attack with critical hits")
+    ax.legend()
     # --8<-- [end:viz]
 
 

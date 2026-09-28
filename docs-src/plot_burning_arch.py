@@ -15,39 +15,25 @@
 
 
 def fig_callback() -> None:
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_burning_arch.py
     # --8<-- [start:core]
-    from dyce import H, P, expand
+    from dyce import H
 
-    p_4d6 = 4 @ P(6)
-    d6_reroll_first_one = expand(
-        lambda result: result.h if result.outcome == 1 else result.outcome,
-        H(6),
-    )
-    p_4d6_reroll_first_one = 4 @ P(d6_reroll_first_one)
-    p_4d6_reroll_all_ones = 4 @ P(H(5) + 1)
-
-    attr_results: dict[str, H[int]] = {
-        "3d6": 3 @ H(6),
-        "4d6 - discard lowest": p_4d6.at(slice(1, None)),
-        "4d6 - re-roll first 1,\ndiscard lowest": p_4d6_reroll_first_one.at(
-            slice(1, None)
-        ),
-        "4d6 - re-roll all 1s (i.e., 4d(d5 + 1)),\ndiscard lowest": p_4d6_reroll_all_ones.at(
-            slice(1, None)
-        ),
-        "2d6 + 6": 2 @ H(6) + 6,
-        "4d4 + 2": 4 @ H(4) + 2,
-    }
+    save_roll = H(20)
+    burning_arch_damage = 10 @ H(6) + 10
+    pass_save = save_roll.ge(10)
+    damage_half_on_save = burning_arch_damage // (pass_save + 1)
     # --8<-- [end:core]
 
-    # NOTE: Changes to this section should be propagated to docs/assets/nb_4d6_variants.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_burning_arch.py
     # --8<-- [start:viz]
-    from dyce.viz.matplotlib import plot_ridge
+    from matplotlib import ticker
 
-    labels, hs = zip(*attr_results.items(), strict=True)
-    ax = plot_ridge(*hs, labels=labels, cmap="jet")
-    ax.set_title("Comparing various take-three-of-4d6 methods")
+    from dyce.viz.matplotlib import plot_line
+
+    ax = plot_line(damage_half_on_save)
+    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))
+    ax.set_title("Attack with saving throw for half damage")
     # --8<-- [end:viz]
 
 

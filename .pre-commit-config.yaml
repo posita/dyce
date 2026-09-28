@@ -25,21 +25,17 @@ repos:
         # See <https://docs.python.org/3/library/re.html#re.X>
         exclude: |
           (?x)^(
-            docs/(
-              dyce-powered\.svg|
-              assets/perf_.*\.txt|
-              assets/plot_.*\.svg
-            )
+            docs/dyce-powered\.svg|
+            docs/images/plot_.*\.svg|
+            docs-src/perf_.*\.txt
           )$
       - id: trailing-whitespace
         # See <https://docs.python.org/3/library/re.html#re.X>
         exclude: |
           (?x)^(
-            docs/(
-              dyce-powered\.svg|
-              assets/perf_.*\.txt|
-              assets/plot_.*\.svg
-            )
+            docs/dyce-powered\.svg|
+            docs/images/plot_.*\.svg|
+            docs-src/perf_.*\.txt
           )$
 
   - repo: https://github.com/astral-sh/uv-pre-commit
