@@ -139,21 +139,11 @@ def _synthesize_filepath(filepath: Path) -> str:
 
 def _synthesize_filepaths(tmp_dir: Path, filepaths: Iterable[Path]) -> dict[Path, Path]:
     path_map: dict[Path, Path] = {}  # tmp_path -> orig_path
-    seen_flat: dict[str, Path] = {}  # flat_name -> first orig_path (collisions)
 
-    for filepath in filepaths:
-        flat = _flat_name(filepath)
-        if flat in seen_flat:
-            _LOGGER.warning(
-                "name collision: %s and %s both map to %s; skipping %s",
-                _log_text(seen_flat[flat]),
-                _log_text(filepath),
-                _log_text(flat),
-                _log_text(filepath),
-            )
-            continue
-        seen_flat[flat] = filepath
-        tmp_path = tmp_dir / flat
+    for index, filepath in enumerate(filepaths):
+        # The temporary name is an index. The source path stays in path_map,
+        # which is what the checker output is rewritten with.
+        tmp_path = tmp_dir / f"{index}.py"
         try:
             content = _synthesize_filepath(filepath)
         except OSError as exc:
@@ -351,17 +341,6 @@ def _format_filepaths(filepaths: Iterable[Path]) -> bool:
 # ── temp-directory management ─────────────────────────────────────────────────
 
 _tmp_dir: Path | None = None
-
-
-def _flat_name(filepath: Path) -> str:
-    r"""
-    Derives a flat filename for *filepath* suitable for a shared temp directory.
-
-    Leading dots and path separators are stripped, remaining separators are replaced with `__`, and the extension is forced to `.py` so that type checkers will analyse the file.
-    """
-    s = str(filepath).lstrip("." + os.sep)
-    s = s.replace(os.sep, "__").replace("/", "__").replace(".", "_")
-    return str(Path(s).with_suffix(".py"))
 
 
 def _cleanup_tmp_dir(*, tmp_dir: Path) -> None:
