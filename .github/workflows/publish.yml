@@ -116,4 +116,4 @@ jobs:
             args+=(--prerelease --latest=false)
           fi
 
-          gh release create "${args[@]}"
+          gh release create --repo "$GITHUB_REPOSITORY" "${args[@]}"
