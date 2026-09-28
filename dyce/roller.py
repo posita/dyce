@@ -922,8 +922,10 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
 
     def roll(self) -> "Roll[_T_co]":
         r"""
-        Produces a sample outcome collection trace, reporting failures as [`RollError`][dyce.roller.RollError].
+        Returns a [`Roll`][dyce.roller.Roll] produced by this roller.
 
+        A [`RollError`][dyce.roller.RollError] from a child roller passes through with this roller added to its path.
+        Any other exception becomes a `RollError` with the original as its cause.
         Subclasses implement the [`_roll` method][dyce.roller.Roller._roll] instead of overriding this method.
         """
         try:
@@ -2427,7 +2429,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2436,7 +2438,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2447,7 +2449,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2458,7 +2460,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2469,7 +2471,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2480,7 +2482,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2492,7 +2494,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2504,7 +2506,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2516,7 +2518,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2528,7 +2530,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2540,7 +2542,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2552,7 +2554,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2564,7 +2566,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2576,7 +2578,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2589,7 +2591,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2602,7 +2604,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2615,7 +2617,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2628,7 +2630,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2641,7 +2643,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2654,7 +2656,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2667,7 +2669,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2680,7 +2682,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2693,7 +2695,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2706,7 +2708,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2719,7 +2721,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2732,7 +2734,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2745,7 +2747,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2758,7 +2760,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2771,7 +2773,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2784,7 +2786,7 @@ def trace(
     *,
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 @overload
 def trace(
     callback: Callable[
@@ -2793,13 +2795,13 @@ def trace(
     *children: Roller[Any],
     label: str | None = ...,
     **state: Any,  # ruff: ignore[any-type]
-) -> Roll[_ResultT]: ...
+) -> _TraceRoll[_ResultT]: ...
 def trace(
     callback: Callable[..., object],
     *children: Roller[Any],
     label: str | None = None,
     **state: Any,
-) -> Roll[Any]:
+) -> _TraceRoll[Any]:
     r"""
     <!-- BEGIN MONKEY PATCH --
     For deterministic outcomes.
@@ -2810,7 +2812,8 @@ def trace(
 
       -- END MONKEY PATCH -->
 
-    Rolls *children*, calls *callback* with the produced [`Roll`s][dyce.roller.Roll], and returns a labeled outcome trace `Roll` whose children are derived from *children*.
+    Rolls each of *children*, calls *callback* with the resulting [`Roll`s][dyce.roller.Roll], and returns a `_TraceRoll` recording that call.
+    The returned roll carries the callback’s outcomes, the child rolls passed to *callback*, and any derivation rolls the callback chose to retain.
 
     Supplied *state* is passed unchanged to *callback*.
     *label* defaults to the callback’s `__name__` or its type’s `__name__`.
@@ -2905,7 +2908,7 @@ def trace(
         else getattr(callback, "__name__", type(callback).__name__),
         state,
     )
-    return trace_roller.roll()
+    return cast("_TraceRoll[Any]", trace_roller.roll())
 
 
 def _as_single_outcome_roller(
