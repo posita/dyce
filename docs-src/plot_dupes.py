@@ -34,7 +34,7 @@ def fig_callback() -> None:
     from dyce.viz.matplotlib import plot_bar
 
     ax = plot_bar(res_15d6, res_8d10, labels=["15d6", "8d10"])
-    ax.set_title("Chances of rolling $n$ duplicates")
+    ax.set_title("Chances of rolling `#!math n` duplicates")
     ax.legend()
     # --8<-- [end:viz]
 
