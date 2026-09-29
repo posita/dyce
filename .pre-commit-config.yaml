@@ -64,8 +64,9 @@ repos:
     hooks:
       - id: uv-lock
 
+    # Keep this rev the same as the gitleaks version in .github/workflows/gitleaks.yml.
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
 

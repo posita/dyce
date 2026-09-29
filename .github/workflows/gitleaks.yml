@@ -31,10 +31,12 @@ jobs:
 
       - name: Install gitleaks
         run: |
-          archive=gitleaks_8.30.0_linux_x64.tar.gz
+          # Keep this version the same as the gitleaks rev in .pre-commit-config.yaml.
+          # Update the checksum in this step when you change the version.
+          archive=gitleaks_8.30.1_linux_x64.tar.gz
           curl --fail --silent --show-error --location --output "$archive" \
-            "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/$archive"
-          echo "79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e  $archive" | sha256sum --check
+            "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/$archive"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $archive" | sha256sum --check
           tar --extract --gzip --file "$archive" gitleaks
           sudo mv gitleaks /usr/local/bin/gitleaks
 
