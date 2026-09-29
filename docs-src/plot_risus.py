@@ -584,13 +584,14 @@ def fig_callback_multi_round_evens_up() -> None:
 
 if __name__ == "__main__":
     import os
-    import sys
     from pathlib import Path
 
     from _plot import _PARSER, main
 
     args = _PARSER.parse_args()
     orig_output_file = args.output_file
+    # Name outputs after this file. The invoked name can differ.
+    script_stem = Path(__file__).stem
 
     for suffix, fig_callback in {
         "first_round": fig_callback_first_round,
@@ -599,7 +600,7 @@ if __name__ == "__main__":
         "multi_round_evens_up": fig_callback_multi_round_evens_up,
     }.items():
         would_be_output_file = args.output_dir.resolve().joinpath(
-            Path(f"{Path(sys.argv[0]).stem}_{suffix}_{args.style}.svg")
+            Path(f"{script_stem}_{suffix}_{args.style}.svg")
         )
         if not orig_output_file or would_be_output_file == orig_output_file:
             args.output_file = would_be_output_file
@@ -607,21 +608,21 @@ if __name__ == "__main__":
 
     snippet_output_dir = Path(__file__).parent.resolve()
     would_be_output_file = snippet_output_dir.joinpath(
-        Path(f"{Path(sys.argv[0]).stem}_evens_up_base.txt")
+        Path(f"{script_stem}_evens_up_base.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
             f.write(repr(d_evens_up_raw_exploded) + os.linesep)
 
     would_be_output_file = snippet_output_dir.joinpath(
-        Path(f"{Path(sys.argv[0]).stem}_evens_up_base_use.txt")
+        Path(f"{script_stem}_evens_up_base_use.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
             f.write(single_round_us_vs_them.format(width=65, scaled=True) + os.linesep)
 
     would_be_output_file = snippet_output_dir.joinpath(
-        Path(f"{Path(sys.argv[0]).stem}_evens_up_decode_hits.txt")
+        Path(f"{script_stem}_evens_up_decode_hits.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
