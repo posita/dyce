@@ -98,11 +98,10 @@ pymdownx.highlight = { default_lang = "python", linenums = true }
 pymdownx.snippets = { dedent_subsections = true, check_paths = true }
 pymdownx.tabbed.alternate_style = true
 pymdownx.tilde = {}
-# TODO(@posita): These don't work right yet
-# # Support `#!math ...` inline syntax
-# pymdownx.inlinehilite.custom_inline = [
-#   { name = "math", class = "arithmatex", format = { object = "pymdownx.arithmatex.arithmatex_inline_format", kwds = { mode = "generic" } } },
-# ]
+# Support `#!math ...` inline syntax
+pymdownx.inlinehilite.custom_inline = [
+  { name = "math", class = "arithmatex", format = { object = "pymdownx.arithmatex.arithmatex_inline_format", kwds = { mode = "generic" } } },
+]
 # Support ```math ...``` fence syntax
 pymdownx.superfences.custom_fences = [
   { name = "math", class = "arithmatex", format = { object = "pymdownx.arithmatex.arithmatex_fenced_format", kwds = { mode = "generic", tag = "pre" } } },

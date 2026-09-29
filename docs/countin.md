@@ -44,7 +44,7 @@ So with that illuminating (or perhaps impenetrable) introduction out of the way,
 
 ## Basic examples
 
-`H(n)` is shorthand for explicitly enumerating outcomes $[{ {1} .. {n} }]$, each with a frequency of 1.
+`H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
 A normal, six-sided die (d6) can be modeled as:
 
     >>> from dyce import H
@@ -295,7 +295,7 @@ An inefficient way to enumerate all possible rolls is:
 
 
 Both histograms and pools support various comparison operations.
-The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in $[1 .. 6]$ is:
+The odds of observing all even faces when rolling `#!math n` six-sided dice, for `#!math n` in `#!math [1 .. 6]` is:
 
     >>> d6_even = H(6).apply(lambda outcome: outcome % 2 == 0)
     >>> d6_even  # basically a fair coin whose sides are False and True
@@ -312,7 +312,7 @@ The odds of observing all even faces when rolling $n$ six-sided dice, for $n$ in
      1d6: 50.00%
 
 
-The odds of scoring at least one nine or higher for any one of $n$ “[exploding][dyce.explode_n]” six-sided dice, for $n$ in $[1 .. 10]$ is:
+The odds of scoring at least one nine or higher for any one of `#!math n` “[exploding][dyce.explode_n]” six-sided dice, for `#!math n` in `#!math [1 .. 10]` is:
 
     >>> from dyce import explode_n
     >>> # By the time we're exploding to a third die, we're guaranteed

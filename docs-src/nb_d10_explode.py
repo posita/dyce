@@ -97,7 +97,7 @@ for k, rows in rows_by_k.items():
         line.set_marker("")
     ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
     ax.tick_params(axis="x", labelrotation=60)
-    ax.set_title(f"Taking the {k} highest of $n$ exploding d10s")
+    ax.set_title(f"Taking the {k} highest of `#!math n` exploding d10s")
     ax.set_xlim(left=0, right=max_x)  # subplots should share a horizontal scale
 # subplots should share a vertical scale
 axes = plt.gcf().get_axes()
