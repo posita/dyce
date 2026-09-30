@@ -1581,28 +1581,28 @@ wheels = [
 
 [[package]]
 name = "jupyterlite"
-version = "0.8.3"
+version = "0.8.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jupyterlite-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/cd/0ab2222eebc7f7f52530894517a19aba8cb4531d2a26f6d019f75b1239fd/jupyterlite-0.8.3.tar.gz", hash = "sha256:3f5cb91cb4da89efb9bb16b9e432a69c60f6f6bc94584fc4bd6699b8a1de4794", size = 6071, upload-time = "2026-08-20T14:26:07.82Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/c7/b8f11ef65023e6bfe3e502e23a3ee366d8bfcca2adc4076f6e7f8c4c2949/jupyterlite-0.8.4.tar.gz", hash = "sha256:8fffd256dcf8ee9f1b8e53354c01bb9a4476482fcd265bc8f0419c6e923cdf5c", size = 6113, upload-time = "2026-09-22T08:44:49.06Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/74/0f5f546814a8d5d35227cd4547999651ae420ce8871beea4782fbc1af513/jupyterlite-0.8.3-py3-none-any.whl", hash = "sha256:5b7a6aff124ae3b14a6142b8bfb09a81632b0bb136ef1042fcef85277e5de89a", size = 6688, upload-time = "2026-08-20T14:26:05.926Z" },
+    { url = "https://files.pythonhosted.org/packages/80/3f/13120e4aa0774e3b8b13b647cd9000af2f29a5fe5bffafb96f14a950abce/jupyterlite-0.8.4-py3-none-any.whl", hash = "sha256:f2c8c08b2b7e28f63f4ea351c0c0bdfc946cc0a9efd3270afff507793e895429", size = 6974, upload-time = "2026-09-22T08:44:47.688Z" },
 ]
 
 [[package]]
 name = "jupyterlite-core"
-version = "0.8.3"
+version = "0.8.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "doit" },
     { name = "jupyter-core" },
     { name = "pycparser", marker = "platform_python_implementation == 'PyPy'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/72/31/9b18a4cac1925ca9229c62a0a734554c91f8795b19dc6e2be18084334a56/jupyterlite_core-0.8.3.tar.gz", hash = "sha256:92735e2de4e1f67b411a218094d609b21350327d46454d89de84f113cd8440ae", size = 15791222, upload-time = "2026-08-20T14:27:29.986Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e9/0d/76609e89f8e891fdea1203c383cce3a888da72a771c0d51ff45bd95a653d/jupyterlite_core-0.8.5.tar.gz", hash = "sha256:7ee0d20ea5591700d9b87b8f27be01f4f05404cabdf0346d3eff3ec935094f24", size = 15802385, upload-time = "2026-09-28T13:51:15.934Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/f1/c527ec3191c1d4f3019c4fdf08697adfdbb4054e31b0282b559cf15d4aa4/jupyterlite_core-0.8.3-py3-none-any.whl", hash = "sha256:f61b1dc434368794850dfeb9089e91bc86a2741dd6966e061edb028c8112c2e3", size = 15803305, upload-time = "2026-08-20T14:27:26.402Z" },
+    { url = "https://files.pythonhosted.org/packages/29/8c/0a4a982d2fc79755ce2844ab96aaec90fd7d132503182fd43424e932568b/jupyterlite_core-0.8.5-py3-none-any.whl", hash = "sha256:296767f7f8a99b493a83b8a75439e8969fe38b6d3d1816925d374755ccc78871", size = 15816221, upload-time = "2026-09-28T13:51:12.869Z" },
 ]
 
 [[package]]
@@ -2966,15 +2966,15 @@ wheels = [
 
 [[package]]
 name = "pymdown-extensions"
-version = "12.0.1"
+version = "12.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/7e/53144b512818c75d459523e3a91d9bf7b65cd6a1dfb964fe690adc8b3670/pymdown_extensions-12.0.1.tar.gz", hash = "sha256:88fe2c97fb9153b9f2cc1da59f1d7c7cb74971110daf33cccb2a5514e0f7e970", size = 866904, upload-time = "2026-09-15T23:20:33.187Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/94/858e0163cb4d83d6d8234018a01792c749a56daee41794cac7d6c46661e8/pymdown_extensions-12.1.tar.gz", hash = "sha256:fdb8f47f5d7fd069d10ef2a7d8908e613d7865ff0419d544a0ffd3984e884f11", size = 868245, upload-time = "2026-09-23T00:08:42Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8c/30/c866b3ca8ad5cca79a3ee1a55c12d61d3e72381e5eadbfdaceb6006ebc84/pymdown_extensions-12.0.1-py3-none-any.whl", hash = "sha256:15d629e8035892b93d788a8424ccea754d4aa3cec247a64cbfe7b15089c9ad7f", size = 276957, upload-time = "2026-09-15T23:20:31.551Z" },
+    { url = "https://files.pythonhosted.org/packages/36/d1/98313da89960a604402266a115311b510254900ff1295ea426403f9423cc/pymdown_extensions-12.1-py3-none-any.whl", hash = "sha256:4a254b771acfcddc6c110a7f4590d818f1f849e2d5aacf69b4b07c8dd2a9700d", size = 277069, upload-time = "2026-09-23T00:08:40.069Z" },
 ]
 
 [[package]]
