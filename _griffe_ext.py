@@ -4,15 +4,19 @@
 # waived or licensed are reserved. If that file is missing or appears to be modified
 # from its original, then please contact the author before viewing or using this
 # software in any capacity.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Please keep each docstring sentence on its own unwrapped line. It looks like crap in a
+# text editor, but it has no effect on rendering, and it allows much more useful diffs.
+# (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
 r"""
-Griffe extension that injects an Experimental admonition into docstrings at parse
-time.
+Griffe extension that injects an Experimental admonition into docstrings at parse time.
 
-Detects `@experimental` from `dyce.lifecycle` and prepends the corresponding MkDocs
-admonition to the object’s docstring, mirroring what the runtime decorator does to
-`__doc__`.
+Detects `@experimental` from `dyce.lifecycle` and prepends the corresponding admonition to the object’s docstring, mirroring what the runtime decorator does to `__doc__`.
 
 `@deprecated` admonitions are handled by `griffe-warnings-deprecated`.
 """
