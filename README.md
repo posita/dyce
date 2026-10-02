@@ -37,7 +37,15 @@ Now you’re playing with …
 
 `dyce` is a pure-Python library for modeling arbitrarily complex dice mechanics.
 It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
-Its primary audiences are game designers and tool makers who want to understand or experiment with various dice mechanics and interactions.
+Its primary applications are:
+
+1. Computing finite discrete probability distributions for:
+    - ***Game designers*** who want to understand or experiment with various dice mechanics and interactions; and
+    - ***Design tool developers***.
+1. Generating transparent, weighted random rolls for:
+    - ***Game environment developers*** who want flexible dice mechanic resolution in, e.g., virtual tabletops (VTTs), chat servers, etc.
+
+Beyond those audiences, `dyce` may be useful to anyone interested in exploring finite discrete probabilities but not in developing all the low-level math bits from scratch.
 
 `dyce` is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
 While not as compact as a dedicated grammar, `dyce`’s Python-based primitives are quite sufficient, and often more expressive.
@@ -145,6 +153,11 @@ In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org
 [`H` objects](https://dycelib.org/latest/dyce/#dyce.H) represent histograms for modeling finite discrete outcomes, like individual dice.
 [`P` objects](https://dycelib.org/latest/dyce/#dyce.P) represent pools (ordered sequences) of histograms.
 [`expand`](https://dycelib.org/latest/dyce/#expand) handles mechanics that include dependent variables.
+<!-- TODO(@posita): Figure out what we're doing with dyce.r -->
+<!--
+[`R` objects](https://dycelib.org/latest/dyce/#dyce.R) (covered [elsewhere](https://dycelib.org/latest/rollin/)) represent nodes in arbitrary roller trees useful for translating from proprietary grammars and generating weighted random rolls that “show their work” without the overhead of enumeration.
+All support a variety of operations.
+  -->
 
 ```python
 >>> from dyce import H
