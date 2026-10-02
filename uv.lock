@@ -892,6 +892,7 @@ dev = [
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
     { name = "ipython" },
+    { name = "jsonschema" },
     { name = "jupyter-server" },
     { name = "jupyterlab-server" },
     { name = "jupyterlab-widgets" },
@@ -921,6 +922,7 @@ dev = [
     { name = "tox" },
     { name = "tox-uv" },
     { name = "ty" },
+    { name = "types-jsonschema" },
     { name = "zensical" },
     { name = "zuban" },
 ]
@@ -973,6 +975,7 @@ lint = [
     { name = "ruff" },
     { name = "sympy" },
     { name = "ty" },
+    { name = "types-jsonschema" },
     { name = "zensical" },
     { name = "zuban" },
 ]
@@ -980,6 +983,7 @@ test = [
     { name = "coverage", extra = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "matplotlib" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
@@ -988,12 +992,14 @@ test = [
     { name = "pytest-benchmark" },
     { name = "pytest-cov" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 test-beartype = [
     { name = "beartype" },
     { name = "coverage", extra = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "matplotlib" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
@@ -1002,12 +1008,15 @@ test-beartype = [
     { name = "pytest-benchmark" },
     { name = "pytest-cov" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 test-pypy = [
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "pytest" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 tox = [
     { name = "tox" },
@@ -1031,6 +1040,7 @@ dev = [
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
     { name = "ipython" },
+    { name = "jsonschema" },
     { name = "jupyter-server" },
     { name = "jupyterlab-server" },
     { name = "jupyterlab-widgets" },
@@ -1059,6 +1069,7 @@ dev = [
     { name = "tox" },
     { name = "tox-uv" },
     { name = "ty" },
+    { name = "types-jsonschema" },
     { name = "zensical" },
     { name = "zuban" },
 ]
@@ -1109,6 +1120,7 @@ lint = [
     { name = "ruff" },
     { name = "sympy" },
     { name = "ty" },
+    { name = "types-jsonschema" },
     { name = "zensical" },
     { name = "zuban" },
 ]
@@ -1116,6 +1128,7 @@ test = [
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
@@ -1123,12 +1136,14 @@ test = [
     { name = "pytest-benchmark" },
     { name = "pytest-cov" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 test-beartype = [
     { name = "beartype", specifier = ">=0.23.0rc0" },
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
@@ -1136,12 +1151,15 @@ test-beartype = [
     { name = "pytest-benchmark" },
     { name = "pytest-cov" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 test-pypy = [
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },
+    { name = "jsonschema" },
     { name = "pytest" },
     { name = "sympy" },
+    { name = "types-jsonschema" },
 ]
 tox = [
     { name = "tox" },
@@ -3686,6 +3704,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d8/b2/c941ce83a59e46ef31dd04bdf6067530e7ec77d5f0cdd1e223fbc6fc351b/ty-0.0.83-py3-none-win32.whl", hash = "sha256:0391017dac6ba3e452e0322301f50bba12fbccadac07d7fd888c46951ad37638", size = 13105291, upload-time = "2026-09-21T22:47:19.807Z" },
     { url = "https://files.pythonhosted.org/packages/b2/8a/5eef9458505698b144643cbd2062f465c5d860d8cf86a8710d74505ad9a0/ty-0.0.83-py3-none-win_amd64.whl", hash = "sha256:1b67d86f5bbad4076ae1a2ff23a6a4493219885d72d4b148cb0193e090390060", size = 13901557, upload-time = "2026-09-21T22:47:23.429Z" },
     { url = "https://files.pythonhosted.org/packages/9f/27/a06061513f1de25569c2e8898018bd552ab7b31afa7cfe818703269b3350/ty-0.0.83-py3-none-win_arm64.whl", hash = "sha256:a916a3d7d68fe30b7aacdb9fe16d461fa944d722e59e96ea0fa9d206a1b6625f", size = 13627960, upload-time = "2026-09-21T22:47:26.305Z" },
+]
+
+[[package]]
+name = "types-jsonschema"
+version = "4.26.0.20260518"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "referencing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dd/46/73b6a5d61a61015c4248030a8cb07e5bdddb4041430fae9e585a68692578/types_jsonschema-4.26.0.20260518.tar.gz", hash = "sha256:e1dd53dc97a64f5eccdd6fa9839666e09bb500a8ebba2db6fdaf1789faea81a6", size = 16638, upload-time = "2026-05-18T06:06:44.106Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/d5/134f8a147dcecda10db7f60cfc6af0578a25a5c53c87b3907a64385e0184/types_jsonschema-4.26.0.20260518-py3-none-any.whl", hash = "sha256:30b30a518c7fe335df85c919fcbcc631b69c03d4a4b5b632fa916bea03065307", size = 16072, upload-time = "2026-05-18T06:06:43.264Z" },
 ]
 
 [[package]]
