@@ -15,6 +15,7 @@
 
 import sys
 from collections import Counter, UserString
+from contextlib import nullcontext
 from enum import IntEnum, auto
 from fractions import Fraction
 from importlib.util import find_spec
@@ -22,8 +23,8 @@ from typing import TYPE_CHECKING, Any, Never
 
 import pytest
 
-from dyce import H, HResult, P, PResult, TruncationWarning, expand, explode_n
-from dyce.d import d0, d1, d6, d8, d10, p2d8
+from dyce import H, HResult, PResult, TruncationWarning, expand, explode_n
+from dyce.d import d0, d1, d2, d6, d8, d10, p2d8, pd6
 from dyce.types import DYCE_IS_BEARIFIED, BeartypeCallHintViolation
 
 if TYPE_CHECKING:
@@ -34,8 +35,8 @@ __all__ = ()
 
 class TestResult:
     def test_type_covariance(self) -> None:
-        h_result_int: HResult[int] = HResult(H(6), 1)
-        p_result_int: PResult[int] = PResult(P(6), (1,))
+        h_result_int: HResult[int] = HResult(d6, 1)
+        p_result_int: PResult[int] = PResult(pd6, (1,))
 
         h_result_object: HResult[object] = h_result_int
         p_result_object: PResult[object] = p_result_int
@@ -98,7 +99,7 @@ class TestExpand:
             c = Counter(p_result.roll)
             return H({Result.ONES: c[1], Result.FIVES_OR_SIXES: c[5] + c[6]})
 
-        assert expand(_fn, 4 @ P(6)) == H({Result.ONES: 1, Result.FIVES_OR_SIXES: 2})
+        assert expand(_fn, 4 @ pd6) == H({Result.ONES: 1, Result.FIVES_OR_SIXES: 2})
 
     def test_no_sources_raises(self) -> None:
         def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # ruff: ignore[any-type]
@@ -130,12 +131,93 @@ class TestExpand:
                 return Versus.raw_vs(us.outcome, them.outcome)
 
         for us_h, them_h in (
-            ((5 @ P(6)).at(-1), (4 @ P(6)).at(-1)),
+            ((5 @ pd6).at(-1), (4 @ pd6).at(-1)),
             (5 @ d6, 4 @ d6),
         ):
             apply_version = (us_h).apply(Versus.raw_vs, them_h)
-            expand_version = expand(Versus.vs, us_h, them_h, precision=Fraction(0))
+            expand_version = expand(
+                Versus.vs, us_h, them_h, min_path_probability=Fraction(0)
+            )
             assert apply_version == expand_version
+
+
+class TestExpandContext:
+    @pytest.mark.parametrize(
+        ("min_path_probability", "independent", "expected", "truncated"),
+        [
+            (None, False, H({3: 1}), True),
+            (Fraction(0), False, H({1: 1, 2: 1, 3: 2}), False),
+            (Fraction(1, 3), True, H({1: 1, 2: 1, 3: 2}), False),
+            (None, True, H({1: 1, 2: 1, 3: 2}), False),
+        ],
+    )
+    def test_min_path_probability_nested_override(
+        self,
+        *,
+        min_path_probability: Fraction | None,
+        independent: bool,
+        expected: H[int],
+        truncated: bool,
+    ) -> None:
+        def callback(result: HResult[int]) -> H[int] | int:
+            if result.outcome == 1:
+                return expand(
+                    lambda inner: inner.outcome,
+                    d2,
+                    min_path_probability=min_path_probability,
+                    independent=independent,
+                )
+            else:
+                return 3
+
+        with pytest.warns(TruncationWarning) if truncated else nullcontext():
+            # each outcome in a d2 is above the minimum path probability of 1/3
+            result = expand(callback, d2, min_path_probability=Fraction(1, 3))
+        assert result == expected
+
+    def test_min_path_probability_narrowing_override_after_zero(self) -> None:
+        def callback(_result: HResult[int]) -> H[int]:
+            return expand(
+                lambda inner: inner.outcome,
+                d2,
+                min_path_probability=Fraction(1, 3),
+            )
+
+        with pytest.warns(TruncationWarning):
+            result = expand(callback, d2, min_path_probability=Fraction(0))
+        assert result == H({})
+
+    def test_independent_call_restores_enclosing_context(self) -> None:
+        inner_h = H(-6)
+
+        def callback(result: HResult[int]) -> H[int]:
+            if result.outcome == 1:
+                # This will survive
+                min_path_probability = Fraction(0)
+                independent = True
+            else:
+                # These won't
+                min_path_probability = None
+                independent = False
+
+            return expand(
+                lambda inner_result: inner_result.outcome,
+                inner_h,
+                min_path_probability=min_path_probability,
+                independent=independent,
+            )
+
+        with pytest.warns(TruncationWarning):
+            result = expand(callback, H(3), min_path_probability=Fraction(1, 3))
+        assert result == inner_h
+
+    def test_min_path_probability_out_of_range_raises(self) -> None:
+        def _fn(*_args: Any, **_kw: Any) -> H[Never]:  # ruff: ignore[any-type]
+            return d0
+
+        for bad_min_path_probability in (Fraction(-1), Fraction(2)):
+            with pytest.raises(ValueError, match=r"\bbetween zero and one\b"):
+                expand(_fn, d0, min_path_probability=bad_min_path_probability)
 
 
 class TestExpandTruncation:
@@ -165,7 +247,7 @@ class TestExpandTruncation:
                 expand(
                     _explode_with_truncation,
                     d6,
-                    precision=Fraction(1, 6**4 - 1),
+                    min_path_probability=Fraction(1, 6**4 - 1),
                 )
                 == self._D6X_TRUNCATED_AT_3RD_ROLL
             )
@@ -221,7 +303,7 @@ class TestExpandTruncationBenchmark:
             return r.outcome * 2
 
         h = d6
-        benchmark(expand, _callback, h, precision=Fraction(0))
+        benchmark(expand, _callback, h, min_path_probability=Fraction(0))
 
 
 class TestExplodeN:

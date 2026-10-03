@@ -241,7 +241,7 @@ For deterministic outcomes.
 
 ```python
 >>> from dyce.d import d6
->>> d6.roll()
+>>> d6.sample()
 4
 
 ```
@@ -249,7 +249,7 @@ For deterministic outcomes.
 ```python
 >>> d0to9 = H(10) - 1
 >>> p6d0to9 = 6 @ P(d0to9)
->>> p6d0to9.roll()
+>>> p6d0to9.sample()
 (0, 0, 2, 3, 5, 9)
 
 ```

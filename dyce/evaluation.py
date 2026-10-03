@@ -67,7 +67,7 @@ class PResult(NamedTuple, Generic[_T_co]):
 
 class _ExpandContext(NamedTuple):
     path_probability: Fraction
-    precision: Fraction
+    min_path_probability: Fraction
 
 
 class _TruncationReason(IntEnum):
@@ -75,7 +75,7 @@ class _TruncationReason(IntEnum):
     RCRS_LMT_EXCEEDED = auto()
 
 
-_DEFAULT_PRECISION: Fraction = Fraction(1, 0x7FFFFF)
+_DEFAULT_MIN_PATH_PROBABILITY: Fraction = Fraction(1, 0x7FFFFF)
 _expand_ctxt: ContextVar[_ExpandContext] = ContextVar("_DYCE_EXPAND_CONTEXT")
 
 
@@ -84,7 +84,8 @@ def expand(
     callback: Callable[[HResult[_T]], H[_ResultT] | _ResultT],
     source: H[_T],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -92,7 +93,8 @@ def expand(
     callback: Callable[[PResult[_T]], H[_ResultT] | _ResultT],
     source: P[_T],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -101,7 +103,8 @@ def expand(
     source1: H[_T1],
     source2: H[_T2],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -110,7 +113,8 @@ def expand(
     source1: H[_T1],
     source2: P[_T2],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -119,7 +123,8 @@ def expand(
     source1: P[_T1],
     source2: H[_T2],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -128,7 +133,8 @@ def expand(
     source1: P[_T1],
     source2: P[_T2],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -140,7 +146,8 @@ def expand(
     source2: H[_T2],
     source3: H[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -152,7 +159,8 @@ def expand(
     source2: H[_T2],
     source3: P[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -164,7 +172,8 @@ def expand(
     source2: P[_T2],
     source3: H[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -176,7 +185,8 @@ def expand(
     source2: P[_T2],
     source3: P[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -188,7 +198,8 @@ def expand(
     source2: H[_T2],
     source3: H[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -200,7 +211,8 @@ def expand(
     source2: H[_T2],
     source3: P[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -212,7 +224,8 @@ def expand(
     source2: P[_T2],
     source3: H[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -224,20 +237,23 @@ def expand(
     source2: P[_T2],
     source3: P[_T3],
     *,
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
-    precision: Fraction = ...,
+    independent: bool = ...,
+    min_path_probability: Fraction | None = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[Any]: ...
 def expand(  # ruff: ignore[complex-structure]
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
-    precision: Fraction = _DEFAULT_PRECISION,
+    independent: bool = False,
+    min_path_probability: Fraction | None = None,
     **state: Any,
 ) -> H[Any]:
     r"""
@@ -255,7 +271,7 @@ def expand(  # ruff: ignore[complex-structure]
     - **`H({})` (the empty histogram)** - The branch is *eliminated*, meaning it contributes nothing to the accumulation and is silently discarded.
       This is the designated mechanism for signaling that an outcome is impossible or should be excluded from the result.
 
-    This is useful for modeling mechanics where the outcome of one die affects how others are rolled
+    This is useful for modeling mechanics where the outcome of one die affects how others are rolled.
     Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.
 
     Re-roll an initial 1:
@@ -304,23 +320,32 @@ def expand(  # ruff: ignore[complex-structure]
         >>> expand(always_reroll_on_one, H(6))
         H({2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
-    **Precision and recursion limiting**
+    **Path probability and recursion limiting**
 
-    The *precision* parameter controls when recursive expansion is stopped automatically.
-    It represents the minimum path probability (the cumulative probability of reaching a branch) at or below which the callback is not invoked.
+    The *min_path_probability* parameter controls when recursive expansion is stopped automatically.
+    It represents the minimum path probability (the cumulative probability of reaching a branch) below which the callback is not invoked.
     Additionally, any branch that exceeds Python’s recursion limit is also dropped.
     In both cases, the branch is eliminated exactly as if the callback had returned `H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.
 
-    *precision* is set by the outermost `expand` call and propagated automatically to all recursive calls via a context variable.
+    When *min_path_probability* is `None`, nested calls inherit the enclosing call's *min_path_probability*.
+    At the top level, its default value is `Fraction(1, 0x7FFFFF)`.
+    An explicit fraction sets *min_path_probability* for this call.
+    Nested calls inherit that value unless they override it.
+    Zero disables probability-based truncation, but cumulative path probability is still tracked.
 
-    !!! warning "*precision* is ***not*** overridden during recursion"
+    When *independent* is `True`, this call (re)starts with path probability one.
+    When *independent* is `True` and *min_path_probability* is `None`, this call uses the default value for *min_path_probability*.
+    The enclosing context is restored after the call.
 
-        Passing *precision* in a recursive call has no effect.
-        The value from the outermost call is *always* used.
+    !!! warning "Independent calls and min_path_probability overrides can increase computation"
 
-    Because *precision* is path-probability-based, the same threshold produces different recursion depths depending on how likely the exploding face is.
-    A heavier exploding face keeps branches above the threshold longer:
+        A nested call can disable probability-based truncation by setting *min_path_probability* to zero.
+        Repeated independent calls can prevent cumulative path probability from decreasing across recursion.
+        Neither choice restores branches already discarded by an enclosing call.
+
+    The same *min_path_probability* can produce different recursion depths depending on the probability of the exploding face.
+    A more probable exploding face keeps cumulative path probability at or above *min_path_probability* for more recursive calls:
 
         >>> from dyce import TruncationWarning
         >>> import warnings
@@ -336,7 +361,7 @@ def expand(  # ruff: ignore[complex-structure]
         ...     expand(
         ...         explode_on_max,
         ...         H({1: 1, 2: 3}),
-        ...         precision=Fraction(1, 16),
+        ...         min_path_probability=Fraction(1, 16),
         ...     )
         H({1: 256, 3: 192, 5: 144, 7: 108, 9: 81, 18: 243})
         >>> caught and all(w.category is TruncationWarning for w in caught)
@@ -347,7 +372,7 @@ def expand(  # ruff: ignore[complex-structure]
         ...     expand(
         ...         explode_on_max,
         ...         H({1: 3, 2: 1}),
-        ...         precision=Fraction(1, 16),
+        ...         min_path_probability=Fraction(1, 16),
         ...     )
         H({1: 12, 3: 3, 4: 1})
         >>> caught and all(w.category is TruncationWarning for w in caught)
@@ -355,7 +380,7 @@ def expand(  # ruff: ignore[complex-structure]
 
     **Arbitrary state threading**
 
-    Any keyword arguments beyond *precision* are forwarded verbatim to *callback* as keyword-only arguments.
+    Any keyword arguments beyond *min_path_probability* and *independent* are forwarded verbatim to *callback* as keyword-only arguments.
     To pass updated state into recursive calls, include it explicitly:
 
         >>> def explode_on_max_up_to_n_times(
@@ -388,21 +413,23 @@ def expand(  # ruff: ignore[complex-structure]
 
         >>> from dyce import P
         >>> from dyce.evaluation import PResult
-        >>> p_2d10 = 2 @ P(10)
+        >>> p2d10 = 2 @ P(10)
 
         >>> def times_d6_beats_two_d10s(
         ...     d6_result: HResult[int],
-        ...     p_result: PResult[int],
+        ...     p2d10_result: PResult[int],
         ... ) -> int:
         ...     return sum(
-        ...         1 for outcome in p_result.roll if outcome < d6_result.outcome
+        ...         1 for outcome in p2d10_result.roll if outcome < d6_result.outcome
         ...     )
 
-        >>> expand(times_d6_beats_two_d10s, H(6), p_2d10)
+        >>> expand(times_d6_beats_two_d10s, H(6), p2d10)
         H({0: 71, 1: 38, 2: 11})
     """
-    # TODO(@posita): # ruff: ignore[missing-todo-link] - Put some guardrails on precision
-    # and document them above
+    if min_path_probability is not None and not (0 <= min_path_probability <= 1):
+        raise ValueError(
+            f"if set, min_path_probability ({min_path_probability}) must be between zero and one, inclusive"
+        )
     if not sources:
         raise ValueError("expand requires at least one source")
     try:
@@ -414,11 +441,21 @@ def expand(  # ruff: ignore[complex-structure]
         # We're at the top level, so create a new context
         cur_ctxt = _ExpandContext(
             path_probability=Fraction(1),
-            precision=precision,
+            min_path_probability=(
+                _DEFAULT_MIN_PATH_PROBABILITY
+                if min_path_probability is None
+                else min_path_probability
+            ),
         )
 
-    current_path_prob = cur_ctxt.path_probability
-    effective_precision = cur_ctxt.precision
+    current_path_prob = Fraction(1) if independent else cur_ctxt.path_probability
+    effective_min_path_probability = (
+        min_path_probability
+        if min_path_probability is not None
+        else _DEFAULT_MIN_PATH_PROBABILITY
+        if independent
+        else cur_ctxt.min_path_probability
+    )
     total_product = prod(s.total for s in sources)
     truncation_reasons: set[_TruncationReason] = set()
 
@@ -431,12 +468,12 @@ def expand(  # ruff: ignore[complex-structure]
             branch_path_prob = current_path_prob * Fraction(
                 combined_count, total_product
             )
-            if branch_path_prob < effective_precision:
+            if branch_path_prob < effective_min_path_probability:
                 truncation_reasons.add(_TruncationReason.PROB_BDGT_EXHAUSTED)
                 continue
             new_ctxt = _ExpandContext(
                 path_probability=branch_path_prob,
-                precision=effective_precision,
+                min_path_probability=effective_min_path_probability,
             )
             token = _expand_ctxt.set(new_ctxt)
             try:
@@ -448,46 +485,10 @@ def expand(  # ruff: ignore[complex-structure]
                 _expand_ctxt.reset(token)
             yield result, combined_count
 
-    def _result_counts_no_truncate() -> Iterator[tuple[Any, int]]:
-        # When precision is 0, the truncation check can never fire, and branch_path_prob
-        # would otherwise only feed nested expand's same dead computation since
-        # precision is fixed at outermost. Skip the per-branch Fraction construction.
-        # The ContextVar still has to be set (so nested calls suppress the
-        # outermost-only ExperimentalWarning and inherit precision), but the value is
-        # constant across iterations. It is set once around the loop instead of
-        # per-iteration.
-        shared_ctxt = _ExpandContext(
-            path_probability=current_path_prob,
-            precision=effective_precision,
-        )
-        token = _expand_ctxt.set(shared_ctxt)
-        try:
-            for result_counts in iproduct(
-                *(_source_to_result_iterable(s) for s in sources)
-            ):
-                results, counts = zip(*result_counts, strict=True)
-                combined_count = prod(counts)
-                try:
-                    result = callback(*results, **state)
-                except RecursionError:
-                    truncation_reasons.add(_TruncationReason.RCRS_LMT_EXCEEDED)
-                    continue
-                yield result, combined_count
-        finally:
-            _expand_ctxt.reset(token)
-
-    # Warning: _ExpandContext.path_probability is only maintained accurately on the
-    # truncating path (precision > 0). The no-truncate fast path skips the per-branch
-    # Fraction multiplication, so path_probability stays at its initial value (typically
-    # Fraction(1)) at every recursion level. Don't treat it as a meaningful cumulative
-    # probability indicator for diagnostics or any other purpose outside the truncation
-    # check itself when precision is 0.
-    h = aggregate_weighted(
-        _result_counts() if effective_precision > 0 else _result_counts_no_truncate()
-    )
+    h = aggregate_weighted(_result_counts())
     if _TruncationReason.PROB_BDGT_EXHAUSTED in truncation_reasons:
         warnings.warn(
-            f"expand: some branches with path probability < {effective_precision!r} "
+            f"expand: some branches with path probability < {effective_min_path_probability!r} "
             f"were truncated",
             TruncationWarning,
             stacklevel=2,
@@ -519,7 +520,7 @@ def explode_n(
     source: H[ot.CanAdd[_OtherT, _ResultT]],
     *,
     n: int = 1,
-    precision: Fraction = Fraction(0),
+    min_path_probability: Fraction = Fraction(0),
     resolver: Callable[
         [HResult[_ResultT], int, int], H[_ResultT] | _ResultT
     ] = _explode_on_max,
@@ -551,9 +552,8 @@ def explode_n(
         >>> explode_n(H({x: 1}), n=2)  # pyright: ignore[reportArgumentType]
         H({3*x: 1})
 
-    *precision* is forwarded to the outermost [`expand`][dyce.expand] call.
-    (See that function for details.)
-    With sufficient large values for *n*, a [`TruncationWarning`][dyce.TruncationWarning] will be emitted for branches dropped by exhausting any precision budget.
+    *min_path_probability* is forwarded to [`expand`][dyce.expand] and defaults to zero.
+    A [`TruncationWarning`][dyce.TruncationWarning] is emitted when a branch's cumulative path probability falls below *min_path_probability* or a branch exceeds Python's recursion limit.
 
         >>> from dyce import TruncationWarning
         >>> import sys, warnings
@@ -563,7 +563,7 @@ def explode_n(
         ...     explode_n(
         ...         d6,
         ...         n=sys.maxsize,
-        ...         precision=Fraction(1, 6**3),
+        ...         min_path_probability=Fraction(1, 6**3),
         ...     )
         H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
         >>> caught and all(w.category is TruncationWarning for w in caught)
@@ -579,7 +579,7 @@ def explode_n(
         ...     explode_n(
         ...         d6,
         ...         n=sys.maxsize,
-        ...         precision=Fraction(1, 6**3),
+        ...         min_path_probability=Fraction(1, 6**3),
         ...         resolver=explode_on_even_resolver,
         ...     )
         H({1: 36, 3: 42, 5: 49, 6: 1, 7: 21, 8: 3, 9: 18, 10: 6, 11: 13, 12: 7, 13: 6, 14: 6, 15: 3, 16: 3, 17: 1, 18: 1})
@@ -601,7 +601,9 @@ def explode_n(
             )
         return next_h_or_outcome
 
-    return expand(_callback, source, n_left=n, precision=precision)
+    return expand(
+        _callback, source, n_left=n, min_path_probability=min_path_probability
+    )
 
 
 # ---- Helpers -------------------------------------------------------------------------

@@ -302,7 +302,7 @@ def risus_combat_driver(
         return expand(
             _resolve_next_round_from_this_round,
             this_round_results,
-            precision=Fraction(1, 0x7FFFFFFF),
+            min_path_probability=Fraction(1, 0x7FFFFFFF),
         )  # ty: ignore[invalid-return-type]
 
     return _resolve_us_vs_them_func(our_pool_size, their_pool_size)

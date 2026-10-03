@@ -280,7 +280,7 @@ def risus_combat_driver(
         return expand(
             _resolve_next_round_from_this_round,
             this_round_results,
-            precision=Fraction(1, 0x7FFFFFFF),
+            min_path_probability=Fraction(1, 0x7FFFFFFF),
         )  # ty: ignore[invalid-return-type]
 
     return _resolve_us_vs_them_func(our_pool_size, their_pool_size)
@@ -526,14 +526,17 @@ assert d_evens_up_raw_exploded == H(
 
 # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
 # --8<-- [start:evens-up-decode-hits]
-def evens_up_decode_hits(outcome: int) -> int:
-    # Clever math that is equivalent to:
-    #     outcome // 2 +  # a tally of any exploded hits
-    #     outcome % 2  # any final hit  # ruff: ignore[commented-out-code]
-    return (outcome + 1) // 2
+d_evens_up = H.from_counts(
+    (
+        outcome // 2  # a tally of any exploded hits
+        + outcome % 2,  # any final hit
+        count,
+    )
+    for outcome, count in d_evens_up_raw_exploded.items()
+)
+# A clever alternative
+assert d_evens_up == (d_evens_up_raw_exploded + 1) // 2
 
-
-d_evens_up = d_evens_up_raw_exploded.apply(evens_up_decode_hits).lowest_terms()
 print(d_evens_up.format(width=65, scaled=True))
 # --8<-- [end:evens-up-decode-hits]
 
