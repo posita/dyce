@@ -965,11 +965,11 @@ class TestHQuantizeCounts:
 class TestHRoll:
     def test_roll_empty_raises(self) -> None:
         with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty histogram\b"):
-            H({}).roll()
+            H({}).sample()
 
     def test_roll(self) -> None:
         d6 = H(6)
-        assert all(d6.roll() in d6 for _ in range(100))
+        assert all(d6.sample() in d6 for _ in range(100))
 
 
 class TestHStdev:
@@ -1028,7 +1028,9 @@ class TestHVariance:
             TruncationWarning,
             match=r"\brecursion depth exceeded\b",
         ):
-            variance = explode_n(H(6), n=800, precision=Fraction(0)).variance()
+            variance = explode_n(
+                H(6), n=800, min_path_probability=Fraction(0)
+            ).variance()
         assert math.isclose(variance, 10.64)
 
 

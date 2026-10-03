@@ -33,16 +33,18 @@
 - Removes `H.draw`.
 - Removes `H.vs` and `H.within`.
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
+- Renames `H.roll` to [`H.sample`][dyce.H.sample].
 - [`HableT.h`][dyce.HableT.h] is now an abstract base class, not merely a protocol.
 - Modifies [`P.h`][dyce.P.h] such that it now takes no arguments to remain consistent with [`HableT.h`][dyce.HableT.h].
   Selection is now handled by a separate [`P.at`][dyce.P.at] method.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
-- Returns `P.is_homogeneous` to being a property.
+- Renames `P.roll` to [`P.sample`][dyce.P.sample].
+- Restores `P.is_homogeneous` as a property.
 - Adds optional `preserve_zero_counts` parameter to [`H.lowest_terms`][dyce.H.lowest_terms].
 - Adds experimental [`H.quantile`][dyce.H.quantile] method.
 - Adds experimental [`H.quantize_counts` method][dyce.H.quantize_counts] and [`quantize_hs` context manager][dyce.quantize_hs].
 - Adds experimental [`P.survey`][dyce.P.survey] method implementing a version of [Icepool’s algorithm](https://github.com/HighDiceRoller/icepool#paper-on-algorithm) augmented to accommodate heterogeneous pools.
-- Simplifies and consolidates `dyce.evaluation.expandable` and `dyce.evaluation.foreach` into [`expand`][dyce.expand] (still experimental).
+- Removes `dyce.evaluation.expandable` and `dyce.evaluation.foreach` in favor of the simplified [`expand`][dyce.expand] (still experimental).
 - Renames `explode` to [`explode_n`][dyce.explode_n] to be more explicit about the exit criteria.
 - *(Finally!)* removes deprecated interfaces:
     - `H.explode`

@@ -729,7 +729,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         return sum_h(self)
 
     @experimental
-    def roll(self: "P[_T]") -> RollT[_T]:
+    def sample(self: "P[_T]") -> RollT[_T]:
         r"""
         Returns (weighted) random outcomes from contained histograms.
 
@@ -742,7 +742,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             raise ValueError("no outcomes from an empty pool")
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ExperimentalWarning)
-            roll = [h.roll() for h in self]
+            roll = [h.sample() for h in self]
         try:
             roll.sort()  # pyright: ignore[reportCallIssue] # zuban: ignore[call-arg]
         except TypeError:

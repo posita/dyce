@@ -2026,7 +2026,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         return self if quantized is self else type(self)(quantized)
 
     @experimental
-    def roll(self: "H[_T]") -> _T:
+    def sample(self: "H[_T]") -> _T:
         r"""
         <!-- BEGIN MONKEY PATCH --
         For deterministic outcomes.
@@ -2040,7 +2040,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         Returns a (weighted) random outcome.
 
             >>> d6 = H(6)
-            >>> [d6.roll() for _ in range(10)]
+            >>> [d6.sample() for _ in range(10)]
             [2, 6, 1, 2, 4, 5, 1, 4, 2, 5]
         """
         from . import rng
