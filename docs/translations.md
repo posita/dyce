@@ -490,13 +490,9 @@ Example 1 translation:
 
 Example 1 table:
 
-<details>
-<summary>
-  Table source code
-</summary>
+??? example "Table source code"
 
-    --8<-- "docs-src/plot_great_weapon_fighting.py:table"
-</details>
+        --8<-- "docs-src/plot_great_weapon_fighting.py:table"
 
 <style type="text/css">
 </style>
@@ -630,13 +626,9 @@ Translation:
 
 Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=d10_explode.ipynb)
 
-<details>
-<summary>
-  Visualization source code
-</summary>
+??? example "Visualization source code"
 
-    --8<-- "docs-src/plot_d10_explode.py:viz"
-</details>
+        --8<-- "docs-src/plot_d10_explode.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <!--
@@ -714,13 +706,9 @@ Translation:
 
 Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=roll_and_keep.ipynb)
 
-<details>
-<summary>
-  Visualization source code
-</summary>
+??? example "Visualization source code"
 
-    --8<-- "docs-src/plot_roll_and_keep.py:viz"
-</details>
+        --8<-- "docs-src/plot_roll_and_keep.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
 <!--
@@ -870,13 +858,9 @@ This highlights the mechanic’s notorious “death spiral”, which we can visu
 
     --8<-- "docs-src/plot_risus.py:display"
 
-<details>
-<summary>
-  Visualization source code
-</summary>
+??? example "Visualization source code"
 
-    --8<-- "docs-src/plot_risus.py:display-detail"
-</details>
+        --8<-- "docs-src/plot_risus.py:display-detail"
 
 Visualization: [![Try dyce](https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg)](jupyter/lab/index.html?path=risus.ipynb)
 
@@ -942,13 +926,9 @@ This pattern will come up again below, so we’ll capture it in a helper functio
 
     --8<-- "docs-src/plot_risus.py:viz-multi-round-goliath-helper"
 
-<details>
-<summary>
-  Visualization Goliath Rule helper source code
-</summary>
+??? example "Visualization Goliath Rule helper source code"
 
-    --8<-- "docs-src/plot_risus.py:viz-multi-round-goliath-helper-detail"
-</details>
+        --8<-- "docs-src/plot_risus.py:viz-multi-round-goliath-helper-detail"
 
 We’ll use that Goliath Rule helper to approximate a complete “Best-of-Set” combat and compare it to a “standard” one.
 
@@ -989,9 +969,12 @@ If we choose our values carefully, we can encode how many times we’ve encounte
 --8<-- "docs-src/plot_risus_evens_up_base.txt"
 ```
 
-For every value that is even, we ended in a miss.
-For every value that is odd, we ended in a hit that will need to be tallied.
-Dividing by two and ignoring any remainder will tell us how many exploding hits we had along the way.
+For every outcome in that distribution that is even, our streak ended in a miss (i.e., zero or more `HIT_EXPLODE` values followed by a `MISS`).
+For every outcome that is odd, out streak ended in a non-exploding hit that will need to be tallied (i.e., zero or more `HIT_EXPLODE` values followed by a `HIT`).
+
+An outcome of `0` indicates a `MISS`. An outcome of `1` indicates a `HIT`. An outcome of `2` indicates a `HIT_EXPLODE` followed by a `MISS`. An outcome of `5` indicates a `HIT_EXPLODE` followed by another `HIT_EXPLODE` followed by a `HIT`.
+
+In other words, dividing by two will tell us how many exploding hits we had along the way. The remainder will tell us whether exploding ended in a miss or a hit.
 
     --8<-- "docs-src/plot_risus.py:evens-up-decode-hits"
 
