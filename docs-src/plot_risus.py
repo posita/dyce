@@ -107,13 +107,14 @@ def vs_scenarios_dataframes(  # type: ignore[no-redef]
     their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
-    h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
             our_pool_size = their_pool_size + our_pool_rel_size
             us_vs_them_results = H.from_counts(
-                h_vs, us_vs_them_func(our_pool_size, their_pool_size)
+                dict.fromkeys(Versus, 0),
+                us_vs_them_func(our_pool_size, their_pool_size),
+                preserve_zero_counts=True,
             )
             data[f"{our_pool_size}d6"] = {
                 outcome.name: float(prob)
