@@ -107,6 +107,36 @@ class TestExpand:
         with pytest.raises(ValueError, match=r"\brequires\b.*\bsource\b"):
             expand(_fn)
 
+    def test_apply_equivalence(self) -> None:
+        from enum import IntEnum
+
+        class Versus(IntEnum):
+            LOSE = -1
+            DRAW = 0
+            WIN = 1
+
+            @staticmethod
+            def raw_vs(us_outcome: int, them_outcome: int) -> "Versus":
+                return (
+                    Versus.LOSE
+                    if us_outcome < them_outcome
+                    else Versus.WIN
+                    if us_outcome > them_outcome
+                    else Versus.DRAW
+                )
+
+            @staticmethod
+            def vs(us: HResult[int], them: HResult[int]) -> "Versus":
+                return Versus.raw_vs(us.outcome, them.outcome)
+
+        for us_h, them_h in (
+            ((5 @ P(6)).at(-1), (4 @ P(6)).at(-1)),
+            (5 @ d6, 4 @ d6),
+        ):
+            apply_version = (us_h).apply(Versus.raw_vs, them_h)
+            expand_version = expand(Versus.vs, us_h, them_h, precision=Fraction(0))
+            assert apply_version == expand_version
+
 
 class TestExpandTruncation:
     _D6X_TRUNCATED_AT_3RD_ROLL = H(

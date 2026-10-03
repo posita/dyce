@@ -307,7 +307,7 @@ def expand(  # ruff: ignore[complex-structure]
     **Precision and recursion limiting**
 
     The *precision* parameter controls when recursive expansion is stopped automatically.
-    It represents the minimum path probability (the cumulative probability of reaching a branch) below which the callback is not invoked.
+    It represents the minimum path probability (the cumulative probability of reaching a branch) at or below which the callback is not invoked.
     Additionally, any branch that exceeds Python’s recursion limit is also dropped.
     In both cases, the branch is eliminated exactly as if the callback had returned `H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.
