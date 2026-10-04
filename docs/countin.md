@@ -488,7 +488,7 @@ We also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hi
 The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `H({})` from our function.
 (See the `always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
 We’re not explicitly returning `H({})` in our function, but there are two scenarios where that is done automatically.
-The first is when we’ve exhausted our precision budget (which is what happened in our example above).
+The first is when a branch’s cumulative path probability falls below `min_path_probability` (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:
 
     >>> import sys
@@ -497,7 +497,7 @@ And the second is when we’ve exhausted the call stack:
     >>> expand(
     ...     naive_explode,
     ...     fair_coin,
-    ...     precision=Fraction(0),
+    ...     min_path_probability=Fraction(0),
     ... )  # these numbers get *big*
     H({0: ...})
 
@@ -552,14 +552,14 @@ We can check.
 We can now recognize the counts as powers of our maximum face.
 
 But how can we control the number of explosions?
-Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `precision` parameter.
+Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `min_path_probability` parameter.
 
     >>> num_faces = 6
     >>> explosions = 3
     >>> expand(
     ...     guarded_explode,
     ...     H(num_faces),
-    ...     precision=Fraction(1, num_faces ** (explosions + 1)),
+    ...     min_path_probability=Fraction(1, num_faces ** (explosions + 1)),
     ... )
     H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
 
@@ -581,7 +581,7 @@ Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass do
     True
 
 
-Our function is still implicitly limited by the `precision` parameter, but we can make that go away by setting it to `Fraction(0)` as we did in our recursion exhaustion illustration above.
+Our function is still implicitly limited by the `min_path_probability` parameter, but we can make that go away by setting it to `Fraction(0)` as we did in our recursion exhaustion illustration above.
 If we wanted to make that the default, we could create a simple wrapper.
 
     >>> from collections.abc import Callable
@@ -592,7 +592,7 @@ If we wanted to make that the default, we could create a simple wrapper.
     ...     source: H[T],
     ...     *,
     ...     n: int = 0,
-    ...     precision: Fraction = Fraction(0),
+    ...     min_path_probability: Fraction = Fraction(0),
     ... ) -> H[T]:
     ...
     ...     def _callback(result: HResult[T], *, n_left: int) -> H[T] | T:
@@ -602,7 +602,9 @@ If we wanted to make that the default, we could create a simple wrapper.
     ...                 return result.outcome + inner
     ...         return result.outcome
     ...
-    ...     return expand(_callback, source, n_left=n, precision=precision)
+    ...     return expand(
+    ...         _callback, source, n_left=n, min_path_probability=min_path_probability
+    ...     )
 
     >>> proper_explode_n(d6, n=3)
     H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
@@ -819,7 +821,7 @@ Enumerating rolls works.
     [((2*x/3, 2*x/3 + 1/3, 2*x/3 + 2/3), 1), ((2*x/3 + 1/3, 2*x/3 + 2/3, x), 1), ((2*x/3, 2*x/3 + 2/3, x + 1/3), 1), ..., ((2*x/3, x/3 + 1/3, x/3 + 2/3), 1), ((x, x/3 + 1/3, x/3 + 2/3), 1), ((x/3, x/3 + 1/3, x/3 + 2/3), 1)]
 
 
-[`P.roll`][dyce.P.roll] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.
+[`P.sample`][dyce.P.sample] “works” (i.e., falls back to natural ordering of outcomes), but that is a deliberate compromise of convenience.
 
 <!-- BEGIN MONKEY PATCH --
 For deterministic outcomes.
@@ -830,7 +832,7 @@ For deterministic outcomes.
 
   -- END MONKEY PATCH -->
 
-    >>> p.roll()
+    >>> p.sample()
     (2*x/3, 2*x/3 + 2/3, x + 1/3)
 
 

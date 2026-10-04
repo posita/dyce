@@ -1074,19 +1074,19 @@ class TestPAt:
 class TestPRoll:
     def test_roll_empty_raises(self) -> None:
         with pytest.raises(ValueError, match=r"\bno outcomes\b.*\bempty pool\b"):
-            P().roll()
+            P().sample()
 
     def test_roll(self) -> None:
         d10 = H(10)
         p_6d10 = 6 @ P(d10)
 
         for _ in range(100):
-            roll = p_6d10.roll()
+            roll = p_6d10.sample()
             assert len(roll) == len(p_6d10)
             assert all(v in d10 for v in roll)
 
     def test_incomparable_outcomes_use_natural_order(self) -> None:
-        assert P(H({2j: 1}), H({1j: 1})).roll() == (1j, 2j)
+        assert P(H({2j: 1}), H({1j: 1})).sample() == (1j, 2j)
 
     def test_roll_symbols(self) -> None:
         sympy = pytest.importorskip("sympy", reason="requires sympy")
@@ -1095,7 +1095,7 @@ class TestPRoll:
         p_6d10x = 6 @ P(d10x)
 
         for _ in range(50):
-            roll = p_6d10x.roll()
+            roll = p_6d10x.sample()
             assert len(roll) == len(p_6d10x)
             assert all(v in d10x for v in roll)  # zuban: ignore[operator]
 
