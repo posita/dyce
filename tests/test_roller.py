@@ -130,7 +130,7 @@ class TestRollError:
         roller = HRoller(H(6)) + 1
 
         with (
-            patch.object(H, "roll", side_effect=failure),
+            patch.object(H, "sample", side_effect=failure),
             pytest.raises(RollError) as caught,
         ):
             roller.roll()
@@ -152,7 +152,7 @@ class TestRollError:
 
     def test_base_exception_propagates(self) -> None:
         with (
-            patch.object(H, "roll", side_effect=KeyboardInterrupt),
+            patch.object(H, "sample", side_effect=KeyboardInterrupt),
             pytest.raises(KeyboardInterrupt),
         ):
             HRoller(H(6)).roll()
@@ -671,7 +671,7 @@ class TestPRoller:
             assert source is p
             return (1, 2)
 
-        monkeypatch.setattr(P, "roll", p_roll)
+        monkeypatch.setattr(P, "sample", p_roll)
         pool = PRoller(p, label="pool")
         roll = pool.roll()
 
@@ -2244,7 +2244,7 @@ class TestTraceEndToEnd:
     def test_attack_mechanic(
         self, roll_mode: _RollMode, rolls: list[int], expected: int
     ) -> None:
-        with patch.object(H, "roll", side_effect=rolls):
+        with patch.object(H, "sample", side_effect=rolls):
             result = _attack(15, 1, 2, roll_mode)
 
         assert result.outcomes == (expected,)
