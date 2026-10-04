@@ -1009,7 +1009,7 @@ class SingleOutcomeRoller(Roller[_T_co], ABC):
 
 
 class HRoller(SingleOutcomeRoller[_T_co]):
-    r"""A roller backed by [`H.roll`][dyce.H.roll]."""
+    r"""A roller backed by [`H.sample`][dyce.H.sample]."""
 
     __slots__ = ("_h", "_label")
 
@@ -1037,7 +1037,7 @@ class HRoller(SingleOutcomeRoller[_T_co]):
         }
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        return SingleOutcomeRoll(self._h.roll(), self)
+        return SingleOutcomeRoll(self._h.sample(), self)
 
 
 class HableRoller(SingleOutcomeRoller[_T_co]):
@@ -1069,7 +1069,7 @@ class HableRoller(SingleOutcomeRoller[_T_co]):
         }
 
     def _roll(self) -> "SingleOutcomeRoll[_T_co]":
-        return SingleOutcomeRoll(self._hable.h().roll(), self)
+        return SingleOutcomeRoll(self._hable.h().sample(), self)
 
 
 class LiteralRoller(SingleOutcomeRoller[_T_co]):
@@ -1146,7 +1146,7 @@ class PRoller(Roller[_T_co]):
         }
 
     def _roll(self) -> "Roll[_T_co]":
-        outcomes = self._p.roll()
+        outcomes = self._p.sample()
         return Roll(outcomes, self)
 
 
