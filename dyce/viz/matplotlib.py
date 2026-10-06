@@ -50,6 +50,8 @@ else:
     from matplotlib.colors import Colormap
     from matplotlib.typing import RGBAColorType
 
+import optype as ot
+
 from dyce.h import H
 from dyce.lifecycle import experimental
 from dyce.types import natural_key
@@ -61,6 +63,8 @@ __all__ = (
     "format_outcome_name",
     "format_outcome_name_probability",
     "format_probability",
+    "format_probability_at_least",
+    "format_probability_at_most",
     "plot_bar",
     "plot_burst",
     "plot_line",
@@ -150,6 +154,38 @@ def format_probability(
 
 
 _formatter = format_probability
+
+
+@experimental
+def format_probability_at_least(
+    outcome: _T,
+    prob: Fraction,  # ruff: ignore[unused-function-argument]
+    h: H[ot.CanLe[_T, bool]],
+) -> str:
+    r"""
+    Burst-plot formatter that labels each wedge with its cumulative at-least probability as a percentage.
+    """
+    h_le_outcome = h.le(outcome)
+    return f"{float(h_le_outcome[True] / h_le_outcome.total):.2%}"
+
+
+_formatter = format_probability_at_least
+
+
+@experimental
+def format_probability_at_most(
+    outcome: _T,
+    prob: Fraction,  # ruff: ignore[unused-function-argument]
+    h: H[ot.CanGe[_T, bool]],
+) -> str:
+    r"""
+    Burst-plot formatter that labels each wedge with its cumulative at-most probability as a percentage.
+    """
+    h_ge_outcome = h.ge(outcome)
+    return f"{float(h_ge_outcome[True] / h_ge_outcome.total):.2%}"
+
+
+_formatter = format_probability_at_most
 del _formatter
 
 
@@ -384,7 +420,7 @@ def plot_burst(
     outer_labels, outer_probs = _wedges(h_compare, compare_formatter)
     cmap = mpl.rcParams["image.cmap"] if cmap is None else cmap
     assert cmap is not None
-    compare_cmap = mpl.rcParams["image.cmap"] if compare_cmap is None else compare_cmap
+    compare_cmap = cmap if compare_cmap is None else compare_cmap
     assert compare_cmap is not None
     inner_colors = _colors_proportionate(
         cmap, inner_probs, alpha, use_midpoints=use_midpoints_for_colors

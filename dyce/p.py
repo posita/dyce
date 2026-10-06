@@ -882,7 +882,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         r"""
         Returns a new [`H`][dyce.H] by folding a transition function defined by *surveyor* over the pool one outcome at a time.
 
-        This implements a state-collapsing dynamic program similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
+        This implements a state-collapsing dynamic algorithm similar to Albert Julius Liu’s [`icepool`](https://github.com/HighDiceRoller/icepool).
         Rather than enumerating every distinct roll, it sweeps the shared outcome axis once, and branches on how many dice show each distinct outcome.
         Equivalent partial rolls that reach the same state are merged, so the cost scales with the number of reachable states rather than the number of rolls.
 

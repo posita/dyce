@@ -36,6 +36,8 @@ from dyce.viz.matplotlib import (
     format_outcome_name,
     format_outcome_name_probability,
     format_probability,
+    format_probability_at_least,
+    format_probability_at_most,
     plot_bar,
     plot_burst,
     plot_line,
@@ -90,7 +92,19 @@ class TestFormatters:
         from fractions import Fraction
 
         result = format_probability(3, Fraction(1, 6), d6)
-        assert "16.67%" in result
+        assert result == "16.67%"
+
+    def test_format_probability_at_least(self) -> None:
+        from fractions import Fraction
+
+        result = format_probability_at_least(3, Fraction(1, 6), d6)
+        assert result == "50.00%"
+
+    def test_format_probability_at_most(self) -> None:
+        from fractions import Fraction
+
+        result = format_probability_at_most(3, Fraction(1, 6), d6)
+        assert result == "66.67%"
 
     def test_format_outcome_name_probability(self) -> None:
         labels = tuple(

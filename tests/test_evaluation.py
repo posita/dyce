@@ -143,7 +143,7 @@ class TestExpand:
 
 class TestExpandContext:
     @pytest.mark.parametrize(
-        ("min_path_probability", "independent", "expected", "truncated"),
+        ("min_path_probability", "reset_path_probability", "expected", "truncated"),
         [
             (None, False, H({3: 1}), True),
             (Fraction(0), False, H({1: 1, 2: 1, 3: 2}), False),
@@ -155,7 +155,7 @@ class TestExpandContext:
         self,
         *,
         min_path_probability: Fraction | None,
-        independent: bool,
+        reset_path_probability: bool,
         expected: H[int],
         truncated: bool,
     ) -> None:
@@ -165,7 +165,7 @@ class TestExpandContext:
                     lambda inner: inner.outcome,
                     d2,
                     min_path_probability=min_path_probability,
-                    independent=independent,
+                    reset_path_probability=reset_path_probability,
                 )
             else:
                 return 3
@@ -194,17 +194,17 @@ class TestExpandContext:
             if result.outcome == 1:
                 # This will survive
                 min_path_probability = Fraction(0)
-                independent = True
+                reset_path_probability = True
             else:
                 # These won't
                 min_path_probability = None
-                independent = False
+                reset_path_probability = False
 
             return expand(
                 lambda inner_result: inner_result.outcome,
                 inner_h,
                 min_path_probability=min_path_probability,
-                independent=independent,
+                reset_path_probability=reset_path_probability,
             )
 
         with pytest.warns(TruncationWarning):

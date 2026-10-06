@@ -84,8 +84,8 @@ def expand(
     callback: Callable[[HResult[_T]], H[_ResultT] | _ResultT],
     source: H[_T],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -93,8 +93,8 @@ def expand(
     callback: Callable[[PResult[_T]], H[_ResultT] | _ResultT],
     source: P[_T],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -103,8 +103,8 @@ def expand(
     source1: H[_T1],
     source2: H[_T2],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -113,8 +113,8 @@ def expand(
     source1: H[_T1],
     source2: P[_T2],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -123,8 +123,8 @@ def expand(
     source1: P[_T1],
     source2: H[_T2],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -133,8 +133,8 @@ def expand(
     source1: P[_T1],
     source2: P[_T2],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -146,8 +146,8 @@ def expand(
     source2: H[_T2],
     source3: H[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -159,8 +159,8 @@ def expand(
     source2: H[_T2],
     source3: P[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -172,8 +172,8 @@ def expand(
     source2: P[_T2],
     source3: H[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -185,8 +185,8 @@ def expand(
     source2: P[_T2],
     source3: P[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -198,8 +198,8 @@ def expand(
     source2: H[_T2],
     source3: H[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -211,8 +211,8 @@ def expand(
     source2: H[_T2],
     source3: P[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -224,8 +224,8 @@ def expand(
     source2: P[_T2],
     source3: H[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
@@ -237,23 +237,23 @@ def expand(
     source2: P[_T2],
     source3: P[_T3],
     *,
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[_ResultT]: ...
 @overload
 def expand(
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
-    independent: bool = ...,
     min_path_probability: Fraction | None = ...,
+    reset_path_probability: bool = ...,
     **state: Any,  # ruff: ignore[any-type]
 ) -> H[Any]: ...
 def expand(  # ruff: ignore[complex-structure]
     callback: Callable[..., Any],
     *sources: H[Any] | P[Any],
-    independent: bool = False,
     min_path_probability: Fraction | None = None,
+    reset_path_probability: bool = False,
     **state: Any,
 ) -> H[Any]:
     r"""
@@ -334,14 +334,14 @@ def expand(  # ruff: ignore[complex-structure]
     Nested calls inherit that value unless they override it.
     Zero disables probability-based truncation, but cumulative path probability is still tracked.
 
-    When *independent* is `True`, this call (re)starts with path probability one.
-    When *independent* is `True` and *min_path_probability* is `None`, this call uses the default value for *min_path_probability*.
+    When *reset_path_probability* is `True`, this call starts with path probability one.
+    When *reset_path_probability* is `True` and *min_path_probability* is `None`, this call uses the default value for *min_path_probability*.
     The enclosing context is restored after the call.
 
     !!! warning "Independent calls and min_path_probability overrides can increase computation"
 
         A nested call can disable probability-based truncation by setting *min_path_probability* to zero.
-        Repeated independent calls can prevent cumulative path probability from decreasing across recursion.
+        Repeated calls with *reset_path_probability* set to `True` can prevent cumulative path probability from decreasing across recursion.
         Neither choice restores branches already discarded by an enclosing call.
 
     The same *min_path_probability* can produce different recursion depths depending on the probability of the exploding face.
@@ -380,7 +380,7 @@ def expand(  # ruff: ignore[complex-structure]
 
     **Arbitrary state threading**
 
-    Any keyword arguments beyond *min_path_probability* and *independent* are forwarded verbatim to *callback* as keyword-only arguments.
+    Any keyword arguments beyond *min_path_probability* and *reset_path_probability* are forwarded verbatim to *callback* as keyword-only arguments.
     To pass updated state into recursive calls, include it explicitly:
 
         >>> def explode_on_max_up_to_n_times(
@@ -448,12 +448,14 @@ def expand(  # ruff: ignore[complex-structure]
             ),
         )
 
-    current_path_prob = Fraction(1) if independent else cur_ctxt.path_probability
+    current_path_prob = (
+        Fraction(1) if reset_path_probability else cur_ctxt.path_probability
+    )
     effective_min_path_probability = (
         min_path_probability
         if min_path_probability is not None
         else _DEFAULT_MIN_PATH_PROBABILITY
-        if independent
+        if reset_path_probability
         else cur_ctxt.min_path_probability
     )
     total_product = prod(s.total for s in sources)
