@@ -12,6 +12,8 @@ all : \
 	../docs/images/plot_burning_arch_light.svg \
 	../docs/images/plot_d10_explode_dark.svg \
 	../docs/images/plot_d10_explode_light.svg \
+	../docs/images/plot_d20_success_dark.svg \
+	../docs/images/plot_d20_success_light.svg \
 	../docs/images/plot_d4s_dark.svg \
 	../docs/images/plot_d4s_light.svg \
 	../docs/images/plot_dupes_dark.svg \
@@ -42,6 +44,7 @@ all : \
 	../docs/images/plot_viz_plot_line_at_least_light.svg \
 	../docs/images/plot_viz_plot_ridge_dark.svg \
 	../docs/images/plot_viz_plot_ridge_light.svg \
+	../requirements-dev.txt \
 	jupyterlite \
 	snippets/plotly_viz_plot_bar.html \
 	snippets/plotly_viz_plot_hbar.html \
@@ -56,6 +59,9 @@ FORCE :
 perf : \
 	perf_expand.txt \
 	perf_rolls_with_counts.txt
+
+../requirements-dev.txt : ../uv.lock
+	cd .. && uv export --format requirements-txt --locked --no-hashes >$@
 
 ../docs/dyce-powered.svg : Makefile
 	curl --fail --silent --show-error --location --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'
@@ -131,6 +137,7 @@ jupyterlite : FORCE \
 	../docs/notebooks/advantage.ipynb \
 	../docs/notebooks/burning_arch.ipynb \
 	../docs/notebooks/d10_explode.ipynb \
+	../docs/notebooks/d20_success.ipynb \
 	../docs/notebooks/dupes.ipynb \
 	../docs/notebooks/great_weapon_fighting.ipynb \
 	../docs/notebooks/histogram.ipynb \

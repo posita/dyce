@@ -20,263 +20,126 @@ If that file is missing or appears to be modified from its original, then please
 <!-- docs:hide:end -->
 
 [![Tests](https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg)](https://github.com/posita/dyce/actions/workflows/tests.yml)
-[![Coverage](https://codecov.io/gh/posita/dyce/branch/main/graph/badge.svg)](https://app.codecov.io/gh/posita/dyce)
 [![Version](https://img.shields.io/pypi/v/dyce.svg)](https://pypi.org/project/dyce/)
-![Development Stage](https://img.shields.io/pypi/status/dyce.svg)
-[![License](https://img.shields.io/pypi/l/dyce.svg)](http://opensource.org/licenses/MIT)
-![Supported Python Versions](https://img.shields.io/pypi/pyversions/dyce.svg)
-![Supported Python Implementations](https://img.shields.io/pypi/implementation/dyce.svg)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![License](https://img.shields.io/pypi/l/dyce.svg)](https://opensource.org/licenses/MIT)
+![Supported Python versions](https://img.shields.io/pypi/pyversions/dyce.svg)
 [![Bear-ified™](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.rtfd.io/)
 
-Now you’re playing with …
+*Now you’re playing with …*
 
 <img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/main/docs/dyce.svg" alt="dyce logo">
 
-# `dyce` – Simple Python tools for exploring dice outcomes and other finite discrete probabilities
+# `dyce`
 
-`dyce` is a pure-Python library for modeling arbitrarily complex dice mechanics.
-It strives for ***compact expression*** and ***efficient computation***, especially for the most common cases.
-Its primary audiences are game designers and tool makers who want to understand or experiment with various dice mechanics and interactions.
+`dyce` is a Python library for dice mechanics and other problems with a finite set of possible outcomes.
+It counts how many ways each outcome can occur, then calculates exact probabilities.
 
-`dyce` is designed to be immediately and broadly useful with minimal additional investment beyond basic knowledge of Python.
-While not as compact as a dedicated grammar, `dyce`’s Python-based primitives are quite sufficient, and often more expressive.
-Those familiar with various [game notations](https://en.wikipedia.org/wiki/Dice_notation) should be able to adapt quickly.
-If you’re looking at something on which to build your own grammar or interface, `dyce` can serve you well.
+Game designers can compare rules.
+Python developers can use the calculations in their own tools.
 
-`dyce` is intended to model a broad range of dice probability problems.
-The documentation combines API reference material with examples to help you understand and use `dyce`.
+## Overview
 
-`dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the accompanying `LICENSE` file for details.
-Experimental features are marked in the API documentation and may change or be removed in a future release.
-See the [release notes](https://dycelib.org/latest/notes/) for a summary of version-to-version changes.
-Source code is [available on GitHub](https://github.com/posita/dyce).
+- [`H`](https://dycelib.org/latest/dyce/#dyce.H) represents possible outcomes and their weights as integer counts.
+  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H(6)`.
+  The sum of three six-sided dice can be represented as `3 @ H(6)`.
+- [`P`](https://dycelib.org/latest/dyce/#dyce.P) represents an ordered sequence of histograms.
+  A pool of three separate six-sided dice can be represented as `3 @ P(H(6))`, or the shorthand `3 @ P(6)`.
+  `P`s keep each die separate, so you can select any die or group of dice and calculate the distribution of their summed results.
+- [`P.survey`](https://dycelib.org/latest/dyce/#dyce.P.survey) and [`expand`](https://dycelib.org/latest/dyce/#dyce.expand) are experimental interfaces useful for modeling mechanics where the outcome of one die affects how others are rolled.
+  Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.
+- Optional [Matplotlib](https://dycelib.org/latest/dyce.viz.matplotlib/) and [Plotly](https://dycelib.org/latest/dyce.viz.plotly/) helpers support visualization.
 
-If you find it lacking in any way, please don’t hesitate to [bring it to my attention](https://dycelib.org/latest/contrib/).
+## Example: d20 versus a “target number”
 
-<!-- Should match any title of the corresponding plot title -->
+Consider a mechanic where a roll on a fair twenty-sided die “succeeds” when it is greater than or equal to a specific value (a “target number”).
+This example compares the outcome distributions for one d20, the higher of two d20s (“advantage”), and the lower of two d20s (“disadvantage”).
+
+```python
+>>> from dyce import H, P
+>>> d20 = H(20)  # shorthand for an evenly-weighted 20-sided die
+>>> d20
+H({1: 1, 2: 1, 3: 1, ..., 18: 1, 19: 1, 20: 1})
+
+```
+
+```python
+>>> p2d20 = 2 @ P(d20)  # a pool of two such dice
+>>> d20_advantage = p2d20.at(-1)  # right-most index (-1) selects highest
+>>> d20_disadvantage = p2d20.at(0)  # left-most index (0) selects lowest
+>>> d20_advantage
+H({1: 1, 2: 3, 3: 5, ..., 18: 35, 19: 37, 20: 39})
+>>> d20_disadvantage
+H({1: 39, 2: 37, 3: 35, ..., 18: 5, 19: 3, 20: 1})
+
+```
+
+With a single d20, the chance of rolling a 15 or higher is 30%.
+With advantage, it climbs to 51%.
+With disadvantage, it drops to 9%.
+
+```python
+>>> target_number = 15
+>>> # How often a d20 is greater than or equal to target_number
+>>> d20_vs_target = d20.ge(target_number)
+>>> print(d20_vs_target.format())  # built-in text formatting
+  avg |    0.30
+  std |    0.46
+False |  70.00% |#################################
+ True |  30.00% |##############
+
+```
+
+```python
+>>> d20_advantage_vs_target = d20_advantage.ge(target_number)
+>>> print(d20_advantage_vs_target.format_short())
+{avg: 0.51, False: 49.00%, True: 51.00%}
+
+```
+
+```python
+>>> d20_disadvantage_vs_target = d20_disadvantage.ge(target_number)
+>>> print(d20_disadvantage_vs_target.format_short())
+{avg: 0.09, False: 91.00%, True:  9.00%}
+
+```
+
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
-  <img alt="Plot: Various quantities of d4s" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d4s_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_light.svg">
+  <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_light.svg">
 </picture>
+
+As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.
+With advantage, one is likely to roll at ***least*** a 15 over half the time, and one is nearly twice as likely to roll a 20.
+With disadvantage, one is likely to roll at ***most*** a 6 over half the time, and one is nearly twice as likely to roll a 1.
+
+[Run this example in JupyterLite](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb): [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb)
 
 ## Installation
 
-Installation can be performed via [PyPI](https://pypi.python.org/pypi/dyce/).
-
 ```sh
-% pip install dyce
-...
+python -m pip install dyce
 ```
 
-Alternately, you can download [the source](https://github.com/posita/dyce) and install manually.
+`dyce` supports CPython 3.11–3.14 and PyPy 3.11.
+It depends on [`optype`](https://jorenham.github.io/optype/) for static and runtime type-checking.
+It is available under the [MIT License](https://dycelib.org/latest/license/).
 
-```sh
-% git clone https://github.com/posita/dyce.git
-...
-% cd dyce
-% python3 -m pip install .  # -or- python3 -c 'from setuptools import setup ; setup()' install .
-...
-```
+`dyce` will opportunistically use the following, if available:
 
-### Requirements
+- [Beartype](https://beartype.github.io/beartype/) for runtime type checking 👌🏾🐻
+- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via [`dyce.viz.matplotlib`](https://dycelib.org/latest/dyce.viz.matplotlib/)
+- [NumPy](https://numpy.org/) for random number generation
 
-`dyce` requires a relatively modern version of Python:
+## Explore further
 
-- [CPython](https://www.python.org/) (3.11+)
-- [PyPy](http://pypy.org/) (CPython 3.11+ compatible)
-
-It has the following runtime dependencies:
-
-- [`optype`](https://jorenham.github.io/optype/) for *proper* static and runtime numeric type-checking
-
-`dyce` will opportunistically use the following, if available at runtime:
-
-- [Beartype](https://beartype.github.io/beartype/) for runtime type checking of `dyce` APIs
-- [Matplotlib](https://matplotlib.org/) for basic visualization helpers via `dyce.viz.matplotlib`
-- [NumPy](https://numpy.org/) to supply `dyce` with an alternate random number generator implementation
-
-See the [hacking quick-start](https://dycelib.org/latest/contrib/#hacking-quick-start) for additional development and testing dependencies.
-
-`dyce` is proudly 100% [Bear-ified™](https://beartype.rtfd.io/)! 👌🏾🐻
-
-## Design philosophy
-
-`dyce` is fairly low-level by design, prioritizing ergonomics and composability.
-It explicitly avoids stochastic simulation, but instead determines outcomes through enumeration and discrete computation.
-That’s a highfalutin way of saying it doesn’t guess.
-It *knows*, even if knowing is harder or more limiting.
-Which, if we possess a modicum of humility, it often is.
-
-!!! quote
-
-    “It’s frightening to think that you might not know something, but more frightening to think that, by and large, the world is run by people who have faith that they know exactly what is going on.”
-
-    —Amos Tversky
-
-Because `dyce` exposes Python primitives rather than defining a dedicated grammar and interpreter, one can more easily integrate it with other tools.[^1]
-It can be installed and run anywhere[^2], and modified as desired.
-On its own, `dyce` is completely adequate for casual tinkering.
-However, it really shines when used in larger contexts such as with [Matplotlib](https://matplotlib.org/), [Plotly](https://plotly.com/), or [Jupyter](https://jupyter.org/) or embedded in a special-purpose application.
-
-[^1]:
-
-    You won’t find any lexers, parsers, or tokenizers in `dyce`’s core, other than straight-up Python.
-    That being said, you can always “roll” your own (see what we did there?) and lean on `dyce` underneath.
-    It doesn’t mind.
-    <!-- TODO(@posita): Figure out what we're doing with dyce.r -->
-    <!-- It actually [kind of *likes* it](https://dycelib.org/latest/rollin/). -->
-
-[^2]:
-
-    <!-- Was: https://jokejet.com/guys-i-need-a-network-specialist-with-some-python-experience-its-urgent/ -->
-    Okay, maybe not *literally* anywhere, but [you’d be surprised](https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Frd64erbk6nj41.jpg).
-    Void where prohibited.
-    [Certain restrictions](#requirements) apply.
-    [Do not taunt Happy Fun Ball](https://youtu.be/GmqeZl8OI2M).
-
-In an intentional departure from [RFC 1925, § 2.2](https://datatracker.ietf.org/doc/html/rfc1925#section-2), `dyce` includes some conveniences, such as minor computation optimizations (e.g., the [`H.lowest_terms` method](https://dycelib.org/latest/dyce/#dyce.H.lowest_terms), various other shorthands, etc.) and formatting conveniences (e.g., the [`H.probability_items`](https://dycelib.org/latest/dyce/#dyce.H.probability_items) and [`H.format`](https://dycelib.org/latest/dyce/#dyce.H.format) methods).
-
-## A taste
-
-`dyce` provides two core primitives and tools for dependent computations.
-[`H` objects](https://dycelib.org/latest/dyce/#dyce.H) represent histograms for modeling finite discrete outcomes, like individual dice.
-[`P` objects](https://dycelib.org/latest/dyce/#dyce.P) represent pools (ordered sequences) of histograms.
-[`expand`](https://dycelib.org/latest/dyce/#expand) handles mechanics that include dependent variables.
-
-```python
->>> from dyce import H
->>> H(6)  # a standard six-sided die
-H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
->>> from dyce.d import d6  # dyce.d contains some convenient shorthands
->>> d6 == H(6)
-True
->>> 2 @ d6 * 3 - 4  # 2d6 * 3 - 4
-H({2: 1, 5: 2, 8: 3, 11: 4, 14: 5, 17: 6, 20: 5, 23: 4, 26: 3, 29: 2, 32: 1})
->>> d6.lt(d6)  # how often a first six-sided die shows a face less than a second
-H({False: 21, True: 15})
->>> abs(d6 - d6)  # subtract the least of two six-sided dice from the greatest
-H({0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2})
-
-```
-
-```python
->>> from dyce import P
->>> 2 @ P(d6)  # a pool of two six-sided dice
-2@P(H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}))
->>> from dyce.d import p2d6
->>> p2d6 == 2 @ P(d6)
-True
->>> p2d6.h()  # pools can be collapsed into histograms
-H({2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1})
->>> from dyce.d import h2d6
->>> p2d6 == h2d6 == 2 @ d6  # pools and histograms are comparable
-True
-
-```
-
-By providing one or more index arguments to the [`P.at` method](https://dycelib.org/latest/dyce/#dyce.P.at), one can “take” individual dice from pools, ordered least to greatest.
-(The [`H.format` method](https://dycelib.org/latest/dyce/#dyce.H.format) provides rudimentary visualization for convenience.)
-
-```python
->>> p2d6.at(0)  # take the lowest die of 2d6
-H({1: 11, 2: 9, 3: 7, 4: 5, 5: 3, 6: 1})
->>> print(p2d6.at(0).format(width=65))
-avg |    2.53
-std |    1.40
-  1 |  30.56% |###############
-  2 |  25.00% |############
-  3 |  19.44% |#########
-  4 |  13.89% |######
-  5 |   8.33% |####
-  6 |   2.78% |#
-
-```
-
-```python
->>> p2d6.at(-1)  # take the highest die of 2d6
-H({1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11})
->>> print(p2d6.at(-1).format(width=65))
-avg |    4.47
-std |    1.40
-  1 |   2.78% |#
-  2 |   8.33% |####
-  3 |  13.89% |######
-  4 |  19.44% |#########
-  5 |  25.00% |############
-  6 |  30.56% |###############
-
-```
-
-[`H` objects](https://dycelib.org/latest/dyce/#dyce.H) provides a [`probability_items` method](https://dycelib.org/latest/dyce/#dyce.H.probability_items) to ease integration with plotting packages.
-[`dyce.viz.matplotlib`](https://dycelib.org/latest/dyce.viz.matplotlib/) provides [Matplotlib](https://matplotlib.org/stable/api/index.html)-based visualization conveniences.
-[`dyce.viz.plotly`](https://dycelib.org/latest/dyce.viz.plotly/) does likewise for [Plotly](https://plotly.com/python-api-reference/).
-[`dyceum`](https://github.com/posita/dyceum/) provides additional interactive visualization tools.
-
-    --8<-- "docs-src/plot_2d6_lo_hi.py:core"
-
-Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=2d6_lo_hi.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try dyce"></a>
-
-    --8<-- "docs-src/plot_2d6_lo_hi.py:viz"
-
-<!-- Should match any title of the corresponding plot title -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
-  <img alt="Plot: Various quantities of 2d6_lo_hi" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_2d6_lo_hi_light.svg">
-</picture>
-
-[`H` objects](https://dycelib.org/latest/dyce/#dyce.H) and [`P` objects](https://dycelib.org/latest/dyce/#dyce.P) can generate random rolls.
-
-<!-- BEGIN MONKEY PATCH --
-For deterministic outcomes.
-
->>> import random
->>> from dyce import rng
->>> rng.RNG = random.Random(1776137328)
-
-  -- END MONKEY PATCH -->
-
-```python
->>> from dyce.d import d6
->>> d6.sample()
-4
-
-```
-
-```python
->>> d0to9 = H(10) - 1
->>> p6d0to9 = 6 @ P(d0to9)
->>> p6d0to9.sample()
-(0, 0, 2, 3, 5, 9)
-
-```
-
-See the tutorials on [counting](https://dycelib.org/latest/countin/) <!-- and [rolling](https://dycelib.org/latest/rollin/), --> as well as the [API guide](https://dycelib.org/latest/dyce/) for much more thorough treatments, including detailed examples.
-
-## Other efforts
-
-`dyce`’s goal is to provide ergonomic and idiomatic Python interfaces to reasonably efficient discrete probability computations useful for gaming with minimal dependencies.
-Consider exploring the [applications and translations](https://dycelib.org/latest/translations/) for added color.
-But `dyce` does not stand alone.
-Other works include:
-
-- The OG [`dice_roll.py`](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f) by Ilmari Karonen
-- [`icepool`](https://pypi.org/project/icepool/) by Albert Julius Liu
-- [GNOLL](https://pypi.org/project/gnoll/) by Ian Hunter
-- [lea](https://pypi.org/project/lea/) by Pierre Denis
-- [dice](https://pypi.org/project/dice/) by Sam Clements
-- [ossuary](https://github.com/bszonye/ossuary) by B. Szonye
-- [PythonDice](https://github.com/Ar-Kareem/PythonDice) by Ar-Kareem
-- [dice-notation](https://pypi.org/project/dice-notation/) by Bernardo Martinez Garrido
-- Avrae’s [d20](https://pypi.org/project/d20/) by Andrew Zhu
-- [python-dice](https://pypi.org/project/python-dice/) by Mark Robson
-- [DnDice](https://github.com/LordSembor/DnDice) by “LordSembor”
-- [AnyDice](https://anydice.com/) (closed source) by Jasper Flick
-
-Please consider [contributing an issue](https://dycelib.org/latest/contrib/) if you observe discrepancies or think something should be added to the list.
+- Consult the [glossary](https://dycelib.org/latest/glossary/) for important terms used in this documentation.
+- Read the [counting guide](https://dycelib.org/latest/countin/) for the core concepts and operations.
+- See [applications and translations](https://dycelib.org/latest/translations/) for worked examples.
+- Browse the [API reference](https://dycelib.org/latest/dyce/).
+- Read the [contribution guide](https://dycelib.org/latest/contrib/) to report an issue or contribute a change.
+- See the [release notes](https://dycelib.org/latest/notes/) for changes between releases.
+- Browse the [source code](https://github.com/posita/dyce).
 
 ## Donors
 
@@ -286,45 +149,3 @@ When one worries that the flickering light of humanity may be snuffed out at any
   As such, `dyce` is now [available as ~~`dycelib`~~ *`dyce`*](https://pypi.org/project/dyce/)!
   Thanks to his generosity, ~~millions~~ *dozens* of future `dyce` users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡
-
-## Customers [![`dyce`-powered!](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)](https://dycelib.org/)
-
-- This could be *you*! 👋
-
-Do you have a project that uses `dyce`?
-[Let me know](https://dycelib.org/latest/contrib/#starting-discussions-and-filing-issues), and I’ll promote it here!
-
-And don’t forget to do your part in perpetuating gratuitous badge-ification!
-
-```markdown
-<!-- Markdown -->
-As of version 1.1, HighRollin is
-[![dyce-powered](https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg)][dyce-powered]!
-[dyce-powered]: https://dycelib.org/ "dyce-powered!"
-```
-
-```rst
-..
-    reStructuredText - see https://docutils.sourceforge.io/docs/ref/rst/directives.html#image
-
-As of version 1.1, HighRollin is |dyce-powered|!
-
-.. |dyce-powered| image:: https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg
-   :align: top
-   :target: https://dycelib.org/
-   :alt: dyce-powered
-```
-
-```html
-<!-- HTML -->
-As of version 1.1, HighRollin is <a href="https://dycelib.org/"><img
-  src="https://raw.githubusercontent.com/posita/dyce/latest/docs/dyce-powered.svg"
-  alt="dyce-powered"
-  style="vertical-align: middle;"></a>!
-```
-
-## License
-
-`dyce` is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-See the included [`LICENSE`](https://dycelib.org/latest/license/) file for details.
-Source code is [available on GitHub](https://github.com/posita/dyce).

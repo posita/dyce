@@ -2,25 +2,27 @@
 
 ## The MIT License (MIT)
 
-Copyright © 2026 [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce)
+Copyright © 2020-2026 [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce)
 ([**@posita**](https://github.com/posita)).
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this
-software and associated documentation files (the “Software”), to deal in the Software
-without restriction, including without limitation the rights to use, copy, modify,
-merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to the following
-conditions:
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+“Software”), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or
-substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
-OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## Contributors
 
@@ -29,17 +31,12 @@ The following individuals or entities have contributed to this software:
 - [Matt Bogosian](mailto:matt@bogosian.net?Subject=dyce); GitHub – [**@posita**](https://github.com/posita)
 - [Renaud Guillon](mailto:renaud.guillon@gmail.com?Subject=dyce); GitHub – [**@rguillon**](https://github.com/rguillon)
 
-<!--
-    Entry formats:
-    - NAME
-    - [NAME](MAILTO_URL)
-    - … ; FORUM – [SCREEN_NAME](URL); …
-  -->
-
-By adding your name to this list, you grant a nonexclusive, perpetual license to your
-contributions to this software under the same terms as its license, above. Further, you
-warrant that your contributions to this software are exclusively your own creations and
-no one else has any superior right or claim to them. Finally, you agree to indemnify and
-hold harmless this software’s owner against any colorable claim of infringement by a
-third party for this software’s owner’s otherwise lawful use of your contribution,
-whether or not such use was contemplated by you at the time you made it.
+By adding your name to this list, you grant a nonexclusive, perpetual
+license to your contributions to this software under the same terms as
+its license, above. Further, you warrant that your contributions to
+this software are exclusively your own creations and no one else has
+any superior right or claim to them. Finally, you agree to indemnify
+and hold harmless this software’s owner and its users against any
+colorable claim of infringement by a third party for this software’s
+owner’s otherwise lawful use of your contribution, whether or not such
+use was contemplated by you at the time you made it.

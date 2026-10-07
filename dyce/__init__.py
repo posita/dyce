@@ -14,15 +14,20 @@
 # ======================================================================================
 
 r"""
-`dyce` revolves around two core primitives.
-[`H` objects][dyce.H] are histograms (outcomes or individual dice).
-[`P` objects][dyce.P] are ordered sequences of histograms (pools).
-
-Additionally, `dyce` provides [`expand`][dyce.expand], which is useful for substitutions, explosions, and modeling arbitrarily complex computations with dependent terms.
-It also provides [`explode_n`][dyce.explode_n] as a convenient shorthand.
+- [`H`][dyce.H] represents possible outcomes and their weights as integer counts.
+  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H(6)`.
+  The sum of three six-sided dice can be represented as `3 @ H(6)`.
+- [`P`][dyce.P] represents an ordered sequence of histograms.
+  A pool of three separate six-sided dice can be represented as `3 @ P(H(6))`, or the shorthand `3 @ P(6)`.
+  `P`s keep each die separate, so you can select any die or group of dice and calculate the distribution of their summed results.
+- [`P.survey`][dyce.P.survey] and [`expand`][dyce.expand] are experimental interfaces useful for modeling mechanics where the outcome of one die affects how others are rolled.
+  Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.
+    - [`explode_n`][dyce.explode_n] is provided as a convenient shorthand.
 """
 
-if True:  # so ruff won't complain imports are out-of-order, but still sort the others
+if True:
+    # This needs to come first. Placing it in this block keeps ruff from complaining
+    # imports are out-of-order, while still keeping the others sorted.
     from .types import beartype_this_package
 
     beartype_this_package()

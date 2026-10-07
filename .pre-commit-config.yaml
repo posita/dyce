@@ -74,6 +74,14 @@ repos:
     rev: v2.6.0
     hooks:
       - id: osv-scanner
+        args:
+          - scan
+          - source
+          - --format=vertical
+          - --no-resolve
+          - --recursive
+          - --verbosity=error
+          - .
 
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.178.0
