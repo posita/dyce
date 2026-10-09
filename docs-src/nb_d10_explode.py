@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -71,8 +71,8 @@ def nkk(n: int, k: int) -> H[int]:
 
 
 # %%
-from matplotlib import pyplot as plt
-from matplotlib import ticker
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 from dyce.viz.matplotlib import plot_ridge
 
@@ -95,7 +95,7 @@ for k, rows in rows_by_k.items():
     plot_ridge(*hs, labels=labels, cmap="cool", peak=max_y, ax=ax)
     for line in ax.lines:
         line.set_marker("")
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(5))
     ax.tick_params(axis="x", labelrotation=60)
     ax.set_title(f"Taking the {k} highest of $n$ exploding d10s")
     ax.set_xlim(left=0, right=max_x)  # subplots should share a horizontal scale
@@ -106,6 +106,6 @@ for ax in axes:
     ax.set_ylim(min(lo for lo, _ in y_lims), max(hi for _, hi in y_lims))
 plt.gcf().set_size_inches(6.4, 8.0)
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

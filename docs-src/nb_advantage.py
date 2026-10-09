@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -75,7 +75,7 @@ def crit(result: HResult[int]) -> H[int] | int:
 advantage_weighted = expand(crit, advantage)
 
 # %%
-from matplotlib import ticker
+import matplotlib.ticker as mticker
 
 from dyce.viz.matplotlib import plot_line
 
@@ -85,10 +85,10 @@ ax = plot_line(
     advantage_weighted,
     labels=["Normal hit", "Critical hit", "Advantage-weighted"],
 )
-ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
+ax.xaxis.set_major_locator(mticker.IndexLocator(base=2, offset=1))
 ax.set_title("Advantage-weighted attack with critical hits")
 ax.legend()
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

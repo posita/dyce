@@ -49,13 +49,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -97,7 +97,7 @@ print(d20_disadvantage_vs_target.format())
 
 # %%
 import matplotlib as mpl
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib.patches import Wedge
 
 from dyce.viz.matplotlib import plot_burst
@@ -106,7 +106,7 @@ _, axes = plt.subplots(1, 2)
 plot_burst(
     d20_advantage,
     d20,
-    title="highest of 2d20 vs. d20",
+    title="highest of 2d20\nor “advantage” (front)\nvs. d20 (back)",
     alpha=0.9,
     ax=axes[0],
     cmap="twilight_shifted",
@@ -115,7 +115,7 @@ plot_burst(
 plot_burst(
     d20_disadvantage,
     d20,
-    title="lowest of 2d20 vs. d20",
+    title="lowest of 2d20\nor “disadvantage” (front)\nvs. d20 (back)",
     alpha=0.9,
     ax=axes[1],
     cmap="twilight_shifted_r",

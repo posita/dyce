@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -90,11 +90,11 @@ df = pd.DataFrame(data, index=[label_sa, label_gwf_2014, label_gwf_2024])
 # Display df as table
 import jinja2  # ruff: ignore[unused-import]
 
-# Translated from print(df.style.format("{:.0%}").to_html()) in plot_great_weapon_fighting.py
+# Translated from print(df.style.format("{:.0%}").to_html()) in plot_matplotlib_great_weapon_fighting.py
 df.style.format("{:.0%}")
 
 # %%
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 from dyce.viz.matplotlib import plot_ridge
 

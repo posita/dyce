@@ -1,0 +1,51 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+
+def fig_callback() -> None:
+    # NOTE: Changes to this section should be propagated to docs-src/nb_advantage.py
+    # --8<-- [start:core]
+    from dyce import H, HResult, P, expand
+
+    normal_hit = H(12) + 5
+    critical_hit = 3 @ H(12) + 5
+    advantage = (2 @ P(20)).at(-1)
+
+    def crit(result: HResult[int]) -> H[int] | int:
+        if result.outcome == 20:
+            return critical_hit
+        elif result.outcome + 5 >= 14:
+            return normal_hit
+        else:
+            return 0
+
+    advantage_weighted = expand(crit, advantage)
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs-src/nb_advantage.py
+    # --8<-- [start:viz]
+    from matplotlib import ticker
+
+    from dyce.viz.matplotlib import plot_line
+
+    ax = plot_line(
+        normal_hit,
+        critical_hit,
+        advantage_weighted,
+        labels=["Normal hit", "Critical hit", "Advantage-weighted"],
+    )
+    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
+    ax.set_title("Advantage-weighted attack with critical hits")
+    ax.legend()
+    # --8<-- [end:viz]
+
+
+if __name__ == "__main__":
+    from _plot import main
+
+    main(fig_callback)

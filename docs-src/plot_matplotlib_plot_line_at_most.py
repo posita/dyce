@@ -1,0 +1,30 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+
+def fig_callback() -> None:
+    # --8<-- [start:viz]
+    from dyce import H
+    from dyce.viz import GraphType
+    from dyce.viz.matplotlib import plot_line
+
+    ax = plot_line(
+        2 @ H(10),
+        H(8) + H(12),
+        labels=["2d10", "d8 + d12"],
+        graph_type=GraphType.AT_MOST,
+    )
+    ax.set_title('2d10 vs. d8 + d12 ("at most")')
+    ax.legend(loc="upper left")
+    # --8<-- [end:viz]
+
+
+if __name__ == "__main__":
+    from _plot import main
+
+    main(fig_callback)

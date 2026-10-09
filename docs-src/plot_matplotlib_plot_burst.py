@@ -1,0 +1,40 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+
+def fig_callback() -> None:
+    # --8<-- [start:viz]
+    import matplotlib.pyplot as plt
+
+    from dyce import H
+    from dyce.viz.matplotlib import plot_burst
+
+    ax_d6 = plt.subplot2grid((1, 2), (0, 0))
+    plot_burst(
+        H(6),
+        ax=ax_d6,
+    )
+    ax_d6.set_title("d6")
+
+    ax_2d10_vs_d8d12 = plt.subplot2grid((1, 2), (0, 1))
+    plot_burst(
+        2 @ H(10),
+        H(8) + H(12),
+        cmap="RdYlGn",
+        compare_cmap="RdYlBu",
+        ax=ax_2d10_vs_d8d12,
+    )
+    ax_2d10_vs_d8d12.set_title("2d10 vs. d8 + d12")
+    plt.gcf().set_size_inches(6.4, 3.2)
+    # --8<-- [end:viz]
+
+
+if __name__ == "__main__":
+    from _plot import main
+
+    main(fig_callback)

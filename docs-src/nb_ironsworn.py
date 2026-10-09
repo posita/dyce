@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %% editable=false
@@ -130,15 +130,15 @@ df.index.name = "Action Modifier"
 # Display df as table
 import jinja2  # ruff: ignore[unused-import]
 
-# Translated from print(df.style.format("{:.2%}").to_html()) in plot_ironsworn.py
+# Translated from print(df.style.format("{:.2%}").to_html()) in plot_matplotlib_ironsworn.py
 df.style.format("{:.2%}")
 
 # %% editable=false
-from matplotlib import pyplot as plt
-from matplotlib import ticker
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 ax = df.plot(kind="barh", stacked=True)
-ax.xaxis.set_major_formatter(ticker.PercentFormatter(xmax=1))
+ax.xaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
 ax.set_title("Ironsworn distributions")
 ax.legend(loc="center")
 

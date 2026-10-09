@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -72,6 +72,6 @@ ax = plot_bar(
 ax.set_title("Taking the lowest or highest die of 2d6")
 ax.legend()
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

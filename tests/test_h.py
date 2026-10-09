@@ -395,6 +395,39 @@ class TestHAdd:
         with pytest.raises(TypeError):
             frozenset({"incompatible"}) + H({3: 1})  # type: ignore[operator] # ty: ignore[unsupported-operator]
 
+    def test_miwin_distribution(self) -> None:
+        miwin_iii = H((1, 2, 5, 6, 7, 9))
+        miwin_iv = H((1, 3, 4, 5, 8, 9))
+        miwin_v = H((2, 3, 4, 6, 7, 8))
+
+        assert miwin_iii + miwin_iv + miwin_v == H(
+            {
+                4: 1,
+                5: 2,
+                6: 3,
+                7: 4,
+                8: 7,
+                9: 9,
+                10: 10,
+                11: 11,
+                12: 17,
+                13: 19,
+                14: 18,
+                15: 14,
+                16: 18,
+                17: 19,
+                18: 17,
+                19: 11,
+                20: 10,
+                21: 9,
+                22: 7,
+                23: 4,
+                24: 3,
+                25: 2,
+                26: 1,
+            }
+        )
+
 
 class TestHSub:
     def test_scalar_fwd(self) -> None:

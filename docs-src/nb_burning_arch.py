@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -64,14 +64,14 @@ pass_save = save_roll.ge(10)
 damage_half_on_save = burning_arch_damage // (pass_save + 1)
 
 # %%
-from matplotlib import ticker
+import matplotlib.ticker as mticker
 
 from dyce.viz.matplotlib import plot_line
 
 ax = plot_line(damage_half_on_save)
-ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=0))
+ax.xaxis.set_major_locator(mticker.IndexLocator(base=2, offset=0))
 ax.set_title("Attack with saving throw for half damage")
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

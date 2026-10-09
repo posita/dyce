@@ -1,0 +1,36 @@
+# ======================================================================================
+# Copyright and other protections apply. Please see the accompanying LICENSE file for
+# rights and restrictions governing use of this software. All rights not expressly
+# waived or licensed are reserved. If that file is missing or appears to be modified
+# from its original, then please contact the author before viewing or using this
+# software in any capacity.
+# ======================================================================================
+
+
+def fig_callback() -> None:
+    # NOTE: Changes to this section should be propagated to docs-src/nb_2d6_lo_hi.py
+    # --8<-- [start:core]
+    from dyce.d import p2d6
+
+    h2d6_lowest = p2d6.at(0)
+    h2d6_highest = p2d6.at(-1)
+    # --8<-- [end:core]
+
+    # NOTE: Changes to this section should be propagated to docs-src/nb_2d6_lo_hi.py
+    # --8<-- [start:viz]
+    from dyce.viz.matplotlib import plot_bar
+
+    ax = plot_bar(
+        h2d6_lowest,
+        h2d6_highest,
+        labels=("Lowest", "Highest"),
+    )
+    ax.set_title("Taking the lowest or highest die of 2d6")
+    ax.legend()
+    # --8<-- [end:viz]
+
+
+if __name__ == "__main__":
+    from _plot import main
+
+    main(fig_callback)

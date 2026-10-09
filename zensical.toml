@@ -26,7 +26,7 @@ extra_javascript = ["https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 nav = [
   { Introduction = "index.md" },
-  { "Countin’ with histograms and pools" = "countin.md" },
+  { "Introduction to histograms and pools" = "intro.md" },
   { "Applications and translations" = "translations.md" },
   { "Release notes" = "notes.md" },
   { Contributing = "contrib.md" },

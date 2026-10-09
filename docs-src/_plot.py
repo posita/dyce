@@ -50,9 +50,9 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     import warnings
 
     import matplotlib as mpl
-    from matplotlib import colors as mcolors
-    from matplotlib import pyplot as plt
-    from matplotlib import style as mstyle
+    import matplotlib.colors as mcolors
+    import matplotlib.pyplot as plt
+    import matplotlib.style as mstyle
 
     from dyce.lifecycle import ExperimentalWarning
 

@@ -46,13 +46,13 @@ await install_if_missing(  # type: ignore[top-level-await]
 
 import warnings
 
+import matplotlib.style as mstyle
 import matplotlib_inline
-from matplotlib import style
 
 from dyce.lifecycle import ExperimentalWarning
 
 matplotlib_inline.backend_inline.set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
-style.use("bmh")
+mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
@@ -76,6 +76,6 @@ ax = plot_bar(res_15d6, res_8d10, labels=["15d6", "8d10"])
 ax.set_title("Chances of rolling `#!math n` duplicates")
 ax.legend()
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

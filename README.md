@@ -104,9 +104,9 @@ False |  70.00% |#################################
 ```
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_light.svg">
-  <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_d20_success_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_matplotlib_d20_success_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_matplotlib_d20_success_light.svg">
+  <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_matplotlib_d20_success_light.svg">
 </picture>
 
 As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.
@@ -134,12 +134,32 @@ It is available under the [MIT License](https://dycelib.org/latest/license/).
 ## Explore further
 
 - Consult the [glossary](https://dycelib.org/latest/glossary/) for important terms used in this documentation.
-- Read the [counting guide](https://dycelib.org/latest/countin/) for the core concepts and operations.
+- Read the [introduction](https://dycelib.org/latest/intro/) for the core concepts and operations.
 - See [applications and translations](https://dycelib.org/latest/translations/) for worked examples.
 - Browse the [API reference](https://dycelib.org/latest/dyce/).
 - Read the [contribution guide](https://dycelib.org/latest/contrib/) to report an issue or contribute a change.
 - See the [release notes](https://dycelib.org/latest/notes/) for changes between releases.
 - Browse the [source code](https://github.com/posita/dyce).
+
+## Other efforts
+
+`dyce` does not stand alone.
+Other works include:
+
+- The OG [`dice_roll.py`](https://gist.github.com/vyznev/8f5e62c91ce4d8ca7841974c87271e2f) by Ilmari Karonen
+- [`icepool`](https://pypi.org/project/icepool/) by Albert Julius Liu
+- [GNOLL](https://pypi.org/project/gnoll/) by Ian Hunter
+- [lea](https://pypi.org/project/lea/) by Pierre Denis
+- [dice](https://pypi.org/project/dice/) by Sam Clements
+- [ossuary](https://github.com/bszonye/ossuary) by B. Szonye
+- [PythonDice](https://github.com/Ar-Kareem/PythonDice) by Ar-Kareem
+- [dice-notation](https://pypi.org/project/dice-notation/) by Bernardo Martinez Garrido
+- Avrae’s [d20](https://pypi.org/project/d20/) by Andrew Zhu
+- [python-dice](https://pypi.org/project/python-dice/) by Mark Robson
+- [DnDice](https://github.com/LordSembor/DnDice) by “LordSembor”
+- [AnyDice](https://anydice.com/) (closed source) by Jasper Flick
+
+Please consider [contributing an issue](https://dycelib.org/latest/contrib/) if you observe discrepancies or think something should be added to the list.
 
 ## Donors
 
