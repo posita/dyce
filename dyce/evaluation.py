@@ -323,7 +323,7 @@ def expand(  # ruff: ignore[complex-structure]
     **Path probability and recursion limiting**
 
     The *min_path_probability* parameter controls when recursive expansion is stopped automatically.
-    It represents the minimum path probability (the cumulative probability of reaching a branch) below which the callback is not invoked.
+    It represents the minimum path probability (the probability of reaching a branch) below which the callback is not invoked.
     Additionally, any branch that exceeds Python’s recursion limit is also dropped.
     In both cases, the branch is eliminated exactly as if the callback had returned `H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.
@@ -332,7 +332,7 @@ def expand(  # ruff: ignore[complex-structure]
     At the top level, its default value is `Fraction(1, 0x7FFFFF)`.
     An explicit fraction sets *min_path_probability* for this call.
     Nested calls inherit that value unless they override it.
-    Zero disables probability-based truncation, but cumulative path probability is still tracked.
+    Zero disables probability-based truncation, but path probability is still tracked.
 
     When *reset_path_probability* is `True`, this call starts with path probability one.
     When *reset_path_probability* is `True` and *min_path_probability* is `None`, this call uses the default value for *min_path_probability*.
@@ -341,11 +341,11 @@ def expand(  # ruff: ignore[complex-structure]
     !!! warning "Independent calls and min_path_probability overrides can increase computation"
 
         A nested call can disable probability-based truncation by setting *min_path_probability* to zero.
-        Repeated calls with *reset_path_probability* set to `True` can prevent cumulative path probability from decreasing across recursion.
+        Repeated calls with *reset_path_probability* set to `True` can prevent path probability from decreasing across recursion.
         Neither choice restores branches already discarded by an enclosing call.
 
     The same *min_path_probability* can produce different recursion depths depending on the probability of the exploding face.
-    A more probable exploding face keeps cumulative path probability at or above *min_path_probability* for more recursive calls:
+    A more probable exploding face keeps path probability at or above *min_path_probability* for more recursive calls:
 
         >>> from dyce import TruncationWarning
         >>> import warnings
@@ -555,7 +555,7 @@ def explode_n(
         H({3*x: 1})
 
     *min_path_probability* is forwarded to [`expand`][dyce.expand] and defaults to zero.
-    A [`TruncationWarning`][dyce.TruncationWarning] is emitted when a branch's cumulative path probability falls below *min_path_probability* or a branch exceeds Python's recursion limit.
+    A [`TruncationWarning`][dyce.TruncationWarning] is emitted when a branch's path probability falls below *min_path_probability* or a branch exceeds Python's recursion limit.
 
         >>> from dyce import TruncationWarning
         >>> import sys, warnings

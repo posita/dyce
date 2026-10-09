@@ -18,26 +18,18 @@ all : \
 	../docs/images/plot_matplotlib_4d6_variants_light.svg \
 	../docs/images/plot_matplotlib_advantage_dark.svg \
 	../docs/images/plot_matplotlib_advantage_light.svg \
-	../docs/images/plot_matplotlib_burning_arch_dark.svg \
-	../docs/images/plot_matplotlib_burning_arch_light.svg \
 	../docs/images/plot_matplotlib_d10_explode_dark.svg \
 	../docs/images/plot_matplotlib_d10_explode_light.svg \
 	../docs/images/plot_matplotlib_d20_success_dark.svg \
 	../docs/images/plot_matplotlib_d20_success_light.svg \
 	../docs/images/plot_matplotlib_d4s_dark.svg \
 	../docs/images/plot_matplotlib_d4s_light.svg \
-	../docs/images/plot_matplotlib_dupes_dark.svg \
-	../docs/images/plot_matplotlib_dupes_light.svg \
-	../docs/images/plot_matplotlib_great_weapon_fighting_dark.svg \
-	../docs/images/plot_matplotlib_great_weapon_fighting_light.svg \
 	../docs/images/plot_matplotlib_ironsworn_dark.svg \
 	../docs/images/plot_matplotlib_ironsworn_light.svg \
 	../docs/images/plot_matplotlib_risus_first_round_dark.svg \
 	../docs/images/plot_matplotlib_risus_first_round_light.svg \
 	../docs/images/plot_matplotlib_risus_multi_round_standard_dark.svg \
 	../docs/images/plot_matplotlib_risus_multi_round_standard_light.svg \
-	../docs/images/plot_matplotlib_roll_and_keep_dark.svg \
-	../docs/images/plot_matplotlib_roll_and_keep_light.svg \
 	../docs/images/plot_matplotlib_plot_bar_dark.svg \
 	../docs/images/plot_matplotlib_plot_bar_light.svg \
 	../docs/images/plot_matplotlib_plot_burst_dark.svg \
@@ -145,14 +137,10 @@ jupyterlite : FORCE \
 	../docs/notebooks/3d6_selection.ipynb \
 	../docs/notebooks/4d6_variants.ipynb \
 	../docs/notebooks/advantage.ipynb \
-	../docs/notebooks/burning_arch.ipynb \
 	../docs/notebooks/d10_explode.ipynb \
 	../docs/notebooks/d20_success.ipynb \
-	../docs/notebooks/dupes.ipynb \
-	../docs/notebooks/great_weapon_fighting.ipynb \
 	../docs/notebooks/ironsworn.ipynb \
-	../docs/notebooks/risus.ipynb \
-	../docs/notebooks/roll_and_keep.ipynb
+	../docs/notebooks/risus.ipynb
 	cd .. && uv build --wheel
 	@cd .. && set -eu; \
 		dyce_wheel=$$(ls -t dist/dyce*-none-any.whl | head -n 1); \

@@ -11,15 +11,17 @@ def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs-src/nb_d10_explode.py
     # --8<-- [start:core]
     from dyce import H, P, explode_n
+    from dyce.d import d10
 
     explode_depth = 2
+    exploded_d10 = explode_n(d10, n=explode_depth)
 
     def keep(p: P[int], k: int) -> H[int]:
         r"Negative k keeps lowest, otherwise keeps highest"
         return p.at(slice(-k, None) if k > 0 else slice(-k))
 
     def nkk(n: int, k: int) -> H[int]:
-        return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)
+        return keep(n @ P(exploded_d10), k=k)
 
     # --8<-- [end:core]
 

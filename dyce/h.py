@@ -2004,8 +2004,9 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         preserve_zero_counts: bool = False,
     ) -> "H[Any]":
         r"""
-        Constructs an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits and proportions are retained.
+        Constructs an [`H`][dyce.H] by “quantizing” its counts such that no count occupies more than *bit_width* bits.
 
+        Proportions are approximated.
         If *preserve_zero_counts* is `True`, outcomes are retained even if their counts are reduced to `0`.
 
             >>> H.quantize_counts(

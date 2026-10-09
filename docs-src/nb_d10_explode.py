@@ -57,8 +57,10 @@ warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
 from dyce import H, P, explode_n
+from dyce.d import d10
 
 explode_depth = 2
+exploded_d10 = explode_n(d10, n=explode_depth)
 
 
 def keep(p: P[int], k: int) -> H[int]:
@@ -67,7 +69,7 @@ def keep(p: P[int], k: int) -> H[int]:
 
 
 def nkk(n: int, k: int) -> H[int]:
-    return keep(n @ P(explode_n(H(10), n=explode_depth)), k=k)
+    return keep(n @ P(exploded_d10), k=k)
 
 
 # %%

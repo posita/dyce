@@ -26,12 +26,14 @@ extra_javascript = ["https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 nav = [
   { Introduction = "index.md" },
-  { "Introduction to histograms and pools" = "intro.md" },
-  { "Applications and translations" = "translations.md" },
+  { "Core concepts" = "concepts.md" },
+  { Examples = "examples.md" },
   { "Release notes" = "notes.md" },
   { Contributing = "contrib.md" },
-  { License = "license.md" },
+  { "License and credits" = "license.md" },
   { API = [
+    # dyce.lifecycle, dyce.rng, and dyce.types are internal and
+    # intentionally excluded from the published API navigation
     { Core = "dyce.md" },
     { Conveniences = "dyce.d.md" },
     { Visualization = [
@@ -39,9 +41,8 @@ nav = [
       { "Matplotlib (optional)" = "dyce.viz.matplotlib.md" },
       { Plotly = "dyce.viz.plotly.md" },
     ] },
-    # dyce.lifecycle, dyce.rng, and dyce.types are internal and
-    # intentionally excluded from the published API navigation
   ] },
+  { Glossary = "glossary.md" }
 ]
 
 [project.theme]

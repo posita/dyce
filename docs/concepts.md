@@ -20,6 +20,9 @@ For typing:
 >>> import sympy.solvers.inequalities  # type: ignore[import-untyped]
 
   -- END MONKEY PATCH -->
+
+# Core concepts
+
 `dyce` provides two core primitives for basic finite discrete probability computations.
 
 [`H` objects][dyce.H] represent finite discrete probability distributions as histograms.
@@ -302,7 +305,7 @@ If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed, [`dy
 
 ## Further exploration
 
-Consider delving into some [applications and translations](translations.md) for more sophisticated examples, or jump right into the [API](dyce.md).
+See the [examples](examples.md) for worked calculations, or consult the [API reference](dyce.md).
 
 Anywhere you see a JupyterLite logo <img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">, you can click on it to immediately start tinkering with a temporal instance of that example.
 Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.

@@ -34,8 +34,10 @@ If that file is missing or appears to be modified from its original, then please
 `dyce` is a Python library for dice mechanics and other problems with a finite set of possible outcomes.
 It counts how many ways each outcome can occur, then calculates exact probabilities.
 
-Game designers can compare rules.
-Python developers can use the calculations in their own tools.
+Suggested audiences and applications:
+
+- Game designers for crafting and compare game mechanics
+- Tool developers for using calculations in higher level tooling
 
 ## Overview
 
@@ -134,8 +136,8 @@ It is available under the [MIT License](https://dycelib.org/latest/license/).
 ## Explore further
 
 - Consult the [glossary](https://dycelib.org/latest/glossary/) for important terms used in this documentation.
-- Read the [introduction](https://dycelib.org/latest/intro/) for the core concepts and operations.
-- See [applications and translations](https://dycelib.org/latest/translations/) for worked examples.
+- Read about `dyce`’s [core concepts](https://dycelib.org/latest/concepts/) and operations.
+- See [examples](https://dycelib.org/latest/examples/) for worked examples.
 - Browse the [API reference](https://dycelib.org/latest/dyce/).
 - Read the [contribution guide](https://dycelib.org/latest/contrib/) to report an issue or contribute a change.
 - See the [release notes](https://dycelib.org/latest/notes/) for changes between releases.
