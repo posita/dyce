@@ -137,7 +137,7 @@ df.style.format("{:.2%}")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-ax = df.plot(kind="barh", stacked=True)
+ax = df.plot(kind="barh", stacked=True, colormap="RdYlGn")
 ax.xaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
 ax.set_title("Ironsworn distributions")
 ax.legend(loc="center")

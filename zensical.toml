@@ -36,6 +36,7 @@ nav = [
     # intentionally excluded from the published API navigation
     { Core = "dyce.md" },
     { Conveniences = "dyce.d.md" },
+    { "Traceable Rollers" = "dyce.roller.md" },
     { Visualization = [
       { "Shared structures" = "dyce.viz.md" },
       { "Matplotlib (optional)" = "dyce.viz.matplotlib.md" },
