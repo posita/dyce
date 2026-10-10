@@ -123,7 +123,7 @@ With disadvantage, one is likely to roll at ***most*** a 6 over half the time, a
 python -m pip install dyce
 ```
 
-`dyce` supports CPython 3.11–3.14 and PyPy 3.11.
+`dyce` supports CPython 3.11–3.15 and PyPy 3.11-3.12.
 It depends on [`optype`](https://jorenham.github.io/optype/) for static and runtime type-checking.
 It is available under the [MIT License](https://dycelib.org/latest/license/).
 

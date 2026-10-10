@@ -21,11 +21,11 @@
     Some of the following changes are not backward compatible.
     Please review before upgrading.
 
-- Drops support for 3.9 and 3.10 and extends support to 3.14.
+- Drops support for 3.9 and 3.10 and extends support to 3.15.
 - Fixes embarrassingly long-running logical error in 4d6 variants example.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
-- Derives [`H`][dyce.H] from [`HableT`][dyce.HableT] and implements [`HableT.h`][dyce.HableT.h] to return `self`.
-- Adds `H.from_counts` class method constructs an [`H`][dyce.H] from multiple sources.
+- Derives [`H`][dyce.H] from [`HableT`][dyce.HableT] and implements [`H.h`][dyce.H.h] to return `self`.
+- Adds `H.from_counts` class method for constructing an [`H`][dyce.H] from multiple sources.
 - Removes `H.map`, `H.rmap`, and `H.umap` in favor of [`expand`][dyce.expand] and [`H.apply`][dyce.H.apply].
 - Removes `H.accumulate` and `H.zero_fill` in favor of [`H.from_counts`][dyce.H.from_counts].
 - Removes `H.is_even` and `H.is_odd`, whose functionality can be trivially reintroduced using `(H(...) + 1) % 2` and  `H(...) % 2`, respectively.
@@ -34,7 +34,7 @@
 - Removes `H.vs` and `H.within`.
 - Renames `H.distribution` to [`H.probability_items`][dyce.H.probability_items] and removes `H.distribution_xy`.
 - Renames `H.roll` to [`H.sample`][dyce.H.sample].
-- [`HableT.h`][dyce.HableT.h] is now an abstract base class, not merely a protocol.
+- [`HableT`][dyce.HableT] is now an abstract base class, not merely a protocol.
 - Modifies [`P.h`][dyce.P.h] such that it now takes no arguments to remain consistent with [`HableT.h`][dyce.HableT.h].
   Selection is now handled by a separate [`P.at`][dyce.P.at] method.
 - Removes `P.map`, `P.rmap`, and `P.umap` in favor of [`P.apply_to_each_h`][dyce.P.apply_to_each_h].
@@ -55,7 +55,6 @@
     - `dyce.h.resolve_dependent_probability`
     - `dyce.h.sum_h` (not previously deprecated, but to-date unused)
 - Adds [`dyce.d`][dyce.d] convenience aliases.
-- Modernizes use of [beartype](https://github.com/beartype/beartype/) with [pytest-beartype](https://github.com/beartype/pytest-beartype).
 - Completely eliminates dependency on [`numerary`](https://github.com/beartype/numerary/) (which was flawed since conception), and instead relies on [`optype`](https://jorenham.github.io/optype/) for mathematical operator typing.
   ([`H`][dyce.H] and [`P`][dyce.P] still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)
 - Re-introduces low-level [Matplotlib](https://matplotlib.org/) plotting functions in [`dyce.viz.matplotlib`][dyce.viz.matplotlib].

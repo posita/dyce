@@ -25,7 +25,10 @@ jobs:
           - { python: "3.13",     tox-env: "py313-beartype" }
           - { python: "3.14",     tox-env: "py314" }
           - { python: "3.14",     tox-env: "py314-beartype" }
+          - { python: "3.15",     tox-env: "py315" }
+          - { python: "3.15",     tox-env: "py315-beartype" }
           - { python: "pypy3.11", tox-env: "pypy311" }
+          - { python: "pypy3.12", tox-env: "pypy312" }
           - { python: "3.11",     tox-env: "py311", os: "macos-14" }  # Apple Silicon (ARM64) sanity check
           - { python: "3.11",     tox-env: "py311", os: "windows-latest" }  # Windoze sanity check
     steps:
