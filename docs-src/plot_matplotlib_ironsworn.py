@@ -95,7 +95,7 @@ def fig_callback() -> None:
     # --8<-- [start:viz]
     from matplotlib import ticker
 
-    ax = df.plot(kind="barh", stacked=True)
+    ax = df.plot(kind="barh", stacked=True, colormap="RdYlGn")
     ax.xaxis.set_major_formatter(ticker.PercentFormatter(xmax=1))
     ax.set_title("Ironsworn distributions")
     ax.legend(loc="center")
