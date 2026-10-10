@@ -30,7 +30,7 @@ def fig_callback() -> None:
     plot_burst(
         d20_advantage,
         d20,
-        title="highest of 2d20\nor “advantage” (front)\nvs. d20 (back)",
+        title="highest of 2d20\nor “advantage” (foreground)\nvs. d20 (background)",
         alpha=0.9,
         ax=axes[0],
         cmap="twilight_shifted",
@@ -39,7 +39,7 @@ def fig_callback() -> None:
     plot_burst(
         d20_disadvantage,
         d20,
-        title="lowest of 2d20\nor “disadvantage” (front)\nvs. d20 (back)",
+        title="lowest of 2d20\nor “disadvantage” (foreground)\nvs. d20 (background)",
         alpha=0.9,
         ax=axes[1],
         cmap="twilight_shifted_r",

@@ -14,8 +14,15 @@
 
 # Examples
 
-The following examples and translations are intended to showcase `dyce`’s flexibility.
-If you have exposure to another tool, they may also help with transition.
+The examples and translations below are intended to showcase `dyce`’s flexibility.
+
+### Advanced topics
+
+- [Checking Angry’s math on the Tension Pool](examples-tension-pool.md)
+- [Modeling *Ironsworn*’s core mechanic](examples-ironsworn.md)
+- [Modeling *Risus* combat](examples-risus.md)
+- [Expansion and recursion](examples-expand.md)
+- [Symbolic outcomes](examples-symbolic.md)
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
 
@@ -209,11 +216,3 @@ Rudimentary visualization using built-in methods:
       2 |  19.97% |#########
       3 |  25.19% |############
       4 |  33.37% |################
-
-## Advanced Topics
-
-- [Checking Angry’s math on the Tension Pool](examples-tension-pool.md)
-- [Modeling *Ironsworn*’s core mechanic](examples-ironsworn.md)
-- [Modeling *Risus* combat](examples-risus.md)
-- [Expansion and recursion](example-expand.md)
-- [Symbolic outcomes](examples-symbolic.md)
