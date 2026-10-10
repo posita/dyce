@@ -28,9 +28,10 @@ r"""
 if True:
     # This needs to come first. Placing it in this block keeps ruff from complaining
     # imports are out-of-order, while still keeping the others sorted.
-    from .types import beartype_this_package
+    from .types import beartype_this_package, warn_if_beartype_claw_inactive
 
     beartype_this_package()
+    warn_if_beartype_claw_inactive()
 
 from importlib.metadata import PackageNotFoundError, version
 

@@ -52,6 +52,10 @@ def nobeartype(arg: _T) -> _T:
     return arg
 
 
+def warn_if_beartype_claw_inactive() -> None:
+    pass
+
+
 if not TYPE_CHECKING:  # pragma: no cover
     try:
         from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
@@ -59,7 +63,7 @@ if not TYPE_CHECKING:  # pragma: no cover
             BeartypeStrategy,
             beartype,
         )
-        from beartype.claw import beartype_this_package  # ruff: ignore[unused-import]
+        from beartype.claw import beartype_this_package, warn_if_beartype_claw_inactive  # ruff: ignore[unused-import]
         from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
             BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType] # ruff: ignore[unused-import]
         )
