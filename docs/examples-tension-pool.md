@@ -12,7 +12,7 @@
   Thank you!
   -->
 
-# Checking Angry’s math on the [Tension Pool](https://theangrygm.com/definitive-tension-pool/)
+# Checking the Angry GM’s math on the [Tension Pool](https://theangrygm.com/definitive-tension-pool/)
 
 In the [Angry GM](https://theangrygm.com/)’s publication of the [PDF version of his Tension Pool mechanic](https://theangrygm.com/wp-content/uploads/The-Tension-Pool.pdf), he includes some probabilities.
 Can `dyce` check his work?
@@ -30,13 +30,16 @@ Let’s reproduce his tables (with slightly different names to provide context).
 | 6           | 66.5%                                           |
 
 How do we do compute these results using `dyce`?
+Taking advantage of our [counting trick](concepts.md#comparisons-and-counting) makes this pretty simple:
 
     >>> from dyce import H
     >>> one_in_d6 = H(6).eq(1)
+    >>> one_in_d6
+    H({False: 5, True: 1})
     >>> for n in range(1, 7):  # (1)!
-    ...     ones_in_nd6 = n @ one_in_d6
-    ...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-    ...     print(f"{n}: {at_least_one_one_in_nd6[1] / at_least_one_one_in_nd6.total:6.2%}")
+    ...     ones_appearing_in_nd6 = n @ one_in_d6  # (2)!
+    ...     at_least_one_one_in_nd6 = ones_appearing_in_nd6.ge(1)
+    ...     print(f"{n}: {at_least_one_one_in_nd6[True] / at_least_one_one_in_nd6.total:6.2%}")
     1: 16.67%
     2: 30.56%
     3: 42.13%
@@ -44,7 +47,8 @@ How do we do compute these results using `dyce`?
     5: 59.81%
     6: 66.51%
 
-1. Iterates `n` over the range ${1..6}$
+1. Iterates `n` over the range `#!math [{ {1} .. {6} }]`.
+2. Our [counting trick](concepts.md#comparisons-and-counting).
 
 So far so good.
 Let’s keep going.
@@ -65,14 +69,15 @@ One way is [`IntEnum`](https://docs.python.org/3/library/enum.html#intenum)s.
 `IntEnum`s have a property that allows them to substitute directly for `int`s, which, with a little nudging, is very convenient.
 
     >>> from enum import IntEnum
-
     >>> class Complication(IntEnum):
     ...     NONE = 0  # this will come in handy later
     ...     COMMON = 1
     ...     UNCOMMON = 2
     ...     RARE = 3
     ...     VERY_RARE = 4
-
+    ...
+    ...     def __repr__(self) -> str:
+    ...         return self.name  # makes formatting easier on the eyes
     >>> OUTCOME_TO_RARITY_MAP = {
     ...     2: Complication.VERY_RARE,
     ...     3: Complication.VERY_RARE,
@@ -107,21 +112,15 @@ Now let’s use our map to validate the probabilities of a particular outcome us
     >>> from dyce import H, HResult, expand
     >>> from pprint import pprint
     >>> d8d12 = H(8) + H(12)
-
     >>> def rarity(h_result: HResult[int]) -> Complication:
     ...     return OUTCOME_TO_RARITY_MAP[h_result.outcome]
-
     >>> prob_of_complication: H[Complication] = expand(rarity, d8d12)
-    >>> pprint(
-    ...     {
-    ...         outcome: f"{float(prob):5.1%}"
-    ...         for outcome, prob in prob_of_complication.probability_items()
-    ...     }
-    ... )
-    {<Complication.COMMON: 1>: '41.7%',
-     <Complication.UNCOMMON: 2>: '27.1%',
-     <Complication.RARE: 3>: '18.8%',
-     <Complication.VERY_RARE: 4>: '12.5%'}
+    >>> for outcome, prob in prob_of_complication.probability_items():
+    ...     print(f"{outcome.name:>9}: {float(prob):5.1%}")
+       COMMON: 41.7%
+     UNCOMMON: 27.1%
+         RARE: 18.8%
+    VERY_RARE: 12.5%
 
 Lookin’ good!
 Now let’s put everything together.
@@ -136,20 +135,20 @@ Now let’s put everything together.
 | 6           | 33.5% | 27.7%  | 18.0%    | 12.5% | 8.3%      |
 
     >>> for n in range(1, 7):
-    ...     ones_in_nd6 = n @ one_in_d6
-    ...     at_least_one_one_in_nd6 = ones_in_nd6.ge(1)
-    ...     prob_complication_in_nd6 = at_least_one_one_in_nd6 * prob_of_complication
-    ...     complications_for_nd6 = {
-    ...         Complication(outcome).name: f"{float(prob):5.1%}"
-    ...         for outcome, prob in (prob_complication_in_nd6).probability_items()
-    ...     }
-    ...     print("{} -> {}".format(n, complications_for_nd6))
-    1 -> {'NONE': '83.3%', 'COMMON': ' 6.9%', 'UNCOMMON': ' 4.5%', 'RARE': ' 3.1%', 'VERY_RARE': ' 2.1%'}
-    2 -> {'NONE': '69.4%', 'COMMON': '12.7%', 'UNCOMMON': ' 8.3%', 'RARE': ' 5.7%', 'VERY_RARE': ' 3.8%'}
-    3 -> {'NONE': '57.9%', 'COMMON': '17.6%', 'UNCOMMON': '11.4%', 'RARE': ' 7.9%', 'VERY_RARE': ' 5.3%'}
-    4 -> {'NONE': '48.2%', 'COMMON': '21.6%', 'UNCOMMON': '14.0%', 'RARE': ' 9.7%', 'VERY_RARE': ' 6.5%'}
-    5 -> {'NONE': '40.2%', 'COMMON': '24.9%', 'UNCOMMON': '16.2%', 'RARE': '11.2%', 'VERY_RARE': ' 7.5%'}
-    6 -> {'NONE': '33.5%', 'COMMON': '27.7%', 'UNCOMMON': '18.0%', 'RARE': '12.5%', 'VERY_RARE': ' 8.3%'}
+    ...     ones_appearing_in_nd6 = n @ one_in_d6
+    ...     at_least_one_one_in_nd6 = ones_appearing_in_nd6.ge(1)
+    ...     prob_complication_in_nd6 = (at_least_one_one_in_nd6 * prob_of_complication).apply(
+    ...         Complication
+    ...     )
+    ...     print(
+    ...         f"{n}: {prob_complication_in_nd6.format_short(include_avg=False, precision=1)}"
+    ...     )
+    1: {NONE: 83.3%, COMMON:  6.9%, UNCOMMON:  4.5%, RARE:  3.1%, VERY_RARE:  2.1%}
+    2: {NONE: 69.4%, COMMON: 12.7%, UNCOMMON:  8.3%, RARE:  5.7%, VERY_RARE:  3.8%}
+    3: {NONE: 57.9%, COMMON: 17.6%, UNCOMMON: 11.4%, RARE:  7.9%, VERY_RARE:  5.3%}
+    4: {NONE: 48.2%, COMMON: 21.6%, UNCOMMON: 14.0%, RARE:  9.7%, VERY_RARE:  6.5%}
+    5: {NONE: 40.2%, COMMON: 24.9%, UNCOMMON: 16.2%, RARE: 11.2%, VERY_RARE:  7.5%}
+    6: {NONE: 33.5%, COMMON: 27.7%, UNCOMMON: 18.0%, RARE: 12.5%, VERY_RARE:  8.3%}
 
 Well butter my butt, and call me a biscuit! 🤠
 That Angry guy sure knows his math!

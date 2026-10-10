@@ -278,10 +278,8 @@ def expand(  # ruff: ignore[complex-structure]
 
         >>> from dyce import H
         >>> from dyce.evaluation import HResult, expand
-
         >>> def reroll_first_one(result: HResult[int]) -> H[int] | int:
         ...     return result.h if result.outcome == 1 else result.outcome
-
         >>> expand(reroll_first_one, H(6))
         H({1: 1, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7})
 
@@ -292,10 +290,8 @@ def expand(  # ruff: ignore[complex-structure]
         >>> d00 = (H(10) - 1) * 10
         >>> set(H(6)) & set(d00)  # no outcomes in common
         set()
-
         >>> def roll_d00_on_one(result: HResult[int]) -> H[int] | int:
         ...     return d00 if result.outcome == 1 else result.outcome
-
         >>> d6_d00 = expand(roll_d00_on_one, H(6))
         >>> d6_d00
         H({0: 1, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10, 10: 1, 20: 1, 30: 1, 40: 1, 50: 1, 60: 1, 70: 1, 80: 1, 90: 1})
@@ -316,16 +312,15 @@ def expand(  # ruff: ignore[complex-structure]
 
         >>> def always_reroll_on_one(result: HResult[int]) -> H[int] | int:
         ...     return H({}) if result.outcome == 1 else result.outcome
-
         >>> expand(always_reroll_on_one, H(6))
         H({2: 1, 3: 1, 4: 1, 5: 1, 6: 1})
 
     **Path probability and recursion limiting**
 
-    The *min_path_probability* parameter controls when recursive expansion is stopped automatically.
+    The *min_path_probability* parameter controls when recursive expansion is truncated automatically.
     It represents the minimum path probability (the probability of reaching a branch) below which the callback is not invoked.
-    Additionally, any branch that exceeds Python’s recursion limit is also dropped.
-    In both cases, the branch is eliminated exactly as if the callback had returned `H({})`.
+    Additionally, any branch that exceeds Python’s recursion limit is also truncated.
+    In both cases, the branch is eliminated exactly as if the callback had explicitly returned `H({})`.
     A [`TruncationWarning`][dyce.TruncationWarning] is emitted when any branch is dropped this way, distinguishing resource-limit elimination from intentional callback-driven elimination.
 
     When *min_path_probability* is `None`, nested calls inherit the enclosing call's *min_path_probability*.
@@ -349,13 +344,11 @@ def expand(  # ruff: ignore[complex-structure]
 
         >>> from dyce import TruncationWarning
         >>> import warnings
-
         >>> def explode_on_max(result: HResult[int]) -> H[int] | int:
         ...     if result.outcome == max(result.h):
         ...         inner = expand(explode_on_max, result.h)
         ...         return (inner + result.outcome) if inner else result.outcome
         ...     return result.outcome
-
         >>> with warnings.catch_warnings(record=True) as caught:
         ...     warnings.simplefilter("always", category=TruncationWarning)
         ...     expand(
@@ -366,7 +359,6 @@ def expand(  # ruff: ignore[complex-structure]
         H({1: 256, 3: 192, 5: 144, 7: 108, 9: 81, 18: 243})
         >>> caught and all(w.category is TruncationWarning for w in caught)
         True
-
         >>> with warnings.catch_warnings(record=True) as caught:
         ...     warnings.simplefilter("always", category=TruncationWarning)
         ...     expand(
@@ -391,14 +383,12 @@ def expand(  # ruff: ignore[complex-structure]
         ...         if inner:
         ...             return inner + result.outcome
         ...     return result.outcome
-
         >>> expand(
         ...     explode_on_max_up_to_n_times,
         ...     H(10),
         ...     n=0,  # just the first roll with zero explosions
         ... ) == H(10)
         True
-
         >>> expand(
         ...     explode_on_max_up_to_n_times,
         ...     H(10),
@@ -414,7 +404,6 @@ def expand(  # ruff: ignore[complex-structure]
         >>> from dyce import P
         >>> from dyce.evaluation import PResult
         >>> p2d10 = 2 @ P(10)
-
         >>> def times_d6_beats_two_d10s(
         ...     d6_result: HResult[int],
         ...     p2d10_result: PResult[int],
@@ -422,7 +411,6 @@ def expand(  # ruff: ignore[complex-structure]
         ...     return sum(
         ...         1 for outcome in p2d10_result.roll if outcome < d6_result.outcome
         ...     )
-
         >>> expand(times_d6_beats_two_d10s, H(6), p2d10)
         H({0: 71, 1: 38, 2: 11})
     """
@@ -535,7 +523,11 @@ def explode_n(
 
     Convenience wrapper around [`expand`][dyce.expand] for exploding dice.
 
-    *resolver* can return either a histogram to indicate the next die to be rolled and accumulated (up to *n* times) or an outcome.
+    The *resolver* callback takes an [`HResult`][dyce.HResult] for the current roll being resolved and two `int`s.
+    The first `int` is how many explosions we have left before `explode_n` terminates all further exploration (i.e., our remaining depth).
+    The second `int` is how many explosions we’ve performed so far (i.e., our current depth).
+    Together, they should always sum to the value of *n* originally passed to `explode_n`.
+    The *resolver* callback can return either a histogram to indicate the next die to be rolled and accumulated or a single outcome.
     The default *resolver* explodes on the maximum face.
 
         >>> from dyce import H, HResult, explode_n
@@ -547,11 +539,18 @@ def explode_n(
 
         >>> import sympy
         >>> x = sympy.sympify("x")
+        >>> dx = H({x: 1})
         >>> # Zero explosions is the starting roll
-        >>> explode_n(H({x: 1}), n=0)  # pyright: ignore[reportArgumentType]
-        H({x: 1})
+        >>> explode_n(
+        ...     dx,  # zuban: ignore[arg-type] # pyright: ignore[reportArgumentType]
+        ...     n=0,
+        ... ) == dx
+        True
         >>> # Starting roll with up to two explosions
-        >>> explode_n(H({x: 1}), n=2)  # pyright: ignore[reportArgumentType]
+        >>> explode_n(
+        ...     dx,  # zuban: ignore[arg-type] # pyright: ignore[reportArgumentType]
+        ...     n=2,
+        ... )
         H({3*x: 1})
 
     *min_path_probability* is forwarded to [`expand`][dyce.expand] and defaults to zero.
@@ -570,12 +569,10 @@ def explode_n(
         H({1: 36, 2: 36, 3: 36, 4: 36, 5: 36, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1})
         >>> caught and all(w.category is TruncationWarning for w in caught)
         True
-
         >>> def explode_on_even_resolver(
         ...     result: HResult[int], n_left: int, n_done: int
         ... ) -> H[int] | int:
         ...     return result.h if result.outcome % 2 == 0 else result.outcome
-
         >>> with warnings.catch_warnings(record=True) as caught:
         ...     warnings.simplefilter("always", TruncationWarning)
         ...     explode_n(

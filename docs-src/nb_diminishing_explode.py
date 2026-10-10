@@ -30,7 +30,7 @@
 # stale.
 # -->
 #
-# ## Taking the lowest or highest die of 2d6 in [`dyce`](https://dycelib.org/)
+# ## [`dyce`](https://dycelib.org/) example of a “diminishing explode” mechanic
 #
 # Select `Run All Cells` from the `Run` menu above.
 
@@ -56,21 +56,57 @@ mstyle.use("bmh")
 warnings.simplefilter("ignore", ExperimentalWarning)
 
 # %%
-from dyce.d import p2d6
+from dyce import H, HResult
+from dyce.d import d4, d6, d8, d10, d12, d20
 
-h2d6_lowest = p2d6.at(0)
-h2d6_highest = p2d6.at(-1)
+progression = {
+    d6: d4,
+    d8: d6,
+    d10: d8,
+    d12: d10,
+    d20: d12,
+}
+
+
+def diminishing_returns_resolver(
+    result: HResult[int],
+    _n_left: int,
+    _n_done: int,
+    *,
+    progression: dict[H[int], H[int]],
+) -> H[int] | int:
+    if result.outcome == max(result.h) and result.h in progression:
+        return progression[result.h]
+    return result.outcome
+
 
 # %%
-from dyce.viz.matplotlib import plot_bar
+import sys
+from functools import partial
 
-ax = plot_bar(
-    h2d6_lowest,
-    h2d6_highest,
-    labels=("Lowest", "Highest"),
+import matplotlib.ticker as mticker
+
+from dyce import explode_n
+from dyce.viz.matplotlib import plot_ridge
+
+ax = plot_ridge(
+    *(
+        explode_n(
+            d,
+            n=sys.maxsize,  # unrestricted recursion, since our resolver determines how deep we go
+            resolver=partial(
+                diminishing_returns_resolver,
+                progression=progression,
+            ),
+        )
+        for d in progression
+    ),
+    labels=("d6", "d8", "d10", "d12", "d20"),
+    cmap="coolwarm",
 )
-ax.set_title("Taking the lowest or highest die of 2d6")
-ax.legend()
+ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+ax.tick_params(axis="x", labelrotation=60)
+ax.set_title("Diminishing explode mechanic for polygonal dice")
 
 import matplotlib.pyplot as plt
 

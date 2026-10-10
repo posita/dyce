@@ -22,51 +22,37 @@ If it is equal to or less than both challenge dice, it’s a failure.
 
 A verbose way to model this is to enumerate the product of the three dice and then perform logical comparisons.
 [`expand`][dyce.expand] can calculate the challenge-dice results for each action-die outcome.
-We can also deploy a counting trick with the two d10s.
+We can also deploy our prior [counting trick](concepts.md#comparisons-and-counting) for dealing with the two d10s.
 
     >>> from dyce import H, HResult, expand
     >>> from enum import IntEnum
     >>> from typing import cast
     >>> d6 = H(6)
     >>> d10 = H(10)
-    >>> action_mods = list(range(-1, 4))
-
     >>> class IronResult(IntEnum):
     ...     FAILURE = 0
     ...     WEAK_SUCCESS = 1
     ...     STRONG_SUCCESS = 2
-
-    >>> def iron_dependent_term(action: HResult[int]) -> H[int]:
-    ...     return 2 @ d10.lt(action.outcome)
-
+    ...
+    ...     def __repr__(self) -> str:
+    ...         return self.name  # makes formatting easier on the eyes
+    >>> def iron_dependent_term(action: HResult[int]) -> H[IronResult]:
+    ...     res = 2 @ d10.lt(action.outcome)  # (1)!
+    ...     return res.apply(IronResult)
     >>> expand(iron_dependent_term, d6 + 1)  # expected results for an action modifier of +1
-    H({0: 271, 1: 238, 2: 91})
+    H({FAILURE: 271, WEAK_SUCCESS: 238, STRONG_SUCCESS: 91})
 
-<!-- -->
+1. Our [counting trick](concepts.md#comparisons-and-counting).
 
-    >>> iron_distributions_by_action_mod = {
-    ...     action_mod: H.from_counts(
-    ...         expand(iron_dependent_term, d6 + action_mod),
-    ...         cast("dict[int, int]", dict.fromkeys(IronResult, 0)),
-    ...         preserve_zero_counts=True,
-    ...     )
-    ...     for action_mod in action_mods
-    ... }
-    >>> for action_mod, iron_distribution in iron_distributions_by_action_mod.items():
-    ...     print(
-    ...         "{:+} -> {}".format(
-    ...             action_mod,
-    ...             {
-    ...                 IronResult(outcome).name: f"{float(prob):6.2%}"
-    ...                 for outcome, prob in iron_distribution.probability_items()
-    ...             },
-    ...         )
-    ...     )
-    -1 -> {'FAILURE': '71.67%', 'WEAK_SUCCESS': '23.33%', 'STRONG_SUCCESS': ' 5.00%'}
-    +0 -> {'FAILURE': '59.17%', 'WEAK_SUCCESS': '31.67%', 'STRONG_SUCCESS': ' 9.17%'}
-    +1 -> {'FAILURE': '45.17%', 'WEAK_SUCCESS': '39.67%', 'STRONG_SUCCESS': '15.17%'}
-    +2 -> {'FAILURE': '33.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '23.17%'}
-    +3 -> {'FAILURE': '23.17%', 'WEAK_SUCCESS': '43.67%', 'STRONG_SUCCESS': '33.17%'}
+    >>> action_mods = list(range(-1, 4))
+    >>> for action_mod in action_mods:
+    ...     iron_distribution = expand(iron_dependent_term, d6 + action_mod)
+    ...     print(f"{action_mod:+} -> {iron_distribution.format_short(include_avg=False)}")
+    -1 -> {FAILURE: 71.67%, WEAK_SUCCESS: 23.33%, STRONG_SUCCESS:  5.00%}
+    +0 -> {FAILURE: 59.17%, WEAK_SUCCESS: 31.67%, STRONG_SUCCESS:  9.17%}
+    +1 -> {FAILURE: 45.17%, WEAK_SUCCESS: 39.67%, STRONG_SUCCESS: 15.17%}
+    +2 -> {FAILURE: 33.17%, WEAK_SUCCESS: 43.67%, STRONG_SUCCESS: 23.17%}
+    +3 -> {FAILURE: 23.17%, WEAK_SUCCESS: 43.67%, STRONG_SUCCESS: 33.17%}
 
 !!! question "What’s with that `2 @ d10.lt(action.outcome)`?"
 
@@ -83,7 +69,6 @@ We can also deploy a counting trick with the two d10s.
             H({0: 36, 1: 48, 2: 16})
             >>> (d10_lt5 + d10_lt5).total
             100
-
 
     How do we interpret those results?
     36 times out of a hundred, neither d10 will be strictly less than five.
@@ -181,17 +166,15 @@ Table:
   </tbody>
 </table>
 
-Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=ironsworn.ipynb)
+Visualization:
 
     --8<-- "docs-src/plot_matplotlib_ironsworn.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_ironsworn_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_ironsworn_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_ironsworn_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_ironsworn_light.svg">
   <img alt="Plot: Ironsworn distributions" src="images/plot_matplotlib_ironsworn_light.svg">
 </picture>
+
+Interactive version: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=ironsworn.ipynb)

@@ -17,6 +17,7 @@
 ## Outcome
 
 A possible result represented in a calculation.
+`1` is one of the outcomes of rolling a six-sided die (d6).
 
 ## Count
 
@@ -24,9 +25,19 @@ A nonnegative integer assigned to an outcome indicating its weight relative to o
 A count can represent the number of ways an outcome occurs.
 Reducing counts to their lowest terms can change a count’s value without changing its probability or relative weight.
 
-## Histogram (`H`)
+## Histogram (`dyce.H`)
 
 A [`dyce.H`][dyce.H] object is an immutable map of outcomes to counts.
+
+## Pool (`dyce.P`)
+
+A [`dyce.P`][dyce.P] object is an immutable sorted sequence of [`H`][dyce.H] objects.
+
+## \[`#!math m`\]d`#!math n` (e.g. d6, 2d20)
+
+d`#!math n` is shorthand for a histogram modeling a fair die having `#!math n` faces whose outcomes are numbered `#!math [{ {1} .. {n} }]`.
+`#!math m`d`#!math n` is shorthand for a either the sum of `#!math m` such histograms or a pool of `#!math m` such histograms, depending on the context.
+The convention is to disambiguate with a variable prefix (e.g., `h2d20` is a histogram, whereas `p2d20` is a pool).
 
 ## Probability distribution
 
@@ -34,10 +45,6 @@ A probability distribution (sometimes shortened to “distribution”) assigns a
 [`H.probability_items`][dyce.H.probability_items] yields outcome and probability pairs, using fractions by default to represent exact probabilities.
 For outcomes with positive counts, each specific outcome’s probability is its count divided by [`H.total`][dyce.H.total].
 Outcomes with zero counts have probabilities of zero.
-
-## Pool (`P`)
-
-An immutable sorted sequence of [`H`][dyce.H] objects.
 
 ## Roll
 
@@ -79,7 +86,7 @@ The `min_path_probability` parameter sets the threshold below which a branch is 
 
 ## Truncation
 
-The removal of branches from an [`expand`][dyce.expand] calculation because their path probability is below the threshold or they exceed Python’s recursion limit.
+The removal of branches from an [`expand`][dyce.expand] calculation because their path probability is below a threshold or they exceed Python’s recursion limit.
 [`TruncationWarning`][dyce.TruncationWarning] reports this removal.
 The resulting probabilities describe the remaining outcomes.
 Returning an empty histogram from the callback intentionally excludes a branch and does not, by itself, cause a truncation warning.

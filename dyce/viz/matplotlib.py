@@ -222,12 +222,8 @@ def plot_bar(
             --8<-- "docs-src/plot_matplotlib_plot_bar.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_light.svg">
-            <!--
-              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-              img[src] should be "../images/...".
-              -->
+            <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_bar_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_bar_light.svg">
             <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="images/plot_matplotlib_plot_bar_light.svg">
         </picture>
 
@@ -236,12 +232,8 @@ def plot_bar(
             --8<-- "docs-src/plot_matplotlib_plot_bar_horizontal.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_horizontal_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_horizontal_light.svg">
-            <!--
-              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-              img[src] should be "../images/...".
-              -->
+            <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_bar_horizontal_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_bar_horizontal_light.svg">
             <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="images/plot_matplotlib_plot_bar_horizontal_light.svg">
         </picture>
     """
@@ -389,12 +381,8 @@ def plot_burst(
         --8<-- "docs-src/plot_matplotlib_plot_burst.py:viz"
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_burst_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_burst_light.svg">
-        <!--
-          TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-          img[src] should be "../images/...".
-          -->
+        <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_burst_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_burst_light.svg">
         <img alt="Plot: 2d10 vs. d8 + d12" src="images/plot_matplotlib_plot_burst_light.svg">
     </picture>
     """
@@ -489,12 +477,8 @@ def plot_line(
             --8<-- "docs-src/plot_matplotlib_plot_line.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_light.svg">
-            <!--
-              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-              img[src] should be "../images/...".
-              -->
+            <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_line_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_line_light.svg">
             <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_matplotlib_plot_line_light.svg">
         </picture>
 
@@ -503,12 +487,8 @@ def plot_line(
             --8<-- "docs-src/plot_matplotlib_plot_line_at_most.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_most_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_most_light.svg">
-            <!--
-              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-              img[src] should be "../images/...".
-              -->
+            <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_line_at_most_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_line_at_most_light.svg">
             <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_matplotlib_plot_line_at_most_light.svg">
         </picture>
 
@@ -517,12 +497,8 @@ def plot_line(
             --8<-- "docs-src/plot_matplotlib_plot_line_at_least.py:viz"
 
         <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_least_dark.svg">
-            <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_least_light.svg">
-            <!--
-              TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-              img[src] should be "../images/...".
-              -->
+            <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_line_at_least_dark.svg">
+            <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_line_at_least_light.svg">
             <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="images/plot_matplotlib_plot_line_at_least_light.svg">
         </picture>
     """
@@ -606,12 +582,8 @@ def plot_ridge(
         --8<-- "docs-src/plot_matplotlib_plot_ridge.py:viz"
 
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_ridge_dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_ridge_light.svg">
-        <!--
-          TODO(@posita): <https://github.com/zensical/zensical/issues/975> -
-          img[src] should be "../images/...".
-          -->
+        <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_plot_ridge_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_plot_ridge_light.svg">
         <img alt="Plot: 2d10 vs. d8 + d12" src="images/plot_matplotlib_plot_ridge_light.svg">
     </picture>
     """

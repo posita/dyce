@@ -1059,7 +1059,7 @@ dev = [
     { name = "tox" },
     { name = "tox-uv" },
     { name = "ty" },
-    { name = "zensical" },
+    { name = "zensical", specifier = ">=0.0.66" },
     { name = "zuban" },
 ]
 docs = [
@@ -1080,7 +1080,7 @@ docs = [
     { name = "plotly" },
     { name = "pymdown-extensions" },
     { name = "sympy" },
-    { name = "zensical" },
+    { name = "zensical", specifier = ">=0.0.66" },
 ]
 lint = [
     { name = "griffe-warnings-deprecated" },
@@ -1109,7 +1109,7 @@ lint = [
     { name = "ruff" },
     { name = "sympy" },
     { name = "ty" },
-    { name = "zensical" },
+    { name = "zensical", specifier = ">=0.0.66" },
     { name = "zuban" },
 ]
 test = [
@@ -1125,7 +1125,7 @@ test = [
     { name = "sympy" },
 ]
 test-beartype = [
-    { name = "beartype", specifier = ">=0.23.0rc0" },
+    { name = "beartype", specifier = ">=0.23.0" },
     { name = "coverage", extras = ["toml"] },
     { name = "griffe-warnings-deprecated" },
     { name = "ipdb" },

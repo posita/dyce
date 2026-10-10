@@ -15,67 +15,54 @@
 # Examples
 
 The examples and translations below are intended to showcase `dyce`’s flexibility.
-
-### Advanced topics
-
-- [Checking Angry’s math on the Tension Pool](examples-tension-pool.md)
-- [Modeling *Ironsworn*’s core mechanic](examples-ironsworn.md)
-- [Modeling *Risus* combat](examples-risus.md)
-- [Expansion and recursion](examples-expand.md)
-- [Symbolic outcomes](examples-symbolic.md)
+Links to more [advanced examples](#advanced-deep-dives) appear at the bottom.
 
 ## Translation of the accepted answer to “[Roll and Keep in Anydice?](https://rpg.stackexchange.com/a/166637)”
 
-Source:
+Original AnyDice source:
 
 ```
 \ How best to model this in a way that allows testing 1k1 to 10k5? \
 output [highest 3 of 10d [explode d10]] named "10k3"
 ```
 
-Translation:
+`dyce` translation:
 
     --8<-- "docs-src/plot_matplotlib_d10_explode.py:core"
-
-Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=d10_explode.ipynb)
 
 ??? example "Visualization source code"
 
         --8<-- "docs-src/plot_matplotlib_d10_explode.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_d10_explode_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_d10_explode_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_d10_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_d10_explode_light.svg">
   <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="images/plot_matplotlib_d10_explode_light.svg">
 </picture>
+
+Interactive version: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=d10_explode.ipynb)
 
 ## Modeling “[The Probability of 4d6, Drop the Lowest, Reroll 1s](http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/)”
 
     --8<-- "docs-src/plot_matplotlib_4d6_variants.py:core"
 
-Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=4d6_variants.ipynb)
+Visualization:
 
     --8<-- "docs-src/plot_matplotlib_4d6_variants.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_4d6_variants_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_4d6_variants_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_4d6_variants_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_4d6_variants_light.svg">
   <img alt="Plot: Comparing various take-three-of-4d6 methods" src="images/plot_matplotlib_4d6_variants_light.svg">
 </picture>
 
+Interactive version: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=4d6_variants.ipynb)
+
 ## Attack damage with advantage and critical hits
 
-Source example from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples):
+Original [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#examples) example source:
 
     from DnDice import d, advantage, plot
 
@@ -93,28 +80,26 @@ Source example from [`LordSembor/DnDice`](https://github.com/LordSembor/DnDice#e
     result.normalizeExpectancies()
     # …
 
-Translation:
+`dyce` translation:
 
     --8<-- "docs-src/plot_matplotlib_advantage.py:core"
 
-Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=advantage.ipynb)
+Visualization:
 
     --8<-- "docs-src/plot_matplotlib_advantage.py:viz"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_advantage_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_advantage_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_advantage_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_advantage_light.svg">
   <img alt="Plot: Advantage-weighted attack with critical hits" src="images/plot_matplotlib_advantage_light.svg">
 </picture>
 
+Interactive version: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=advantage.ipynb)
+
 ## Translation of the accepted answer to “[Modelling opposed dice pools with a swap](https://rpg.stackexchange.com/a/112951)”
 
-Source of basic `brawl`:
+Original AnyDice source of basic `brawl`:
 
 ```
 function: brawl A:s vs B:s {
@@ -131,7 +116,6 @@ output [brawl 3d6 vs 3d6] named "A vs B Damage"
 Translation:
 
     >>> from dyce.evaluation import PResult
-
     >>> def brawl(p_result_a: PResult[int], p_result_b: PResult[int]) -> int:
     ...     a_successes = sum(1 for v in p_result_a.roll if v >= p_result_b.roll[-1])
     ...     b_successes = sum(1 for v in p_result_b.roll if v >= p_result_a.roll[-1])
@@ -140,7 +124,7 @@ Translation:
 Rudimentary textual visualization using built-in methods:
 
     >>> from dyce import P, expand
-    >>> p3d6 = 3 @ P(6)
+    >>> from dyce.d import p3d6
     >>> res = expand(brawl, p3d6, p3d6)
     >>> print(res.format(width=65))
     avg |    0.00
@@ -153,7 +137,7 @@ Rudimentary textual visualization using built-in methods:
       2 |  15.52% |#######
       3 |   7.86% |###
 
-Source of `brawl` with an optional dice swap:
+Original AnyDice source of `brawl` with an optional dice swap:
 
 ```
 function: set element I:n in SEQ:s to N:n {
@@ -204,6 +188,8 @@ Rudimentary visualization using built-in methods:
       2 |  23.19% |###########
       3 |  58.15% |#############################
 
+<!-- -->
+
     >>> p4d6 = 4 @ P(6)
     >>> res = expand(brawl_w_optional_swap, p4d6, p4d6)
     >>> print(res.format(width=65))
@@ -216,3 +202,17 @@ Rudimentary visualization using built-in methods:
       2 |  19.97% |#########
       3 |  25.19% |############
       4 |  33.37% |################
+
+## Advanced deep dives
+
+- [Symbolic outcomes](examples-symbolic.md)
+- [Expansion and recursion](examples-expand.md)
+- [Checking the Angry GM’s math on the Tension Pool](examples-tension-pool.md)
+- [Modeling *Ironsworn*’s core mechanic](examples-ironsworn.md)
+
+### *Double-secret* advanced deep dive
+
+Experts only.
+Closed course.
+
+- [Modeling *Risus* combat](examples-risus.md)

@@ -27,11 +27,12 @@ For typing:
 
 [`H` objects][dyce.H] represent finite discrete probability distributions as histograms.
 They map outcomes to integer counts.
-Each outcome’s probability is its count by the histogram’s total count.
+Each positive outcome’s probability is its count by the histogram’s total count.
+Outcomes with zero counts have probabilities of zero.
 
 [`P` objects][dyce.P] represent pools (sorted sequences) of histograms.
-If all you need is to aggregate outcomes (sums) from rolling a bunch of dice (or perform calculations on aggregate outcomes), [`H` objects][dyce.H] are probably sufficient.
-If you need to narrow outcomes prior to computing aggregates (e.g., taking the highest and lowest of each possible roll of *n* dice), that’s where [`P` objects][dyce.P] come in.
+If all you need is aggregate outcomes (sums) from rolling a bunch of dice, [`H` objects][dyce.H] are probably sufficient.
+If you need to narrow outcomes prior to computing aggregates (e.g., taking the highest and lowest of each possible roll of `#!math n` dice), that’s where [`P` objects][dyce.P] come in.
 
 As a wise person whose name has been lost to history once said: “Language is imperfect. If at all possible, shut up and point.”
 So with that illuminating (or perhaps impenetrable) introduction out of the way, let’s dive into some examples!
@@ -41,7 +42,7 @@ So with that illuminating (or perhaps impenetrable) introduction out of the way,
 ### Histograms
 
 `H(n)` is shorthand for explicitly enumerating outcomes `#!math [{ {1} .. {n} }]`, each with a frequency of 1.
-A normal, six-sided die (d6) can be modeled as:
+A fair, six-sided die (d6) can be modeled as:
 
     >>> from dyce import H
     >>> H(6)
@@ -93,16 +94,14 @@ The above can be expressed more succinctly.
 When compared with a histogram, a pool is treated as the distribution of its summed outcomes.
 We can validate that a pool representing a pair of Sicherman dice is equivalent to a histogram representing 2d6.
 
-??? info "[Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)"
-
-    > Sicherman dice … are a pair of 6-sided dice with non-standard numbers—one with the sides 1, 2, 2, 3, 3, 4 and the other with the sides 1, 3, 4, 5, 6, 8.
-    > They are notable as the only pair of 6-sided dice that are not [standard 6-sided] dice, bear only positive integers, and have the same probability distribution for [their] sum as [two standard 6-sided] dice.
-
-<!-- -->
-
     >>> d_sicherman = P(H((1, 2, 2, 3, 3, 4)), H((1, 3, 4, 5, 6, 8)))
     >>> d_sicherman == h2d6
     True
+
+!!! info "[Sicherman dice](https://en.wikipedia.org/wiki/Sicherman_dice)"
+
+    > Sicherman dice … are a pair of 6-sided dice with non-standard numbers—one with the sides 1, 2, 2, 3, 3, 4 and the other with the sides 1, 3, 4, 5, 6, 8.
+    > They are notable as the only pair of 6-sided dice that are not [standard 6-sided] dice, bear only positive integers, and have the same probability distribution for [their] sum as [two standard 6-sided] dice.
 
 ### Arithmetic and formatting
 
@@ -150,7 +149,7 @@ Pools are useful for “keeping” or “taking” (selecting) some of each roll
 Outcomes in rolls are ordered from least to greatest.
 Provide one or more integers, slices, or a mix thereof to those methods to select outcomes by their ordered positions.
 
-Taking the least two, least and greatest, or greatest two faces when rolling three six-sided dice:
+Taking the least two, least and greatest, or greatest two faces when rolling three six-sided dice (3d6):
 
     >>> p3d6 = 3 @ P(6)
     >>> print(p3d6.at(0, 1).format(width=65))  # least two
@@ -253,12 +252,13 @@ Because `==`, `!=`, `<`, etc. compare whole histograms, `H` provides [`H.eq`][dy
     H({False: 1, True: 2})
 
 `False` and `True` behave as zero and one in arithmetic.
-Summing these outcomes counts how many dice meet the condition.
-To calculate the probability that all three d6 outcomes are even:
+These allow us to take advantage of a counting trick.
+Summing `#!math n` of these histograms tells us how many of the `#!math n` original dice meet the condition.
+Calculating the probability that all of 3d6’s outcomes are even:
 
     >>> from dyce.d import d6
     >>> d6_even = (d6 % 2).eq(0)
-    >>> d6_even  # basically a fair coin whose sides are False and True
+    >>> d6_even
     H({False: 3, True: 3})
     >>> number_of_evens_in_3d6 = 3 @ d6_even  # our counting trick
     >>> number_of_evens_in_3d6
@@ -268,8 +268,6 @@ To calculate the probability that all three d6 outcomes are even:
     {avg: 0.12, False: 87.50%, True: 12.50%}
 
 ## Visualization
-
-That covers both backends. I’d make the descriptions more concrete and remove “more sophisticated”:
 
 [`H.probability_items`][dyce.H.probability_items] yields outcome and probability pairs for use with plotting packages.
 If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed, [`dyce.viz.matplotlib`][dyce.viz.matplotlib] provides functions for plotting histograms.
@@ -283,13 +281,9 @@ If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed, [`dy
             --8<-- "docs-src/plot_matplotlib_3d6_selection.py:viz"
 
     <!-- Should match any title of the corresponding plot title -->
-    <!--
-      TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-      source[srcset] should be "images/..."
-      -->
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_3d6_selection_dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_3d6_selection_light.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_3d6_selection_dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_3d6_selection_light.svg">
       <img alt="Plot: Distribution for 3d6" src="images/plot_matplotlib_3d6_selection_light.svg">
     </picture>
 
@@ -306,6 +300,3 @@ If [Matplotlib](https://matplotlib.org/stable/api/index.html) is installed, [`dy
 ## Further exploration
 
 See the [examples](examples.md) for worked calculations, or consult the [API reference](dyce.md).
-
-Anywhere you see a JupyterLite logo <img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">, you can click on it to immediately start tinkering with a temporal instance of that example.
-Just be aware that changes are stored in browser memory, so make sure to download any notebooks you want to preserve.

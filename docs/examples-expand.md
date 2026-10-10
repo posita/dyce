@@ -14,23 +14,24 @@
 
 # Expansion and recursion
 
+## Constructing an exploding dice mechanic
+
 Explosion is a great way to illustrate use of the [`expand` interface][dyce.expand].
 One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
-This framing is intuitive because it maps to well to reality.
-We might start with the following implementation:
+This framing is intuitive because it maps to well to how exploding dice are typically handled at the table.
+
+We might start with something like the following:
 
     >>> from dyce import H, HResult, expand
-
     >>> def naive_explode(result: HResult[int]) -> H[int] | int:
     ...     if result.outcome == max(result.h):
     ...         # If we've rolled the max for this die, add another die roll
     ...         # to our existing outcome
     ...         return result.outcome + expand(naive_explode, result.h)
     ...     return result.outcome
-
     >>> d6 = H(6)
     >>> h = expand(naive_explode, d6)
-    >>> print(h.format(width=65, scaled=True))
+    >>> print(h.format(scaled=True, width=65))
     avg |    4.20
     std |    3.26
       1 |  16.67% |#################################################
@@ -50,15 +51,7 @@ We might start with the following implementation:
      17 |   0.46% |#
      19 |   0.08% |
      ...
-     23 |   0.08% |
-     25 |   0.01% |
-     ...
-     29 |   0.01% |
-     31 |   0.00% |
-     ...
      47 |   0.00% |
-    >>> h
-    H({1: 233280, ..., 5: 233280, ..., 43: 1, ..., 47: 1})
 
 ```linenums="0"
 TruncationWarning: expand: some branches with path probability < Fraction(1, 8388607) were truncated
@@ -67,16 +60,15 @@ TruncationWarning: expand: some branches with path probability < Fraction(1, 838
 What just happened?
 It appears that we went no further than eight rolls (a first roll plus up to seven explosions).
 Folks familiar with this domain might recognize the distribution looks *mostly* correct, but the counts are a bit…*off*.
-We’re also missing the final outcome of `48`.
-We also got a [`TruncationWarning`][dyce.TruncationWarning], which provides a hint.
+With eight rolls, we might also expect to see `48` as the largest outcome, but it’s not present.
+The [`TruncationWarning`][dyce.TruncationWarning] provides a clue.
 
-The way to eliminate a branch from consideration when recursing with [`expand`][dyce.expand] is to explicitly return the empty histogram `H({})` from our function.
+The way to eliminate a branch from consideration when calling [`expand`][dyce.expand] recursively is to explicitly return the empty histogram `H({})` from our callback.
 (See the `always_reroll_on_one` example from [`expand`’s docstring][dyce.expand].)
-We’re not explicitly returning `H({})` in our function, but there are two scenarios where that is done automatically.
+Our callback does not explicitly return `H({})`, but there are two scenarios where that is done implicitly on our behalf.
 The first is when a branch’s cumulative path probability falls below `min_path_probability` (which is what happened in our example above).
 And the second is when we’ve exhausted the call stack:
 
-    >>> import sys
     >>> from fractions import Fraction
     >>> fair_coin = H({0: 1, 1: 1})
     >>> expand(
@@ -84,20 +76,20 @@ And the second is when we’ve exhausted the call stack:
     ...     fair_coin,
     ...     min_path_probability=Fraction(0),
     ... )  # these numbers get *big*
-    H({0: ...})
+    H({0: ..., ...})
 
 ```linenums="0"
 TruncationWarning: expand: some branches whose recursion depth exceeded 1000 were truncated
 ```
 
-When either of those things happen, [`expand`][dyce.expand] returns `H({})`.
-Let’s take a closer look at our implementation now that we know that might happen:
+When either of those things happen, [`expand`][dyce.expand] “truncates” those branches by returning `H({})`.
+Let’s take a closer look at our implementation:
 
-```python linenums="7"
+```python linenums="6"
        return result.outcome + expand(naive_explode, result.h)
 ```
 
-For the above line, if [`expand`][dyce.expand] returns `H({})`, our function will also return `H({})` for that branch.
+For the above line, if [`expand`][dyce.expand] returns `H({})`, our callback will also return `H({})` for that branch.
 This is because adding `H({})` to anything is `H({})`:
 
     >>> H({}) + 1024
@@ -125,15 +117,17 @@ We can check.
     ...             return result.outcome + inner
     ...     # Every other case returns our current outcome
     ...     return result.outcome
-
     >>> expand(guarded_explode, d6)
     H({..., 19: 1296, ..., 23: 1296, 25: 216, ..., 29: 216, 31: 36, ..., 35: 36, 37: 6, ..., 41: 6, 43: 1, ..., 48: 1})
 
+```linenums="0"
+TruncationWarning: expand: some branches with path probability < Fraction(1, 8388607) were truncated
+```
+
 *Much* better.
-We can now recognize the counts as powers of our maximum face.
 
 But how can we control the number of explosions?
-Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `min_path_probability` parameter.
+We *could* do some math and fiddle with [`expand`][dyce.expand]’s `min_path_probability` parameter.
 
     >>> num_faces = 6
     >>> explosions = 3
@@ -144,8 +138,12 @@ Sure, we *could* do some math and fiddle with [`expand`][dyce.expand]’s `min_p
     ... )
     H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
 
+```linenums="0"
+TruncationWarning: expand: some branches with path probability < Fraction(1, 1296) were truncated
+```
+
 But that’s fragile and highly domain-specific.
-Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass down arbitrary keyword arguments to make our depth counting explicit.
+Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass down arbitrary keyword arguments to make our own depth counter.
 
     >>> def guarded_explode_n(result: HResult[int], n: int = 0) -> H[int] | int:
     ...     if n > 0 and result.outcome == max(result.h):
@@ -160,13 +158,12 @@ Instead, we can take advantage of [`expand`][dyce.expand]’s ability to pass do
     >>> expand(guarded_explode_n, d6, n=0) == d6
     True
 
-Our function is still implicitly limited by the `min_path_probability` parameter, but we can make that go away by setting it to `Fraction(0)` as we did in our recursion exhaustion illustration above.
-If we wanted to make that the default, we could create a simple wrapper.
+Our callback is still implicitly limited by the `min_path_probability` parameter, but we can make that go away by setting it to `Fraction(0)` as we did in our recursion exhaustion illustration above.
+To make that the default, we create a simple wrapper:
 
     >>> from collections.abc import Callable
     >>> from typing import TypeVar
     >>> T = TypeVar("T")
-
     >>> def proper_explode_n(
     ...     source: H[T],
     ...     *,
@@ -184,21 +181,24 @@ If we wanted to make that the default, we could create a simple wrapper.
     ...     return expand(
     ...         _callback, source, n_left=n, min_path_probability=min_path_probability
     ...     )
-
     >>> proper_explode_n(d6, n=3)
     H({1: 216, 2: 216, 3: 216, ..., 22: 1, 23: 1, 24: 1})
     >>> proper_explode_n(d6, n=0) == d6
     True
 
-The above is very nearly the implementation for [`explode_n`][dyce.explode_n], which offers an additional `resolver` parameter that allows for some additional flexibility.
+The above is very nearly the implementation for `dyce`’s own [`explode_n`][dyce.explode_n], which includes a `resolver` parameter.
+We’ll explore that next.
 
-Now let’s say we’re considering a new exploding mechanic where, to explode, one must roll the highest outcome on a given die.
-However, on the second explosion, re-explosion occurs if either the highest or second highest outcome is rolled.
-On the third explosion, anything greater than or equal to the third highest outcome will re-explode, etc.
-In order to have somewhere to stop, we’ll never allow explosions if the minimum outcome is rolled.
+## Using `dyce.explode_n`
+
+Let’s say we’re considering a new exploding mechanic.
+For the first explosion, one must roll the highest outcome on a given die.
+A second explosion occurs if either the highest or second highest outcome is rolled.
+A third explosion occurs if anything greater than or equal to the third highest outcome is rolled.
+Etc.
+We’ll never allow explosions if the minimum outcome is rolled.
 
     >>> from dyce import explode_n
-
     >>> def explosions_get_easier_resolver(
     ...     result: HResult[T], n_left: int, n_done: int
     ... ) -> H[T] | T:
@@ -216,14 +216,13 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
     ...         )
     ...         else result.outcome
     ...     )
-
     >>> d10 = H(10)
     >>> h = explode_n(
     ...     d10,
     ...     n=3,
     ...     resolver=explosions_get_easier_resolver,
     ... )
-    >>> print(h.format(width=65, scaled=True))
+    >>> print(h.format(scaled=True, width=65))
     avg |    6.19
     std |    4.71
       1 |  10.00% |##################################################
@@ -266,36 +265,22 @@ In order to have somewhere to stop, we’ll never allow explosions if the minimu
      40 |   0.01% |
 
 Now let’s consider a “diminishing returns” explosion mechanic, where standard polygonal dice “degrade” into their next smallest die for the next explosion.
+We’ll draft our resolver so that it can take a progression of dice in the form of a `dict` mapping the current die to the next one.
 
-    >>> from dyce import P, explode_n
-    >>> from functools import partial
+    --8<-- "docs-src/plot_matplotlib_diminishing_explode.py:core"
 
-    >>> def diminishing_returns_resolver(
-    ...     result: HResult[T],
-    ...     n_left: int,
-    ...     n_done: int,
-    ...     *,
-    ...     pool: P[T],
-    ... ) -> H[T] | T:
-    ...     if result.h in pool:
-    ...         which = pool.index(result.h)
-    ...         if which > 0 and result.outcome == max(result.h):  # type: ignore[type-var] # zuban: ignore[arg-type,operator]
-    ...             return pool[which - 1]
-    ...     return result.outcome
+However, [`explode_n`][dyce.explode_n] doesn’t provide a mechanism to pass arbitrary arguments to its *resolver* callback.
+`functools.partial` provides a work-around.
 
-    >>> standard_set = P(4, 6, 8, 10, 12, 20)
-    >>> for d in standard_set:
-    ...     explode_n(
-    ...         d,
-    ...         n=sys.maxsize,
-    ...         resolver=partial(
-    ...             diminishing_returns_resolver,
-    ...             pool=standard_set,
-    ...         ),
-    ...     )
-    H({1: 1, 2: 1, 3: 1, 4: 1})
-    H({1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 7: 1, 8: 1, 9: 1, 10: 1})
-    H({1: 24, ..., 7: 24, 9: 4, ...: 4, 15: 1, ..., 18: 1})
-    H({1: 192, ..., 9: 192, 11: 24, ..., 17: 24, 19: 4, ..., 23: 4, 25: 1, ..., 28: 1})
-    H({1: 1920, ..., 11: 1920, 13: 192, ..., 21: 192, 23: 24, ..., 29: 24, 31: 4, ..., 34: 4, 35: 4, 37: 1, ..., 40: 1})
-    H({1: 23040, ..., 19: 23040, 21: 1920, ..., 31: 1920, 33: 192, ..., 41: 192, 43: 24, ..., 49: 24, 51: 4, ..., 55: 4, 57: 1, ..., 60: 1})
+    --8<-- "docs-src/plot_matplotlib_diminishing_explode.py:viz"
+
+<!-- Should match any title of the corresponding plot title -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_diminishing_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_diminishing_explode_light.svg">
+  <img alt="Plot: Diminishing explode mechanic for polygonal dice" src="images/plot_matplotlib_diminishing_explode_light.svg">
+</picture>
+
+Interactive version: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=diminishing_explode.ipynb)
+
+For more complicated mechanics that don’t fit neatly into [`explode_n`][dyce.expand]’s *resolver* parameter, we can always write our own using the more flexible [`expand`][dyce.expand].

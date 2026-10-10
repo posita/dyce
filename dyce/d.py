@@ -37,7 +37,7 @@ To illustrate, consider these different shorthands for expressing 3d6:
     (True, False)
     >>> p3d6.h() == h3d6, p3d6.h() is h3d6  # equivalent, but not the same object
     (True, False)
-    >>> print(h3d6.format(width=65, scaled=True))
+    >>> print(h3d6.format(scaled=True, width=65))
     avg |   10.50
     std |    2.96
       3 |   0.46% |#

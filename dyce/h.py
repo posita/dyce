@@ -1779,6 +1779,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
     def format_short(
         self,
         *,
+        include_avg: bool = True,
         precision: int = DEFAULT_PRECISION,
     ) -> str:
         r"""
@@ -1786,22 +1787,28 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
 
             >>> print(H(6).format_short())
             {avg: 3.50, 1: 16.67%, 2: 16.67%, 3: 16.67%, 4: 16.67%, 5: 16.67%, 6: 16.67%}
-            >>> print(H(6).format_short(precision=3))  # decimal places
-            {avg: 3.500, 1: 16.667%, 2: 16.667%, 3: 16.667%, 4: 16.667%, 5: 16.667%, 6: 16.667%}
+            >>> print(
+            ...     H(6).format_short(
+            ...         include_avg=False,
+            ...         precision=3,  # decimal places
+            ...     )
+            ... )
+            {1: 16.667%, 2: 16.667%, 3: 16.667%, 4: 16.667%, 5: 16.667%, 6: 16.667%}
         """
         prob_width = 5 + precision
-        try:
-            mu: float | None = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
-        except Exception as exc:  # ruff: ignore[blind-except]
-            # See format() for rationale
-            warnings.warn(f"{exc!s}", stacklevel=2)
-            mu = None
+        mu: float | None = None
+        if include_avg:
+            try:
+                mu = self.mean()  # type: ignore[misc] # ty: ignore[invalid-argument-type]
+            except Exception as exc:  # ruff: ignore[blind-except]
+                # See format() for rationale
+                warnings.warn(f"{exc!s}", stacklevel=2)
 
         def _parts() -> Iterator[str]:
             if mu is not None:
                 yield f"avg: {mu:.2f}"
             yield from (
-                f"{outcome}:{float(probability):{prob_width}.{precision}%}"
+                f"{outcome!r}:{float(probability):{prob_width}.{precision}%}"
                 for outcome, probability in self.probability_items()
             )
 

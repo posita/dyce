@@ -69,6 +69,9 @@ class IronDramaticResult(IntEnum):
     STRONG_SUCCESS = 2
     SPECTACULAR_SUCCESS = 3
 
+    def __repr__(self) -> str:
+        return self.name
+
 
 def iron_dramatic_dependent_term(
     action: HResult[int],
@@ -76,25 +79,24 @@ def iron_dramatic_dependent_term(
     *,
     action_mod: int = 0,
 ) -> IronDramaticResult:
-    modded_action = action.outcome + action_mod
+    modded_act = action.outcome + action_mod
     assert len(challenges.roll) == 2, "pool must have exactly 2 challenge dice"
-    first_challenge_outcome, second_challenge_outcome = challenges.roll
-    challenge_doubles = first_challenge_outcome == second_challenge_outcome
-    modded_action_beats_first_challenge = modded_action > first_challenge_outcome
-    modded_action_beats_second_challenge = modded_action > second_challenge_outcome
-
-    if modded_action_beats_first_challenge and modded_action_beats_second_challenge:
+    ch1_outcome, ch2_outcome = challenges.roll
+    doubles = ch1_outcome == ch2_outcome
+    modded_act_beats_ch1 = modded_act > ch1_outcome
+    modded_act_beats_ch2 = modded_act > ch2_outcome
+    if modded_act_beats_ch1 and modded_act_beats_ch2:
         return (
             IronDramaticResult.SPECTACULAR_SUCCESS
-            if challenge_doubles
+            if doubles
             else IronDramaticResult.STRONG_SUCCESS
         )
-    elif modded_action_beats_first_challenge or modded_action_beats_second_challenge:
+    elif modded_act_beats_ch1 or modded_act_beats_ch2:
         return IronDramaticResult.WEAK_SUCCESS
     else:
         return (
             IronDramaticResult.SPECTACULAR_FAILURE
-            if challenge_doubles
+            if doubles
             else IronDramaticResult.FAILURE
         )
 
@@ -118,12 +120,7 @@ data = [
     for result in results_by_action_mod.values()
 ]
 
-# TODO(@posita): <https://github.com/pandas-dev/pandas/issues/54386>
-df = pd.DataFrame(
-    data,
-    columns=[v.name for v in IronDramaticResult],
-    index=action_mods,
-)
+df = pd.DataFrame(data, index=action_mods)
 df.index.name = "Action Modifier"
 
 # %% editable=false jupyter={"source_hidden": true}
@@ -134,12 +131,13 @@ import jinja2  # ruff: ignore[unused-import]
 df.style.format("{:.2%}")
 
 # %% editable=false
-import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-ax = df.plot(kind="barh", stacked=True)
+ax = df.plot(kind="barh", stacked=True, colormap="RdYlGn")
 ax.xaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
 ax.set_title("Ironsworn distributions")
 ax.legend(loc="center")
+
+import matplotlib.pyplot as plt
 
 plt.tight_layout()

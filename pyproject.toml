@@ -81,7 +81,7 @@ docs = [
     "plotly",
     "pymdown-extensions",
     "sympy",
-    "zensical",
+    "zensical>=0.0.66",
     {include-group = "viz-mpl"},
 ]
 # Only what's needed for uv run pre-commit run --all-files --hook-stage pre-push
@@ -109,7 +109,7 @@ test = [
     {include-group = "viz-mpl"},
 ]
 test-beartype = [
-    "beartype>=0.23.0rc0",
+    "beartype>=0.23.0",
     {include-group = "test"},
 ]
 # Only what's needed for uv run pytest specifically with PyPy (via Tox)

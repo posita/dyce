@@ -20,49 +20,52 @@ For beefs, rants, ideas, recipes, etc., consider starting or joining a [discussi
 
 ## Hacking quick-start
 
-```sh
-# Basic setup
-git clone https://github.com/posita/dyce.git
-cd dyce
-uv venv --clear --prompt "$( basename "${PWD}" )" --relocatable
-uv sync
-uv run pre-commit install
+=== "Using `uv`"
 
-# Run tests with coverage using the current environment
-uv run pytest --cov
+    ```sh
+    # Basic setup
+    git clone https://github.com/posita/dyce.git
+    cd dyce
+    uv venv --clear --prompt "$( basename "${PWD}" )" --relocatable
+    uv sync
+    uv run pre-commit install
 
-# Run tests across configured Python versions
-uv run tox
+    # Run tests with coverage using the current environment
+    uv run pytest --cov
 
-# Run linters, type checkers, and other validators via pre-commit
-uv run pre-commit run --all-files --hook-stage pre-push
-```
+    # Run tests across configured Python versions
+    uv run tox
 
-Alternative using `pip`:
+    # Run linters, type checkers, and other validators via pre-commit
+    uv run pre-commit run --all-files --hook-stage pre-push
+    ```
 
-```sh
-# Basic setup
-git clone https://github.com/posita/dyce.git
-cd dyce
-python3 -m venv --prompt dyce .venv
-. .venv/bin/activate
-pip install --requirements requirements-dev.txt
-pre-commit install
+=== "Using `pip`"
 
-# Run tests with coverage using the current environment
-pytest --cov
+    ```sh
+    # Basic setup
+    git clone https://github.com/posita/dyce.git
+    cd dyce
+    python3 -m venv --prompt dyce .venv
+    . .venv/bin/activate
+    pip install --requirements requirements-dev.txt
+    pre-commit install
 
-# Run tests across configured Python versions
-tox
+    # Run tests with coverage using the current environment
+    pytest --cov
 
-# Run linters, type checkers, and other validators via pre-commit
-pre-commit run --all-files --hook-stage pre-push
-```
+    # Run tests across configured Python versions
+    tox
+
+    # Run linters, type checkers, and other validators via pre-commit
+    pre-commit run --all-files --hook-stage pre-push
+    ```
 
 ## Submission guidelines
 
 Consider submitting a [pull request](https://github.com/posita/dyce/pulls) with a fix, if you have one.
-***Required:*** If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the [`LICENSE`](license.md) file to assent to the inclusion of your contribution.
+***Required:*** If it is not already present, please add your name to the [`LICENSE`](license.md) file to assent to the inclusion of your contribution.
+Optionally include your email, GitHub username, website address, or other contact information as desired.
 If you want feedback on a work-in-progress, consider [“mentioning” me](https://github.blog/2011-03-23-mention-somebody-they-re-notified/) ([**@posita**](https://github.com/posita)), and describe specifically how I can help.
 
 Provide tests where feasible and appropriate.

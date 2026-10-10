@@ -28,7 +28,7 @@ def fig_callback() -> None:
     # NOTE: Changes to this section should be propagated to docs-src/nb_d10_explode.py
     # --8<-- [start:viz]
     import matplotlib.pyplot as plt
-    from matplotlib import ticker
+    import matplotlib.ticker as mticker
 
     from dyce.viz.matplotlib import plot_ridge
 
@@ -51,7 +51,7 @@ def fig_callback() -> None:
         plot_ridge(*hs, labels=labels, cmap="cool", peak=max_y, ax=ax)
         for line in ax.lines:
             line.set_marker("")
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
+        ax.xaxis.set_major_locator(mticker.MultipleLocator(5))
         ax.tick_params(axis="x", labelrotation=60)
         ax.set_title(f"Taking the {k} highest of $n$ exploding d10s")
         ax.set_xlim(left=0, right=max_x)  # subplots should share a horizontal scale

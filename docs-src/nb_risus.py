@@ -91,7 +91,7 @@ class Versus(IntEnum):
 our_pool_size = 2
 their_pool_size = 3
 single_round_us_vs_them = Versus.single_round_us_vs_them(our_pool_size, their_pool_size)
-print(single_round_us_vs_them.format(width=65, scaled=True))
+print(single_round_us_vs_them.format(scaled=True, width=65))
 
 # %% editable=false
 from typing import TYPE_CHECKING
@@ -106,15 +106,15 @@ if TYPE_CHECKING:
     def vs_scenarios_dataframes(
         us_vs_them_func: VersusFuncT,
         *,
-        our_pool_rel_sizes: Sequence[int] = tuple(range(-1, 2)),
-        their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
+        our_pool_rel_sizes: Sequence[int] = ...,
+        their_pool_sizes: Sequence[int] = ...,
     ) -> ScenariosDataframesT: ...
 
     def us_vs_them_heatmap_subplot(
         vs_dfs: ScenariosDataframesT,
-        cmap_name: str = "viridis",
-        plt_total_rows: int = 1,
-        plt_cur_row: int = 0,
+        cmap_name: str = ...,
+        plt_total_rows: int = ...,
+        plt_cur_row: int = ...,
     ) -> list[Axes]: ...
 
 
@@ -135,13 +135,14 @@ def vs_scenarios_dataframes(  # type: ignore[no-redef]
     their_pool_sizes: Sequence[int] = tuple(range(3, 6)),
 ) -> ScenariosDataframesT:
     vs_dfs: list[pd.DataFrame] = []
-    h_vs: H[Versus] = H(Versus)
     for their_pool_size in their_pool_sizes:
         data: dict[str, dict[str, float]] = {}
         for our_pool_rel_size in our_pool_rel_sizes:
             our_pool_size = their_pool_size + our_pool_rel_size
             us_vs_them_results = H.from_counts(
-                h_vs, us_vs_them_func(our_pool_size, their_pool_size)
+                dict.fromkeys(Versus, 0),
+                us_vs_them_func(our_pool_size, their_pool_size),
+                preserve_zero_counts=True,
             )
             data[f"{our_pool_size}d6"] = {
                 outcome.name: float(prob)
@@ -205,7 +206,9 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
 # %% editable=false
 vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
 us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
-plt.gcf().set_size_inches(6.4, 2.8)
+fig = plt.gcf()
+fig.suptitle("Modeling the Risus combat mechanic after the first roll")
+fig.set_size_inches(6.4, 2.8)
 
 plt.tight_layout()
 
@@ -229,11 +232,7 @@ def risus_combat_driver(
             f"them: {their_pool_size})"
         )
     elif our_pool_size == 0 and their_pool_size == 0:
-        # This should not happen unless we are called as
-        # risus_combat_driver(0, 0, ...). In other words, this is the only
-        # case where a combat will result in a draw. This is because, draws
-        # are re-rolled during combat, so eliminate those results below.
-        return H({Versus.DRAW: 1})
+        raise ValueError("at least one participant must have a non-empty pool")
 
     # The @cache` decorator
     # (https://docs.python.org/3/library/functools.html#functools.cache)
@@ -248,15 +247,8 @@ def risus_combat_driver(
         our_pool_size: int,  # number of dice we still have
         their_pool_size: int,  # number of dice they still have
     ) -> H[Versus]:
-        assert our_pool_size != 0 or their_pool_size != 0, (
-            "In this function, the case where both parties are at zero is "
-            "considered an error. Because only one party can lose a die "
-            "during each round, the only way both parties can be at zero "
-            "simultaneously is if they both started at zero. Since we guard "
-            "against that case in the enclosing function, we don't have to "
-            "worry about it here. Either our_pool_size is zero, "
-            "their_pool_size is zero, or neither is zero."
-        )
+        # Either our_pool_size is zero, their_pool_size is zero, or neither is
+        # zero
         if our_pool_size == 0:
             # Base case: we are out of dice, so they win
             return H({Versus.LOSE: 1})
@@ -315,7 +307,9 @@ vs_dfs = vs_scenarios_dataframes(
     their_pool_sizes=range(2, 6),
 )
 us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
-plt.gcf().set_size_inches(8.0, 3.2)
+fig = plt.gcf()
+fig.suptitle("Modeling an entire standard combat in Risus")
+fig.set_size_inches(8.0, 3.2)
 
 plt.tight_layout()
 
@@ -484,13 +478,13 @@ def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
 # %% editable=false
 viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
 fig = plt.gcf()
-fig.set_size_inches(9.6, 9.6)
 fig.suptitle(
-    "Full combat results based on starting pool sizes\n"
+    "Full “Best-of-Set” combat results based on starting pool sizes\n"
     "Standard (top row)\n"
     "Best-of-Set w/o the Goliath Rule (middle row)\n"
     "Best-of-Set w/ the Goliath Rule (bottom row)"
 )
+fig.set_size_inches(9.6, 9.6)
 
 plt.tight_layout()
 
@@ -525,15 +519,18 @@ print(d_evens_up_raw_exploded)
 
 
 # %% editable=false
-def evens_up_decode_hits(outcome: int) -> int:
-    # Clever math that is equivalent to:
-    #     outcome // 2 +  # a tally of any exploded hits
-    #     outcome % 2  # any final hit # ruff: ignore[commented-out-code]
-    return (outcome + 1) // 2
+d_evens_up = H.from_counts(
+    (
+        outcome // 2  # a tally of any exploded hits
+        + outcome % 2,  # any final hit
+        count,
+    )
+    for outcome, count in d_evens_up_raw_exploded.items()
+)
+# A clever alternative
+assert d_evens_up == (d_evens_up_raw_exploded + 1) // 2
 
-
-d_evens_up = d_evens_up_raw_exploded.apply(evens_up_decode_hits).lowest_terms()
-print(d_evens_up.format(width=65, scaled=True))
+print(d_evens_up.format(scaled=True, width=65))
 
 
 # %% editable=false
@@ -562,12 +559,12 @@ def evens_up_single_round_us_vs_them(
 # %% editable=false
 viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
 fig = plt.gcf()
-fig.set_size_inches(9.6, 9.6)
 fig.suptitle(
-    "Full combat results based on starting pool sizes\n"
+    "Full “Evens-Up” combat results based on starting pool sizes\n"
     "Standard (top row)\n"
-    "Evens Up w/o the Goliath Rule (middle row)\n"
-    "Evens Up w/ the Goliath Rule (bottom row)"
+    "Evens-Up w/o the Goliath Rule (middle row)\n"
+    "Evens-Up w/ the Goliath Rule (bottom row)"
 )
+fig.set_size_inches(9.6, 9.6)
 
 plt.tight_layout()

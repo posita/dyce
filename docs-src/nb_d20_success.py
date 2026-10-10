@@ -123,7 +123,7 @@ plot_burst(
 )
 for ax in axes:
     for wedge in (patch for patch in ax.patches if isinstance(patch, Wedge)):
-        wedge.set_edgecolor(mpl.rcParams["text.color"])
-plt.gcf().set_size_inches(8, 6)
+        wedge.set_edgecolor(mpl.rcParams["patch.edgecolor"])
+plt.gcf().set_size_inches(9.6, 6.4)
 
 plt.tight_layout()
