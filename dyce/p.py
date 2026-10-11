@@ -612,7 +612,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
             >>> p_10d4.at(slice(2), slice(-2, None))
             H({4: 1, 5: 10, 6: 1012, 7: 5030, 8: 51973, 9: 168760, 10: 595004, 11: 168760, 12: 51973, 13: 5030, 14: 1012, 15: 10, 16: 1})
             >>> print(
-            ...     p_10d4.at(slice(2), slice(-2, None)).format(width=65, scaled=True)
+            ...     p_10d4.at(slice(2), slice(-2, None)).format(scaled=True, width=65)
             ... )
             avg |   10.00
             std |    0.91

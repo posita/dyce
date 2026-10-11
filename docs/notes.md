@@ -22,7 +22,7 @@
     Please review before upgrading.
 
 - Drops support for 3.9 and 3.10 and extends support to 3.15.
-- Fixes embarrassingly long-running logical error in 4d6 variants example.
+- Fixes embarrassingly long-running logical error in 4d6 variants and *Risus* examples.
 - Removes `dyce.r` altogether (pending rewrite of an alternative).
 - Derives [`H`][dyce.H] from [`HableT`][dyce.HableT] and implements [`H.h`][dyce.H.h] to return `self`.
 - Adds `H.from_counts` class method for constructing an [`H`][dyce.H] from multiple sources.

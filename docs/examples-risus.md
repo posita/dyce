@@ -15,6 +15,9 @@
 # Modeling *Risus* combat
 
 [S. John Ross’s *Risus*](https://www.risusiverse.com/) and its many [community-developed alternative rules](http://www.risusiverse.com/home/optional-rules) not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.
+
+# Modeling a single combat round
+
 We can easily model the first round of its opposed combat system for various starting configurations.
 Our first step is a callback for [`H.apply`][dyce.H.apply] for refereeing a head-to-head contest of values:
 
@@ -53,13 +56,9 @@ Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/b
     --8<-- "docs-src/plot_matplotlib_risus.py:viz-first-round"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_first_round_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_first_round_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_risus_first_round_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_risus_first_round_light.svg">
   <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_matplotlib_risus_first_round_light.svg">
 </picture>
 
@@ -88,19 +87,17 @@ Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/b
     --8<-- "docs-src/plot_matplotlib_risus.py:viz-multi-round-standard"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_standard_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_standard_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_matplotlib_risus_multi_round_standard_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_risus_multi_round_standard_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_risus_multi_round_standard_light.svg">
+  <img alt="Plot: Modeling an entire standard combat in Risus" src="images/plot_matplotlib_risus_multi_round_standard_light.svg">
 </picture>
 
 ## Modeling different combat resolution methods
 
-Using our `risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best of Set” alternative mechanic from *[The Risus Companion](https://i.4pcdn.org/tg/1366392953060.pdf)* (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
+### Best-of-Set with and without the Goliath Rule
+
+Using our `risus_combat_driver` from above, we can craft a alternative resolution function to model the less death-spirally “Best-of-Set” alternative mechanic from *The Risus Companion* <!-- https://i.4pcdn.org/tg/1366392953060.pdf --> (free with membership to the [IOR](https://www.risusiverse.com/home/ior-charter)) with the optional “Goliath Rule” for resolving ties.
 
 
     --8<-- "docs-src/plot_matplotlib_risus.py:goliath-rule"
@@ -123,17 +120,15 @@ Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/b
     --8<-- "docs-src/plot_matplotlib_risus.py:viz-multi-round-best-of-set"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_best_of_set_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_risus_multi_round_best_of_set_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
+  <img alt="Plot: Full “Best-of-Set” combat results based on starting pool sizes; Standard (top row); Best-of-Set w/o the Goliath Rule (middle row); Best-of-Set w/ the Goliath Rule (bottom row)" src="images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
 </picture>
 
-The “[Evens Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
+### Evens-Up with and without the Goliath Rule
+
+The “[Evens-Up](http://www.risusiverse.com/home/optional-rules/evens-up)” alternative dice mechanic presents some challenges.
 
 First, `dyce`’s substitution mechanism only resolves outcomes through a fixed number of iterations, so it can only approximate probabilities for infinite series.
 Most of the time, the implications are largely theoretical for a sufficient number of iterations.
@@ -143,7 +138,7 @@ Another limitation is that `dyce` only provides a mechanism to directly expand o
 This means we can’t arbitrarily *increase* the likelihood of achieving a particular outcome through replacement.
 With some creativity, we can work around that, too.
 
-In the case of “Evens Up”, we need to keep track of whether an even number was rolled, but we also need to keep rolling (and accumulating) as long as sixes are rolled.
+In the case of “Evens-Up”, we need to keep track of whether an even number was rolled, but we also need to keep rolling (and accumulating) as long as sixes are rolled.
 This behaves a lot like an exploding die with three values (miss, hit, and hit-and-explode).
 Further, we can observe that every “run” will be zero or more exploding hits terminated by either a miss or a non-exploding hit.
 
@@ -168,25 +163,21 @@ In other words, dividing by two will tell us how many exploding hits we had alon
 --8<-- "docs-src/plot_matplotlib_risus_evens_up_decode_hits.txt"
 ```
 
-Now we can craft an “Evens Up” implementation suitable for passing to our `risus_combat_driver`.
+Now we can craft an “Evens-Up” implementation suitable for passing to our `risus_combat_driver`.
 
     --8<-- "docs-src/plot_matplotlib_risus.py:evens-up"
 
-We’ll use that to approximate a complete “Evens Up” combat, continuing to leveraging our Goliath Rule helper from above.
+We’ll use that to approximate a complete “Evens-Up” combat, continuing to leveraging our Goliath Rule helper from above.
 
 Visualization: [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=risus.ipynb)
 
     --8<-- "docs-src/plot_matplotlib_risus.py:viz-multi-round-evens-up"
 
 <!-- Should match any title of the corresponding plot title -->
-<!--
-  TODO(@posita): https://github.com/zensical/zensical/issues/975 -
-  source[srcset] should be "images/..."
-  -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_evens_up_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
-  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="images/plot_matplotlib_risus_multi_round_evens_up_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
+  <img alt="Plot: Full “Evens-Up” combat results based on starting pool sizes; Standard (top row); Evens-Up w/o the Goliath Rule (middle row); Evens-Up w/ the Goliath Rule (bottom row)" src="images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
 </picture>
 
 *Phew!*

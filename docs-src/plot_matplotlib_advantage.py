@@ -29,7 +29,7 @@ def fig_callback() -> None:
 
     # NOTE: Changes to this section should be propagated to docs-src/nb_advantage.py
     # --8<-- [start:viz]
-    from matplotlib import ticker
+    import matplotlib.ticker as mticker
 
     from dyce.viz.matplotlib import plot_line
 
@@ -39,7 +39,7 @@ def fig_callback() -> None:
         advantage_weighted,
         labels=["Normal hit", "Critical hit", "Advantage-weighted"],
     )
-    ax.xaxis.set_major_locator(ticker.IndexLocator(base=2, offset=1))
+    ax.xaxis.set_major_locator(mticker.IndexLocator(base=2, offset=1))
     ax.set_title("Advantage-weighted attack with critical hits")
     ax.legend()
     # --8<-- [end:viz]

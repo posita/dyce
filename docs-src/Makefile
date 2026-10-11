@@ -10,8 +10,6 @@ all : \
 	../docs/dyce-powered.svg \
 	../docs/index.md \
 	../docs/license.md \
-	../docs/images/plot_matplotlib_2d6_lo_hi_dark.svg \
-	../docs/images/plot_matplotlib_2d6_lo_hi_light.svg \
 	../docs/images/plot_matplotlib_3d6_selection_dark.svg \
 	../docs/images/plot_matplotlib_3d6_selection_light.svg \
 	../docs/images/plot_matplotlib_4d6_variants_dark.svg \
@@ -22,8 +20,8 @@ all : \
 	../docs/images/plot_matplotlib_d10_explode_light.svg \
 	../docs/images/plot_matplotlib_d20_success_dark.svg \
 	../docs/images/plot_matplotlib_d20_success_light.svg \
-	../docs/images/plot_matplotlib_d4s_dark.svg \
-	../docs/images/plot_matplotlib_d4s_light.svg \
+	../docs/images/plot_matplotlib_diminishing_explode_dark.svg \
+	../docs/images/plot_matplotlib_diminishing_explode_light.svg \
 	../docs/images/plot_matplotlib_ironsworn_dark.svg \
 	../docs/images/plot_matplotlib_ironsworn_light.svg \
 	../docs/images/plot_matplotlib_risus_first_round_dark.svg \
@@ -133,12 +131,12 @@ perf_%.txt : perf_%.ipy ../dyce/*.py ../dyce/*/*.py
 UV_LOCK_WHEELS = "$${PYTHON:-python3}" -c 'import sys, tomllib; packages = tomllib.load(open("uv.lock", "rb"))["package"]; print("\n".join(next(w["url"] for p in packages if p["name"] == pkg_name for w in p.get("wheels", []) if "none-any" in w["url"]) for pkg_name in sys.argv[1:]))'
 
 jupyterlite : FORCE \
-	../docs/notebooks/2d6_lo_hi.ipynb \
 	../docs/notebooks/3d6_selection.ipynb \
 	../docs/notebooks/4d6_variants.ipynb \
 	../docs/notebooks/advantage.ipynb \
 	../docs/notebooks/d10_explode.ipynb \
 	../docs/notebooks/d20_success.ipynb \
+	../docs/notebooks/diminishing_explode.ipynb \
 	../docs/notebooks/ironsworn.ipynb \
 	../docs/notebooks/risus.ipynb
 	cd .. && uv build --wheel

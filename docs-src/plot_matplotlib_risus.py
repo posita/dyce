@@ -6,7 +6,7 @@
 # software in any capacity.
 # ======================================================================================
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:base]
 import warnings
 from collections.abc import Callable, Sequence
@@ -45,19 +45,19 @@ class Versus(IntEnum):
 
 # --8<-- [end:base]
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:base-use]
 our_pool_size = 2
 their_pool_size = 3
 single_round_us_vs_them = Versus.single_round_us_vs_them(our_pool_size, their_pool_size)
-print(single_round_us_vs_them.format(width=65, scaled=True))
+print(single_round_us_vs_them.format(scaled=True, width=65))
 # --8<-- [end:base-use]
 
 assert single_round_us_vs_them == H(
     {Versus.LOSE: 1009, Versus.DRAW: 90, Versus.WIN: 197}
 )
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:display]
 from typing import TYPE_CHECKING
 
@@ -83,7 +83,7 @@ if TYPE_CHECKING:
     ) -> list[Axes]: ...
 # --8<-- [end:display]
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:display-detail]
 from typing import cast
 
@@ -172,15 +172,17 @@ def us_vs_them_heatmap_subplot(  # type: ignore[no-redef]
 
 
 def fig_callback_first_round() -> None:
-    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
     # --8<-- [start:viz-first-round]
     vs_dfs = vs_scenarios_dataframes(Versus.single_round_us_vs_them)
     us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
-    plt.gcf().set_size_inches(6.4, 2.8)
+    fig = plt.gcf()
+    fig.suptitle("Modeling the Risus combat mechanic after the first roll")
+    fig.set_size_inches(6.4, 2.8)
     # --8<-- [end:viz-first-round]
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:driver]
 from fractions import Fraction
 from functools import cache
@@ -200,11 +202,7 @@ def risus_combat_driver(
             f"them: {their_pool_size})"
         )
     elif our_pool_size == 0 and their_pool_size == 0:
-        # This should not happen unless we are called as
-        # risus_combat_driver(0, 0, ...). In other words, this is the only
-        # case where a combat will result in a draw. This is because, draws
-        # are re-rolled during combat, so eliminate those results below.
-        return H({Versus.DRAW: 1})
+        raise ValueError("at least one participant must have a non-empty pool")
 
     # The @cache` decorator
     # (https://docs.python.org/3/library/functools.html#functools.cache)
@@ -219,15 +217,8 @@ def risus_combat_driver(
         our_pool_size: int,  # number of dice we still have
         their_pool_size: int,  # number of dice they still have
     ) -> H[Versus]:
-        assert our_pool_size != 0 or their_pool_size != 0, (
-            "In this function, the case where both parties are at zero is "
-            "considered an error. Because only one party can lose a die "
-            "during each round, the only way both parties can be at zero "
-            "simultaneously is if they both started at zero. Since we guard "
-            "against that case in the enclosing function, we don't have to "
-            "worry about it here. Either our_pool_size is zero, "
-            "their_pool_size is zero, or neither is zero."
-        )
+        # Either our_pool_size is zero, their_pool_size is zero, or neither is
+        # zero
         if our_pool_size == 0:
             # Base case: we are out of dice, so they win
             return H({Versus.LOSE: 1})
@@ -283,7 +274,7 @@ def risus_combat_driver(
 
 
 def fig_callback_multi_round_standard() -> None:
-    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
     # --8<-- [start:viz-multi-round-standard]
     vs_dfs = vs_scenarios_dataframes(
         risus_combat_driver,
@@ -291,11 +282,13 @@ def fig_callback_multi_round_standard() -> None:
         their_pool_sizes=range(2, 6),
     )
     us_vs_them_heatmap_subplot(vs_dfs, cmap_name="magma")
-    plt.gcf().set_size_inches(8.0, 3.2)
+    fig = plt.gcf()
+    fig.suptitle("Modeling an entire standard combat in Risus")
+    fig.set_size_inches(8.0, 3.2)
     # --8<-- [end:viz-multi-round-standard]
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:goliath-rule]
 def single_round_goliath(
     h_result: HResult[Versus], *, our_pool_size: int, their_pool_size: int
@@ -342,7 +335,7 @@ assert (
 # --8<-- [end:goliath-rule]
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:vs-best-of-set]
 from dyce import P
 
@@ -371,7 +364,7 @@ def best_of_set_single_round_us_vs_them(
 
 # --8<-- [end:vs-best-of-set]
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:viz-multi-round-goliath-helper]
 from typing import Protocol
 
@@ -394,7 +387,7 @@ if TYPE_CHECKING:
 # --8<-- [end:viz-multi-round-goliath-helper]
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:viz-multi-round-goliath-helper-detail]
 # See <https://github.com/python/mypy/issues/19169#issuecomment-2920914460>
 def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
@@ -467,21 +460,21 @@ def viz_multi_round_goliath_helper(  # type: ignore[no-redef]
 
 
 def fig_callback_multi_round_best_of_set() -> None:
-    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
     # --8<-- [start:viz-multi-round-best-of-set]
     viz_multi_round_goliath_helper(best_of_set_single_round_us_vs_them)
     fig = plt.gcf()
-    fig.set_size_inches(9.6, 9.6)
     fig.suptitle(
-        "Full combat results based on starting pool sizes\n"
+        "Full “Best-of-Set” combat results based on starting pool sizes\n"
         "Standard (top row)\n"
         "Best-of-Set w/o the Goliath Rule (middle row)\n"
         "Best-of-Set w/ the Goliath Rule (bottom row)"
     )
+    fig.set_size_inches(9.6, 9.6)
     # --8<-- [end:viz-multi-round-best-of-set]
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:evens-up-base]
 from dyce import explode_n
 
@@ -517,7 +510,7 @@ assert d_evens_up_raw_exploded == H(
 )
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:evens-up-decode-hits]
 d_evens_up = H.from_counts(
     (
@@ -530,13 +523,13 @@ d_evens_up = H.from_counts(
 # A clever alternative
 assert d_evens_up == (d_evens_up_raw_exploded + 1) // 2
 
-print(d_evens_up.format(width=65, scaled=True))
+print(d_evens_up.format(scaled=True, width=65))
 # --8<-- [end:evens-up-decode-hits]
 
 assert d_evens_up == H({0: 216, 1: 180, 2: 30, 3: 5, 4: 1})
 
 
-# NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+# NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
 # --8<-- [start:evens-up]
 def evens_up_single_round_us_vs_them(
     our_pool_size: int,
@@ -565,17 +558,17 @@ def evens_up_single_round_us_vs_them(
 
 def fig_callback_multi_round_evens_up() -> None:
 
-    # NOTE: Changes to this section should be propagated to docs-src/nb_ironsworn.py
+    # NOTE: Changes to this section should be propagated to docs-src/nb_risus.py
     # --8<-- [start:viz-multi-round-evens-up]
     viz_multi_round_goliath_helper(evens_up_single_round_us_vs_them)
     fig = plt.gcf()
-    fig.set_size_inches(9.6, 9.6)
     fig.suptitle(
-        "Full combat results based on starting pool sizes\n"
+        "Full “Evens-Up” combat results based on starting pool sizes\n"
         "Standard (top row)\n"
-        "Evens Up w/o the Goliath Rule (middle row)\n"
-        "Evens Up w/ the Goliath Rule (bottom row)"
+        "Evens-Up w/o the Goliath Rule (middle row)\n"
+        "Evens-Up w/ the Goliath Rule (bottom row)"
     )
+    fig.set_size_inches(9.6, 9.6)
     # --8<-- [end:viz-multi-round-evens-up]
 
 
@@ -615,11 +608,11 @@ if __name__ == "__main__":
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
-            f.write(single_round_us_vs_them.format(width=65, scaled=True) + os.linesep)
+            f.write(single_round_us_vs_them.format(scaled=True, width=65) + os.linesep)
 
     would_be_output_file = snippet_output_dir.joinpath(
         Path(f"{script_stem}_evens_up_decode_hits.txt")
     )
     if not orig_output_file or would_be_output_file == orig_output_file:
         with would_be_output_file.open("w", encoding="utf_8") as f:
-            f.write(d_evens_up.format(width=65, scaled=True) + os.linesep)
+            f.write(d_evens_up.format(scaled=True, width=65) + os.linesep)

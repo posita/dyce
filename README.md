@@ -42,19 +42,21 @@ Suggested audiences and applications:
 ## Overview
 
 - [`H`](https://dycelib.org/latest/dyce/#dyce.H) represents possible outcomes and their weights as integer counts.
-  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H(6)`.
+  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H((1, 2, 3, 4, 5, 6))`, or simply `H(6)`.
   The sum of three six-sided dice can be represented as `3 @ H(6)`.
 - [`P`](https://dycelib.org/latest/dyce/#dyce.P) represents an ordered sequence of histograms.
   A pool of three separate six-sided dice can be represented as `3 @ P(H(6))`, or the shorthand `3 @ P(6)`.
   `P`s keep each die separate, so you can select any die or group of dice and calculate the distribution of their summed results.
-- [`P.survey`](https://dycelib.org/latest/dyce/#dyce.P.survey) and [`expand`](https://dycelib.org/latest/dyce/#dyce.expand) are experimental interfaces useful for modeling mechanics where the outcome of one die affects how others are rolled.
+- [`P.survey`](https://dycelib.org/latest/dyce/#dyce.P.survey) and [`expand`](https://dycelib.org/latest/dyce/#dyce.expand) are experimental interfaces useful for modeling mechanics where an outcome of one die affects how others are included.
   Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.
 - Optional [Matplotlib](https://dycelib.org/latest/dyce.viz.matplotlib/) and [Plotly](https://dycelib.org/latest/dyce.viz.plotly/) helpers support visualization.
 
 ## Example: d20 versus a “target number”
 
-Consider a mechanic where a roll on a fair twenty-sided die “succeeds” when it is greater than or equal to a specific value (a “target number”).
+Consider a mechanic popularized by one of the world’s roll playing games[^1] where a roll on a (typically dodecahedral) twenty-sided die “succeeds” when it is greater than or equal to a specific value (a “target number”).
 This example compares the outcome distributions for one d20, the higher of two d20s (“advantage”), and the lower of two d20s (“disadvantage”).
+
+[^1]: Hat tip (or profuse apologies) to [the Angry GM](https://theangrygm.com/support-theangrygm-com/) who is not only one of the world’s greatest role playing game *masters*, but a remarkably reflective human being for whom I have a tremendous amount of respect and gratitude.
 
 ```python
 >>> from dyce import H, P
@@ -111,11 +113,11 @@ False |  70.00% |#################################
   <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/main/docs/images/plot_matplotlib_d20_success_light.svg">
 </picture>
 
+[Run this example in JupyterLite](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb): [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb)
+
 As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.
 With advantage, one is likely to roll at ***least*** a 15 over half the time, and one is nearly twice as likely to roll a 20.
 With disadvantage, one is likely to roll at ***most*** a 6 over half the time, and one is nearly twice as likely to roll a 1.
-
-[Run this example in JupyterLite](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb): [<img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try `dyce`!" align="absmiddle">](https://dycelib.org/latest/jupyter/lab/?path=d20_success.ipynb)
 
 ## Installation
 
@@ -125,7 +127,7 @@ python -m pip install dyce
 
 `dyce` supports CPython 3.11–3.15 and PyPy 3.11-3.12.
 It depends on [`optype`](https://jorenham.github.io/optype/) for static and runtime type-checking.
-It is available under the [MIT License](https://dycelib.org/latest/license/).
+`dyce` is available under the [MIT License](https://dycelib.org/latest/license/).
 
 `dyce` will opportunistically use the following, if available:
 
@@ -143,7 +145,7 @@ It is available under the [MIT License](https://dycelib.org/latest/license/).
 - See the [release notes](https://dycelib.org/latest/notes/) for changes between releases.
 - Browse the [source code](https://github.com/posita/dyce).
 
-## Other efforts
+### Other efforts
 
 `dyce` does not stand alone.
 Other works include:
