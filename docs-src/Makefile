@@ -61,8 +61,8 @@ perf : \
 	perf_expand.txt \
 	perf_rolls_with_counts.txt
 
-../requirements-dev.txt : ../uv.lock
-	cd .. && uv export --format requirements-txt --locked --no-hashes >$@
+../requirements-dev.txt : Makefile ../uv.lock
+	cd .. && uv export --format requirements-txt --locked --no-hashes --output-file "$$( basename $@ )"
 
 ../docs/dyce-powered.svg : Makefile
 	curl --fail --silent --show-error --location --output $@ 'https://img.shields.io/badge/%F0%9F%92%A5%F0%9F%8E%B2-%F0%9D%9A%8D%F0%9D%9A%A2%F0%9D%9A%8C%F0%9D%9A%8E--powered%21-gold'

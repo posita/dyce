@@ -1,7 +1,7 @@
 # `dyce` development guidance
 
 `dyce` is a typed Python library for finite discrete probability computation.
-It supports CPython 3.11–3.14 and PyPy 3.11.
+It supports CPython 3.11–3.15 and PyPy 3.11-3.12.
 Versions come from Git tags through `setuptools-scm`; do not edit a version file.
 
 The code is authoritative when this guidance becomes stale.
@@ -79,7 +79,7 @@ Review it before changing documentation packaging.
 
 Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.
 
-Use Orwell's tests: know what you mean; choose concrete words; cut needless words; prefer active voice when the actor matters; and avoid stale metaphors and inflated jargon. Prefer minimalism and a conversational tone that prioritizes clarity over complex syntax. Employ short, direct sentences and plain language to make complex themes accessible to a broad audience. Do not use metaphor or metaphorical professional jargon in technical writing. It must be precise, consistent, and unambiguous. Do not use metaphor, jargon, or multiple terms to refer to the same concept. It only confuses readers.
+Use Orwell's tests: know what you mean; choose concrete words; cut needless words; prefer active voice when the actor matters; and avoid stale metaphors and inflated jargon. Prefer minimalism and a conversational tone that prioritizes clarity over complex syntax. Employ short, direct sentences and plain language to make complex themes accessible to a broad audience. Avoid metaphor or metaphorical professional jargon in technical writing. Prose must be precise, consistent, and unambiguous. Use one authoritative term consistently to refer to a single concept.
 
 Complete thoughts should be separated by periods and a single space. Colons, em-dashes, and semicolons should be used sparingly. For example, semicolons may be used to separate items in a complicated list, usually preceded by a colon (see, e.g., Orwell's tests above). Em-dashes can be used to signal the occasional aside or parenthetical, but parentheses are preferred. If the aside is relevant in context, consider instead restructuring to improve clarity or simplicity. If it is not relevant, omit it. Occasional, brief asides that providing an appropriate jab or comic relief to a frustrating or complicated topic can remain in place, but they should be very rare exceptions and always subject to approval.
 

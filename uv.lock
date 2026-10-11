@@ -194,11 +194,11 @@ wheels = [
 
 [[package]]
 name = "beartype"
-version = "0.23.0rc2"
+version = "0.23.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2d/58/a4ac1ef919ce13a20c35ed3312b727e56a52029a1921e8f0e91cc52ef2cd/beartype-0.23.0rc2.tar.gz", hash = "sha256:d589e5c6cf1859e4cf355db52ddcd08e2eca98784d7d73dc5f4491f423f94ee5", size = 1974911, upload-time = "2026-09-26T03:23:22.586Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/b7/6f162c0116815b45de8ac81cde5aaacfc67cce4b573fb2e194c3a8c623eb/beartype-0.23.0.tar.gz", hash = "sha256:9d915ce043a2262ee3eb110d1c1c528179f06eb4145e375a750f72ddbdf40fa3", size = 1992744, upload-time = "2026-10-10T07:07:41.909Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/70/1e82c75d1869d71cd1d027497af76c755fde89afbdfd3215c10d677095c0/beartype-0.23.0rc2-py3-none-any.whl", hash = "sha256:fffbb5aa86562b034038f2c90da71cac463247374c89981c937685f47a75223c", size = 1578057, upload-time = "2026-09-26T03:23:20.504Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/ce/64d48f01d88370a78dc0b3e484e8424cd5c87d5a0ac34c1ac93ad8d24275/beartype-0.23.0-py3-none-any.whl", hash = "sha256:a88b85be516c064d4de2b42045a258a43be97bce5cbc18b777f332027c0979f7", size = 1581485, upload-time = "2026-10-10T07:07:39.543Z" },
 ]
 
 [[package]]
