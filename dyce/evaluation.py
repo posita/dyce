@@ -449,6 +449,7 @@ def expand(  # ruff: ignore[complex-structure]
     total_product = prod(s.total for s in sources)
     truncation_reasons: set[_TruncationReason] = set()
 
+    @nobeartype  # not decoratable by beartype (avoids warning)
     def _result_counts() -> Iterator[tuple[Any, int]]:
         for result_counts in iproduct(
             *(_source_to_result_iterable(s) for s in sources)
@@ -608,7 +609,6 @@ def explode_n(
 # ---- Helpers -------------------------------------------------------------------------
 
 
-@nobeartype  # not decoratable by beartype (avoids warning)
 def _source_to_result_iterable(
     source: H[Any] | P[Any],
 ) -> Iterator[tuple[HResult[Any] | PResult[Any], int]]:

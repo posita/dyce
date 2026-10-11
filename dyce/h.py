@@ -191,7 +191,6 @@ except (KeyError, ValueError):
     _ROW_WIDTH = 65
 
 
-@nobeartype  # not decoratable by beartype (avoids warning)
 class HableT(ABC, Generic[_T_co]):
     r"""
     An abstract base whose implementer can be expressed as (or reduced to) an [`H` object][dyce.H] by calling its [`h` method][dyce.HableT.h].
@@ -458,6 +457,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         self._order_stat_funcs_by_n: dict[int, Callable[[int], H[Any]]] = {}
         self._total: int | None = None
 
+        @nobeartype  # not decoratable by beartype (avoids warning)
         def _sorted_items_iter(
             items: Sequence[tuple[Any, SupportsInt]],
         ) -> Iterator[tuple[Any, int]]:
