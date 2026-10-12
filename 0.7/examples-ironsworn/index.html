@@ -1,0 +1,1139 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for exploring dice outcomes and other finite discrete probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.67">
+    
+    
+      
+        <title>Modeling Ironsworn’s core mechanic - dyce</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+      
+      
+
+
+    
+    
+  
+      
+    
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modeling-ironsworns-core-mechanic" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Modeling Ironsworn’s core mechanic
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="light-green"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core concepts
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Release notes
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  License and credits
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  API
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Conveniences
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Visualization
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Visualization
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Shared structures
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Matplotlib (optional)
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Plotly
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+  -->
+
+<h1 id="modeling-ironsworns-core-mechanic">Modeling <em>Ironsworn</em>’s core mechanic</h1>
+<p><a href="https://www.ironswornrpg.com/">Shawn Tomlin’s <em>Ironsworn</em></a> melds a number of different influences in a fresh way.
+Its core mechanic involves rolling an <em>action die</em> (a d6), adding a modifier, and comparing the result to two <em>challenge dice</em> (d10s).
+If the modified value from the action die is strictly greater than both challenge dice, the result is a strong success.
+If it is strictly greater than only one challenge die, the result is a weak success.
+If it is equal to or less than both challenge dice, it’s a failure.</p>
+<p>A verbose way to model this is to enumerate the product of the three dice and then perform logical comparisons.
+<a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> can calculate the challenge-dice results for each action-die outcome.
+We can also deploy our prior <a href="../concepts/#comparisons-and-counting">counting trick</a> for dealing with the two d10s.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">HResult</span><span class="p">,</span> <span class="n">expand</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d10</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">class</span><span class="w"> </span><span class="nc">IronResult</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="o">...</span>     <span class="n">FAILURE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="o">...</span>     <span class="n">WEAK_SUCCESS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">...</span>     <span class="n">STRONG_SUCCESS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="o">...</span>
+<span class="o">...</span>     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="o">...</span>         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># makes formatting easier on the eyes</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">iron_dependent_term</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">IronResult</span><span class="p">]:</span>
+<span class="o">...</span>     <span class="n">res</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">d10</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">outcome</span><span class="p">)</span>  <span class="c1"># (1)!</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">IronResult</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">iron_dependent_term</span><span class="p">,</span> <span class="n">d6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># expected results for an action modifier of +1</span>
+<span class="n">H</span><span class="p">({</span><span class="n">FAILURE</span><span class="p">:</span> <span class="mi">271</span><span class="p">,</span> <span class="n">WEAK_SUCCESS</span><span class="p">:</span> <span class="mi">238</span><span class="p">,</span> <span class="n">STRONG_SUCCESS</span><span class="p">:</span> <span class="mi">91</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+<ol>
+<li>
+<p>Our <a href="../concepts/#comparisons-and-counting">counting trick</a>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">action_mods</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action_mod</span> <span class="ow">in</span> <span class="n">action_mods</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">iron_distribution</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">iron_dependent_term</span><span class="p">,</span> <span class="n">d6</span> <span class="o">+</span> <span class="n">action_mod</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">action_mod</span><span class="si">:</span><span class="s2">+</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">iron_distribution</span><span class="o">.</span><span class="n">format_short</span><span class="p">(</span><span class="n">include_avg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="go">-1 -&gt; {FAILURE: 71.67%, WEAK_SUCCESS: 23.33%, STRONG_SUCCESS:  5.00%}</span>
+<span class="go">+0 -&gt; {FAILURE: 59.17%, WEAK_SUCCESS: 31.67%, STRONG_SUCCESS:  9.17%}</span>
+<span class="go">+1 -&gt; {FAILURE: 45.17%, WEAK_SUCCESS: 39.67%, STRONG_SUCCESS: 15.17%}</span>
+<span class="go">+2 -&gt; {FAILURE: 33.17%, WEAK_SUCCESS: 43.67%, STRONG_SUCCESS: 23.17%}</span>
+<span class="go">+3 -&gt; {FAILURE: 23.17%, WEAK_SUCCESS: 43.67%, STRONG_SUCCESS: 33.17%}</span>
+</code></pre></div></td></tr></table></div>
+</li>
+</ol>
+<div class="admonition question">
+<p class="admonition-title">What’s with that <code>2 @ d10.lt(action.outcome)</code>?</p>
+<p>Let’s break it down.
+<code>H(10).lt(value)</code> will tell us how often a single d10 is less than <code>value</code>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># how often a d10 is strictly less than 5</span>
+    <span class="n">H</span><span class="p">({</span><span class="kc">False</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+<p>By taking advantage of the fact that, in Python, <code>bool</code>s act like <code>int</code>s when it comes to arithmetic operators, we can count how often that happens with more than one interchangeable d10 by “summing” them.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="n">d10_lt5</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">d10_lt5</span> <span class="o">+</span> <span class="n">d10_lt5</span>
+    <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="n">d10_lt5</span> <span class="o">+</span> <span class="n">d10_lt5</span><span class="p">)</span><span class="o">.</span><span class="n">total</span>
+    <span class="mi">100</span>
+</code></pre></div></td></tr></table></div>
+<p>How do we interpret those results?
+36 times out of a hundred, neither d10 will be strictly less than five.
+48 times out of a hundred, exactly one of the d10s will be strictly less than five.
+16 times out of a hundred, both d10s will be strictly less than five.</p>
+<p><a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a>’s <code>@</code> operator provides a shorthand.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">d10_lt5</span> <span class="o">==</span> <span class="n">d10_lt5</span> <span class="o">+</span> <span class="n">d10_lt5</span>
+    <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Why doesn’t <code>2 @ H(6).gt(H(10)</code> work?</p>
+<p><code>H(6).gt(H(10))</code> will compute how often a six-sided die is strictly greater than a ten-sided die.
+<code>2 @ H(6).gt(H(10))</code> will show the frequencies that a first six-sided die is strictly greater than a first ten-sided die and a second six-sided die is strictly greater than a second ten-sided die.
+This isn’t quite what we want, since the mechanic calls for rolling a single six-sided die and comparing that result to each of two ten-sided dice.</p>
+</div>
+<p>Now for a <em>twist</em>.
+A failure or success is particularly spectacular when the d10s come up doubles.
+The doubles rule uses both challenge-die outcomes.
+To model it, evaluate each combination of outcomes from the modified d6 and both d10s.</p>
+<p><a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> evaluates combinations from multiple source histograms or pools.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">HResult</span><span class="p">,</span> <span class="n">PResult</span><span class="p">,</span> <span class="n">expand</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">d6</span><span class="p">,</span> <span class="n">p2d10</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IronDramaticResult</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">SPECTACULAR_FAILURE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">FAILURE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">WEAK_SUCCESS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">STRONG_SUCCESS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SPECTACULAR_SUCCESS</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iron_dramatic_dependent_term</span><span class="p">(</span>
+    <span class="n">action</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">challenges</span><span class="p">:</span> <span class="n">PResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">action_mod</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IronDramaticResult</span><span class="p">:</span>
+    <span class="n">modded_act</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">action_mod</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">challenges</span><span class="o">.</span><span class="n">roll</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"pool must have exactly 2 challenge dice"</span>
+    <span class="n">ch1_outcome</span><span class="p">,</span> <span class="n">ch2_outcome</span> <span class="o">=</span> <span class="n">challenges</span><span class="o">.</span><span class="n">roll</span>
+    <span class="n">doubles</span> <span class="o">=</span> <span class="n">ch1_outcome</span> <span class="o">==</span> <span class="n">ch2_outcome</span>
+    <span class="n">modded_act_beats_ch1</span> <span class="o">=</span> <span class="n">modded_act</span> <span class="o">&gt;</span> <span class="n">ch1_outcome</span>
+    <span class="n">modded_act_beats_ch2</span> <span class="o">=</span> <span class="n">modded_act</span> <span class="o">&gt;</span> <span class="n">ch2_outcome</span>
+    <span class="k">if</span> <span class="n">modded_act_beats_ch1</span> <span class="ow">and</span> <span class="n">modded_act_beats_ch2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">IronDramaticResult</span><span class="o">.</span><span class="n">SPECTACULAR_SUCCESS</span>
+            <span class="k">if</span> <span class="n">doubles</span>
+            <span class="k">else</span> <span class="n">IronDramaticResult</span><span class="o">.</span><span class="n">STRONG_SUCCESS</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">modded_act_beats_ch1</span> <span class="ow">or</span> <span class="n">modded_act_beats_ch2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">IronDramaticResult</span><span class="o">.</span><span class="n">WEAK_SUCCESS</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">IronDramaticResult</span><span class="o">.</span><span class="n">SPECTACULAR_FAILURE</span>
+            <span class="k">if</span> <span class="n">doubles</span>
+            <span class="k">else</span> <span class="n">IronDramaticResult</span><span class="o">.</span><span class="n">FAILURE</span>
+        <span class="p">)</span>
+
+<span class="n">action_mods</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">results_by_action_mod</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">action_mod</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+        <span class="n">iron_dramatic_dependent_term</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">p2d10</span><span class="p">,</span> <span class="n">action_mod</span><span class="o">=</span><span class="n">action_mod</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">action_mod</span> <span class="ow">in</span> <span class="n">action_mods</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>The callback accepts <code>mod</code> as a keyword-only parameter, which lets us pass values to it through <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> for visualization.</p>
+<p>Table:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="n">outcome</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">from_counts</span><span class="p">(</span>
+            <span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">IronDramaticResult</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">preserve_zero_counts</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">probability_items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results_by_action_mod</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">action_mods</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Action Modifier"</span>
+</code></pre></div></td></tr></table></div>
+<style type="text/css">
+</style>
+<table id="T_ironsworn">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_ironsworn_level0_col0" class="col_heading level0 col0" >SPECTACULAR_FAILURE</th>
+      <th id="T_ironsworn_level0_col1" class="col_heading level0 col1" >FAILURE</th>
+      <th id="T_ironsworn_level0_col2" class="col_heading level0 col2" >WEAK_SUCCESS</th>
+      <th id="T_ironsworn_level0_col3" class="col_heading level0 col3" >STRONG_SUCCESS</th>
+      <th id="T_ironsworn_level0_col4" class="col_heading level0 col4" >SPECTACULAR_SUCCESS</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Action Modifier</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_ironsworn_level0_row0" class="row_heading level0 row0" >-1</th>
+      <td id="T_ironsworn_row0_col0" class="data row0 col0" >8.33%</td>
+      <td id="T_ironsworn_row0_col1" class="data row0 col1" >63.33%</td>
+      <td id="T_ironsworn_row0_col2" class="data row0 col2" >23.33%</td>
+      <td id="T_ironsworn_row0_col3" class="data row0 col3" >3.33%</td>
+      <td id="T_ironsworn_row0_col4" class="data row0 col4" >1.67%</td>
+    </tr>
+    <tr>
+      <th id="T_ironsworn_level0_row1" class="row_heading level0 row1" >0</th>
+      <td id="T_ironsworn_row1_col0" class="data row1 col0" >7.50%</td>
+      <td id="T_ironsworn_row1_col1" class="data row1 col1" >51.67%</td>
+      <td id="T_ironsworn_row1_col2" class="data row1 col2" >31.67%</td>
+      <td id="T_ironsworn_row1_col3" class="data row1 col3" >6.67%</td>
+      <td id="T_ironsworn_row1_col4" class="data row1 col4" >2.50%</td>
+    </tr>
+    <tr>
+      <th id="T_ironsworn_level0_row2" class="row_heading level0 row2" >1</th>
+      <td id="T_ironsworn_row2_col0" class="data row2 col0" >6.50%</td>
+      <td id="T_ironsworn_row2_col1" class="data row2 col1" >38.67%</td>
+      <td id="T_ironsworn_row2_col2" class="data row2 col2" >39.67%</td>
+      <td id="T_ironsworn_row2_col3" class="data row2 col3" >11.67%</td>
+      <td id="T_ironsworn_row2_col4" class="data row2 col4" >3.50%</td>
+    </tr>
+    <tr>
+      <th id="T_ironsworn_level0_row3" class="row_heading level0 row3" >2</th>
+      <td id="T_ironsworn_row3_col0" class="data row3 col0" >5.50%</td>
+      <td id="T_ironsworn_row3_col1" class="data row3 col1" >27.67%</td>
+      <td id="T_ironsworn_row3_col2" class="data row3 col2" >43.67%</td>
+      <td id="T_ironsworn_row3_col3" class="data row3 col3" >18.67%</td>
+      <td id="T_ironsworn_row3_col4" class="data row3 col4" >4.50%</td>
+    </tr>
+    <tr>
+      <th id="T_ironsworn_level0_row4" class="row_heading level0 row4" >3</th>
+      <td id="T_ironsworn_row4_col0" class="data row4 col0" >4.50%</td>
+      <td id="T_ironsworn_row4_col1" class="data row4 col1" >18.67%</td>
+      <td id="T_ironsworn_row4_col2" class="data row4 col2" >43.67%</td>
+      <td id="T_ironsworn_row4_col3" class="data row4 col3" >27.67%</td>
+      <td id="T_ironsworn_row4_col4" class="data row4 col4" >5.50%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Visualization:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"barh"</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s2">"RdYlGn"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">PercentFormatter</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Ironsworn distributions"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"center"</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_ironsworn_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_ironsworn_light.svg">
+  <img alt="Plot: Ironsworn distributions" src="../images/plot_matplotlib_ironsworn_light.svg">
+</picture></p>
+<p>Interactive version: <a href="https://dycelib.org/latest/jupyter/lab/?path=ironsworn.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

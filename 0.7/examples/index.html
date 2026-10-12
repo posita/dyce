@@ -1,0 +1,1518 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for exploring dice outcomes and other finite discrete probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      
+        <link rel="prev" href="../concepts/">
+      
+      
+        <link rel="next" href="../notes/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.67">
+    
+    
+      
+        <title>Examples - dyce</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+      
+      
+
+
+    
+    
+  
+      
+    
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#examples" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Examples
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="light-green"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core concepts
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-roll-and-keep-in-anydice" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Translation of the accepted answer to “Roll and Keep in Anydice?”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Modeling “The Probability of 4d6, Drop the Lowest, Reroll 1s”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-damage-with-advantage-and-critical-hits" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Attack damage with advantage and critical hits
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-modelling-opposed-dice-pools-with-a-swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Translation of the accepted answer to “Modelling opposed dice pools with a swap”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-deep-dives" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Advanced deep dives
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced deep dives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-secret-advanced-deep-dive" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <em>Double-secret</em> advanced deep dive
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Release notes
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  License and credits
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  API
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Conveniences
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Visualization
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Visualization
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Shared structures
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Matplotlib (optional)
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Plotly
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-roll-and-keep-in-anydice" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Translation of the accepted answer to “Roll and Keep in Anydice?”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Modeling “The Probability of 4d6, Drop the Lowest, Reroll 1s”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-damage-with-advantage-and-critical-hits" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Attack damage with advantage and critical hits
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#translation-of-the-accepted-answer-to-modelling-opposed-dice-pools-with-a-swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Translation of the accepted answer to “Modelling opposed dice pools with a swap”
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-deep-dives" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Advanced deep dives
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced deep dives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-secret-advanced-deep-dive" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <em>Double-secret</em> advanced deep dive
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+  -->
+
+<h1 id="examples">Examples</h1>
+<p>The examples and translations below are intended to showcase <code>dyce</code>’s flexibility.
+Links to more <a href="#advanced-deep-dives">advanced examples</a> appear at the bottom.</p>
+<h2 id="translation-of-the-accepted-answer-to-roll-and-keep-in-anydice">Translation of the accepted answer to “<a href="https://rpg.stackexchange.com/a/166637">Roll and Keep in Anydice?</a>”</h2>
+<p>Original AnyDice source:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>\ <span class="n">How</span> <span class="n">best</span> <span class="n">to</span> <span class="n">model</span> <span class="n">this</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">way</span> <span class="n">that</span> <span class="n">allows</span> <span class="n">testing</span> <span class="mi">1</span><span class="n">k1</span> <span class="n">to</span> <span class="mi">10</span><span class="n">k5</span><span class="err">?</span> \
+<span class="n">output</span> <span class="p">[</span><span class="n">highest</span> <span class="mi">3</span> <span class="n">of</span> <span class="mi">10</span><span class="n">d</span> <span class="p">[</span><span class="n">explode</span> <span class="n">d10</span><span class="p">]]</span> <span class="n">named</span> <span class="s2">"10k3"</span>
+</code></pre></div></td></tr></table></div>
+<p><code>dyce</code> translation:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">explode_n</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">d10</span>
+
+<span class="n">explode_depth</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">exploded_d10</span> <span class="o">=</span> <span class="n">explode_n</span><span class="p">(</span><span class="n">d10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">explode_depth</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">keep</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">P</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="s2">"Negative k keeps lowest, otherwise keeps highest"</span>
+    <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">nkk</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">keep</span><span class="p">(</span><span class="n">n</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">exploded_d10</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<details class="example">
+<summary>Visualization source code</summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
+
+<span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span>  <span class="c1"># range: [start_k..end_k)</span>
+<span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span>  <span class="c1"># range: [start_n..end_n)</span>
+<span class="n">rows_by_k</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">:</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">k</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">nkk</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">n_end</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_start</span><span class="p">,</span> <span class="n">k_end</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">max_x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)</span>
+<span class="n">max_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+    <span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">rows</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">probability_items</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">rows_by_k</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">labels</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">rows</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="n">k_end</span> <span class="o">-</span> <span class="n">k_start</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">k_start</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"cool"</span><span class="p">,</span> <span class="n">peak</span><span class="o">=</span><span class="n">max_y</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">set_marker</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Taking the </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> highest of $n$ exploding d10s"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">max_x</span><span class="p">)</span>  <span class="c1"># subplots should share a horizontal scale</span>
+<span class="c1"># subplots should share a vertical scale</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()</span>
+<span class="n">y_lims</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">lo</span> <span class="k">for</span> <span class="n">lo</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">y_lims</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">hi</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">hi</span> <span class="ow">in</span> <span class="n">y_lims</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+</details>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_d10_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_d10_explode_light.svg">
+  <img alt="Plot: Taking the *k* highest of *n* exploding d10s" src="../images/plot_matplotlib_d10_explode_light.svg">
+</picture></p>
+<p>Interactive version: <a href="https://dycelib.org/latest/jupyter/lab/?path=d10_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<h2 id="modeling-the-probability-of-4d6-drop-the-lowest-reroll-1s">Modeling “<a href="http://prestonpoulter.com/2010/11/19/the-probability-of-4d6-drop-the-lowest-reroll-1s/">The Probability of 4d6, Drop the Lowest, Reroll 1s</a>”</h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">expand</span>
+
+<span class="n">p_4d6</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">d6_reroll_first_one</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">result</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span> <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span>
+    <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">p_4d6_reroll_first_one</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">d6_reroll_first_one</span><span class="p">)</span>
+<span class="n">p_4d6_reroll_all_ones</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">attr_results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"3d6"</span><span class="p">:</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+    <span class="s2">"4d6 - discard lowest"</span><span class="p">:</span> <span class="n">p_4d6</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)),</span>
+    <span class="s2">"4d6 - re-roll first 1,</span><span class="se">\n</span><span class="s2">discard lowest"</span><span class="p">:</span> <span class="n">p_4d6_reroll_first_one</span><span class="o">.</span><span class="n">at</span><span class="p">(</span>
+        <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="s2">"4d6 - re-roll all 1s (i.e., 4d(d5 + 1)),</span><span class="se">\n</span><span class="s2">discard lowest"</span><span class="p">:</span> <span class="n">p_4d6_reroll_all_ones</span><span class="o">.</span><span class="n">at</span><span class="p">(</span>
+        <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="s2">"2d6 + 6"</span><span class="p">:</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s2">"4d4 + 2"</span><span class="p">:</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>Visualization:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
+
+<span class="n">labels</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">attr_results</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_ridge</span><span class="p">(</span><span class="o">*</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"jet"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Comparing various take-three-of-4d6 methods"</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_4d6_variants_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_4d6_variants_light.svg">
+  <img alt="Plot: Comparing various take-three-of-4d6 methods" src="../images/plot_matplotlib_4d6_variants_light.svg">
+</picture></p>
+<p>Interactive version: <a href="https://dycelib.org/latest/jupyter/lab/?path=4d6_variants.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<h2 id="attack-damage-with-advantage-and-critical-hits">Attack damage with advantage and critical hits</h2>
+<p>Original <a href="https://github.com/LordSembor/DnDice#examples"><code>LordSembor/DnDice</code></a> example source:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">DnDice</span><span class="w"> </span><span class="kn">import</span> <span class="n">d</span><span class="p">,</span> <span class="n">advantage</span><span class="p">,</span> <span class="n">plot</span>
+
+<span class="n">normal_hit</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">critical_hit</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">d</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">probability</span> <span class="ow">in</span> <span class="n">advantage</span><span class="p">():</span>
+  <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">critical_hit</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">value</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">normal_hit</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">d</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">normalizeExpectancies</span><span class="p">()</span>
+<span class="c1"># …</span>
+</code></pre></div></td></tr></table></div>
+<p><code>dyce</code> translation:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">HResult</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">expand</span>
+
+<span class="n">normal_hit</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">critical_hit</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">H</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">advantage</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">crit</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">critical_hit</span>
+    <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">normal_hit</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<span class="n">advantage_weighted</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">advantage</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Visualization:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_line</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_line</span><span class="p">(</span>
+    <span class="n">normal_hit</span><span class="p">,</span>
+    <span class="n">critical_hit</span><span class="p">,</span>
+    <span class="n">advantage_weighted</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Normal hit"</span><span class="p">,</span> <span class="s2">"Critical hit"</span><span class="p">,</span> <span class="s2">"Advantage-weighted"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">IndexLocator</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Advantage-weighted attack with critical hits"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_advantage_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_advantage_light.svg">
+  <img alt="Plot: Advantage-weighted attack with critical hits" src="../images/plot_matplotlib_advantage_light.svg">
+</picture></p>
+<p>Interactive version: <a href="https://dycelib.org/latest/jupyter/lab/?path=advantage.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<h2 id="translation-of-the-accepted-answer-to-modelling-opposed-dice-pools-with-a-swap">Translation of the accepted answer to “<a href="https://rpg.stackexchange.com/a/112951">Modelling opposed dice pools with a swap</a>”</h2>
+<p>Original AnyDice source of basic <code>brawl</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">function</span><span class="p">:</span> <span class="n">brawl</span> <span class="n">A</span><span class="p">:</span><span class="n">s</span> <span class="n">vs</span> <span class="n">B</span><span class="p">:</span><span class="n">s</span> <span class="p">{</span>
+  <span class="n">SA</span><span class="p">:</span> <span class="n">A</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="nd">@B</span>
+  <span class="n">SB</span><span class="p">:</span> <span class="n">B</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="nd">@A</span>
+  <span class="k">if</span> <span class="n">SA</span><span class="o">-</span><span class="n">SB</span><span class="o">=</span><span class="mi">0</span> <span class="p">{</span>
+    <span class="n">result</span><span class="p">:(</span><span class="n">A</span> <span class="o">&gt;</span> <span class="n">B</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">A</span> <span class="o">&lt;</span> <span class="n">B</span><span class="p">)</span>
+  <span class="p">}</span>
+  <span class="n">result</span><span class="p">:</span><span class="n">SA</span><span class="o">-</span><span class="n">SB</span>
+<span class="p">}</span>
+<span class="n">output</span> <span class="p">[</span><span class="n">brawl</span> <span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span><span class="p">]</span> <span class="n">named</span> <span class="s2">"A vs B Damage"</span>
+</code></pre></div></td></tr></table></div>
+<p>Translation:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">PResult</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">brawl</span><span class="p">(</span><span class="n">p_result_a</span><span class="p">:</span> <span class="n">PResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">p_result_b</span><span class="p">:</span> <span class="n">PResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="n">a_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">p_result_a</span><span class="o">.</span><span class="n">roll</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">p_result_b</span><span class="o">.</span><span class="n">roll</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">b_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">p_result_b</span><span class="o">.</span><span class="n">roll</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">p_result_a</span><span class="o">.</span><span class="n">roll</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">a_successes</span> <span class="o">-</span> <span class="n">b_successes</span>
+</code></pre></div></td></tr></table></div>
+<p>Rudimentary textual visualization using built-in methods:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">P</span><span class="p">,</span> <span class="n">expand</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">p3d6</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">brawl</span><span class="p">,</span> <span class="n">p3d6</span><span class="p">,</span> <span class="n">p3d6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.00</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.73</span>
+ <span class="o">-</span><span class="mi">3</span> <span class="o">|</span>   <span class="mf">7.86</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+ <span class="o">-</span><span class="mi">2</span> <span class="o">|</span>  <span class="mf">15.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">0</span> <span class="o">|</span>  <span class="mf">19.96</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.64</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">15.52</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">7.86</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+</code></pre></div></td></tr></table></div>
+<p>Original AnyDice source of <code>brawl</code> with an optional dice swap:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">function</span><span class="p">:</span> <span class="nb">set</span> <span class="n">element</span> <span class="n">I</span><span class="p">:</span><span class="n">n</span> <span class="ow">in</span> <span class="n">SEQ</span><span class="p">:</span><span class="n">s</span> <span class="n">to</span> <span class="n">N</span><span class="p">:</span><span class="n">n</span> <span class="p">{</span>
+  <span class="n">NEW</span><span class="p">:</span> <span class="p">{}</span>
+  <span class="n">loop</span> <span class="n">J</span> <span class="n">over</span> <span class="p">{</span><span class="mi">1</span> <span class="o">..</span> <span class="c1">#SEQ} {</span>
+    <span class="k">if</span> <span class="n">I</span> <span class="o">=</span> <span class="n">J</span> <span class="p">{</span> <span class="n">NEW</span><span class="p">:</span> <span class="p">{</span><span class="n">NEW</span><span class="p">,</span> <span class="n">N</span><span class="p">}</span> <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span> <span class="n">NEW</span><span class="p">:</span> <span class="p">{</span><span class="n">NEW</span><span class="p">,</span> <span class="n">J</span><span class="nd">@SEQ</span><span class="p">}</span> <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">result</span><span class="p">:</span> <span class="n">NEW</span>
+<span class="p">}</span>
+<span class="n">function</span><span class="p">:</span> <span class="n">brawl</span> <span class="n">A</span><span class="p">:</span><span class="n">s</span> <span class="n">vs</span> <span class="n">B</span><span class="p">:</span><span class="n">s</span> <span class="k">with</span> <span class="n">optional</span> <span class="n">swap</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="c1">#A@A &gt;= 1@B {</span>
+    <span class="n">result</span><span class="p">:</span> <span class="p">[</span><span class="n">brawl</span> <span class="n">A</span> <span class="n">vs</span> <span class="n">B</span><span class="p">]</span>
+  <span class="p">}</span>
+  <span class="n">AX</span><span class="p">:</span> <span class="p">[</span><span class="n">sort</span> <span class="p">[</span><span class="nb">set</span> <span class="n">element</span> <span class="c1">#A in A to 1@B]]</span>
+  <span class="n">BX</span><span class="p">:</span> <span class="p">[</span><span class="n">sort</span> <span class="p">[</span><span class="nb">set</span> <span class="n">element</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">B</span> <span class="n">to</span> <span class="c1">#A@A]]</span>
+  <span class="n">result</span><span class="p">:</span> <span class="p">[</span><span class="n">brawl</span> <span class="n">AX</span> <span class="n">vs</span> <span class="n">BX</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="n">output</span> <span class="p">[</span><span class="n">brawl</span> <span class="mi">3</span><span class="n">d6</span> <span class="n">vs</span> <span class="mi">3</span><span class="n">d6</span> <span class="k">with</span> <span class="n">optional</span> <span class="n">swap</span><span class="p">]</span> <span class="n">named</span> <span class="s2">"A vs B Damage"</span>
+</code></pre></div></td></tr></table></div>
+<p>Translation:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">brawl_w_optional_swap</span><span class="p">(</span><span class="n">p_result_a</span><span class="p">:</span> <span class="n">PResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">p_result_b</span><span class="p">:</span> <span class="n">PResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="n">roll_a</span><span class="p">,</span> <span class="n">roll_b</span> <span class="o">=</span> <span class="n">p_result_a</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span> <span class="n">p_result_b</span><span class="o">.</span><span class="n">roll</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">roll_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+<span class="o">...</span>         <span class="n">roll_a</span><span class="p">,</span> <span class="n">roll_b</span> <span class="o">=</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">roll_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:],</span> <span class="n">roll_a</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">roll_b</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="o">...</span>         <span class="c1"># Sort greatest-to-least after the swap</span>
+<span class="o">...</span>         <span class="n">roll_a</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">roll_a</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">...</span>         <span class="n">roll_b</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">roll_b</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="o">...</span>     <span class="k">else</span><span class="p">:</span>
+<span class="o">...</span>         <span class="c1"># Reverse to be greatest-to-least</span>
+<span class="o">...</span>         <span class="n">roll_a</span> <span class="o">=</span> <span class="n">roll_a</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="o">...</span>         <span class="n">roll_b</span> <span class="o">=</span> <span class="n">roll_b</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="o">...</span>     <span class="n">a_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_a</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">...</span>     <span class="n">b_successes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roll_b</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">roll_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">a_successes</span> <span class="o">-</span> <span class="n">b_successes</span> <span class="ow">or</span> <span class="p">(</span><span class="n">roll_a</span> <span class="o">&gt;</span> <span class="n">roll_b</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">roll_a</span> <span class="o">&lt;</span> <span class="n">roll_b</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Rudimentary visualization using built-in methods:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">,</span> <span class="n">p3d6</span><span class="p">,</span> <span class="n">p3d6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.36</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">0.88</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>   <span class="mf">1.42</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">0</span> <span class="o">|</span>   <span class="mf">0.59</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.65</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">23.19</span><span class="o">%</span> <span class="o">|</span><span class="c1">###########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">58.15</span><span class="o">%</span> <span class="o">|</span><span class="c1">#############################</span>
+</code></pre></div></td></tr></table></div>
+<!-- -->
+
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">p4d6</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">brawl_w_optional_swap</span><span class="p">,</span> <span class="n">p4d6</span><span class="p">,</span> <span class="n">p4d6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">2.64</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">1.28</span>
+ <span class="o">-</span><span class="mi">2</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="o">-</span><span class="mi">1</span> <span class="o">|</span>   <span class="mf">2.94</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">0</span> <span class="o">|</span>   <span class="mf">0.31</span><span class="o">%</span> <span class="o">|</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">18.16</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">19.97</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">25.19</span><span class="o">%</span> <span class="o">|</span><span class="c1">############</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">33.37</span><span class="o">%</span> <span class="o">|</span><span class="c1">################</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="advanced-deep-dives">Advanced deep dives</h2>
+<ul>
+<li><a href="../examples-symbolic/">Symbolic outcomes</a></li>
+<li><a href="../examples-expand/">Expansion and recursion</a></li>
+<li><a href="../examples-tension-pool/">Checking the Angry GM’s math on the Tension Pool</a></li>
+<li><a href="../examples-ironsworn/">Modeling <em>Ironsworn</em>’s core mechanic</a></li>
+</ul>
+<h3 id="double-secret-advanced-deep-dive"><em>Double-secret</em> advanced deep dive</h3>
+<p>Experts only.
+Closed course.</p>
+<ul>
+<li><a href="../examples-risus/">Modeling <em>Risus</em> combat</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../concepts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Core concepts">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Core concepts
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../notes/" class="md-footer__link md-footer__link--next" aria-label="Next: Release notes">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Release notes
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../translations/">
+        <link rel="prev" href="../examples/">
       
       
         <link rel="next" href="../contrib/">
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.65">
+      <meta name="generator" content="zensical-0.0.67">
     
     
       
@@ -34,12 +34,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
       
       
 
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dyce-release-notes" class="md-skip">
+        <a href="#release-notes" class="md-skip">
           Skip to content
         </a>
       
@@ -282,14 +282,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../countin/" class="md-nav__link">
+      <a href="../concepts/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Countin’ with histograms and pools
+  Core concepts
 
     
   </span>
@@ -308,14 +308,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../translations/" class="md-nav__link">
+      <a href="../examples/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Applications and translations
+  Examples
 
     
   </span>
@@ -633,7 +633,7 @@
   <span class="md-ellipsis">
     
   
-  License
+  License and credits
 
     
   </span>
@@ -900,6 +900,32 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -1147,6 +1173,7 @@
               <article class="md-content__inner md-typeset">
                 
                   
+
   
   
 
@@ -1165,7 +1192,7 @@
   Thank you!
   -->
 
-<h1 id="dyce-release-notes"><code>dyce</code> release notes</h1>
+<h1 id="release-notes">Release notes</h1>
 <h2 id="070"><a href="https://github.com/posita/dyce/releases/tag/v0.7.0">0.7.0</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Breaking changes</p>
@@ -1173,16 +1200,12 @@
 Please review before upgrading.</p>
 </div>
 <ul>
-<li>Drops support for 3.9 and 3.10 and extends support to 3.14.</li>
-<li>Fixes embarrassingly long-running logical error in 4d6 variants example.</li>
+<li>Drops support for 3.9 and 3.10 and extends support to 3.15.</li>
+<li>Fixes embarrassingly long-running logical error in 4d6 variants and <em>Risus</em> examples.</li>
 <li>Removes <code>dyce.r</code> altogether (pending rewrite of an alternative).</li>
-<li>Derives <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> and implements <a class="autorefs autorefs-internal" title="h() -&gt; H[_T]
-
-  
-      abstractmethod
-  " href="../dyce/#dyce.HableT.h"><code>HableT.h</code></a> to return <code>self</code>.</li>
-<li>Adds <code>H.from_counts</code> class method constructs an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
-<li>Removes <code>H.map</code>, <code>H.rmap</code>, and <code>H.umap</code> in favor of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> and <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -&gt; H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
+<li>Derives <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from <a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> and implements <a class="autorefs autorefs-internal" title="h() -&gt; H[_T]" href="../dyce/#dyce.H.h"><code>H.h</code></a> to return <code>self</code>.</li>
+<li>Adds <code>H.from_counts</code> class method for constructing an <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> from multiple sources.</li>
+<li>Removes <code>H.map</code>, <code>H.rmap</code>, and <code>H.umap</code> in favor of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> and <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -&gt; H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a>.</li>
 <li>Removes <code>H.accumulate</code> and <code>H.zero_fill</code> in favor of <a class="autorefs autorefs-internal" title="from_counts(*sources: Mapping[_T, SupportsInt] | Iterable[tuple[_T, SupportsInt]], preserve_zero_counts: bool = False) -&gt; H[_T]
 
   
@@ -1193,11 +1216,8 @@ Please review before upgrading.</p>
 <li>Removes <code>H.draw</code>.</li>
 <li>Removes <code>H.vs</code> and <code>H.within</code>.</li>
 <li>Renames <code>H.distribution</code> to <a class="autorefs autorefs-internal" title="probability_items(rational_t: Callable[[int, int], _OtherT] | None = None) -&gt; Iterator[tuple[_T, _OtherT]]" href="../dyce/#dyce.H.probability_items"><code>H.probability_items</code></a> and removes <code>H.distribution_xy</code>.</li>
-<li><a class="autorefs autorefs-internal" title="h() -&gt; H[_T]
-
-  
-      abstractmethod
-  " href="../dyce/#dyce.HableT.h"><code>HableT.h</code></a> is now an abstract base class, not merely a protocol.</li>
+<li>Renames <code>H.roll</code> to <a class="autorefs autorefs-internal" title="sample() -&gt; _T" href="../dyce/#dyce.H.sample"><code>H.sample</code></a>.</li>
+<li><a class="autorefs autorefs-internal" href="../dyce/#dyce.HableT"><code>HableT</code></a> is now an abstract base class, not merely a protocol.</li>
 <li>Modifies <a class="autorefs autorefs-internal" title="h() -&gt; H[Any]" href="../dyce/#dyce.P.h"><code>P.h</code></a> such that it now takes no arguments to remain consistent with <a class="autorefs autorefs-internal" title="h() -&gt; H[_T]
 
   
@@ -1205,13 +1225,14 @@ Please review before upgrading.</p>
   " href="../dyce/#dyce.HableT.h"><code>HableT.h</code></a>.
   Selection is now handled by a separate <a class="autorefs autorefs-internal" title="at(which: GetItemT, *more: GetItemT) -&gt; H[Any]" href="../dyce/#dyce.P.at"><code>P.at</code></a> method.</li>
 <li>Removes <code>P.map</code>, <code>P.rmap</code>, and <code>P.umap</code> in favor of <a class="autorefs autorefs-internal" title="apply_to_each_h(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel, *, apply_to_each: bool = False) -&gt; P[_ResultT]" href="../dyce/#dyce.P.apply_to_each_h"><code>P.apply_to_each_h</code></a>.</li>
-<li>Returns <code>P.is_homogeneous</code> to being a property.</li>
+<li>Renames <code>P.roll</code> to <a class="autorefs autorefs-internal" title="sample() -&gt; RollT[_T]" href="../dyce/#dyce.P.sample"><code>P.sample</code></a>.</li>
+<li>Restores <code>P.is_homogeneous</code> as a property.</li>
 <li>Adds optional <code>preserve_zero_counts</code> parameter to <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -&gt; H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="quantile(numerator: SupportsInt, denominator: SupportsInt) -&gt; _T" href="../dyce/#dyce.H.quantile"><code>H.quantile</code></a> method.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="quantize_counts(bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, *, preserve_zero_counts: bool = False) -&gt; H[Any]" href="../dyce/#dyce.H.quantize_counts"><code>H.quantize_counts</code> method</a> and <a class="autorefs autorefs-internal" title="quantize_hs(*, bit_width: int = DEFAULT_QUANTIZATION_BIT_WIDTH, preserve_zero_counts: bool = True) -&gt; Any" href="../dyce/#dyce.quantize_hs"><code>quantize_hs</code> context manager</a>.</li>
 <li>Adds experimental <a class="autorefs autorefs-internal" title="survey(surveyor: SurveyorBase[_T, _StateT, _ResultT] | None = None, *, accumulate: Callable[[_StateT | None, _T, int], _StateT] | None = None, initial: _StateT | None = None, order: Callable[[Iterable[_T]], Iterable[_T]] | None = None, settle: Callable[[_StateT], _ResultT] | None = None) -&gt; H[_StateT | _ResultT]" href="../dyce/#dyce.P.survey"><code>P.survey</code></a> method implementing a version of <a href="https://github.com/HighDiceRoller/icepool#paper-on-algorithm">Icepool’s algorithm</a> augmented to accommodate heterogeneous pools.</li>
-<li>Simplifies and consolidates <code>dyce.evaluation.expandable</code> and <code>dyce.evaluation.foreach</code> into <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], precision: Fraction = _DEFAULT_PRECISION, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
-<li>Renames <code>explode</code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, precision: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
+<li>Removes <code>dyce.evaluation.expandable</code> and <code>dyce.evaluation.foreach</code> in favor of the simplified <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> (still experimental).</li>
+<li>Renames <code>explode</code> to <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, min_path_probability: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> to be more explicit about the exit criteria.</li>
 <li><em>(Finally!)</em> removes deprecated interfaces:<ul>
 <li><code>H.explode</code></li>
 <li><code>H.foreach</code></li>
@@ -1223,7 +1244,6 @@ Please review before upgrading.</p>
 </ul>
 </li>
 <li>Adds <a class="autorefs autorefs-internal" href="../dyce.d/#dyce.d"><code>dyce.d</code></a> convenience aliases.</li>
-<li>Modernizes use of <a href="https://github.com/beartype/beartype/">beartype</a> with <a href="https://github.com/beartype/pytest-beartype">pytest-beartype</a>.</li>
 <li>Completely eliminates dependency on <a href="https://github.com/beartype/numerary/"><code>numerary</code></a> (which was flawed since conception), and instead relies on <a href="https://jorenham.github.io/optype/"><code>optype</code></a> for mathematical operator typing.
   (<a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code></a> and <a class="autorefs autorefs-internal" href="../dyce/#dyce.P"><code>P</code></a> still largely assume that outcome types won’t be mixed, but doing so will still probably work in most contexts, so FAAFO.)</li>
 <li>Re-introduces low-level <a href="https://matplotlib.org/">Matplotlib</a> plotting functions in <a class="autorefs autorefs-internal" href="../dyce.viz.matplotlib/#dyce.viz.matplotlib"><code>dyce.viz.matplotlib</code></a>.</li>
@@ -1262,7 +1282,7 @@ Please review before upgrading.</p>
 <li>Allows outcomes with zero counts in non-normalized <a class="autorefs autorefs-internal" href="../dyce/#dyce.H"><code>H</code> objects</a>.
   Outcomes with zero counts are dropped when calling <a class="autorefs autorefs-internal" title="lowest_terms(*, preserve_zero_counts: bool = False) -&gt; H[_T]" href="../dyce/#dyce.H.lowest_terms"><code>H.lowest_terms</code></a>.
   Adds the <code>H.zero_fill</code> convenience method.</li>
-<li>Fixes memoization in <a href="../translations/#modeling-entire-multi-round-combats">Risus multi-round combat translation</a>.</li>
+<li>Fixes memoization in <a href="../examples-risus/#modeling-entire-multi-round-combats">Risus multi-round combat translation</a>.</li>
 <li>Migrates from <a href="https://pypi.org/project/setuptools-scm/"><code>setuptools_scm</code></a> to <a href="https://pypi.org/project/versioningit/"><code>versioningit</code></a> for more flexible version number formatting.</li>
 <li>Allows deployments to PyPI from CI based on tags.</li>
 <li>Uses JupyterLite instead of Binder for examples.</li>
@@ -1442,7 +1462,7 @@ Non-experimental features should be considered stable.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../translations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Applications and translations">
+          <a href="../examples/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Examples">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
@@ -1452,7 +1472,7 @@ Non-experimental features should be considered stable.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Applications and translations
+                Examples
               </div>
             </div>
           </a>
@@ -1501,7 +1521,7 @@ Non-experimental features should be considered stable.</p>
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -1513,10 +1533,10 @@ Non-experimental features should be considered stable.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

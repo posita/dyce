@@ -1,0 +1,1861 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for exploring dice outcomes and other finite discrete probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.67">
+    
+    
+      
+        <title>Modeling Risus combat - dyce</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+      
+      
+
+
+    
+    
+  
+      
+    
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modeling-risus-combat" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Modeling Risus combat
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="light-green"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core concepts
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Release notes
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  License and credits
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  API
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Conveniences
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Visualization
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Visualization
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Shared structures
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Matplotlib (optional)
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Plotly
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+  -->
+
+<h1 id="modeling-risus-combat">Modeling <em>Risus</em> combat</h1>
+<p><a href="https://www.risusiverse.com/">S. John Ross’s <em>Risus</em></a> and its many <a href="http://www.risusiverse.com/home/optional-rules">community-developed alternative rules</a> not only make for entertaining reading, but are fertile ground for stressing ergonomics and capabilities of any discrete outcome modeling tool.</p>
+<h1 id="modeling-a-single-combat-round">Modeling a single combat round</h1>
+<p>We can easily model the first round of its opposed combat system for various starting configurations.
+Our first step is a callback for <a class="autorefs autorefs-internal" title="apply(func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT], other: H[_OtherT] | _OtherT | SentinelT = Sentinel) -&gt; H[_ResultT]" href="../dyce/#dyce.H.apply"><code>H.apply</code></a> for refereeing a head-to-head contest of values:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">d6</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.lifecycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentalWarning</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">ExperimentalWarning</span><span class="p">)</span>
+
+<span class="n">VersusFuncT</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">[</span><span class="s2">"Versus"</span><span class="p">]]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Versus</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">LOSE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">DRAW</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">WIN</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">raw_vs</span><span class="p">(</span><span class="n">us_outcome</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">them_outcome</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Versus"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">Versus</span><span class="o">.</span><span class="n">LOSE</span>
+            <span class="k">if</span> <span class="n">us_outcome</span> <span class="o">&lt;</span> <span class="n">them_outcome</span>
+            <span class="k">else</span> <span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span>
+            <span class="k">if</span> <span class="n">us_outcome</span> <span class="o">&gt;</span> <span class="n">them_outcome</span>
+            <span class="k">else</span> <span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">single_round_us_vs_them</span><span class="p">(</span>
+        <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="s2">"Versus"</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">our_pool_size</span> <span class="o">@</span> <span class="n">d6</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">Versus</span><span class="o">.</span><span class="n">raw_vs</span><span class="p">,</span> <span class="n">their_pool_size</span> <span class="o">@</span> <span class="n">d6</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As an aside, this reasonably common “versus” pattern can be characterized in a more concise (albeit less readable) way:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">d6</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">ours</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">@</span> <span class="n">d6</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">theirs</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">@</span> <span class="n">d6</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="n">ours</span> <span class="o">-</span> <span class="n">theirs</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="o">...</span>     <span class="k">lambda</span> <span class="n">outcome</span><span class="p">:</span> <span class="n">outcome</span> <span class="o">//</span> <span class="nb">abs</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span> <span class="k">if</span> <span class="n">outcome</span> <span class="k">else</span> <span class="n">outcome</span>
+    <span class="o">...</span> <span class="p">)</span><span class="o">.</span><span class="n">lowest_terms</span><span class="p">()</span>
+    <span class="n">H</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1009</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">197</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+</div>
+<p>Example use for a single round of combat:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">our_pool_size</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">their_pool_size</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">single_round_us_vs_them</span> <span class="o">=</span> <span class="n">Versus</span><span class="o">.</span><span class="n">single_round_us_vs_them</span><span class="p">(</span><span class="n">our_pool_size</span><span class="p">,</span> <span class="n">their_pool_size</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">single_round_us_vs_them</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code>              <span class="n">avg</span> <span class="o">|</span>   <span class="o">-</span><span class="mf">0.63</span>
+              <span class="n">std</span> <span class="o">|</span>    <span class="mf">0.73</span>
+<span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">LOSE</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span> <span class="o">|</span>  <span class="mf">77.85</span><span class="o">%</span> <span class="o">|</span><span class="c1">####################################</span>
+ <span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">:</span> <span class="mi">0</span><span class="o">&gt;</span> <span class="o">|</span>   <span class="mf">6.94</span><span class="o">%</span> <span class="o">|</span><span class="c1">###</span>
+  <span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">|</span>  <span class="mf">15.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#######</span>
+</code></pre></div>
+<p>This highlights the mechanic’s notorious “death spiral”, which we can visualize as a heat map.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes</span>
+
+<span class="n">ScenariosDataframesT</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">vs_scenarios_dataframes</span><span class="p">(</span>
+        <span class="n">us_vs_them_func</span><span class="p">:</span> <span class="n">VersusFuncT</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">our_pool_rel_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">their_pool_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScenariosDataframesT</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">us_vs_them_heatmap_subplot</span><span class="p">(</span>
+        <span class="n">vs_dfs</span><span class="p">:</span> <span class="n">ScenariosDataframesT</span><span class="p">,</span>
+        <span class="n">cmap_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">plt_total_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">plt_cur_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span> <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+<details class="example">
+<summary>Visualization source code</summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Index</span>
+
+<span class="c1"># See &lt;https://github.com/python/mypy/issues/19169#issuecomment-2920914460&gt;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vs_scenarios_dataframes</span><span class="p">(</span>  <span class="c1"># type: ignore[no-redef]</span>
+    <span class="n">us_vs_them_func</span><span class="p">:</span> <span class="n">VersusFuncT</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">our_pool_rel_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+    <span class="n">their_pool_sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScenariosDataframesT</span><span class="p">:</span>
+    <span class="n">vs_dfs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">their_pool_size</span> <span class="ow">in</span> <span class="n">their_pool_sizes</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">our_pool_rel_size</span> <span class="ow">in</span> <span class="n">our_pool_rel_sizes</span><span class="p">:</span>
+            <span class="n">our_pool_size</span> <span class="o">=</span> <span class="n">their_pool_size</span> <span class="o">+</span> <span class="n">our_pool_rel_size</span>
+            <span class="n">us_vs_them_results</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">from_counts</span><span class="p">(</span>
+                <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">Versus</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">us_vs_them_func</span><span class="p">(</span><span class="n">our_pool_size</span><span class="p">,</span> <span class="n">their_pool_size</span><span class="p">),</span>
+                <span class="n">preserve_zero_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">our_pool_size</span><span class="si">}</span><span class="s2">d6"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">outcome</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">us_vs_them_results</span><span class="o">.</span><span class="n">probability_items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">Versus</span><span class="p">],</span>
+            <span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+        <span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">their_pool_size</span><span class="si">}</span><span class="s2">d6"</span>
+        <span class="n">vs_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">vs_dfs</span>
+
+<span class="c1"># See &lt;https://github.com/python/mypy/issues/19169#issuecomment-2920914460&gt;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">us_vs_them_heatmap_subplot</span><span class="p">(</span>  <span class="c1"># type: ignore[no-redef]</span>
+    <span class="n">vs_dfs</span><span class="p">:</span> <span class="n">ScenariosDataframesT</span><span class="p">,</span>
+    <span class="n">cmap_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"viridis"</span><span class="p">,</span>
+    <span class="n">plt_total_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">plt_cur_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Versus</span><span class="p">]</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="n">cmap_name</span><span class="p">]</span>
+    <span class="n">lo_color</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="mf">100.0</span><span class="p">)</span>
+    <span class="n">hi_color</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># ruff: ignore[redefined-loop-name]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"our</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> …"</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"… vs. their </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">plt_total_rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">)),</span>
+            <span class="p">(</span><span class="n">plt_cur_row</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_name</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)),</span> <span class="n">labels</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span> <span class="n">labels</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                    <span class="n">x</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                    <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">hi_color</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="n">lo_color</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">"str"</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axes</span>
+</code></pre></div></td></tr></table></div>
+</details>
+<p>Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">vs_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span><span class="n">Versus</span><span class="o">.</span><span class="n">single_round_us_vs_them</span><span class="p">)</span>
+<span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">"magma"</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Modeling the Risus combat mechanic after the first roll"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_first_round_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_first_round_light.svg">
+  <img alt="Plot: Modeling the Risus combat mechanic after the first roll" src="../images/plot_matplotlib_risus_first_round_light.svg">
+</picture></p>
+<h2 id="modeling-entire-multi-round-combats">Modeling entire multi-round combats</h2>
+<p>With a little <del>elbow</del> <em>finger</em> grease, we can roll up our … erm … fingerless gloves and even model how various starting conditions affect combat completion (in this case, applying dynamic programming to avoid redundant computations).</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fractions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">HResult</span><span class="p">,</span> <span class="n">expand</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">risus_combat_driver</span><span class="p">(</span>
+    <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># our starting pool size</span>
+    <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># their starting pool size</span>
+    <span class="n">single_round_us_vs_them_func</span><span class="p">:</span> <span class="n">VersusFuncT</span> <span class="o">=</span> <span class="n">Versus</span><span class="o">.</span><span class="n">single_round_us_vs_them</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
+    <span class="c1"># Preliminary checks before we start recursion</span>
+    <span class="k">if</span> <span class="n">our_pool_size</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">their_pool_size</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"cannot have negative numbers (us: </span><span class="si">{</span><span class="n">our_pool_size</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"them: </span><span class="si">{</span><span class="n">their_pool_size</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">our_pool_size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">their_pool_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"at least one participant must have a non-empty pool"</span><span class="p">)</span>
+
+    <span class="c1"># The @cache` decorator</span>
+    <span class="c1"># (https://docs.python.org/3/library/functools.html#functools.cache)</span>
+    <span class="c1"># does simple memoization for us because there are redundancies. For</span>
+    <span class="c1"># example, we might compute a case where we lose a die, then our</span>
+    <span class="c1"># opposition loses a die. We arrive at a similar case where our</span>
+    <span class="c1"># opposition loses a die, then we lose a die. Both cases would be</span>
+    <span class="c1"># identical from that point on. In this context, `@cache` helps us avoid</span>
+    <span class="c1"># recomputing redundant sub-trees.</span>
+    <span class="nd">@cache</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_us_vs_them_func</span><span class="p">(</span>
+        <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># number of dice we still have</span>
+        <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># number of dice they still have</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
+        <span class="c1"># Either our_pool_size is zero, their_pool_size is zero, or neither is</span>
+        <span class="c1"># zero</span>
+        <span class="k">if</span> <span class="n">our_pool_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Base case: we are out of dice, so they win</span>
+            <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="n">Versus</span><span class="o">.</span><span class="n">LOSE</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">their_pool_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Base case: they are out of dice, so we win</span>
+            <span class="k">return</span> <span class="n">H</span><span class="p">({</span><span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+        <span class="c1"># Otherwise, the battle rages on ...</span>
+        <span class="n">this_round_results</span> <span class="o">=</span> <span class="n">single_round_us_vs_them_func</span><span class="p">(</span>
+            <span class="n">our_pool_size</span><span class="p">,</span> <span class="n">their_pool_size</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Keeping in mind that we're inside our recursive implementation, we</span>
+        <span class="c1"># define a dependent term suitable for dyce.expand, allowing us to</span>
+        <span class="c1"># take our computation for this round, and lean on dyce to "fold in"</span>
+        <span class="c1"># subsequent rounds.</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_next_round_from_this_round</span><span class="p">(</span>
+            <span class="n">this_round</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">Versus</span><span class="p">],</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
+            <span class="k">match</span> <span class="n">this_round</span><span class="o">.</span><span class="n">outcome</span><span class="p">:</span>
+                <span class="k">case</span> <span class="n">Versus</span><span class="o">.</span><span class="n">LOSE</span><span class="p">:</span>
+                    <span class="c1"># We lost this round, so keep going with one fewer die</span>
+                    <span class="c1"># in our pool (which could now be at zero dice)</span>
+                    <span class="k">return</span> <span class="n">_resolve_us_vs_them_func</span><span class="p">(</span>
+                        <span class="n">our_pool_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">their_pool_size</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">case</span> <span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span><span class="p">:</span>
+                    <span class="c1"># They lost this round, so keep going with one fewer die</span>
+                    <span class="c1"># in their pool (which could now be at zero dice)</span>
+                    <span class="k">return</span> <span class="n">_resolve_us_vs_them_func</span><span class="p">(</span>
+                        <span class="n">our_pool_size</span><span class="p">,</span>
+                        <span class="n">their_pool_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">case</span> <span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">:</span>
+                    <span class="c1"># Ignore (i.e., immediately re-roll) all ties</span>
+                    <span class="k">return</span> <span class="n">H</span><span class="p">({})</span>
+                <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                    <span class="c1"># Should never be here</span>
+                    <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span>  <span class="c1"># ruff: ignore[assert-false, pytest-assert-always-false]</span>
+                        <span class="sa">f</span><span class="s2">"unrecognized this_round.outcome </span><span class="si">{</span><span class="n">this_round</span><span class="o">.</span><span class="n">outcome</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="n">_resolve_next_round_from_this_round</span><span class="p">,</span>
+            <span class="n">this_round_results</span><span class="p">,</span>
+            <span class="n">min_path_probability</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x7FFFFFFF</span><span class="p">),</span>
+        <span class="p">)</span>  <span class="c1"># ty: ignore[invalid-return-type]</span>
+
+    <span class="k">return</span> <span class="n">_resolve_us_vs_them_func</span><span class="p">(</span><span class="n">our_pool_size</span><span class="p">,</span> <span class="n">their_pool_size</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>There’s lot going on there.
+Thankfully, it’s heavily annotated.
+It’s worth going back and dissecting as a fairly nuanced application of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a complicated example that involves some fairly sophisticated programming techniques (recursion, memoization, nested functions, etc.).
+The point is not to suggest that such techniques are required to be productive.
+However, it is useful to show that <code>dyce</code> is flexible enough to model these types of outcomes in a couple dozen lines of code.
+It is high-level enough to lean on for nuanced number crunching without a lot of detailed knowledge, while still being low-level enough that authors knowledgeable of advanced programming techniques are not precluded from using them.</p>
+</div>
+<p>When called with its default arguments, <code>risus_combat_driver</code> satisfies the <code>VersusFuncT</code> interface.
+This means we can use it directly with our <code>vs_scenarios_dataframes</code> helper to enumerate resolution outcomes from various starting positions.</p>
+<p>Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">vs_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span>
+    <span class="n">risus_combat_driver</span><span class="p">,</span>
+    <span class="n">our_pool_rel_sizes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+    <span class="n">their_pool_sizes</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span><span class="n">vs_dfs</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="s2">"magma"</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Modeling an entire standard combat in Risus"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_standard_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_standard_light.svg">
+  <img alt="Plot: Modeling an entire standard combat in Risus" src="../images/plot_matplotlib_risus_multi_round_standard_light.svg">
+</picture></p>
+<h2 id="modeling-different-combat-resolution-methods">Modeling different combat resolution methods</h2>
+<h3 id="best-of-set-with-and-without-the-goliath-rule">Best-of-Set with and without the Goliath Rule</h3>
+<p>Using our <code>risus_combat_driver</code> from above, we can craft a alternative resolution function to model the less death-spirally “Best-of-Set” alternative mechanic from <em>The Risus Companion</em> <!-- https://i.4pcdn.org/tg/1366392953060.pdf --> (free with membership to the <a href="https://www.risusiverse.com/home/ior-charter">IOR</a>) with the optional “Goliath Rule” for resolving ties.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">single_round_goliath</span><span class="p">(</span>
+    <span class="n">h_result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">Versus</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Versus</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Goliath Rule: Instead of re-rolling ties, the win goes to the party with</span>
+<span class="sd">    fewer dice in this round.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">Versus</span><span class="p">(</span>
+            <span class="c1"># Resolves to 1 if we have fewer dice, -1 if they have fewer</span>
+            <span class="c1"># dice, and 0 if we're tied</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">our_pool_size</span> <span class="o">&lt;</span> <span class="n">their_pool_size</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">our_pool_size</span> <span class="o">&gt;</span> <span class="n">their_pool_size</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">h_result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span>
+        <span class="k">else</span> <span class="n">h_result</span><span class="o">.</span><span class="n">outcome</span>
+    <span class="p">)</span>
+
+
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">single_round_goliath</span><span class="p">(</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="ow">is</span> <span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">single_round_goliath</span><span class="p">(</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="ow">is</span> <span class="n">Versus</span><span class="o">.</span><span class="n">LOSE</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">single_round_goliath</span><span class="p">(</span>
+        <span class="n">HResult</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">H</span><span class="p">(</span><span class="n">Versus</span><span class="p">),</span> <span class="n">outcome</span><span class="o">=</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">),</span>
+        <span class="n">our_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">their_pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="ow">is</span> <span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">P</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">best_of_set_single_round_us_vs_them</span><span class="p">(</span>
+    <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">with_goliath_rule</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
+    <span class="n">our_best</span> <span class="o">=</span> <span class="p">(</span><span class="n">our_pool_size</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">their_best</span> <span class="o">=</span> <span class="p">(</span><span class="n">their_pool_size</span> <span class="o">@</span> <span class="n">P</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">raw_result</span> <span class="o">=</span> <span class="n">our_best</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">Versus</span><span class="o">.</span><span class="n">raw_vs</span><span class="p">,</span> <span class="n">their_best</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="n">single_round_goliath</span><span class="p">,</span>
+            <span class="n">raw_result</span><span class="p">,</span>
+            <span class="n">our_pool_size</span><span class="o">=</span><span class="n">our_pool_size</span><span class="p">,</span>
+            <span class="n">their_pool_size</span><span class="o">=</span><span class="n">their_pool_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_goliath_rule</span>
+        <span class="k">else</span> <span class="n">raw_result</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Python’s <a href="https://docs.python.org/3/library/functools.html#functools.partial"><code>functools.partial</code></a> allows us to override individual function details, but still leverage our current callback machinery.
+This pattern will come up again below, so we’ll capture it in a helper function.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">VersusFuncGoliathT</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">with_goliath_rule</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span> <span class="o">...</span>
+
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">viz_multi_round_goliath_helper</span><span class="p">(</span>
+        <span class="n">single_round_goliath_func</span><span class="p">:</span> <span class="n">VersusFuncGoliathT</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span> <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+<details class="example">
+<summary>Visualization Goliath Rule helper source code</summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># See &lt;https://github.com/python/mypy/issues/19169#issuecomment-2920914460&gt;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">viz_multi_round_goliath_helper</span><span class="p">(</span>  <span class="c1"># type: ignore[no-redef]</span>
+    <span class="n">single_round_goliath_func</span><span class="p">:</span> <span class="n">VersusFuncGoliathT</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+    <span class="n">all_axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">our_pool_rel_sizes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">their_pool_sizes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+
+    <span class="c1"># Standard combat (for comparison)</span>
+    <span class="n">standard_vs_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span>
+        <span class="n">risus_combat_driver</span><span class="p">,</span>
+        <span class="n">our_pool_rel_sizes</span><span class="o">=</span><span class="n">our_pool_rel_sizes</span><span class="p">,</span>
+        <span class="n">their_pool_sizes</span><span class="o">=</span><span class="n">their_pool_sizes</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axes_standard</span> <span class="o">=</span> <span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span>
+        <span class="n">standard_vs_dfs</span><span class="p">,</span>
+        <span class="n">plt_total_rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">plt_cur_row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">cmap_name</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">all_axes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">axes_standard</span><span class="p">)</span>
+
+    <span class="c1"># Without the Goliath Rule</span>
+    <span class="n">risus_combat_driver_wo_goliath</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">risus_combat_driver</span><span class="p">,</span>
+        <span class="n">single_round_us_vs_them_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span>
+            <span class="n">single_round_goliath_func</span><span class="p">,</span> <span class="n">with_goliath_rule</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">wo_goliath_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span>
+        <span class="n">risus_combat_driver_wo_goliath</span><span class="p">,</span>
+        <span class="n">our_pool_rel_sizes</span><span class="o">=</span><span class="n">our_pool_rel_sizes</span><span class="p">,</span>
+        <span class="n">their_pool_sizes</span><span class="o">=</span><span class="n">their_pool_sizes</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axes_wo_goliath</span> <span class="o">=</span> <span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span>
+        <span class="n">wo_goliath_dfs</span><span class="p">,</span>
+        <span class="n">plt_total_rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">plt_cur_row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">cmap_name</span><span class="o">=</span><span class="s2">"cividis"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">all_axes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">axes_wo_goliath</span><span class="p">)</span>
+
+    <span class="c1"># With the Goliath Rule</span>
+    <span class="n">risus_combat_driver_w_goliath</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">risus_combat_driver</span><span class="p">,</span>
+        <span class="n">single_round_us_vs_them_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span>
+            <span class="n">single_round_goliath_func</span><span class="p">,</span> <span class="n">with_goliath_rule</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">w_goliath_dfs</span> <span class="o">=</span> <span class="n">vs_scenarios_dataframes</span><span class="p">(</span>
+        <span class="n">risus_combat_driver_w_goliath</span><span class="p">,</span>
+        <span class="n">our_pool_rel_sizes</span><span class="o">=</span><span class="n">our_pool_rel_sizes</span><span class="p">,</span>
+        <span class="n">their_pool_sizes</span><span class="o">=</span><span class="n">their_pool_sizes</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axes_w_goliath</span> <span class="o">=</span> <span class="n">us_vs_them_heatmap_subplot</span><span class="p">(</span>
+        <span class="n">w_goliath_dfs</span><span class="p">,</span>
+        <span class="n">plt_total_rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">plt_cur_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">cmap_name</span><span class="o">=</span><span class="s2">"plasma"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">all_axes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">axes_w_goliath</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_axes</span>
+</code></pre></div></td></tr></table></div>
+</details>
+<p>We’ll use that Goliath Rule helper to approximate a complete “Best-of-Set” combat and compare it to a “standard” one.</p>
+<p>Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">best_of_set_single_round_us_vs_them</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s2">"Full “Best-of-Set” combat results based on starting pool sizes</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Standard (top row)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Best-of-Set w/o the Goliath Rule (middle row)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Best-of-Set w/ the Goliath Rule (bottom row)"</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_best_of_set_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
+  <img alt="Plot: Full “Best-of-Set” combat results based on starting pool sizes; Standard (top row); Best-of-Set w/o the Goliath Rule (middle row); Best-of-Set w/ the Goliath Rule (bottom row)" src="../images/plot_matplotlib_risus_multi_round_best_of_set_light.svg">
+</picture></p>
+<h3 id="evens-up-with-and-without-the-goliath-rule">Evens-Up with and without the Goliath Rule</h3>
+<p>The “<a href="http://www.risusiverse.com/home/optional-rules/evens-up">Evens-Up</a>” alternative dice mechanic presents some challenges.</p>
+<p>First, <code>dyce</code>’s substitution mechanism only resolves outcomes through a fixed number of iterations, so it can only approximate probabilities for infinite series.
+Most of the time, the implications are largely theoretical for a sufficient number of iterations.
+This is no exception.</p>
+<p>Another limitation is that <code>dyce</code> only provides a mechanism to directly expand outcomes, not counts.
+This means we can’t arbitrarily <em>increase</em> the likelihood of achieving a particular outcome through replacement.
+With some creativity, we can work around that, too.</p>
+<p>In the case of “Evens-Up”, we need to keep track of whether an even number was rolled, but we also need to keep rolling (and accumulating) as long as sixes are rolled.
+This behaves a lot like an exploding die with three values (miss, hit, and hit-and-explode).
+Further, we can observe that every “run” will be zero or more exploding hits terminated by either a miss or a non-exploding hit.</p>
+<p>If we choose our values carefully, we can encode how many times we’ve encountered relevant events as we explode.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">explode_n</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">EvensUp</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">MISS</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">HIT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">HIT_EXPLODE</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="n">d_evens_up_raw</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">EvensUp</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">MISS</span><span class="p">,</span>  <span class="c1"># 1</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">HIT</span><span class="p">,</span>  <span class="c1"># 2</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">MISS</span><span class="p">,</span>  <span class="c1"># 3</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">HIT</span><span class="p">,</span>  <span class="c1"># 4</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">MISS</span><span class="p">,</span>  <span class="c1"># 5</span>
+        <span class="n">EvensUp</span><span class="o">.</span><span class="n">HIT_EXPLODE</span><span class="p">,</span>  <span class="c1"># 6</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="n">d_evens_up_raw_exploded</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">explode_n</span><span class="p">(</span>
+        <span class="n">d_evens_up_raw</span><span class="p">,</span>
+        <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>  <span class="c1"># plenty deep for our needs</span>
+    <span class="p">)</span>
+    <span class="o">+</span> <span class="mi">0</span>  <span class="c1"># make sure everything is an int</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">d_evens_up_raw_exploded</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">648</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">432</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
+<p>For every outcome in that distribution that is even, our streak ended in a miss (i.e., zero or more <code>HIT_EXPLODE</code> values followed by a <code>MISS</code>).
+For every outcome that is odd, out streak ended in a non-exploding hit that will need to be tallied (i.e., zero or more <code>HIT_EXPLODE</code> values followed by a <code>HIT</code>).</p>
+<p>An outcome of <code>0</code> indicates a <code>MISS</code>. An outcome of <code>1</code> indicates a <code>HIT</code>. An outcome of <code>2</code> indicates a <code>HIT_EXPLODE</code> followed by a <code>MISS</code>. An outcome of <code>5</code> indicates a <code>HIT_EXPLODE</code> followed by another <code>HIT_EXPLODE</code> followed by a <code>HIT</code>.</p>
+<p>In other words, dividing by two will tell us how many exploding hits we had along the way. The remainder will tell us whether exploding ended in a miss or a hit.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">d_evens_up</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">from_counts</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">outcome</span> <span class="o">//</span> <span class="mi">2</span>  <span class="c1"># a tally of any exploded hits</span>
+        <span class="o">+</span> <span class="n">outcome</span> <span class="o">%</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># any final hit</span>
+        <span class="n">count</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">d_evens_up_raw_exploded</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="c1"># A clever alternative</span>
+<span class="k">assert</span> <span class="n">d_evens_up</span> <span class="o">==</span> <span class="p">(</span><span class="n">d_evens_up_raw_exploded</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">d_evens_up</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">avg</span> <span class="o">|</span>    <span class="mf">0.60</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">0.69</span>
+  <span class="mi">0</span> <span class="o">|</span>  <span class="mf">50.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">41.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#########################################</span>
+  <span class="mi">2</span> <span class="o">|</span>   <span class="mf">6.94</span><span class="o">%</span> <span class="o">|</span><span class="c1">######</span>
+  <span class="mi">3</span> <span class="o">|</span>   <span class="mf">1.16</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+  <span class="mi">4</span> <span class="o">|</span>   <span class="mf">0.23</span><span class="o">%</span> <span class="o">|</span>
+</code></pre></div>
+<p>Now we can craft an “Evens-Up” implementation suitable for passing to our <code>risus_combat_driver</code>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">evens_up_single_round_us_vs_them</span><span class="p">(</span>
+    <span class="n">our_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">their_pool_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">with_goliath_rule</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">Versus</span><span class="p">]:</span>
+    <span class="n">raw_result</span> <span class="o">=</span> <span class="p">(</span><span class="n">our_pool_size</span> <span class="o">@</span> <span class="n">d_evens_up</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="n">Versus</span><span class="o">.</span><span class="n">raw_vs</span><span class="p">,</span> <span class="n">their_pool_size</span> <span class="o">@</span> <span class="n">d_evens_up</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="n">single_round_goliath</span><span class="p">,</span>
+            <span class="n">raw_result</span><span class="p">,</span>
+            <span class="n">our_pool_size</span><span class="o">=</span><span class="n">our_pool_size</span><span class="p">,</span>
+            <span class="n">their_pool_size</span><span class="o">=</span><span class="n">their_pool_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_goliath_rule</span>
+        <span class="k">else</span> <span class="n">raw_result</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>We’ll use that to approximate a complete “Evens-Up” combat, continuing to leveraging our Goliath Rule helper from above.</p>
+<p>Visualization: <a href="https://dycelib.org/latest/jupyter/lab/?path=risus.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">viz_multi_round_goliath_helper</span><span class="p">(</span><span class="n">evens_up_single_round_us_vs_them</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s2">"Full “Evens-Up” combat results based on starting pool sizes</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Standard (top row)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Evens-Up w/o the Goliath Rule (middle row)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Evens-Up w/ the Goliath Rule (bottom row)"</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_risus_multi_round_evens_up_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
+  <img alt="Plot: Full “Evens-Up” combat results based on starting pool sizes; Standard (top row); Evens-Up w/o the Goliath Rule (middle row); Evens-Up w/ the Goliath Rule (bottom row)" src="../images/plot_matplotlib_risus_multi_round_evens_up_light.svg">
+</picture></p>
+<p><em>Phew!</em>
+What a journey!
+Hopefully this highlights some of <code>dyce</code>’s flexibility and capabilities.
+If you’d like help using <code>dyce</code> with modeling your own complicated mechanics, <a href="https://dycelib.org/latest/contrib/#starting-discussions-and-filing-issues">drop me a line</a>!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

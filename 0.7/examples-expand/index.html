@@ -1,0 +1,1338 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple Python tools for exploring dice outcomes and other finite discrete probabilities">
+      
+      
+        <meta name="author" content="Matt Bogosian">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.67">
+    
+    
+      
+        <title>Expansion and recursion - dyce</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+      
+      
+
+
+    
+    
+  
+      
+    
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js" charset="utf-8"></script>
+  <script src="../javascripts/plotly-theme.js"></script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#expansion-and-recursion" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="dyce" class="md-header__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dyce
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Expansion and recursion
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="light-green"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="dyce" class="md-nav__button md-logo" aria-label="dyce" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    dyce
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/posita/dyce/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core concepts
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Release notes
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  License and credits
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  API
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Core
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Conveniences
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Visualization
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Visualization
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Shared structures
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.matplotlib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Matplotlib (optional)
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dyce.viz.plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Plotly
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#constructing-an-exploding-dice-mechanic" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Constructing an exploding dice mechanic
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-dyceexplode_n" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Using <code>dyce.explode_n</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<!---
+  Copyright and other protections apply.
+  Please see the accompanying LICENSE file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! IMPORTANT: READ THIS BEFORE EDITING! !!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Please keep each sentence on its own unwrapped line.
+  It looks like crap in a text editor, but it has no effect on rendering, and it allows much more useful diffs.
+  Thank you!
+  -->
+
+<h1 id="expansion-and-recursion">Expansion and recursion</h1>
+<h2 id="constructing-an-exploding-dice-mechanic">Constructing an exploding dice mechanic</h2>
+<p>Explosion is a great way to illustrate use of the <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code> interface</a>.
+One way to approximate an exploding die is to recursively re-roll and add to a running total whenever the outcome is the die’s highest.
+This framing is intuitive because it maps to well to how exploding dice are typically handled at the table.</p>
+<p>We might start with something like the following:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">HResult</span><span class="p">,</span> <span class="n">expand</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">naive_explode</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
+<span class="o">...</span>         <span class="c1"># If we've rolled the max for this die, add another die roll</span>
+<span class="o">...</span>         <span class="c1"># to our existing outcome</span>
+<span class="o">...</span>         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d6</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">d6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">4.20</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">3.26</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">16.67</span><span class="o">%</span> <span class="o">|</span><span class="c1">#################################################</span>
+  <span class="mi">7</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">8</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+  <span class="mi">9</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+ <span class="mi">10</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">2.78</span><span class="o">%</span> <span class="o">|</span><span class="c1">########</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">15</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">0.46</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">19</span> <span class="o">|</span>   <span class="mf">0.08</span><span class="o">%</span> <span class="o">|</span>
+ <span class="o">...</span>
+ <span class="mi">47</span> <span class="o">|</span>   <span class="mf">0.00</span><span class="o">%</span> <span class="o">|</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="k">with</span> <span class="n">path</span> <span class="n">probability</span> <span class="o">&lt;</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8388607</span><span class="p">)</span> <span class="n">were</span> <span class="n">truncated</span>
+</code></pre></div>
+<p>What just happened?
+It appears that we went no further than eight rolls (a first roll plus up to seven explosions).
+Folks familiar with this domain might recognize the distribution looks <em>mostly</em> correct, but the counts are a bit…<em>off</em>.
+With eight rolls, we might also expect to see <code>48</code> as the largest outcome, but it’s not present.
+The <a class="autorefs autorefs-internal" href="../dyce/#dyce.TruncationWarning"><code>TruncationWarning</code></a> provides a clue.</p>
+<p>The way to eliminate a branch from consideration when calling <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> recursively is to explicitly return the empty histogram <code>H({})</code> from our callback.
+(See the <code>always_reroll_on_one</code> example from <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code>’s docstring</a>.)
+Our callback does not explicitly return <code>H({})</code>, but there are two scenarios where that is done implicitly on our behalf.
+The first is when a branch’s cumulative path probability falls below <code>min_path_probability</code> (which is what happened in our example above).
+And the second is when we’ve exhausted the call stack:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">fractions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fraction</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fair_coin</span> <span class="o">=</span> <span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">naive_explode</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">fair_coin</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">min_path_probability</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<span class="o">...</span> <span class="p">)</span>  <span class="c1"># these numbers get *big*</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="n">whose</span> <span class="n">recursion</span> <span class="n">depth</span> <span class="n">exceeded</span> <span class="mi">1000</span> <span class="n">were</span> <span class="n">truncated</span>
+</code></pre></div>
+<p>When either of those things happen, <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> “truncates” those branches by returning <code>H({})</code>.
+Let’s take a closer look at our implementation:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code>       <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>For the above line, if <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a> returns <code>H({})</code>, our callback will also return <code>H({})</code> for that branch.
+This is because adding <code>H({})</code> to anything is <code>H({})</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">H</span><span class="p">({})</span> <span class="o">+</span> <span class="mi">1024</span>
+<span class="n">H</span><span class="p">({})</span>
+</code></pre></div></td></tr></table></div>
+<p>This explains why <code>48</code> is missing from our results above.
+A more illustrative case is trying to “explode” a one-sided die (d1), where no branch is “settled” before exhaustion occurs:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">naive_explode</span><span class="p">,</span> <span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">H</span><span class="p">({})</span>
+</code></pre></div></td></tr></table></div>
+<p>How do we fix this?
+Great question!
+Thanks for asking!</p>
+<p>It’s easy.
+We can check.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">guarded_explode</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
+<span class="o">...</span>         <span class="n">inner</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="n">inner</span><span class="p">:</span>
+<span class="o">...</span>             <span class="c1"># Only return another histogram if we weren't truncated</span>
+<span class="o">...</span>             <span class="c1"># somewhere down the line</span>
+<span class="o">...</span>             <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">inner</span>
+<span class="o">...</span>     <span class="c1"># Every other case returns our current outcome</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode</span><span class="p">,</span> <span class="n">d6</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="o">...</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="mi">1296</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1296</span><span class="p">,</span> <span class="mi">25</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">29</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">31</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">35</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">37</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">43</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="k">with</span> <span class="n">path</span> <span class="n">probability</span> <span class="o">&lt;</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8388607</span><span class="p">)</span> <span class="n">were</span> <span class="n">truncated</span>
+</code></pre></div>
+<p><em>Much</em> better.</p>
+<p>But how can we control the number of explosions?
+We <em>could</em> do some math and fiddle with <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s <code>min_path_probability</code> parameter.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">num_faces</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">explosions</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">guarded_explode</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">H</span><span class="p">(</span><span class="n">num_faces</span><span class="p">),</span>
+<span class="o">...</span>     <span class="n">min_path_probability</span><span class="o">=</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_faces</span> <span class="o">**</span> <span class="p">(</span><span class="n">explosions</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><span class="n">TruncationWarning</span><span class="p">:</span> <span class="n">expand</span><span class="p">:</span> <span class="n">some</span> <span class="n">branches</span> <span class="k">with</span> <span class="n">path</span> <span class="n">probability</span> <span class="o">&lt;</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1296</span><span class="p">)</span> <span class="n">were</span> <span class="n">truncated</span>
+</code></pre></div>
+<p>But that’s fragile and highly domain-specific.
+Instead, we can take advantage of <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>’s ability to pass down arbitrary keyword arguments to make our own depth counter.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">guarded_explode_n</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
+<span class="o">...</span>         <span class="n">inner</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode_n</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="n">inner</span><span class="p">:</span>
+<span class="o">...</span>             <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">inner</span>
+<span class="o">...</span>     <span class="c1"># Every other case returns our current outcome</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode_n</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">expand</span><span class="p">(</span><span class="n">guarded_explode_n</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
+<span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+<p>Our callback is still implicitly limited by the <code>min_path_probability</code> parameter, but we can make that go away by setting it to <code>Fraction(0)</code> as we did in our recursion exhaustion illustration above.
+To make that the default, we create a simple wrapper:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">proper_explode_n</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">source</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+<span class="o">...</span>     <span class="o">*</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">min_path_probability</span><span class="p">:</span> <span class="n">Fraction</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+<span class="o">...</span>
+<span class="o">...</span>     <span class="k">def</span><span class="w"> </span><span class="nf">_callback</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">T</span><span class="p">:</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="n">n_left</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>  <span class="c1"># type: ignore[type-var] # zuban: ignore[arg-type]</span>
+<span class="o">...</span>             <span class="n">inner</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">_callback</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="n">n_left</span><span class="o">=</span><span class="n">n_left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>             <span class="k">if</span> <span class="n">inner</span><span class="p">:</span>
+<span class="o">...</span>                 <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">+</span> <span class="n">inner</span>
+<span class="o">...</span>         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+<span class="o">...</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="n">expand</span><span class="p">(</span>
+<span class="o">...</span>         <span class="n">_callback</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">n_left</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">min_path_probability</span><span class="o">=</span><span class="n">min_path_probability</span>
+<span class="o">...</span>     <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">proper_explode_n</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">H</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">216</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">proper_explode_n</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">d6</span>
+<span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+<p>The above is very nearly the implementation for <code>dyce</code>’s own <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, min_path_probability: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a>, which includes a <code>resolver</code> parameter.
+We’ll explore that next.</p>
+<h2 id="using-dyceexplode_n">Using <code>dyce.explode_n</code></h2>
+<p>Let’s say we’re considering a new exploding mechanic.
+For the first explosion, one must roll the highest outcome on a given die.
+A second explosion occurs if either the highest or second highest outcome is rolled.
+A third explosion occurs if anything greater than or equal to the third highest outcome is rolled.
+Etc.
+We’ll never allow explosions if the minimum outcome is rolled.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">explode_n</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">explosions_get_easier_resolver</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">n_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_done</span><span class="p">:</span> <span class="nb">int</span>
+<span class="o">...</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">T</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">return</span> <span class="p">(</span>
+<span class="o">...</span>         <span class="n">result</span><span class="o">.</span><span class="n">h</span>
+<span class="o">...</span>         <span class="c1"># Explode only maximum value if we haven't exploded yet,</span>
+<span class="o">...</span>         <span class="c1"># on [max - 1..max] if we've already exploded once, on</span>
+<span class="o">...</span>         <span class="c1"># [max - 2..max] if we've already exploded twice, etc.</span>
+<span class="o">...</span>         <span class="c1"># ...</span>
+<span class="o">...</span>         <span class="k">if</span> <span class="p">(</span>
+<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">n_done</span>  <span class="c1"># type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]</span>
+<span class="o">...</span>             <span class="ow">and</span>
+<span class="o">...</span>             <span class="c1"># ... but never explode on the minimum</span>
+<span class="o">...</span>             <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>  <span class="c1"># type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]</span>
+<span class="o">...</span>         <span class="p">)</span>
+<span class="o">...</span>         <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+<span class="o">...</span>     <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d10</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">explode_n</span><span class="p">(</span>
+<span class="o">...</span>     <span class="n">d10</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="o">...</span>     <span class="n">resolver</span><span class="o">=</span><span class="n">explosions_get_easier_resolver</span><span class="p">,</span>
+<span class="o">...</span> <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">65</span><span class="p">))</span>
+<span class="n">avg</span> <span class="o">|</span>    <span class="mf">6.19</span>
+<span class="n">std</span> <span class="o">|</span>    <span class="mf">4.71</span>
+  <span class="mi">1</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">2</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">3</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">4</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">5</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">6</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">7</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">8</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+  <span class="mi">9</span> <span class="o">|</span>  <span class="mf">10.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">##################################################</span>
+ <span class="mi">11</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">12</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">13</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">14</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">15</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">16</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">17</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">18</span> <span class="o">|</span>   <span class="mf">1.00</span><span class="o">%</span> <span class="o">|</span><span class="c1">#####</span>
+ <span class="mi">20</span> <span class="o">|</span>   <span class="mf">0.10</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">21</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">22</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">23</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">24</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">25</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">26</span> <span class="o">|</span>   <span class="mf">0.20</span><span class="o">%</span> <span class="o">|</span><span class="c1">#</span>
+ <span class="mi">27</span> <span class="o">|</span>   <span class="mf">0.10</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">28</span> <span class="o">|</span>   <span class="mf">0.01</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">29</span> <span class="o">|</span>   <span class="mf">0.03</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">30</span> <span class="o">|</span>   <span class="mf">0.05</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">31</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">32</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">33</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">34</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">35</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">36</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">37</span> <span class="o">|</span>   <span class="mf">0.06</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">38</span> <span class="o">|</span>   <span class="mf">0.05</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">39</span> <span class="o">|</span>   <span class="mf">0.03</span><span class="o">%</span> <span class="o">|</span>
+ <span class="mi">40</span> <span class="o">|</span>   <span class="mf">0.01</span><span class="o">%</span> <span class="o">|</span>
+</code></pre></div></td></tr></table></div>
+<p>Now let’s consider a “diminishing returns” explosion mechanic, where standard polygonal dice “degrade” into their next smallest die for the next explosion.
+We’ll draft our resolver so that it can take a progression of dice in the form of a <code>dict</code> mapping the current die to the next one.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span><span class="p">,</span> <span class="n">HResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.d</span><span class="w"> </span><span class="kn">import</span> <span class="n">d4</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">d8</span><span class="p">,</span> <span class="n">d10</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d20</span>
+
+<span class="n">progression</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">d6</span><span class="p">:</span> <span class="n">d4</span><span class="p">,</span>
+    <span class="n">d8</span><span class="p">:</span> <span class="n">d6</span><span class="p">,</span>
+    <span class="n">d10</span><span class="p">:</span> <span class="n">d8</span><span class="p">,</span>
+    <span class="n">d12</span><span class="p">:</span> <span class="n">d10</span><span class="p">,</span>
+    <span class="n">d20</span><span class="p">:</span> <span class="n">d12</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">diminishing_returns_resolver</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">HResult</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">_n_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">_n_done</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">progression</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">h</span> <span class="ow">in</span> <span class="n">progression</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">progression</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">h</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outcome</span>
+</code></pre></div></td></tr></table></div>
+<p>However, <a class="autorefs autorefs-internal" title="explode_n(source: H[ot.CanAdd[_OtherT, _ResultT]], *, n: int = 1, min_path_probability: Fraction = Fraction(0), resolver: Callable[[HResult[_ResultT], int, int], H[_ResultT] | _ResultT] = _explode_on_max) -&gt; H[_ResultT]" href="../dyce/#dyce.explode_n"><code>explode_n</code></a> doesn’t provide a mechanism to pass arbitrary arguments to its <em>resolver</em> callback.
+<code>functools.partial</code> provides a work-around.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">explode_n</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_ridge</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_ridge</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">(</span>
+        <span class="n">explode_n</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>  <span class="c1"># unrestricted recursion, since our resolver determines how deep we go</span>
+            <span class="n">resolver</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span>
+                <span class="n">diminishing_returns_resolver</span><span class="p">,</span>
+                <span class="n">progression</span><span class="o">=</span><span class="n">progression</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">progression</span>
+    <span class="p">),</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s2">"d6"</span><span class="p">,</span> <span class="s2">"d8"</span><span class="p">,</span> <span class="s2">"d10"</span><span class="p">,</span> <span class="s2">"d12"</span><span class="p">,</span> <span class="s2">"d20"</span><span class="p">),</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"coolwarm"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Diminishing explode mechanic for polygonal dice"</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<!-- Should match any title of the corresponding plot title -->
+<p><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_diminishing_explode_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_diminishing_explode_light.svg">
+  <img alt="Plot: Diminishing explode mechanic for polygonal dice" src="../images/plot_matplotlib_diminishing_explode_light.svg">
+</picture></p>
+<p>Interactive version: <a href="https://dycelib.org/latest/jupyter/lab/?path=diminishing_explode.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
+<p>For more complicated mechanics that don’t fit neatly into <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>explode_n</code></a>’s <em>resolver</em> parameter, we can always write our own using the more flexible <a class="autorefs autorefs-internal" title="expand(callback: Callable[..., Any], *sources: H[Any] | P[Any], min_path_probability: Fraction | None = None, reset_path_probability: bool = False, **state: Any) -&gt; H[Any]" href="../dyce/#dyce.expand"><code>expand</code></a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <i>Copyright and other protections apply.
+  Please see the accompanying <tt>LICENSE</tt> file for rights and restrictions governing use of this software.
+  All rights not expressly waived or licensed are reserved.
+  If that file is missing or appears to be modified from its original, then please contact the author before viewing or using this software in any capacity.</i>
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

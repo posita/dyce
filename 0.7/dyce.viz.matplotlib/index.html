@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.65">
+      <meta name="generator" content="zensical-0.0.67">
     
     
       
@@ -34,12 +34,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
       
       
 
@@ -282,14 +282,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../countin/" class="md-nav__link">
+      <a href="../concepts/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Countin’ with histograms and pools
+  Core concepts
 
     
   </span>
@@ -308,14 +308,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../translations/" class="md-nav__link">
+      <a href="../examples/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Applications and translations
+  Examples
 
     
   </span>
@@ -393,7 +393,7 @@
   <span class="md-ellipsis">
     
   
-  License
+  License and credits
 
     
   </span>
@@ -710,6 +710,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.format_probability_at_least" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        format_probability_at_least
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.format_probability_at_most" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        format_probability_at_most
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dyce.viz.matplotlib.plot_bar" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -802,6 +824,32 @@
           </nav>
         
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -902,6 +950,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.format_probability_at_least" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        format_probability_at_least
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.format_probability_at_most" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        format_probability_at_most
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dyce.viz.matplotlib.plot_bar" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -959,6 +1029,7 @@
               <article class="md-content__inner md-typeset">
                 
                   
+
   
   
 
@@ -1067,11 +1138,7 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
@@ -1079,7 +1146,11 @@ Otherwise <code>str(outcome)</code> is used.</p>
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_outcome_name</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
@@ -1120,11 +1191,7 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
@@ -1133,7 +1200,11 @@ Otherwise <code>str(outcome)</code> is used.</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
-<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_outcome_name_probability</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>
@@ -1173,16 +1244,16 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
 <span class="normal">148</span>
-<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_probability</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>
@@ -1192,6 +1263,100 @@ Otherwise <code>str(outcome)</code> is used.</p>
 <span class="sd">    Burst-plot formatter that labels each wedge with its probability as a percentage.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="dyce.viz.matplotlib.format_probability_at_least" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">format_probability_at_least</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanLe</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p><code>dyce.viz.matplotlib.format_probability_at_least</code> is experimental; its interface may change or it may be removed in a future release.</p>
+</div>
+<p>Burst-plot formatter that labels each wedge with its cumulative at-least probability as a percentage.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_probability_at_least</span><span class="p">(</span>
+    <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
+    <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
+    <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanLe</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Burst-plot formatter that labels each wedge with its cumulative at-least probability as a percentage.</span>
+<span class="sd">    """</span>
+    <span class="n">h_le_outcome</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">h_le_outcome</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">h_le_outcome</span><span class="o">.</span><span class="n">total</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="dyce.viz.matplotlib.format_probability_at_most" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">format_probability_at_most</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanGe</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p><code>dyce.viz.matplotlib.format_probability_at_most</code> is experimental; its interface may change or it may be removed in a future release.</p>
+</div>
+<p>Burst-plot formatter that labels each wedge with its cumulative at-most probability as a percentage.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_probability_at_most</span><span class="p">(</span>
+    <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
+    <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
+    <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">CanGe</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Burst-plot formatter that labels each wedge with its cumulative at-most probability as a percentage.</span>
+<span class="sd">    """</span>
+    <span class="n">h_ge_outcome</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">h_ge_outcome</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">h_ge_outcome</span><span class="o">.</span><span class="n">total</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1249,13 +1414,9 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_bar_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_bar_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_bar_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_light.svg">
+    <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_matplotlib_plot_bar_light.svg">
 </picture></p>
 </div>
 <div class="tabbed-block">
@@ -1282,13 +1443,9 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_hbar_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_hbar_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_hbar_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_horizontal_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_horizontal_light.svg">
+    <img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_matplotlib_plot_bar_horizontal_light.svg">
 </picture></p>
 </div>
 </div>
@@ -1297,43 +1454,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
@@ -1397,7 +1518,35 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
-<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_bar</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_PLOT_ALPHA</span><span class="p">,</span>
@@ -1427,30 +1576,22 @@ Returns the axes so the caller can further customize the plot.</p>
 
 <span class="sd">    === "Vertical bars (default)"</span>
 
-<span class="sd">            --8&lt;-- "docs-src/plot_viz_plot_bar.py:viz"</span>
+<span class="sd">            --8&lt;-- "docs-src/plot_matplotlib_plot_bar.py:viz"</span>
 
 <span class="sd">        &lt;picture&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_bar_dark.svg"&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_bar_light.svg"&gt;</span>
-<span class="sd">            &lt;!--</span>
-<span class="sd">              TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">              img[src] should be "../images/...".</span>
-<span class="sd">              --&gt;</span>
-<span class="sd">            &lt;img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_bar_light.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_dark.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_light.svg"&gt;</span>
+<span class="sd">            &lt;img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_matplotlib_plot_bar_light.svg"&gt;</span>
 <span class="sd">        &lt;/picture&gt;</span>
 
 <span class="sd">    === "Horizontal bars (`horizontal=True`)"</span>
 
-<span class="sd">            --8&lt;-- "docs-src/plot_viz_plot_hbar.py:viz"</span>
+<span class="sd">            --8&lt;-- "docs-src/plot_matplotlib_plot_bar_horizontal.py:viz"</span>
 
 <span class="sd">        &lt;picture&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_hbar_dark.svg"&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_hbar_light.svg"&gt;</span>
-<span class="sd">            &lt;!--</span>
-<span class="sd">              TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">              img[src] should be "../images/...".</span>
-<span class="sd">              --&gt;</span>
-<span class="sd">            &lt;img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_viz_plot_hbar_light.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_bar_horizontal_dark.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_bar_horizontal_light.svg"&gt;</span>
+<span class="sd">            &lt;img alt="Plot: 2d10 vs. d8 + d12, vertically and horizontally" src="../images/plot_matplotlib_plot_bar_horizontal_light.svg"&gt;</span>
 <span class="sd">        &lt;/picture&gt;</span>
 <span class="sd">    """</span>
     <span class="n">hs_list</span> <span class="o">=</span> <span class="n">_labeled_hs</span><span class="p">(</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
@@ -1563,7 +1704,7 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
-<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce</span><span class="w"> </span><span class="kn">import</span> <span class="n">H</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dyce.viz.matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_burst</span>
@@ -1587,47 +1728,15 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_burst_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_burst_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_burst_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_burst_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_burst_light.svg">
+    <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_burst_light.svg">
 </picture></p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
 <span class="normal">346</span>
@@ -1703,7 +1812,31 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">416</span>
 <span class="normal">417</span>
 <span class="normal">418</span>
-<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_burst</span><span class="p">(</span>
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T1</span><span class="p">],</span>
     <span class="n">compare</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T2</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1741,16 +1874,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
 <span class="sd">    Returns the axes so the caller can further customize the plot.</span>
 
-<span class="sd">        --8&lt;-- "docs-src/plot_viz_plot_burst.py:viz"</span>
+<span class="sd">        --8&lt;-- "docs-src/plot_matplotlib_plot_burst.py:viz"</span>
 
 <span class="sd">    &lt;picture&gt;</span>
-<span class="sd">        &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_burst_dark.svg"&gt;</span>
-<span class="sd">        &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_burst_light.svg"&gt;</span>
-<span class="sd">        &lt;!--</span>
-<span class="sd">          TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">          img[src] should be "../images/...".</span>
-<span class="sd">          --&gt;</span>
-<span class="sd">        &lt;img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_burst_light.svg"&gt;</span>
+<span class="sd">        &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_burst_dark.svg"&gt;</span>
+<span class="sd">        &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_burst_light.svg"&gt;</span>
+<span class="sd">        &lt;img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_burst_light.svg"&gt;</span>
 <span class="sd">    &lt;/picture&gt;</span>
 <span class="sd">    """</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">_get_ax</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
@@ -1775,7 +1904,7 @@ Returns the axes so the caller can further customize the plot.</p>
     <span class="n">outer_labels</span><span class="p">,</span> <span class="n">outer_probs</span> <span class="o">=</span> <span class="n">_wedges</span><span class="p">(</span><span class="n">h_compare</span><span class="p">,</span> <span class="n">compare_formatter</span><span class="p">)</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"image.cmap"</span><span class="p">]</span> <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cmap</span>
     <span class="k">assert</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="n">compare_cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"image.cmap"</span><span class="p">]</span> <span class="k">if</span> <span class="n">compare_cmap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">compare_cmap</span>
+    <span class="n">compare_cmap</span> <span class="o">=</span> <span class="n">cmap</span> <span class="k">if</span> <span class="n">compare_cmap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">compare_cmap</span>
     <span class="k">assert</span> <span class="n">compare_cmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">inner_colors</span> <span class="o">=</span> <span class="n">_colors_proportionate</span><span class="p">(</span>
         <span class="n">cmap</span><span class="p">,</span> <span class="n">inner_probs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">use_midpoints</span><span class="o">=</span><span class="n">use_midpoints_for_colors</span>
@@ -1866,13 +1995,9 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_light.svg">
+    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_light.svg">
 </picture></p>
 </div>
 <div class="tabbed-block">
@@ -1901,13 +2026,9 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_most_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_most_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_most_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_most_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_most_light.svg">
+    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_at_most_light.svg">
 </picture></p>
 </div>
 <div class="tabbed-block">
@@ -1936,13 +2057,9 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_least_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_least_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_least_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_least_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_least_light.svg">
+    <img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_at_least_light.svg">
 </picture></p>
 </div>
 </div>
@@ -1951,31 +2068,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
@@ -2048,7 +2141,19 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">516</span>
 <span class="normal">517</span>
 <span class="normal">518</span>
-<span class="normal">519</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_line</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_PLOT_ALPHA</span><span class="p">,</span>
@@ -2079,44 +2184,32 @@ Returns the axes so the caller can further customize the plot.</p>
 
 <span class="sd">    === "`graph_type=GraphType.NORMAL` (default)"</span>
 
-<span class="sd">            --8&lt;-- "docs-src/plot_viz_plot_line.py:viz"</span>
+<span class="sd">            --8&lt;-- "docs-src/plot_matplotlib_plot_line.py:viz"</span>
 
 <span class="sd">        &lt;picture&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_dark.svg"&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_light.svg"&gt;</span>
-<span class="sd">            &lt;!--</span>
-<span class="sd">              TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">              img[src] should be "../images/...".</span>
-<span class="sd">              --&gt;</span>
-<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_light.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_dark.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_light.svg"&gt;</span>
+<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_light.svg"&gt;</span>
 <span class="sd">        &lt;/picture&gt;</span>
 
 <span class="sd">    === "`graph_type=GraphType.AT_MOST`"</span>
 
-<span class="sd">            --8&lt;-- "docs-src/plot_viz_plot_line_at_most.py:viz"</span>
+<span class="sd">            --8&lt;-- "docs-src/plot_matplotlib_plot_line_at_most.py:viz"</span>
 
 <span class="sd">        &lt;picture&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_most_dark.svg"&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_most_light.svg"&gt;</span>
-<span class="sd">            &lt;!--</span>
-<span class="sd">              TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">              img[src] should be "../images/...".</span>
-<span class="sd">              --&gt;</span>
-<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_most_light.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_most_dark.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_most_light.svg"&gt;</span>
+<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_at_most_light.svg"&gt;</span>
 <span class="sd">        &lt;/picture&gt;</span>
 
 <span class="sd">    === "`graph_type=GraphType.AT_LEAST`"</span>
 
-<span class="sd">            --8&lt;-- "docs-src/plot_viz_plot_line_at_least.py:viz"</span>
+<span class="sd">            --8&lt;-- "docs-src/plot_matplotlib_plot_line_at_least.py:viz"</span>
 
 <span class="sd">        &lt;picture&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_line_at_least_dark.svg"&gt;</span>
-<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_line_at_least_light.svg"&gt;</span>
-<span class="sd">            &lt;!--</span>
-<span class="sd">              TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">              img[src] should be "../images/...".</span>
-<span class="sd">              --&gt;</span>
-<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_viz_plot_line_at_least_light.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_line_at_least_dark.svg"&gt;</span>
+<span class="sd">            &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_line_at_least_light.svg"&gt;</span>
+<span class="sd">            &lt;img alt="Plot: d6 and 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_line_at_least_light.svg"&gt;</span>
 <span class="sd">        &lt;/picture&gt;</span>
 <span class="sd">    """</span>
     <span class="n">hs_list</span> <span class="o">=</span> <span class="n">_labeled_hs</span><span class="p">(</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
@@ -2211,31 +2304,15 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"2d10 vs. d8 + d12"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_ridge_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_ridge_light.svg">
-    <!--
-      TODO(@posita): <a href="https://github.com/zensical/zensical/issues/975">https://github.com/zensical/zensical/issues/975</a> -
-      img[src] should be "../images/...".
-      -->
-    <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_ridge_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_ridge_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_ridge_light.svg">
+    <img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_ridge_light.svg">
 </picture></p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">534</span>
 <span class="normal">535</span>
 <span class="normal">536</span>
 <span class="normal">537</span>
@@ -2417,7 +2494,15 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">713</span>
 <span class="normal">714</span>
 <span class="normal">715</span>
-<span class="normal">716</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span>
+<span class="normal">722</span>
+<span class="normal">723</span>
+<span class="normal">724</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_ridge</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_ALPHA</span><span class="p">,</span>
@@ -2465,16 +2550,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="sd">    If *ax* is `None`, `matplotlib.pyplot.gca()` is used.</span>
 <span class="sd">    Returns the axes so the caller can further customize the plot.</span>
 
-<span class="sd">        --8&lt;-- "docs-src/plot_viz_plot_ridge.py:viz"</span>
+<span class="sd">        --8&lt;-- "docs-src/plot_matplotlib_plot_ridge.py:viz"</span>
 
 <span class="sd">    &lt;picture&gt;</span>
-<span class="sd">        &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_viz_plot_ridge_dark.svg"&gt;</span>
-<span class="sd">        &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_viz_plot_ridge_light.svg"&gt;</span>
-<span class="sd">        &lt;!--</span>
-<span class="sd">          TODO(@posita): &lt;https://github.com/zensical/zensical/issues/975&gt; -</span>
-<span class="sd">          img[src] should be "../images/...".</span>
-<span class="sd">          --&gt;</span>
-<span class="sd">        &lt;img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_viz_plot_ridge_light.svg"&gt;</span>
+<span class="sd">        &lt;source media="(prefers-color-scheme: dark)" srcset="../images/plot_matplotlib_plot_ridge_dark.svg"&gt;</span>
+<span class="sd">        &lt;source media="(prefers-color-scheme: light)" srcset="../images/plot_matplotlib_plot_ridge_light.svg"&gt;</span>
+<span class="sd">        &lt;img alt="Plot: 2d10 vs. d8 + d12" src="../images/plot_matplotlib_plot_ridge_light.svg"&gt;</span>
 <span class="sd">    &lt;/picture&gt;</span>
 <span class="sd">    """</span>
     <span class="n">hs_list</span> <span class="o">=</span> <span class="n">_labeled_hs</span><span class="p">(</span><span class="n">hs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
@@ -2717,7 +2798,7 @@ Returns the axes so the caller can further customize the plot.</p>
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -2729,10 +2810,10 @@ Returns the axes so the caller can further customize the plot.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

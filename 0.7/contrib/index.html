@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.65">
+      <meta name="generator" content="zensical-0.0.67">
     
     
       
@@ -34,12 +34,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
       
       
 
@@ -282,14 +282,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../countin/" class="md-nav__link">
+      <a href="../concepts/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Countin’ with histograms and pools
+  Core concepts
 
     
   </span>
@@ -308,14 +308,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../translations/" class="md-nav__link">
+      <a href="../examples/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Applications and translations
+  Examples
 
     
   </span>
@@ -419,17 +419,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#starting-discussions-and-filing-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Starting discussions and filing issues
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#hacking-quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -473,7 +462,7 @@
   <span class="md-ellipsis">
     
   
-  License
+  License and credits
 
     
   </span>
@@ -740,6 +729,32 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -781,17 +796,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#starting-discussions-and-filing-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Starting discussions and filing issues
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#hacking-quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -827,6 +831,7 @@
               <article class="md-content__inner md-typeset">
                 
                   
+
   
   
 
@@ -846,117 +851,90 @@
   -->
 
 <h1 id="contributing-to-dyce">Contributing to <code>dyce</code></h1>
-<p>There are many ways you can contribute.
-You have only but to try.</p>
-<h2 id="starting-discussions-and-filing-issues">Starting discussions and filing issues</h2>
-<p>You can <a href="https://github.com/posita/dyce/issues">file new issues</a> as you find them.
-Please try to avoid duplicating issues.
-For more free-flow discussions (beefs, rants, ideas, recipes, etc.), consider starting or joining a <a href="https://github.com/posita/dyce/discussions">discussion</a>.</p>
-<!--
-## Posting on StackExchange
-
-If you’re so inclined, feel free to post on StackExchange (e.g., in [RPG](https://rpg.stackexchange.com/) or [Math](https://math.stackexchange.com/)), and tag the question with `dyce`.
-Feel free to at-mention `@posita` as well.
-  -->
-
+<p>You can help by <a href="https://github.com/posita/dyce/issues">filing new issues</a>.
+Please try to avoid duplicates.
+For beefs, rants, ideas, recipes, etc., consider starting or joining a <a href="https://github.com/posita/dyce/discussions">discussion</a>.</p>
 <h2 id="hacking-quick-start">Hacking quick-start</h2>
-<p>An easy way to bootstrap an isolated development environment is:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code>%<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/posita/dyce.git
-…
-%<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dyce
-%<span class="w"> </span>uv<span class="w"> </span>venv<span class="w"> </span>--clear<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="w"> </span>basename<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="k">)</span><span class="s2">"</span><span class="w"> </span>--relocatable
-…
-%<span class="w"> </span>uv<span class="w"> </span>sync
-…
-%<span class="w"> </span>.<span class="w"> </span>.venv/bin/activate
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Using <code>uv</code></label><label for="__tabbed_1_2">Using <code>pip</code></label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Basic setup</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/posita/dyce.git
+<span class="nb">cd</span><span class="w"> </span>dyce
+uv<span class="w"> </span>venv<span class="w"> </span>--clear<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="w"> </span>basename<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="k">)</span><span class="s2">"</span><span class="w"> </span>--relocatable
+uv<span class="w"> </span>sync
+uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+
+<span class="c1"># Run tests with coverage using the current environment</span>
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>--cov
+
+<span class="c1"># Run tests across configured Python versions</span>
+uv<span class="w"> </span>run<span class="w"> </span>tox
+
+<span class="c1"># Run linters, type checkers, and other validators via pre-commit</span>
+uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files<span class="w"> </span>--hook-stage<span class="w"> </span>pre-push
 </code></pre></div></td></tr></table></div>
-<p>Substitute your preferred virtual environment process for <a href="https://docs.python.org/3/library/venv.html"><code>venv</code></a>.
-The <code>[dev]</code> variant includes additional dependencies necessary for development and testing.</p>
-<p>Unit tests are run via <a href="https://docs.pytest.org/">pytest</a> via <a href="https://tox.readthedocs.org/">Tox</a>.
-Linting and type checking are run via <a href="https://pre-commit.com/">pre-commit</a>.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>%<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>…/path/to/dyce
-%<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>--cov<span class="w">  </span><span class="c1"># or uv run tox [-e ...]</span>
-…
-%<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files<span class="w"> </span>--hook-stage<span class="w"> </span>pre-push
-…
+</div>
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Basic setup</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/posita/dyce.git
+<span class="nb">cd</span><span class="w"> </span>dyce
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>--prompt<span class="w"> </span>dyce<span class="w"> </span>.venv
+.<span class="w"> </span>.venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>--requirements<span class="w"> </span>requirements-dev.txt
+pre-commit<span class="w"> </span>install
+
+<span class="c1"># Run tests with coverage using the current environment</span>
+pytest<span class="w"> </span>--cov
+
+<span class="c1"># Run tests across configured Python versions</span>
+tox
+
+<span class="c1"># Run linters, type checkers, and other validators via pre-commit</span>
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files<span class="w"> </span>--hook-stage<span class="w"> </span>pre-push
 </code></pre></div></td></tr></table></div>
-<!--
-
-!!! fail "Special considerations for regenerating class diagrams"
-
-    We use [Pyreverse](https://www.logilab.org/blogentry/6883) to generate class diagrams.
-    Pyreverse is [not very flexible](https://github.com/PyCQA/pylint/issues/568#issuecomment-897755586) with respect to what it includes.
-    We use [PyGraphviz](https://pygraphviz.github.io/) to get rid of unwanted entries from the `.dot` file generated by Pyreverse.
-    This is because the pure-Python alternative we use elsewhere [does not support editing](https://github.com/xflr6/graphviz/issues/141).
-    PyGraphviz has some [special needs](https://pygraphviz.github.io/documentation/stable/install.html#advanced) when it comes to installation.
-
-    This dumpster fire is complicated and fragile.[^1]
-    Depending on your configuration, PyGraphviz may not be able to find the native Graphviz library it needs.
-    This can often be remedied by setting the appropriate [`gcc` environment variables](https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html).
-
-    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nv">CPATH</span><span class="o">=</span>/opt/local/include<span class="w"> </span><span class="nv">LIBRARY_PATH</span><span class="o">=</span>/optlocal/lib<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>assets
-</code></pre></div></td></tr></table></div>
-
-[^1]:
-
-    It is uncanny how often those two properties are found together.
-
-  -->
-
+</div>
+</div>
+</div>
 <h2 id="submission-guidelines">Submission guidelines</h2>
-<p>If you are willing and able, consider <a href="https://github.com/posita/dyce/pulls">submitting a pull request</a> with a fix.
-See <a href="https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">the docs</a> if you’re not already familiar with pull requests.
-<code>dyce</code> releases from <a href="https://github.com/posita/dyce/tree/main"><code>main</code></a> (although not always immediately), so <a href="https://githubflow.github.io/#how-we-do-it">this workflow</a> might be helpful to understand.
-There are only a few additional guidelines:</p>
-<ul>
-<li>If it is not already present, please add your name (and optionally your email, GitHub username, website address, or other contact information) to the <a href="../license/"><code>LICENSE</code></a> file.</li>
-</ul>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>...
-<span class="k">-</span><span class="w"> </span>[<span class="nt">Matt Bogosian</span>](<span class="na">mailto:matt@bogosian.net?Subject=dyce</span>); GitHub – [<span class="gs">**@posita**</span>](https://github.com/posita)
-...
-</code></pre></div></td></tr></table></div>
-<ul>
-<li>
-<p>Use <a href="https://docs.astral.sh/ruff/">Ruff</a> to format your changes.
-  Do your best to follow the source conventions as you observe them.
-  If it’s important to you, existing comments are wrapped at 88 characters per line to match Black’s default.
-  (Don’t spend too much effort on strict conformance, though.
-  I can clean things up later if they really bother me.)</p>
-</li>
-<li>
+<p>Consider submitting a <a href="https://github.com/posita/dyce/pulls">pull request</a> with a fix, if you have one.
+<strong><em>Required:</em></strong> If it is not already present, please add your name to the <a href="../license/"><code>LICENSE</code></a> file to assent to the inclusion of your contribution.
+Optionally include your email, GitHub username, website address, or other contact information as desired.
+If you want feedback on a work-in-progress, consider <a href="https://github.blog/2011-03-23-mention-somebody-they-re-notified/">“mentioning” me</a> (<a href="https://github.com/posita"><strong>@posita</strong></a>), and describe specifically how I can help.</p>
 <p>Provide tests where feasible and appropriate.
-  At the very least, existing tests should not fail.
-  (There are exceptions, but if there is any doubt, they probably do not apply.)
-  Unit tests live in <a href="https://github.com/posita/dyce/tree/main/tests"><code>tests</code></a>.</p>
-</li>
-<li>
-<p>If you want feedback on a work-in-progress, consider <a href="https://github.blog/2011-03-23-mention-somebody-they-re-notified/">“mentioning” me</a> (<a href="https://github.com/posita"><strong>@posita</strong></a>), and describe specifically how I can help.
-  Consider prefixing your pull request’s title with something like, “<code>NEED FEEDBACK –</code>”.</p>
-</li>
-<li>
-<p>If your pull request is still in progress, but you are not blocked on anything, consider using the <a href="https://github.blog/2019-02-14-introducing-draft-pull-requests/">draft feature</a>.</p>
-</li>
-<li>
-<p>Once you are ready for a merge, resolve any conflicts, squash your commits, and provide a useful commit message.
-  (<a href="https://robots.thoughtbot.com/git-interactive-rebase-squash-amend-rewriting-history">This</a> and <a href="http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html">this</a> may be helpful.)
-  If your pull request started out as a draft, promote it by requesting a review.
-  Consider prefixing the pull request’s title to something like, “<code>READY FOR MERGE –</code>”.
-  I will try to get to it as soon as I can.</p>
-</li>
-</ul>
+Unit tests live in <a href="https://github.com/posita/dyce/tree/main/tests"><code>tests</code></a>.
+At the very least, existing tests should not fail.</p>
+<p>If at all possible, please author commit messages and PR descriptions yourself.
+LLM-produced prose tends to lack concision, clarity, and character.</p>
 
 
 
@@ -1007,13 +985,13 @@ There are only a few additional guidelines:</p>
         
         
           
-          <a href="../license/" class="md-footer__link md-footer__link--next" aria-label="Next: License">
+          <a href="../license/" class="md-footer__link md-footer__link--next" aria-label="Next: License and credits">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                License
+                License and credits
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1049,7 +1027,7 @@ There are only a few additional guidelines:</p>
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -1061,10 +1039,10 @@ There are only a few additional guidelines:</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
+      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

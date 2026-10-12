@@ -2,7 +2,7 @@
   "jupyter-config-data": {
     "appName": "dyce",
     "appUrl": "./lab",
-    "appVersion": "0.8.3",
+    "appVersion": "0.8.5",
     "baseUrl": "./",
     "collaborative": false,
     "contentStorageDrivers": [
@@ -420,7 +420,7 @@
     "litePluginSettings": {
       "@jupyterlite/pyodide-kernel-extension:kernel": {
         "pipliteUrls": [
-          "./pypi/all.json?sha256=66098e397fb2f90cf35a5f2b2ea68c80d4ac3adaba9ae16da165d191f8f5707f",
+          "./pypi/all.json?sha256=b1693cce6f47cd2b6a17eaa0b215dea44f5fe9d01f2092129febd52dc8344617",
           "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=94e75a51d1c49df7d0c23591188ff4a7ca5475efe7332814b3e5c4b980ef5a71"
         ]
       }
@@ -436,11 +436,11 @@
     "versionInfo": {
       "@jupyter-notebook/application": {
         "label": "Jupyter Notebook",
-        "version": "7.6.2"
+        "version": "7.6.3"
       },
       "@jupyterlab/application": {
         "label": "JupyterLab",
-        "version": "4.6.3"
+        "version": "4.6.4"
       }
     }
   },
