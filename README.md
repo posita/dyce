@@ -41,6 +41,8 @@ Suggested audiences and applications:
 
 ## Overview
 
+<!-- This should match dyce/__init__.py -->
+
 - [`H`](https://dycelib.org/latest/dyce/#dyce.H) represents possible outcomes and their weights as integer counts.
   A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H((1, 2, 3, 4, 5, 6))`, or simply `H(6)`.
   The sum of three six-sided dice can be represented as `3 @ H(6)`.
@@ -49,6 +51,7 @@ Suggested audiences and applications:
   `P`s keep each die separate, so you can select any die or group of dice and calculate the distribution of their summed results.
 - [`P.survey`](https://dycelib.org/latest/dyce/#dyce.P.survey) and [`expand`](https://dycelib.org/latest/dyce/#dyce.expand) are experimental interfaces useful for modeling mechanics where an outcome of one die affects how others are included.
   Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.
+    - [`explode_n`](https://dycelib.org/latest/dyce/#dyce.explode_n) is provided as a convenient shorthand.
 - Optional [Matplotlib](https://dycelib.org/latest/dyce.viz.matplotlib/) and [Plotly](https://dycelib.org/latest/dyce.viz.plotly/) helpers support visualization.
 
 ## Example: d20 versus a “target number”

@@ -13,9 +13,11 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+# This should match README.md
+
 r"""
 - [`H`][dyce.H] represents possible outcomes and their weights as integer counts.
-  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H(6)`.
+  A fair, six-sided die can be represented as `H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})`, or the shorthand `H((1, 2, 3, 4, 5, 6))`, or simply `H(6)`.
   The sum of three six-sided dice can be represented as `3 @ H(6)`.
 - [`P`][dyce.P] represents an ordered sequence of histograms.
   A pool of three separate six-sided dice can be represented as `3 @ P(H(6))`, or the shorthand `3 @ P(6)`.

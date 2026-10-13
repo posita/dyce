@@ -1561,7 +1561,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             H({<Versus.LOSS: -1>: 27, <Versus.DRAW: 0>: 6, <Versus.WIN: 1>: 15})
 
         Omitting *other* allows examination of just the histogram.
-        One way to determine Apocalypse World outcomes with a modifier:
+        One way to determine *Apocalypse World* mechanic outcomes with a modifier:
 
             >>> class PBTA(IntEnum):
             ...     MISS = 0
@@ -1885,7 +1885,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         r"""
         Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.
 
-        *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.
+        *pos* is a zero-based index analogous to `#!math k` in the `#!math k`th order statistic this method implements.
 
             >>> d6avg = H((2, 3, 3, 4, 4, 5))
             >>> d6avg.order_stat_for_n_at_pos(5, 3)
@@ -2109,7 +2109,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         def _order_stat_at_pos(pos: int) -> "H[_T]":
             # Two endpoint fast paths reduce the inner binomial sum to a single
             # closed-form term per outcome. Both also carry `prev_term` across
-            # iterations so each outcome does ONE pow op rather than two.
+            # iterations so each outcome does ONE pow operation rather than two.
             #
             # pos == n - 1 (max): only k == n contributes; the sum is just `c_le^n`.
             # Difference between adjacent outcomes is `cur_term - prev_term`.
