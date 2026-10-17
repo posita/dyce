@@ -38,6 +38,6 @@ def fig_callback() -> "PlotSpec":
 
 
 if __name__ == "__main__":
-    from _plotly import main
+    from _plot_plotly import main
 
     main(fig_callback)

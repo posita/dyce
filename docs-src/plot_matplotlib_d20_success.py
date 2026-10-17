@@ -20,11 +20,22 @@ def fig_callback() -> None:
 
     # NOTE: Changes to this section should be propagated to docs-src/nb_d20_success.py
     # --8<-- [start:viz]
+    import colorsys
+
     import matplotlib as mpl
+    import matplotlib.colors as mcolors
     import matplotlib.pyplot as plt
     from matplotlib.patches import Wedge
 
-    from dyce.viz.matplotlib import plot_burst
+    from dyce.viz.matplotlib import plot_burst, scale_cmap_lightness
+
+    bg_color_rgb = mcolors.to_rgb(mpl.rcParams["figure.facecolor"])
+    _hue, lit, _sat = colorsys.rgb_to_hls(*bg_color_rgb)
+    adj = 1.25 if lit > 0.5 else 0.75
+    twilight = scale_cmap_lightness("twilight", adj)
+    twilight_r = scale_cmap_lightness("twilight_r", adj)
+    twilight_shifted = scale_cmap_lightness("twilight_shifted", adj)
+    twilight_shifted_r = scale_cmap_lightness("twilight_shifted_r", adj)
 
     _, axes = plt.subplots(1, 2)
     plot_burst(
@@ -33,8 +44,8 @@ def fig_callback() -> None:
         title="highest of 2d20\nor “advantage” (foreground)\nvs. d20 (background)",
         alpha=0.9,
         ax=axes[0],
-        cmap="twilight_shifted",
-        compare_cmap="twilight_r",
+        cmap=twilight_shifted,
+        compare_cmap=twilight_r,
     )
     plot_burst(
         d20_disadvantage,
@@ -42,8 +53,8 @@ def fig_callback() -> None:
         title="lowest of 2d20\nor “disadvantage” (foreground)\nvs. d20 (background)",
         alpha=0.9,
         ax=axes[1],
-        cmap="twilight_shifted_r",
-        compare_cmap="twilight",
+        cmap=twilight_shifted_r,
+        compare_cmap=twilight,
     )
     for ax in axes:
         for wedge in (patch for patch in ax.patches if isinstance(patch, Wedge)):
@@ -53,6 +64,6 @@ def fig_callback() -> None:
 
 
 if __name__ == "__main__":
-    from _plot import main
+    from _plot_matplotlib import main
 
     main(fig_callback)

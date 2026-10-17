@@ -23,6 +23,7 @@ from collections.abc import Generator, Iterable
 from typing import cast
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
@@ -42,6 +43,8 @@ from dyce.viz.matplotlib import (
     plot_burst,
     plot_line,
     plot_ridge,
+    scale_cmap_lightness,
+    scale_color_lightness,
 )
 
 __all__ = ()
@@ -474,3 +477,31 @@ class TestPlotRidge:
         assert ax is not None
         # TODO(@posita): # ruff: ignore[missing-todo-link] - test whether the color map
         # was used
+
+
+class TestScaleColors:
+    def test_scale_cmap_lightness(self) -> None:
+        cm_orig = plt.colormaps.get_cmap("coolwarm")
+        adj = 1.25
+        cm_adj = scale_cmap_lightness(cm_orig, adj)
+        assert cm_adj.name == "adj_coolwarm"
+        assert cm_orig(0) == pytest.approx((0.2298057, 0.298717966, 0.753683153, 1.0))
+        assert cm_adj(-1) == pytest.approx(
+            (0.41575799970154326, 0.4691775832131031, 0.8218586400484567, 1.0)
+        )
+
+    def test_scale_color_lightness(self) -> None:
+        assert scale_color_lightness("red", amount=0.5) == (0.5, 0.0, 0.0)
+        assert scale_color_lightness("white", amount=0.5) == (0.5, 0.5, 0.5)
+        assert scale_color_lightness("#996", amount=0.5) == pytest.approx(
+            (0.3, 0.3, 0.2)
+        )
+        assert scale_color_lightness(
+            np.array((np.float64(0.5), np.float64(0.5), np.float64(0.5))), amount=0.5
+        ) == (0.25, 0.25, 0.25)
+
+    def test_out_of_range_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"must be between 0\.0 and 2\.0"):
+            assert scale_color_lightness("white", amount=-0.125)
+        with pytest.raises(ValueError, match=r"must be between 0\.0 and 2\.0"):
+            assert scale_color_lightness("black", amount=2.125)

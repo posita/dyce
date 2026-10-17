@@ -576,7 +576,7 @@ if __name__ == "__main__":
     import os
     from pathlib import Path
 
-    from _plot import _PARSER, main
+    from _plot_matplotlib import _PARSER, main
 
     args = _PARSER.parse_args()
     orig_output_file = args.output_file
