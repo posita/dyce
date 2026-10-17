@@ -7,7 +7,7 @@
 # ======================================================================================
 
 r"""
-Companion to _plot.py, for generating interactive figures as HTML fragments instead of static images.
+Companion to _plot_matplotlib.py, for generating interactive figures as HTML fragments instead of static images.
 Emitted fragments depend on plotly.js.
 """
 

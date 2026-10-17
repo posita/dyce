@@ -45,6 +45,6 @@ def fig_callback() -> None:
 
 
 if __name__ == "__main__":
-    from _plot import main
+    from _plot_matplotlib import main
 
     main(fig_callback)

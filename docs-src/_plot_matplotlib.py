@@ -73,6 +73,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
 
     plt.clf()
     mstyle.use("bmh")
+    mpl.rcParams["figure.facecolor"] = lo_color
     mpl.rcParams["axes.facecolor"] = lo_color
     mpl.rcParams["grid.color"] = hi_color
     mpl.rcParams["axes.edgecolor"] = hi_color
@@ -81,7 +82,7 @@ def main(fig_callback: FigCallbackT, args: argparse.Namespace | None = None) -> 
     mpl.rcParams["xtick.color"] = hi_color
     mpl.rcParams["ytick.color"] = hi_color
 
-    _LOGGER.debug("calling %r(%r)", fig_callback, hi_color)
+    _LOGGER.debug("calling %r()", fig_callback)
     fig_callback()
     plt.tight_layout()
     _LOGGER.info("saving %s", output_path)

@@ -67,7 +67,7 @@ executing==2.2.1
     # via stack-data
 fastjsonschema==2.22.2
     # via nbformat
-filelock==4.0.12
+filelock==3.32.6
     # via
     #   python-discovery
     #   tox

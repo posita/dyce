@@ -31,6 +31,7 @@ uv sync --group viz-mpl
 """
 
 from collections.abc import Callable, Sequence
+from colorsys import hls_to_rgb, rgb_to_hls
 from fractions import Fraction
 from itertools import accumulate, cycle
 from typing import Any, Generic, TypedDict, TypeVar, cast, overload
@@ -46,9 +47,11 @@ else:
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mticker
     import matplotlib.transforms as mtransforms
+    import numpy as np
+    import numpy.typing as npt
     from matplotlib.axes import Axes
     from matplotlib.colors import Colormap
-    from matplotlib.typing import RGBAColorType
+    from matplotlib.typing import ColorType, RGBAColorType
 
 import optype as ot
 
@@ -69,6 +72,8 @@ __all__ = (
     "plot_burst",
     "plot_line",
     "plot_ridge",
+    "scale_cmap_lightness",
+    "scale_color_lightness",
 )
 
 _T = TypeVar("_T")
@@ -722,6 +727,30 @@ def plot_ridge(
     ax.set_ylim(*ylim)
 
     return ax
+
+
+@experimental
+def scale_cmap_lightness(cmap: str | Colormap, adj: float) -> Colormap:
+    cm: Colormap = plt.colormaps.get_cmap(cmap) if isinstance(cmap, str) else cmap
+    colors = cm(range(cm.N))
+    adj_colors = [scale_color_lightness(c, adj) for c in colors]
+    return mcolors.LinearSegmentedColormap.from_list(f"adj_{cm.name}", adj_colors)
+
+
+@experimental
+def scale_color_lightness(
+    color: ColorType | npt.NDArray[np.float32] | npt.NDArray[np.float64], amount: float
+) -> ColorType:
+    r"""Lightens (1 < *amount* <= 2) or darkens (0 <= *amount* < 1) a color."""
+    if amount > 2.0 or amount < 0.0:
+        raise ValueError(f"amount ({amount}) must be between 0.0 and 2.0")
+    try:
+        c = mcolors.cnames[cast("str", color)]
+    except (KeyError, TypeError):
+        c = cast("ColorType", color)
+    c = rgb_to_hls(*mcolors.to_rgb(c))
+    lt = amount * c[1] if amount <= 1.0 else 1.0 - (2.0 - amount) * (1.0 - c[1])
+    return hls_to_rgb(c[0], max(0.0, min(1.0, lt)), c[2])
 
 
 # ---- Helpers -------------------------------------------------------------------------

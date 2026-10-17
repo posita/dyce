@@ -105,22 +105,22 @@ perf : \
 ../docs/images/plot_matplotlib_risus_first_round_dark.svg \
 ../docs/images/plot_matplotlib_risus_multi_round_standard_dark.svg \
 ../docs/images/plot_matplotlib_risus_multi_round_best_of_set_dark.svg \
-../docs/images/plot_matplotlib_risus_multi_round_evens_up_dark.svg &: plot_matplotlib_risus.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
+../docs/images/plot_matplotlib_risus_multi_round_evens_up_dark.svg &: plot_matplotlib_risus.py _plot_matplotlib.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_matplotlib_risus.py --log-level INFO --style dark --output-dir ../docs/images
 
 ../docs/images/plot_matplotlib_risus_first_round_light.svg \
 ../docs/images/plot_matplotlib_risus_multi_round_standard_light.svg \
 ../docs/images/plot_matplotlib_risus_multi_round_best_of_set_light.svg \
-../docs/images/plot_matplotlib_risus_multi_round_evens_up_light.svg &: plot_matplotlib_risus.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
+../docs/images/plot_matplotlib_risus_multi_round_evens_up_light.svg &: plot_matplotlib_risus.py _plot_matplotlib.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_matplotlib_risus.py --log-level INFO --style light --output-dir ../docs/images
 
-../docs/images/plot_matplotlib_%_dark.svg : plot_matplotlib_%.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
+../docs/images/plot_matplotlib_%_dark.svg : plot_matplotlib_%.py _plot_matplotlib.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_matplotlib_$*.py --log-level INFO --style dark --output-file $@
 
-../docs/images/plot_matplotlib_%_light.svg : plot_matplotlib_%.py _plot.py ../dyce/*.py ../dyce/viz/matplotlib.py
+../docs/images/plot_matplotlib_%_light.svg : plot_matplotlib_%.py _plot_matplotlib.py ../dyce/*.py ../dyce/viz/matplotlib.py
 	"$${PYTHON:-python3}" plot_matplotlib_$*.py --log-level INFO --style light --output-file $@
 
-snippets/plot_plotly_%.html : plot_plotly_%.py _plotly.py ../dyce/*.py ../dyce/viz/plotly.py
+snippets/plot_plotly_%.html : plot_plotly_%.py _plot_plotly.py ../dyce/*.py ../dyce/viz/plotly.py
 	"$${PYTHON:-python3}" plot_plotly_$*.py --log-level INFO --output-file $@
 
 perf_%.txt : perf_%.ipy ../dyce/*.py ../dyce/*/*.py

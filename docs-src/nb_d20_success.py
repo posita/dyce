@@ -84,16 +84,11 @@ print(d20_vs_target.format())
 
 # %%
 d20_advantage_vs_target = d20_advantage.ge(target_number)
-print(d20_advantage_vs_target.format())
+print(d20_advantage_vs_target.format_short())
 
 # %%
 d20_disadvantage_vs_target = d20_disadvantage.ge(target_number)
-print(d20_disadvantage_vs_target.format())
-
-# %% [markdown]
-# As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.a
-# With advantage, one is likely to roll at ***least*** a 15 over half the time, and one is nearly twice as likely to roll a 20.
-# With disadvantage, one is likely to roll at ***most*** a 6 over half the time, and one is nearly twice as likely to roll a 1.
+print(d20_disadvantage_vs_target.format_short())
 
 # %%
 import matplotlib as mpl
@@ -127,3 +122,8 @@ for ax in axes:
 plt.gcf().set_size_inches(9.6, 6.4)
 
 plt.tight_layout()
+
+# %% [markdown]
+# As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.a
+# With advantage, one is likely to roll at ***least*** a 15 over half the time, and one is nearly twice as likely to roll a 20.
+# With disadvantage, one is likely to roll at ***most*** a 6 over half the time, and one is nearly twice as likely to roll a 1.
