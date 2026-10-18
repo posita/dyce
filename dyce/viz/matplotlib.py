@@ -802,6 +802,6 @@ def _labeled_hs(
 def _sorted_outcomes(hs_list: list[tuple[str, H[_T]]]) -> list[_T]:
     all_outcomes: set[_T] = {o for _, h in hs_list for o in h}
     try:
-        return sorted(all_outcomes)  # type: ignore[type-var] # zuban: ignore[arg-type]
+        return sorted(all_outcomes)  # type: ignore[type-var] # ty: ignore[invalid-argument-type] # zuban: ignore[arg-type]
     except TypeError:  # pragma: no cover
         return sorted(all_outcomes, key=natural_key)

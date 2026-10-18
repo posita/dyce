@@ -312,7 +312,7 @@ def test_empty_pool_returns_empty_h() -> None:
 def test_repeated_invocation_is_stable() -> None:
     # The memo is scoped per top-level call; repeated calls must be identical.
     pool = P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))
-    surveyor: ParameterizedSurveyor[int, int, int] = ParameterizedSurveyor(  # ty: ignore[invalid-assignment]
+    surveyor: ParameterizedSurveyor[int, int, int] = ParameterizedSurveyor(
         accumulate=_largest_set_next,
         order=survey_outcome_order_ascending,
     )
