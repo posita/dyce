@@ -79,7 +79,7 @@ docs = [
     "pandas",
     "pandas-stubs",
     "plotly",
-    "pymdown-extensions<=12.1",
+    "pymdown-extensions<=12.2",
     "sympy",
     "zensical>=0.0.66",
     {include-group = "viz-mpl"},
