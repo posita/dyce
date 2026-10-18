@@ -1,15 +1,15 @@
 name: Update requirements-dev.txt
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
     paths:
-      - pyproject.toml
       - uv.lock
 
 permissions:
   contents: write
   actions: write
+  pull-requests: read
 
 concurrency:
   group: export-requirements-${{ github.event.pull_request.number }}
@@ -25,32 +25,73 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Check changed files and read PR lockfile
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp "repos/$GH_REPO/pulls/$PR_NUMBER/files" |
+            jq -e '
+              add |
+              any(.filename == "uv.lock") and
+              all(.status == "modified" and
+                  (.filename == "uv.lock" or .filename == "requirements-dev.txt"))
+            '
+          gh api "repos/$GH_REPO/contents/uv.lock?ref=$PR_HEAD" \
+            -H 'Accept: application/vnd.github.raw+json' > uv.lock
+          gh api "repos/$GH_REPO/contents/requirements-dev.txt?ref=$PR_HEAD" \
+            -H 'Accept: application/vnd.github.raw+json' > requirements-dev.txt
+          cp requirements-dev.txt "$RUNNER_TEMP/requirements-dev-before.txt"
 
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
 
       - name: Export requirements
         run: |
+          # Keep the header consistent with docs-src/Makefile.
+          head -n 2 requirements-dev.txt > "$RUNNER_TEMP/requirements-dev-header.txt"
           uv export \
             --format requirements-txt \
-            --locked \
+            --frozen \
+            --offline \
+            --no-header \
             --no-hashes \
             --output-file requirements-dev.txt
+          cat "$RUNNER_TEMP/requirements-dev-header.txt" requirements-dev.txt \
+            > "$RUNNER_TEMP/requirements-dev-export.txt"
+          cp "$RUNNER_TEMP/requirements-dev-export.txt" requirements-dev.txt
 
       - name: Commit export and start validation
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          if ! git diff --quiet -- requirements-dev.txt; then
-            git config user.name 'github-actions[bot]'
-            git config user.email \
-              '41898282+github-actions[bot]@users.noreply.github.com'
-            git add -- requirements-dev.txt
-            git commit -m \
-              'Regenerate requirements-dev.txt [dependabot skip]'
-            git push origin "HEAD:refs/heads/$PR_BRANCH"
+          set -euo pipefail
+          if ! cmp -s requirements-dev.txt "$RUNNER_TEMP/requirements-dev-before.txt"; then
+            gh api graphql \
+              -F repository="$GH_REPO" \
+              -F branch="$PR_BRANCH" \
+              -F head="$PR_HEAD" \
+              -F contents="$(base64 -w 0 requirements-dev.txt)" \
+              -f query='
+                mutation($repository: String!, $branch: String!,
+                         $head: GitObjectID!, $contents: Base64String!) {
+                  createCommitOnBranch(input: {
+                    branch: {repositoryNameWithOwner: $repository, branchName: $branch},
+                    expectedHeadOid: $head,
+                    message: {headline: "Regenerate requirements-dev.txt [dependabot skip]"},
+                    fileChanges: {additions: [{path: "requirements-dev.txt", contents: $contents}]}
+                  }) { commit { oid } }
+                }'
           fi
 
           gh workflow run tests.yml --ref "$PR_BRANCH"
