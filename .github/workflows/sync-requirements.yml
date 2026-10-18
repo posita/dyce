@@ -1,0 +1,56 @@
+name: Update requirements-dev.txt
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - pyproject.toml
+      - uv.lock
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: export-requirements-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  export:
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+
+      - name: Export requirements
+        run: |
+          uv export \
+            --format requirements-txt \
+            --locked \
+            --no-hashes \
+            --output-file requirements-dev.txt
+
+      - name: Commit export and start validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if ! git diff --quiet -- requirements-dev.txt; then
+            git config user.name 'github-actions[bot]'
+            git config user.email \
+              '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -- requirements-dev.txt
+            git commit -m \
+              'Regenerate requirements-dev.txt [dependabot skip]'
+            git push origin "HEAD:refs/heads/$PR_BRANCH"
+          fi
+
+          gh workflow run tests.yml --ref "$PR_BRANCH"
