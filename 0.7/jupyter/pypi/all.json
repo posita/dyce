@@ -1,24 +1,24 @@
 {
   "dyce": {
     "releases": {
-      "0.7.0rc12": [
+      "0.7.0": [
         {
           "comment_text": "",
           "digests": {
-            "md5": "cf356f3d84024ab79bf8db8d10b1d289",
-            "sha256": "5bcb6ea7fee4d1214c89c7c005150c69f141d481a68a9133b99d57efd574be22"
+            "md5": "e60980bd0a5f775fe82e99112e2abf63",
+            "sha256": "16624d1df278e3ed4c42bdd286a9fcaf557920e717cd1ae31883ba0552a1a181"
           },
           "downloads": -1,
-          "filename": "dyce-0.7.0rc12-py3-none-any.whl",
+          "filename": "dyce-0.7.0-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "cf356f3d84024ab79bf8db8d10b1d289",
+          "md5_digest": "e60980bd0a5f775fe82e99112e2abf63",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
           "requires_python": ">=3.11",
-          "size": 70107,
-          "upload_time": "2026-10-12T01:58:41.147499Z",
-          "upload_time_iso_8601": "2026-10-12T01:58:41.147499Z",
-          "url": "./dyce-0.7.0rc12-py3-none-any.whl",
+          "size": 70597,
+          "upload_time": "2026-10-18T22:53:21.277218Z",
+          "upload_time_iso_8601": "2026-10-18T22:53:21.277218Z",
+          "url": "./dyce-0.7.0-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null
         }

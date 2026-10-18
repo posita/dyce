@@ -13,6 +13,7 @@
       
       
       
+      
         <link rel="prev" href="../dyce.viz/">
       
       
@@ -23,7 +24,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.67">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -34,12 +35,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -83,14 +84,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#dycevizmatplotlib-package-reference" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -775,6 +773,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.scale_cmap_lightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        scale_cmap_lightness
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.scale_color_lightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        scale_color_lightness
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1015,6 +1035,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.scale_cmap_lightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        scale_cmap_lightness
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dyce.viz.matplotlib.scale_color_lightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        scale_color_lightness
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1027,6 +1069,7 @@
             <div class="md-content" data-md-component="content">
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
 
@@ -1138,19 +1181,19 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
-<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_outcome_name</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
@@ -1191,12 +1234,7 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
@@ -1204,7 +1242,12 @@ Otherwise <code>str(outcome)</code> is used.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_outcome_name_probability</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>
@@ -1244,16 +1287,16 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_probability</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>
@@ -1289,17 +1332,17 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
-<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_probability_at_least</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
@@ -1336,17 +1379,17 @@ Otherwise <code>str(outcome)</code> is used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
 <span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">format_probability_at_most</span><span class="p">(</span>
     <span class="n">outcome</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="n">prob</span><span class="p">:</span> <span class="n">Fraction</span><span class="p">,</span>  <span class="c1"># ruff: ignore[unused-function-argument]</span>
@@ -1454,12 +1497,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">197</span>
 <span class="normal">198</span>
 <span class="normal">199</span>
 <span class="normal">200</span>
@@ -1546,7 +1584,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
-<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_bar</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_PLOT_ALPHA</span><span class="p">,</span>
@@ -1736,12 +1779,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">348</span>
 <span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
@@ -1836,7 +1874,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">440</span>
 <span class="normal">441</span>
 <span class="normal">442</span>
-<span class="normal">443</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_burst</span><span class="p">(</span>
     <span class="n">h</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T1</span><span class="p">],</span>
     <span class="n">compare</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T2</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2068,12 +2111,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">451</span>
 <span class="normal">452</span>
 <span class="normal">453</span>
 <span class="normal">454</span>
@@ -2153,7 +2191,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">528</span>
 <span class="normal">529</span>
 <span class="normal">530</span>
-<span class="normal">531</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_line</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_PLOT_ALPHA</span><span class="p">,</span>
@@ -2312,12 +2355,7 @@ Returns the axes so the caller can further customize the plot.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">539</span>
 <span class="normal">540</span>
 <span class="normal">541</span>
 <span class="normal">542</span>
@@ -2502,7 +2540,12 @@ Returns the axes so the caller can further customize the plot.</p>
 <span class="normal">721</span>
 <span class="normal">722</span>
 <span class="normal">723</span>
-<span class="normal">724</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_ridge</span><span class="p">(</span>
     <span class="o">*</span><span class="n">hs</span><span class="p">:</span> <span class="n">H</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_RIDGE_ALPHA</span><span class="p">,</span>
@@ -2699,6 +2742,95 @@ Returns the axes so the caller can further customize the plot.</p>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h2 id="dyce.viz.matplotlib.scale_cmap_lightness" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">scale_cmap_lightness</span><span class="p">(</span><span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Colormap</span><span class="p">,</span> <span class="n">adj</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Colormap</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+</div>
+<p><code>dyce.viz.matplotlib.scale_cmap_lightness</code> is experimental; its interface may change or it may be removed in a future release.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_cmap_lightness</span><span class="p">(</span><span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Colormap</span><span class="p">,</span> <span class="n">adj</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Colormap</span><span class="p">:</span>
+    <span class="n">cm</span><span class="p">:</span> <span class="n">Colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colormaps</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">cmap</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">cm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
+    <span class="n">adj_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">scale_color_lightness</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">adj</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="sa">f</span><span class="s2">"adj_</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">adj_colors</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="dyce.viz.matplotlib.scale_color_lightness" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">scale_color_lightness</span><span class="p">(</span><span class="n">color</span><span class="p">:</span> <span class="n">ColorType</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColorType</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p><code>dyce.viz.matplotlib.scale_color_lightness</code> is experimental; its interface may change or it may be removed in a future release.</p>
+</div>
+<p>Lightens (1 &lt; <em>amount</em> &lt;= 2) or darkens (0 &lt;= <em>amount</em> &lt; 1) a color.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>dyce/viz/matplotlib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@experimental</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_color_lightness</span><span class="p">(</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">ColorType</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColorType</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Lightens (1 &lt; *amount* &lt;= 2) or darkens (0 &lt;= *amount* &lt; 1) a color."""</span>
+    <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="mf">2.0</span> <span class="ow">or</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"amount (</span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2">) must be between 0.0 and 2.0"</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">cnames</span><span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="s2">"str"</span><span class="p">,</span> <span class="n">color</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ColorType"</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">rgb_to_hls</span><span class="p">(</span><span class="o">*</span><span class="n">mcolors</span><span class="o">.</span><span class="n">to_rgb</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="n">lt</span> <span class="o">=</span> <span class="n">amount</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">amount</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">hls_to_rgb</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lt</span><span class="p">)),</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
 
 
   </div>
@@ -2810,10 +2942,10 @@ Returns the axes so the caller can further customize the plot.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

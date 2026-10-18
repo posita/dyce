@@ -14,6 +14,7 @@
       
       
       
+      
         <link rel="next" href="./concepts/">
       
       
@@ -21,7 +22,7 @@
       
       
       <link rel="icon" href="./assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.67">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -32,12 +33,12 @@
       
         
       
-      <link rel="stylesheet" href="./assets/stylesheets/modern/main.4ae390e2.min.css">
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="./assets/stylesheets/modern/palette.96d1a7e4.min.css">
+        <link rel="stylesheet" href="./assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -81,14 +82,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#dyce" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -927,6 +925,7 @@
             <div class="md-content" data-md-component="content">
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
 
@@ -949,12 +948,12 @@
   -->
 
 <p><a href="https://github.com/posita/dyce/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/posita/dyce/actions/workflows/tests.yml/badge.svg" /></a>
-<a href="https://pypi.org/project/dyce/0.7.0rc12/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0rc12.svg" /></a>
-<a href="https://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0rc12.svg" /></a>
-<img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0rc12.svg" />
+<a href="https://pypi.org/project/dyce/0.7.0/"><img alt="Version" src="https://img.shields.io/pypi/v/dyce/0.7.0.svg" /></a>
+<a href="https://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/pypi/l/dyce/0.7.0.svg" /></a>
+<img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/dyce/0.7.0.svg" />
 <a href="https://beartype.rtfd.io/"><img alt="Bear-ified™" src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a></p>
 <p><em>Now you’re playing with …</em></p>
-<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc12/docs/dyce.svg" alt="dyce logo"></p>
+<p><img style="float: right; padding: 0 1.0em 0 1.0em;" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0/docs/dyce.svg" alt="dyce logo"></p>
 <h1 id="dyce"><code>dyce</code></h1>
 <p><code>dyce</code> is a Python library for dice mechanics and other problems with a finite set of possible outcomes.
 It counts how many ways each outcome can occur, then calculates exact probabilities.</p>
@@ -964,6 +963,8 @@ It counts how many ways each outcome can occur, then calculates exact probabilit
 <li>Tool developers for using calculations in higher level tooling</li>
 </ul>
 <h2 id="overview">Overview</h2>
+<!-- This should match dyce/__init__.py -->
+
 <ul>
 <li><a href="https://dycelib.org/0.7/dyce/#dyce.H"><code>H</code></a> represents possible outcomes and their weights as integer counts.
   A fair, six-sided die can be represented as <code>H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})</code>, or the shorthand <code>H((1, 2, 3, 4, 5, 6))</code>, or simply <code>H(6)</code>.
@@ -972,7 +973,10 @@ It counts how many ways each outcome can occur, then calculates exact probabilit
   A pool of three separate six-sided dice can be represented as <code>3 @ P(H(6))</code>, or the shorthand <code>3 @ P(6)</code>.
   <code>P</code>s keep each die separate, so you can select any die or group of dice and calculate the distribution of their summed results.</li>
 <li><a href="https://dycelib.org/0.7/dyce/#dyce.P.survey"><code>P.survey</code></a> and <a href="https://dycelib.org/0.7/dyce/#dyce.expand"><code>expand</code></a> are experimental interfaces useful for modeling mechanics where an outcome of one die affects how others are included.
-  Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.</li>
+  Examples include: exploding dice, conditional re-rolls, or damage that depends on whether an attack hits.<ul>
+<li><a href="https://dycelib.org/0.7/dyce/#dyce.explode_n"><code>explode_n</code></a> is provided as a convenient shorthand.</li>
+</ul>
+</li>
 <li>Optional <a href="https://dycelib.org/0.7/dyce.viz.matplotlib/">Matplotlib</a> and <a href="https://dycelib.org/0.7/dyce.viz.plotly/">Plotly</a> helpers support visualization.</li>
 </ul>
 <h2 id="example-d20-versus-a-target-number">Example: d20 versus a “target number”</h2>
@@ -1032,9 +1036,9 @@ With disadvantage, it drops to 9%.</p>
 <span class="p">{</span><span class="n">avg</span><span class="p">:</span> <span class="mf">0.09</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="mf">91.00</span><span class="o">%</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span>  <span class="mf">9.00</span><span class="o">%</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <p><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc12/docs/images/plot_matplotlib_d20_success_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc12/docs/images/plot_matplotlib_d20_success_light.svg">
-  <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0rc12/docs/images/plot_matplotlib_d20_success_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0/docs/images/plot_matplotlib_d20_success_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/posita/dyce/v0.7.0/docs/images/plot_matplotlib_d20_success_light.svg">
+  <img alt="Plot: Comparison of the higher of 2d20 vs. a single d20 and the lower of 2d20 vs. a single d20" src="https://raw.githubusercontent.com/posita/dyce/v0.7.0/docs/images/plot_matplotlib_d20_success_light.svg">
 </picture></p>
 <p><a href="https://dycelib.org/0.7/jupyter/lab/?path=d20_success.ipynb">Run this example in JupyterLite</a>: <a href="https://dycelib.org/0.7/jupyter/lab/?path=d20_success.ipynb"><img src="https://jupyterlite.readthedocs.io/en/latest/_static/badge.svg" alt="Try <code>dyce</code>!" align="absmiddle"></a></p>
 <p>As one might expect, with a single d20, each outcome is equally likely, with 10.5 being the average.
@@ -1084,7 +1088,7 @@ Other works include:</p>
 <p>When one worries that the flickering light of humanity may be snuffed out at any moment, when one’s heart breaks at the perverse celebration of judgment, vengeance, and death and the demonizing of empathy, compassion, and love, sometimes all that is needed is the kindness of a single stranger to reinvigorate one’s faith that—while all may not be right in the world—there is hope for us human beings.</p>
 <ul>
 <li><a href="https://eykd.net/about/">David Eyk</a> not only <a href="https://eykd.net/blog/">inspires others to explore creative writing</a>, but has graciously ceded his PyPI project dedicated to <a href="https://code.google.com/archive/p/dyce/">his own prior work under a similar name</a>.
-  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0rc12/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
+  As such, <code>dyce</code> is now <a href="https://pypi.org/project/dyce/0.7.0/">available as <del><code>dycelib</code></del> <em><code>dyce</code></em></a>!
   Thanks to his generosity, <del>millions</del> <em>dozens</em> of future <code>dyce</code> users will be spared from typing superfluous characters.
   On behalf of myself, those souls, and our keyboards, we salute you, Mr. Eyk. 🫡</li>
 </ul>
@@ -1184,10 +1188,10 @@ Other works include:</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":".","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"./assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":".","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"./assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="./assets/javascripts/bundle.67a597eb.min.js"></script>
+      <script src="./assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

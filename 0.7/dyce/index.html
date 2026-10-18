@@ -13,6 +13,7 @@
       
       
       
+      
         <link rel="prev" href="../license/">
       
       
@@ -23,7 +24,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.67">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -34,12 +35,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.4ae390e2.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.96d1a7e4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -83,14 +84,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#dyce-package-reference" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -1855,6 +1853,7 @@
             <div class="md-content" data-md-component="content">
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
 
@@ -1888,7 +1887,7 @@
 
         <ul>
 <li><a class="autorefs autorefs-internal" href="./#dyce.H"><code>H</code></a> represents possible outcomes and their weights as integer counts.
-  A fair, six-sided die can be represented as <code>H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})</code>, or the shorthand <code>H(6)</code>.
+  A fair, six-sided die can be represented as <code>H({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1})</code>, or the shorthand <code>H((1, 2, 3, 4, 5, 6))</code>, or simply <code>H(6)</code>.
   The sum of three six-sided dice can be represented as <code>3 @ H(6)</code>.</li>
 <li><a class="autorefs autorefs-internal" href="./#dyce.P"><code>P</code></a> represents an ordered sequence of histograms.
   A pool of three separate six-sided dice can be represented as <code>3 @ P(H(6))</code>, or the shorthand <code>3 @ P(6)</code>.
@@ -5394,7 +5393,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).lt(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 7, True: 13})</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_lt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_lt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">"H[ot.CanLe[_OtherT, bool]]"</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">"H[_OtherT]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"H[bool]"</span><span class="p">:</span> <span class="o">...</span>
@@ -5409,7 +5408,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).le(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 1, True: 3})</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_le</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_le</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">"H[ot.CanEq[_OtherT, bool]]"</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">"H[_OtherT]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"H[bool]"</span><span class="p">:</span> <span class="o">...</span>
@@ -5454,7 +5453,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).ge(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 13, True: 7})</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ge</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ge</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">"H[ot.CanGt[_OtherT, bool]]"</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s2">"H[_OtherT]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"H[bool]"</span><span class="p">:</span> <span class="o">...</span>
@@ -5469,7 +5468,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            &gt;&gt;&gt; H(6).gt(H(10)).lowest_terms()</span>
 <span class="sd">            H({False: 3, True: 1})</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_gt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_gt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="c1"># ---- Unary operators -------------------------------------------------------------</span>
 
@@ -5593,7 +5592,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">            H({&lt;Versus.LOSS: -1&gt;: 27, &lt;Versus.DRAW: 0&gt;: 6, &lt;Versus.WIN: 1&gt;: 15})</span>
 
 <span class="sd">        Omitting *other* allows examination of just the histogram.</span>
-<span class="sd">        One way to determine Apocalypse World outcomes with a modifier:</span>
+<span class="sd">        One way to determine *Apocalypse World* mechanic outcomes with a modifier:</span>
 
 <span class="sd">            &gt;&gt;&gt; class PBTA(IntEnum):</span>
 <span class="sd">            ...     MISS = 0</span>
@@ -5864,7 +5863,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="sd">        """</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">count</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"H[_T]"</span><span class="p">,</span> <span class="n">H</span><span class="p">({}))</span>
+            <span class="k">return</span> <span class="n">H</span><span class="p">({})</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="o">*</span><span class="n">counts</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">H</span><span class="p">(</span>
             <span class="p">{</span>
@@ -5917,7 +5916,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.</span>
 
-<span class="sd">        *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.</span>
+<span class="sd">        *pos* is a zero-based index analogous to `#!math k` in the `#!math k`th order statistic this method implements.</span>
 
 <span class="sd">            &gt;&gt;&gt; d6avg = H((2, 3, 3, 4, 4, 5))</span>
 <span class="sd">            &gt;&gt;&gt; d6avg.order_stat_for_n_at_pos(5, 3)</span>
@@ -6141,7 +6140,7 @@ To reduce, call the <a class="autorefs autorefs-internal" title="lowest_terms(*,
         <span class="k">def</span><span class="w"> </span><span class="nf">_order_stat_at_pos</span><span class="p">(</span><span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"H[_T]"</span><span class="p">:</span>
             <span class="c1"># Two endpoint fast paths reduce the inner binomial sum to a single</span>
             <span class="c1"># closed-form term per outcome. Both also carry `prev_term` across</span>
-            <span class="c1"># iterations so each outcome does ONE pow op rather than two.</span>
+            <span class="c1"># iterations so each outcome does ONE pow operation rather than two.</span>
             <span class="c1">#</span>
             <span class="c1"># pos == n - 1 (max): only k == n contributes; the sum is just `c_le^n`.</span>
             <span class="c1"># Difference between adjacent outcomes is `cur_term - prev_term`.</span>
@@ -6535,7 +6534,7 @@ If <em>other</em> is a scalar, call <code>func(outcome, other)</code> for each o
 <span class="n">H</span><span class="p">({</span><span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">LOSS</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">DRAW</span><span class="p">:</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Versus</span><span class="o">.</span><span class="n">WIN</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span> <span class="mi">15</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
 <p>Omitting <em>other</em> allows examination of just the histogram.
-One way to determine Apocalypse World outcomes with a modifier:</p>
+One way to determine <em>Apocalypse World</em> mechanic outcomes with a modifier:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -6748,7 +6747,7 @@ One way to determine Apocalypse World outcomes with a modifier:</p>
 <span class="sd">        H({&lt;Versus.LOSS: -1&gt;: 27, &lt;Versus.DRAW: 0&gt;: 6, &lt;Versus.WIN: 1&gt;: 15})</span>
 
 <span class="sd">    Omitting *other* allows examination of just the histogram.</span>
-<span class="sd">    One way to determine Apocalypse World outcomes with a modifier:</span>
+<span class="sd">    One way to determine *Apocalypse World* mechanic outcomes with a modifier:</span>
 
 <span class="sd">        &gt;&gt;&gt; class PBTA(IntEnum):</span>
 <span class="sd">        ...     MISS = 0</span>
@@ -7719,7 +7718,7 @@ Otherwise, they are omitted.</p>
 <span class="sd">        &gt;&gt;&gt; H(6).ge(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 13, True: 7})</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ge</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_ge</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7772,7 +7771,7 @@ Otherwise, they are omitted.</p>
 <span class="sd">        &gt;&gt;&gt; H(6).gt(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 3, True: 1})</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_gt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_gt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7852,7 +7851,7 @@ Otherwise, they are omitted.</p>
 <span class="sd">        &gt;&gt;&gt; H(6).le(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 1, True: 3})</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_le</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_le</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7936,7 +7935,7 @@ Otherwise, they are omitted.</p>
 <span class="sd">    """</span>
     <span class="n">counts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">count</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"H[_T]"</span><span class="p">,</span> <span class="n">H</span><span class="p">({}))</span>
+        <span class="k">return</span> <span class="n">H</span><span class="p">({})</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="o">*</span><span class="n">counts</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">H</span><span class="p">(</span>
         <span class="p">{</span>
@@ -7997,7 +7996,7 @@ Otherwise, they are omitted.</p>
 <span class="sd">        &gt;&gt;&gt; H(6).lt(H(10)).lowest_terms()</span>
 <span class="sd">        H({False: 7, True: 13})</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_lt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # ty: ignore[no-matching-overload]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">do_lt</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8192,7 +8191,7 @@ Otherwise, they are omitted.</p>
 <p><code>dyce.h.H.order_stat_for_n_at_pos</code> is experimental; its interface may change or it may be removed in a future release.</p>
 </div>
 <p>Computes the probability distribution for each outcome appearing at <em>pos</em> among <em>n</em> like histograms sorted least-to-greatest.</p>
-<p><em>pos</em> is a zero-based index analogous to <span class="arithmatex">\(k\)</span> in the <code>#!k</code>th order statistic this method implements.</p>
+<p><em>pos</em> is a zero-based index analogous to <span class="arithmatex">\(k\)</span> in the <span class="arithmatex">\(k\)</span>th order statistic this method implements.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">d6avg</span> <span class="o">=</span> <span class="n">H</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -8261,7 +8260,7 @@ Otherwise, they are omitted.</p>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Computes the probability distribution for each outcome appearing at *pos* among *n* like histograms sorted least-to-greatest.</span>
 
-<span class="sd">    *pos* is a zero-based index analogous to `#!math k` in the `#!k`th order statistic this method implements.</span>
+<span class="sd">    *pos* is a zero-based index analogous to `#!math k` in the `#!math k`th order statistic this method implements.</span>
 
 <span class="sd">        &gt;&gt;&gt; d6avg = H((2, 3, 3, 4, 4, 5))</span>
 <span class="sd">        &gt;&gt;&gt; d6avg.order_stat_for_n_at_pos(5, 3)</span>
@@ -9528,7 +9527,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9556,7 +9555,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9584,7 +9583,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9612,7 +9611,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9640,7 +9639,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__mod__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9668,7 +9667,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__mod__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__mod__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9696,7 +9695,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9724,7 +9723,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__lshift__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__lshift__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9752,7 +9751,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rshift__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rshift__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9780,7 +9779,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__and__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__and__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9808,7 +9807,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__or__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__or__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span>  <span class="c1"># type: ignore[overload-overlap]</span>
@@ -9836,7 +9835,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__xor__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[call-overload]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__xor__</span><span class="p">(</span><span class="n">_flatten_to_h</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]</span>
 
     <span class="c1"># ---- Reflected operators ---------------------------------------------------------</span>
 
@@ -9851,7 +9850,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__radd__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__radd__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span>
@@ -9864,7 +9863,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rsub__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rsub__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span>
@@ -9877,7 +9876,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span>
@@ -9890,7 +9889,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rfloordiv__</span><span class="p">(</span>
@@ -9903,7 +9902,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmod__</span><span class="p">(</span>
@@ -9916,7 +9915,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rmod__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rmod__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span>
@@ -9929,7 +9928,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rpow__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rpow__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rlshift__</span><span class="p">(</span>
@@ -9942,7 +9941,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rlshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rlshift__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rlshift__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rrshift__</span><span class="p">(</span>
@@ -9955,7 +9954,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rrshift__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rrshift__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span>
@@ -9968,7 +9967,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rand__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rand__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__ror__</span><span class="p">(</span>
@@ -9981,7 +9980,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__ror__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__ror__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rxor__</span><span class="p">(</span>
@@ -9994,7 +9993,7 @@ For deterministic outcomes.
     <span class="k">def</span><span class="w"> </span><span class="fm">__rxor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">H</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">_should_defer_hable_operator</span><span class="p">(</span><span class="n">lhs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rxor__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # zuban: ignore[arg-type]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span><span class="o">.</span><span class="fm">__rxor__</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>  <span class="c1"># type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]</span>
 
     <span class="c1"># ---- Unary operators -------------------------------------------------------------</span>
 
@@ -14763,10 +14762,10 @@ A <a class="autorefs autorefs-internal" href="./#dyce.TruncationWarning"><code>T
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.annotate","content.tabs.link","navigation.footer","navigation.expand","navigation.sections","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.67a597eb.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
