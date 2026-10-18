@@ -1,4 +1,4 @@
-name: Publish Tagged Docs (2026-10)
+name: Publish Tagged Docs
 
 on:
   push:
