@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'win32'",
@@ -1049,7 +1049,7 @@ dev = [
     { name = "plotly" },
     { name = "pre-commit" },
     { name = "pre-commit-uv" },
-    { name = "pymdown-extensions", specifier = "<=12.1" },
+    { name = "pymdown-extensions", specifier = "<12.2.0" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-benchmark" },
@@ -1078,7 +1078,7 @@ docs = [
     { name = "pandas" },
     { name = "pandas-stubs" },
     { name = "plotly" },
-    { name = "pymdown-extensions", specifier = "<=12.1" },
+    { name = "pymdown-extensions", specifier = "<12.2.0" },
     { name = "sympy" },
     { name = "zensical", specifier = ">=0.0.66" },
 ]
@@ -1102,7 +1102,7 @@ lint = [
     { name = "plotly" },
     { name = "pre-commit" },
     { name = "pre-commit-uv" },
-    { name = "pymdown-extensions", specifier = "<=12.1" },
+    { name = "pymdown-extensions", specifier = "<12.2.0" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-benchmark" },
