@@ -18,17 +18,9 @@ updates:
     groups:
       python-packages:
         patterns: ["*"]
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      interval: weekly
-    cooldown:
-      default-days: 7
-    groups:
-      python-packages:
-        patterns: ["*"]
   - package-ecosystem: uv
     directory: /
+    versioning-strategy: lockfile-only
     schedule:
       interval: weekly
     cooldown:
