@@ -500,7 +500,7 @@ def expand(  # ruff: ignore[complex-structure]
 @nobeartype  # not decoratable by beartype (avoids warning)
 def _explode_on_max(result: HResult[_T], _n_left: int, _n_done: int) -> H[_T] | _T:
     try:
-        max_result = max(result.h)  # type: ignore[type-var] # zuban: ignore[arg-type]
+        max_result = max(result.h)  # type: ignore[type-var] # ty: ignore[invalid-argument-type] # zuban: ignore[arg-type]
     except TypeError:
         max_result = max(result.h, key=natural_key)
     return result.h if bool(result.outcome == max_result) else result.outcome

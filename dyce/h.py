@@ -1362,7 +1362,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             >>> H(6).lt(H(10)).lowest_terms()
             H({False: 7, True: 13})
         """
-        return self.apply(ot.do_lt, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_lt, rhs)  # pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def le(self: "H[ot.CanLe[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1377,7 +1377,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             >>> H(6).le(H(10)).lowest_terms()
             H({False: 1, True: 3})
         """
-        return self.apply(ot.do_le, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_le, rhs)  # pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def eq(self: "H[ot.CanEq[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1422,7 +1422,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             >>> H(6).ge(H(10)).lowest_terms()
             H({False: 13, True: 7})
         """
-        return self.apply(ot.do_ge, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_ge, rhs)  # pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def gt(self: "H[ot.CanGt[_OtherT, bool]]", rhs: "H[_OtherT]") -> "H[bool]": ...
@@ -1437,7 +1437,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
             >>> H(6).gt(H(10)).lowest_terms()
             H({False: 3, True: 1})
         """
-        return self.apply(ot.do_gt, rhs)  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
+        return self.apply(ot.do_gt, rhs)  # pyright: ignore[reportArgumentType,reportCallIssue] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     # ---- Unary operators -------------------------------------------------------------
 
@@ -1832,7 +1832,7 @@ class H(Mapping[_T_co, int], Iterable[_T_co], HableT[_T_co]):  # type: ignore[ty
         """
         counts = tuple(count for count in self._h.values() if count)
         if not counts:
-            return cast("H[_T]", H({}))
+            return H({})
         g = math.gcd(*counts)
         return H(
             {
@@ -2275,7 +2275,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __add__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__add__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __sub__(  # type: ignore[overload-overlap]
@@ -2303,7 +2303,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __sub__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__sub__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __mul__(  # type: ignore[overload-overlap]
@@ -2331,7 +2331,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __mul__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__mul__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __truediv__(  # type: ignore[overload-overlap]
@@ -2359,7 +2359,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __truediv__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__truediv__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __floordiv__(  # type: ignore[overload-overlap]
@@ -2387,7 +2387,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __floordiv__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__floordiv__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __mod__(  # type: ignore[overload-overlap]
@@ -2415,7 +2415,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __mod__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__mod__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __pow__(  # type: ignore[overload-overlap]
@@ -2443,7 +2443,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __pow__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__pow__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __lshift__(  # type: ignore[overload-overlap]
@@ -2471,7 +2471,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __lshift__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__lshift__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __rshift__(  # type: ignore[overload-overlap]
@@ -2499,7 +2499,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rshift__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__rshift__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __and__(  # type: ignore[overload-overlap]
@@ -2527,7 +2527,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __and__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__and__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __or__(  # type: ignore[overload-overlap]
@@ -2555,7 +2555,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __or__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__or__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     @overload
     def __xor__(  # type: ignore[overload-overlap]
@@ -2583,7 +2583,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __xor__(self, rhs: object) -> object:
         if _should_defer_hable_operator(rhs):
             return NotImplemented
-        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator] # zuban: ignore[call-overload]
+        return self.h().__xor__(_flatten_to_h(rhs))  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[call-overload]
 
     # ---- Reflected operators ---------------------------------------------------------
 
@@ -2598,7 +2598,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __radd__(self, lhs: object) -> object:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__radd__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__radd__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rsub__(
@@ -2611,7 +2611,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rsub__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rsub__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rsub__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rmul__(
@@ -2624,7 +2624,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rmul__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rmul__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rmul__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rtruediv__(
@@ -2637,7 +2637,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rtruediv__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rtruediv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rtruediv__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rfloordiv__(
@@ -2650,7 +2650,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rfloordiv__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rfloordiv__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rfloordiv__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rmod__(
@@ -2663,7 +2663,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rmod__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rmod__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rmod__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rpow__(
@@ -2676,7 +2676,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rpow__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rpow__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rpow__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rlshift__(
@@ -2689,7 +2689,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rlshift__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rlshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rlshift__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rrshift__(
@@ -2702,7 +2702,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rrshift__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rrshift__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rrshift__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rand__(
@@ -2715,7 +2715,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rand__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rand__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rand__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __ror__(
@@ -2728,7 +2728,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __ror__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__ror__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__ror__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     @overload
     def __rxor__(
@@ -2741,7 +2741,7 @@ class HableOpsMixin(HableT[_T_co]):
     def __rxor__(self, lhs: object) -> H[object]:
         if _should_defer_hable_operator(lhs):
             return NotImplemented
-        return self.h().__rxor__(lhs)  # type: ignore[operator] # zuban: ignore[arg-type]
+        return self.h().__rxor__(lhs)  # type: ignore[operator] # ty: ignore[no-matching-overload] # zuban: ignore[arg-type]
 
     # ---- Unary operators -------------------------------------------------------------
 
@@ -2884,7 +2884,7 @@ def sum_h(hs: Iterable[H[_CanAddSameT]]) -> H[_CanAddSameT]:
         n = sum(1 for _ in group)
         batch = h @ n if n > 1 else h
         result = batch if result is None else result + batch  # type: ignore[operator]
-    return cast("H[_CanAddSameT]", H({})) if result is None else result
+    return H({}) if result is None else result
 
 
 class _ConvolveFallbackWarning(UserWarning):
