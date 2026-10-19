@@ -66,7 +66,6 @@ ax = plot_ridge(
     labels=("least two", "least and greatest", "greatest two"),
 )
 ax.set_title("Distributions for various selections from 3d6")
-ax.legend()
 
 import matplotlib.pyplot as plt
 
