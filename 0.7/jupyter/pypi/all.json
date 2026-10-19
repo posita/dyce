@@ -5,19 +5,19 @@
         {
           "comment_text": "",
           "digests": {
-            "md5": "e60980bd0a5f775fe82e99112e2abf63",
-            "sha256": "16624d1df278e3ed4c42bdd286a9fcaf557920e717cd1ae31883ba0552a1a181"
+            "md5": "fcc9d26a3e7b91078540668b0442a5e5",
+            "sha256": "00d12c2359177c75c0bb4236a1f02052288e8c95a6252eb000496d3fc03afe1a"
           },
           "downloads": -1,
           "filename": "dyce-0.7.0-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "e60980bd0a5f775fe82e99112e2abf63",
+          "md5_digest": "fcc9d26a3e7b91078540668b0442a5e5",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
           "requires_python": ">=3.11",
           "size": 70597,
-          "upload_time": "2026-10-18T22:53:21.277218Z",
-          "upload_time_iso_8601": "2026-10-18T22:53:21.277218Z",
+          "upload_time": "2026-10-19T00:53:20.011591Z",
+          "upload_time_iso_8601": "2026-10-19T00:53:20.011591Z",
           "url": "./dyce-0.7.0-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null
