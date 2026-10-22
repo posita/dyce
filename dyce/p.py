@@ -527,7 +527,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T, _OtherT], _ResultT],
-        other: "H[_OtherT]",
+        other: H[_OtherT],
         *,
         apply_to_each: bool = ...,
     ) -> "P[_ResultT]": ...
@@ -542,7 +542,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
     def apply_to_each_h(
         self: "P[_T]",
         func: Callable[[_T], _ResultT] | Callable[[_T, _OtherT], _ResultT],
-        other: "H[_OtherT] | _OtherT | SentinelT" = Sentinel,
+        other: H[_OtherT] | _OtherT | SentinelT = Sentinel,
         *,
         apply_to_each: bool = False,
     ) -> "P[_ResultT]":
@@ -938,7 +938,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
         """
         if surveyor is None:
             if accumulate is None or order is None:
-                raise ValueError("must provide a surveyor or an accumulate and order")
+                raise ValueError("must provide surveyor or accumulate and order")
             survey_raw_iter = (
                 # Without the convoluted ... if settle is None else ... structure below,
                 # Mypy is confused whether the return type is H[_StateT] or H[_ResultT]
@@ -970,7 +970,7 @@ class P(Sequence[H[_T_co]], HableOpsMixin[_T_co]):
                 or settle is not None
             ):
                 raise ValueError(
-                    "must not provide an accumulate and order with a surveyor"
+                    "must not provide accumulate, initial, order, or settle with surveyor"
                 )
             return aggregate_weighted(self._survey_raw(surveyor))
 

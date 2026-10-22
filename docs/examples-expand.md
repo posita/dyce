@@ -209,10 +209,10 @@ We’ll never allow explosions if the minimum outcome is rolled.
     ...         # [max - 2..max] if we've already exploded twice, etc.
     ...         # ...
     ...         if (
-    ...             result.outcome >= max(result.h) - n_done  # type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]
+    ...             result.outcome >= max(result.h) - n_done  # type: ignore[operator,type-var] # zuban: ignore[arg-type]
     ...             and
     ...             # ... but never explode on the minimum
-    ...             result.outcome > min(result.h)  # type: ignore[operator,type-var] # zuban: ignore[arg-type,operator]
+    ...             result.outcome > min(result.h)  # type: ignore[operator,type-var] # zuban: ignore[arg-type]
     ...         )
     ...         else result.outcome
     ...     )

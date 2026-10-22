@@ -37,13 +37,13 @@ __all__ = (
     "ridge_spec",
 )
 
-# Rows sit one _RIDGE_ROW_STEP apart and the tallest ridge stands _DEFAULT_RIDGE_OVERLAP of them
-# high. Only the ratio matters, since the y-axis range derives from it.
+# Adjacent ridge baselines are _RIDGE_ROW_STEP units apart. The tallest ridge is
+# _DEFAULT_RIDGE_OVERLAP * _RIDGE_ROW_STEP units high.
 _RIDGE_ROW_STEP: float = 1.0
 _DEFAULT_RIDGE_OVERLAP: float = 2.4
 _RIDGE_FILL_ALPHA: float = 0.4
-# Seats each fill on the baseline with a slight taper, and gives a lone
-# single-outcome spike a visible triangle instead of a zero-width sliver.
+# Extend the fill to the baseline with sloped edges. For a single outcome, these edges
+# form a visible triangle instead of a zero-width shape.
 _RIDGE_FILL_FOOT: float = 0.1
 _DEFAULT_PRECISION: int = 2
 

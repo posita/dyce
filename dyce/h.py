@@ -3030,7 +3030,7 @@ def _h_binary_callable(
     lhs_mapping: Mapping[Any, int],
     rhs_mapping: Mapping[Any, int],
     func: Callable[[Any, Any], Any],
-) -> "dict[Any, int] | NotImplementedType":
+) -> dict[Any, int] | NotImplementedType:
     r"""
     Computes and returns the Cartesian product: for each `(lhs_outcome, lhs_count)` &times; `(rhs_outcome, rhs_count)`, compute `func(lhs_outcome, rhs_outcome)` and accumulates `lhs_count * rhs_count`.
     Returns `NotImplemented` immediately if *func* does.

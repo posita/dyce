@@ -67,7 +67,7 @@ executing==2.2.1
     # via stack-data
 fastjsonschema==2.22.2
     # via nbformat
-filelock==3.32.6
+filelock==4.2.1
     # via
     #   python-discovery
     #   tox
@@ -212,7 +212,7 @@ narwhals==2.26.0
     # via plotly
 nbclient==0.11.0
     # via nbconvert
-nbconvert==7.17.1
+nbconvert==7.17.2
     # via jupyter-server
 nbformat==5.11.1
     # via
@@ -458,7 +458,7 @@ uv==0.13.5
     #   tox-uv
 verspec==0.1.0
     # via mike
-virtualenv==21.14.12
+virtualenv==21.14.13
     # via
     #   pre-commit
     #   tox
