@@ -854,13 +854,13 @@ class Roller(_HableOpsOptOut, ABC, Generic[_T_co]):
         if isinstance(value, Roller):
             return value if label is None else value.label(label)
         elif isinstance(value, H):
-            return HRoller(value, label=label)  # type: ignore[no-any-return]
+            return HRoller(value, label=label)
         elif isinstance(value, P):
-            return PRoller(value, label=label)  # type: ignore[no-any-return]
+            return PRoller(value, label=label)
         elif isinstance(value, HableT):
-            return HableRoller(value, label=label)  # type: ignore[no-any-return]
+            return HableRoller(value, label=label)
         else:
-            return LiteralRoller(value, label=label)  # type: ignore[no-any-return]
+            return LiteralRoller(value, label=label)
 
     def label(self, label: str) -> "Roller[_T_co]":
         r"""Returns a roller that labels this roller without changing it."""
