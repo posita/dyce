@@ -103,7 +103,6 @@ test = [
     "coverage[toml]",
     "numpy",
     "pandas",
-    "pytest-benchmark",
     "pytest-cov",
     {include-group = "test-pypy"},
     {include-group = "viz-mpl"},
@@ -117,6 +116,7 @@ test-pypy = [
     "griffe-warnings-deprecated",
     "ipdb",
     "pytest",
+    "pytest-benchmark",
     "sympy",
 ]
 # Only what's needed for uv run tox [-e ...]

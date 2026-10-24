@@ -58,13 +58,13 @@ def warn_if_beartype_claw_inactive() -> None:
 
 if not TYPE_CHECKING:  # pragma: no cover
     try:
-        from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
+        from beartype import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
             BeartypeConf,
             BeartypeStrategy,
             beartype,
         )
         from beartype.claw import beartype_this_package, warn_if_beartype_claw_inactive  # ruff: ignore[unused-import]
-        from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
+        from beartype.roar import (  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
             BeartypeCallHintViolation,  # pyright: ignore[reportAssignmentType] # ruff: ignore[unused-import]
         )
 

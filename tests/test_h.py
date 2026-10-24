@@ -26,10 +26,11 @@ from decimal import Decimal
 from enum import IntEnum
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Never, SupportsFloat, assert_type
+from typing import Any, Never, SupportsFloat, assert_type
 from unittest.mock import patch
 
 import pytest
+from pytest_benchmark.fixture import BenchmarkFixture
 
 from dyce import H, HableOpsMixin, P, TruncationWarning, explode_n
 from dyce.h import (
@@ -46,9 +47,6 @@ from ._helpers import (
     enumerate_weighted_unsorted_rolls_multinomial_coefficient,
     sort_and_select_from_rolls,
 )
-
-if TYPE_CHECKING:
-    from pytest_benchmark.fixture import BenchmarkFixture
 
 __all__ = ()
 
@@ -1073,10 +1071,10 @@ class TestHVariance:
     reason="pytest_benchmark not available",
 )
 class TestAggregateWeightedBenchmark:
-    def test_aggregate_weighted(self, benchmark: "BenchmarkFixture") -> None:
+    def test_aggregate_weighted(self, benchmark: BenchmarkFixture) -> None:
         benchmark(aggregate_weighted, ((H(4), 3), (5, 2), (H(6), 2)))
 
-    def test_aggregate_weighted_prod(self, benchmark: "BenchmarkFixture") -> None:
+    def test_aggregate_weighted_prod(self, benchmark: BenchmarkFixture) -> None:
         benchmark(_aggregate_weighted_prod, ((H(4), 3), (5, 2), (H(6), 2)))
 
 

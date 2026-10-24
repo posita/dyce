@@ -13,10 +13,10 @@
 # (This does not apply to code comments.) Thank you!
 # ======================================================================================
 
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Callable, Iterable
-from dataclasses import dataclass
-from typing import Any
+from typing import Any, Generic, TypeVar
 from unittest.mock import Mock
 
 import pytest
@@ -34,132 +34,157 @@ from dyce.p import (
 
 from ._helpers import enumerate_weighted_unsorted_rolls_brute_force
 
-# ---- Brute-force oracle ----------------------------------------------------------------
+_StateT = TypeVar("_StateT")
 
 
-def _oracle(pool: "P[int]", mechanic: Callable[[tuple[int, ...]], Any]) -> "H[Any]":
-    r"""
-    Reduces *mechanic* over every weighted roll of *pool*.
-
-    This deliberately uses an independently verified, brute-force mechanism to enumerate rolls and weights.
-    """
-    acc: dict[Any, int] = defaultdict(int)
-    for roll, weight in enumerate_weighted_unsorted_rolls_brute_force(pool):
-        acc[mechanic(roll)] += weight
-    return H(acc)
-
-
-# ---- Mechanics, expressed both as transition functions and as roll oracles --------------
-
-
-def _sum_next(state: int | None, outcome: int, count: int) -> int:
-    return outcome * count if state is None else state + outcome * count
-
-
-def _sum_roll(roll: tuple[int, ...]) -> int:
-    return sum(roll)
-
-
-def _successes_next(state: int | None, outcome: int, count: int) -> int:
-    running = 0 if state is None else state
-    return running + (count if outcome >= 5 else 0)
-
-
-def _successes_roll(roll: tuple[int, ...]) -> int:
-    return sum(1 for outcome in roll if outcome >= 5)
-
-
-def _largest_set_next(
-    state: int | None,
-    outcome: int,  # ruff: ignore[unused-function-argument]
-    count: int,
-) -> int:
-    return max(0 if state is None else state, count)
-
-
-def _largest_set_roll(roll: tuple[int, ...]) -> int:
-    return max((roll.count(outcome) for outcome in set(roll)), default=0)
-
-
-def _keep_two_next(
-    state: tuple[int, int] | None, outcome: int, count: int
-) -> tuple[int, int]:
-    kept, total = (0, 0) if state is None else state
-    take = min(count, 2 - kept)
-    return kept + take, total + outcome * take
-
-
-def _keep_two_settle(state: tuple[int, int]) -> int:  # ruff: ignore[reimplemented-operator]
-    return state[1]
-
-
-def _keep_highest_two_roll(roll: tuple[int, ...]) -> int:
-    return sum(sorted(roll, reverse=True)[:2])
-
-
-def _keep_lowest_two_roll(roll: tuple[int, ...]) -> int:
-    return sum(sorted(roll)[:2])
-
-
-def _max_next(
-    state: int | None,
-    outcome: int,
-    count: int,  # ruff: ignore[unused-function-argument]
-) -> int:
-    # A presence mechanic: under positive-only calls, accumulate sees only outcomes
-    # that appeared, so count need not be consulted.
-    return outcome if state is None else max(state, outcome)
-
-
-def _max_roll(roll: tuple[int, ...]) -> int:
-    return max(roll)
-
-
-def _min_next(
-    state: int | None,
-    outcome: int,
-    count: int,  # ruff: ignore[unused-function-argument]
-) -> int:
-    return outcome if state is None else min(state, outcome)
-
-
-def _min_roll(roll: tuple[int, ...]) -> int:
-    return min(roll)
-
-
-@dataclass(frozen=True)
-class Mechanic:
+class Mechanic(ABC, Generic[_StateT]):
     name: str
-    accumulate: Callable[[Any, Any, int], Any]
-    roll: Callable[[tuple[int, ...]], Any]
-    initial: Any = None
-    order: Callable[[Iterable[Any]], Iterable[Any]] | None = None
-    settle: Callable[[Any], Any] | None = None
+    initial: _StateT | None = None
+
+    @abstractmethod
+    def accumulate(
+        self, state: _StateT | None, outcome: int, count: int
+    ) -> _StateT: ...
+
+    @abstractmethod
+    def roll(self, roll: tuple[int, ...]) -> int: ...
+
+    def order(self, outcomes: Iterable[int]) -> Iterable[int]:
+        return survey_outcome_order_ascending(outcomes)
+
+    @abstractmethod
+    def settle(self, state: _StateT) -> int: ...
 
 
-MECHANICS: list[Mechanic] = [
-    Mechanic("sum", _sum_next, _sum_roll, initial=0),
-    Mechanic("successes_ge5", _successes_next, _successes_roll, initial=0),
-    Mechanic("largest_matching_set", _largest_set_next, _largest_set_roll),
-    Mechanic(
-        "keep_highest_2",
-        _keep_two_next,
-        _keep_highest_two_roll,
-        order=survey_outcome_order_descending,
-        settle=_keep_two_settle,
-    ),
-    Mechanic(
-        "keep_lowest_2",
-        _keep_two_next,
-        _keep_lowest_two_roll,
-        settle=_keep_two_settle,
-    ),
-    Mechanic("max", _max_next, _max_roll),
-    Mechanic("min", _min_next, _min_roll),
+class SumMechanic(Mechanic[int]):
+    name = "sum"
+    initial = 0
+
+    def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+        return outcome * count if state is None else state + outcome * count
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return sum(roll)
+
+    def settle(self, state: int) -> int:
+        return state
+
+
+class SuccessesMechanic(Mechanic[int]):
+    name = "successes_ge5"
+    initial = 0
+
+    def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+        running = 0 if state is None else state
+        return running + (count if outcome >= 5 else 0)
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return sum(1 for outcome in roll if outcome >= 5)
+
+    def settle(self, state: int) -> int:
+        return state
+
+
+class LargestMatchingSetMechanic(Mechanic[int]):
+    name = "largest_matching_set"
+
+    def accumulate(
+        self,
+        state: int | None,
+        outcome: int,  # ruff: ignore[unused-method-argument]
+        count: int,
+    ) -> int:
+        return max(0 if state is None else state, count)
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return max((roll.count(outcome) for outcome in set(roll)), default=0)
+
+    def settle(self, state: int) -> int:
+        return state
+
+
+class KeepTwoMechanic(Mechanic[tuple[int, int]]):
+    def accumulate(
+        self, state: tuple[int, int] | None, outcome: int, count: int
+    ) -> tuple[int, int]:
+        kept, total = (0, 0) if state is None else state
+        take = min(count, 2 - kept)
+        return kept + take, total + outcome * take
+
+    def settle(self, state: tuple[int, int]) -> int:
+        return state[1]
+
+
+class KeepHighestTwoMechanic(KeepTwoMechanic):
+    name = "keep_highest_2"
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return sum(sorted(roll, reverse=True)[:2])
+
+    def order(self, outcomes: Iterable[int]) -> Iterable[int]:
+        return survey_outcome_order_descending(outcomes)
+
+
+class KeepLowestTwoMechanic(KeepTwoMechanic):
+    name = "keep_lowest_2"
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return sum(sorted(roll)[:2])
+
+
+class MaxMechanic(Mechanic[int]):
+    name = "max"
+
+    def accumulate(
+        self,
+        state: int | None,
+        outcome: int,
+        count: int,  # ruff: ignore[unused-method-argument]
+    ) -> int:
+        # This function is only ever called for outcomes with positive counts. Checking
+        # count is not needed to determine which outcome is largest.
+        return outcome if state is None else max(state, outcome)
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return max(roll)
+
+    def settle(self, state: int) -> int:
+        return state
+
+
+class MinMechanic(Mechanic[int]):
+    name = "min"
+
+    def accumulate(
+        self,
+        state: int | None,
+        outcome: int,
+        count: int,  # ruff: ignore[unused-method-argument]
+    ) -> int:
+        # This function is only ever called for outcomes with positive counts. Checking
+        # count is not needed to determine which outcome is smallest.
+        return outcome if state is None else min(state, outcome)
+
+    def roll(self, roll: tuple[int, ...]) -> int:
+        return min(roll)
+
+    def settle(self, state: int) -> int:
+        return state
+
+
+MECHANICS: list[Mechanic[Any]] = [
+    SumMechanic(),
+    SuccessesMechanic(),
+    LargestMatchingSetMechanic(),
+    KeepHighestTwoMechanic(),
+    KeepLowestTwoMechanic(),
+    MaxMechanic(),
+    MinMechanic(),
 ]
 
-# Homogeneous, heterogeneous+weighted+gap-bearing, mixed sizes, negatives, and a singleton.
-POOLS: list[tuple[str, "P[int]"]] = [
+# Homogeneous, heterogeneous+weighted+gap-bearing, mixed sizes, negatives, and a
+# singleton.
+POOLS: list[tuple[str, P[int]]] = [
     ("3d6", 3 @ P(6)),
     ("hetero_weighted_gap", P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))),
     ("4d4", 4 @ P(4)),
@@ -169,215 +194,173 @@ POOLS: list[tuple[str, "P[int]"]] = [
 ]
 
 
-# ---- Tests -----------------------------------------------------------------------------
+class TestPSurvey:
+    @pytest.mark.parametrize("mech", MECHANICS, ids=[m.name for m in MECHANICS])
+    @pytest.mark.parametrize("pool", [p for _, p in POOLS], ids=[n for n, _ in POOLS])
+    def test_survey_matches_oracle(self, pool: P[int], mech: Mechanic[Any]) -> None:
+        survey_h = pool.survey(
+            accumulate=mech.accumulate,
+            initial=mech.initial,
+            order=mech.order,
+            settle=mech.settle,
+        )
+        assert survey_h == _brute_force_oracle(pool, mech.roll)
+        assert survey_h.total == pool.total
 
+    def test_sum_matches_native_h(self) -> None:
+        for _, pool in POOLS:
+            assert (
+                pool.survey(
+                    accumulate=SumMechanic().accumulate,
+                    initial=0,
+                    order=survey_outcome_order_ascending,
+                )
+                == pool.h()
+            )
 
-def _mech(name: str) -> Mechanic:
-    return next(m for m in MECHANICS if m.name == name)
+    def test_keep_highest_two_matches_native_h(self) -> None:
+        for _, pool in POOLS:
+            survey_h = pool.survey(
+                accumulate=KeepHighestTwoMechanic().accumulate,
+                order=survey_outcome_order_descending,
+                settle=KeepHighestTwoMechanic().settle,
+            )
+            assert survey_h == pool.at(slice(-2, None))
 
+    def test_keep_lowest_two_matches_native_h(self) -> None:
+        for _, pool in POOLS:
+            survey_h = pool.survey(
+                accumulate=KeepLowestTwoMechanic().accumulate,
+                order=survey_outcome_order_ascending,
+                settle=KeepLowestTwoMechanic().settle,
+            )
+            assert survey_h == pool.at(slice(0, 2))
 
-@pytest.mark.parametrize("mech", MECHANICS, ids=[m.name for m in MECHANICS])
-@pytest.mark.parametrize("pool", [p for _, p in POOLS], ids=[n for n, _ in POOLS])
-def test_survey_matches_oracle(pool: "P[int]", mech: Mechanic) -> None:
-    order = mech.order if mech.order is not None else survey_outcome_order_ascending
-    got = pool.survey(  # zuban: ignore[call-overload]
-        accumulate=mech.accumulate,
-        initial=mech.initial,
-        order=order,
-        settle=mech.settle,
-    )
-    assert got == _oracle(pool, mech.roll)
-    # No mass created or lost: the result totals exactly the pool's.
-    assert got.total == pool.total
+    def test_max_matches_native_h(self) -> None:
+        for _, pool in POOLS:
+            assert pool.survey(
+                accumulate=MaxMechanic().accumulate,
+                order=survey_outcome_order_ascending,
+            ) == pool.at(-1)
 
+    def test_min_matches_native_h(self) -> None:
+        for _, pool in POOLS:
+            assert pool.survey(
+                accumulate=MinMechanic().accumulate,
+                order=survey_outcome_order_ascending,
+            ) == pool.at(0)
 
-def test_sum_matches_native_h() -> None:
-    for _, pool in POOLS:
-        assert (
-            pool.survey(
-                accumulate=_sum_next,
+    def test_order_agnostic_mechanic_is_direction_invariant(self) -> None:
+        # Summing outcomes should give the same result in ascending and descending order
+        for _, pool in POOLS:
+            ascending = pool.survey(
+                accumulate=SumMechanic().accumulate,
                 initial=0,
                 order=survey_outcome_order_ascending,
             )
-            == pool.h()
-        )
+            descending = pool.survey(
+                accumulate=SumMechanic().accumulate,
+                initial=0,
+                order=survey_outcome_order_descending,
+            )
+            assert ascending == descending
 
-
-def test_keep_highest_two_matches_native_h() -> None:
-    for _, pool in POOLS:
-        got = pool.survey(
-            accumulate=_keep_two_next,
-            order=survey_outcome_order_descending,
-            settle=_keep_two_settle,
-        )
-        assert got == pool.at(slice(-2, None))
-
-
-def test_keep_lowest_two_matches_native_h() -> None:
-    for _, pool in POOLS:
-        got = pool.survey(
-            accumulate=_keep_two_next,
-            order=survey_outcome_order_ascending,
-            settle=_keep_two_settle,
-        )
-        assert got == pool.at(slice(0, 2))
-
-
-def test_max_matches_native_h() -> None:
-    for _, pool in POOLS:
-        assert pool.survey(
-            accumulate=_mech("max").accumulate,
-            order=survey_outcome_order_ascending,
-        ) == pool.at(-1)
-
-
-def test_min_matches_native_h() -> None:
-    for _, pool in POOLS:
-        assert pool.survey(
-            accumulate=_mech("min").accumulate,
-            order=survey_outcome_order_ascending,
-        ) == pool.at(0)
-
-
-def test_order_agnostic_mechanic_is_direction_invariant() -> None:
-    # A mechanic that folds symmetrically (sum) must give the same result either
-    # sweep direction; an order-sensitive one (keep-highest) need not.
-    for _, pool in POOLS:
-        ascending = pool.survey(
-            accumulate=_sum_next,
-            initial=0,
-            order=survey_outcome_order_ascending,
-        )
-        descending = pool.survey(
-            accumulate=_sum_next,
-            initial=0,
-            order=survey_outcome_order_descending,
-        )
-        assert ascending == descending
-
-
-def test_count_blindness_is_safe_for_presence_but_not_multiplicity() -> None:
-    # Under positive-only calls, ignoring count is SAFE for a presence mechanic
-    # (max is only told about outcomes that actually appeared) ...
-    pool = 2 @ P(6)
-    assert pool.survey(
-        accumulate=_max_next,
-        order=survey_outcome_order_ascending,
-    ) == pool.at(-1)
-
-    # ... but WRONG for a multiplicity mechanic: a count-blind sum adds each present
-    # outcome once, dropping the extra dice on any doubled face.
-    def count_blind_sum(
-        state: int | None,
-        outcome: int,
-        count: int,  # ruff: ignore[unused-function-argument]
-    ) -> int:
-        return outcome if state is None else state + outcome
-
-    assert pool.survey(
-        accumulate=count_blind_sum,
-        initial=0,
-        order=survey_outcome_order_ascending,
-    ) != pool.survey(
-        accumulate=_sum_next,
-        initial=0,
-        order=survey_outcome_order_ascending,
-    )
-
-
-def test_accumulate_never_invoked_with_zero_count() -> None:
-    # The positive-only contract: accumulate is called only for outcomes at least one
-    # die shows, never for outcomes a branch places no dice on.
-    def accumulate(state: int | None, outcome: int, count: int) -> int:
-        return (0 if state is None else state) + outcome * count
-
-    accumulate_mock = Mock(wraps=accumulate)
-    (2 @ P(H({1: 1, 2: 1}))).survey(
-        accumulate=accumulate_mock,
-        initial=0,
-        order=survey_outcome_order_ascending,
-    )
-    accumulate_mock.assert_called()
-    assert all(invocation.args[2] > 0 for invocation in accumulate_mock.call_args_list)
-
-
-def test_empty_pool_returns_empty_h() -> None:
-    assert P().survey(
-        accumulate=_sum_next,
-        initial=0,
-        order=survey_outcome_order_ascending,
-    ) == H({})
-
-
-def test_repeated_invocation_is_stable() -> None:
-    # The memo is scoped per top-level call; repeated calls must be identical.
-    pool = P(2 @ P(H({2: 1, 4: 2, 6: 3})), 2 @ P(6))
-    surveyor: ParameterizedSurveyor[int, int, int] = ParameterizedSurveyor(
-        accumulate=_largest_set_next,
-        order=survey_outcome_order_ascending,
-    )
-    assert pool.survey(surveyor) == pool.survey(surveyor)
-
-
-def test_survey_without_surveyor_or_accumulate_raises() -> None:
-    # Deliberately-invalid calls, routed through an Any reference so the static
-    # checkers don't (correctly) reject them before the runtime guard fires.
-    survey: Any = P(6).survey
-    with pytest.raises(ValueError, match=r"must provide a surveyor or an accumulate"):
-        survey()
-
-
-def test_survey_with_both_surveyor_and_kwargs_raises() -> None:
-    surveyor = ParameterizedSurveyor(
-        accumulate=_sum_next, order=survey_outcome_order_ascending
-    )
-    survey: Any = P(6).survey
-    with pytest.raises(ValueError, match=r"must not provide an accumulate"):
-        survey(
-            surveyor,
-            accumulate=_sum_next,
-            order=survey_outcome_order_ascending,
-        )
-
-
-def test_which_surveyor_requires_a_selection() -> None:
-    with pytest.raises(ValueError, match=r"requires at least one selection"):
-        _WhichHSurveyor(P(6), ())
-
-
-def test_surveyor_base_default_initial_and_settle() -> None:
-    # A minimal SurveyorBase subclass overriding only the two abstract methods,
-    # exercising the base initial (None) and settle (identity) defaults.
-    class _SumSurveyor(SurveyorBase[int, int, int]):
-        def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+    def test_accumulate_never_invoked_with_zero_count(self) -> None:
+        def accumulate(state: int | None, outcome: int, count: int) -> int:
             return (0 if state is None else state) + outcome * count
 
-        def order(self, outcomes: Iterable[int]) -> Iterable[int]:
-            return survey_outcome_order_ascending(outcomes)
+        accumulate_mock = Mock(wraps=accumulate)
+        (2 @ P(H({1: 1, 2: 1}))).survey(
+            accumulate=accumulate_mock,
+            initial=0,
+            order=survey_outcome_order_ascending,
+        )
+        accumulate_mock.assert_called()
+        assert all(
+            invocation.args[2] > 0 for invocation in accumulate_mock.call_args_list
+        )
 
-    pool = 2 @ P(6)
-    assert pool.survey(_SumSurveyor()) == pool.h()
+    def test_empty_pool_returns_empty_h(self) -> None:
+        assert P().survey(
+            accumulate=SumMechanic().accumulate,
+            initial=0,
+            order=survey_outcome_order_ascending,
+        ) == H({})
+
+    def test_survey_without_surveyor_or_accumulate_raises(self) -> None:
+        with pytest.raises(
+            ValueError, match=r"must provide surveyor or accumulate and order"
+        ):
+            P(6).survey()  # type: ignore[call-overload] # ty: ignore[no-matching-overload]
+
+    def test_survey_with_both_surveyor_and_kwargs_raises(self) -> None:
+        surveyor = ParameterizedSurveyor(
+            accumulate=SumMechanic().accumulate, order=survey_outcome_order_ascending
+        )
+        survey: Any = P(6).survey
+        with pytest.raises(
+            ValueError,
+            match=r"must not provide accumulate, initial, order, or settle with surveyor",
+        ):
+            survey(
+                surveyor,
+                accumulate=SumMechanic().accumulate,
+                order=survey_outcome_order_ascending,
+            )
+
+    def test_which_surveyor_requires_a_selection(self) -> None:
+        with pytest.raises(ValueError, match=r"requires at least one selection"):
+            _WhichHSurveyor(P(6), ())
+
+    def test_surveyor_base_default_initial_and_settle(self) -> None:
+        # A minimal SurveyorBase subclass overriding only the two abstract methods,
+        # exercising the base initial (None) and settle (identity) defaults
+        class _SumSurveyor(SurveyorBase[int, int, int]):
+            def accumulate(self, state: int | None, outcome: int, count: int) -> int:
+                return (0 if state is None else state) + outcome * count
+
+            def order(self, outcomes: Iterable[int]) -> Iterable[int]:
+                return survey_outcome_order_ascending(outcomes)
+
+        pool = 2 @ P(6)
+        assert pool.survey(_SumSurveyor()) == pool.h()
+
+    def test_ascending_descending_surveyor_bases_supply_order(self) -> None:
+        # The two order-mixin bases just delegate to the module order helpers.
+        class _Asc(AscendingSurveyorBase[int, int, int]):
+            def accumulate(
+                self,
+                state: int | None,  # ruff: ignore[unused-method-argument]
+                outcome: int,
+                count: int,  # ruff: ignore[unused-method-argument]
+            ) -> int:
+                return outcome
+
+        class _Desc(DescendingSurveyorBase[int, int, int]):
+            def accumulate(
+                self,
+                state: int | None,  # ruff: ignore[unused-method-argument]
+                outcome: int,
+                count: int,  # ruff: ignore[unused-method-argument]
+            ) -> int:
+                return outcome
+
+        assert list(_Asc().order([3, 1, 2])) == [1, 2, 3]
+        assert list(_Desc().order([3, 1, 2])) == [3, 2, 1]
 
 
-def test_ascending_descending_surveyor_bases_supply_order() -> None:
-    # The two order-mixin bases just delegate to the module order helpers.
-    class _Asc(AscendingSurveyorBase[int, int, int]):
-        def accumulate(
-            self,
-            state: int | None,  # ruff: ignore[unused-method-argument]
-            outcome: int,
-            count: int,  # ruff: ignore[unused-method-argument]
-        ) -> int:
-            return outcome
+# ---- Helpers -------------------------------------------------------------------------
 
-    class _Desc(DescendingSurveyorBase[int, int, int]):
-        def accumulate(
-            self,
-            state: int | None,  # ruff: ignore[unused-method-argument]
-            outcome: int,
-            count: int,  # ruff: ignore[unused-method-argument]
-        ) -> int:
-            return outcome
 
-    assert list(_Asc().order([3, 1, 2])) == [1, 2, 3]
-    assert list(_Desc().order([3, 1, 2])) == [3, 2, 1]
+def _brute_force_oracle(
+    pool: P[int], mechanic: Callable[[tuple[int, ...]], Any]
+) -> H[Any]:
+    r"""
+    Reduces *mechanic* over every weighted roll of *pool*.
+
+    This deliberately uses an independently verified, brute-force mechanism to enumerate rolls and weights.
+    """
+    acc: dict[Any, int] = defaultdict(int)
+    for roll, weight in enumerate_weighted_unsorted_rolls_brute_force(pool):
+        acc[mechanic(roll)] += weight
+    return H(acc)

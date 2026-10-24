@@ -21,7 +21,7 @@ get_ipython: Callable[[], Any]
 
 
 async def install_if_missing(
-    *packages: "tuple[str, str] | tuple[str, str, str]",
+    *packages: tuple[str, str] | tuple[str, str, str],
 ) -> None:
     r"""
     Install packages that are not already importable.
@@ -32,7 +32,7 @@ async def install_if_missing(
     2. A `(import_name, pip_spec, piplite_spec)` triple for cases where the version specifier must differ between environments (e.g. dev wheels whose local segment confuses piplite's version resolver).
     """
     try:
-        import piplite  # type: ignore[import-not-found] # ty: ignore[unresolved-import] # zuban: ignore[import-not-found]
+        import piplite  # type: ignore[import-not-found] # ty: ignore[unresolved-import]
 
         in_piplite = True
     except ImportError:
