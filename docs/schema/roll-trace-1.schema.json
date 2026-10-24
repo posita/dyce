@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dycelib.org/latest/schema/roll-trace-1.schema.json",
+  "title": "dyce roll trace version 1",
+  "description": "A portable trace returned by dyce.roller.Roll.trace(). References must identify records in the applicable rollers or rolls table. The root must identify a roll. JSON Schema does not enforce reference integrity, reachability, or acyclicity.",
+  "type": "object",
+  "required": ["format", "version", "root", "rollers", "rolls"],
+  "properties": {
+    "format": {"const": "dyce.roll-trace"},
+    "version": {"const": 1},
+    "root": {"$ref": "#/$defs/roll-id"},
+    "rollers": {
+      "type": "object",
+      "propertyNames": {"$ref": "#/$defs/roller-id"},
+      "additionalProperties": {"$ref": "#/$defs/roller-record"}
+    },
+    "rolls": {
+      "type": "object",
+      "propertyNames": {"$ref": "#/$defs/roll-id"},
+      "additionalProperties": {"$ref": "#/$defs/roll-record"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "roller-id": {
+      "type": "string",
+      "pattern": "^roller[0-9]+$"
+    },
+    "roll-id": {
+      "type": "string",
+      "pattern": "^roll[0-9]+$"
+    },
+    "roller-reference": {
+      "oneOf": [
+        {"$ref": "#/$defs/roller-id"},
+        {
+          "type": "array",
+          "items": {"$ref": "#/$defs/roller-id"}
+        }
+      ]
+    },
+    "roll-reference": {
+      "oneOf": [
+        {"$ref": "#/$defs/roll-id"},
+        {
+          "type": "array",
+          "items": {"$ref": "#/$defs/roll-id"}
+        }
+      ]
+    },
+    "roller-relationships": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/roller-reference"}
+    },
+    "roll-relationships": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/roll-reference"}
+    },
+    "json-value": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "number"},
+        {"type": "string"},
+        {
+          "type": "array",
+          "items": {"$ref": "#/$defs/json-value"}
+        },
+        {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/json-value"}
+        }
+      ]
+    },
+    "one-child": {
+      "type": "object",
+      "required": ["children"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/roller-id"},
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "two-children": {
+      "type": "object",
+      "required": ["children"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/roller-id"},
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "additionalProperties": false
+    },
+    "many-children": {
+      "type": "object",
+      "required": ["children"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/roller-id"},
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "h-attributes": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"const": "dyce.h"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "hable-attributes": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"const": "dyce.hable"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "literal-attributes": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {"const": "dyce.literal"},
+        "value": {"$ref": "#/$defs/json-value"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "p-attributes": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"const": "dyce.p"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "pool-attributes": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"const": "dyce.pool"}
+      },
+      "additionalProperties": false
+    },
+    "label-attributes": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"const": "dyce.label"},
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "binary-attributes": {
+      "type": "object",
+      "required": ["kind", "operator"],
+      "properties": {
+        "kind": {"const": "dyce.binary"},
+        "operator": {
+          "enum": [
+            "add", "sub", "mul", "truediv", "floordiv", "mod", "pow",
+            "lshift", "rshift", "and", "or", "xor",
+            "lt", "le", "eq", "ne", "ge", "gt"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "unary-attributes": {
+      "type": "object",
+      "required": ["kind", "operator"],
+      "properties": {
+        "kind": {"const": "dyce.unary"},
+        "operator": {"enum": ["neg", "pos", "abs", "invert"]}
+      },
+      "additionalProperties": false
+    },
+    "pool-sum-attributes": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"const": "dyce.pool-sum"}
+      },
+      "additionalProperties": false
+    },
+    "slice": {
+      "type": "object",
+      "required": ["start", "stop", "step"],
+      "properties": {
+        "start": {"type": ["integer", "null"]},
+        "stop": {"type": ["integer", "null"]},
+        "step": {"type": ["integer", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "pool-selection-attributes": {
+      "type": "object",
+      "required": ["kind", "selectors"],
+      "properties": {
+        "kind": {"const": "dyce.pool-selection"},
+        "selectors": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"type": "integer"},
+              {"$ref": "#/$defs/slice"}
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "trace-attributes": {
+      "type": "object",
+      "required": ["kind", "label", "state"],
+      "properties": {
+        "kind": {"const": "dyce.trace"},
+        "label": {"type": "string"},
+        "state": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/json-value"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "custom-attributes": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!dyce\\.).+"
+        }
+      },
+      "additionalProperties": {"$ref": "#/$defs/json-value"}
+    },
+    "roller-record": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/h-attributes"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/hable-attributes"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/literal-attributes"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {"attributes": {"$ref": "#/$defs/p-attributes"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/pool-attributes"},
+            "relationships": {"$ref": "#/$defs/many-children"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/label-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/binary-attributes"},
+            "relationships": {"$ref": "#/$defs/two-children"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/unary-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/pool-sum-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes", "relationships"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/pool-selection-attributes"},
+            "relationships": {"$ref": "#/$defs/one-child"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/trace-attributes"},
+            "relationships": {"$ref": "#/$defs/many-children"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["attributes"],
+          "properties": {
+            "attributes": {"$ref": "#/$defs/custom-attributes"},
+            "relationships": {"$ref": "#/$defs/roller-relationships"}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "roll-record": {
+      "type": "object",
+      "required": ["roller"],
+      "properties": {
+        "roller": {"$ref": "#/$defs/roller-id"},
+        "outcome": {"$ref": "#/$defs/json-value"},
+        "outcomes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/json-value"},
+          "minItems": 1
+        },
+        "relationships": {"$ref": "#/$defs/roll-relationships"}
+      },
+      "oneOf": [
+        {"required": ["outcome"], "not": {"required": ["outcomes"]}},
+        {"required": ["outcomes"], "not": {"required": ["outcome"]}}
+      ],
+      "additionalProperties": false
+    }
+  }
+}
