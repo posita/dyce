@@ -410,7 +410,7 @@ tomli==2.4.1
     #   zensical
 tomli-w==1.2.0
     # via tox
-tornado==6.5.10
+tornado==6.6
     # via
     #   jupyter-client
     #   jupyter-server
