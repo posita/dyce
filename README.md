@@ -37,6 +37,7 @@ It counts how many ways each outcome can occur, then calculates exact probabilit
 Suggested audiences and applications:
 
 - Game designers for crafting and compare game mechanics
+- Game developers for defining mechanics as rollers for performing transparent random rolls
 - Tool developers for using calculations in higher level tooling
 
 ## Overview
