@@ -51,7 +51,7 @@ repos:
           - tomli
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.4
+    rev: v0.17.5
     hooks:
       - id: ruff-check
         entry: ruff check
@@ -60,7 +60,7 @@ repos:
         entry: ruff format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.13.7
+    rev: 0.13.9
     hooks:
       - id: uv-lock
 
@@ -85,7 +85,7 @@ repos:
           - .
 
   - repo: https://github.com/semgrep/pre-commit
-    rev: v1.185.0
+    rev: v1.186.0
     hooks:
       - id: semgrep-ci
 
